@@ -21,7 +21,7 @@
 | W12（`codex exec` 单任务） | 见 notes/dispatch.md | T25 | 已结束 |
 | W13（`codex exec` 单任务） | 见 notes/dispatch.md | T27 | 已结束 |
 | W14（`codex exec` 单任务） | 见 notes/dispatch.md | T30/T31 | 已结束 |
-| W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 进行中 |
+| W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 已结束（Claude 审阅通过，8 卡 A/B 任务 014/015/017/018） |
 | W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 已结束（Claude 核验：722/722 token 一致） |
 
 **进行中**
