@@ -310,3 +310,4 @@
 - **打包与PTX / P47-03**：000→101→105→110→111→112→113→140→120→130→150全栈fuzz0、3623源码+6工具py_compile，确定生成、应用树一致、整栈反向逐字节还原、base_exact未改。实际sm80 bf16 MMA无FP8指令、0spill；paged/ragged96/138寄存器、8KB shared，113主kernel166寄存器/48KB shared，unpack29寄存器/0shared。112/113 v2 decode PTX一致。最终`evidence/T47/summary.json`绑定源码/测试/oracle/补丁/证据，12远端源SHA全匹配。
 - **开放问题 / INFERRED**：本任务证明112/113在已预热模型/tile/dtype/布局类别内免精确长度JIT，未热的新head/dtype/布局类别仍可能有限首次编译；没有修改150预热计划，也不保证其它SGLang kernel/整服务零编译。真实TP8/NEXTN、模型能力、graph池与SLO由Claude另测。112/113需配套v2，未加入RELEASE/构建/队列。
 - **收尾**：F68、TEST_PLAN、patch说明/索引、计划归档及自有board条目已同步；活跃Codex实例表未改。仅开发机arena GPU0算子，自有进程全退出，两卡4MiB/0%。未操作bohr/Trisol/pod、8卡、镜像或提交。
+| T48 | 09-23 | Claude→Codex W22（astra/xhigh） | M4 MTP/NEXTN 在 sm80 可用：路径走查、不兼容点修复（补丁 160）、与 101/140/120 交互、算子验证、8 卡任务脚本与接受率采集 | patches/160-*、evidence/T48/、scripts/pod/jobs/dev_b160_mtp_n6.sh、prompt plans/prompts/T48-M4-mtp-sm80.md | queued | |
