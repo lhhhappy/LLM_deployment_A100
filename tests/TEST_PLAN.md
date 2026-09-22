@@ -209,3 +209,13 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P112-05 | GPU微基准 | decode B6×32k/190k与prefill8192×32k/190k，同数据新旧ms/加速比；大prefill每行数值/topk同门 | pass（4大矩阵对照+8性能行；graph decode4.75×/4.54×，prefill2.01–2.95×；见summary.json） |
 | P112-06 | CPU/GPU编译 | 全8补丁栈fuzz0；确定生成、编译、reverse全文件字节相等、只读底包未改；实际sm80 bf16 MMA | pass（stack_receipt.json：3623 py_compile；compiler/：代表形状0 spills，sm80/bf16，无fp8指令） |
 | P112-07 | L2/T8 | Claude审阅后实际模型/服务/TP8/NEXTN整合、能力、原dev TTFT/TPOT/错误门与flush | todo（本任务未触碰pod/Trisol/镜像/提交） |
+
+## P113 — T44 预填充 indexer（W18）
+
+| ID | 环境 | 通过标准 | 状态 |
+|---|---|---|---|
+| P113-01 | GPU算子 | 原P112-01/02/03全部用例，对110及112逐行相对L∞<1e-2、topk≥99.5%；decode源不改 | pass（final_all.log：复用所有112用例并分别对110/112；全222组max相对L∞3.956824e-5、topk≥99.9512%；decode源码/PTX相同） |
+| P113-02 | GPU算子 | 原P112-04全部动态graph + 新tile边界，capture/replay逐bit同eager | pass（10组graph×3次动态重放，逐bit同eager；包括q/K/scale变化、增长/缩短/清空） |
+| P113-03 | GPU微基准 | 8192×32k/95k/190k causal/ragged全行数值与topk过门；旧新ms与有效TFLOPS≥100，未达给profile；decode不退步 | pass（六档131.4–185.7等效TFLOPS、6.19–6.69×；全行对两版数值/topk通过，decode graph0.1024/0.5925ms，见performance_table.md） |
+| P113-04 | CPU/GPU编译 | 9补丁全栈fuzz0、确定生成、编译/反向字节还原/base_exact未改；编译与profile收据 | pass（stack_receipt.json：9补丁fuzz0、3623编译/确定生成/反向字节还原/base未改；compiler/和profile/已绑定最终SHA） |
+| P113-05 | L2/T8 | Claude交叉审阅后完整模型/服务/能力与SLO | todo（用户限定开发机算子） |

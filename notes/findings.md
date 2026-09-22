@@ -361,3 +361,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **VERIFIED（单卡微基准，非TP8/SLO）**：B6/N1 decode CUDA graph，32k key：0.4859→0.1023ms（4.75×），190k：2.6867→0.5917ms（4.54×）；8192query prefill causal：32k 207.93→96.38ms（2.16×），190k 1248.86→622.45ms（2.01×）；ragged：32k 207.71→76.11ms（2.73×），190k 1249.07→423.39ms（2.95×）。CUDA event中位数、排除JIT与数据生成，完整样本与eager结果见 `summary.json` / `final_all.log`。
 - **VERIFIED（交付栈）**：000→101→105→110→111→112→120→130全fuzz0、3623文件py_compile、确定生成、全栈反向逐字节还原、base_exact未改；实际PTX为sm80 bf16 MMA、代表形状0 spills。`summary.json`绑定源码/oracle/测试/补丁/compiler SHA。
 - **INFERRED / 开放**：应降低F63中的110算子成本，但没有8卡TTFT/TPOT或N@SLO结果；服务导入、真实激活/能力、完整NEXTN集成待Claude。未改RELEASE/队列/服务、未操作bohr/Trisol/pod/镜像/提交；不能直接用池化后key长度的算子耗时推导原prompt耗时。
+
+## F65 — T44/113：预填充131–186等效TFLOPS，decode保持112（W18）
+
+- **VERIFIED（P113-01…04）**：独立 `113-sm80-prefill-indexer` 叠加112。H32/nq≥32/nk≥1024先各解码q/K一次到bf16；query-major 2query×128key、每program复用query计算4个key tile、GROUP32/4warps/stages1。保留逐头bf16舍入、fp32输出、clean=False全宽及clean=True完整-inf写回；小形状/其他head数回退原112。
+- **VERIFIED / 完整入口微基准**：8192query，32k causal/ragged分别96.854→15.378ms（139.6等效TFLOPS）/76.112→11.662ms（184.1）；95k为314.727→47.073ms（135.4）/227.133→34.326ms（185.7）；190k为622.164→97.047ms（131.4）/425.674→68.814ms（185.3）。相对112加速6.19–6.69×，包含每次预解码/分配；全宽等效口径2*nq*nk*32*128，剪枝计入收益，不当作实际MMA利用率。CUDA event七轮交替中位数、随机激活；证据 `evidence/T44/final_all.log`、`performance_table.md`。
+- **VERIFIED / 数值**：沿用112全部用例并分别对未改110与112，加新边界及全部六个大矩阵逐行对照；222组全过，最大逐行相对L∞/L2 3.956824e-5，topk最小99.951171875%。30动态graph重放（含q/K/scale变化）与eager逐bit一致。decode函数源码、代表形状PTX SHA与T43/112完全相同；本轮32k/190k graph约0.1024/0.5925ms，F64历史数据不改。
+- **VERIFIED / profile与交付**：190k causal CUDA profiler，112为624.397ms，113主kernel96.102ms、两次预解码合计0.104790ms（0.11%GPU时间）；113主kernel162寄存器/0spill/48KB shared，sm80 bf16 MMA。9补丁000→101→105→110→111→112→113→120→130 fuzz0、3623编译、确定生成、整栈反向逐字节还原/base_exact未改通过。`summary.json`绑定所有SHA；`make_113.py`可复现。
+- **INFERRED / 边界**：有利于单卡prefill算子，但没有TP8/服务/能力/NEXTN/SLO证明；额外scratch最大测试形状110.39MiB/调用，完整fp32输出6.226GB仍存在，需Claude实际服务验证显存和JIT预热。未操作bohr/Trisol/pod/镜像/提交，未入RELEASE；回滚反向113恢复112。

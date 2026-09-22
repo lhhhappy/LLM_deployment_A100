@@ -1,0 +1,24 @@
+Generated patches/113-sm80-prefill-indexer.patch
+{
+  "status": "PASS",
+  "patches": [
+    "000-interface-compliance",
+    "101-d1v12-on-base",
+    "105-role-split-single-partial",
+    "110-sm80-dsa-indexer",
+    "111-sm80-fp8-moe-marlin",
+    "112-sm80-indexer-kernels",
+    "113-sm80-prefill-indexer",
+    "120-sched-protect-chain",
+    "130-async-tokenize"
+  ],
+  "py_compile": 3623,
+  "deterministic": true,
+  "base_unchanged": true,
+  "full_reverse_exact": true,
+  "decode_source_byte_exact": true,
+  "fallback_source_byte_exact": true,
+  "applied_equals_candidate": true,
+  "base_files": 4680,
+  "patch_sha256": "01cf4ce27c7a13b8740424e0d0d96ba0d2c6efd256578b1fc5802ecc152d3963"
+}

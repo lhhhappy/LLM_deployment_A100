@@ -1,0 +1,22 @@
+Generated patches/140-kda-dual-snapshot.patch
+{
+  "status": "PASS",
+  "patches": [
+    "000-interface-compliance",
+    "101-d1v12-on-base",
+    "105-role-split-single-partial",
+    "110-sm80-dsa-indexer",
+    "111-sm80-fp8-moe-marlin",
+    "112-sm80-indexer-kernels",
+    "140-kda-dual-snapshot",
+    "120-sched-protect-chain",
+    "130-async-tokenize"
+  ],
+  "files": 3621,
+  "tools": 8,
+  "deterministic": true,
+  "applied_equals_candidate": true,
+  "base_unchanged": true,
+  "full_reverse_exact": true,
+  "patch_sha256": "6acdd461f88fd0152dd385ad11dde46cfb89462445bad5f6d229d1ffbf68752d"
+}

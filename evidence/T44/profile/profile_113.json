@@ -1,0 +1,74 @@
+[
+  {
+    "name": "aten::empty",
+    "count": 9,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 110.02400000000006,
+    "self_device_memory_usage": 19026579456
+  },
+  {
+    "name": "aten::reshape",
+    "count": 9,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 52.07199999999989,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "aten::view",
+    "count": 15,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 60.9099999999994,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "Activity Buffer Request",
+    "count": 1,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 1781.37,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "cuLaunchKernelEx",
+    "count": 9,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 95.79499999999962,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "_unpack_prefill",
+    "count": 6,
+    "self_device_time_total_us": 314.3690000000079,
+    "device_time_total_us": 314.3690000000079,
+    "cpu_time_total_us": 0,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "_prefill",
+    "count": 3,
+    "self_device_time_total_us": 288307.448,
+    "device_time_total_us": 288307.448,
+    "cpu_time_total_us": 0,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "[memory]",
+    "count": 9,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 0.0,
+    "self_device_memory_usage": -19026579456
+  },
+  {
+    "name": "cudaDeviceSynchronize",
+    "count": 2,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 288324.683,
+    "self_device_memory_usage": 0
+  }
+]

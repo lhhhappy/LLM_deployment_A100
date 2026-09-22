@@ -1,0 +1,66 @@
+[
+  {
+    "name": "aten::empty",
+    "count": 3,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 102.58000000000021,
+    "self_device_memory_usage": 18679332864
+  },
+  {
+    "name": "aten::reshape",
+    "count": 9,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 56.37400000000059,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "aten::view",
+    "count": 15,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 59.59699999999941,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "Activity Buffer Request",
+    "count": 1,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 1912.854,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "cuLaunchKernelEx",
+    "count": 3,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 155.2110000000007,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "_ragged",
+    "count": 3,
+    "self_device_time_total_us": 1873189.7780000002,
+    "device_time_total_us": 1873189.7780000002,
+    "cpu_time_total_us": 0,
+    "self_device_memory_usage": 0
+  },
+  {
+    "name": "[memory]",
+    "count": 3,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 0.0,
+    "self_device_memory_usage": -18679332864
+  },
+  {
+    "name": "cudaDeviceSynchronize",
+    "count": 2,
+    "self_device_time_total_us": 0,
+    "device_time_total_us": 0,
+    "cpu_time_total_us": 1872908.42,
+    "self_device_memory_usage": 0
+  }
+]

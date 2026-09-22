@@ -216,5 +216,26 @@
 - **VERIFIED / 打包（P112-06）**：000→101→105→110→111→112→120→130全部`patch -p3 --fuzz=0`可打，3623 Python编译通过，确定再生成/整栈反向逐字节还原/base_exact未改。代表形状实际PTX是sm80 bf16 MMA，无fp8指令、无spill；paged/ragged为128/205寄存器、8KB共享内存。早期验证流程失败和所有参数扫描保留，不覆盖历史日志。
 - **INFERRED / 开放问题（P112-07）**：微基准证明110算子成本下降，不能直接推出8卡TTFT/TPOT/N@SLO；真实激活、完整服务加载、实际NEXTN、能力与原dev全门仍待Claude。输出矩阵仍为完整fp32（8192×190000≈6.23GB），没有融合topk；cold编译预热仍需服务层安排。建议同基线链仅切112 on/off、原参数/原harness真flush做L2 A/B，并单列NEXTN；这是验证建议，未创建队列或服务。
 - **授权与收尾**：仅使用GPU开发机 `/sjtu/linhang/arena/code/T43` 与 `runs/T43`，自有算子进程全部退出，两卡各4MiB/0%（`gpu_final_idle.log`）。未操作bohr/Trisol/pod、未起8卡/打镜像/提交。F64/D33、TEST_PLAN和已完成计划同步；活跃Codex实例表留给Claude维护。回滚在代码副本反向撤112即可恢复110。
-| T44 | 09-23 | Claude→Codex W18（astra/xhigh） | sm80 预填充 indexer kernel 逼近算力上限（112 仅约 30 TFLOPS，目标 ≥100），补丁 113 或 112v2 | patches/113-*、evidence/T44/、prompt plans/prompts/T44-prefill-indexer-roofline.md | accepted | W18已读规则与112实现/证据；仅GPU开发机算子优化，交付独立113叠加112，decode保持原样。 |
-| T45 | 09-23 | Claude→Codex W19（astra/xhigh） | M2 KDA 双点 fp32 快照（补丁 140，替代 101/105 拆分预填充）：kernel 内导出角色边界状态+卷积历史，缓存树双节点，开关可回退 | patches/140-*、scripts/make_140.py、evidence/T45/、prompt plans/prompts/T45-M2-kda-dual-snapshot.md | queued | |
+| T44 | 09-23 | Claude→Codex W18（astra/xhigh） | sm80 预填充 indexer kernel 逼近算力上限（112 仅约 30 TFLOPS，目标 ≥100），补丁 113 或 112v2 | patches/113-*、evidence/T44/、prompt plans/prompts/T44-prefill-indexer-roofline.md | done | accepted → in-progress → done：113叠加112交付；222数值/30graph全过，六档131–186等效TFLOPS、6.19–6.69×；decode源码/PTX保持112。9补丁fuzz0/3623编译/反向字节还原，profile/最终SHA绑定。F65/D34；evidence/T44，计划plans/completed/113-prefill-indexer.md。GPU任务结束，未触碰服务/镜像/提交，L2待Claude。 |
+| T45 | 09-23 | Claude→Codex W19（astra/xhigh） | M2 KDA 双点 fp32 快照（补丁 140，替代 101/105 拆分预填充）：kernel 内导出角色边界状态+卷积历史，缓存树双节点，开关可回退 | patches/140-*、scripts/make_140.py、evidence/T45/、prompt plans/prompts/T45-M2-kda-dual-snapshot.md | in-progress | accepted → in-progress：完成源码路径核对，计划 plans/active/2026-09-23-T45-kda-dual-snapshot.md；140叠加101/105并由开关绕过拆分。CPU真实缓存11项通过；GPU首组逐bit相同，扩展用例发现8.535e-5状态差，正在核查底包按序列长度切换intra融合路径；未通过数值门前不交付为done。GPU仅用1号卡。 |
+
+### T44 W18 → Claude：交付
+
+- **VERIFIED / 产物**：独立 `patches/113-sm80-prefill-indexer.patch` 及同名说明，**叠加112，不替换112**。可复现生成器 `scripts/make_113.py`；唯一kernel源 `scripts/kernels/sm80_indexer_113.py`；完整验收/汇总 `test_sm80_indexer_113.py`、`verify_113.py`、`summarize_113.py`。证据索引 `evidence/T44/README.md`，最终 `summary.json` 绑定oracle/112/113/test/patch/compiler/profile SHA；未加入RELEASE。
+- **VERIFIED / 实现**：H32/nq≥32/nk≥1024时q/K各解码一次到bf16，再以2query×128key query-major MMA计算，每program复用query处理4个key tile、GROUP32/4warps/stages1。更大tile/更多warp/另一朝向较慢或spill，stages3无稳定收益。原型/扫描均保存。保持110每头bf16舍入、fp32输出、clean=False全宽、clean=True无交集跳算且所有区间外写-inf；小形状与其他head数回退原112。
+- **VERIFIED / 数值与graph（P113-01/02/03）**：复用112全部用例并分别对未改110、112，新增形状与六个8192query大矩阵逐行比较。222组全过，最大逐行相对L∞/L2为3.956824e-5，topk(min(2048,有限有效key数))集合最低99.951171875%。30次动态graph重放逐bit同eager，包括q/K/scale改变和长度增长/缩短/清空。随机激活，未采集真实模型激活。
+- **VERIFIED / 性能（P113-03）**：A100-SXM4-80GB、torch2.13.0+cu130/Triton3.7.1。下表为同输入七轮交替顺序112/113 CUDA event中位数，含每次预解码与scratch/输出分配、排除JIT/输入生成。TFLOPS为任务指定全宽等效口径2*nq*nk*32*128；剪枝也计入收益，不能当作硬件MMA利用率，JSON另报有效pair比例。
+
+| 场景（nq=8192） | nk | 112 ms | 113 ms | 112 TFLOPS | 113 TFLOPS | 加速 |
+|---|---:|---:|---:|---:|---:|---:|
+| causal | 32000 | 96.854 | 15.378 | 22.2 | 139.6 | 6.30× |
+| ragged | 32000 | 76.112 | 11.662 | 28.2 | 184.1 | 6.53× |
+| causal | 95000 | 314.727 | 47.073 | 20.3 | 135.4 | 6.69× |
+| ragged | 95000 | 227.133 | 34.326 | 28.1 | 185.7 | 6.62× |
+| causal | 190000 | 622.164 | 97.047 | 20.5 | 131.4 | 6.41× |
+| ragged | 190000 | 425.674 | 68.814 | 30.0 | 185.3 | 6.19× |
+
+- **VERIFIED / decode不退步**：入口/helper/kernel源码字节相同，代表形状PTX SHA与T43完全相同（128寄存器/0spill/8KB shared）。本轮graph 32k：112/113为0.102520/0.102427ms，190k：0.592206/0.592515ms，最大差0.05%；eager为0.1705/0.1684ms与0.7077/0.6638ms。没有decode优化，不把测量波动当收益；F64/T43历史112数据原样保留。
+- **VERIFIED / profile与补丁链（P113-04）**：190k causal的112 CUDA kernel均值624.397ms；113主kernel96.102ms、两次解码合计0.104790ms（0.11%GPU时间）。最终主kernel162寄存器/0spill/48KB shared、sm80 bf16 MMA，无FP8指令。000→101→105→110→111→112→113→120→130全部fuzz0、3623 Python编译、确定再生成、全栈反向逐字节还原/base_exact未改均通过。profile为torch CUDA profiler，非ncu硬件counter。
+- **INFERRED / 开放问题（P113-05）**：预填充算子目标已满足，实际TP8/NEXTN/模型能力与TTFT/TPOT/N@SLO未测。8192×190k额外scratch110.39MiB/调用，fp32输出6.226GB仍存在；服务中的显存池/graph与新形状JIT预热需Claude复核。未融合topk或改输出精度。建议同栈112/113、同参数、真实flush的服务A/B，由Claude安排；本任务未入队。
+- **收尾**：F65/D34、TEST_PLAN、补丁说明/索引、已完成计划均更新；仅GPU开发机arena目录内GPU0算子，进程已退出、收尾两卡4MiB/0%。未操作bohr/Trisol/pod、未起服务/8卡、未打镜像/提交；活跃Codex实例表留给Claude。反向113即可回到112。

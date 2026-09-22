@@ -1,0 +1,74 @@
+000-interface-compliance
+patching file srt/entrypoints/http_server.py
+Hunk #2 succeeded at 928 (offset -10 lines).
+Hunk #3 succeeded at 1005 (offset -10 lines).
+patching file srt/managers/tokenizer_control_mixin.py
+Hunk #1 succeeded at 305 (offset 3 lines).
+101-d1v12-on-base
+patching file srt/managers/schedule_policy.py
+105-role-split-single-partial
+patching file srt/managers/schedule_policy.py
+110-sm80-dsa-indexer
+patching file srt/layers/attention/dsa_backend.py
+patching file srt/layers/attention/dsa/dsa_indexer.py
+patching file srt/layers/attention/dsa/dsa_indexer_kpool.py
+patching file srt/layers/attention/dsa/kpool_fp8_index.py
+patching file kernels/ops/attention/dsa/triton_kernel.py
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file kernels/ops/attention/dsa/ax_soft_fp8.py
+111-sm80-fp8-moe-marlin
+patching file srt/layers/moe/fused_moe_triton/fused_marlin_moe.py
+patching file srt/layers/moe/moe_runner/marlin.py
+patching file srt/layers/quantization/fp8.py
+patching file srt/layers/quantization/marlin_utils_fp8.py
+112-sm80-indexer-kernels
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+113-sm80-prefill-indexer
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+120-sched-protect-chain
+patching file srt/managers/schedule_policy.py
+patching file srt/managers/scheduler.py
+130-async-tokenize
+patching file srt/entrypoints/http_server.py
+patching file srt/entrypoints/request_headers.py
+patching file srt/managers/async_text_tokenizer.py
+patching file srt/managers/io_struct.py
+patching file srt/managers/tokenizer_manager.py
+reverse 130-async-tokenize
+patching file srt/entrypoints/http_server.py
+patching file srt/entrypoints/request_headers.py
+patching file srt/managers/async_text_tokenizer.py
+patching file srt/managers/io_struct.py
+patching file srt/managers/tokenizer_manager.py
+reverse 120-sched-protect-chain
+patching file srt/managers/schedule_policy.py
+patching file srt/managers/scheduler.py
+reverse 113-sm80-prefill-indexer
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+reverse 112-sm80-indexer-kernels
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+reverse 111-sm80-fp8-moe-marlin
+patching file srt/layers/moe/fused_moe_triton/fused_marlin_moe.py
+patching file srt/layers/moe/moe_runner/marlin.py
+patching file srt/layers/quantization/fp8.py
+patching file srt/layers/quantization/marlin_utils_fp8.py
+reverse 110-sm80-dsa-indexer
+patching file srt/layers/attention/dsa_backend.py
+patching file srt/layers/attention/dsa/dsa_indexer.py
+patching file srt/layers/attention/dsa/dsa_indexer_kpool.py
+patching file srt/layers/attention/dsa/kpool_fp8_index.py
+patching file kernels/ops/attention/dsa/triton_kernel.py
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file kernels/ops/attention/dsa/ax_soft_fp8.py
+reverse 105-role-split-single-partial
+patching file srt/managers/schedule_policy.py
+reverse 101-d1v12-on-base
+patching file srt/managers/schedule_policy.py
+reverse 000-interface-compliance
+patching file srt/entrypoints/http_server.py
+Hunk #2 succeeded at 907 (offset -10 lines).
+Hunk #3 succeeded at 982 (offset -10 lines).
+patching file srt/managers/tokenizer_control_mixin.py
+Hunk #1 succeeded at 305 (offset 3 lines).

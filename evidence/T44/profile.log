@@ -1,0 +1,5 @@
+USDT:2026-09-22 20:15:21 1260853:1260853 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-22 20:15:23 1260853:1260853 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-22 20:15:24 1260853:1260853 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-22 20:15:24 1260853:1260853 SyncActivityProfilerHandler.cpp:59] profiler_stop
+{"source_sha256": "234333413e28911e40df5ad87ef2a997b0228a0c24dc6c825050542cc8854fd8", "nk": 190000, "nq": 8192}

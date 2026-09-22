@@ -24,11 +24,11 @@
 | W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 已结束（Claude 审阅通过，8 卡 A/B 任务 014/015/017/018） |
 | W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 已结束（Claude 核验：722/722 token 一致） |
 | W17（`codex exec`，astra/xhigh） | logs/codex/W17.log | T43 sm80 indexer 融合 kernel 补丁 112 | 已结束（Claude 核验 summary PASS） |
-| W18（`codex exec`，astra/xhigh） | logs/codex/W18.log | T44 预填充 indexer 逼近算力上限（补丁 113） | 进行中 |
+| W18（`codex exec`，astra/xhigh） | logs/codex/W18.log | T44 预填充 indexer 逼近算力上限（补丁 113） | 已结束（Claude 核验 PASS，6.2–6.7×） |
 | W19（`codex exec`，astra/xhigh） | logs/codex/W19.log | T45 M2 KDA 双点 fp32 快照（补丁 140） | 进行中 |
 
 **进行中**
-- [Codex W18] T44：预填充 indexer 优化（113叠加112），产出 `patches/113-*`、`evidence/T44/`；将追加 dispatch/findings/TEST_PLAN 并维护自有生成器与测试。
+- [Codex W19] T45：KDA双点fp32快照140；产出 `patches/140-*`、`scripts/make_140.py`、`evidence/T45/`。将更新dispatch/TEST_PLAN及自有计划，不改活跃实例表。
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）
@@ -37,6 +37,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex W18] T44 / 113 预填充indexer（叠加112）— `patches/113-sm80-prefill-indexer.*`、`evidence/T44/`；六档131–186等效TFLOPS/6.19–6.69×，222数值/30graph/9补丁栈全过，decode源码/PTX保留112。F65/D34，GPU任务已结束，L2交Claude。
 - [Codex W17] T43 / 112 sm80融合indexer — `patches/112-sm80-indexer-kernels.*`、`evidence/T43/`；88数值对照/4种graph/整栈通过，graph decode4.75×/4.54×、prefill2.01–2.95×（单卡算子）；两卡已空闲，L2交Claude。
 - [Codex W15] T41 / 120 调度保护：27 CPU测试、3617文件编译、off字节对照与回滚通过；默认decode交替/长chunk上限/短命中共享预算。GPU/SLO待测，未入队/启动服务 — `patches/120-sched-protect-chain.md`、`evidence/T41/`。
 - [Codex W16] T42 M3 分词线程池与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；14单测、722真实对话逐token全同；256733token loop-lag中位数194.57→8.59ms（本地CPU）。F60/决策31/M3，待Claude交叉审阅与8卡验证。

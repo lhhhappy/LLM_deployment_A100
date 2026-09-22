@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "numeric_comparisons": 222,
+  "max_row_relative_linf": 3.9568240026710555e-05,
+  "max_row_relative_l2": 3.9568240026710555e-05,
+  "min_topk_overlap": 0.99951171875,
+  "min_effective_tflops": 131.3862917081869
+}

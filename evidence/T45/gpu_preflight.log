@@ -1,0 +1,54 @@
+Tue Sep 22 20:01:43 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   29C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   29C    P0              61W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+T43
+T44
+analyze_e2_numeric.py
+archive_v0520
+compare_e2.py
+contract_probe.py
+e1_env.sh
+e2_completion_checks.py
+e2_completion_trace.py
+e2_raw_logits.py
+e2_serve_trace.py
+if_checks.py
+launch_e1_standin.sh
+launch_e2_completion.sh
+launch_e2_standin.sh
+make_case_sets.py
+make_e1_kimi_standin.py
+preflight_8gpu.py
+remote_smoke.py
+replay_chains.py
+run_e2_numeric_pipeline.sh
+run_e2_variant.sh
+serving_probe.py
+setup_e1_env.sh
+test_e2_tools.py
+test_replay_chains.py
+ana
+cuda-compat-13-0
+m0
+sgl
