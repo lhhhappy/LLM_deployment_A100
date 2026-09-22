@@ -3,10 +3,13 @@
 Run after scripts/make_120.py. Uses only owned build/p120/verified output.
 """
 import hashlib
+import difflib
 import json
 from pathlib import Path
 import py_compile
 import shutil
+import runpy
+import tempfile
 import subprocess
 import sys
 
@@ -40,6 +43,28 @@ def main():
     base_patched = hashes(baseline)
     changed = [p for p, digest in actual.items() if base_patched.get(p) != digest]
     assert sorted(changed) == ['srt/managers/schedule_policy.py', 'srt/managers/scheduler.py'], changed
+    generator = runpy.run_path(str(ROOT / 'scripts/make_120.py'))
+    regenerated = []
+    for rel, edit in zip(generator['FILES'], (generator['edit_policy'], generator['edit_scheduler'])):
+        original = (baseline / rel).read_text()
+        modified = edit(original)
+        assert modified == (candidate / rel).read_text(), rel
+        regenerated.extend(difflib.unified_diff(original.splitlines(True), modified.splitlines(True),
+                           fromfile='a/python/sglang/' + rel, tofile='b/python/sglang/' + rel))
+    assert ''.join(regenerated) == (ROOT / 'patches/120-sched-protect-chain.patch').read_text()
+    with tempfile.TemporaryDirectory(dir=WORK) as tmp:
+        reverse_root = Path(tmp)
+        for rel in changed:
+            path = reverse_root / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(candidate / rel, path)
+        reverse = subprocess.run(['patch', '--batch', '--fuzz=0', '-R', '-p3', '-i',
+                                 str(ROOT / 'patches/120-sched-protect-chain.patch')],
+                                cwd=reverse_root, text=True, capture_output=True)
+        (OUT / 'patch_reverse.log').write_text(reverse.stdout + reverse.stderr)
+        assert reverse.returncode == 0
+        for rel in changed:
+            assert (reverse_root / rel).read_bytes() == (baseline / rel).read_bytes()
     files = sorted(verified.rglob('*.py'))
     failures = []
     for path in files:
@@ -52,7 +77,8 @@ def main():
         py_compile.compile(str(path), doraise=True)
     assert before == hashes(base), 'READ-ONLY BASE CHANGED'
     receipt = dict(python=sys.version, patch_application='PASS',
-                   candidate_matches_patch=True, changed_files=changed,
+                   candidate_matches_patch=True, deterministic_regeneration=True, reverse_matches_baseline=True,
+                   changed_files=changed,
                    compared_files=len(actual), py_compile_files=len(files),
                    tool_compile_files=len(tools), failures=failures,
                    base_unchanged_during_verification=True,

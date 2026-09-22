@@ -7,3 +7,5 @@
 - `v0520/`：v0.5.20 线（001/002/003/004），打不上底包，只作 L1 替身参考。
 
 - `130-async-tokenize`（T42，CPU 已验证、待交叉审阅/L2）：叠在 000→101→110→111 上，完整分词单线程移出 HTTP loop、S1 routing key 接入；开关 `SGLANG_AX_ASYNC_TOKENIZE=0` 回退分词。未加入 RELEASE，说明与证据见同名 `.md` / `evidence/T42/`。
+
+- `120-sched-protect-chain`（T41，CPU 已验证、待交叉审阅/GPU）：叠在 000→101→110→111 上，默认开启 decode 交替、对齐的长请求分块上限、短命中共享批预算；`SGLANG_AX_SCHED_PROTECT=0` 回退。未加入 RELEASE，复现 `scripts/make_120.py`；说明见同名 `.md` / `evidence/T41/`。

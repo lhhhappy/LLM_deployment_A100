@@ -463,6 +463,7 @@ class ProtectTests(unittest.TestCase):
 
     def test_off_byte_identical_decision_sequences(self):
         receipts = []
+        raw_pairs = []
         with patch.dict(os.environ, {'SGLANG_AX_SCHED_PROTECT': '0'}):
             for seed in range(24):
                 pair = []
@@ -485,9 +486,11 @@ class ProtectTests(unittest.TestCase):
                             break
                     pair.append(json.dumps(trace, sort_keys=True, separators=(',', ':')).encode())
                 self.assertEqual(pair[0], pair[1], f'seed={seed}')
+                raw_pairs.append({'seed': seed, 'baseline': json.loads(pair[0]), 'off': json.loads(pair[1])})
                 receipts.append(dict(seed=seed, rounds=len(trace), baseline_assertion='baseline_assertion' in trace[-1], baseline_sha256=hashlib.sha256(pair[0]).hexdigest(),
                                      off_sha256=hashlib.sha256(pair[1]).hexdigest()))
         (EVIDENCE / 'off_parity.json').write_text(json.dumps(receipts, indent=2) + '\n')
+        (EVIDENCE / 'off_decision_traces.json').write_text(json.dumps(raw_pairs, separators=(',', ':')) + '\n')
 
     def test_starvation_bound_with_endless_short_arrivals(self):
         rows = []

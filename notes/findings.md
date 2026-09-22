@@ -339,3 +339,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **VERIFIED（有条件轮次上界）**：100000 token、cap=2048、持续短请求到达：无 role split 用 49 次 prefill/97 总轮，101 尾切分用 50/99；数据 `evidence/T41/starvation_bound.json`。前提是已准入、每轮资源够 C、无 retract/abort；不是 chain_start 秒数保证。原 LPM 在无限热流下的未准入冷请求饥饿没有被修复，完整论证见补丁文档。
 - **VERIFIED（off 对照）**：24 组成对决策序列字节一致；22 组各 40 轮正常，2 组基线与 off 在同一原生断言处失败。定向反例：已有 chunk 1536 token、101 在 1024 切尾，余预算允许新长请求变成第二个 partial，`scheduler.py` 原 `assert self.chunked_req is None` 失败。120 on 的已有/新 partial 守卫拒绝第二个请求；不是回退行为变化。证据 `off_parity.json` / `cpu_tests.log`。
 - **INFERRED**：较少连续 prefill 可缓解 intra TTFT/TPOT；更小 chunk 增加轮数可能伤害 chain_start/吞吐。仅 CPU 不能确认数值、真实缓存回收、NEXTN 或 N@SLO，未进行 GPU/Trisol/bohr/镜像/提交操作。
+
+## F62 — 101 在并发下触发"双 partial"断言使引擎崩溃；补丁 105 修复（真实 8 卡）
+- pod 任务 011（b111 = 000+101+110+111，dev N6）：warmup 阶段 18:05:26 全部 TP rank `scheduler.py:3789 assert self.chunked_req is None` → 引擎退出；
+  正式测量 722/722 请求 `Connection refused`，但任务仍记为 done（harness 不检查引擎存活）。012（N10）同样会崩，已中止。
+- 根因（源码）：101 的 tail split 把本应是最后一块的续算请求再次切分（仍为 chunked，`has_chunked_req=True`），
+  省下的预算又允许一个新请求走截断分支成为 `new_chunked_req`；101 的保护只看 `new_chunked_req`，漏了 `has_chunked_req`。W15 在 CPU 上也复现过（T41）。
+- 修复：`patches/105-role-split-single-partial.patch`（角色切分开启且有续算分块时，拒绝再截断新请求）；与 120 上下文不冲突，000→101→105→110→111→120→130 全栈 fuzz=0 可打。
+- 影响：已提交的 B（45767，含 101 无 105）即使能在 A100 启动也会在并发下崩。dev 模板已加"跑完检查引擎存活"。

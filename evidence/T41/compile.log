@@ -2,6 +2,8 @@
   "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
   "patch_application": "PASS",
   "candidate_matches_patch": true,
+  "deterministic_regeneration": true,
+  "reverse_matches_baseline": true,
   "changed_files": [
     "srt/managers/schedule_policy.py",
     "srt/managers/scheduler.py"

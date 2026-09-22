@@ -174,7 +174,7 @@
 | T39 | 09-23 | Claude（自做） | L2 8 卡 pod 上线后的工作方式：scripts/pod（pexec/ppush/pstatus/podq/lib.sh；bohr exec 不转发 stdin，文件用 base64 参数分块传）；pod 内队列 worker；代码版本化（/tmp/ax/src/<name> = 原版复制 + 仓库补丁）；守护进程 idle_hold 改为永不自动释放；M0：2 卡替身证实原版在 A100 启动即崩（DeepGEMM Unsupported architecture），真实 8 卡复现进行中 | scripts/pod、scripts/m0、tests/trisol_test_config.json | in-progress | demo 任务端到端通过，pod 生成的 B 代码与 build/l3_0922f 三个文件哈希一致；队列暂停中，待原版手动运行结束后由 GPU 机 tmux 窗口 resume 自动恢复并跑 001-m0_submitted_b |
 
 | T40 | 09-22 | Codex→Claude（用户要求） | 更新本地容器的 Claude Code，并验证安装版本 | `evidence/T40/` | done | accepted→in-progress→done；VERIFIED：官方 `claude update` 将原生安装从 2.1.278 更新至 2.1.280；`claude --version` 与二进制链接一致，`claude doctor` 无安装问题。原始日志见 evidence/T40；重新启动 Claude Code 后使用新版。 |
-| T41 | 09-23 | Claude→Codex W15（astra/xhigh） | M1 调度保护链中间请求：补丁 120（冷启动分块期间穿插 decode、命中短请求优先、冷启动每轮预算上限，开关可回退），CPU 测试 | patches/120-*、evidence/T41/、prompt plans/prompts/T41-M1-scheduler.md | in-progress | accepted → in-progress：已读规则/题面/底包调度；实现有界分块预算、短命中共享入批与 decode 间隔，保留原 LPM 和 101；CPU 验证进行中。 |
+| T41 | 09-23 | Claude→Codex W15（astra/xhigh） | M1 调度保护链中间请求：补丁 120（冷启动分块期间穿插 decode、命中短请求优先、冷启动每轮预算上限，开关可回退），CPU 测试 | patches/120-*、evidence/T41/、prompt plans/prompts/T41-M1-scheduler.md | done | accepted → in-progress → done：120 默认开/环境变量关回退、生成器/27 CPU 测试/3617文件编译、方案与证据齐全；24组off轨迹字节一致（2组忠实复现基线断言）。交付见下，未GPU/Trisol/镜像/提交。 |
 | T42 | 09-23 | Claude→Codex W16（astra/high） | M3 分词移出事件循环 + 前缀分词缓存 + 路由键：补丁 130，token 一致性对照测试 | patches/130-*、evidence/T42/、prompt plans/prompts/T42-M3-tokenize.md | done | accepted → in-progress → done：130补丁/说明、14 CPU单测、722真实对话逐token与冻结计数全同；原样256733token最大loop-lag中位数194.57→8.59ms。单线程完整分词、header路由接线，无前缀缓存；F60/决策31/M3-01…05。证据evidence/T42；M3-06待Claude，未GPU/Trisol/镜像/提交。 |
 
 ### T42 W16 → Claude：交付
@@ -184,3 +184,14 @@
 - **实现**：每manager单worker串行完整分词，取消后实际完成才释放槽位；`SGLANG_AX_ASYNC_TOKENIZE=0`恢复同步分词，原dynamic-batch参数保留优先权。body routing_key非None优先，否则Routing-Key头→Session-ID头；batch补传routing_key，不写native session/cache_salt。时间戳、计数、flush未改。可选前缀缓存未实现：真实BPE反例表明即便字符串前缀相同也不能直接拼token。
 - **INFERRED / 开放问题**：仅证明分词正确性与CPU loop响应改善，未证明8卡N@SLO/TPOT收益；小请求仍等大请求分词，未增加CPU吞吐；chat模板/JSON/IPC仍在原路径，多模态及其他tokenizer后端未量化；完整服务导入、shutdown/disconnect/持续取消时RSS需live验证。请Claude交叉审阅；未加入RELEASE/构建脚本或任何队列。
 - **8卡验证方案（M3-06，未执行）**：相同底包链和参数只切换0/1；先核对实际依赖、完整启动、25万token/长短并发与持续SSE，逐条核对prompt IDs/计数、ignore_eos/thinking/tools及接收→分词→prefill时序；测busy/idle flush、取消/RSS/线程/退出；再原版dev各档真flush，交替顺序A/B并复测全部TTFT桶/TPOT/错误门。只由Claude安排，本轮无GPU/bohr/Trisol/镜像/提交。
+
+
+### T41 W15 → Claude：交付
+
+- **VERIFIED（CPU/源码）**：`patches/120-sched-protect-chain.patch` 与同名 `.md` 已落盘。普通 TP 默认开启；有存活 decode 才在 prefill 后插一轮；续算先保留对齐的 cap（默认2048），剩余批预算让完整设备短命中按原 LPM 入批，OTHER 跳过前执行原 Mamba 拒绝清理。首次冷/长准入也限 cap，已有/新 partial 共用单 partial 守卫。101 role helper、LPM 类与原预算方法 AST 不变，meta_info/输出预算/flush 路径不改。D32、F61 已入账。
+- **可复现生成**：`python3 scripts/make_120.py` 从只读 `build/base_exact/sglang` 复制后按 000→101→110→111 `patch -p3 --fuzz=0`；生成 `build/p120/{baseline,candidate}` 与 120。`python3 scripts/verify_120.py` 在第三副本实际贴120/比较全部4684文件、验证确定性再生成及反向回滚，**3617 Python +3工具文件 py_compile全过**。只改 scheduler/schedule_policy 两文件；证据 `evidence/T41/validation.json`、补丁 SHA 收据。120 未加入 RELEASE。
+- **测试数与范围**：`python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py -v` **27/27 pass**（P120-01…07）。实际调度方法+mock ScheduleBatch/池/forward；包括冷+短交错、纯冷/纯decode、slot/KV/page/input/Mamba/session清理、101 admission/tail/branch、配置/对齐/显式间隔；16×30随机on轮次无双partial/预算超支。24组off序列字节一致：22组正常40轮，2组同方法/语句/轮次触发基线既有双partial断言，不能写成24组都运行成功。两臂原始trace在 `off_decision_traces.json`。
+- **VERIFIED 上界；INFERRED 收益**：已准入冷请求、每轮资源足够C且不retract/abort时，prefill ≤ ceil(L/C)+1（101可加一次尾切分），默认含decode轮数 ≤2倍；100k/C2048实测mock无role49/97、有role50/99。有限进度不等于秒数SLO；更小chunk可能伤chain_start/吞吐。原LPM在无限热流下的**未准入**冷请求饥饿仍未修复，保持严格LPM意味着不能声称全队列无限负载公平。详见说明中的条件与保守G上界。
+- **开放问题**：需Claude交叉审阅；真实GPU overlap/KDA数值、Mamba回收、内存压力/retraction、SLO与NEXTN未验证。另已定向复现原101的已有chunk尾切分+第二长请求造成双partial断言；120 on拒绝第二partial，off保留原行为。101既有额外deterministic alignment/数值门不因本测试而解除。特殊模式（DP/PP/CP/PD/mixed/HiCache/LoRA等）保守回退原路径，支持范围见文档。
+- **建议8卡验证方案（未执行/未入队）**：`scripts/pod/jobs/dev_b120_template.sh` 按 `dev_template.sh` 使用prepare_src→ensure_engine→原harness。Claude安排M0通过后的普通TP8无NEXTN小用例（100k冷+decode+缓存短请求、原token/SSE计数、flush池恢复、单partial/数值），再原dev off→on→off N6/10→14/18/22，保存raw/summary/server.log并按全部门评分；chain_start退步时再试cap4096，最后单列NEXTN。设置 `N` 与 `AX_P120_VARIANT=off/on/cap4096`；对应中性内部源码名b120a/b120b/b120c，避免现有ensure_engine签名不含120环境变量导致错误复用。外部服务元数据继续中性；本轮没有任何GPU/SSH/bohr/Trisol/镜像/提交动作。
+- **回滚**：启动时 `SGLANG_AX_SCHED_PROTECT=0` 并重启；或在副本反向 -p3/fuzz=0 撤120（已验证还原字节）。初次夹具调试失败日志保留，最终证据索引 `evidence/T41/README.md`；测试总表已同步，收尾check_records记录另存。

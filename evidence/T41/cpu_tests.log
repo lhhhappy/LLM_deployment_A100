@@ -27,6 +27,6 @@ test_starvation_bound_with_endless_short_arrivals (test_sched_protect_chain.Prot
 test_unsupported_modes_bypass_protection (test_sched_protect_chain.ProtectTests) ... ok
 
 ----------------------------------------------------------------------
-Ran 27 tests in 4.157s
+Ran 27 tests in 3.551s
 
 OK

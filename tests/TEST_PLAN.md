@@ -175,3 +175,22 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | M3-04 | CPU | body 键优先、Routing-Key→Session-ID fallback、无/空头、batch 子请求、真实 handler SSE/接收时间透传 | pass（生产 helper/handler 抽取 + transport stub；不是 live HTTP） |
 | M3-05 | CPU | 大文本同步/线程对照；1ms 心跳期间仍可运行，报告耗时和最大 loop lag；实测 Rust GIL 行为 | pass（real_results.json；96k/250k 派生压力文本各3组交替；原样对话另见 real_prompt_benchmark.json） |
 | M3-06 | L2/T8 | 实际服务导入、原始 dev 开关 A/B、SSE/TTFT/TPOT 全门、取消/RSS/flush/输出与时间戳诚实 | todo（未起 GPU/Trisol/镜像/提交；由 Claude 审阅安排） |
+
+
+## M1. 调度保护链中间请求（T41 / 120；底包线）
+
+命令：`python3 scripts/make_120.py`；`python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py -v`；`python3 scripts/verify_120.py`。
+真实调度/准入方法 AST + CPU mock ScheduleBatch/池/forward；不等同于 GPU 正确性或性能通过。说明：`patches/120-sched-protect-chain.md`；证据 `evidence/T41/`。
+
+| ID | P | 环境 | 用例 / 通过标准 | 状态 |
+|---|---|---|---|---|
+| P120-01 | P0 | CPU | 冷长 + 在跑 decode + 新短命中：prefill/decode 交替；短命中同批加入；续算 cap 生效 | pass（27/27 测试，interleave.json） |
+| P120-02 | P0 | CPU | 仅冷启动无空转，100k/2048 在 49 prefill 完成；仅 decode 与基线一致；存活判断及显式 interval 不重复叠加 | pass（cpu_tests.log） |
+| P120-03 | P0 | CPU | 短请求完整适配、设备命中/阈值/host 守卫、LPM 原排序 AST 不变；长队首不挡短命中；至多一 partial | pass（cpu_tests.log；16×30 随机轮次） |
+| P120-04 | P0 | CPU | 000→101→110→111 与 120-off 24 组决策 JSON 字节一致；断言方法/语句/时点一致 | pass（off_parity.json；22组40轮正常，2组原生断言；off_decision_traces.json） |
+| P120-05 | P0 | CPU | 无限短到达下已准入冷请求完成，验证条件轮次上界；101 admission/tail/branch 保留 | pass（starvation_bound.json；100k无role49/97，有role50/99；不承诺未准入LPM公平） |
+| P120-06 | P0 | CPU | 页/KV/input 预算、请求行保留、COW 拒绝释放/session槽保留、unsupported回退、配置/对齐；101已存在chunk的双partial反例保护 | pass（cpu_tests.log） |
+| P120-07 | P0 | CPU | 真实 -p3/fuzz=0 应用只改2文件，全部4684文件匹配生成器；3617 Python +3工具 py_compile；只读底包不变 | pass（validation.json；patch_apply.log；compile.log） |
+| P120-08 | P0 | L2/T8 | 普通TP8/default overlap、cold+hot+decode、101分叉：原计数/输出/时间戳、无双partial/崩溃，flush后KV/Mamba/request池回收，数值对照通过 | todo（本轮仅CPU；Claude安排） |
+| P120-09 | P0 | T8 | 原dev harness off→on→off N6/10→14/18/22；全部TTFT门与TPOT/错误率不退步；cap4096按需消融 | todo（dev_b120_template.sh仅方案，未入队/未执行） |
+| P120-10 | P1 | T8 | 若拟采用NEXTN，单独重复稳定性/数值/真实token与SLO验证；CPU不能替代 | todo |

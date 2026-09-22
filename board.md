@@ -26,7 +26,6 @@
 
 **进行中**
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
-- [Codex W15] T41 M1 调度保护链中间请求 — `patches/120-sched-protect-chain.*`、`evidence/T41/`；将更新共享测试账本。
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）
 - [Claude] L2 会话 `lh-arena-sess-a` 排队等卡；GPU 机 tmux `arena-daemons:l2` 守护进程自动跑 `tests/queue/`
@@ -34,6 +33,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex W15] T41 / 120 调度保护：27 CPU测试、3617文件编译、off字节对照与回滚通过；默认decode交替/长chunk上限/短命中共享预算。GPU/SLO待测，未入队/启动服务 — `patches/120-sched-protect-chain.md`、`evidence/T41/`。
 - [Codex W16] T42 M3 分词线程池与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；14单测、722真实对话逐token全同；256733token loop-lag中位数194.57→8.59ms（本地CPU）。F60/决策31/M3，待Claude交叉审阅与8卡验证。
 - [Codex] T40 本地 Claude Code 2.1.278 → 2.1.280；版本核验及 doctor 通过 — `evidence/T40/`
 - [Codex main] T36实际底包探索 — `research/codex/R15_base_source_exploration.md`、F52、`evidence/T36/source_receipt.json`。102的单点替换/状态精度边界、103族/session/salt分离、104五文件依赖与负载保护；407文件与归档全匹配。底包重号F49已仅改F51；无补丁实现或实验。
