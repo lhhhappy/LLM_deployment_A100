@@ -216,3 +216,4 @@
 - **VERIFIED / 打包（P112-06）**：000→101→105→110→111→112→120→130全部`patch -p3 --fuzz=0`可打，3623 Python编译通过，确定再生成/整栈反向逐字节还原/base_exact未改。代表形状实际PTX是sm80 bf16 MMA，无fp8指令、无spill；paged/ragged为128/205寄存器、8KB共享内存。早期验证流程失败和所有参数扫描保留，不覆盖历史日志。
 - **INFERRED / 开放问题（P112-07）**：微基准证明110算子成本下降，不能直接推出8卡TTFT/TPOT/N@SLO；真实激活、完整服务加载、实际NEXTN、能力与原dev全门仍待Claude。输出矩阵仍为完整fp32（8192×190000≈6.23GB），没有融合topk；cold编译预热仍需服务层安排。建议同基线链仅切112 on/off、原参数/原harness真flush做L2 A/B，并单列NEXTN；这是验证建议，未创建队列或服务。
 - **授权与收尾**：仅使用GPU开发机 `/sjtu/linhang/arena/code/T43` 与 `runs/T43`，自有算子进程全部退出，两卡各4MiB/0%（`gpu_final_idle.log`）。未操作bohr/Trisol/pod、未起8卡/打镜像/提交。F64/D33、TEST_PLAN和已完成计划同步；活跃Codex实例表留给Claude维护。回滚在代码副本反向撤112即可恢复110。
+| T44 | 09-23 | Claude→Codex W18（astra/xhigh） | sm80 预填充 indexer kernel 逼近算力上限（112 仅约 30 TFLOPS，目标 ≥100），补丁 113 或 112v2 | patches/113-*、evidence/T44/、prompt plans/prompts/T44-prefill-indexer-roofline.md | queued | |

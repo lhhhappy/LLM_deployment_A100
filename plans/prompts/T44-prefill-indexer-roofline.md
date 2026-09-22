@@ -1,0 +1,6 @@
+你是 Codex worker W18，任务 T44：把补丁 112 的 sm80 **预填充** indexer kernel（fp8_mqa_logits，ragged/causal）推近 A100 算力上限，产出补丁 113（在 112 之上，或直接给出 112 的 v2，二选一并说明）。
+仓库 /workspace/Agentic_science_challenge。先读：AGENTS.md、rule.md §2/§4、patches/112-sm80-indexer-kernels.md、scripts/kernels/sm80_indexer_112.py、scripts/test_sm80_indexer_112.py、evidence/T43/performance_table.md 与 README.md、notes/findings.md F63/F64。
+现状（W17 实测，A100-SXM4-80GB）：8192 query × 190000 key ragged 423ms、causal 622ms；8192×32000 ragged 76ms。按 32 头 ×128 维计 FLOPs≈2·nq·nk·32·128 → 190k 档约 12.7 TFLOP，仅约 30 TFLOPS（bf16 峰值 312）。tile 为 2 query×64 key/4 warps。
+目标：ragged 与 causal 在 8192×{32000,95000,190000} 上达到 ≥100 TFLOPS 有效（或说明上限原因并给出 profile/ncu 证据）；decode 路径不得退步（保持 112 数据）。方向提示（可自行判断）：更大 tile（多 query×128 key，把 query 与 32 头拼成 M 维做 tl.dot）、fp8→bf16 解码摊销（先解码到 shared 再多次复用）、num_stages 流水、跳过 ks/ke 区间外 tile（clean=False 语义保持 110 行为，见 112 说明）、输出写回合并；可选：输出改 bf16 须证明 topk(2048) 选中集合与 fp32 版本重合率 ≥99.9%，否则保持 fp32。
+红线与验证：与 110 torch oracle 和 112 对照（沿用 test_sm80_indexer_112.py 的全部用例 + 新形状），逐行相对 L∞ < 1e-2、topk 重合率 ≥99.5%；CUDA graph 可捕获重放一致；000→101→105→110→111→112→(113)→120→130 全部 fuzz=0 可打。只用 GPU 开发机 /sjtu/linhang/arena/（先 source env.sh，nvidia-smi 看占用），不碰 bohr/Trisol/pod，不打镜像不提交。
+落盘：notes/dispatch.md T44 行 accepted→in-progress→done/blocked；证据 evidence/T44/；可复现生成器；最后追加「T44 W18 → Claude：交付」节（性能表：旧/新 ms 与 TFLOPS、数值、开放问题）。
