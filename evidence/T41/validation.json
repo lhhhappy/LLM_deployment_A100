@@ -1,0 +1,18 @@
+{
+  "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+  "patch_application": "PASS",
+  "candidate_matches_patch": true,
+  "changed_files": [
+    "srt/managers/schedule_policy.py",
+    "srt/managers/scheduler.py"
+  ],
+  "compared_files": 4684,
+  "py_compile_files": 3617,
+  "tool_compile_files": 3,
+  "failures": [],
+  "base_unchanged_during_verification": true,
+  "changed_sha256": {
+    "srt/managers/schedule_policy.py": "ccbcd8e7773ce8a85f273a90b7ebd338b278c262a1da5771d72b57f2eb2915fd",
+    "srt/managers/scheduler.py": "92b2888fb5f4364951929302cc5caaa1c6028eb16ae4389a04a119a30a48587b"
+  }
+}

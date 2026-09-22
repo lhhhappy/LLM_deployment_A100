@@ -159,3 +159,19 @@ PF-01/PF-02 的 T8 实测状态不因这些 mock 测试改变。
 关联工具回归：TL-01 29/29（测试环境 `ARENA_FLUSH_ATTEMPTS=1 ARENA_FLUSH_SERVER_WAIT_S=0`），
 T19+preflight 38/38；T31合并重跑67/67，见 `evidence/T31/dependency_regression.log`（原T23证据保留）。
 IF/CAP/PF/SUB-03 的 live 状态没有因为这些自动化单测而升级。
+
+
+## M3 — T42 / 130 分词线程池与路由键（W16）
+
+CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能：加 `--benchmark-real-only`。
+需 transformers 5.12.1 / tokenizers 0.22.2 / jinja2；基线临时副本按 000→101→110→111→130 应用。
+生产方法经 AST 抽取运行；并非完整 GPU 服务导入。证据 `evidence/T42/`，设计 `patches/130-async-tokenize.md`。
+
+| ID | 环境 | 覆盖 / 通过标准 | 状态 |
+|---|---|---|---|
+| M3-01 | CPU | 补丁链 fuzz=0、五个改动文件语法、原始 downstream token/time 逻辑不变；回退/fast/slow/batch/pair/EOS/dynamic 策略一致 | pass（14 项单测中的相关项，cpu_tests.log） |
+| M3-02 | CPU | 真实 glm_tok、完整 dev bodies：原版/开启/关闭的 token IDs 逐项相同；冻结 glm_tokens 对齐 | pass（722/722，34416777 输入 tokens；token_comparison.jsonl；最大 256733） |
+| M3-03 | CPU | 取消运行与排队请求、错误恢复、关闭；同一线程串行且无取消积压 | pass（单测；7 adversarial +21 并发对照 +3 batch/pair 真 tokenizer 对照通过） |
+| M3-04 | CPU | body 键优先、Routing-Key→Session-ID fallback、无/空头、batch 子请求、真实 handler SSE/接收时间透传 | pass（生产 helper/handler 抽取 + transport stub；不是 live HTTP） |
+| M3-05 | CPU | 大文本同步/线程对照；1ms 心跳期间仍可运行，报告耗时和最大 loop lag；实测 Rust GIL 行为 | pass（real_results.json；96k/250k 派生压力文本各3组交替；原样对话另见 real_prompt_benchmark.json） |
+| M3-06 | L2/T8 | 实际服务导入、原始 dev 开关 A/B、SSE/TTFT/TPOT 全门、取消/RSS/flush/输出与时间戳诚实 | todo（未起 GPU/Trisol/镜像/提交；由 Claude 审阅安排） |

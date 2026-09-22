@@ -1,0 +1,34 @@
+test_batch_key_propagation (__main__.Tests) ... ok
+test_cancel_running_and_waiting (__main__.Tests) ... ok
+test_close_rejects_work (__main__.Tests) ... ok
+test_downstream_key_and_time_code_unchanged (__main__.Tests) ... Executing <Task pending name='Task-13' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /usr/lib/python3.10/unittest/async_case.py:95> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.10/asyncio/base_events.py:429> created at /usr/lib/python3.10/unittest/async_case.py:117> took 0.132 seconds
+ok
+test_dynamic_precedence (__main__.Tests) ... ok
+test_embedding_eos (__main__.Tests) ... ok
+test_exception_releases_slot (__main__.Tests) ... ok
+test_generate_handler_timestamp_and_stream (__main__.Tests) ... ok
+test_header_precedence (__main__.Tests) ... ok
+test_invalid_inputs (__main__.Tests) ... ok
+test_shapes_fast_and_disabled (__main__.Tests) ... ok
+test_slow_encode_branch (__main__.Tests) ... ok
+test_startup_switch_and_dynamic (__main__.Tests) ... ok
+test_thread_identity_and_serialization (__main__.Tests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.336s
+
+OK
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/scripts/test_async_tokenize.py", line 364, in <module>
+    if args.real: asyncio.run(real_tests(args.evidence))
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/workspace/Agentic_science_challenge/scripts/test_async_tokenize.py", line 298, in real_tests
+    requests={r['req_id']:r for r in map(json.loads,(ROOT/'s1-dev/data/dev-combined-v1/requests.jsonl').read_text().splitlines())}
+  File "/workspace/Agentic_science_challenge/scripts/test_async_tokenize.py", line 298, in <dictcomp>
+    requests={r['req_id']:r for r in map(json.loads,(ROOT/'s1-dev/data/dev-combined-v1/requests.jsonl').read_text().splitlines())}
+KeyError: 'req_id'

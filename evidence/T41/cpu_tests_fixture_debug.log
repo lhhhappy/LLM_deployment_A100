@@ -1,0 +1,96 @@
+test_budget_input_and_page_cost_preserved (test_sched_protect_chain.ProtectTests) ... FAIL
+test_cold_and_short_hits_interleave_actual_scheduler (test_sched_protect_chain.ProtectTests) ... ok
+test_config_alignment_and_minimum_progress (test_sched_protect_chain.ProtectTests) ... ok
+test_config_off_ignores_invalid_knobs (test_sched_protect_chain.ProtectTests) ... ok
+test_d1_active_chunk_prevents_short_second_partial (test_sched_protect_chain.ProtectTests) ... FAIL
+test_d1_admission_and_tail_splits_preserved (test_sched_protect_chain.ProtectTests) ... FAIL
+test_d1_branch_conflict_stays_native (test_sched_protect_chain.ProtectTests) ... ok
+test_explicit_decode_interval_is_not_doubled (test_sched_protect_chain.ProtectTests) ... ok
+test_finished_decode_batch_does_not_starve_cold (test_sched_protect_chain.ProtectTests) ... ok
+test_kv_no_token_still_refuses_waiter (test_sched_protect_chain.ProtectTests) ... FAIL
+test_lpm_order_short_hits_after_skipped_long (test_sched_protect_chain.ProtectTests) ... ok
+test_off_byte_identical_decision_sequences (test_sched_protect_chain.ProtectTests) ... FAIL
+test_only_cold_no_idle_or_decode_gap (test_sched_protect_chain.ProtectTests) ... ok
+test_only_decode_unchanged (test_sched_protect_chain.ProtectTests) ... ok
+test_original_lpm_role_budget_and_interfaces_unchanged (test_sched_protect_chain.ProtectTests) ... ok
+test_reserve_request_slot_for_continuation (test_sched_protect_chain.ProtectTests) ... ok
+test_session_mamba_slot_is_not_freed (test_sched_protect_chain.ProtectTests) ... ok
+test_short_requires_device_hit_and_complete_fit (test_sched_protect_chain.ProtectTests) ... FAIL
+test_skipped_mamba_cow_is_freed_before_next_waiter (test_sched_protect_chain.ProtectTests) ... ok
+test_starvation_bound_with_endless_short_arrivals (test_sched_protect_chain.ProtectTests) ... ok
+test_unsupported_modes_bypass_protection (test_sched_protect_chain.ProtectTests) ... ok
+
+======================================================================
+FAIL: test_budget_input_and_page_cost_preserved (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 375, in test_budget_input_and_page_cost_preserved
+    self.assertEqual(a.rem_input_tokens, 128)
+AssertionError: 2176 != 128
+
+======================================================================
+FAIL: test_d1_active_chunk_prevents_short_second_partial (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 395, in test_d1_active_chunk_prevents_short_second_partial
+    self.assertEqual(short.extend_range.length, 1536)
+AssertionError: 1024 != 1536
+
+======================================================================
+FAIL: test_d1_admission_and_tail_splits_preserved (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 385, in test_d1_admission_and_tail_splits_preserved
+    self.assertEqual(r.extend_range.end, 1024)
+AssertionError: 1536 != 1024
+
+======================================================================
+FAIL: test_kv_no_token_still_refuses_waiter (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 366, in test_kv_no_token_still_refuses_waiter
+    self.assertEqual([r[0] for r in t['reqs']], ['c'])
+AssertionError: Lists differ: ['c', 's'] != ['c']
+
+First list contains 1 additional elements.
+First extra element 1:
+'s'
+
+- ['c', 's']
++ ['c']
+
+======================================================================
+FAIL: test_off_byte_identical_decision_sequences (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 476, in test_off_byte_identical_decision_sequences
+    trace.append(step(s, arrivals))
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 250, in step
+    plan = s.get_next_batch_to_run(s.running_batch, s.last_batch)
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/scheduler.py", line 3459, in get_next_batch_to_run
+    prefill_plan = self.get_new_batch_prefill(running_batch)
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/scheduler.py", line 3545, in get_new_batch_prefill
+    ret, running_batch = self._get_new_batch_prefill_raw(
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/scheduler.py", line 3789, in _get_new_batch_prefill_raw
+    assert self.chunked_req is None
+AssertionError
+
+======================================================================
+FAIL: test_short_requires_device_hit_and_complete_fit (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 333, in test_short_requires_device_hit_and_complete_fit
+    self.assertEqual([r[0] for r in t['reqs']], ['cold', 'fits', 'tiny'])
+AssertionError: Lists differ: ['cold', 'fits', 'too_big_for_rest'] != ['cold', 'fits', 'tiny']
+
+First differing element 2:
+'too_big_for_rest'
+'tiny'
+
+- ['cold', 'fits', 'too_big_for_rest']
++ ['cold', 'fits', 'tiny']
+
+----------------------------------------------------------------------
+Ran 21 tests in 2.873s
+
+FAILED (failures=6)

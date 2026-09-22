@@ -1,0 +1,32 @@
+test_baseline_second_partial_reproducer_protected (test_sched_protect_chain.ProtectTests) ... ok
+test_budget_input_and_page_cost_preserved (test_sched_protect_chain.ProtectTests) ... ok
+test_cold_and_short_hits_interleave_actual_scheduler (test_sched_protect_chain.ProtectTests) ... ok
+test_config_alignment_and_minimum_progress (test_sched_protect_chain.ProtectTests) ... ok
+test_config_off_ignores_invalid_knobs (test_sched_protect_chain.ProtectTests) ... ok
+test_continuation_survives_zero_request_slots (test_sched_protect_chain.ProtectTests) ... ok
+test_d1_active_chunk_prevents_short_second_partial (test_sched_protect_chain.ProtectTests) ... ok
+test_d1_admission_and_tail_splits_preserved (test_sched_protect_chain.ProtectTests) ... ok
+test_d1_branch_conflict_stays_native (test_sched_protect_chain.ProtectTests) ... ok
+test_explicit_decode_interval_is_not_doubled (test_sched_protect_chain.ProtectTests) ... ok
+test_finished_decode_batch_does_not_starve_cold (test_sched_protect_chain.ProtectTests) ... ok
+test_kv_no_token_still_refuses_waiter (test_sched_protect_chain.ProtectTests) ... ok
+test_lpm_order_short_hits_after_skipped_long (test_sched_protect_chain.ProtectTests) ... ok
+test_new_cold_cannot_overwrite_101_partial_in_same_batch (test_sched_protect_chain.ProtectTests) ... ok
+test_off_byte_identical_decision_sequences (test_sched_protect_chain.ProtectTests) ... ok
+test_on_randomized_admission_never_two_partials_or_overbudget (test_sched_protect_chain.ProtectTests) ... ok
+test_only_cold_no_idle_or_decode_gap (test_sched_protect_chain.ProtectTests) ... ok
+test_only_decode_unchanged (test_sched_protect_chain.ProtectTests) ... ok
+test_original_lpm_role_budget_and_interfaces_unchanged (test_sched_protect_chain.ProtectTests) ... ok
+test_protection_is_default_on (test_sched_protect_chain.ProtectTests) ... ok
+test_reserve_request_slot_for_continuation (test_sched_protect_chain.ProtectTests) ... ok
+test_session_mamba_slot_is_not_freed (test_sched_protect_chain.ProtectTests) ... ok
+test_short_requires_device_hit_and_complete_fit (test_sched_protect_chain.ProtectTests) ... ok
+test_skipped_mamba_cow_is_freed_before_next_waiter (test_sched_protect_chain.ProtectTests) ... ok
+test_small_chunk_and_changed_threshold (test_sched_protect_chain.ProtectTests) ... ok
+test_starvation_bound_with_endless_short_arrivals (test_sched_protect_chain.ProtectTests) ... ok
+test_unsupported_modes_bypass_protection (test_sched_protect_chain.ProtectTests) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 4.157s
+
+OK

@@ -1,0 +1,29 @@
+{
+  "sha256": {
+    "patches/000-interface-compliance.patch": "e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6",
+    "patches/101-d1v12-on-base.patch": "93dbc0e01f60ef52f8997a1e5cd5ef7984640ae09725db39cc530581960da376",
+    "patches/110-sm80-dsa-indexer.patch": "e0ed2d96703c6eaea84387508f7e17217cad7fd5db8f9f85250ef51241f1ec5e",
+    "patches/111-sm80-fp8-moe-marlin.patch": "67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a",
+    "patches/130-async-tokenize.patch": "d48bf2a2d8a4c4daf68981aefdbc1646cf2d36b986ebf610f41e377a60ba2380",
+    "scripts/test_async_tokenize.py": "7285e6403cd64c79a8ce33d53211f8a8f0de3d85bbb5f171d8ffbb9d523a876a",
+    "s1-dev/harness/s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+    "s1-dev/glm_tok/tokenizer.json": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+    "s1-dev/glm_tok/tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+    "s1-dev/glm_tok/chat_template.jinja": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891",
+    "s1-dev/data/dev-combined-v1/requests.jsonl": "00c79cb68219a95420bb73048e701719953c8931b5dc70dd6822cc4ff3d4d047",
+    "s1-dev/data/dev-combined-v1/bodies/dev-combined-v1.jsonl.gz": "41a4b6fb88311bfac353105c351acd764138d1ebbdaa1829357dfcf1ac5bf37f",
+    "build/base_exact/pyproject.toml": "dcfa288a1e4d98a73b10f555ccaf3d1aa0c552ea6407ef48bf2b1d62f89e7167"
+  },
+  "changed_production_files": [
+    "srt/entrypoints/request_headers.py",
+    "srt/entrypoints/http_server.py",
+    "srt/managers/async_text_tokenizer.py",
+    "srt/managers/tokenizer_manager.py",
+    "srt/managers/io_struct.py"
+  ],
+  "patch_reverse_restores_baseline_exactly": true,
+  "syntax_compile_passed": true,
+  "unit_tests": 14,
+  "real_prompts": 722,
+  "gpu_or_remote_actions": false
+}

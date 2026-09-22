@@ -1,0 +1,159 @@
+test_batch_key_propagation (__main__.Tests) ... ok
+test_cancel_running_and_waiting (__main__.Tests) ... ok
+test_close_rejects_work (__main__.Tests) ... ok
+test_downstream_key_and_time_code_unchanged (__main__.Tests) ... Executing <Task pending name='Task-13' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /usr/lib/python3.10/unittest/async_case.py:95> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.10/asyncio/base_events.py:429> created at /usr/lib/python3.10/unittest/async_case.py:117> took 0.127 seconds
+ok
+test_dynamic_precedence (__main__.Tests) ... ok
+test_embedding_eos (__main__.Tests) ... ok
+test_exception_releases_slot (__main__.Tests) ... ok
+test_generate_handler_timestamp_and_stream (__main__.Tests) ... ok
+test_header_precedence (__main__.Tests) ... ok
+test_invalid_inputs (__main__.Tests) ... ok
+test_shapes_fast_and_disabled (__main__.Tests) ... ok
+test_slow_encode_branch (__main__.Tests) ... ok
+test_startup_switch_and_dynamic (__main__.Tests) ... ok
+test_thread_identity_and_serialization (__main__.Tests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.311s
+
+OK
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+{
+  "input_kind": "unmodified real dataset prompts, both paths warm",
+  "runs": [
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "sync",
+      "repeat": 0,
+      "elapsed_s": 0.06914795900229365,
+      "max_loop_lag_s": 0.06820070806518197,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0013999999975785613
+    },
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "thread",
+      "repeat": 0,
+      "elapsed_s": 0.05477116699330509,
+      "max_loop_lag_s": 0.002483042004518211,
+      "heartbeat_count": 38,
+      "ticks_during_encode": 26,
+      "p95_loop_lag_s": 0.0012315829992294311
+    },
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "thread",
+      "repeat": 1,
+      "elapsed_s": 0.053009708994068205,
+      "max_loop_lag_s": 0.002231041948311031,
+      "heartbeat_count": 38,
+      "ticks_during_encode": 26,
+      "p95_loop_lag_s": 0.0012474590223282575
+    },
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "sync",
+      "repeat": 1,
+      "elapsed_s": 0.06828995805699378,
+      "max_loop_lag_s": 0.0673394999941811,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0014671669816598296
+    },
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "sync",
+      "repeat": 2,
+      "elapsed_s": 0.09096466598566622,
+      "max_loop_lag_s": 0.0900267080180347,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0013809579433873296
+    },
+    {
+      "req_id": "biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5",
+      "tokens": 100214,
+      "mode": "thread",
+      "repeat": 2,
+      "elapsed_s": 0.05948933295439929,
+      "max_loop_lag_s": 0.0030259999223053455,
+      "heartbeat_count": 40,
+      "ticks_during_encode": 28,
+      "p95_loop_lag_s": 0.0012854158887639642
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "sync",
+      "repeat": 0,
+      "elapsed_s": 0.1940089580602944,
+      "max_loop_lag_s": 0.19307950004097074,
+      "heartbeat_count": 11,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0012388750221580267
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "thread",
+      "repeat": 0,
+      "elapsed_s": 0.17663241690024734,
+      "max_loop_lag_s": 0.008589958004653453,
+      "heartbeat_count": 97,
+      "ticks_during_encode": 85,
+      "p95_loop_lag_s": 0.001250709105283022
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "thread",
+      "repeat": 1,
+      "elapsed_s": 0.17963795794639736,
+      "max_loop_lag_s": 0.009470291948877274,
+      "heartbeat_count": 99,
+      "ticks_during_encode": 87,
+      "p95_loop_lag_s": 0.0014332080502063036
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "sync",
+      "repeat": 1,
+      "elapsed_s": 0.19610795797780156,
+      "max_loop_lag_s": 0.19516641697939485,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0013977920645847916
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "sync",
+      "repeat": 2,
+      "elapsed_s": 0.19551704195328057,
+      "max_loop_lag_s": 0.19456999998167157,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0012861670004203915
+    },
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "tokens": 256733,
+      "mode": "thread",
+      "repeat": 2,
+      "elapsed_s": 0.16809004195965827,
+      "max_loop_lag_s": 0.008129166021011769,
+      "heartbeat_count": 92,
+      "ticks_during_encode": 80,
+      "p95_loop_lag_s": 0.0012241659462451935
+    }
+  ]
+}

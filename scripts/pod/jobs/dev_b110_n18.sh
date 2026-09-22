@@ -8,7 +8,7 @@ export SGLANG_OPT_DEEPGEMM_HC_PRENORM=0   # mHC large-batch path: tilelang inste
 ensure_engine b110 --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang || exit 1
 S1=$AX/s1/s1-dev
 cd $S1 && S1_HARNESS_DIR=$S1/harness python3 run_dev.py --base-url http://127.0.0.1:$PORT --set dev-combined-v1 \
-  --root data/dev-combined-v1 --cohort harness/g0a/samples_v3/cohort_dev-combined-v1.json \
+  --root $S1/data/dev-combined-v1 --cohort $S1/harness/g0a/samples_v3/cohort_dev-combined-v1.json \
   --tok-dir /mnt/models --out $RUN_DIR/dev --n $N ${DEV_EXTRA:-}
 rc=$?
 python3 -c "import json;d=json.load(open('$RUN_DIR/dev/summary.json'));print('SUMMARY',json.dumps(d,ensure_ascii=False)[:1500])" 2>/dev/null

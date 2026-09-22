@@ -1,0 +1,20 @@
+test_batch_key_propagation (__main__.Tests) ... ok
+test_cancel_running_and_waiting (__main__.Tests) ... ok
+test_close_rejects_work (__main__.Tests) ... ok
+test_downstream_key_and_time_code_unchanged (__main__.Tests) ... Executing <Task pending name='Task-13' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /usr/lib/python3.10/unittest/async_case.py:95> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.10/asyncio/base_events.py:429> created at /usr/lib/python3.10/unittest/async_case.py:117> took 0.195 seconds
+ok
+test_dynamic_precedence (__main__.Tests) ... ok
+test_embedding_eos (__main__.Tests) ... ok
+test_exception_releases_slot (__main__.Tests) ... ok
+test_generate_handler_timestamp_and_stream (__main__.Tests) ... ok
+test_header_precedence (__main__.Tests) ... ok
+test_invalid_inputs (__main__.Tests) ... ok
+test_shapes_fast_and_disabled (__main__.Tests) ... ok
+test_slow_encode_branch (__main__.Tests) ... ok
+test_startup_switch_and_dynamic (__main__.Tests) ... ok
+test_thread_identity_and_serialization (__main__.Tests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.382s
+
+OK

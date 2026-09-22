@@ -1,0 +1,118 @@
+[
+  {
+    "mode": "prefill",
+    "reqs": [
+      [
+        "cold",
+        0,
+        2048
+      ]
+    ],
+    "waiting": [],
+    "chunk": "cold",
+    "full": false,
+    "interval": 0,
+    "budget": [
+      6144,
+      14336,
+      2352.0,
+      2112
+    ],
+    "verdicts": [
+      [
+        "cold",
+        "CONTINUE"
+      ]
+    ]
+  },
+  {
+    "mode": "decode",
+    "reqs": [
+      [
+        "running",
+        0,
+        1
+      ]
+    ],
+    "waiting": [
+      "short"
+    ],
+    "chunk": "cold",
+    "full": false,
+    "interval": 0,
+    "budget": [
+      6144,
+      14336,
+      2352.0,
+      2112
+    ],
+    "verdicts": [
+      [
+        "cold",
+        "CONTINUE"
+      ]
+    ]
+  },
+  {
+    "mode": "prefill",
+    "reqs": [
+      [
+        "cold",
+        2048,
+        4096
+      ],
+      [
+        "short",
+        65536,
+        66048
+      ]
+    ],
+    "waiting": [],
+    "chunk": "cold",
+    "full": false,
+    "interval": 0,
+    "budget": [
+      5632,
+      13824,
+      3167.0,
+      2688
+    ],
+    "verdicts": [
+      [
+        "short",
+        "CONTINUE"
+      ]
+    ]
+  },
+  {
+    "mode": "decode",
+    "reqs": [
+      [
+        "running",
+        0,
+        1
+      ],
+      [
+        "short",
+        65536,
+        66048
+      ]
+    ],
+    "waiting": [],
+    "chunk": "cold",
+    "full": false,
+    "interval": 0,
+    "budget": [
+      5632,
+      13824,
+      3167.0,
+      2688
+    ],
+    "verdicts": [
+      [
+        "short",
+        "CONTINUE"
+      ]
+    ]
+  }
+]

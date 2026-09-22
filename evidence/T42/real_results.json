@@ -1,0 +1,179 @@
+{
+  "real_prompts": 722,
+  "adversarial_prompts": 7,
+  "concurrent_comparisons": 21,
+  "batch_pair_cases": 3,
+  "all_token_ids_equal": true,
+  "frozen_glm_counts_equal": true,
+  "largest_real_tokens": 256733,
+  "largest_real_req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+  "benchmark": [
+    {
+      "mode": "sync",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 0,
+      "elapsed_s": 0.1161295409547165,
+      "max_loop_lag_s": 0.11520683304499835,
+      "heartbeat_count": 11,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.002016750095412135
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 0,
+      "elapsed_s": 0.07927604205906391,
+      "max_loop_lag_s": 0.0031626669699326157,
+      "heartbeat_count": 47,
+      "ticks_during_encode": 36,
+      "p95_loop_lag_s": 0.0019830000130459666
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 1,
+      "elapsed_s": 0.07861770805902779,
+      "max_loop_lag_s": 0.0026737920017912984,
+      "heartbeat_count": 46,
+      "ticks_during_encode": 35,
+      "p95_loop_lag_s": 0.002013749956153333
+    },
+    {
+      "mode": "sync",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 1,
+      "elapsed_s": 0.1165356250712648,
+      "max_loop_lag_s": 0.11561599995568395,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0017109580114483833
+    },
+    {
+      "mode": "sync",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 2,
+      "elapsed_s": 0.11861791706178337,
+      "max_loop_lag_s": 0.1176948330141604,
+      "heartbeat_count": 11,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0029742080261930823
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 100000,
+      "actual_tokens": 96262,
+      "repeat": 2,
+      "elapsed_s": 0.07939366705249995,
+      "max_loop_lag_s": 0.0020908749904483557,
+      "heartbeat_count": 51,
+      "ticks_during_encode": 39,
+      "p95_loop_lag_s": 0.001155874972231686
+    },
+    {
+      "mode": "sync",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 0,
+      "elapsed_s": 0.34851704200264066,
+      "max_loop_lag_s": 0.3477052090931684,
+      "heartbeat_count": 11,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.002320832969620824
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 0,
+      "elapsed_s": 0.3307294170372188,
+      "max_loop_lag_s": 0.009469666915014385,
+      "heartbeat_count": 166,
+      "ticks_during_encode": 154,
+      "p95_loop_lag_s": 0.002072583000175655
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 1,
+      "elapsed_s": 0.44605133298318833,
+      "max_loop_lag_s": 0.008356833063066005,
+      "heartbeat_count": 215,
+      "ticks_during_encode": 203,
+      "p95_loop_lag_s": 0.0019996250523254275
+    },
+    {
+      "mode": "sync",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 1,
+      "elapsed_s": 0.29820412502158433,
+      "max_loop_lag_s": 0.2972965010451153,
+      "heartbeat_count": 12,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.003944500047713518
+    },
+    {
+      "mode": "sync",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 2,
+      "elapsed_s": 0.2590571250766516,
+      "max_loop_lag_s": 0.2581580000007525,
+      "heartbeat_count": 11,
+      "ticks_during_encode": 0,
+      "p95_loop_lag_s": 0.0018643750119954347
+    },
+    {
+      "mode": "thread",
+      "target_tokens": 250000,
+      "actual_tokens": 249967,
+      "repeat": 2,
+      "elapsed_s": 0.21586004202254117,
+      "max_loop_lag_s": 0.008241916937753557,
+      "heartbeat_count": 113,
+      "ticks_during_encode": 102,
+      "p95_loop_lag_s": 0.001454124973155558
+    }
+  ],
+  "rust_backend_thread": {
+    "elapsed_s": 0.2043980830349028,
+    "max_loop_lag_s": 0.004890917032957077,
+    "heartbeat_count": 112,
+    "ticks_during_encode": 102,
+    "p95_loop_lag_s": 0.0011648340625688433
+  },
+  "prefix_merge_counterexample": {
+    "full": [
+      14978
+    ],
+    "naive_concat": [
+      48808,
+      385
+    ]
+  },
+  "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.35",
+  "transformers": "5.12.1",
+  "tokenizers": "0.22.2",
+  "tokenizer_class": "TokenizersBackend",
+  "is_fast": true,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "tokenizers_parallelism": "unset"
+}

@@ -175,4 +175,12 @@
 
 | T40 | 09-22 | Codex→Claude（用户要求） | 更新本地容器的 Claude Code，并验证安装版本 | `evidence/T40/` | done | accepted→in-progress→done；VERIFIED：官方 `claude update` 将原生安装从 2.1.278 更新至 2.1.280；`claude --version` 与二进制链接一致，`claude doctor` 无安装问题。原始日志见 evidence/T40；重新启动 Claude Code 后使用新版。 |
 | T41 | 09-23 | Claude→Codex W15（astra/xhigh） | M1 调度保护链中间请求：补丁 120（冷启动分块期间穿插 decode、命中短请求优先、冷启动每轮预算上限，开关可回退），CPU 测试 | patches/120-*、evidence/T41/、prompt plans/prompts/T41-M1-scheduler.md | in-progress | accepted → in-progress：已读规则/题面/底包调度；实现有界分块预算、短命中共享入批与 decode 间隔，保留原 LPM 和 101；CPU 验证进行中。 |
-| T42 | 09-23 | Claude→Codex W16（astra/high） | M3 分词移出事件循环 + 前缀分词缓存 + 路由键：补丁 130，token 一致性对照测试 | patches/130-*、evidence/T42/、prompt plans/prompts/T42-M3-tokenize.md | queued | |
+| T42 | 09-23 | Claude→Codex W16（astra/high） | M3 分词移出事件循环 + 前缀分词缓存 + 路由键：补丁 130，token 一致性对照测试 | patches/130-*、evidence/T42/、prompt plans/prompts/T42-M3-tokenize.md | done | accepted → in-progress → done：130补丁/说明、14 CPU单测、722真实对话逐token与冻结计数全同；原样256733token最大loop-lag中位数194.57→8.59ms。单线程完整分词、header路由接线，无前缀缓存；F60/决策31/M3-01…05。证据evidence/T42；M3-06待Claude，未GPU/Trisol/镜像/提交。 |
+
+### T42 W16 → Claude：交付
+- **VERIFIED（M3-01…05）**：`patches/130-async-tokenize.patch` + 同名说明，基线 base_exact 副本按000→101→110→111→130，`patch -p3 --fuzz=0`通过；五文件语法编译通过，反向应用恢复基线全部文件字节一致。`scripts/test_async_tokenize.py`、`evidence/T42/receipt.json`可复核。
+- **VERIFIED（测试数）**：14/14 CPU单测；真实glm_tok和完整开发集722/722对话（34,416,777 tokens，最长256,733）原版/开启/关闭IDs逐项相同、冻结glm_tokens全同；另7边界文本、21并发、3batch/pair对照。未修改harness、只读源码或数据。完整GPU服务导入未测，CPU执行的是抽取的生产方法。
+- **VERIFIED（性能/GIL）**：本地aarch64、transformers5.12.1/tokenizers0.22.2。原样100,214/256,733token各3次交替，最大loop lag中位数68.20/194.57ms→2.48/8.59ms；分词耗时中位数69.15/195.52ms→54.77/176.63ms。Rust backend编码204.4ms中有102次loop心跳，证实此版本会释放GIL；Python wrapper仍有短暂GIL占用。派生压力输入另列，不能混同原样性能或SLO。
+- **实现**：每manager单worker串行完整分词，取消后实际完成才释放槽位；`SGLANG_AX_ASYNC_TOKENIZE=0`恢复同步分词，原dynamic-batch参数保留优先权。body routing_key非None优先，否则Routing-Key头→Session-ID头；batch补传routing_key，不写native session/cache_salt。时间戳、计数、flush未改。可选前缀缓存未实现：真实BPE反例表明即便字符串前缀相同也不能直接拼token。
+- **INFERRED / 开放问题**：仅证明分词正确性与CPU loop响应改善，未证明8卡N@SLO/TPOT收益；小请求仍等大请求分词，未增加CPU吞吐；chat模板/JSON/IPC仍在原路径，多模态及其他tokenizer后端未量化；完整服务导入、shutdown/disconnect/持续取消时RSS需live验证。请Claude交叉审阅；未加入RELEASE/构建脚本或任何队列。
+- **8卡验证方案（M3-06，未执行）**：相同底包链和参数只切换0/1；先核对实际依赖、完整启动、25万token/长短并发与持续SSE，逐条核对prompt IDs/计数、ignore_eos/thinking/tools及接收→分词→prefill时序；测busy/idle flush、取消/RSS/线程/退出；再原版dev各档真flush，交替顺序A/B并复测全部TTFT桶/TPOT/错误门。只由Claude安排，本轮无GPU/bohr/Trisol/镜像/提交。

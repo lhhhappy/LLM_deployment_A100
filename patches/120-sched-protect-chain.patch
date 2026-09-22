@@ -114,15 +114,17 @@
                      return AddReqResult.OTHER
 --- a/python/sglang/srt/managers/scheduler.py
 +++ b/python/sglang/srt/managers/scheduler.py
-@@ -212,6 +212,7 @@
+@@ -212,6 +212,9 @@
      AddReqResult,
      PrefillAdder,
      SchedulePolicy,
 +    _ax_sched_protect_config,
++    is_dsa_prefill_cp_in_seq_split,
++    is_prefill_context_parallel_enabled,
  )
  from sglang.srt.managers.scheduler_components.batch_result_processor import (
      SchedulerBatchResultProcessor,
-@@ -1253,6 +1254,51 @@
+@@ -1253,6 +1256,58 @@
                  )
                  self.enable_dynamic_chunking = False
  
@@ -134,6 +136,9 @@
 +            and self.chunked_prefill_size is not None
 +            and self.ps.pp_size == 1
 +            and not self.require_mlp_sync
++            and not is_dsa_prefill_cp_in_seq_split()
++            and not is_prefill_context_parallel_enabled()
++            and not self.tree_cache.disable
 +            and self.disaggregation_mode == DisaggregationMode.NULL
 +            and self.dllm_config is None
 +            and not self.is_mixed_chunk
@@ -169,12 +174,16 @@
 +        self._ax_decode_due = False
 +        # Called AFTER last extend is merged, so newly completed short requests
 +        # count as running. With no decoders, immediately continue cold prefill.
-+        return due and not running_batch.is_empty() and not running_batch.is_prefill_only
++        return (
++            due
++            and not running_batch.is_prefill_only
++            and any(not req.finished() for req in running_batch.reqs)
++        )
 +
      def _should_defer_prefill(self) -> bool:
          if self._prefill_decode_interval_remaining == 0:
              return False
-@@ -3453,7 +3499,7 @@
+@@ -3453,7 +3508,7 @@
  
          if self.dllm_config is not None:
              new_batch = self.get_new_batch_dllm(running_batch)
@@ -183,7 +192,7 @@
              new_batch = None
          else:
              prefill_plan = self.get_new_batch_prefill(running_batch)
-@@ -3498,6 +3544,8 @@
+@@ -3498,6 +3553,8 @@
              )
          ret = converted
          self._arm_prefill_decode_interval(ret)
@@ -192,7 +201,7 @@
  
          # Handle ngram embedding
          ret = self.ngram_embedding_manager.prepare_for_forward(
-@@ -3652,6 +3700,7 @@
+@@ -3652,6 +3709,7 @@
              dllm_config=self.dllm_config,
              waiting_queue_len=len(self.waiting_queue),
              prefill_tile_block_m=prefill_tile_block_m,
@@ -200,7 +209,7 @@
          )
  
          if self.chunked_req is not None:
-@@ -3768,6 +3817,15 @@
+@@ -3768,6 +3826,18 @@
                              req.kv.mamba_pool_idx.unsqueeze(-1)
                          )
                          req.kv.mamba_pool_idx = None
@@ -208,7 +217,10 @@
 +                    adder.ax_protect is not None
 +                    and not added
 +                    and res == AddReqResult.OTHER
-+                    and (adder.ax_continuation is not None or adder.new_chunked_req is not None)
++                    and (
++                        adder.ax_continuation is not None
++                        or adder.new_chunked_req is not None
++                    )
 +                ):
 +                    # A long/non-fitting waiter must not hide a short hit. Keep
 +                    # the native rejection cleanup above, and keep LPM order.

@@ -326,3 +326,16 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 探测：500/1500/3000/9000/20000 token 全 200，前缀命中正常（448/1472/2944/8960），`/flush_cache` 返回 JSON 成功。
 - **TTFT 异常**：500 token 58.9 s、9000 token 67.8 s；其余 0.34–1.6 s。原因：KDA Triton 核（`chunk_kda_fwd_kernel_inter_solve_fused`、`_recompute_w_u_fwd_kernel`）
   按形状在服务期编译，每个变体 1–7 s × 多个（日志自带 "pre-compile it during engine init" 警告）。评测计时阶段若遇到新形状会直接吃掉 TTFT → 需要启动期预热/编译缓存（优化项）。
+
+## F60 — T42 / 130：完整分词线程池逐 token 等价，真实长输入显著降低 HTTP loop 阻塞（CPU）
+- **VERIFIED（M3-01…05）**：base_exact 副本按 000→101→110→111→130、fuzz=0；14/14 单测。真实 glm_tok、完整 dev 722 条/34,416,777 tokens，原版/线程/关闭 IDs 逐项相同且冻结 glm_tokens 全同；另有7边界、21并发、3batch/pair对照。证据 `evidence/T42/`，复现 `scripts/test_async_tokenize.py`。
+- **VERIFIED（本地 aarch64 CPU）**：transformers 5.12.1 / tokenizers 0.22.2，原样100,214 /256,733 token 对话各3组交替；最大 loop lag 的中位数同步68.20/194.57ms→线程2.48/8.59ms；分词耗时中位数69.15/195.52ms→54.77/176.63ms。直接 Rust encode_batch 204.4ms 内有102次 loop 心跳（最大 lag 4.89ms），证明此版本编码会释放 GIL；不代表零 GIL 阻塞或所有后端。
+- **VERIFIED（源码/CPU）**：routing key 按 body非None→Routing-Key头→Session-ID头，batch继续透传；不写 native session/cache_salt。取消后实际工作完成才释放槽位；不加入前缀缓存。GLM `encode('hello')=[14978]`，`encode('hel')+encode('lo')=[48808,385]`，逐字节前缀相同不足以安全拼接 token IDs。
+- **INFERRED**：SSE/TTFT/TPOT 可受益，但本地 CPU 数字不代表8卡吞吐或N@SLO；M3-06仍todo，完整服务导入、取消/flush/RSS和开发集A/B待Claude安排。没有GPU、Trisol、镜像或提交动作。
+
+## F61 — T41/120 调度保护 CPU 验证与 101 既有双 partial 反例（2026-09-22，Codex W15）
+
+- **VERIFIED（真实调度方法 + CPU mock，非 GPU 性能）**：`tests/test_sched_protect_chain.py` 27/27；000→101→110→111 副本加 120，实际 `get_next_batch_to_run` / admission / PrefillAdder 执行冷长与短命中混排、prefill/decode 交替、101 role split、Mamba 拒绝清理、KV/页/请求槽位门。`validation.json` 确认只改 scheduler/schedule_policy，4684 文件逐字节一致，3617 Python 文件 py_compile 全过。
+- **VERIFIED（有条件轮次上界）**：100000 token、cap=2048、持续短请求到达：无 role split 用 49 次 prefill/97 总轮，101 尾切分用 50/99；数据 `evidence/T41/starvation_bound.json`。前提是已准入、每轮资源够 C、无 retract/abort；不是 chain_start 秒数保证。原 LPM 在无限热流下的未准入冷请求饥饿没有被修复，完整论证见补丁文档。
+- **VERIFIED（off 对照）**：24 组成对决策序列字节一致；22 组各 40 轮正常，2 组基线与 off 在同一原生断言处失败。定向反例：已有 chunk 1536 token、101 在 1024 切尾，余预算允许新长请求变成第二个 partial，`scheduler.py` 原 `assert self.chunked_req is None` 失败。120 on 的已有/新 partial 守卫拒绝第二个请求；不是回退行为变化。证据 `off_parity.json` / `cpu_tests.log`。
+- **INFERRED**：较少连续 prefill 可缓解 intra TTFT/TPOT；更小 chunk 增加轮数可能伤害 chain_start/吞吐。仅 CPU 不能确认数值、真实缓存回收、NEXTN 或 N@SLO，未进行 GPU/Trisol/bohr/镜像/提交操作。

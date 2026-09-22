@@ -1,0 +1,170 @@
+[
+  {
+    "seed": 0,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "11867923a95bef55de7d206bac5f4e935b183683f99349335a4fa68a3521cb43",
+    "off_sha256": "11867923a95bef55de7d206bac5f4e935b183683f99349335a4fa68a3521cb43"
+  },
+  {
+    "seed": 1,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "f335c0ecff218db47e924df56ce18aa1ba99d73a657b995073e8a716731e8fa5",
+    "off_sha256": "f335c0ecff218db47e924df56ce18aa1ba99d73a657b995073e8a716731e8fa5"
+  },
+  {
+    "seed": 2,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "eceabef0964f70daf4f390e526766c7b6e0a303e71cdb921e28f0758439b42ab",
+    "off_sha256": "eceabef0964f70daf4f390e526766c7b6e0a303e71cdb921e28f0758439b42ab"
+  },
+  {
+    "seed": 3,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "f462cab4f45b65e8c363d009155afa3cb8c4f8d1bad32ab059ec72c940e88010",
+    "off_sha256": "f462cab4f45b65e8c363d009155afa3cb8c4f8d1bad32ab059ec72c940e88010"
+  },
+  {
+    "seed": 4,
+    "rounds": 5,
+    "baseline_assertion": true,
+    "baseline_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6",
+    "off_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6"
+  },
+  {
+    "seed": 5,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "2d8e1f20699828890770a1724b39360fca4bec617edc1339fbf5b729d7bd6a6b",
+    "off_sha256": "2d8e1f20699828890770a1724b39360fca4bec617edc1339fbf5b729d7bd6a6b"
+  },
+  {
+    "seed": 6,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "275cdf689c779eff09faea88c29248a18398ea61d26fc1e34b3dd50da21915b0",
+    "off_sha256": "275cdf689c779eff09faea88c29248a18398ea61d26fc1e34b3dd50da21915b0"
+  },
+  {
+    "seed": 7,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "4c16a314b439a941fe68ea8b6f0a28cedafa3317fc17587d03adbb2dd5c9f90e",
+    "off_sha256": "4c16a314b439a941fe68ea8b6f0a28cedafa3317fc17587d03adbb2dd5c9f90e"
+  },
+  {
+    "seed": 8,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "330eff4db7e2f11c6e75c1d4020f15bd81744ab6a305ffc39b9a25200e4da335",
+    "off_sha256": "330eff4db7e2f11c6e75c1d4020f15bd81744ab6a305ffc39b9a25200e4da335"
+  },
+  {
+    "seed": 9,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "d19524aef40b5d04560d208fff2264f3b5607b9efdbd5c1671fba19af2831dc5",
+    "off_sha256": "d19524aef40b5d04560d208fff2264f3b5607b9efdbd5c1671fba19af2831dc5"
+  },
+  {
+    "seed": 10,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "6e503629fcb6afc374f1b8d0105802bd9659825e449a342f3ae164fbf3a984c0",
+    "off_sha256": "6e503629fcb6afc374f1b8d0105802bd9659825e449a342f3ae164fbf3a984c0"
+  },
+  {
+    "seed": 11,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "b32838be80578af59beef5ed9c756eea505bff89f26d084963da91c3ae1ca875",
+    "off_sha256": "b32838be80578af59beef5ed9c756eea505bff89f26d084963da91c3ae1ca875"
+  },
+  {
+    "seed": 12,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "aa964eb6e391b5730f9d6788893015ee69577c9abbd24aa4d1a6330c2f6505cf",
+    "off_sha256": "aa964eb6e391b5730f9d6788893015ee69577c9abbd24aa4d1a6330c2f6505cf"
+  },
+  {
+    "seed": 13,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "2daa3653d25bef11e99f1f8108508bb158e4b6e5283cef885578713b15c5f18a",
+    "off_sha256": "2daa3653d25bef11e99f1f8108508bb158e4b6e5283cef885578713b15c5f18a"
+  },
+  {
+    "seed": 14,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "201d84fd7b48505f87ea129e8cab924ced6517295acedfd00b82da95907bfd24",
+    "off_sha256": "201d84fd7b48505f87ea129e8cab924ced6517295acedfd00b82da95907bfd24"
+  },
+  {
+    "seed": 15,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "dbda6fc665142ea4f940c32311c6f66e6a2ac86851df159e661c48d46d69d9eb",
+    "off_sha256": "dbda6fc665142ea4f940c32311c6f66e6a2ac86851df159e661c48d46d69d9eb"
+  },
+  {
+    "seed": 16,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "31ca2b3d05fc79fe99ecc5b54074d4b3ffb9a5fa6f25f9a59d4cfb245e1cf328",
+    "off_sha256": "31ca2b3d05fc79fe99ecc5b54074d4b3ffb9a5fa6f25f9a59d4cfb245e1cf328"
+  },
+  {
+    "seed": 17,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "4105abd012f8f2ffdfe36dc3378d5a5f634f8d1dace8521e13f8aaaa1d302034",
+    "off_sha256": "4105abd012f8f2ffdfe36dc3378d5a5f634f8d1dace8521e13f8aaaa1d302034"
+  },
+  {
+    "seed": 18,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "8f4b7b96d4ffd33609a88c191ddbbc841816a796aeaafbaf55ed8cbf75a15d81",
+    "off_sha256": "8f4b7b96d4ffd33609a88c191ddbbc841816a796aeaafbaf55ed8cbf75a15d81"
+  },
+  {
+    "seed": 19,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "5f72388b09f30bdf09c0bf248182589976db0e91d24936b3f21724231e453660",
+    "off_sha256": "5f72388b09f30bdf09c0bf248182589976db0e91d24936b3f21724231e453660"
+  },
+  {
+    "seed": 20,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "61274202a74f608dfec7668af714046f510fbffc86087ccda75860eee3d578a8",
+    "off_sha256": "61274202a74f608dfec7668af714046f510fbffc86087ccda75860eee3d578a8"
+  },
+  {
+    "seed": 21,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "482ebb4fa51dc225091e679690dd27ed0614f889098134c44cc362cefc24d136",
+    "off_sha256": "482ebb4fa51dc225091e679690dd27ed0614f889098134c44cc362cefc24d136"
+  },
+  {
+    "seed": 22,
+    "rounds": 5,
+    "baseline_assertion": true,
+    "baseline_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6",
+    "off_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6"
+  },
+  {
+    "seed": 23,
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "094e742343f186e781d7141b33792c8b249cc0686bb73572a3220ce9603ba414",
+    "off_sha256": "094e742343f186e781d7141b33792c8b249cc0686bb73572a3220ce9603ba414"
+  }
+]

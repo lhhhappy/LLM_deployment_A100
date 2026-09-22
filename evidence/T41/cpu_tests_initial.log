@@ -1,0 +1,386 @@
+test_budget_input_and_page_cost_preserved (test_sched_protect_chain.ProtectTests) ... ERROR
+test_cold_and_short_hits_interleave_actual_scheduler (test_sched_protect_chain.ProtectTests) ... ERROR
+test_config_alignment_and_minimum_progress (test_sched_protect_chain.ProtectTests) ... ERROR
+test_config_off_ignores_invalid_knobs (test_sched_protect_chain.ProtectTests) ... ERROR
+test_d1_active_chunk_prevents_short_second_partial (test_sched_protect_chain.ProtectTests) ... ERROR
+test_d1_admission_and_tail_splits_preserved (test_sched_protect_chain.ProtectTests) ... ERROR
+test_d1_branch_conflict_stays_native (test_sched_protect_chain.ProtectTests) ... ERROR
+test_explicit_decode_interval_is_not_doubled (test_sched_protect_chain.ProtectTests) ... ERROR
+test_finished_decode_batch_does_not_starve_cold (test_sched_protect_chain.ProtectTests) ... ERROR
+test_kv_no_token_still_refuses_waiter (test_sched_protect_chain.ProtectTests) ... ERROR
+test_lpm_order_short_hits_after_skipped_long (test_sched_protect_chain.ProtectTests) ... ERROR
+test_off_byte_identical_decision_sequences (test_sched_protect_chain.ProtectTests) ... ERROR
+test_only_cold_no_idle_or_decode_gap (test_sched_protect_chain.ProtectTests) ... ERROR
+test_only_decode_unchanged (test_sched_protect_chain.ProtectTests) ... ERROR
+test_original_lpm_role_budget_and_interfaces_unchanged (test_sched_protect_chain.ProtectTests) ... ok
+test_reserve_request_slot_for_continuation (test_sched_protect_chain.ProtectTests) ... ERROR
+test_session_mamba_slot_is_not_freed (test_sched_protect_chain.ProtectTests) ... ERROR
+test_short_requires_device_hit_and_complete_fit (test_sched_protect_chain.ProtectTests) ... ERROR
+test_skipped_mamba_cow_is_freed_before_next_waiter (test_sched_protect_chain.ProtectTests) ... ERROR
+test_starvation_bound_with_endless_short_arrivals (test_sched_protect_chain.ProtectTests) ... ERROR
+test_unsupported_modes_bypass_protection (test_sched_protect_chain.ProtectTests) ... ERROR
+
+======================================================================
+ERROR: test_budget_input_and_page_cost_preserved (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 369, in test_budget_input_and_page_cost_preserved
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[Req('s', 65, cached=1024)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_cold_and_short_hits_interleave_actual_scheduler (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 280, in test_cold_and_short_hits_interleave_actual_scheduler
+    s, _ = make_scheduler(waiting=[cold], running=[Req('running', 1)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_config_alignment_and_minimum_progress (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 408, in test_config_alignment_and_minimum_progress
+    s, _ = make_scheduler(waiting=[Req('c', 20000)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_config_off_ignores_invalid_knobs (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 451, in test_config_off_ignores_invalid_knobs
+    s, ns = make_scheduler()
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_d1_active_chunk_prevents_short_second_partial (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 391, in test_d1_active_chunk_prevents_short_second_partial
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[short], role=True)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_d1_admission_and_tail_splits_preserved (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 381, in test_d1_admission_and_tail_splits_preserved
+    s, ns = make_scheduler(waiting=[] if continuation else [r], chunk=r if continuation else None, role=True)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_d1_branch_conflict_stays_native (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 399, in test_d1_branch_conflict_stays_native
+    s, ns = make_scheduler(waiting=[r], role=True)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_explicit_decode_interval_is_not_doubled (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 419, in test_explicit_decode_interval_is_not_doubled
+    s, _ = make_scheduler(waiting=[Req('c', 20000)], running=[Req('r', 1)], interval=2)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_finished_decode_batch_does_not_starve_cold (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 424, in test_finished_decode_batch_does_not_starve_cold
+    s, _ = make_scheduler(waiting=[Req('c', 8192)], running=[Req('done', 1, output=0)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_kv_no_token_still_refuses_waiter (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 362, in test_kv_no_token_still_refuses_waiter
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[Req('s', 4096, cached=1000)], available=5000)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_lpm_order_short_hits_after_skipped_long (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 318, in test_lpm_order_short_hits_after_skipped_long
+    s, _ = make_scheduler(waiting=[low, long, high], chunk=c)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_off_byte_identical_decision_sequences (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 467, in test_off_byte_identical_decision_sequences
+    s, _ = make_scheduler(root, waiting=initial, running=[Req('running', 1)],
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_only_cold_no_idle_or_decode_gap (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 294, in test_only_cold_no_idle_or_decode_gap
+    s, _ = make_scheduler(waiting=[cold])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_only_decode_unchanged (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 308, in test_only_decode_unchanged
+    s, _ = make_scheduler(root, running=[Req('r', 1)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/baseline/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_reserve_request_slot_for_continuation (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 356, in test_reserve_request_slot_for_continuation
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[Req('s', 64, cached=1000)], slots=1)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_session_mamba_slot_is_not_freed (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 349, in test_session_mamba_slot_is_not_freed
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[long])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_short_requires_device_hit_and_complete_fit (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 326, in test_short_requires_device_hit_and_complete_fit
+    s, _ = make_scheduler(chunk=c, waiting=[Req('host', 100, cached=10000, host=100),
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_skipped_mamba_cow_is_freed_before_next_waiter (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 338, in test_skipped_mamba_cow_is_freed_before_next_waiter
+    s, _ = make_scheduler(chunk=Req('c', 20000), waiting=[long, Req('s', 64, cached=9000)])
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_starvation_bound_with_endless_short_arrivals (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 487, in test_starvation_bound_with_endless_short_arrivals
+    s, _ = make_scheduler(waiting=[c], running=[Req('r', 1, output=10000)], role=role)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+======================================================================
+ERROR: test_unsupported_modes_bypass_protection (test_sched_protect_chain.ProtectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 436, in test_unsupported_modes_bypass_protection
+    s, _ = make_scheduler()
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 169, in make_scheduler
+    ns = load_source(root)
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 146, in load_source
+    compile_nodes(root / 'srt/managers/schedule_policy.py',
+  File "/workspace/Agentic_science_challenge/tests/test_sched_protect_chain.py", line 120, in compile_nodes
+    exec(compile(ast.fix_missing_locations(mod), str(path), 'exec'), ns)
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 222, in <module>
+    class SchedulePolicy:
+  File "/workspace/Agentic_science_challenge/build/p120/candidate/sglang/srt/managers/schedule_policy.py", line 223, in SchedulePolicy
+    Policy = Union[CacheAwarePolicy, CacheAgnosticPolicy]
+NameError: name 'Union' is not defined
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.443s
+
+FAILED (errors=20)

@@ -22,10 +22,9 @@
 | W13（`codex exec` 单任务） | 见 notes/dispatch.md | T27 | 已结束 |
 | W14（`codex exec` 单任务） | 见 notes/dispatch.md | T30/T31 | 已结束 |
 | W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 进行中 |
-| W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 进行中 |
+| W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 已结束（Claude 核验：722/722 token 一致） |
 
 **进行中**
-- [Codex W16] T42 M3 分词移出事件循环与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；将追加共享测试账本。
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex W15] T41 M1 调度保护链中间请求 — `patches/120-sched-protect-chain.*`、`evidence/T41/`；将更新共享测试账本。
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
@@ -35,6 +34,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex W16] T42 M3 分词线程池与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；14单测、722真实对话逐token全同；256733token loop-lag中位数194.57→8.59ms（本地CPU）。F60/决策31/M3，待Claude交叉审阅与8卡验证。
 - [Codex] T40 本地 Claude Code 2.1.278 → 2.1.280；版本核验及 doctor 通过 — `evidence/T40/`
 - [Codex main] T36实际底包探索 — `research/codex/R15_base_source_exploration.md`、F52、`evidence/T36/source_receipt.json`。102的单点替换/状态精度边界、103族/session/salt分离、104五文件依赖与负载保护；407文件与归档全匹配。底包重号F49已仅改F51；无补丁实现或实验。
 - [Codex main] T35近期PR/issue复核 — `research/codex/R14_recent_pr_watchlist.md`、F50、`evidence/T35/github_status.json`；10条状态/正文、56960/40517完整diff，内部快照/DP亲和性/ReplaySSM候选及HiCache前置项；容量+14.7%仅统计修正，外部跑分非本赛结果。仅调研，无实验或引擎/服务变更。

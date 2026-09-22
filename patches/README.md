@@ -5,3 +5,5 @@
   新补丁编号 1xx，叠在 000 之上。
 - `drafts/`：未定稿（102a 单点版，存在 strict-append 退步与 bf16 精度问题，见 plans/active/102-role-track.md）。
 - `v0520/`：v0.5.20 线（001/002/003/004），打不上底包，只作 L1 替身参考。
+
+- `130-async-tokenize`（T42，CPU 已验证、待交叉审阅/L2）：叠在 000→101→110→111 上，完整分词单线程移出 HTTP loop、S1 routing key 接入；开关 `SGLANG_AX_ASYNC_TOKENIZE=0` 回退分词。未加入 RELEASE，说明与证据见同名 `.md` / `evidence/T42/`。

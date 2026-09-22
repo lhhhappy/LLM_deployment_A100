@@ -104,7 +104,7 @@ class AddReqResult(Enum):''')
 
 
 def edit_scheduler(s):
-    s = replace(s, '    SchedulePolicy,\n', '    SchedulePolicy,\n    _ax_sched_protect_config,\n')
+    s = replace(s, '    SchedulePolicy,\n', '    SchedulePolicy,\n    _ax_sched_protect_config,\n    is_dsa_prefill_cp_in_seq_split,\n    is_prefill_context_parallel_enabled,\n')
     # mamba_checkpoint_grid is shared with 101 rather than a duplicated constant.
     s = replace(s, '    def _should_defer_prefill(self) -> bool:\n', '''    def _ax_sched_protect_enabled(self) -> bool:
         # 120 is scoped to ordinary TP serving. Specialized schedulers keep
@@ -114,6 +114,9 @@ def edit_scheduler(s):
             and self.chunked_prefill_size is not None
             and self.ps.pp_size == 1
             and not self.require_mlp_sync
+            and not is_dsa_prefill_cp_in_seq_split()
+            and not is_prefill_context_parallel_enabled()
+            and not self.tree_cache.disable
             and self.disaggregation_mode == DisaggregationMode.NULL
             and self.dllm_config is None
             and not self.is_mixed_chunk
@@ -149,7 +152,11 @@ def edit_scheduler(s):
         self._ax_decode_due = False
         # Called AFTER last extend is merged, so newly completed short requests
         # count as running. With no decoders, immediately continue cold prefill.
-        return due and not running_batch.is_empty() and not running_batch.is_prefill_only
+        return (
+            due
+            and not running_batch.is_prefill_only
+            and any(not req.finished() for req in running_batch.reqs)
+        )
 
     def _should_defer_prefill(self) -> bool:
 ''')
@@ -167,7 +174,10 @@ def edit_scheduler(s):
                     adder.ax_protect is not None
                     and not added
                     and res == AddReqResult.OTHER
-                    and (adder.ax_continuation is not None or adder.new_chunked_req is not None)
+                    and (
+                        adder.ax_continuation is not None
+                        or adder.new_chunked_req is not None
+                    )
                 ):
                     # A long/non-fitting waiter must not hide a short hit. Keep
                     # the native rejection cleanup above, and keep LPM order.

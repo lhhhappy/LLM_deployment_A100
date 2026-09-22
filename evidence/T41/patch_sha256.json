@@ -3,5 +3,5 @@
   "patches/101-d1v12-on-base.patch": "93dbc0e01f60ef52f8997a1e5cd5ef7984640ae09725db39cc530581960da376",
   "patches/110-sm80-dsa-indexer.patch": "e0ed2d96703c6eaea84387508f7e17217cad7fd5db8f9f85250ef51241f1ec5e",
   "patches/111-sm80-fp8-moe-marlin.patch": "67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a",
-  "patches/120-sched-protect-chain.patch": "12aaddd39df3d3968ca20fe29ad93508ad88c1a16e84d594734a4a3b6f0f5db4"
+  "patches/120-sched-protect-chain.patch": "05804a649143387b2e4b9c287666331d984eb11a4d8ff2c2a04a445089e5eb7b"
 }

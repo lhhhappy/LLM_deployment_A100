@@ -1,0 +1,71 @@
+test_batch_key_propagation (__main__.Tests) ... ok
+test_cancel_running_and_waiting (__main__.Tests) ... ok
+test_close_rejects_work (__main__.Tests) ... ok
+test_downstream_key_and_time_code_unchanged (__main__.Tests) ... Executing <Task pending name='Task-13' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /usr/lib/python3.10/unittest/async_case.py:95> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.10/asyncio/base_events.py:429> created at /usr/lib/python3.10/unittest/async_case.py:117> took 0.122 seconds
+ok
+test_dynamic_precedence (__main__.Tests) ... ok
+test_embedding_eos (__main__.Tests) ... ok
+test_exception_releases_slot (__main__.Tests) ... ok
+test_generate_handler_timestamp_and_stream (__main__.Tests) ... ok
+test_header_precedence (__main__.Tests) ... ok
+test_invalid_inputs (__main__.Tests) ... ok
+test_shapes_fast_and_disabled (__main__.Tests) ... ok
+test_slow_encode_branch (__main__.Tests) ... ok
+test_startup_switch_and_dynamic (__main__.Tests) ... ok
+test_thread_identity_and_serialization (__main__.Tests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.335s
+
+OK
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Compared 50 real prompts
+Compared 100 real prompts
+Compared 150 real prompts
+Compared 200 real prompts
+Compared 250 real prompts
+Compared 300 real prompts
+Compared 350 real prompts
+Compared 400 real prompts
+Compared 450 real prompts
+Compared 500 real prompts
+Compared 550 real prompts
+Compared 600 real prompts
+Compared 650 real prompts
+Compared 700 real prompts
+Benchmarked target 100000
+Benchmarked target 250000
+{
+  "real_prompts": 722,
+  "adversarial_prompts": 7,
+  "concurrent_comparisons": 21,
+  "batch_pair_cases": 3,
+  "all_token_ids_equal": true,
+  "frozen_glm_counts_equal": true,
+  "largest_real_tokens": 256733,
+  "largest_real_req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+  "rust_backend_thread": {
+    "elapsed_s": 0.2043980830349028,
+    "max_loop_lag_s": 0.004890917032957077,
+    "heartbeat_count": 112,
+    "ticks_during_encode": 102,
+    "p95_loop_lag_s": 0.0011648340625688433
+  },
+  "prefix_merge_counterexample": {
+    "full": [
+      14978
+    ],
+    "naive_concat": [
+      48808,
+      385
+    ]
+  },
+  "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.35",
+  "transformers": "5.12.1",
+  "tokenizers": "0.22.2",
+  "tokenizer_class": "TokenizersBackend",
+  "is_fast": true,
+  "tokenizers_parallelism": "unset"
+}
