@@ -318,3 +318,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 任务 006（B+110，tilelang）：DSA 已过，MoE `fused_moe_kernel` 编译报 `type fp8e4nv not supported in this architecture`（Triton sm80 只有 fp8e4b15/fp8e5）。
 - 底包已有 vLLM 移植的 `prepare_moe_fp8_layer_for_marlin` 与支持 kFE4M3fn 的 Marlin MoE JIT 核，但 Fp8MoEMethod 未接线；`fused_marlin_moe.get_scalar_type` 在 8 bit 只返回 uint8b128。
 - VERIFIED（pod 单卡 A100）：补丁 111 后相对误差 ≈6e-3，CUDA graph 可捕获；证据 `evidence/F58/`，说明 `patches/111-sm80-fp8-moe-marlin.md`。
+
+## F59 — B+110+111（tilelang）在真实 8×A100 启动并通过功能探测；首次形状触发服务期 Triton 编译
+- pod 任务 008（000+101+110+111，`--dsa-prefill-backend tilelang --dsa-decode-backend tilelang`，env `SGLANG_OPT_DEEPGEMM_HC_PRENORM=0`、`SGLANG_OPT_USE_TOPK_V2=0`）：
+  ENGINE_READY 165 s（页缓存热）；decode CUDA graph 捕获 34 s。
+- 容量（每卡）：KV bf16 943,360 token（11.17 GB）；KDA 状态槽 584（ssm 9.71 GB + conv 0.34 GB，每请求 5 槽）→ max_running_requests=116；chunked_prefill 8192。
+- 探测：500/1500/3000/9000/20000 token 全 200，前缀命中正常（448/1472/2944/8960），`/flush_cache` 返回 JSON 成功。
+- **TTFT 异常**：500 token 58.9 s、9000 token 67.8 s；其余 0.34–1.6 s。原因：KDA Triton 核（`chunk_kda_fwd_kernel_inter_solve_fused`、`_recompute_w_u_fwd_kernel`）
+  按形状在服务期编译，每个变体 1–7 s × 多个（日志自带 "pre-compile it during engine init" 警告）。评测计时阶段若遇到新形状会直接吃掉 TTFT → 需要启动期预热/编译缓存（优化项）。
