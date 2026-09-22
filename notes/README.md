@@ -144,6 +144,8 @@
 - plans/prompts/T41-M1-scheduler.md
 - plans/prompts/T42-M3-tokenize.md
 - plans/prompts/T43-sm80-indexer-kernels.md
+- plans/prompts/T44-prefill-indexer-roofline.md
+- plans/prompts/T45-M2-kda-dual-snapshot.md
 
 ## Reports
 

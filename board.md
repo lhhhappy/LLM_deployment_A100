@@ -25,8 +25,10 @@
 | W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 已结束（Claude 核验：722/722 token 一致） |
 | W17（`codex exec`，astra/xhigh） | logs/codex/W17.log | T43 sm80 indexer 融合 kernel 补丁 112 | 已结束（Claude 核验 summary PASS） |
 | W18（`codex exec`，astra/xhigh） | logs/codex/W18.log | T44 预填充 indexer 逼近算力上限（补丁 113） | 进行中 |
+| W19（`codex exec`，astra/xhigh） | logs/codex/W19.log | T45 M2 KDA 双点 fp32 快照（补丁 140） | 进行中 |
 
 **进行中**
+- [Codex W18] T44：预填充 indexer 优化（113叠加112），产出 `patches/113-*`、`evidence/T44/`；将追加 dispatch/findings/TEST_PLAN 并维护自有生成器与测试。
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）
