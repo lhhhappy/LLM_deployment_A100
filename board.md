@@ -21,8 +21,13 @@
 | W12（`codex exec` 单任务） | 见 notes/dispatch.md | T25 | 已结束 |
 | W13（`codex exec` 单任务） | 见 notes/dispatch.md | T27 | 已结束 |
 | W14（`codex exec` 单任务） | 见 notes/dispatch.md | T30/T31 | 已结束 |
+| W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 进行中 |
+| W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 进行中 |
 
 **进行中**
+- [Codex W16] T42 M3 分词移出事件循环与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；将追加共享测试账本。
+- [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
+- [Codex W15] T41 M1 调度保护链中间请求 — `patches/120-sched-protect-chain.*`、`evidence/T41/`；将更新共享测试账本。
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）
 - [Claude] L2 会话 `lh-arena-sess-a` 排队等卡；GPU 机 tmux `arena-daemons:l2` 守护进程自动跑 `tests/queue/`

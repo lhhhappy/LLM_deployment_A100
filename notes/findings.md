@@ -313,3 +313,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - sm80 上 MHA_ONE_SHOT 预填充只在 sm90/sm100 启用（`dsa_backend.py:4461`），所以预填充也走 tilelang 稀疏路径。
 - VERIFIED（pod 单卡 A100）：对 torch 参考相对误差 ≤3.6e-3，CUDA graph 可捕获；decode（≤64 token）单层 ≈0.32 ms，4096 token 预填充单层 6.4 ms。
   证据 `evidence/F57/`。启动参数改为 `--dsa-prefill-backend tilelang --dsa-decode-backend tilelang`；8 卡启动验证 = 任务 006。
+
+## F58 — A100 上 FP8 MoE 专家必须走 Marlin W8A16（补丁 111）
+- 任务 006（B+110，tilelang）：DSA 已过，MoE `fused_moe_kernel` 编译报 `type fp8e4nv not supported in this architecture`（Triton sm80 只有 fp8e4b15/fp8e5）。
+- 底包已有 vLLM 移植的 `prepare_moe_fp8_layer_for_marlin` 与支持 kFE4M3fn 的 Marlin MoE JIT 核，但 Fp8MoEMethod 未接线；`fused_marlin_moe.get_scalar_type` 在 8 bit 只返回 uint8b128。
+- VERIFIED（pod 单卡 A100）：补丁 111 后相对误差 ≈6e-3，CUDA graph 可捕获；证据 `evidence/F58/`，说明 `patches/111-sm80-fp8-moe-marlin.md`。

@@ -57,6 +57,7 @@
 - **F54** L3 实际运行的 SGLang 代码 = build/base_exact + 我们的补丁（证据链已闭合）
 - **F55** 平台拒收 `name:tag@sha256:digest` 形式的 image；45734/45735 因此部署失败（不计额度）
 - **F56** 原版底包在真实 8×A100 上启动即崩（DeepGEMM 不支持 sm80）；A/B 提交不可能运行
+- **F57** A100 上 DSA 注意力后端必须用 tilelang，不能用 fa3（supersedes F56 中的 fa3 参数）
 
 ## Decisions（最新在上）
 
@@ -128,6 +129,8 @@
 - plans/completed/2026-09-22-d1-role-boundary.md
 - plans/completed/2026-09-22-evaluation-strategy.md
 - plans/completed/2026-09-22-first-8gpu-session.md
+- plans/prompts/T41-M1-scheduler.md
+- plans/prompts/T42-M3-tokenize.md
 
 ## Reports
 

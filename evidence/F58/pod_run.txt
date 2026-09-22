@@ -1,0 +1,8 @@
+# pod lh-arena-sess-a, CUDA_VISIBLE_DEVICES=0 (A100), src /tmp/ax/src/b111 (000+101+110+111, sig 0a61153e026f4305), 2026-09-23
+M=1 rel_err=6.03e-03 time=0.264ms
+M=7 rel_err=5.97e-03 time=0.245ms
+M=64 rel_err=5.88e-03 time=0.243ms
+M=512 rel_err=6.01e-03 time=0.400ms
+M=4096 rel_err=5.86e-03 time=2.347ms
+graph replay rel_err=5.84e-03
+PASS

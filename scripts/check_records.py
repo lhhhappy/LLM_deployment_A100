@@ -31,7 +31,7 @@ else:
     tbl = board.split("## 活跃 Codex 实例", 1)[1].split("**进行中**", 1)[0]
     if not re.search(r"^\| main", tbl, re.M): errors.append("board: main row missing")
     ws = re.findall(r"^\| (W\d+)", tbl, re.M)
-    logs = sorted({p.name.split("_")[0] for p in (root / "logs/codex").glob("W*.log")})
+    logs = sorted({p.name.split("_")[0].split(".")[0] for p in (root / "logs/codex").glob("W*.log")})
     for w in logs:
         if w not in ws: errors.append(f"board: worker {w} has a log but no row (table overwritten?)")
 
