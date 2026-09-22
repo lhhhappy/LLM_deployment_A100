@@ -217,7 +217,7 @@
 - **INFERRED / 开放问题（P112-07）**：微基准证明110算子成本下降，不能直接推出8卡TTFT/TPOT/N@SLO；真实激活、完整服务加载、实际NEXTN、能力与原dev全门仍待Claude。输出矩阵仍为完整fp32（8192×190000≈6.23GB），没有融合topk；cold编译预热仍需服务层安排。建议同基线链仅切112 on/off、原参数/原harness真flush做L2 A/B，并单列NEXTN；这是验证建议，未创建队列或服务。
 - **授权与收尾**：仅使用GPU开发机 `/sjtu/linhang/arena/code/T43` 与 `runs/T43`，自有算子进程全部退出，两卡各4MiB/0%（`gpu_final_idle.log`）。未操作bohr/Trisol/pod、未起8卡/打镜像/提交。F64/D33、TEST_PLAN和已完成计划同步；活跃Codex实例表留给Claude维护。回滚在代码副本反向撤112即可恢复110。
 | T44 | 09-23 | Claude→Codex W18（astra/xhigh） | sm80 预填充 indexer kernel 逼近算力上限（112 仅约 30 TFLOPS，目标 ≥100），补丁 113 或 112v2 | patches/113-*、evidence/T44/、prompt plans/prompts/T44-prefill-indexer-roofline.md | done | accepted → in-progress → done：113叠加112交付；222数值/30graph全过，六档131–186等效TFLOPS、6.19–6.69×；decode源码/PTX保持112。9补丁fuzz0/3623编译/反向字节还原，profile/最终SHA绑定。F65/D34；evidence/T44，计划plans/completed/113-prefill-indexer.md。GPU任务结束，未触碰服务/镜像/提交，L2待Claude。 |
-| T45 | 09-23 | Claude→Codex W19（astra/xhigh） | M2 KDA 双点 fp32 快照（补丁 140，替代 101/105 拆分预填充）：kernel 内导出角色边界状态+卷积历史，缓存树双节点，开关可回退 | patches/140-*、scripts/make_140.py、evidence/T45/、prompt plans/prompts/T45-M2-kda-dual-snapshot.md | in-progress | accepted → in-progress：完成源码路径核对，计划 plans/active/2026-09-23-T45-kda-dual-snapshot.md；140叠加101/105并由开关绕过拆分。CPU真实缓存11项通过；GPU首组逐bit相同，扩展用例发现8.535e-5状态差，正在核查底包按序列长度切换intra融合路径；未通过数值门前不交付为done。GPU仅用1号卡。 |
+| T45 | 09-23 | Claude→Codex W19（astra/xhigh） | M2 KDA 双点 fp32 快照（补丁 140，替代 101/105 拆分预填充）：kernel 内导出角色边界状态+卷积历史，缓存树双节点，开关可回退 | patches/140-*、scripts/make_140.py、evidence/T45/、prompt plans/prompts/T45-M2-kda-dual-snapshot.md | done | accepted → in-progress → done：140补丁/说明/生成器交付；8组GPU（7组边界）最大误差0、21CPU、960轮off调度一致；722真实请求离线回放、完整9补丁fuzz0/3622源码+10工具编译/反向字节还原、20个远端源码SHA匹配。F66/D35；计划已归档，交接见下。仅GPU1算子已退出，未操作服务/8卡/镜像/提交，L2交Claude。 |
 
 ### T44 W18 → Claude：交付
 
@@ -239,3 +239,34 @@
 - **VERIFIED / profile与补丁链（P113-04）**：190k causal的112 CUDA kernel均值624.397ms；113主kernel96.102ms、两次解码合计0.104790ms（0.11%GPU时间）。最终主kernel162寄存器/0spill/48KB shared、sm80 bf16 MMA，无FP8指令。000→101→105→110→111→112→113→120→130全部fuzz0、3623 Python编译、确定再生成、全栈反向逐字节还原/base_exact未改均通过。profile为torch CUDA profiler，非ncu硬件counter。
 - **INFERRED / 开放问题（P113-05）**：预填充算子目标已满足，实际TP8/NEXTN/模型能力与TTFT/TPOT/N@SLO未测。8192×190k额外scratch110.39MiB/调用，fp32输出6.226GB仍存在；服务中的显存池/graph与新形状JIT预热需Claude复核。未融合topk或改输出精度。建议同栈112/113、同参数、真实flush的服务A/B，由Claude安排；本任务未入队。
 - **收尾**：F65/D34、TEST_PLAN、补丁说明/索引、已完成计划均更新；仅GPU开发机arena目录内GPU0算子，进程已退出、收尾两卡4MiB/0%。未操作bohr/Trisol/pod、未起服务/8卡、未打镜像/提交；活跃Codex实例表留给Claude。反向113即可回到112。
+
+### T45 W19 → Claude：交付
+
+- **VERIFIED / 产物与开关**：`patches/140-kda-dual-snapshot.patch` + 同名说明，确定性生成器 `scripts/make_140.py`，源模板 `scripts/p140/`；证据索引 `evidence/T45/README.md`，最终 `summary.json` 绑定补丁、源码、测试与原始证据SHA。140叠加101/105，`SGLANG_AX_KDA_DUAL_SNAPSHOT=1` 时绕过101的admit/tail拆分及105对应限制；默认/0恢复原栈，需重启切换。未入RELEASE/构建脚本/队列。
+- **VERIFIED / 对齐与缓存**：最后user/observation的marker下标r；`G=lcm(64, mamba_checkpoint_grid(page_size))`，角色深度`R=floor(r/G)*G`，不包含marker；对齐prefix P、本次长度L的入树末尾`E=P+floor(L/G)*G`。仅`P<R<E`且槽充足时多分配一槽；R==E复用末尾。未对齐角色向下取整，最多重算G−1个marker前token；槽不足/无角色仅保留末尾；不对齐prefix/streaming session整批回原tracking，不新增调度。kernel从fp32累加器直写角色/末尾池，conv在原位卷积前导出history；实际未对齐末尾仍保留active fp32。
+- **VERIFIED / 所有权与淘汰**：额外slot请求持有→角色insert移交树；duplicate/abort/不缓存finish回收。先原末尾insert，再锁尾、重取树拥有的KV插角色，避免重复释放KV；下一轮经原match/COW恢复conv+SSM。角色标签只归精确深度，tail在可淘汰候选内先于原LRU，Full leaf与pathcap也优先tail；锁仍优先保护。21项CPU真实controller/tree/components/tracking/pool/flush方法与checked allocator通过，每项原sanity_check；busy拒绝/idle真清均覆盖。3种branch×3请求+evict的off缓存JSON字节相同；32组×30轮=960轮off调度JSON字节相同，8组on无双partial，定向role请求2→1次extend。
+- **VERIFIED / 数值（P140-01/02）**：A100-SXM4-80GB、torch2.13.0+cu130/Triton3.7.1，仅GPU1。随机projection/conv/gate权重，实际patched forward_extend→dispatcher→Triton方法与底包算子；支持初始state、strided slot、变长、全部NT_BUCKET。8组最终日志 `numeric_final_v3.log`，下表有效边界的SSM/conv/续算输出误差均0；对齐末尾、active输出/最终状态及off对照也逐元素相同。是算子测试，未加载完整模型权重。
+
+| H×D | 每条extend长度 | 边界offset | fp32边界最大误差 | conv误差 | 续算输出误差 | off与原kernel |
+|---|---|---|---:|---:|---:|---|
+| 64×128 | 273,337 | 128,192 | 0 | 0 | 0 | 逐元素相同 |
+| 64×128 | 128,192 | 64,128 | 0 | 0 | 0 | 逐元素相同 |
+| 64×128 | 65,129 | 64,128 | 0 | 0 | 0 | 逐元素相同 |
+| 64×128 | 1025,833 | 512,640 | 0 | 0 | 0 | 逐元素相同 |
+| 8×128 | 273,337 | 64,256 | 0 | 0 | 0 | 逐元素相同 |
+| 64×128 | 256,320 | 禁用角色槽 | — | — | — | 逐元素相同 |
+| 64×128 | 4097,3073 | 2048,1536 | 0 | 0 | 0 | 逐元素相同 |
+| 64×128 | 8192,4033 | 4096,2048 | 0 | 0 | 0 | 逐元素相同 |
+
+- **VERIFIED / 数值前提与失败史**：初版one-shot/截断prefill跨`B*NT*H<=256`融合阈值有8.535385e-5最大误差，140开启固定非融合intra后解决；短extend可能增加kernel启动成本。关闭调用原始Triton函数且源字节完全保留，仍按原阈值选择。两臂最终共享源码相同的gate/output helpers及autotune选择；独立helper副本最初冷对照曾失败（未记录差值），未改源码暖重跑通过，不能把该失败单独归因140或断言所有独立冷启动bitexact。全部失败日志保留。
+- **VERIFIED / 离线估算（P140-06，MODEL OUTPUT）**：原Renderer+glm_tok，722请求/311链/34,416,777输入token，全部冻结计数一致。每链空缓存串行回放，无未来oracle；无限容量、prompt-only，不含decode状态、淘汰、并发准入或retraction。下表不是实测cached_tokens/SLO；分别6/73请求命中改善，均0退步。
+
+| 调度chunk | off命中token（101+105） | on命中token | 增加 | off→on extend次数 | 移除101 split次数 |
+|---:|---:|---:|---:|---:|---:|
+| 8192 | 16,886,400 | 16,903,104 | 16,704 | 3284→2616 | 666 |
+| 2048 | 16,806,912 | 16,905,152 | 98,240 | 9430→8949 | 428 |
+
+- **VERIFIED / 打包（P140-07）**：000→101→105→110→111→112→140→120→130全部`patch -p3 --fuzz=0`、3622源码+10工具py_compile、确定再生成、应用与生成树一致、整栈反向字节还原、base_exact未改。20个远端实际源码/测试/oracle哈希与交付一致；140 SHA256 `1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35`。
+- **INFERRED / 开放问题**：少一轮调度与保留角色状态可能改善链中间延迟，尚无8卡吞吐、TPOT或N@SLO证明。固定非融合intra成本、每rank约17.6MiB额外state、有限池slot跳过、tail淘汰对共享的影响须实测。完整服务导入、真实权重/34层、TP8 collective、overlap长跑、能力及冷autotune仍未验证。开启限制普通GLM TP、extra_buffer、fp32、FULL+MAMBA Python cache；NEXTN/spec、HiCache、lazy/int8/unified、SWA、session radix、DP/CP/PP/PD/mixed/TBO/ReplaySSM显式拒绝，不能直接带入现有NEXTN配置。
+- **8卡A/B方案（P140-08，未执行）**：Claude审阅后同一栈仅切140 off/on，普通TP8无NEXTN、101 IDs保留、120/130保持一致，外部中性元数据、内部profile设开关。先真实reminder/branch/非整页链核对缓存命中、extend范围/次数、输出/logits和计数；再default overlap、长冷+短热、Mamba/KV压力、duplicate/abort/retract/槽耗尽，检查树/锁/池及busy/idle flush、flush后首请求cached_tokens=0。原dev每档真flush交替A→B→A，N6/10→14/18/22，比较全部TTFT桶/TPOT/错误门、显存与slot_skip；先chunk8192，再单列120/2048消融，避免同时混入113。NEXTN等需另行接线验证。
+- **收尾**：F66/D35、TEST_PLAN、已完成计划与board自有任务条目已更新；活跃实例表留给Claude。开发机自有算子已退出，两卡4MiB/0%（gpu_final_idle.log）；仅arena目录内工作，未操作bohr/Trisol/pod、8卡、镜像或提交。回滚为开关0重启，或在副本反向撤下游后撤140。

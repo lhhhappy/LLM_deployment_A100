@@ -3,6 +3,8 @@
 import argparse
 import importlib.util
 import json
+import os
+from unittest.mock import patch
 import sys
 from pathlib import Path
 from types import SimpleNamespace as NS
@@ -237,10 +239,67 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(hit.device_indices),256)
 
 
+    def test_configuration_guard_and_off_bypass(self):
+        import types
+        runtime=types.ModuleType('sglang.srt.runtime_context')
+        args=NS(disaggregation_mode='null')
+        runtime.get_server_args=lambda:args
+        runtime.process_model_config=lambda:NS(hf_config=NS(architectures=['Glm5NextForConditionalGeneration']))
+        sys.modules[runtime.__name__]=runtime
+        c=NS(is_mamba_enabled=True,is_swa_enabled=False,_tree_core_backend='python',
+             req_to_token_pool=NS(mamba_pool=NS(mamba_cache=NS(temporal=torch.zeros(1)))))
+        params=NS(disable=False,is_eagle=False,enable_mamba_extra_buffer=True,
+                  enable_mamba_extra_buffer_lazy=False,pp_size=1,attn_cp_size=1,enable_session_radix_cache=False)
+        with patch.dict(os.environ,{'SGLANG_AX_KDA_DUAL_SNAPSHOT':'1'}):
+            self.assertTrue(helper.configure(c,params))
+            for flag in ('enable_unified_memory','enable_two_batch_overlap','enable_mixed_chunk',
+                         'enable_hierarchical_cache','enable_int8_mamba_checkpoint','enable_linear_replayssm',
+                         'enable_dp_attention','speculative_algorithm'):
+                setattr(args,flag,True)
+                with self.assertRaises(ValueError):helper.configure(c,params)
+                setattr(args,flag,False)
+            c.req_to_token_pool.mamba_pool.mamba_cache.temporal=torch.zeros(1,dtype=torch.bfloat16)
+            with self.assertRaises(ValueError):helper.configure(c,params)
+        with patch.dict(os.environ,{'SGLANG_AX_KDA_DUAL_SNAPSHOT':'0'}):
+            self.assertFalse(helper.configure(None,None))
+
+
+def off_trace():
+    rows=[]
+    for branch in (None,64,128):
+        c=cache_fixture(P,on=False,cap=2)
+        for i in range(3):
+            ids=[1]*337;ids[150]=154827;ids[200]=i+2
+            r=Req(P,c,ids,i)
+            r.mamba_branching_seqlen=branch
+            b=NS(tree_cache=c,req_to_token_pool=c.req_to_token_pool,
+                 model_config=NS(hf_text_config=NS(mamba_chunk_size=64)),ax_kda_dual_snapshot_batch=False)
+            entry=P._mamba_radix_cache_v2_req_prepare_for_extend(b,r)
+            c.cache_finished_req(r,kv_len_to_handle=337)
+            hit=c.match_prefix(P.MatchPrefixParams(P.RadixKey(ids)))
+            nodes=sorted((list(n.key), None if n.component_data[P.ComponentType.MAMBA].value is None
+                          else n.component_data[P.ComponentType.MAMBA].value.tolist(),
+                          n.component_data[P.ComponentType.MAMBA].lock_ref,
+                          n.component_data[P.ComponentType.FULL].lock_ref)
+                         for n in c.tree_core._node_arena.values() if n.parent is not None)
+            rows.append(dict(branch=branch,step=i,entry=list(entry),hit=len(hit.device_indices),nodes=nodes,
+                             slots=sorted(c.req_to_token_pool.mamba_allocator.live),
+                             kv=sorted(c.token_to_kv_pool_allocator.live)))
+            c.tree_core.sanity_check([],[])
+        c.evict(P.EvictParams(num_tokens=9999,mamba_num=999))
+        rows.append(dict(branch=branch,empty_slots=sorted(c.req_to_token_pool.mamba_allocator.live),
+                         empty_kv=sorted(c.token_to_kv_pool_allocator.live)))
+    return rows
+
+
 def main():
     global P,helper
     parser=argparse.ArgumentParser(); parser.add_argument('--source',type=Path,required=True)
+    parser.add_argument('--off-trace',type=Path)
     args=parser.parse_args(); P=load(args.source)
+    if args.off_trace:
+        args.off_trace.write_text(json.dumps(off_trace(),sort_keys=True,separators=(',',':'))+'\n')
+        print('OFF trace complete'); return
     path=args.source/'srt/mem_cache/kda_dual_snapshot.py'
     spec=importlib.util.spec_from_file_location('sglang.srt.mem_cache.kda_dual_snapshot',path)
     helper=importlib.util.module_from_spec(spec); sys.modules[spec.name]=helper; spec.loader.exec_module(helper)

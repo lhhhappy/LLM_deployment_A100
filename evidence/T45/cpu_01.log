@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 154, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 145, in main
+    args=parser.parse_args(); P=load(args.source)
+                                ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T45/p140/cpu_fixture.py", line 75, in load
+    execute('srt/disaggregation/kv_events.py')
+  File "/sjtu/linhang/arena/code/T45/p140/cpu_fixture.py", line 65, in execute
+    exec(compile(tree, str(root / rel), 'exec'), g)
+  File "candidate/sglang/srt/disaggregation/kv_events.py", line 251, in <module>
+    class StorageMedium(str, enum.Enum):
+                             ^^^^
+NameError: name 'enum' is not defined. Did you mean: 'Enum'? Or did you forget to import 'enum'?

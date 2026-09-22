@@ -1,0 +1,17 @@
+test_abort_discards_slot (__main__.Tests.test_abort_discards_slot) ... ok
+test_alignment (__main__.Tests.test_alignment) ... ok
+test_duplicate_role_no_kv_double_free (__main__.Tests.test_duplicate_role_no_kv_double_free) ... ok
+test_finished_insert (__main__.Tests.test_finished_insert) ... ok
+test_flush_resets_tree_and_pools (__main__.Tests.test_flush_resets_tree_and_pools) ... ok
+test_full_eviction_tail_before_other_leaf (__main__.Tests.test_full_eviction_tail_before_other_leaf) ... ok
+test_insert_match_restore_refcounts (__main__.Tests.test_insert_match_restore_refcounts) ... ok
+test_locked_tail_not_evicted (__main__.Tests.test_locked_tail_not_evicted) ... ok
+test_mamba_eviction_tail_before_role (__main__.Tests.test_mamba_eviction_tail_before_role) ... ok
+test_path_cap_preserves_role (__main__.Tests.test_path_cap_preserves_role) ... ok
+test_pressure_skips_optional (__main__.Tests.test_pressure_skips_optional) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.102s
+
+OK
+{"tests": 11, "failures": 0, "errors": 0}

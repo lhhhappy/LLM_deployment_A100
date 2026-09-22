@@ -26,6 +26,7 @@ patching file srt/layers/attention/dsa/sm80_deep_gemm.py
 patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
 140-kda-dual-snapshot
 patching file kernels/ops/attention/fla/chunk_delta_h.py
+patching file kernels/ops/attention/fla/chunk_delta_h_snapshot.py
 patching file kernels/ops/attention/fla/kda.py
 patching file kernels/ops/attention/fla/kda_snapshot.py
 patching file srt/layers/attention/linear/kda_backend.py
@@ -107,6 +108,7 @@ Hunk #7 succeeded at 1452 (offset 2 lines).
 patching file srt/managers/scheduler.py
 140-kda-dual-snapshot
 patching file kernels/ops/attention/fla/chunk_delta_h.py
+patching file kernels/ops/attention/fla/chunk_delta_h_snapshot.py
 patching file kernels/ops/attention/fla/kda.py
 patching file kernels/ops/attention/fla/kda_snapshot.py
 patching file srt/layers/attention/linear/kda_backend.py

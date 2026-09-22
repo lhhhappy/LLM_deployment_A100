@@ -9,6 +9,7 @@
   ],
   "changed": [
     "kernels/ops/attention/fla/chunk_delta_h.py",
+    "kernels/ops/attention/fla/chunk_delta_h_snapshot.py",
     "kernels/ops/attention/fla/kda.py",
     "kernels/ops/attention/fla/kda_snapshot.py",
     "srt/layers/attention/linear/kda_backend.py",
@@ -22,5 +23,5 @@
     "srt/mem_cache/unified_radix_cache.py",
     "srt/model_executor/forward_batch_info.py"
   ],
-  "patch_sha256": "6acdd461f88fd0152dd385ad11dde46cfb89462445bad5f6d229d1ffbf68752d"
+  "patch_sha256": "1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35"
 }

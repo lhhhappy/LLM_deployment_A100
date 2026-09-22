@@ -1,0 +1,28 @@
+Tue Sep 22 20:28:20 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   30C    P0              62W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{"capability": [8, 0], "device": "NVIDIA A100-SXM4-80GB", "files": {"kernels/ops/attention/fla/chunk_delta_h.py": "8cceaadccb3744ec1cc8d52ab581339129d70bed4de603f8c18848b78839ae93", "kernels/ops/attention/fla/kda.py": "153d7d2450532a4e04c10ab511c62af5447b0faaee131c50630e7c61f68c5991", "kernels/ops/attention/fla/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5", "srt/hardware_backend/xpu/kernels/fla/chunk_delta_h.py": "0c4ed9c26ae0529f661ab906d7c35c6cb26e07358aadc09b36690cecd7c84754"}, "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "kind": "off_check", "lengths": [273, 337], "output": {"elements": 4997120, "equal": true, "max_abs": 0.0, "rms": 0.0}}
+{"boundaries": [128, 192], "boundary": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "conv": {"elements": 147456, "equal": true, "max_abs": 0.0, "rms": 0.0}, "dim": 128, "end": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "exporter_final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "exporter_output": {"elements": 4997120, "equal": true, "max_abs": 0.0, "rms": 0.0}, "final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "guard_untouched": true, "heads": 64, "kind": "numeric", "lengths": [273, 337], "off_baseline_final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "off_baseline_output": {"elements": 4997120, "equal": true, "max_abs": 0.0, "rms": 0.0}, "resume": {"elements": 2375680, "equal": true, "max_abs": 0.0, "rms": 0.0}, "seed": 42, "strided": false, "warm_prefix": false}
+{"cases": 1, "kind": "complete", "passed": true}

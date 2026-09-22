@@ -1,0 +1,55 @@
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+{
+  "assumptions": "unlimited cache; chains independent and serial; prompt tokens only; no decode checkpoints/eviction/retraction/admission pressure; current-prompt-only boundary selection",
+  "transformers": "5.12.1",
+  "tokenizers": "0.22.2",
+  "chains": 311,
+  "chunks": {
+    "8192": {
+      "off": {
+        "requests": 722,
+        "hit_tokens": 16886400,
+        "uncached_tokens": 17530377,
+        "extends": 3284,
+        "extra_101_splits": 666,
+        "fast_intra_requests": 367,
+        "fast_intra_uncached_p95": 90123
+      },
+      "on": {
+        "requests": 722,
+        "hit_tokens": 16903104,
+        "uncached_tokens": 17513673,
+        "extends": 2616,
+        "extra_101_splits": 0,
+        "fast_intra_requests": 367,
+        "fast_intra_uncached_p95": 90123
+      },
+      "improved": 6,
+      "regressed": 0,
+      "hit_delta": 16704
+    },
+    "2048": {
+      "off": {
+        "requests": 722,
+        "hit_tokens": 16806912,
+        "uncached_tokens": 17609865,
+        "extends": 9430,
+        "extra_101_splits": 428,
+        "fast_intra_requests": 367,
+        "fast_intra_uncached_p95": 90123
+      },
+      "on": {
+        "requests": 722,
+        "hit_tokens": 16905152,
+        "uncached_tokens": 17511625,
+        "extends": 8949,
+        "extra_101_splits": 0,
+        "fast_intra_requests": 367,
+        "fast_intra_uncached_p95": 90123
+      },
+      "improved": 73,
+      "regressed": 0,
+      "hit_delta": 98240
+    }
+  }
+}

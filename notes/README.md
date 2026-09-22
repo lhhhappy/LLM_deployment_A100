@@ -66,9 +66,11 @@
 - **F63** A100 上的主瓶颈是补丁 110 的 torch 版 DSA indexer（占约 60% GPU 时间）
 - **F64** T43/112：sm80融合indexer保持110数值/边界/graph语义，开发机算子加速（W17）
 - **F65** T44/113：预填充131–186等效TFLOPS，decode保持112（W18）
+- **F66** T45/140：KDA双点fp32快照、数值前提与离线命中估算（W19）
 
 ## Decisions（最新在上）
 
+- **#35** T45/140叠加101/105，以SGLANG_AX_KDA_DUAL_SNAPSHOT启动开关替换split为双点fp32导出；额外角色槽可失败降级、tail先淘汰；开启固定非融合intra，关闭走原kernel字节
 - **#34** T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退
 - **#33** T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口
 - **#32** T41/120 默认启用普通 TP 调度保护：续算先保留对齐的 2048 token 上限预算，剩余预算按原 LPM 接完整短命中；prefill 后有存活 decoder 才交替一次；不启用 mixed、不重排 LPM。环境变量关可逐决策回退 
@@ -139,12 +141,12 @@
 ## Plans
 
 - plans/active/102-role-track.md
-- plans/active/2026-09-23-T45-kda-dual-snapshot.md
 - plans/completed/112-sm80-indexer.md
 - plans/completed/113-prefill-indexer.md
 - plans/completed/2026-09-22-d1-role-boundary.md
 - plans/completed/2026-09-22-evaluation-strategy.md
 - plans/completed/2026-09-22-first-8gpu-session.md
+- plans/completed/2026-09-23-T45-kda-dual-snapshot.md
 - plans/prompts/T41-M1-scheduler.md
 - plans/prompts/T42-M3-tokenize.md
 - plans/prompts/T43-sm80-indexer-kernels.md

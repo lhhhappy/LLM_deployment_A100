@@ -12,11 +12,12 @@ Generated patches/140-kda-dual-snapshot.patch
     "120-sched-protect-chain",
     "130-async-tokenize"
   ],
-  "files": 3621,
-  "tools": 8,
+  "files": 3622,
+  "tools": 10,
   "deterministic": true,
   "applied_equals_candidate": true,
   "base_unchanged": true,
+  "original_triton_kernel_bytes_equal": true,
   "full_reverse_exact": true,
-  "patch_sha256": "6acdd461f88fd0152dd385ad11dde46cfb89462445bad5f6d229d1ffbf68752d"
+  "patch_sha256": "1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35"
 }

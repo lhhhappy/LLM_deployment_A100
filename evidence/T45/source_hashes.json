@@ -1,0 +1,22 @@
+{
+  "candidate/sglang/kernels/ops/attention/fla/chunk_delta_h.py": "4e24e178a2b4dfbb5f4ad5ee0a86e9371f0a273e7822dd1bff7509bfd93ecd24",
+  "candidate/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "ee6301244990657e4418f445493f65f4f0bfaad459142c5a797e3a36bed68cc2",
+  "candidate/sglang/kernels/ops/attention/fla/kda.py": "153d7d2450532a4e04c10ab511c62af5447b0faaee131c50630e7c61f68c5991",
+  "candidate/sglang/kernels/ops/attention/fla/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5",
+  "candidate/sglang/srt/layers/attention/linear/kda_backend.py": "bfd038fdec7b63a9fd65fbe5ebe88d49a124af575268eacea1aab8ebe16614ad",
+  "candidate/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "3b13e2ebbdc727ba7da3ce86348acf57bd65c2f396835a1bbaa783f8c7de1c14",
+  "candidate/sglang/srt/managers/schedule_batch.py": "12461a8f0628c06ce7c4688067588bb04890bc262392f8512f15e268df2ef904",
+  "candidate/sglang/srt/managers/schedule_policy.py": "9d50c503bd2b0f997603832d7364b5f8fdab6d50bb48364f34345e78f7e5c7ba",
+  "candidate/sglang/srt/mem_cache/kda_dual_snapshot.py": "23949c4c62be1c7c14937814bf94b71907c4f03a3d115c028e0a1b042f76f57e",
+  "candidate/sglang/srt/mem_cache/memory_pool.py": "681638086d390b97c06fb8e277a6bbfdb00eef214e16860811ef5c4c91632f47",
+  "candidate/sglang/srt/mem_cache/unified_cache/components/full_component.py": "3473df2c0bd35b952df3be477fb44d048e88337fa86ce9099182549bf28c76e7",
+  "candidate/sglang/srt/mem_cache/unified_cache/components/mamba_component.py": "3d1860ccd92c4a70b4b08e2b9af451bb0376865320734454153604417ded0632",
+  "candidate/sglang/srt/mem_cache/unified_radix_cache.py": "f4c82a08c4ad4582c6609c5c025c061690ce123706a210a106ee581c6da245ab",
+  "candidate/sglang/srt/model_executor/forward_batch_info.py": "b8ffea7aed79c5c741462a12f320a5d9878f6886dadee7f8bfc31585bb119013",
+  "test_kda_snapshot_140.py": "7c856a46f0e7b309b2641d82f24240bfb1c3d93ea1501316e2177344ef971aa3",
+  "test_kda_snapshot_cache_140.py": "bbb1f40d3049500dc1e39c12f090d2b1383867504cf239a8144938d0d705ecc8",
+  "replay_kda_snapshot_140.py": "3f22a6790fdaf770323bd6912518edc0b01cdb405f48a6be50e03a691d9899f0",
+  "p140/cpu_fixture.py": "b282931bbabb80a5f8c4d79984199eeed31e48e6dc20f0b6ade4a91829d8b938",
+  "baseline/kda.py": "aa32ae9abdb14f5d333f6479fc9e40498439e6e4a8dd1fe8a4d1b932484b85f4",
+  "baseline/chunk_delta_h.py": "580a24d2e91c885ef180f5135978c3cc35f01e96a17776baa4b13fe06533bb60"
+}

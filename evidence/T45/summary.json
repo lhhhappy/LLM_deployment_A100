@@ -1,0 +1,736 @@
+{
+  "status": "PASS",
+  "environment": {
+    "capability": [
+      8,
+      0
+    ],
+    "device": "NVIDIA A100-SXM4-80GB",
+    "files": {
+      "kernels/ops/attention/fla/chunk_delta_h.py": "4e24e178a2b4dfbb5f4ad5ee0a86e9371f0a273e7822dd1bff7509bfd93ecd24",
+      "kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "ee6301244990657e4418f445493f65f4f0bfaad459142c5a797e3a36bed68cc2",
+      "kernels/ops/attention/fla/kda.py": "153d7d2450532a4e04c10ab511c62af5447b0faaee131c50630e7c61f68c5991",
+      "kernels/ops/attention/fla/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5",
+      "srt/hardware_backend/xpu/kernels/fla/chunk_delta_h.py": "0c4ed9c26ae0529f661ab906d7c35c6cb26e07358aadc09b36690cecd7c84754",
+      "srt/layers/attention/linear/kda_backend.py": "bfd038fdec7b63a9fd65fbe5ebe88d49a124af575268eacea1aab8ebe16614ad",
+      "srt/layers/attention/linear/kernels/kda_triton.py": "3b13e2ebbdc727ba7da3ce86348acf57bd65c2f396835a1bbaa783f8c7de1c14"
+    },
+    "kind": "environment",
+    "torch": "2.13.0+cu130",
+    "triton": "3.7.1"
+  },
+  "numeric": [
+    {
+      "boundaries": [
+        128,
+        192
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 4997120,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        273,
+        337
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 4997120,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 2375680,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 42,
+      "strided": false,
+      "warm_prefix": false
+    },
+    {
+      "boundaries": [
+        64,
+        128
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 2621440,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        128,
+        192
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 2621440,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 1048576,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 43,
+      "strided": false,
+      "warm_prefix": false
+    },
+    {
+      "boundaries": [
+        64,
+        128
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 1589248,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        65,
+        129
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 1589248,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 16384,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 44,
+      "strided": true,
+      "warm_prefix": true
+    },
+    {
+      "boundaries": [
+        512,
+        640
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 15220736,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        1025,
+        833
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 15220736,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 5783552,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 45,
+      "strided": true,
+      "warm_prefix": false
+    },
+    {
+      "boundaries": [
+        64,
+        256
+      ],
+      "boundary": {
+        "elements": 262144,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 18432,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 262144,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 262144,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 624640,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 262144,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 8,
+      "kind": "numeric",
+      "lengths": [
+        273,
+        337
+      ],
+      "off_baseline_final": {
+        "elements": 262144,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 624640,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 296960,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 46,
+      "strided": false,
+      "warm_prefix": true
+    },
+    {
+      "boundaries": [
+        -1,
+        -1
+      ],
+      "boundary": null,
+      "conv": null,
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 4718592,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": null,
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        256,
+        320
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 4718592,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": null,
+      "seed": 47,
+      "strided": true,
+      "warm_prefix": false
+    },
+    {
+      "boundaries": [
+        2048,
+        1536
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 58736640,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        4097,
+        3073
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 58736640,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 29376512,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 48,
+      "strided": false,
+      "warm_prefix": true
+    },
+    {
+      "boundaries": [
+        4096,
+        2048
+      ],
+      "boundary": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "conv": {
+        "elements": 147456,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "dim": 128,
+      "end": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "exporter_output": {
+        "elements": 100147200,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "guard_untouched": true,
+      "heads": 64,
+      "kind": "numeric",
+      "lengths": [
+        8192,
+        4033
+      ],
+      "off_baseline_final": {
+        "elements": 2097152,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "off_baseline_output": {
+        "elements": 100147200,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "resume": {
+        "elements": 49815552,
+        "equal": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "seed": 49,
+      "strided": true,
+      "warm_prefix": false
+    }
+  ],
+  "numeric_cases": 8,
+  "boundary_resume_cases": 7,
+  "max_abs": 0,
+  "cpu": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0
+  },
+  "cache_off_bytes_equal": true,
+  "cache_off_scenarios": 3,
+  "scheduler_off_cases": 32,
+  "scheduler_off_rounds": 960,
+  "scheduler_on_cases": 8,
+  "role_example_extends": {
+    "off": 2,
+    "on": 1
+  },
+  "remote_source_files_match": 20,
+  "stack": {
+    "status": "PASS",
+    "patches": [
+      "000-interface-compliance",
+      "101-d1v12-on-base",
+      "105-role-split-single-partial",
+      "110-sm80-dsa-indexer",
+      "111-sm80-fp8-moe-marlin",
+      "112-sm80-indexer-kernels",
+      "140-kda-dual-snapshot",
+      "120-sched-protect-chain",
+      "130-async-tokenize"
+    ],
+    "files": 3622,
+    "tools": 10,
+    "deterministic": true,
+    "applied_equals_candidate": true,
+    "base_unchanged": true,
+    "original_triton_kernel_bytes_equal": true,
+    "full_reverse_exact": true,
+    "patch_sha256": "1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35"
+  },
+  "replay": {
+    "assumptions": "unlimited cache; chains independent and serial; prompt tokens only; no decode checkpoints/eviction/retraction/admission pressure; current-prompt-only boundary selection",
+    "transformers": "5.12.1",
+    "tokenizers": "0.22.2",
+    "chains": 311,
+    "chunks": {
+      "8192": {
+        "off": {
+          "requests": 722,
+          "hit_tokens": 16886400,
+          "uncached_tokens": 17530377,
+          "extends": 3284,
+          "extra_101_splits": 666,
+          "fast_intra_requests": 367,
+          "fast_intra_uncached_p95": 90123
+        },
+        "on": {
+          "requests": 722,
+          "hit_tokens": 16903104,
+          "uncached_tokens": 17513673,
+          "extends": 2616,
+          "extra_101_splits": 0,
+          "fast_intra_requests": 367,
+          "fast_intra_uncached_p95": 90123
+        },
+        "improved": 6,
+        "regressed": 0,
+        "hit_delta": 16704
+      },
+      "2048": {
+        "off": {
+          "requests": 722,
+          "hit_tokens": 16806912,
+          "uncached_tokens": 17609865,
+          "extends": 9430,
+          "extra_101_splits": 428,
+          "fast_intra_requests": 367,
+          "fast_intra_uncached_p95": 90123
+        },
+        "on": {
+          "requests": 722,
+          "hit_tokens": 16905152,
+          "uncached_tokens": 17511625,
+          "extends": 8949,
+          "extra_101_splits": 0,
+          "fast_intra_requests": 367,
+          "fast_intra_uncached_p95": 90123
+        },
+        "improved": 73,
+        "regressed": 0,
+        "hit_delta": 98240
+      }
+    }
+  },
+  "sha256": {
+    "patches/140-kda-dual-snapshot.patch": "1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35",
+    "patches/140-kda-dual-snapshot.md": "df0a2cdd1b1c316eb655b747e9ec5377ac5cb1469af4c8aa03508aabb8b6492d",
+    "scripts/make_140.py": "2748597e416cb0b5039c4011e4eec21ceaf2b984c25d50236b917f663e49e485",
+    "scripts/replay_kda_snapshot_140.py": "3f22a6790fdaf770323bd6912518edc0b01cdb405f48a6be50e03a691d9899f0",
+    "scripts/summarize_140.py": "ad9009bbabdf2c8b454ba8a5cf67746f6d1fa95121b7322975d584009e159e33",
+    "scripts/test_kda_snapshot_140.py": "7c856a46f0e7b309b2641d82f24240bfb1c3d93ea1501316e2177344ef971aa3",
+    "scripts/test_kda_snapshot_cache_140.py": "bbb1f40d3049500dc1e39c12f090d2b1383867504cf239a8144938d0d705ecc8",
+    "scripts/test_kda_snapshot_scheduler_140.py": "41df4e3e1a4ed3c72d774cc518435870a4300475d86080f934eae902b3353b82",
+    "scripts/verify_140.py": "ff3b77b9f53cbe2e5f93f81a9a7ed3bf5d2090642f40ae6c7c0da9d7d980e5ba",
+    "scripts/p140/cpu_fixture.py": "b282931bbabb80a5f8c4d79984199eeed31e48e6dc20f0b6ade4a91829d8b938",
+    "scripts/p140/kda_dual_snapshot.py": "23949c4c62be1c7c14937814bf94b71907c4f03a3d115c028e0a1b042f76f57e",
+    "scripts/p140/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5",
+    "scripts/run_kda_snapshot_140.sh": "638b9657946071f8870c4af8d250cae5f86ce37316c8e80712047c7d4f20d2c5",
+    "evidence/T45/numeric_final.log": "584377877a41774ae190a787eea7edafe6469df23784bbfb32560e0d80b85c4d",
+    "evidence/T45/generate_receipt.json": "e258e6ae95ad7373513befeaa662bdcbaada7db99c5883314564b5c9356c220e",
+    "evidence/T45/remote_hash_receipt.py": "d717e0806f87c46d1e74f336497d71c203883e51de64ee9ed93f1bd358c6d184",
+    "evidence/T45/scheduler_summary.json": "ef11f58d93e47abcbe292e06c2b165768b496a59d7dcfcb7d1b0529134c4251b",
+    "evidence/T45/verify.log": "f1b8b3305a892750513658fea37caee2d1fc9d67e4c84e2127a15cbc686f4d49",
+    "evidence/T45/cpu_final.log": "3ddea014956b8bbc537ce48a94df68973c809a43908146b327b0257d2d1cfb27",
+    "evidence/T45/environment.log": "ce167e5a70b077dbeb2ca42c7b9cb1f80b2ccda1728bad498b84992696e5a2fc",
+    "evidence/T45/numeric_final_v3.log": "b7cb6990899e4608d00d602519dab0c2b8b2a63a7a264ec291617fa6e838ecc9",
+    "evidence/T45/numeric_final_v2.log": "be5a10d9e98740fff8541bcfe04504987e5b0d016ed22ed79f21131e1b22d5e7",
+    "evidence/T45/scheduler_on_traces.json": "ac83fc1598828855fcb2b4982c3170a66860b2751a7392a90fca4dbd3d8618bb",
+    "evidence/T45/cache_off_candidate.json": "69412ec97d15d80b21e0e2e86290bc01926f0d95d235a7f72579ea3fe0093da1",
+    "evidence/T45/off_debug.log": "ba039051d55aae58bdb2dd60f2610b19519e83a52d8e4d22a720eb0913026f80",
+    "evidence/T45/cpu_final_command.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/T45/gpu_preflight.log": "a9a28311dbf43379f87493d4a80af83ee3d4758ece80b9bc211782fbbe1c61cf",
+    "evidence/T45/cpu_02.log": "ee638ed4cb8cf94d42cfd39648aa283416854df33c803f3913aa75e6de88beee",
+    "evidence/T45/cpu_03.log": "660cedbe450b1ad4654edda32e1c2b957bd459b10cd797d20147b60bca0576cb",
+    "evidence/T45/cpu_01.log": "9b4be6174734ae27fb4108362ba4321633693d4eb48c074c222fb081b5d0d515",
+    "evidence/T45/numeric_smoke.log": "8ac643a90e9cc19d001c30dec57a31f76937d76db246ff1e4a391285daab7318",
+    "evidence/T45/cpu_04.log": "ea9366c3ece4754599e86c404622acdb3998d25eaa0eb019ef328d31681b1c15",
+    "evidence/T45/full_stack_apply.log": "87f47243b9333beb0221ebc5d2dab3fafaf5a991092dab49af4e1ee601666c23",
+    "evidence/T45/cpu_final_v2_command.log": "1f002fbbe1b98e980f3fa6aef6e8886eb066bcd1364343d337ea5cb65074e6e3",
+    "evidence/T45/cache_off_baseline.json": "69412ec97d15d80b21e0e2e86290bc01926f0d95d235a7f72579ea3fe0093da1",
+    "evidence/T45/cpu_final_v2.log": "372db1ba5f238184f3972bdc6f7035a21b9b3ffa26b2abad4226e40e5eaa8cd4",
+    "evidence/T45/source_hashes.json": "a608eef228797ec03ecf36b69d1d38cd81b9943ffede3b749c180ce4c018eab9",
+    "evidence/T45/scheduler_tests.log": "e385d4929761ff475572a2e3e6321bdc33cc080616c7b45211524aa0b66f076f",
+    "evidence/T45/replay.log": "70795c0e0b0eab55513e301a27308810283e8998a3a572aee3d587fc98816dc4",
+    "evidence/T45/numeric_01.log": "07ba5c19e367cace3aaa751a51d1b205f35204c8efecee998f5f573ee070d511",
+    "evidence/T45/numeric_02.log": "fa9be17036dfdf2531ec52d74c928cb88d553dfefc6587f7cb25ddb4d463b303",
+    "evidence/T45/gpu_final_idle.log": "f96bfa652cb862d0ef914fc1b4e9b2bb58bc21b9c503a133c5c494d0e35c2682",
+    "evidence/T45/generate_apply.log": "f6a8a12c532e1f7995b7bc527db3a15aa69410a81d8ec8d269b7d5b573600806",
+    "evidence/T45/scheduler_off_traces.json": "0ac5041b54e37aeae9e0ee1bea0e246d67b045ed0adb5c0e2354d1e6a68629e1",
+    "evidence/T45/stack_receipt.json": "5915877fced7578c0309e9fd3c2e94fe65e960eece7fa9a47698516cbfe7a0f9",
+    "evidence/T45/replay/replay_8192.json": "1320f2eaaa6862c51b450dacdc8b81ed229d6ad9efed0dec5be2b743e114fb1d",
+    "evidence/T45/replay/replay_2048.json": "9f239386fc919cd0e83d1552d8fa3d67802ce8c499ee94dad4bdb17745e6f521",
+    "evidence/T45/replay/token_receipts.json": "c96dc95acae7be4e55b5d05a83742e86be02bc89b368a7e79756e188f875b576",
+    "evidence/T45/replay/replay_summary.json": "68e92fda35b74f63cae603a8e311aaaca0389efe85659664ed9180497a75956d",
+    "build/p140/candidate/sglang/kernels/ops/attention/fla/chunk_delta_h.py": "4e24e178a2b4dfbb5f4ad5ee0a86e9371f0a273e7822dd1bff7509bfd93ecd24",
+    "build/p140/candidate/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "ee6301244990657e4418f445493f65f4f0bfaad459142c5a797e3a36bed68cc2",
+    "build/p140/candidate/sglang/kernels/ops/attention/fla/kda.py": "153d7d2450532a4e04c10ab511c62af5447b0faaee131c50630e7c61f68c5991",
+    "build/p140/candidate/sglang/kernels/ops/attention/fla/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5",
+    "build/p140/candidate/sglang/srt/layers/attention/linear/kda_backend.py": "bfd038fdec7b63a9fd65fbe5ebe88d49a124af575268eacea1aab8ebe16614ad",
+    "build/p140/candidate/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "3b13e2ebbdc727ba7da3ce86348acf57bd65c2f396835a1bbaa783f8c7de1c14",
+    "build/p140/candidate/sglang/srt/managers/schedule_batch.py": "12461a8f0628c06ce7c4688067588bb04890bc262392f8512f15e268df2ef904",
+    "build/p140/candidate/sglang/srt/managers/schedule_policy.py": "9d50c503bd2b0f997603832d7364b5f8fdab6d50bb48364f34345e78f7e5c7ba",
+    "build/p140/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py": "23949c4c62be1c7c14937814bf94b71907c4f03a3d115c028e0a1b042f76f57e",
+    "build/p140/candidate/sglang/srt/mem_cache/memory_pool.py": "681638086d390b97c06fb8e277a6bbfdb00eef214e16860811ef5c4c91632f47",
+    "build/p140/candidate/sglang/srt/mem_cache/unified_cache/components/full_component.py": "3473df2c0bd35b952df3be477fb44d048e88337fa86ce9099182549bf28c76e7",
+    "build/p140/candidate/sglang/srt/mem_cache/unified_cache/components/mamba_component.py": "3d1860ccd92c4a70b4b08e2b9af451bb0376865320734454153604417ded0632",
+    "build/p140/candidate/sglang/srt/mem_cache/unified_radix_cache.py": "f4c82a08c4ad4582c6609c5c025c061690ce123706a210a106ee581c6da245ab",
+    "build/p140/candidate/sglang/srt/model_executor/forward_batch_info.py": "b8ffea7aed79c5c741462a12f320a5d9878f6886dadee7f8bfc31585bb119013"
+  },
+  "limitations": [
+    "operator/CPU methods only; no complete engine/TP8/real weights/NEXTN/SLO",
+    "off comparison shares unchanged helper autotune choices; original recurrence source retained",
+    "offline unlimited independent chains, prompt-only; no decode/eviction/concurrency/retraction"
+  ]
+}

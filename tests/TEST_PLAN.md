@@ -219,3 +219,18 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P113-03 | GPU微基准 | 8192×32k/95k/190k causal/ragged全行数值与topk过门；旧新ms与有效TFLOPS≥100，未达给profile；decode不退步 | pass（六档131.4–185.7等效TFLOPS、6.19–6.69×；全行对两版数值/topk通过，decode graph0.1024/0.5925ms，见performance_table.md） |
 | P113-04 | CPU/GPU编译 | 9补丁全栈fuzz0、确定生成、编译/反向字节还原/base_exact未改；编译与profile收据 | pass（stack_receipt.json：9补丁fuzz0、3623编译/确定生成/反向字节还原/base未改；compiler/和profile/已绑定最终SHA） |
 | P113-05 | L2/T8 | Claude交叉审阅后完整模型/服务/能力与SLO | todo（用户限定开发机算子） |
+
+## T45 — 140 KDA双点fp32快照（W19 / M2）
+
+基线base_exact+000→101→105→110→111→112；140再接120→130。生成/打包：`scripts/make_140.py`、`scripts/verify_140.py`；证据 `evidence/T45/summary.json`。GPU为指定2卡开发机上的单卡算子，不是v0.5.20替身或8卡服务。
+
+| ID | 环境 | 用例 / 通过标准 | 状态 |
+|---|---|---|---|
+| P140-01 | L1 GPU算子 | 64头×128/chunk64，导出角色SSM与截断prefill逐元素误差<1e-5；卷积历史exact；恢复续算与全量输出一致；真实backend/dispatcher接线 | pass（最终8组，7组有效边界；SSM/conv/末尾/续算输出最大误差均0；numeric_final_v3.log） |
+| P140-02 | L1 GPU算子 | 变长、未满chunk尾、strided池、初始状态、禁用角色槽、TP8分片8头、完整8192extend及3种NT_BUCKET；开关关闭与原kernel逐bit相同 | pass（8组off输出/状态逐元素相同；共享unchanged helper autotune，原始recurrence源字节未改；早期失败史见README） |
+| P140-03 | CPU | 真实UnifiedRadixCache插入/重复/分裂/命中/COW源、锁/引用计数、Full与Mamba尾部优先淘汰、pathcap、槽压力/abort、chunk续算、namespace；每项原sanity_check通过 | pass（21项CPU中的相关项；cpu_final_v2.log；checked allocators，无GPU） |
+| P140-04 | CPU | 真实scheduler idle flush清树+请求/Mamba/KV池，busy返回false并保留slot；off缓存树/分配器轨迹字节相同；不改token/计数代码 | pass（21项CPU及3种branch×3请求+evict的off JSON逐字节一致；cache_off_baseline/candidate.json） |
+| P140-05 | CPU | 开启101admit/tail与105对应限制不触发，120单partial保护保留；关闭与原栈调度决策字节相同 | pass（32组×30轮=960轮off；8组on；定向请求2→1次extend；scheduler_summary.json） |
+| P140-06 | CPU离线 | 原glm_tok+原Renderer，722请求token数对齐冻结计数；仅当前prompt选边界，估算101/105与140命中和extend次数 | pass（311独立链、无限缓存、prompt-only；8192命中+16704、extend3284→2616；2048命中+98240、9430→8949；均0退步。不是实测SLO） |
+| P140-07 | CPU打包 | 完整000→101→105→110→111→112→140→120→130 fuzz0、确定再生成、全部Python编译、反向字节还原；开发机实际source hashes匹配交付 | pass（3622源码+10工具编译；原kernel逐字节保持；stack_receipt/source_hashes） |
+| P140-08 | L2/T8 | Claude审阅后普通TP8/overlap、真实权重/请求、cache+slot压力、abort/retract/duplicate/flush、能力及原dev A→B→A全部TTFT/TPOT/错误门 | todo（仅提供补丁说明中的A/B方案；无bohr/Trisol/pod/镜像/提交；NEXTN/HiCache/lazy/TBO等目前拒绝开启） |

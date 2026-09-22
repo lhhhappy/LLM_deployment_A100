@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """T45: deterministic generator, real fuzz=0 stack, compilation and byte rollback."""
 import hashlib
+import ast
 import json
 from pathlib import Path
 import py_compile
@@ -33,6 +34,11 @@ def main():
     patch=ROOT/'patches/140-kda-dual-snapshot.patch'
     expected=patch.read_bytes();gen.main();assert patch.read_bytes()==expected
     logs=[]
+    hrel='kernels/ops/attention/fla/chunk_delta_h.py'
+    old=(ROOT/'build/p140/baseline/sglang'/hrel).read_text()
+    new=(ROOT/'build/p140/candidate/sglang'/hrel).read_text()
+    marker='def chunk_gated_delta_rule_fwd_h('
+    assert old.split(marker)[0] == new.split(marker)[0], 'off Triton kernel changed'
     chain=gen.PATCHES+['140-kda-dual-snapshot','120-sched-protect-chain','130-async-tokenize']
     candidate=ROOT/'build/p140/stack/sglang'
     control=ROOT/'build/p140/control/sglang'
@@ -46,7 +52,7 @@ def main():
     for name in [n for n in chain if not n.startswith('140-')]: logs.append(apply(control,name))
     files=list(candidate.rglob('*.py'))
     toolfiles=[ROOT/'scripts'/n for n in ('make_140.py','verify_140.py','test_kda_snapshot_140.py',
-               'test_kda_snapshot_cache_140.py','replay_kda_snapshot_140.py')]+list((ROOT/'scripts/p140').glob('*.py'))
+               'test_kda_snapshot_cache_140.py','test_kda_snapshot_scheduler_140.py','replay_kda_snapshot_140.py','summarize_140.py')]+list((ROOT/'scripts/p140').glob('*.py'))
     with tempfile.TemporaryDirectory() as out:
         for i,p in enumerate(files+toolfiles):py_compile.compile(str(p),cfile=str(Path(out)/f'{i}.pyc'),doraise=True)
     # Separate reversible copy: retain stack trees for scheduler parity tests.
@@ -57,6 +63,7 @@ def main():
     assert hashes(rev)==base and hashes(ROOT/'build/base_exact/sglang')==base
     receipt=dict(status='PASS',patches=chain,files=len(files),tools=len(toolfiles),
                  deterministic=True,applied_equals_candidate=True,base_unchanged=True,
+                 original_triton_kernel_bytes_equal=True,
                  full_reverse_exact=True,patch_sha256=hashlib.sha256(patch.read_bytes()).hexdigest())
     (EV/'full_stack_apply.log').write_text(''.join(logs))
     (EV/'stack_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')

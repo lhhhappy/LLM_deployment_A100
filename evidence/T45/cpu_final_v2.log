@@ -1,0 +1,28 @@
+test_abort_discards_slot (__main__.Tests.test_abort_discards_slot) ... ok
+test_alignment (__main__.Tests.test_alignment) ... ok
+test_branch_priority_replaced_by_two_points (__main__.Tests.test_branch_priority_replaced_by_two_points) ... ok
+test_configuration_guard_and_off_bypass (__main__.Tests.test_configuration_guard_and_off_bypass) ... ok
+test_duplicate_role_no_kv_double_free (__main__.Tests.test_duplicate_role_no_kv_double_free) ... ok
+test_finished_insert (__main__.Tests.test_finished_insert) ... ok
+test_flush_busy_keeps_pending_slot (__main__.Tests.test_flush_busy_keeps_pending_slot) ... WARNING:root:Cache not flushed because there are pending requests. #queue-req: 1, #running-req: 0
+ok
+test_flush_resets_tree_and_pools (__main__.Tests.test_flush_resets_tree_and_pools) ... ok
+test_full_eviction_tail_before_other_leaf (__main__.Tests.test_full_eviction_tail_before_other_leaf) ... ok
+test_full_pressure_frees_every_tree_slot (__main__.Tests.test_full_pressure_frees_every_tree_slot) ... ok
+test_insert_match_restore_refcounts (__main__.Tests.test_insert_match_restore_refcounts) ... ok
+test_locked_tail_not_evicted (__main__.Tests.test_locked_tail_not_evicted) ... ok
+test_mamba_eviction_tail_before_role (__main__.Tests.test_mamba_eviction_tail_before_role) ... ok
+test_middle_chunk_exports_last_global_role (__main__.Tests.test_middle_chunk_exports_last_global_role) ... ok
+test_namespace_preserved (__main__.Tests.test_namespace_preserved) ... ok
+test_no_role_and_short_extend (__main__.Tests.test_no_role_and_short_extend) ... ok
+test_path_cap_preserves_role (__main__.Tests.test_path_cap_preserves_role) ... ok
+test_pressure_skips_optional (__main__.Tests.test_pressure_skips_optional) ... ok
+test_role_exactly_at_end_uses_single_slot (__main__.Tests.test_role_exactly_at_end_uses_single_slot) ... ok
+test_streaming_and_unaligned_batch_fallback (__main__.Tests.test_streaming_and_unaligned_batch_fallback) ... ok
+test_two_requests_never_share_snapshot_slots (__main__.Tests.test_two_requests_never_share_snapshot_slots) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.309s
+
+OK
+{"tests": 21, "failures": 0, "errors": 0}

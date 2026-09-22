@@ -270,6 +270,38 @@ def main():
         EXPORT_SNAPSHOTS=snapshot_offsets is not None,
 ''')
 
+
+    # Keep the original no-export Triton kernel byte-for-byte. Even a dead
+    # constexpr branch can perturb compiler layout/rounding; off means the
+    # original callable, while on uses this mechanically derived exporter.
+    snapshot_rel = 'kernels/ops/attention/fla/chunk_delta_h_snapshot.py'
+    snapshot_source = (after / p).read_text().replace(
+        'chunk_gated_delta_rule_fwd_kernel_h_blockdim64',
+        'chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot'
+    ).replace('def chunk_gated_delta_rule_fwd_h(',
+              'def chunk_gated_delta_rule_fwd_h_snapshot(')
+    (after / snapshot_rel).write_text(snapshot_source)
+    CHANGED.append(snapshot_rel)
+    (after / p).write_bytes((before / p).read_bytes())
+    edit(p, '    use_exp2: bool = False,\n)', '''    use_exp2: bool = False,
+    snapshot_offsets: Optional[torch.Tensor] = None,
+    snapshot_slots: Optional[torch.Tensor] = None,
+)''')
+    edit(p, '    assert not (\n        use_exp2 and g is not None\n    ),', '''    if snapshot_offsets is not None or os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1":
+        from sglang.kernels.ops.attention.fla.chunk_delta_h_snapshot import (
+            chunk_gated_delta_rule_fwd_h_snapshot,
+        )
+
+        return chunk_gated_delta_rule_fwd_h_snapshot(
+            k=k, w=w, u=u, g=g, gk=gk, initial_state=initial_state,
+            initial_state_indices=initial_state_indices, save_new_value=save_new_value,
+            cu_seqlens=cu_seqlens, chunk_indices=chunk_indices, use_exp2=use_exp2,
+            snapshot_offsets=snapshot_offsets, snapshot_slots=snapshot_slots,
+        )
+    assert not (
+        use_exp2 and g is not None
+    ),''')
+
     diff = []
     for rel in sorted(CHANGED):
         old = (before / rel).read_text().splitlines(True) if (before / rel).exists() else []

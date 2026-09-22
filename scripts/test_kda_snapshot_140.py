@@ -145,6 +145,7 @@ def run_case(lengths, boundaries, seed, heads=64, strided=False, warm_prefix=Fal
         baseline = forward(raw, gate, beta, lengths, list(range(n)), warm_prefix, kernel=ORACLE)
         off_baseline_output = error(disabled, baseline)
         off_baseline_final = error(disabled_state, ssm[:n])
+        emit(kind='off_check',output=off_baseline_output,final=off_baseline_final,lengths=lengths)
         assert off_baseline_output['equal'] and off_baseline_final['equal']
         os.environ['SGLANG_AX_KDA_DUAL_SNAPSHOT'] = '1'
     starts = [0] + list(torch.tensor(lengths).cumsum(0).tolist())
@@ -219,18 +220,30 @@ def main():
         old_h = module('oracle_h', 'chunk_delta_h.py')
         old_kda = module('oracle_kda', 'kda.py')
         old_kda.chunk_gated_delta_rule_fwd_h = old_h.chunk_gated_delta_rule_fwd_h
+        # Both arms share UNCHANGED helpers and their autotune decisions, as in
+        # an actual startup toggle. Independently importing a second copy can
+        # choose a different config on a cold autotune cache; an initial cold
+        # probe differed, while its unchanged warm rerun already agreed.
+        import sglang.kernels.ops.attention.fla.kda as candidate_kda
+        old_defs = {n.name: ast.dump(n, include_attributes=False) for n in ast.parse((args.baseline/'kda.py').read_text()).body if isinstance(n, ast.FunctionDef)}
+        new_defs = {n.name: ast.dump(n, include_attributes=False) for n in ast.parse((args.source/'kernels/ops/attention/fla/kda.py').read_text()).body if isinstance(n, ast.FunctionDef)}
+        for name in ('kda_gate_chunk_cumsum','chunk_gla_fwd_o_gk'):
+            assert old_defs[name] == new_defs[name], name
+            setattr(old_kda, name, getattr(candidate_kda, name))
         ORACLE = old_kda.chunk_kda
     emit(kind='environment', torch=torch.__version__, triton=triton.__version__,
          device=torch.cuda.get_device_name(), capability=torch.cuda.get_device_capability(),
          files={str(p.relative_to(args.source)): hashlib.sha256(p.read_bytes()).hexdigest()
-                for p in args.source.rglob('*.py') if p.name in ('chunk_delta_h.py','kda.py','kda_snapshot.py')})
+                for p in args.source.rglob('*.py') if p.name in ('chunk_delta_h.py','chunk_delta_h_snapshot.py','kda.py','kda_snapshot.py','kda_backend.py','kda_triton.py')})
     cases = [([273, 337], [128, 192], 42, 64, False, False)]
     if not args.smoke:
         cases += [([128, 192], [64, 128], 43, 64, False, False),
                   ([65, 129], [64, 128], 44, 64, True, True),
                   ([1025, 833], [512, 640], 45, 64, True, False),
                   ([273, 337], [64, 256], 46, 8, False, True),
-                  ([256, 320], [-1, -1], 47, 64, True, False)]
+                  ([256, 320], [-1, -1], 47, 64, True, False),
+                  ([4097, 3073], [2048, 1536], 48, 64, False, True),
+                  ([8192, 4033], [4096, 2048], 49, 64, True, False)]
     for case in cases:
         run_case(*case)
     emit(kind='complete', cases=len(cases), passed=True)

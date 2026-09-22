@@ -369,3 +369,12 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **VERIFIED / 数值**：沿用112全部用例并分别对未改110与112，加新边界及全部六个大矩阵逐行对照；222组全过，最大逐行相对L∞/L2 3.956824e-5，topk最小99.951171875%。30动态graph重放（含q/K/scale变化）与eager逐bit一致。decode函数源码、代表形状PTX SHA与T43/112完全相同；本轮32k/190k graph约0.1024/0.5925ms，F64历史数据不改。
 - **VERIFIED / profile与交付**：190k causal CUDA profiler，112为624.397ms，113主kernel96.102ms、两次预解码合计0.104790ms（0.11%GPU时间）；113主kernel162寄存器/0spill/48KB shared，sm80 bf16 MMA。9补丁000→101→105→110→111→112→113→120→130 fuzz0、3623编译、确定生成、整栈反向逐字节还原/base_exact未改通过。`summary.json`绑定所有SHA；`make_113.py`可复现。
 - **INFERRED / 边界**：有利于单卡prefill算子，但没有TP8/服务/能力/NEXTN/SLO证明；额外scratch最大测试形状110.39MiB/调用，完整fp32输出6.226GB仍存在，需Claude实际服务验证显存和JIT预热。未操作bohr/Trisol/pod/镜像/提交，未入RELEASE；回滚反向113恢复112。
+
+## F66 — T45/140：KDA双点fp32快照、数值前提与离线命中估算（W19）
+
+- **VERIFIED（P140-01/02）**：底包chunk_delta_h的fp32累加器可在一次extend直接导出角色边界及对齐末尾；卷积历史从原位conv之前的raw QKV最后3行保存。最终8组GPU算子（64×128为主，含8×128分片、65至8192长度、变长/stride/初态/全部NT_BUCKET），7组有效边界的SSM、conv、对齐末尾、续算输出/最终状态均逐元素相同，最大误差0。实际KDA forward_extend/dispatcher/Triton方法；证据 `evidence/T45/numeric_final_v3.log`。
+- **VERIFIED / 数值前提**：直接保留底包按`B*NT*H<=256`选择融合intra，会在one-shot/截断前缀跨阈值时产生8.535385e-5最大SSM差（numeric_01.log）。140开启统一非融合路径后达上述零误差；关闭保持原选择，并调用源字节原样保留的原kernel。独立helper冷autotune曾有一次off比较失败、暖重跑通过；最终对照共享未改helper及其autotune决定，不据此声称所有独立冷启动天然bitexact。
+- **VERIFIED（P140-03…05）**：21/21真实cache/controller/tree/tracking/pool/flush方法CPU测试，含checked allocator与原sanity_check；额外role槽请求→树移交/重复释放/abort清理、锁、tail优先淘汰、busy/idle真flush通过。off缓存三种branch轨迹JSON字节相同；off调度32组×30轮=960轮同原栈，on8组无双partial；role示例2→1次extend。CPU不等于服务/overlap长跑验证。
+- **VERIFIED（P140-06 / MODEL OUTPUT）**：原Renderer+glm_tok、722请求冻结token数全匹配，311独立链prompt-only无限缓存串行模型，无未来oracle。chunk8192，101+105 off/on命中16,886,400→16,903,104（+16,704），extend3284→2616；chunk2048为16,806,912→16,905,152（+98,240），9430→8949；分别6/73请求改善、均0退步。没有模拟decode状态、淘汰/容量压力、实际并发准入/retraction，不是实测cached_tokens/SLO。
+- **VERIFIED（P140-07）**：140补丁/说明/make_140已交付；000→101→105→110→111→112→140→120→130 fuzz0、3622源码+10工具编译、确定生成、全栈反向字节还原；开关默认0。未入RELEASE/构建/队列。
+- **INFERRED / 开放项**：减少调度轮次和保留最新角色状态可能改善链中间延迟，但固定非融合intra的短请求成本及额外17.6MiB/rank状态驻留可能抵消收益；实际TP8/权重/overlap/能力/SLO未测。当前限制普通TP extra_buffer，NEXTN/HiCache/lazy/int8/unified/DP/CP/PP/PD/mixed/TBO等拒绝开启；8卡A/B交Claude。全程仅指定开发机arena内GPU1算子，未操作bohr/Trisol/pod、8卡、镜像或提交。

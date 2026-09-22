@@ -1,0 +1,178 @@
+test_abort_discards_slot (__main__.Tests.test_abort_discards_slot) ... ERROR
+test_alignment (__main__.Tests.test_alignment) ... ok
+test_duplicate_role_no_kv_double_free (__main__.Tests.test_duplicate_role_no_kv_double_free) ... ERROR
+test_finished_insert (__main__.Tests.test_finished_insert) ... ERROR
+test_flush_resets_tree_and_pools (__main__.Tests.test_flush_resets_tree_and_pools) ... ERROR
+test_full_eviction_tail_before_other_leaf (__main__.Tests.test_full_eviction_tail_before_other_leaf) ... ERROR
+test_insert_match_restore_refcounts (__main__.Tests.test_insert_match_restore_refcounts) ... ERROR
+test_locked_tail_not_evicted (__main__.Tests.test_locked_tail_not_evicted) ... ERROR
+test_mamba_eviction_tail_before_role (__main__.Tests.test_mamba_eviction_tail_before_role) ... ERROR
+test_path_cap_preserves_role (__main__.Tests.test_path_cap_preserves_role) ... ERROR
+test_pressure_skips_optional (__main__.Tests.test_pressure_skips_optional) ... ERROR
+
+======================================================================
+ERROR: test_abort_discards_slot (__main__.Tests.test_abort_discards_slot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 84, in test_abort_discards_slot
+    c.cache_finished_req(r,is_insert=False,kv_len_to_handle=337)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 919, in cache_finished_req
+    self._dec_req_lock(req, skip_swa=req.swa_prefix_lock_released)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 807, in _dec_req_lock
+    self.dec_lock_ref(
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 797, in dec_lock_ref
+    result = self.session.try_dec_lock_ref(node_id, params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_dec_lock_ref'
+
+======================================================================
+ERROR: test_duplicate_role_no_kv_double_free (__main__.Tests.test_duplicate_role_no_kv_double_free)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 65, in test_duplicate_role_no_kv_double_free
+    r,_,_=prepared(c); c.cache_unfinished_req(r)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 1008, in cache_unfinished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_finished_insert (__main__.Tests.test_finished_insert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 75, in test_finished_insert
+    c.cache_finished_req(r,kv_len_to_handle=337)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 906, in cache_finished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_flush_resets_tree_and_pools (__main__.Tests.test_flush_resets_tree_and_pools)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 122, in test_flush_resets_tree_and_pools
+    c=cache_fixture(P); r,_,_=prepared(c); c.cache_finished_req(r,kv_len_to_handle=337)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 906, in cache_finished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_full_eviction_tail_before_other_leaf (__main__.Tests.test_full_eviction_tail_before_other_leaf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 108, in test_full_eviction_tail_before_other_leaf
+    other,_,_=prepared(c,[9]*192,row=1); c.cache_finished_req(other,kv_len_to_handle=192)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 919, in cache_finished_req
+    self._dec_req_lock(req, skip_swa=req.swa_prefix_lock_released)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 807, in _dec_req_lock
+    self.dec_lock_ref(
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 797, in dec_lock_ref
+    result = self.session.try_dec_lock_ref(node_id, params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_dec_lock_ref'
+
+======================================================================
+ERROR: test_insert_match_restore_refcounts (__main__.Tests.test_insert_match_restore_refcounts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 43, in test_insert_match_restore_refcounts
+    c.cache_unfinished_req(req)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 1008, in cache_unfinished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_locked_tail_not_evicted (__main__.Tests.test_locked_tail_not_evicted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 115, in test_locked_tail_not_evicted
+    c=cache_fixture(P); r,_,_=prepared(c); c.cache_unfinished_req(r)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 1008, in cache_unfinished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_mamba_eviction_tail_before_role (__main__.Tests.test_mamba_eviction_tail_before_role)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 98, in test_mamba_eviction_tail_before_role
+    c.cache_finished_req(r,kv_len_to_handle=337)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 906, in cache_finished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_path_cap_preserves_role (__main__.Tests.test_path_cap_preserves_role)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 136, in test_path_cap_preserves_role
+    c.cache_unfinished_req(r)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 1008, in cache_unfinished_req
+    commit(self, req, insert_params, result)
+  File "/sjtu/linhang/arena/code/T45/candidate/sglang/srt/mem_cache/kda_dual_snapshot.py", line 120, in commit
+    lock = cache.inc_lock_ref(end_result.last_device_node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 784, in inc_lock_ref
+    result = self.session.try_inc_lock_ref(node_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_inc_lock_ref'
+
+======================================================================
+ERROR: test_pressure_skips_optional (__main__.Tests.test_pressure_skips_optional)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T45/test_kda_snapshot_cache_140.py", line 93, in test_pressure_skips_optional
+    c.cache_unfinished_req(r)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 1027, in cache_unfinished_req
+    self._dec_req_lock(req)
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 807, in _dec_req_lock
+    self.dec_lock_ref(
+  File "candidate/sglang/srt/mem_cache/unified_radix_cache.py", line 797, in dec_lock_ref
+    result = self.session.try_dec_lock_ref(node_id, params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'try_dec_lock_ref'
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.135s
+
+FAILED (errors=10)
+{"tests": 11, "failures": 0, "errors": 10}
