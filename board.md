@@ -26,6 +26,7 @@
 | W17（`codex exec`，astra/xhigh） | logs/codex/W17.log | T43 sm80 indexer 融合 kernel 补丁 112 | 已结束（Claude 核验 summary PASS） |
 | W18（`codex exec`，astra/xhigh） | logs/codex/W18.log | T44 预填充 indexer 逼近算力上限（补丁 113） | 已结束（Claude 核验 PASS，6.2–6.7×） |
 | W19（`codex exec`，astra/xhigh） | logs/codex/W19.log | T45 M2 KDA 双点 fp32 快照（补丁 140） | 已结束（Claude 核验：数值逐位一致；待 8 卡 A/B） |
+| W20（`codex exec`，astra/high） | logs/codex/W20.log | T46 启动期预热补丁 150 | 进行中 |
 
 **进行中**
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
