@@ -4,13 +4,13 @@
 : "${N:?Set concurrency N in the pod job wrapper}"
 source "$AX/bin/scripts/pod/lib.sh"
 case "${AX_P120_VARIANT:-on}" in
-  off)     src_name=b125a; protect=0; cold_cap=2048 ;;
-  on)      src_name=b125b; protect=1; cold_cap=2048 ;;
-  cap4096) src_name=b125c; protect=1; cold_cap=4096 ;;
+  off)     src_name=b126a; protect=0; cold_cap=2048 ;;
+  on)      src_name=b126b; protect=1; cold_cap=2048 ;;
+  cap4096) src_name=b126c; protect=1; cold_cap=4096 ;;
   *) echo "Unknown AX_P120_VARIANT" >&2; exit 2 ;;
 esac
 prepare_src "$src_name" 000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch \
-  110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch \
+  110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch \
   120-sched-protect-chain.patch || exit 1
 export SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829
 export SGLANG_OPT_DEEPGEMM_HC_PRENORM=0
