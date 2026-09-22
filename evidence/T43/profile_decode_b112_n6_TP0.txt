@@ -1,0 +1,33 @@
+trace /tmp/ax/prof_191819/1790104699.9196982-TP-0.trace.json.gz
+total GPU us 496292.1000000061
+    118.6ms  23.9% x   668  void at::native::unrolled_elementwise_kernel
+     99.1ms  20.0% x  1572  void at::native::elementwise_kernel
+     46.6ms   9.4% x   156  void at::native::reduce_kernel
+     39.6ms   8.0% x  1008  void sglang::device::marlin_moe::Marlin
+     30.7ms   6.2% x   132  ampere_bf16_s16816gemm_bf16_64x64_ldg8_f2f_tn
+     27.1ms   5.5% x  3017  void at::native::vectorized_elementwise_kernel
+     21.3ms   4.3% x  2940  void cutlass::Kernel2
+     17.3ms   3.5% x   132  main_kernel
+     14.4ms   2.9% x   157  void at::native::vectorized_gather_kernel
+     10.6ms   2.1% x  1092  void sglang::all_reduce_1shot_push_kernel
+      9.1ms   1.8% x  1080  mhc_pre_big_fuse_with_norm_tilelang_kernel
+      7.2ms   1.4% x   468  void sglang::device::marlin::Marlin
+      6.6ms   1.3% x   540  ampere_bf16_s16816gemm_bf16_64x64_sliced1x2_ldg8_f2f_stages_64x6_tn
+      6.4ms   1.3% x  2544  void cublasLt::splitKreduce_kernel
+      5.5ms   1.1% x  1080  mhc_pre_gemm_sqrsum_splitk_stage_0_kernel
+      5.3ms   1.1% x  1080  mhc_post_tilelang_kernel
+      4.0ms   0.8% x   408  fused_sigmoid_gating_delta_rule_update_kernel
+      3.5ms   0.7% x   504  _moe_align_small_numel_kernel
+      2.5ms   0.5% x   504  _router_triton_kernel
+      2.4ms   0.5% x   132  void sglang::(anonymous namespace)::kpool_topk_transform_kernel
+      2.2ms   0.5% x   768  memcpy32_post
+      1.7ms   0.3% x   408  ampere_s16816gemm_bf16_64x64_ldg8_stages_64x5_tn
+      1.6ms   0.3% x   408  layer_norm_gated_fwd_kernel
+      1.3ms   0.3% x   408  _causal_conv1d_update_kernel
+      1.2ms   0.2% x   132  _act_quant_kernel
+      1.2ms   0.2% x    12  ampere_bf16_s16816gemm_bf16_128x64_ldg8_f2f_stages_64x4_tn
+      1.2ms   0.2% x   504  void moe_sum_reduce_kernel
+      1.0ms   0.2% x   276  kernel_cutlass_kernel_flashinfernormkernelsrmsnormRMSNormKernel_object_at__tensorptrbf16gm
+      1.0ms   0.2% x   132  ampere_sgemm_32x32_sliced1x4_tn
+      0.8ms   0.2% x   132  ampere_bf16_s16816gemm_bf16_64x64_sliced1x2_ldg8_f2f_stages_64x5_tn
+exit_code: 0

@@ -23,6 +23,7 @@
 | W14（`codex exec` 单任务） | 见 notes/dispatch.md | T30/T31 | 已结束 |
 | W15（`codex exec`，astra/xhigh） | logs/codex/W15.log | T41 M1 调度补丁 120 | 已结束（Claude 审阅通过，8 卡 A/B 任务 014/015/017/018） |
 | W16（`codex exec`，astra/high） | logs/codex/W16.log | T42 M3 分词补丁 130 | 已结束（Claude 核验：722/722 token 一致） |
+| W17（`codex exec`，astra/xhigh） | logs/codex/W17.log | T43 sm80 indexer 融合 kernel 补丁 112 | 进行中 |
 
 **进行中**
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
