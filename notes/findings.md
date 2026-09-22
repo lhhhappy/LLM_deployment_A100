@@ -378,3 +378,12 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **VERIFIED（P140-06 / MODEL OUTPUT）**：原Renderer+glm_tok、722请求冻结token数全匹配，311独立链prompt-only无限缓存串行模型，无未来oracle。chunk8192，101+105 off/on命中16,886,400→16,903,104（+16,704），extend3284→2616；chunk2048为16,806,912→16,905,152（+98,240），9430→8949；分别6/73请求改善、均0退步。没有模拟decode状态、淘汰/容量压力、实际并发准入/retraction，不是实测cached_tokens/SLO。
 - **VERIFIED（P140-07）**：140补丁/说明/make_140已交付；000→101→105→110→111→112→140→120→130 fuzz0、3622源码+10工具编译、确定生成、全栈反向字节还原；开关默认0。未入RELEASE/构建/队列。
 - **INFERRED / 开放项**：减少调度轮次和保留最新角色状态可能改善链中间延迟，但固定非融合intra的短请求成本及额外17.6MiB/rank状态驻留可能抵消收益；实际TP8/权重/overlap/能力/SLO未测。当前限制普通TP extra_buffer，NEXTN/HiCache/lazy/int8/unified/DP/CP/PP/PD/mixed/TBO等拒绝开启；8卡A/B交Claude。全程仅指定开发机arena内GPU1算子，未操作bohr/Trisol/pod、8卡、镜像或提交。
+
+## F67 — T46 / 150：请求预热的覆盖边界与真实清理（W20）
+
+- **VERIFIED（源码）**：`http_server.py` custom warmup在lifespan yield之前；但scheduler在更早的init阶段调用`triton_load_watch.mark_serving_started()`，该模块明确说明request-driven warmup仍受“after serving started”告警约束。不能把这条日志字符串直接等同于HTTP ready后编译；需时间分界。证据：底包`sglang/srt/utils/triton_load_watch.py:19`、`managers/scheduler.py:1789`。
+- **VERIFIED（源码，覆盖不完整的反例）**：112 `_ragged`与113 `_prefill`的NQ/NK、113 `_unpack_prefill`的R均为constexpr；autotune key有限不等于JIT specialization有限。600→601可能新编译；发并发6…32不能保证实际eager B6…32，graph可能padding。完整清单`evidence/T46/jit_inventory.json`（667显式Triton函数），重点63函数/12autotune及取值/缺口见补丁150说明。未修改112/113 kernel。
+- **VERIFIED（P150-01…05，CPU/源码）**：150 `@warmup("ax_shapes")`；48组564个合成请求另加真清探针，直接input_ids覆盖指定链/长冷/角色/边缘/ragged/并发。21项CPU测试通过：真实flush wrapper/mixin/scheduler方法+mock池、请求序列与drain、取消/异常、全worker汇总、TP非主rank失败归并、空池断言、零命中探针、log_metrics与exporter守卫。全11补丁fuzz0、3623源码+8工具编译、确定再生成、反向逐字节还原/base不变通过；证据`evidence/T46/`。
+- **INFERRED / 待L2**：应把已实际执行的冷形状编译移到HTTP ready前，但未证明任意服务形状无编译、实际模型启动/缓存恢复或SLO改善；NT_BUCKET2、graph外形状与其它路径见说明缺口。没有8卡/Trisol/pod/镜像/提交操作。开发机仅算子验证单列收据，不替代全栈。
+- **VERIFIED（P150-06，A100算子）**：最终新cache运行`operators_cold5.log`的12组首次调用共113个JIT miss/113实际编译/102次autotuner._bench，编译磁盘命中0；同tensor/shape再跑12组，JIT miss/编译/autotune/新增或变化cache文件全部0。113 query长度600→601新增2次编译（16文件），证明150不能用有限请求覆盖所有新长度。开发机A100-SXM4-80GB、Torch2.13.0+cu130/Triton3.7.1；随机激活，未加载模型，取证秒数不是SLO。30个远端测试/算子源码SHA与交付匹配。早期夹具/JSON序列化失败原始日志保留。
+- **VERIFIED（P150-06，跨进程缓存）**：同A100环境新进程复用cache，首次12组57 JIT内存miss/57编译磁盘命中/0实际编译，仍42次autotune benchmark；12组重复再次全0。`operators_persistent.log`说明FLA部分未传cache_results的装饰器仍会调优，预置cubin不能取代启动期请求预热。测试已退出，两卡4MiB/0%，见`gpu_final_idle.log`。

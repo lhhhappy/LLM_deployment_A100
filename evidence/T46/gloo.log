@@ -1,0 +1,16 @@
+ax_shapes local pool verification failed
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T46/ax_shapes.py", line 88, in verify_empty
+    assert_empty(scheduler)
+  File "/sjtu/linhang/arena/code/T46/ax_shapes.py", line 67, in assert_empty
+    equal('Mamba pool', req.mamba_allocator.available_size(), req.mamba_pool.size)
+  File "/sjtu/linhang/arena/code/T46/ax_shapes.py", line 60, in equal
+    raise RuntimeError(f'ax_shapes {name}: {actual!r} != {expected!r}')
+RuntimeError: ax_shapes Mamba pool: 15 != 16
+ax_shapes local pool verification failed
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T46/ax_shapes.py", line 87, in verify_empty
+    raise RuntimeError('ax_shapes scheduler refused flush')
+RuntimeError: ax_shapes scheduler refused flush
+{"rank": 1, "status": "PASS", "results": [{"phase": "all-clean", "failed": false}, {"phase": "rank1-leak", "failed": true}, {"phase": "rank1-refused", "failed": true}]}
+{"rank": 0, "status": "PASS", "results": [{"phase": "all-clean", "failed": false}, {"phase": "rank1-leak", "failed": true}, {"phase": "rank1-refused", "failed": true}]}

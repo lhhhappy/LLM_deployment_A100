@@ -1,0 +1,24 @@
+Generated patches/150-startup-warmup.patch
+{
+  "status": "PASS",
+  "patches": [
+    "000-interface-compliance",
+    "101-d1v12-on-base",
+    "105-role-split-single-partial",
+    "110-sm80-dsa-indexer",
+    "111-sm80-fp8-moe-marlin",
+    "112-sm80-indexer-kernels",
+    "113-sm80-prefill-indexer",
+    "140-kda-dual-snapshot",
+    "120-sched-protect-chain",
+    "130-async-tokenize",
+    "150-startup-warmup"
+  ],
+  "python_source_files": 3623,
+  "python_tools": 6,
+  "deterministic": true,
+  "applied_equals_candidate": true,
+  "full_reverse_exact": true,
+  "base_unchanged": true,
+  "patch_sha256": "8508323c48ee994d74613eeca1b3e21904caf16044fe0caf9a257f7cf39351b2"
+}

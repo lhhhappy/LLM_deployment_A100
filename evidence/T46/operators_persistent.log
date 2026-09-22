@@ -1,0 +1,27 @@
+{"device": "NVIDIA A100-SXM4-80GB", "torch": "2.13.0+cu130", "triton": "3.7.1", "persistent": true, "cache": "/sjtu/linhang/arena/cache/T46/cold2", "initial_cache_files": 925}
+{"case": "112-fallback-first", "seconds": 0.731087327003479, "jit_misses": 1, "bench_calls": 0, "compiled": 0, "disk_hits": 1, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-prefill-first", "seconds": 0.19080658070743084, "jit_misses": 3, "bench_calls": 0, "compiled": 0, "disk_hits": 3, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-clean-false-first", "seconds": 0.18596529960632324, "jit_misses": 3, "bench_calls": 0, "compiled": 0, "disk_hits": 3, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-6-first", "seconds": 0.18454236164689064, "jit_misses": 1, "bench_calls": 0, "compiled": 0, "disk_hits": 1, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-7-first", "seconds": 0.1782222855836153, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-17-first", "seconds": 0.31036412343382835, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-32-first", "seconds": 0.17893549986183643, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-65-first", "seconds": 7.057323958724737, "jit_misses": 44, "bench_calls": 42, "compiled": 0, "disk_hits": 44, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-600-first", "seconds": 0.1896655522286892, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-2049-first", "seconds": 0.2121040690690279, "jit_misses": 4, "bench_calls": 0, "compiled": 0, "disk_hits": 4, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8192-first", "seconds": 0.18704154342412949, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8257-first", "seconds": 0.18786135129630566, "jit_misses": 1, "bench_calls": 0, "compiled": 0, "disk_hits": 1, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-fallback-repeat", "seconds": 0.18240092508494854, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-prefill-repeat", "seconds": 0.18353190831840038, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-clean-false-repeat", "seconds": 0.1833063866943121, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-6-repeat", "seconds": 0.18291879072785378, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-7-repeat", "seconds": 0.18300285376608372, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-17-repeat", "seconds": 0.19533825665712357, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-32-repeat", "seconds": 0.18097993731498718, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-65-repeat", "seconds": 0.18186385370790958, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-600-repeat", "seconds": 0.18122955970466137, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-2049-repeat", "seconds": 0.18491125851869583, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8192-repeat", "seconds": 0.18365402705967426, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8257-repeat", "seconds": 0.18475758098065853, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-novel-nq-601", "seconds": 0.4352421034127474, "jit_misses": 2, "bench_calls": 0, "compiled": 0, "disk_hits": 2, "cache_files_added": 0, "cache_files_changed": 0}
+{"status": "PASS", "same_shape_repeat_count": 12, "repeat_jit_misses": 0, "repeat_bench_calls": 0, "first_jit_misses": 57, "first_bench_calls": 42}

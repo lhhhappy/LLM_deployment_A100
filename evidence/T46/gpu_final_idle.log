@@ -1,0 +1,4 @@
+index, name, memory.used [MiB], utilization.gpu [%]
+0, NVIDIA A100-SXM4-80GB, 4 MiB, 0 %
+1, NVIDIA A100-SXM4-80GB, 4 MiB, 0 %
+pid, process_name, used_gpu_memory [MiB]

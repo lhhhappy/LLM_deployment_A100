@@ -234,3 +234,17 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P140-06 | CPU离线 | 原glm_tok+原Renderer，722请求token数对齐冻结计数；仅当前prompt选边界，估算101/105与140命中和extend次数 | pass（311独立链、无限缓存、prompt-only；8192命中+16704、extend3284→2616；2048命中+98240、9430→8949；均0退步。不是实测SLO） |
 | P140-07 | CPU打包 | 完整000→101→105→110→111→112→140→120→130 fuzz0、确定再生成、全部Python编译、反向字节还原；开发机实际source hashes匹配交付 | pass（3622源码+10工具编译；原kernel逐字节保持；stack_receipt/source_hashes） |
 | P140-08 | L2/T8 | Claude审阅后普通TP8/overlap、真实权重/请求、cache+slot压力、abort/retract/duplicate/flush、能力及原dev A→B→A全部TTFT/TPOT/错误门 | todo（仅提供补丁说明中的A/B方案；无bohr/Trisol/pod/镜像/提交；NEXTN/HiCache/lazy/TBO等目前拒绝开启） |
+
+## T46 — 150 启动期请求预热（W20）
+
+命令：`scripts/make_150.py`、`scripts/test_startup_warmup_150.py`、`scripts/inventory_warmup_150.py`、`scripts/verify_150.py`；证据 `evidence/T46/`，说明 `patches/150-startup-warmup.md`。
+
+| ID | 环境 | 通过标准 | 状态 |
+|---|---|---|---|
+| P150-01 | CPU/mock | 600/链增量1000/7000/12000/冷20000/角色/边缘/ragged/6…32并发计划；direct input_ids、temperature0、小输出、全drain、计数与命中检查 | pass（21项CPU中的相关项；request_plan.json，48组564请求另加真清探针） |
+| P150-02 | CPU/mock+真实方法 | 真实flush调用、全worker汇总、TP失败归并、request/KV/Mamba/tree空检查、busy拒绝/deferred等待；零命中探针后再真清；log_metrics门控与exporter守卫 | pass（cpu_tests.log；实际scheduler flush与tokenizer mixin/flush wrapper执行；另2个真实Gloo rank×3阶段验证非主rank失败；非真实GPU池） |
+| P150-03 | CPU/mock | 错误/abort/缺输出/timeout/取消清自有rid并flush；flush失败/残留cache禁止ready；MTP跳过、PD/HiCache/DP/PP等前置拒绝 | pass（cpu_tests.log） |
+| P150-04 | CPU打包 | 指定11补丁fuzz0、确定生成、全部Python编译、应用树一致、整栈反向逐字节还原、base未改 | pass（stack_receipt.json：3623源码+8工具；最终SHA见收据） |
+| P150-05 | 源码审计 | 枚举autotune keys、constexpr、特化排除；固定模型预期域、调度依赖、未覆盖路径与无法穷尽的反例 | pass（667显式JIT、63重点函数/12autotune；jit_inventory.json、kernel_keys.md及说明表。不是完整运行覆盖） |
+| P150-06 | L1 GPU算子 | 独立cache冷调用→同shape重复；记录JIT miss/编译cache hit/autotune调用，重复不得新增；另示新shape反例 | pass（cold5：12组首次113编译/102bench，同形状12组全0新增；600→601新2编译。新进程持久cache结果另见summary；非服务/模型） |
+| P150-07 | L2/T8 | Claude安排实际普通TP8启动/metrics/flush/池/graph与eager、逐key观测、readiness后编译数量及原dev全部SLO/能力门；140开关单列 | todo（本任务禁止8卡/Trisol/pod/镜像/提交；不能声称服务期零编译） |

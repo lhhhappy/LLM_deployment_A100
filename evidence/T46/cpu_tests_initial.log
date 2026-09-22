@@ -1,0 +1,163 @@
+test_actual_empty_assertions (__main__.FlushTests) ... ok
+test_busy_not_verified (__main__.FlushTests) ... ok
+test_control_aggregates_all_workers (__main__.FlushTests) ... ok
+test_default_flush_unchanged (__main__.FlushTests) ... ok
+test_deferred (__main__.FlushTests) ... ok
+test_deferred_failure_and_timeout (__main__.FlushTests) ... ERROR:root:Verified cache flush failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/managers/scheduler_components/flush_wrapper.py", line 32, in _flush
+    self._verify_empty()
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 190, in verify
+    raise RuntimeError('leak')
+RuntimeError: leak
+WARNING:root:Deferred flush_cache timed out while waiting for idle state.
+ok
+test_immediate (__main__.FlushTests) ... ok
+test_verifier_failure_reply (__main__.FlushTests) ... ERROR:root:Verified cache flush failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/managers/scheduler_components/flush_wrapper.py", line 32, in _flush
+    self._verify_empty()
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 190, in verify
+    raise RuntimeError('leak')
+RuntimeError: leak
+ok
+test_cancellation_cleanup (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 113, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 432, in wait_for
+    await waiter
+asyncio.exceptions.CancelledError
+ok
+test_flush_failure_is_fatal (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 133, in run
+    await flush()
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 97, in flush
+    raise RuntimeError(f'ax_shapes verified flush failed: {ret.message}')
+RuntimeError: ax_shapes verified flush failed: mock
+ok
+test_lingering_cache_is_fatal (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 139, in run
+    await request('post-flush-probe', ids, lengths, expect_cold=True)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 126, in request
+    raise RuntimeError(f'ax_shapes {label}: cache survived flush')
+RuntimeError: ax_shapes post-flush-probe: cache survived flush
+ok
+test_missing_prefix_hit_is_fatal (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 124, in request
+    raise RuntimeError(f'ax_shapes {label}: prefix reuse was not exercised')
+RuntimeError: ax_shapes chain-1600: prefix reuse was not exercised
+ok
+test_mtp_skip (__main__.WarmTests) ... WARNING:warm150:ax_shapes skipped: speculative/MTP needs a separate shape plan
+ok
+test_plan (__main__.WarmTests) ... ok
+test_request_failure_aborts_and_flushes (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 113, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 445, in wait_for
+    return fut.result()
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 111, in drain
+    async for out in manager.generate_request(obj, None):
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 58, in generate_request
+    raise ValueError('request failed')
+ValueError: request failed
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 121, in request
+    raise RuntimeError(f'ax_shapes {label}: unexpected finish {reason!r}')
+RuntimeError: ax_shapes cold-600: unexpected finish {'type': 'abort'}
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 115, in request
+    raise RuntimeError(f'ax_shapes {label}: missing/extra final responses')
+RuntimeError: ax_shapes cold-600: missing/extra final responses
+ok
+test_sequence_and_cleanup (__main__.WarmTests) ... ok
+test_timeout_aborts_and_flushes (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 111, in drain
+    async for out in manager.generate_request(obj, None):
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 60, in generate_request
+    await asyncio.sleep(10)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 605, in sleep
+    return await future
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 113, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
+ERROR
+test_unsupported (__main__.WarmTests) ... ok
+
+======================================================================
+ERROR: test_timeout_aborts_and_flushes (__main__.WarmTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 111, in drain
+    async for out in manager.generate_request(obj, None):
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 60, in generate_request
+    await asyncio.sleep(10)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 605, in sleep
+    return await future
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/unittest/async_case.py", line 64, in _callTestMethod
+    self._callMaybeAsync(method)
+  File "/usr/lib/python3.10/unittest/async_case.py", line 87, in _callMaybeAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/usr/lib/python3.10/unittest/async_case.py", line 101, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 136, in test_timeout_aborts_and_flushes
+    await warm.run('null', m)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 135, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 113, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.122s
+
+FAILED (errors=1)

@@ -1,0 +1,146 @@
+{
+  "status": "PASS_SCOPED_VALIDATION",
+  "cpu_tests": 21,
+  "gloo_rank_cases": 6,
+  "stack": {
+    "status": "PASS",
+    "patches": [
+      "000-interface-compliance",
+      "101-d1v12-on-base",
+      "105-role-split-single-partial",
+      "110-sm80-dsa-indexer",
+      "111-sm80-fp8-moe-marlin",
+      "112-sm80-indexer-kernels",
+      "113-sm80-prefill-indexer",
+      "140-kda-dual-snapshot",
+      "120-sched-protect-chain",
+      "130-async-tokenize",
+      "150-startup-warmup"
+    ],
+    "python_source_files": 3623,
+    "python_tools": 8,
+    "deterministic": true,
+    "applied_equals_candidate": true,
+    "full_reverse_exact": true,
+    "base_unchanged": true,
+    "patch_sha256": "3d53476f8d94262e55241bb2295e3b9b96fb0ffc243469aaef9541d4169f20af"
+  },
+  "cold_operator_run": {
+    "environment": {
+      "device": "NVIDIA A100-SXM4-80GB",
+      "torch": "2.13.0+cu130",
+      "triton": "3.7.1",
+      "persistent": false,
+      "cache": "/sjtu/linhang/arena/cache/T46/cold2",
+      "initial_cache_files": 1
+    },
+    "first_totals": {
+      "jit_misses": 113,
+      "bench_calls": 102,
+      "compiled": 113,
+      "disk_hits": 0,
+      "cache_files_added": 908,
+      "cache_files_changed": 0
+    },
+    "repeat_cases": 12,
+    "repeat_totals": {
+      "jit_misses": 0,
+      "bench_calls": 0,
+      "compiled": 0,
+      "disk_hits": 0,
+      "cache_files_added": 0,
+      "cache_files_changed": 0
+    },
+    "novel_nq_601": {
+      "case": "113-novel-nq-601",
+      "seconds": 1.2741736620664597,
+      "jit_misses": 2,
+      "bench_calls": 0,
+      "compiled": 2,
+      "disk_hits": 0,
+      "cache_files_added": 16,
+      "cache_files_changed": 0
+    }
+  },
+  "persistent_operator_run": {
+    "environment": {
+      "device": "NVIDIA A100-SXM4-80GB",
+      "torch": "2.13.0+cu130",
+      "triton": "3.7.1",
+      "persistent": true,
+      "cache": "/sjtu/linhang/arena/cache/T46/cold2",
+      "initial_cache_files": 925
+    },
+    "first_totals": {
+      "jit_misses": 57,
+      "bench_calls": 42,
+      "compiled": 0,
+      "disk_hits": 57,
+      "cache_files_added": 0,
+      "cache_files_changed": 0
+    },
+    "repeat_cases": 12,
+    "repeat_totals": {
+      "jit_misses": 0,
+      "bench_calls": 0,
+      "compiled": 0,
+      "disk_hits": 0,
+      "cache_files_added": 0,
+      "cache_files_changed": 0
+    },
+    "novel_nq_601": {
+      "case": "113-novel-nq-601",
+      "seconds": 0.4352421034127474,
+      "jit_misses": 2,
+      "bench_calls": 0,
+      "compiled": 0,
+      "disk_hits": 2,
+      "cache_files_added": 0,
+      "cache_files_changed": 0
+    }
+  },
+  "remote_sources_match": 30,
+  "limitations": [
+    "No full-model/TP8 service test",
+    "Finite warmup cannot guarantee zero serving-time JIT",
+    "NT_BUCKET2/eager decode coverage depends on scheduling",
+    "MTP skipped; selected ordinary TP profile only"
+  ],
+  "sha256": {
+    "evidence/T46/README.md": "c1aad298b7f1d6684eeac181183e84662ea28640a0b54871749a15c208815810",
+    "evidence/T46/check_records.log": "c2e67b13164053fe18e1f1734ca2266bd2f6ba36ea2a0945c419a6c7d6dd8c01",
+    "evidence/T46/cpu_tests.log": "0529afc2f1ef82ab39f0e609c5c0392fd52fedfa5258658641176cc85661796d",
+    "evidence/T46/cpu_tests_initial.log": "7648f47966dec5a853fa3bdbbfbee7d62d9cd4b188033716127f0155e9553e32",
+    "evidence/T46/full_stack_apply.log": "6bed56a961ca6df70b9b815aee1fa278cd308353de0680b1178dc2889ba72e8d",
+    "evidence/T46/generate_apply.log": "4efc27fa77bb11cc9e46cac5e2a3072d27fa54624f66f097977221ddbff1a535",
+    "evidence/T46/generate_receipt.json": "56a61ddcea5e7c9d2b245cdeb132f723654108670bc3a8de978627978b3e439b",
+    "evidence/T46/gloo.log": "e8c97d733f9f2054eb9281932de08f31d423348c4116764cb2a85ace89df0de5",
+    "evidence/T46/gpu_final_idle.log": "c4c71a59a2826041dee6a0d900e6c2405ba429cdd7aff693918df9ac66326b6c",
+    "evidence/T46/inventory_summary.json": "e06aa360919fdc27dcd070bf1562c77255c8601f47a0bf9b67383545f37e3328",
+    "evidence/T46/jit_inventory.json": "b69ff31c033e84911ad5f8abd44647f985da054afd551228bb9b95c04a9bb665",
+    "evidence/T46/kernel_keys.md": "425fb958dd95f4e5785b4da3889807c273a674fd3a5bc92f194b4c00c07ab760",
+    "evidence/T46/observed_keys_cold.json": "993eca16be3c08400ac12cc6d603de608b66df6ac81a2a9cb0e8cb3c9fd4f2b6",
+    "evidence/T46/observed_keys_persistent.json": "33372dd68da36d36028cb60ec0f9e849b5d10e6a029add8d82daea732d67b503",
+    "evidence/T46/operators_cold1.log": "8692fdf70957e45f9a66604c3865cbe12fc2512e61ae98a4f22c8375b541ad51",
+    "evidence/T46/operators_cold2.log": "7b46a795572e6fb7eaa900734b61e647d12ce1285092384fb4e3bd0bf18503ac",
+    "evidence/T46/operators_cold3.log": "4f97489a41bfc0d38e83a8f03fc8ea0a35c458de2385aa48e7c98bb2d38760b0",
+    "evidence/T46/operators_cold4.log": "3a8df427a423e17e751482b27315ff7d538da9854c203ae1239f019bbe964d24",
+    "evidence/T46/operators_cold5.log": "be97fd28ecea734a3179584a9153cc923595a800b5ef5fdf300919a19155337a",
+    "evidence/T46/operators_persistent.log": "3041d1930fe21b0c67382e683110cfeeea59d2492107172a62414e5dfbe327ff",
+    "evidence/T46/remote_source_hashes.json": "b3271e389339958913c9e2d60f74960058798599e60aebec3f144671a8a2b93b",
+    "evidence/T46/request_plan.json": "3d77560cd3e9c7685ef384c208635d90e080b7958c9c685d6d35e6024319e5a4",
+    "evidence/T46/stack_receipt.json": "e4b65b6caad8c4514233fa27821375975fb505a441a900a7cad80ee37bac3048",
+    "evidence/T46/verify.log": "b0a7e6301f014d08c0429d055a44dc2b03c713ea38b8e1b6d517d53dab8e0967",
+    "evidence/T46/verify_initial.log": "0836c539aadedca78717131545eab49d83bc3fa33cf8dfa072835df7287497f9",
+    "patches/150-startup-warmup.md": "3cbda07f8183b730794fa42ed29f32c68e4ab33408c7bfdc4e9c5ba09712b6dd",
+    "patches/150-startup-warmup.patch": "3d53476f8d94262e55241bb2295e3b9b96fb0ffc243469aaef9541d4169f20af",
+    "scripts/inventory_warmup_150.py": "abafddc2446b4f75e16e9c8506100adaf8c17b9f0035983cd83daeb30497ebf2",
+    "scripts/make_150.py": "ca92ab65b2bf21d588f10a00a234c8589f43e089d1405c1ac7ef6b3b6d3906c2",
+    "scripts/p150/ax_shapes.py": "f98db3ed772d554c79addc7b5b4e76c3385f6b3c631aa934089f1c53619c6e04",
+    "scripts/summarize_150.py": "7055396026aa856d854c13af97fda10713b130a03f3be8fd327b61841ee7f37f",
+    "scripts/test_startup_warmup_150.py": "f5af74a8775bd2d9e7c8eb18c2348589144128ba3ec434777b09a99d0508dfb5",
+    "scripts/test_warmup_cache_150.py": "c383e3b9a65783a06433ba08bf53e2532b706482a651bb6f94072fcc89c818ee",
+    "scripts/test_warmup_flush_gloo_150.py": "1d60587c6fc1419a1f012e07bd98e4be7d8641b22fd35faed5169c75a757ac55",
+    "scripts/verify_150.py": "a4ad57c0a9678d802220567a057aafa9508ff0f4c78dfe2650e3b6af9489288b"
+  }
+}

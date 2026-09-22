@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T46/test_warmup_cache_150.py", line 133, in <module>
+    main()
+  File "/sjtu/linhang/arena/code/T46/test_warmup_cache_150.py", line 47, in main
+    from sglang.kernels.ops.attention.fla.kda import chunk_kda
+  File "/sjtu/linhang/arena/code/T46/sglang/kernels/ops/attention/fla/kda.py", line 19, in <module>
+    from sglang.kernels.ops.attention.fla.fused_norm_gate import layer_norm_gated_fwd
+  File "/sjtu/linhang/arena/code/T46/sglang/kernels/ops/attention/fla/fused_norm_gate.py", line 10, in <module>
+    from sglang.kernels.jit.utils import is_arch_support_pdl
+ModuleNotFoundError: No module named 'sglang.kernels.jit'

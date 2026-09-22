@@ -67,9 +67,11 @@
 - **F64** T43/112：sm80融合indexer保持110数值/边界/graph语义，开发机算子加速（W17）
 - **F65** T44/113：预填充131–186等效TFLOPS，decode保持112（W18）
 - **F66** T45/140：KDA双点fp32快照、数值前提与离线命中估算（W19）
+- **F67** T46 / 150：请求预热的覆盖边界与真实清理（W20）
 
 ## Decisions（最新在上）
 
+- **#36** T46/150采用lifespan请求预热与全worker verified真flush；显式启用后请求/池验证失败即终止启动，MTP跳过；有限shape覆盖不承诺服务期零JIT
 - **#35** T45/140叠加101/105，以SGLANG_AX_KDA_DUAL_SNAPSHOT启动开关替换split为双点fp32导出；额外角色槽可失败降级、tail先淘汰；开启固定非融合intra，关闭走原kernel字节
 - **#34** T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退
 - **#33** T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口
@@ -152,6 +154,7 @@
 - plans/prompts/T43-sm80-indexer-kernels.md
 - plans/prompts/T44-prefill-indexer-roofline.md
 - plans/prompts/T45-M2-kda-dual-snapshot.md
+- plans/prompts/T46-startup-warmup.md
 
 ## Reports
 

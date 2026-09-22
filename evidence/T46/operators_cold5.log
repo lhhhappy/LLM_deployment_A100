@@ -1,0 +1,29 @@
+{"device": "NVIDIA A100-SXM4-80GB", "torch": "2.13.0+cu130", "triton": "3.7.1", "persistent": false, "cache": "/sjtu/linhang/arena/cache/T46/cold2", "initial_cache_files": 1}
+{"case": "112-fallback-first", "seconds": 7.986398296430707, "jit_misses": 1, "bench_calls": 0, "compiled": 1, "disk_hits": 0, "cache_files_added": 8, "cache_files_changed": 0}
+{"case": "113-prefill-first", "seconds": 3.511326387524605, "jit_misses": 3, "bench_calls": 0, "compiled": 3, "disk_hits": 0, "cache_files_added": 24, "cache_files_changed": 0}
+{"case": "113-clean-false-first", "seconds": 2.7751219421625137, "jit_misses": 3, "bench_calls": 0, "compiled": 3, "disk_hits": 0, "cache_files_added": 24, "cache_files_changed": 0}
+{"case": "112-decode-6-first", "seconds": 3.6930289305746555, "jit_misses": 1, "bench_calls": 0, "compiled": 1, "disk_hits": 0, "cache_files_added": 8, "cache_files_changed": 0}
+{"case": "112-decode-7-first", "seconds": 0.012156087905168533, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-17-first", "seconds": 0.013313274830579758, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-32-first", "seconds": 0.07096275314688683, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+{"case": "kda-65-first", "seconds": 170.0568659696728, "jit_misses": 49, "bench_calls": 48, "compiled": 49, "disk_hits": 0, "cache_files_added": 393, "cache_files_changed": 0}
+{"case": "kda-600-first", "seconds": 0.09335546940565109, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-2049-first", "seconds": 147.37052086368203, "jit_misses": 55, "bench_calls": 54, "compiled": 55, "disk_hits": 0, "cache_files_added": 443, "cache_files_changed": 0}
+{"case": "kda-8192-first", "seconds": 0.6976264417171478, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8257-first", "seconds": 3.8191835656762123, "jit_misses": 1, "bench_calls": 0, "compiled": 1, "disk_hits": 0, "cache_files_added": 8, "cache_files_changed": 0}
+{"case": "112-fallback-repeat", "seconds": 0.6638430543243885, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-prefill-repeat", "seconds": 0.5095708630979061, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-clean-false-repeat", "seconds": 0.3224323336035013, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-6-repeat", "seconds": 0.49079188890755177, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-7-repeat", "seconds": 0.514291713014245, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-17-repeat", "seconds": 0.5930530596524477, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "112-decode-32-repeat", "seconds": 0.6059361342340708, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-65-repeat", "seconds": 0.5210345666855574, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-600-repeat", "seconds": 0.521635277196765, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-2049-repeat", "seconds": 0.5776444934308529, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8192-repeat", "seconds": 0.5170338656753302, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "kda-8257-repeat", "seconds": 0.7835766430944204, "jit_misses": 0, "bench_calls": 0, "compiled": 0, "disk_hits": 0, "cache_files_added": 0, "cache_files_changed": 0}
+{"case": "113-novel-nq-601", "seconds": 1.2741736620664597, "jit_misses": 2, "bench_calls": 0, "compiled": 2, "disk_hits": 0, "cache_files_added": 16, "cache_files_changed": 0}
+{"status": "PASS", "same_shape_repeat_count": 12, "repeat_jit_misses": 0, "repeat_bench_calls": 0, "first_jit_misses": 113, "first_bench_calls": 102}

@@ -1,0 +1,151 @@
+test_actual_empty_assertions (__main__.FlushTests) ... ok
+test_busy_failure_still_enters_verifier (__main__.FlushTests) ... ok
+test_control_aggregates_all_workers (__main__.FlushTests) ... ok
+test_default_flush_unchanged (__main__.FlushTests) ... ok
+test_deferred (__main__.FlushTests) ... ok
+test_deferred_failure_and_timeout (__main__.FlushTests) ... ERROR:root:Verified cache flush failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/managers/scheduler_components/flush_wrapper.py", line 32, in _flush
+    self._verify_empty(success)
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 205, in verify
+    raise RuntimeError('leak')
+RuntimeError: leak
+WARNING:root:Deferred flush_cache timed out while waiting for idle state.
+ok
+test_immediate (__main__.FlushTests) ... ok
+test_real_scheduler_flush_restores_pools (__main__.FlushTests) ... WARNING:root:Cache not flushed because there are pending requests. #queue-req: 1, #running-req: 0
+ok
+test_tp_peer_failure_propagates (__main__.FlushTests) ... ERROR:warm150:ax_shapes local pool verification failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 88, in verify_empty
+    assert_empty(scheduler)
+  File "/usr/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/usr/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/usr/lib/python3.10/unittest/mock.py", line 1173, in _execute_mock_call
+    raise effect
+RuntimeError: local leak
+ERROR:warm150:ax_shapes local pool verification failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 87, in verify_empty
+    raise RuntimeError('ax_shapes scheduler refused flush')
+RuntimeError: ax_shapes scheduler refused flush
+ok
+test_verifier_failure_reply (__main__.FlushTests) ... ERROR:root:Verified cache flush failed
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/managers/scheduler_components/flush_wrapper.py", line 32, in _flush
+    self._verify_empty(success)
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 205, in verify
+    raise RuntimeError('leak')
+RuntimeError: leak
+ok
+test_cancellation_cleanup (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 138, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 432, in wait_for
+    await waiter
+asyncio.exceptions.CancelledError
+ok
+test_exporter_obeys_metrics_flag (__main__.WarmTests) ... ok
+test_flush_failure_is_fatal (__main__.WarmTests) ... ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 160, in run
+    await flush()
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 122, in flush
+    raise RuntimeError(f'ax_shapes verified flush failed: {ret.message}')
+RuntimeError: ax_shapes verified flush failed: mock
+ok
+test_lingering_cache_is_fatal (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 173, in run
+    await request('post-flush-probe', ids, lengths, expect_cold=True)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 153, in request
+    raise RuntimeError(f'ax_shapes {label}: cache survived flush')
+RuntimeError: ax_shapes post-flush-probe: cache survived flush
+ok
+test_missing_prefix_hit_is_fatal (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 151, in request
+    raise RuntimeError(f'ax_shapes {label}: prefix reuse was not exercised')
+RuntimeError: ax_shapes chain-1600: prefix reuse was not exercised
+ok
+test_mtp_skip (__main__.WarmTests) ... WARNING:warm150:ax_shapes skipped: speculative/MTP needs a separate shape plan
+ok
+test_plan (__main__.WarmTests) ... ok
+test_request_failure_aborts_and_flushes (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 138, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 445, in wait_for
+    return fut.result()
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 136, in drain
+    async for out in manager.generate_request(obj, None):
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 58, in generate_request
+    raise ValueError('request failed')
+ValueError: request failed
+WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 148, in request
+    raise RuntimeError(f'ax_shapes {label}: unexpected finish {reason!r}')
+RuntimeError: ax_shapes cold-600: unexpected finish {'type': 'abort'}
+WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 140, in request
+    raise RuntimeError(f'ax_shapes {label}: missing/extra final responses')
+RuntimeError: ax_shapes cold-600: missing/extra final responses
+ok
+test_sequence_and_cleanup (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ok
+test_timeout_aborts_and_flushes (__main__.WarmTests) ... WARNING:warm150:ax_shapes role checkpoint feature is off; role snapshot coverage unavailable
+ERROR:warm150:ax_shapes failed; startup will fail after cleanup
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 136, in drain
+    async for out in manager.generate_request(obj, None):
+  File "/workspace/Agentic_science_challenge/scripts/test_startup_warmup_150.py", line 60, in generate_request
+    await asyncio.sleep(10)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 605, in sleep
+    return await future
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 169, in run
+    await request(label, ids, lengths, expect_hit=hit)
+  File "/workspace/Agentic_science_challenge/build/p150/candidate/sglang/srt/entrypoints/ax_shapes.py", line 138, in request
+    await asyncio.wait_for(drain(), timeout=REQUEST_TIMEOUT)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
+ok
+test_unsupported (__main__.WarmTests) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.150s
+
+OK

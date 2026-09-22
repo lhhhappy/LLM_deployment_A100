@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T46/test_warmup_cache_150.py", line 140, in <module>
+    main()
+  File "/sjtu/linhang/arena/code/T46/test_warmup_cache_150.py", line 56, in main
+    previous_hook = JITFunction.cache_hook
+                    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'JITFunction' has no attribute 'cache_hook'

@@ -4,6 +4,7 @@
 
 | # | 日期 | 决策 | 理由 / 证据 | 决策人 |
 |---|---|---|---|---|
+| 36 | 2026-09-22 | T46/150采用lifespan请求预热与全worker verified真flush；显式启用后请求/池验证失败即终止启动，MTP跳过；有限shape覆盖不承诺服务期零JIT| 避免静默带冷编译/残留KV/Mamba进入评分；112/113精确constexpr长度证明有限请求不能穷尽。保留原诊断/计数，log_metrics=False并修exporter守卫；P150-01…05/evidence/T46，L2待Claude，未入RELEASE | Codex W20（T46实现范围） |
 | 35 | 2026-09-22 | T45/140叠加101/105，以SGLANG_AX_KDA_DUAL_SNAPSHOT启动开关替换split为双点fp32导出；额外角色槽可失败降级、tail先淘汰；开启固定非融合intra，关闭走原kernel字节| 跨small_grid阈值曾有8.535385e-5误差；固定路径后8组GPU逐元素一致，含7组有效角色边界。额外槽经请求→树移交，21CPU、32×30轮off调度一致；完整8卡验证另交Claude，未入RELEASE/队列。补丁说明与evidence/T45 | Codex W19（T45实现范围） |
 | 34 | 2026-09-22 | T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退| 190k扫描更大tile/更多warp较慢或spill，stages3无稳定收益；最终六档131–186等效TFLOPS、222数值/30graph及全栈通过。额外scratch110.39MiB；不改RELEASE，回滚反向113。见evidence/T44与F65 | Codex W18（T44实现范围） |
 | 33 | 2026-09-22 | T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口| 现有tilelang依赖FP8 GEMM且限N=1；48组tile与后续布局/warp实测发现大tile寄存器溢出，小tile较稳且剪枝更细。evidence/T43；最终88组验收和整栈验证通过。无运行期autotune，回滚反向撤112 | Codex W17（T43实现范围） |
