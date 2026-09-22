@@ -28,6 +28,7 @@ def edit(rel, old, new, count=1):
 
 
 def main():
+    CHANGED.clear()
     WORK.mkdir(parents=True, exist_ok=True)
     (WORK / '.gitignore').write_text('*\n')
     before, after = WORK / 'baseline/sglang', WORK / 'candidate/sglang'
@@ -112,6 +113,16 @@ def main():
     edit(p, '            mamba_track_seqlens=batch.mamba_track_seqlens,', '''            mamba_track_seqlens=batch.mamba_track_seqlens,
             ax_kda_snapshot_offsets=batch.ax_kda_snapshot_offsets,
             ax_kda_snapshot_slots=batch.ax_kda_snapshot_slots,''')
+
+    edit(p, '        if self.mamba_track_seqlens is not None:\n', '''        if self.ax_kda_snapshot_offsets is not None:
+            self.ax_kda_snapshot_offsets = self._pad_tensor_to_size(
+                self.ax_kda_snapshot_offsets, bs, value=-1
+            )
+            self.ax_kda_snapshot_slots = self._pad_tensor_to_size(
+                self.ax_kda_snapshot_slots, bs, value=-1
+            )
+        if self.mamba_track_seqlens is not None:
+''')
 
     p = 'srt/mem_cache/memory_pool.py'
     edit(p, '        mamba_index = req.kv.mamba_pool_idx\n        assert mamba_index is not None, "double free? mamba_index is None"', '''        if req.kv.ax_kda_snapshot_slot is not None:

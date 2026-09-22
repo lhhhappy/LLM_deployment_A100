@@ -1,0 +1,158 @@
+{
+  "off_cases": 32,
+  "off_rounds": 960,
+  "off_json_bytes_equal": true,
+  "on_cases": 8,
+  "single_request": {
+    "0": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "r",
+            0,
+            576
+          ]
+        ],
+        "waiting": [],
+        "chunk": "r",
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7616,
+          15808,
+          640,
+          640
+        ],
+        "verdicts": [
+          [
+            "r",
+            "CONTINUE"
+          ]
+        ]
+      },
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "r",
+            576,
+            1024
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7744,
+          15936,
+          752,
+          512
+        ],
+        "verdicts": []
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "r",
+            576,
+            1024
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7744,
+          15936,
+          752,
+          512
+        ],
+        "verdicts": []
+      }
+    ],
+    "1": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "r",
+            0,
+            1024
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7168,
+          15360,
+          1328,
+          1088
+        ],
+        "verdicts": [
+          [
+            "r",
+            "CONTINUE"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "r",
+            0,
+            1024
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7168,
+          15360,
+          1328,
+          1088
+        ],
+        "verdicts": [
+          [
+            "r",
+            "CONTINUE"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "r",
+            0,
+            1024
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7168,
+          15360,
+          1328,
+          1088
+        ],
+        "verdicts": [
+          [
+            "r",
+            "CONTINUE"
+          ]
+        ]
+      }
+    ]
+  }
+}

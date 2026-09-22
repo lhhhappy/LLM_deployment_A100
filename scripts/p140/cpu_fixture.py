@@ -25,6 +25,7 @@ import numpy as np
 import torch
 
 NS = types.SimpleNamespace
+CREATED = []
 
 
 class Env:
@@ -92,6 +93,10 @@ def load(root):
     g['mamba_checkpoint_grid'] = lambda page: math.lcm(64, page)
     g['mamba_extra_buffer_lazy_enabled'] = lambda: False
     g['_MAMBA_DEBUG_ASSERTS'] = False
+    tree = ast.parse((root / 'srt/managers/scheduler.py').read_text())
+    scheduler = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'Scheduler')
+    flush = next(n for n in scheduler.body if isinstance(n, ast.FunctionDef) and n.name == 'flush_cache')
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[flush],type_ignores=[])), '<real flush>', 'exec'), g)
     # Pool ownership methods, including production fallback/abort cleanup.
     tree = ast.parse((root / 'srt/mem_cache/memory_pool.py').read_text())
     pool = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'HybridReqToTokenPool')
@@ -141,6 +146,7 @@ class Pool:
         for name in ['free_mamba_cache','get_mamba_ping_pong_other_idx','get_mamba_ping_pong_keep_idx',
                      'donate_mamba_ping_pong_slot','set_mamba_ping_pong_slot']:
             setattr(self,name,types.MethodType(getattr(p,name),self))
+    def reset_aux_cache_allocator(self): pass
     def write(self,indices,value): self.req_to_token[indices]=value
     def clear(self):
         self.mamba_allocator.clear(); self.req_to_token.zero_()
@@ -194,4 +200,5 @@ def cache_fixture(p,on=True,cap=-1,slots=64):
     c.components={p.ComponentType.FULL:full,p.ComponentType.MAMBA:mamba}
     c._components_tuple=tuple(c.components.values()); c.tree_components=tuple(c.components)
     c.tree_core=p.UnifiedTreeCore(params,c.components)
+    CREATED.append(c)
     return c

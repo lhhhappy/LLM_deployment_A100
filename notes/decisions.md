@@ -4,7 +4,7 @@
 
 | # | 日期 | 决策 | 理由 / 证据 | 决策人 |
 |---|---|---|---|---|
-| 34 | 2026-09-22 | T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退 | 190k扫描更大tile/更多warp较慢或spill，stages3无稳定收益；最终六档131–186等效TFLOPS、222数值/30graph及全栈通过。额外scratch110.39MiB；不改RELEASE，回滚反向113。见evidence/T44与F65 | Codex W18（T44实现范围） |
+| 34 | 2026-09-22 | T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退| 190k扫描更大tile/更多warp较慢或spill，stages3无稳定收益；最终六档131–186等效TFLOPS、222数值/30graph及全栈通过。额外scratch110.39MiB；不改RELEASE，回滚反向113。见evidence/T44与F65 | Codex W18（T44实现范围） |
 | 33 | 2026-09-22 | T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口| 现有tilelang依赖FP8 GEMM且限N=1；48组tile与后续布局/warp实测发现大tile寄存器溢出，小tile较稳且剪枝更细。evidence/T43；最终88组验收和整栈验证通过。无运行期autotune，回滚反向撤112 | Codex W17（T43实现范围） |
 | 32 | 2026-09-22 | T41/120 默认启用普通 TP 调度保护：续算先保留对齐的 2048 token 上限预算，剩余预算按原 LPM 接完整短命中；prefill 后有存活 decoder 才交替一次；不启用 mixed、不重排 LPM。环境变量关可逐决策回退 | 保留原续算必入/槽位/KV 记账与 101；给已准入长请求严格进度保证，避免短请求无限抢走预算。27 CPU 测试与 3617 文件 py_compile 通过；SLO 收益待实测，patch 说明记录条件上界及原 LPM 排队饥饿边界 | Codex W15（T41 实现范围） |
 | 31 | 2026-09-22 | T42/130 用每个 TokenizerManager 的单线程池执行原始完整分词；所有 regular text（含小输入）串行移出 loop；暂不加入可选前缀缓存。body routing_key 优先，再 Routing-Key 头，再 Session-ID 头 | 避免 HF padding/truncation 共享状态竞争；取消后保持槽位直到实际完成；完整分词天然避开前缀末端 BPE 合并风险。130 默认开启，SGLANG_AX_ASYNC_TOKENIZE=0 恢复同步分词；动态批处理保留原策略。CPU 测试/evidence/T42，L2 待 Claude 审阅安排 | Codex W16（T42 实现范围） |

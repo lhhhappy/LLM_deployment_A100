@@ -9,7 +9,7 @@ from types import SimpleNamespace as NS
 import unittest
 
 import torch
-from p140.cpu_fixture import load, cache_fixture, Req
+from p140.cpu_fixture import load, cache_fixture, Req, CREATED
 
 P=None; helper=None
 
@@ -26,6 +26,9 @@ def prepared(cache, ids=None, row=0):
 
 
 class Tests(unittest.TestCase):
+    def setUp(self): CREATED.clear()
+    def tearDown(self):
+        for c in CREATED: c.tree_core.sanity_check([], [])
     def test_alignment(self):
         for pos,want in [(0,0),(63,0),(64,64),(65,64),(127,64),(128,128)]:
             ids=[2]*300; ids[pos]=154829
@@ -121,7 +124,11 @@ class Tests(unittest.TestCase):
     def test_flush_resets_tree_and_pools(self):
         c=cache_fixture(P); r,_,_=prepared(c); c.cache_finished_req(r,kv_len_to_handle=337)
         # Scheduler's idle flush order: cache reset, req pool and token pool clear.
-        c.reset(); c.req_to_token_pool.clear(); c.token_to_kv_pool_allocator.clear()
+        scheduler=NS(is_fully_idle=lambda:True,tree_cache=c,req_to_token_pool=c.req_to_token_pool,
+                     token_to_kv_pool_allocator=c.token_to_kv_pool_allocator,
+                     grammar_manager=NS(clear=lambda:None),
+                     metrics_reporter=NS(reset_metrics=lambda:None,is_stats_logging_rank=False),draft_worker=None)
+        self.assertTrue(P.flush_cache(scheduler,empty_cache=False))
         self.assertEqual(c.req_to_token_pool.mamba_allocator.available_size(),64)
         self.assertEqual(c.token_to_kv_pool_allocator.available_size(),65536)
         self.assertEqual(len(c.tree_core._node_arena),1)
@@ -137,6 +144,97 @@ class Tests(unittest.TestCase):
         role=[n for n in c.tree_core._node_arena.values() if getattr(n,'ax_kda_role',False)]
         self.assertEqual(len(role),1)
         self.assertIsNotNone(role[0].component_data[P.ComponentType.MAMBA].value)
+
+
+    def test_flush_busy_keeps_pending_slot(self):
+        c=cache_fixture(P); r,_,_=prepared(c)
+        live=set(c.req_to_token_pool.mamba_allocator.live)
+        s=NS(is_fully_idle=lambda:False,waiting_queue=[r],running_batch=NS(reqs=[]))
+        self.assertFalse(P.flush_cache(s,empty_cache=False))
+        self.assertEqual(c.req_to_token_pool.mamba_allocator.live,live)
+        self.assertIsNotNone(r.kv.ax_kda_snapshot_slot)
+        c.cache_finished_req(r,is_insert=False,kv_len_to_handle=337)
+
+    def test_branch_priority_replaced_by_two_points(self):
+        for on in (False,True):
+            c=cache_fixture(P,on=on); r,_,_=prepared(c)
+            # Re-prepare the same range after discarding the provisional extra.
+            helper.discard(c.req_to_token_pool,r)
+            r.mamba_branching_seqlen=64
+            b=NS(tree_cache=c,req_to_token_pool=c.req_to_token_pool,
+                 model_config=NS(hf_text_config=NS(mamba_chunk_size=64)),ax_kda_dual_snapshot_batch=on)
+            entry=P._mamba_radix_cache_v2_req_prepare_for_extend(b,r)
+            self.assertEqual(r.kv.mamba_last_track_seqlen,320 if on else 64)
+            self.assertTrue(entry.track_mask)
+
+    def test_role_exactly_at_end_uses_single_slot(self):
+        c=cache_fixture(P); ids=[1]*337;ids[325]=154827
+        r,b,_=prepared(c,ids)
+        self.assertIsNone(r.kv.ax_kda_snapshot_slot)
+        c.cache_finished_req(r,kv_len_to_handle=337)
+        node=c.tree_core.node_by_id(c.match_prefix(P.MatchPrefixParams(P.RadixKey(ids))).last_device_node)
+        self.assertTrue(node.ax_kda_role)
+        self.assertFalse(node.ax_kda_tail)
+        self.assertEqual(len(c.req_to_token_pool.mamba_allocator.live),1)
+
+    def test_no_role_and_short_extend(self):
+        for size in (17,63,64,65,320):
+            c=cache_fixture(P);r,b,e=prepared(c,[1]*size)
+            self.assertIsNone(r.kv.ax_kda_snapshot_slot)
+            self.assertEqual(b.ax_kda_snapshot_slots[0,1].item(),-1)
+            self.assertEqual(e.track_mask,size>=64)
+            c.cache_finished_req(r,kv_len_to_handle=size)
+            self.assertEqual(len(c.req_to_token_pool.mamba_allocator.live),int(size>=64))
+
+    def test_streaming_and_unaligned_batch_fallback(self):
+        c=cache_fixture(P);r,_,_=prepared(c)
+        b=NS(tree_cache=c,reqs=[r])
+        self.assertTrue(helper.batch_supported(b,64))
+        r.session=object();self.assertFalse(helper.batch_supported(b,64))
+        r.session=None;r.prefix_indices=torch.arange(63)
+        self.assertFalse(helper.batch_supported(b,64))
+
+    def test_namespace_preserved(self):
+        c=cache_fixture(P);r,_,_=prepared(c);r.cache_salt='private-A';r.extra_key='adapter-A'
+        c.cache_finished_req(r,kv_len_to_handle=337)
+        ids=[1]*150+[2]*187
+        hit=c.match_prefix(P.MatchPrefixParams(P.RadixKey(ids,'adapter-A',cache_salt='private-A')))
+        self.assertEqual(len(hit.device_indices),128)
+        for adapter,salt in [('adapter-B','private-A'),('adapter-A','private-B')]:
+            self.assertEqual(len(c.match_prefix(P.MatchPrefixParams(P.RadixKey(ids,adapter,cache_salt=salt))).device_indices),0)
+
+    def test_full_pressure_frees_every_tree_slot(self):
+        c=cache_fixture(P);r,_,_=prepared(c);c.cache_finished_req(r,kv_len_to_handle=337)
+        c.evict(P.EvictParams(num_tokens=10000,mamba_num=100))
+        self.assertEqual(c.req_to_token_pool.mamba_allocator.live,set())
+        self.assertEqual(c.token_to_kv_pool_allocator.live,set())
+
+    def test_two_requests_never_share_snapshot_slots(self):
+        c=cache_fixture(P);r,b,_=prepared(c);r2,b2,_=prepared(c,row=1)
+        self.assertTrue(set(b.ax_kda_snapshot_slots.flatten().tolist()).isdisjoint(b2.ax_kda_snapshot_slots.flatten().tolist()))
+        c.cache_finished_req(r,kv_len_to_handle=337)
+        c.cache_finished_req(r2,kv_len_to_handle=337)
+        self.assertEqual(len(c.req_to_token_pool.mamba_allocator.live),2)
+
+    def test_middle_chunk_exports_last_global_role(self):
+        c=cache_fixture(P); ids=[1]*900;ids[150]=154827;ids[280]=154829
+        r,b,_=prepared(c,ids)
+        helper.discard(c.req_to_token_pool,r)
+        r.extend_range=NS(start=0,end=512,length=512)
+        e=P._mamba_radix_cache_v2_req_prepare_for_extend(b,r)
+        helper.prepare(b,[e.track_index],[e.track_mask],64)
+        self.assertEqual(b.ax_kda_snapshot_offsets.tolist(),[[512,256]])
+        c.cache_unfinished_req(r,chunked=True)
+        self.assertIsNone(r.kv.ax_kda_snapshot_slot)
+        # Continue the original chunk without another role snapshot.
+        r.extend_range=NS(start=512,end=900,length=388)
+        e=P._mamba_radix_cache_v2_req_prepare_for_extend(b,r)
+        helper.prepare(b,[e.track_index],[e.track_mask],64)
+        self.assertEqual(b.ax_kda_snapshot_offsets.tolist(),[[384,-1]])
+        c.cache_unfinished_req(r)
+        c.cache_finished_req(r,kv_len_to_handle=900)
+        hit=c.match_prefix(P.MatchPrefixParams(P.RadixKey([1]*150+[154827]+[1]*129+[2]*620)))
+        self.assertEqual(len(hit.device_indices),256)
 
 
 def main():

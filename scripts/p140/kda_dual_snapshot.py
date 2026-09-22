@@ -31,6 +31,7 @@ def configure(cache, params):
         "no speculative/mixed/HiCache/unified/int8/ReplaySSM": not any((
             getattr(args, "speculative_algorithm", None),
             getattr(args, "enable_mixed_chunk", False),
+            getattr(args, "enable_two_batch_overlap", False),
             getattr(args, "enable_hierarchical_cache", False),
             getattr(args, "enable_unified_memory", False),
             getattr(args, "enable_int8_mamba_checkpoint", False),
