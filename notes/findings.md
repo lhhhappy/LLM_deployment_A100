@@ -347,3 +347,9 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
   省下的预算又允许一个新请求走截断分支成为 `new_chunked_req`；101 的保护只看 `new_chunked_req`，漏了 `has_chunked_req`。W15 在 CPU 上也复现过（T41）。
 - 修复：`patches/105-role-split-single-partial.patch`（角色切分开启且有续算分块时，拒绝再截断新请求）；与 120 上下文不冲突，000→101→105→110→111→120→130 全栈 fuzz=0 可打。
 - 影响：已提交的 B（45767，含 101 无 105）即使能在 A100 启动也会在并发下崩。dev 模板已加"跑完检查引擎存活"。
+
+## F63 — A100 上的主瓶颈是补丁 110 的 torch 版 DSA indexer（占约 60% GPU 时间）
+- b112（000+101+105+110+111）dev N6 运行中：引擎全程存活（105 生效）；纯 decode 每步约 18ms（bs=1）→ 69ms（bs=6），每请求约 +10ms。
+- 12 步 profile（TP0，`evidence/T43/profile_decode_b112_n6_TP0.txt`）：at::native elementwise/unrolled/reduce/gather 约 60%，外加 bf16 bmm 132 次（= 11 个 DSA 层 × 12 步）——全部来自 110 shim；
+  Marlin MoE 8%、tilelang 稀疏注意力 3.5%、KDA 约 1%、allreduce 约 2%。预填充 fp8_mqa_logits 按 32 头循环 mm，同样是 TTFT 主因（推断，待 112 前后对比）。
+- 对策：补丁 112 sm80 融合 kernel（T43，W17）。在此之前 120/130 的 A/B 只能看相对趋势。
