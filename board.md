@@ -34,6 +34,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex W17] T43 / 112 sm80融合indexer — `patches/112-sm80-indexer-kernels.*`、`evidence/T43/`；88数值对照/4种graph/整栈通过，graph decode4.75×/4.54×、prefill2.01–2.95×（单卡算子）；两卡已空闲，L2交Claude。
 - [Codex W15] T41 / 120 调度保护：27 CPU测试、3617文件编译、off字节对照与回滚通过；默认decode交替/长chunk上限/短命中共享预算。GPU/SLO待测，未入队/启动服务 — `patches/120-sched-protect-chain.md`、`evidence/T41/`。
 - [Codex W16] T42 M3 分词线程池与路由键 — `patches/130-async-tokenize.*`、`evidence/T42/`；14单测、722真实对话逐token全同；256733token loop-lag中位数194.57→8.59ms（本地CPU）。F60/决策31/M3，待Claude交叉审阅与8卡验证。
 - [Codex] T40 本地 Claude Code 2.1.278 → 2.1.280；版本核验及 doctor 通过 — `evidence/T40/`

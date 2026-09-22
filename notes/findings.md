@@ -353,3 +353,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 12 步 profile（TP0，`evidence/T43/profile_decode_b112_n6_TP0.txt`）：at::native elementwise/unrolled/reduce/gather 约 60%，外加 bf16 bmm 132 次（= 11 个 DSA 层 × 12 步）——全部来自 110 shim；
   Marlin MoE 8%、tilelang 稀疏注意力 3.5%、KDA 约 1%、allreduce 约 2%。预填充 fp8_mqa_logits 按 32 头循环 mm，同样是 TTFT 主因（推断，待 112 前后对比）。
 - 对策：补丁 112 sm80 融合 kernel（T43，W17）。在此之前 120/130 的 A/B 只能看相对趋势。
+
+## F64 — T43/112：sm80融合indexer保持110数值/边界/graph语义，开发机算子加速（W17）
+
+- **VERIFIED（A100算子，P112-01…06）**：`patches/112-sm80-indexer-kernels.patch` + `scripts/make_112.py`；uint8软件e4m3→bf16解码，逐头MMA结果保留110的bf16舍入，再融合relu/权重/归约/scale。decode页64/4warps；prefill H32时2query×64key/4warps，clean=True跳过无交集tile，clean=False按110全宽计算。负页仍映射0；context [B]/[B,N]、N>1及尾部0保持。
+- **VERIFIED（最终同源）**：`evidence/T43/final_all.log` 88组数值（B1/6/32、N1/2、ctx1024/32000/190000、边界/strides/大幅值、8192query大矩阵）全过；最大逐行相对L∞1.1185e-5，topk集合最低99.951171875%。254有限fp8编码逐bit同torch，2NaN类别同；4种graph×3次动态输入重放与eager逐bit同。真实模型形状的随机激活，不是真实模型q/K/weights。
+- **VERIFIED（单卡微基准，非TP8/SLO）**：B6/N1 decode CUDA graph，32k key：0.4859→0.1023ms（4.75×），190k：2.6867→0.5917ms（4.54×）；8192query prefill causal：32k 207.93→96.38ms（2.16×），190k 1248.86→622.45ms（2.01×）；ragged：32k 207.71→76.11ms（2.73×），190k 1249.07→423.39ms（2.95×）。CUDA event中位数、排除JIT与数据生成，完整样本与eager结果见 `summary.json` / `final_all.log`。
+- **VERIFIED（交付栈）**：000→101→105→110→111→112→120→130全fuzz0、3623文件py_compile、确定生成、全栈反向逐字节还原、base_exact未改；实际PTX为sm80 bf16 MMA、代表形状0 spills。`summary.json`绑定源码/oracle/测试/补丁/compiler SHA。
+- **INFERRED / 开放**：应降低F63中的110算子成本，但没有8卡TTFT/TPOT或N@SLO结果；服务导入、真实激活/能力、完整NEXTN集成待Claude。未改RELEASE/队列/服务、未操作bohr/Trisol/pod/镜像/提交；不能直接用池化后key长度的算子耗时推导原prompt耗时。

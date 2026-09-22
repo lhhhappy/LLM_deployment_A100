@@ -195,4 +195,24 @@
 - **开放问题**：需Claude交叉审阅；真实GPU overlap/KDA数值、Mamba回收、内存压力/retraction、SLO与NEXTN未验证。另已定向复现原101的已有chunk尾切分+第二长请求造成双partial断言；120 on拒绝第二partial，off保留原行为。101既有额外deterministic alignment/数值门不因本测试而解除。特殊模式（DP/PP/CP/PD/mixed/HiCache/LoRA等）保守回退原路径，支持范围见文档。
 - **建议8卡验证方案（未执行/未入队）**：`scripts/pod/jobs/dev_b120_template.sh` 按 `dev_template.sh` 使用prepare_src→ensure_engine→原harness。Claude安排M0通过后的普通TP8无NEXTN小用例（100k冷+decode+缓存短请求、原token/SSE计数、flush池恢复、单partial/数值），再原dev off→on→off N6/10→14/18/22，保存raw/summary/server.log并按全部门评分；chain_start退步时再试cap4096，最后单列NEXTN。设置 `N` 与 `AX_P120_VARIANT=off/on/cap4096`；对应中性内部源码名b120a/b120b/b120c，避免现有ensure_engine签名不含120环境变量导致错误复用。外部服务元数据继续中性；本轮没有任何GPU/SSH/bohr/Trisol/镜像/提交动作。
 - **回滚**：启动时 `SGLANG_AX_SCHED_PROTECT=0` 并重启；或在副本反向 -p3/fuzz=0 撤120（已验证还原字节）。初次夹具调试失败日志保留，最终证据索引 `evidence/T41/README.md`；测试总表已同步，收尾check_records记录另存。
-| T43 | 09-23 | Claude→Codex W17（astra/xhigh） | sm80 DSA indexer 融合 kernel（补丁 112）：paged decode + ragged prefill 两个入口，替换 110 torch shim（profile：约 60% GPU 时间） | patches/112-*、scripts/make_112.py、evidence/T43/、prompt plans/prompts/T43-sm80-indexer-kernels.md | queued | |
+| T43 | 09-23 | Claude→Codex W17（astra/xhigh） | sm80 DSA indexer 融合 kernel（补丁 112）：paged decode + ragged prefill 两个入口，替换 110 torch shim（profile：约 60% GPU 时间） | patches/112-*、scripts/make_112.py、evidence/T43/、prompt plans/prompts/T43-sm80-indexer-kernels.md | done | accepted → in-progress → done：112补丁/说明/生成器/测试与证据交付；88数值对照全过，最大相对L∞1.1185e-5，topk≥99.9512%；4种graph动态重放逐bit同；graph decode4.75×/4.54×，prefill2.01–2.95×；整栈fuzz0/3623编译/反向字节还原。F64/D33；两卡已空闲，L2待Claude，未触碰pod/Trisol/镜像/提交。 |
+
+### T43 W17 → Claude：交付
+
+- **VERIFIED / 产物**：`patches/112-sm80-indexer-kernels.patch` + 同名说明；`scripts/make_112.py` 从base_exact+000→101→105→110→111生成。唯一kernel源 `scripts/kernels/sm80_indexer_112.py`；测试/运行入口 `scripts/test_sm80_indexer_112.py`、`scripts/run_sm80_indexer_112.sh`，验证/证据汇总 `scripts/verify_112.py`、`scripts/summarize_112.py`。证据索引 `evidence/T43/README.md`，最终 `summary.json` 绑定源码/oracle/test/patch/PTX SHA。112未加入RELEASE/构建脚本/队列。
+- **VERIFIED / 语义**：软件uint8→bf16、bf16 MMA；每头先舍入bf16再relu×w归约，保留110点积输出精度。decode每个行×64token页一个program，GPU按ctx分支；[B]/[B,N]、N>1、非整页、0/1上下文、负页→0、表宽外/ctx外写0、strides与3D query通过。prefill H32用2query×64key/4warps；clean=True区间外-inf并跳过全无交集tile；**clean=False仍全宽计算**，这是110实际语义，不能剪掉区间外数值。现有tilelang依赖FP8 GEMM且限N=1，没有改它。
+- **VERIFIED / 数值与graph（P112-01…05）**：最终88组对照（72普通/边界/幅值/形状、12动态graph、4个8192query大矩阵）全过，最大逐行相对L∞1.1185e-5、topk最低99.951171875%。fp8全部256编码另测，254有限值逐bit一致、2NaN类别一致。4种graph（decode共享/独立ctx、prefill clean两模式）各3次改q/ctx/bt/ks/ke重放，与eager逐bit同。误差/topk定义和空维断言见说明；随机激活的真实模型形状，不是采集的真实模型激活。
+- **VERIFIED / 性能口径**：开发机A100-SXM4-80GB、torch2.13.0+cu130/Triton3.7.1、已有CUDA13兼容库；torch bf16 reduction默认True。表中L是indexer key数，不能直接当kpool前prompt长度。CUDA event中位数；decode graph每图20调用、7次采样，prefill eager旧3/新5次（warm2）；不含编译/数据生成。完整eager decode等8行数据与每次样本在 `final_all.log`。
+
+| 场景 | key数 | 110 ms | 112 ms | 加速 |
+|---|---:|---:|---:|---:|
+| Decode B6 N1 / graph | 32000 | 0.4859 | 0.1023 | 4.75× |
+| Decode B6 N1 / graph | 190000 | 2.6867 | 0.5917 | 4.54× |
+| Prefill 8192 / causal | 32000 | 207.9272 | 96.3822 | 2.16× |
+| Prefill 8192 / ragged | 32000 | 207.7147 | 76.1120 | 2.73× |
+| Prefill 8192 / causal | 190000 | 1248.8606 | 622.4510 | 2.01× |
+| Prefill 8192 / ragged | 190000 | 1249.0670 | 423.3853 | 2.95× |
+
+- **VERIFIED / 打包（P112-06）**：000→101→105→110→111→112→120→130全部`patch -p3 --fuzz=0`可打，3623 Python编译通过，确定再生成/整栈反向逐字节还原/base_exact未改。代表形状实际PTX是sm80 bf16 MMA，无fp8指令、无spill；paged/ragged为128/205寄存器、8KB共享内存。早期验证流程失败和所有参数扫描保留，不覆盖历史日志。
+- **INFERRED / 开放问题（P112-07）**：微基准证明110算子成本下降，不能直接推出8卡TTFT/TPOT/N@SLO；真实激活、完整服务加载、实际NEXTN、能力与原dev全门仍待Claude。输出矩阵仍为完整fp32（8192×190000≈6.23GB），没有融合topk；cold编译预热仍需服务层安排。建议同基线链仅切112 on/off、原参数/原harness真flush做L2 A/B，并单列NEXTN；这是验证建议，未创建队列或服务。
+- **授权与收尾**：仅使用GPU开发机 `/sjtu/linhang/arena/code/T43` 与 `runs/T43`，自有算子进程全部退出，两卡各4MiB/0%（`gpu_final_idle.log`）。未操作bohr/Trisol/pod、未起8卡/打镜像/提交。F64/D33、TEST_PLAN和已完成计划同步；活跃Codex实例表留给Claude维护。回滚在代码副本反向撤112即可恢复110。

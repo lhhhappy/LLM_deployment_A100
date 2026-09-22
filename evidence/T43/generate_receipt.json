@@ -1,0 +1,11 @@
+{
+  "baseline_patches": [
+    "000-interface-compliance",
+    "101-d1v12-on-base",
+    "105-role-split-single-partial",
+    "110-sm80-dsa-indexer",
+    "111-sm80-fp8-moe-marlin"
+  ],
+  "patch_sha256": "5eff3dd8e9ce32b1d44df7f1e2b4c4efad2d0d2da9b8a341fd9b8882b362233a",
+  "source_sha256": "5550e3e947457116651a8b7eb650abe10736476cf280e4d1c9b2bae0370c5c14"
+}

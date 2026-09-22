@@ -194,3 +194,18 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P120-08 | P0 | L2/T8 | 普通TP8/default overlap、cold+hot+decode、101分叉：原计数/输出/时间戳、无双partial/崩溃，flush后KV/Mamba/request池回收，数值对照通过 | todo（本轮仅CPU；Claude安排） |
 | P120-09 | P0 | T8 | 原dev harness off→on→off N6/10→14/18/22；全部TTFT门与TPOT/错误率不退步；cap4096按需消融 | todo（dev_b120_template.sh仅方案，未入队/未执行） |
 | P120-10 | P1 | T8 | 若拟采用NEXTN，单独重复稳定性/数值/真实token与SLO验证；CPU不能替代 | todo |
+
+## T43 — 112 sm80 indexer融合kernel（W17）
+
+命令：`python3 scripts/make_112.py`、`python3 scripts/verify_112.py`；GPU开发机 `scripts/test_sm80_indexer_112.py --mode all`，详见补丁说明；摘要 `scripts/summarize_112.py`。
+直接对照未修改110；随机激活的真实模型形状，非真实模型激活/非L2服务。用户明确授权算子微基准，不作为8卡SLO。
+
+| ID | 环境 | 用例 / 通过标准 | 状态 |
+|---|---|---|---|
+| P112-01 | GPU算子 | 软件解码全部256种e4m3fn编码，254有限值含有符号0逐bit一致，2NaN类别一致 | pass（final_all.log） |
+| P112-02 | GPU算子 | B1/6/32×N1/2×ctx1024/32000/190000；[B]/[B,N]；逐行L∞相对误差<1e-2、topk2048集合≥99.5% | pass（36组；最终全部88组最大相对L∞1.1185e-5，topk最低99.9512%） |
+| P112-03 | GPU算子 | 0/1/63/64/65/1025尾部、负页、表宽外/输出短于context、strides、3D q；clean两模式、空/反向/越界区间、空维与8/16/64头；次正规数和大幅值输入 | pass（另36组数值及空维；torch bf16 reduction默认True） |
+| P112-04 | GPU算子 | 两入口CUDA graph捕获，decode共享/独立ctx，prefill clean两模式；重放更改q、ctx、bt、ks/ke；与eager逐bit一致并对110过数值门 | pass（4种×3次=12动态重放，final_all.log） |
+| P112-05 | GPU微基准 | decode B6×32k/190k与prefill8192×32k/190k，同数据新旧ms/加速比；大prefill每行数值/topk同门 | pass（4大矩阵对照+8性能行；graph decode4.75×/4.54×，prefill2.01–2.95×；见summary.json） |
+| P112-06 | CPU/GPU编译 | 全8补丁栈fuzz0；确定生成、编译、reverse全文件字节相等、只读底包未改；实际sm80 bf16 MMA | pass（stack_receipt.json：3623 py_compile；compiler/：代表形状0 spills，sm80/bf16，无fp8指令） |
+| P112-07 | L2/T8 | Claude审阅后实际模型/服务/TP8/NEXTN整合、能力、原dev TTFT/TPOT/错误门与flush | todo（本任务未触碰pod/Trisol/镜像/提交） |

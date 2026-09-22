@@ -1,0 +1,9 @@
+{"capability": [8, 0], "device": "NVIDIA A100-SXM4-80GB", "kind": "environment", "mode": "smoke", "oracle_sha256": "3ffe82c74402aed9ceb0ba6113209850cdc8c1b21eb8f36c330e895578bd103f", "seed": 43, "source_sha256": "d80a9fa22cbd1b4bec659e63b7fe714353ee445e4dc6f65be2dba7f06418246a", "test_sha256": "ffca12198d5714ebcddf9b9421c6f39df0349ceb6914e51a47cc44d965d4479f", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"finite_bits_exact": 254, "kind": "fp8_bits", "nan_class_exact": 2, "tested": 256}
+{"kind": "numeric", "label": "decode B=2 L=129 N=2 ctx=B", "max_abs": 1.1444091796875e-05, "max_row_relative_l2": 1.2371417312806443e-07, "max_row_relative_linf": 2.1705241692870914e-07, "min_topk_overlap": 1.0, "shape": [4, 146]}
+{"kind": "numeric", "label": "decode B=2 L=129 N=2 ctx=BN", "max_abs": 3.814697265625e-06, "max_row_relative_l2": 9.287410307479149e-08, "max_row_relative_linf": 1.4021492233950994e-07, "min_topk_overlap": 1.0, "shape": [4, 146]}
+{"kind": "numeric", "label": "edge L=129 clean=False", "max_abs": 7.62939453125e-06, "max_row_relative_l2": 1.0580235709767294e-07, "max_row_relative_linf": 2.1227458546491107e-07, "min_topk_overlap": 1.0, "shape": [16, 146]}
+{"kind": "numeric", "label": "edge L=129 clean=True", "max_abs": 7.62939453125e-06, "max_row_relative_l2": 1.0580235709767294e-07, "max_row_relative_linf": 2.1227458546491107e-07, "min_topk_overlap": 1.0, "shape": [16, 146]}
+{"kind": "numeric", "label": "prefill nq=37 nk=300 clean=False", "max_abs": 1.1444091796875e-05, "max_row_relative_l2": 1.2153931550074049e-07, "max_row_relative_linf": 2.237561176343661e-07, "min_topk_overlap": 1.0, "shape": [37, 300]}
+{"kind": "numeric", "label": "prefill nq=37 nk=300 clean=True", "max_abs": 7.62939453125e-06, "max_row_relative_l2": 3.347688561916584e-07, "max_row_relative_linf": 3.347688561916584e-07, "min_topk_overlap": 0.9999999403953552, "shape": [37, 300]}
+{"kind": "complete", "mode": "smoke", "status": "PASS"}

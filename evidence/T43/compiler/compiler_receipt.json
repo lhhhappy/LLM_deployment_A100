@@ -1,0 +1,21 @@
+{
+  "paged": {
+    "registers": 128,
+    "spills": 0,
+    "shared": 8192,
+    "ptx_sha256": "73fb7b502c7335f23514a9608abe0a474cd25991358f3bfb04171fc592df4b31",
+    "target_sm80": true,
+    "bf16_mma": true,
+    "fp8_instruction": false
+  },
+  "ragged": {
+    "registers": 205,
+    "spills": 0,
+    "shared": 8192,
+    "ptx_sha256": "42e0e2659656018c64d7aef8a0a99f6681ac066a724506be8bba5ec7557877a5",
+    "target_sm80": true,
+    "bf16_mma": true,
+    "fp8_instruction": false
+  },
+  "source_sha256": "5550e3e947457116651a8b7eb650abe10736476cf280e4d1c9b2bae0370c5c14"
+}

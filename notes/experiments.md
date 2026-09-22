@@ -464,3 +464,11 @@ T22 收尾收据：`evidence/T22/submit_daemon_mock.log` 为纯 mock 演示；`e
 - `E2b_T26_20260922/`首次遗漏make_case_sets依赖，尚未发送case请求便退出；服务自动停。`..._v2/`控制三case全部成功，但批次最终flush检查误拒绝合法的message字段；实际flush成功且池恢复。修正检查器并补正反例测试后，`..._v3/`**只续跑candidate/off**，不重跑或丢弃有效控制。所有失败/中断记录原样保留；一次SSH握手失败重试后成功，未改变引擎配置。
 - 完整GPU artifacts：`/sjtu/linhang/arena/runs/E2b_T26_20260922{,_v2,_v3}/`（服务/回放日志、trace、manifest、请求、补丁与脚本冻结副本）；本地小证据`evidence/T26/comparison.json`、CPU/prepare/input/cleanup receipts。结果JSON记录各来源root，便于重算。
 - **10:11:56 UTC批次完成**，自动停止自己创建的进程组。再次核实GPU0/1各4MiB/0%、无compute进程、31000无监听；`evidence/T26/final_host.log`。未操作既有daemons/其他项目，root README交协调方维护。T26完成后idle，不启动新任务。
+
+### T43 / 112 算子实验（2026-09-22，Codex W17）
+
+- 范围：用户授权开发机A100算子测试，未操作8卡/bohr/Trisol/pod/镜像/提交；不作为N@SLO或完整模型数值证据。P112-01…06已pass，P112-07待Claude。
+- 最终证据 `evidence/T43/summary.json` / `final_all.log`，源码、oracle、测试脚本与补丁SHA均绑定；88数值对照、fp8全编码、4种graph各3次动态重放、8补丁栈和3623编译通过。早期失败/参数扫描保留在同目录，见README。
+- 最终微基准：B6 N1 graph decode 32k 0.4859→0.1023ms、190k 2.6867→0.5917ms；8192-query causal prefill 32k 207.93→96.38ms、190k 1248.86→622.45ms；ragged分别207.71→76.11ms、1249.07→423.39ms。完整eager/graph样本与统计口径在补丁说明；L是indexer key长度。
+- 最终最坏逐行相对L∞1.1185e-5，topk最低99.9512%；4种graph动态重放与eager逐bit一致。真实形状随机激活，不是真实GLM模型激活。开发机torch2.13.0+cu130/Triton3.7.1，保留torch bf16 reduction默认True。
+- 收尾：自有算子进程全部退出，两卡各4MiB/0%，`gpu_final_idle.log`。L2服务/能力/真实激活与NEXTN端到端交Claude；112未加入RELEASE或队列。

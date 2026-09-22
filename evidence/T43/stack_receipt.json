@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "patches": [
+    "000-interface-compliance",
+    "101-d1v12-on-base",
+    "105-role-split-single-partial",
+    "110-sm80-dsa-indexer",
+    "111-sm80-fp8-moe-marlin",
+    "112-sm80-indexer-kernels",
+    "120-sched-protect-chain",
+    "130-async-tokenize"
+  ],
+  "py_compile": 3623,
+  "deterministic": true,
+  "base_unchanged": true,
+  "full_reverse_exact": true,
+  "applied_equals_candidate": true,
+  "base_files": 4680,
+  "patch_sha256": "5eff3dd8e9ce32b1d44df7f1e2b4c4efad2d0d2da9b8a341fd9b8882b362233a"
+}

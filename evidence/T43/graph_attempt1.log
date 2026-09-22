@@ -1,0 +1,10 @@
+{"capability": [8, 0], "device": "NVIDIA A100-SXM4-80GB", "kind": "environment", "mode": "graph", "oracle_sha256": "3ffe82c74402aed9ceb0ba6113209850cdc8c1b21eb8f36c330e895578bd103f", "seed": 43, "source_sha256": "d80a9fa22cbd1b4bec659e63b7fe714353ee445e4dc6f65be2dba7f06418246a", "test_sha256": "dab1f061f41a09498b5f0ceed8c2bf26508158c8ab9103ec69454dda275256d9", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"kind": "numeric", "label": "graph decode step=0", "max_abs": 7.62939453125e-06, "max_row_relative_l2": 1.0322536070361821e-07, "max_row_relative_linf": 1.6183322770757513e-07, "min_topk_overlap": 1.0, "shape": [12, 32017]}
+{"kind": "numeric", "label": "graph decode step=1", "max_abs": 7.62939453125e-06, "max_row_relative_l2": 9.164870817812698e-08, "max_row_relative_linf": 1.6725221030355897e-07, "min_topk_overlap": 1.0, "shape": [12, 32017]}
+{"kind": "numeric", "label": "graph decode step=2", "max_abs": 0.0, "max_row_relative_l2": 0.0, "max_row_relative_linf": 0.0, "min_topk_overlap": 1.0, "shape": [12, 32017]}
+{"eager_bit_exact": true, "kind": "graph", "name": "decode", "replays": 3}
+{"kind": "numeric", "label": "graph prefill step=0", "max_abs": 2.288818359375e-05, "max_row_relative_l2": 1.0994198618163864e-07, "max_row_relative_linf": 2.8704391752398806e-07, "min_topk_overlap": 1.0, "shape": [37, 32000]}
+{"kind": "numeric", "label": "graph prefill step=1", "max_abs": 6.67572021484375e-06, "max_row_relative_l2": 1.4850401441890426e-07, "max_row_relative_linf": 2.6817065190698486e-07, "min_topk_overlap": 1.0, "shape": [37, 32000]}
+{"kind": "numeric", "label": "graph prefill step=2", "max_abs": 0.0, "max_row_relative_l2": 0.0, "max_row_relative_linf": 0.0, "min_topk_overlap": 1.0, "shape": [37, 32000]}
+{"eager_bit_exact": true, "kind": "graph", "name": "prefill", "replays": 3}
+{"kind": "complete", "mode": "graph", "status": "PASS"}

@@ -1,0 +1,170 @@
+{
+  "status": "PASS",
+  "environment": {
+    "bf16_reduced_precision_reduction": true,
+    "capability": [
+      8,
+      0
+    ],
+    "device": "NVIDIA A100-SXM4-80GB",
+    "kind": "environment",
+    "mode": "all",
+    "oracle_sha256": "3ffe82c74402aed9ceb0ba6113209850cdc8c1b21eb8f36c330e895578bd103f",
+    "seed": 43,
+    "source_sha256": "5550e3e947457116651a8b7eb650abe10736476cf280e4d1c9b2bae0370c5c14",
+    "test_sha256": "2d1f6406f6fe578aac58e618fbbf831b15abb26a02c23b9b062eb3f9c9c27d89",
+    "torch": "2.13.0+cu130",
+    "triton": "3.7.1"
+  },
+  "numeric_comparisons": 88,
+  "max_row_relative_linf": 1.1184635695826728e-05,
+  "max_row_relative_l2": 2.66578149421548e-06,
+  "min_topk_overlap": 0.99951171875,
+  "graph_variants": [
+    {
+      "eager_bit_exact": true,
+      "kind": "graph",
+      "name": "decode",
+      "replays": 3
+    },
+    {
+      "eager_bit_exact": true,
+      "kind": "graph",
+      "name": "decode_b",
+      "replays": 3
+    },
+    {
+      "eager_bit_exact": true,
+      "kind": "graph",
+      "name": "prefill",
+      "replays": 3
+    },
+    {
+      "eager_bit_exact": true,
+      "kind": "graph",
+      "name": "prefill_dirty",
+      "replays": 3
+    }
+  ],
+  "benchmarks": [
+    {
+      "B": 6,
+      "L": 32000,
+      "N": 1,
+      "name": "decode",
+      "new_ms": 0.1722719967365265,
+      "old_ms": 0.6522719860076904,
+      "speedup": 3.786291436589534
+    },
+    {
+      "B": 6,
+      "L": 32000,
+      "N": 1,
+      "inner": 20,
+      "name": "decode_graph",
+      "new_ms": 0.10227839946746826,
+      "old_ms": 0.48592319488525393,
+      "speedup": 4.750985520063908
+    },
+    {
+      "B": 6,
+      "L": 190000,
+      "N": 1,
+      "name": "decode",
+      "new_ms": 0.6620160043239594,
+      "old_ms": 2.8588000535964966,
+      "speedup": 4.318324685391646
+    },
+    {
+      "B": 6,
+      "L": 190000,
+      "N": 1,
+      "inner": 20,
+      "name": "decode_graph",
+      "new_ms": 0.5916848182678223,
+      "old_ms": 2.686742401123047,
+      "speedup": 4.540833765159935
+    },
+    {
+      "clean": true,
+      "layout": "causal",
+      "name": "prefill",
+      "new_ms": 96.3821792602539,
+      "nk": 32000,
+      "nq": 8192,
+      "old_ms": 207.9272003173828,
+      "speedup": 2.157319972563931
+    },
+    {
+      "clean": true,
+      "layout": "ragged",
+      "name": "prefill",
+      "new_ms": 76.11196899414062,
+      "nk": 32000,
+      "nq": 8192,
+      "old_ms": 207.7147216796875,
+      "speedup": 2.7290677724508496
+    },
+    {
+      "clean": true,
+      "layout": "causal",
+      "name": "prefill",
+      "new_ms": 622.4509887695312,
+      "nk": 190000,
+      "nq": 8192,
+      "old_ms": 1248.860595703125,
+      "speedup": 2.006359726686093
+    },
+    {
+      "clean": true,
+      "layout": "ragged",
+      "name": "prefill",
+      "new_ms": 423.38525390625,
+      "nk": 190000,
+      "nq": 8192,
+      "old_ms": 1249.0670166015625,
+      "speedup": 2.950190175678964
+    }
+  ],
+  "stack": {
+    "status": "PASS",
+    "patches": [
+      "000-interface-compliance",
+      "101-d1v12-on-base",
+      "105-role-split-single-partial",
+      "110-sm80-dsa-indexer",
+      "111-sm80-fp8-moe-marlin",
+      "112-sm80-indexer-kernels",
+      "120-sched-protect-chain",
+      "130-async-tokenize"
+    ],
+    "py_compile": 3623,
+    "deterministic": true,
+    "base_unchanged": true,
+    "full_reverse_exact": true,
+    "applied_equals_candidate": true,
+    "base_files": 4680,
+    "patch_sha256": "5eff3dd8e9ce32b1d44df7f1e2b4c4efad2d0d2da9b8a341fd9b8882b362233a"
+  },
+  "compiler": {
+    "paged": {
+      "registers": 128,
+      "spills": 0,
+      "shared": 8192,
+      "ptx_sha256": "73fb7b502c7335f23514a9608abe0a474cd25991358f3bfb04171fc592df4b31",
+      "target_sm80": true,
+      "bf16_mma": true,
+      "fp8_instruction": false
+    },
+    "ragged": {
+      "registers": 205,
+      "spills": 0,
+      "shared": 8192,
+      "ptx_sha256": "42e0e2659656018c64d7aef8a0a99f6681ac066a724506be8bba5ec7557877a5",
+      "target_sm80": true,
+      "bf16_mma": true,
+      "fp8_instruction": false
+    },
+    "source_sha256": "5550e3e947457116651a8b7eb650abe10736476cf280e4d1c9b2bae0370c5c14"
+  }
+}

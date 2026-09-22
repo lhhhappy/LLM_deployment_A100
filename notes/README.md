@@ -62,9 +62,13 @@
 - **F59** B+110+111（tilelang）在真实 8×A100 启动并通过功能探测；首次形状触发服务期 Triton 编译
 - **F60** T42 / 130：完整分词线程池逐 token 等价，真实长输入显著降低 HTTP loop 阻塞（CPU）
 - **F61** T41/120 调度保护 CPU 验证与 101 既有双 partial 反例（2026-09-22，Codex W15）
+- **F62** 101 在并发下触发"双 partial"断言使引擎崩溃；补丁 105 修复（真实 8 卡）
+- **F63** A100 上的主瓶颈是补丁 110 的 torch 版 DSA indexer（占约 60% GPU 时间）
+- **F64** T43/112：sm80融合indexer保持110数值/边界/graph语义，开发机算子加速（W17）
 
 ## Decisions（最新在上）
 
+- **#33** T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口
 - **#32** T41/120 默认启用普通 TP 调度保护：续算先保留对齐的 2048 token 上限预算，剩余预算按原 LPM 接完整短命中；prefill 后有存活 decoder 才交替一次；不启用 mixed、不重排 LPM。环境变量关可逐决策回退 
 - **#31** T42/130 用每个 TokenizerManager 的单线程池执行原始完整分词；所有 regular text（含小输入）串行移出 loop；暂不加入可选前缀缓存。body routing_key 优先，再 Routing-Key 头，再 Session-ID 头 
 - **#30** 新主线（research/claude/base/00-summary-mainline.md）：M0 先证 A100 上 DSA 后端能跑（L1 装 base_exact + 带 DSA 替身）；M1 调度保护链中间请求（冷启动分块独占 GPU 是源码里的主瓶颈）；M2 KDA 双点 fp32 快
@@ -128,15 +132,18 @@
 - 环境、控制与命令
 - 结果与TEST_PLAN映射
 - 审阅、失败保留与清理
+- T43 / 112 算子实验（2026-09-22，Codex W17）
 
 ## Plans
 
 - plans/active/102-role-track.md
+- plans/completed/112-sm80-indexer.md
 - plans/completed/2026-09-22-d1-role-boundary.md
 - plans/completed/2026-09-22-evaluation-strategy.md
 - plans/completed/2026-09-22-first-8gpu-session.md
 - plans/prompts/T41-M1-scheduler.md
 - plans/prompts/T42-M3-tokenize.md
+- plans/prompts/T43-sm80-indexer-kernels.md
 
 ## Reports
 

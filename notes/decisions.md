@@ -4,6 +4,7 @@
 
 | # | 日期 | 决策 | 理由 / 证据 | 决策人 |
 |---|---|---|---|---|
+| 33 | 2026-09-22 | T43/112采用Triton uint8软件e4m3→bf16解码和bf16 MMA；decode页64/4warps，prefill BQ2/BK64/4warps（H32）；保留110每头bf16舍入、负页映射0和clean=False全宽语义，不修改tilelang入口| 现有tilelang依赖FP8 GEMM且限N=1；48组tile与后续布局/warp实测发现大tile寄存器溢出，小tile较稳且剪枝更细。evidence/T43；最终88组验收和整栈验证通过。无运行期autotune，回滚反向撤112 | Codex W17（T43实现范围） |
 | 32 | 2026-09-22 | T41/120 默认启用普通 TP 调度保护：续算先保留对齐的 2048 token 上限预算，剩余预算按原 LPM 接完整短命中；prefill 后有存活 decoder 才交替一次；不启用 mixed、不重排 LPM。环境变量关可逐决策回退 | 保留原续算必入/槽位/KV 记账与 101；给已准入长请求严格进度保证，避免短请求无限抢走预算。27 CPU 测试与 3617 文件 py_compile 通过；SLO 收益待实测，patch 说明记录条件上界及原 LPM 排队饥饿边界 | Codex W15（T41 实现范围） |
 | 31 | 2026-09-22 | T42/130 用每个 TokenizerManager 的单线程池执行原始完整分词；所有 regular text（含小输入）串行移出 loop；暂不加入可选前缀缓存。body routing_key 优先，再 Routing-Key 头，再 Session-ID 头 | 避免 HF padding/truncation 共享状态竞争；取消后保持槽位直到实际完成；完整分词天然避开前缀末端 BPE 合并风险。130 默认开启，SGLANG_AX_ASYNC_TOKENIZE=0 恢复同步分词；动态批处理保留原策略。CPU 测试/evidence/T42，L2 待 Claude 审阅安排 | Codex W16（T42 实现范围） |
 | 30 | 2026-09-22 | 新主线（research/claude/base/00-summary-mainline.md）：M0 先证 A100 上 DSA 后端能跑（L1 装 base_exact + 带 DSA 替身）；M1 调度保护链中间请求（冷启动分块独占 GPU 是源码里的主瓶颈）；M2 KDA 双点 fp32 快照（照 vLLM#56960 在 kernel 内导出）+ 淘汰优先级，101 为过渡；M3 分词移出事件循环 + 路由键接入（#31170 思路用于单调度器会话感知排序）；M4 MTP；DP8 暂缓 | 四份底包源码地图（01–04）+ F53/F54；DP8 与负载不匹配 | 用户+Claude |
@@ -41,3 +42,10 @@
 
 - 保持 dev 原始 verdict，默认按 dev 搜索；可显式选择 dev+tpot / estimated。TTFT 估计采用单侧 95% Clopper–Pearson（L=Beta⁻¹(0.05;k,n−k+1)，k=0 时 L=0），全程标 estimated，不宣称与隐藏实现一致；符合 D0 §5 审阅边界。
 - 针对 F23，既做档前严格 flush，也用 S1_FLUSH_URL 本地 guard 验证原 runner 的预热后 flush；失败终止子进程而不修改 harness。VERIFIED：29 项 CPU 测试通过，证据 `evidence/T12/tools_validation.log`；具体接口/用法见脚本头与 experiments「Tools」。
+
+## 决策 34（2026-09-23）— 8 卡服务被守护进程误删后的处置
+- 事实：`lh-arena-sess-a`（2102309548588015616）于 2026-09-22T19:45:59Z 被 `scripts/trisol_test_daemon.py` 以 IDLE_RELEASE 删除。代码默认 `idle_hold_seconds=10800`，
+  配置文件虽已改为 1e9，但**守护进程只在启动时读配置、改后未重启**，于是在旧队列最后一项结束 3 小时后自动释放。违反"停服务须经用户同意"。当时 pod 正在跑 dev N6 基线（019），结果与 pod 内所有状态丢失（profile 摘要已存 evidence/T43）。
+- 处置：守护进程已停止且不再启用（pod 内队列 `scripts/pod/podq` 已承担全部实验；服务不需要"保活"动作）；
+  按原参数重建 `lh-arena-sess-b`（2102486579267252224，底包镜像 arena-sglang-glm53:260918，命令 http.server 挂起，描述空），排队等待准入；`scripts/pod/common.sh` 默认 SID 已切换。
+- 规则：任何会删/停服务的自动化一律不运行；改长驻进程配置后必须重启并在日志中核对生效值。
