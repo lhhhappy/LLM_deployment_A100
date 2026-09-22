@@ -1,0 +1,26 @@
+Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=8, attn_tp_size=8, attention weights will be sharded across 8 ranks.
+When specifying --dsa-prefill-backend or --dsa-decode-backend, you should also explicitly set --kv-cache-dtype (e.g., 'fp8_e4m3' or 'bfloat16'). DeepSeek V3.2 defaults to FP8 KV cache which may not be compatible with all backends.
+Setting KV cache dtype to bfloat16 for DeepSeek DSA on SM8 device.
+Set DSA backends for bfloat16 KV Cache: prefill=fa3, decode=fa3.
+160 GLM sm80 NEXTN: tilelang DSA, Triton KDA, 110-113 kernels; 101/105 role splitting and 140 dual snapshots disabled. Native extra_buffer verify/accept tracking remains enabled.
+{"dsa_decode_backend": "tilelang", "dsa_prefill_backend": "tilelang", "kv_cache_dtype": "bfloat16", "linear_attn_verify_backend": "triton", "max_running_requests": 32, "speculative_algorithm": "EAGLE", "speculative_num_draft_tokens": 4, "speculative_num_steps": 3}
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_resolve_160.py", line 29, in <module>
+    from sglang.srt.models.glm5_next_nextn import Glm5NextForConditionalGenerationNextN
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/models/glm5_next_nextn.py", line 17, in <module>
+    from sglang.srt.models.deepseek_nextn import DeepseekV3ForCausalLMNextN
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/models/deepseek_nextn.py", line 61, in <module>
+    from sglang.srt.models.deepseek_v2 import DeepseekV2DecoderLayer, DeepseekV3ForCausalLM
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/models/deepseek_v2.py", line 65, in <module>
+    from sglang.srt.layers.attention.dsa.dsa_indexer import Indexer
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/layers/attention/dsa/dsa_indexer.py", line 103, in <module>
+    import deep_gemm
+  File "/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/deep_gemm/__init__.py", line 443, in <module>
+    find_cuda_home()
+  File "/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/deep_gemm/cuda_helpers.py", line 20, in find_cuda_home
+    assert cuda_home is not None
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,39 @@
+Tue Sep 22 22:41:18 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   30C    P0              61W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 239, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 235, in main
+    elif args.group=='kpool':kpool()
+                             ^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 195, in kpool
+    err=float((got-ref).norm()/ref.norm());assert err<.015,err;maxerr=max(maxerr,err)
+                                                  ^^^^^^^^
+AssertionError: 0.017049038782715797

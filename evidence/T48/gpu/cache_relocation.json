@@ -1,0 +1,65 @@
+[
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_kpool_topk_transform_512/build-e70120d744fa8472",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_kpool_topk_transform_512/build-e70120d744fa8472",
+    "bytes": 527112,
+    "ownership_proof": [
+      "deps-96e11e78c9c05f1b/build.ninja",
+      "deps-96e11e78c9c05f1b/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_repack/build-88e877f37555ce4c",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_repack/build-88e877f37555ce4c",
+    "bytes": 440697,
+    "ownership_proof": [
+      "deps-6559613ae4e4da4d/build.ninja",
+      "deps-6559613ae4e4da4d/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_fused_eh_norm_4096_false_bf16_t/build-675862a6952150c5",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_fused_eh_norm_4096_false_bf16_t/build-675862a6952150c5",
+    "bytes": 344065,
+    "ownership_proof": [
+      "deps-96a0e77465359ddb/build.ninja",
+      "deps-96a0e77465359ddb/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_moe_align_single_token_false/build-69f1da9d857e6a43",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_moe_align_single_token_false/build-69f1da9d857e6a43",
+    "bytes": 304145,
+    "ownership_proof": [
+      "deps-13b3ee57ab4099bc/build.ninja",
+      "deps-13b3ee57ab4099bc/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_activation_bf16_t_false/build-b40fe288f6171b8c",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_activation_bf16_t_false/build-b40fe288f6171b8c",
+    "bytes": 755169,
+    "ownership_proof": [
+      "deps-bc2173b2c702adb2/build.ninja",
+      "deps-bc2173b2c702adb2/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_moe_wna16_marlin_bf16_t_false_false/build-c95e69df19afdc9f",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_moe_wna16_marlin_bf16_t_false_false/build-c95e69df19afdc9f",
+    "bytes": 6879658,
+    "ownership_proof": [
+      "deps-3199776263f256a8/build.ninja",
+      "deps-3199776263f256a8/cuda.cu"
+    ]
+  },
+  {
+    "source": "/root/.cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-869527f9571fca9c",
+    "destination": "/sjtu/linhang/arena/cache/T48/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-869527f9571fca9c",
+    "bytes": 1529,
+    "ownership_proof": [
+      ".staging-c7b10a9b26aa4cb09866a1a0585482fa/build.ninja",
+      ".staging-c7b10a9b26aa4cb09866a1a0585482fa/cuda.cu"
+    ]
+  }
+]

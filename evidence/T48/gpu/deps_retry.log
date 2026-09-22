@@ -1,0 +1,11 @@
+Looking in indexes: https://mirrors.ivolces.com/pypi/simple/
+WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad3cf20620>: Failed to establish a new connection: [Errno 111] Connection refused'))': /pypi/simple/z3-solver/
+WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad3b73dd00>: Failed to establish a new connection: [Errno 111] Connection refused'))': /pypi/simple/z3-solver/
+WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad3b73ddf0>: Failed to establish a new connection: [Errno 111] Connection refused'))': /pypi/simple/z3-solver/
+WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad3b73df10>: Failed to establish a new connection: [Errno 111] Connection refused'))': /pypi/simple/z3-solver/
+WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProxyError('Cannot connect to proxy.', NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad3b73e090>: Failed to establish a new connection: [Errno 111] Connection refused'))': /pypi/simple/z3-solver/
+ERROR: Could not find a version that satisfies the requirement z3-solver==4.15.4.0 (from versions: none)
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /sjtu/linhang/arena/env/m0/bin/python -m pip install --upgrade pip
+ERROR: No matching distribution found for z3-solver==4.15.4.0

@@ -1,0 +1,8 @@
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+M=1 rel_err=6.03e-03 time=0.348ms
+M=7 rel_err=5.97e-03 time=0.330ms
+M=64 rel_err=5.88e-03 time=0.347ms
+M=512 rel_err=6.01e-03 time=0.420ms
+M=4096 rel_err=5.86e-03 time=2.527ms
+graph replay rel_err=5.84e-03
+PASS

@@ -1,0 +1,47 @@
+Tue Sep 22 22:55:11 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   31C    P0              72W / 400W |   1597MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+[22:55:20] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[22:55:20] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+{"B": 6, "kind": "target_mhc_pre_post", "post": {"exact": false, "max_abs": 0.000244140625, "rel_l2": 5.250598405837081e-06}, "pre": [{"exact": false, "max_abs": 6.115436553955078e-05, "rel_l2": 2.54579572356306e-05}, {"exact": false, "max_abs": 2.2023916244506836e-05, "rel_l2": 3.216481491108425e-05}, {"exact": false, "max_abs": 0.001953125, "rel_l2": 0.00035002754884772}], "status": "PASS"}
+{"B": 24, "kind": "target_mhc_pre_post", "post": {"exact": false, "max_abs": 0.0009765625, "rel_l2": 1.3292848962009884e-05}, "pre": [{"exact": false, "max_abs": 7.271766662597656e-05, "rel_l2": 2.458541712258011e-05}, {"exact": false, "max_abs": 3.123283386230469e-05, "rel_l2": 3.842389924102463e-05}, {"exact": false, "max_abs": 0.001953125, "rel_l2": 0.00031941288034431636}], "status": "PASS"}
+{"group": "mhc", "kind": "complete", "status": "PASS"}

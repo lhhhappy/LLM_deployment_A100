@@ -1,0 +1,53 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/utils/hub.py", line 437, in cached_files
+    hf_hub_download(
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 84, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 132, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/sjtu/linhang/arena/models/GLM-5.3-Flash'. Use `repo_type` argument if needed.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_resolve_160.py", line 17, in <module>
+    a.resolve_once()
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/server_args.py", line 3697, in resolve_once
+    run_resolution_pipeline(self)
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/arg_groups/pipeline.py", line 186, in run_resolution_pipeline
+    apply_inkling_prefill_cuda_graph_default(server_args)
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/arg_groups/cuda_graph_hook.py", line 439, in apply_inkling_prefill_cuda_graph_default
+    arch = model_config_of(server_args).hf_config.architectures[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/arg_groups/model_override_base.py", line 249, in model_config_of
+    model_config = ModelConfig.from_server_args(server_args)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/configs/model_config.py", line 663, in from_server_args
+    return ModelConfig(
+           ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/configs/model_config.py", line 378, in __init__
+    get_config(
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/utils/common.py", line 4283, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/utils/hf_transformers/config.py", line 262, in get_config
+    config = parser.parse(
+             ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/utils/hf_transformers/config.py", line 86, in parse
+    config = _try_load_longcat_config(model, revision, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/srt/utils/hf_transformers/config.py", line 65, in _try_load_longcat_config
+    config_dict, _ = PretrainedConfig.get_config_dict(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/configuration_utils.py", line 687, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/configuration_utils.py", line 742, in _get_config_dict
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/utils/hub.py", line 293, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/utils/hub.py", line 488, in cached_files
+    raise OSError(f"{e}") from e
+OSError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/sjtu/linhang/arena/models/GLM-5.3-Flash'. Use `repo_type` argument if needed.

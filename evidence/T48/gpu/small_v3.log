@@ -1,0 +1,65 @@
+Tue Sep 22 22:42:30 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   31C    P0              62W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+Cannot fingerprint compiler /usr/local/cuda/bin/nvcc: [Errno 2] No such file or directory: '/usr/local/cuda/bin/nvcc'
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 239, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 234, in main
+    elif args.group=='small':small()
+                             ^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 142, in small
+    out=fused_eh_norm(x,h,wx,wh,1e-5)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/kernels/ops/layernorm/fused_eh_norm.py", line 63, in fused_eh_norm
+    module = _jit_fused_eh_norm_module(hidden_size, inputs_embeds.dtype)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/kernels/jit/utils/common.py", line 38, in wrapper
+    result_map[key] = fn(*args, **kwargs)
+                      ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/kernels/ops/layernorm/fused_eh_norm.py", line 25, in _jit_fused_eh_norm_module
+    return load_jit(
+           ^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/kernels/jit/utils/compile/loader.py", line 159, in load_jit
+    library = ninja.build(spec=spec, build_dir=staging, build_file=build_file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/candidate/sglang/kernels/jit/utils/compile/ninja.py", line 159, in build
+    completed = subprocess.run(
+                ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ninja'

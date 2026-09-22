@@ -1,0 +1,30 @@
+Tue Sep 22 22:40:10 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   31C    P0              70W / 400W |      7MiB / 81920MiB |      8%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   31C    P0              61W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"M": 1, "error": {"exact": false, "max_abs": 3.11192125082016e-05, "rel_l2": 0.001956232590600848}, "kind": "tilelang_dsa", "nvalid": 2051, "status": "PASS"}
+{"M": 6, "error": {"exact": false, "max_abs": 2.9484741389751434e-05, "rel_l2": 0.0019791345112025738}, "kind": "tilelang_dsa", "nvalid": 2051, "status": "PASS"}
+{"M": 24, "error": {"exact": false, "max_abs": 3.487803041934967e-05, "rel_l2": 0.001972020138055086}, "kind": "tilelang_dsa", "nvalid": 2051, "status": "PASS"}
+{"M": 36, "error": {"exact": false, "max_abs": 3.480352461338043e-05, "rel_l2": 0.001976038096472621}, "kind": "tilelang_dsa", "nvalid": 2051, "status": "PASS"}
+{"group": "dsa", "kind": "complete", "status": "PASS"}

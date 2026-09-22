@@ -1,0 +1,2 @@
+PASS: bash -n scripts/pod/jobs/dev_b160_mtp_n6.sh scripts/run_mtp_sm80_160.sh
+Job prepared only; never executed.

@@ -4,6 +4,7 @@
 
 | # | 日期 | 决策 | 理由 / 证据 | 决策人 |
 |---|---|---|---|---|
+| 37 | 2026-09-22 | T48/160仅GLM+sm80+NEXTN/EAGLE topk1启用兼容配置；复用110–113，双DSA tilelang/KDA Triton；父进程关闭101角色IDs与140，保留原verify rollback/extra_buffer；首个未执行脚本MR32、120/130 off| draft只有DSA/MoE且target verify仍有KDA/mHC；140与spec scratch无已证实别名冲突，但140显式拒绝spec且组合生命周期未验证。MR32相对48少约1.10GiB/rank D4 scratch；原日志新增tokens/rounds才能精确加权接受长度。R17、patch160与evidence/T48；不代表服务/能力/SLO通过，L2须Claude审阅 | Codex W22（T48实现范围） |
 | 36 | 2026-09-22 | T46/150采用lifespan请求预热与全worker verified真flush；显式启用后请求/池验证失败即终止启动，MTP跳过；有限shape覆盖不承诺服务期零JIT| 避免静默带冷编译/残留KV/Mamba进入评分；112/113精确constexpr长度证明有限请求不能穷尽。保留原诊断/计数，log_metrics=False并修exporter守卫；P150-01…05/evidence/T46，L2待Claude，未入RELEASE | Codex W20（T46实现范围） |
 | 35 | 2026-09-22 | T45/140叠加101/105，以SGLANG_AX_KDA_DUAL_SNAPSHOT启动开关替换split为双点fp32导出；额外角色槽可失败降级、tail先淘汰；开启固定非融合intra，关闭走原kernel字节| 跨small_grid阈值曾有8.535385e-5误差；固定路径后8组GPU逐元素一致，含7组有效角色边界。额外槽经请求→树移交，21CPU、32×30轮off调度一致；完整8卡验证另交Claude，未入RELEASE/队列。补丁说明与evidence/T45 | Codex W19（T45实现范围） |
 | 34 | 2026-09-22 | T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退| 190k扫描更大tile/更多warp较慢或spill，stages3无稳定收益；最终六档131–186等效TFLOPS、222数值/30graph及全栈通过。额外scratch110.39MiB；不改RELEASE，回滚反向113。见evidence/T44与F65 | Codex W18（T44实现范围） |

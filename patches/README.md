@@ -15,3 +15,5 @@
 - `150-startup-warmup`（T46，启动期代表形状预热）：完整000→101→105→110→111→112→113→140→120→130后叠加，`--warmups ax_shapes`开启；真实请求/真flush与池断言，异常失败启动，MTP跳过。CPU与key审计见同名说明，GPU算子证据在`evidence/T46/`；有限采样不保证新长度零JIT。未加入RELEASE。
 
 - **T47 / F68 更新**：112/113原名补丁现为v2，四kernel可变长度/stride改runtime。原数值/graph全过，v1/v2配对最大退步3.38%；50随机形状+600→601预热后208调用零JIT/编译。v1归档`drafts/*-v1.*`，当前证据`evidence/T47/`，仍未加入RELEASE，L2交Claude。
+
+- `160-nextn-sm80`（T48/W22）：GLM NEXTN选择tilelang/Triton并复用110–113，关闭101/140角色组合，新增spec窗口原始计数；全路径/资源估算见`research/codex/R17_nextn_sm80.md`，算子与打包证据`evidence/T48/`。8卡N6脚本只准备，未加入RELEASE或队列。

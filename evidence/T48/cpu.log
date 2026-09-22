@@ -1,0 +1,15 @@
+test_empty (__main__.TestPolicy) ... ok
+test_legacy (__main__.TestPolicy) ... ok
+test_off (__main__.TestPolicy) ... ok
+test_other_arch (__main__.TestPolicy) ... ok
+test_other_sm (__main__.TestPolicy) ... ok
+test_path (__main__.TestPolicy) ... ok
+test_policy (__main__.TestPolicy) ... ok
+test_topk (__main__.TestPolicy) ... ok
+test_weighted (__main__.TestPolicy) ... ok
+test_wiring (__main__.TestPolicy) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK

@@ -69,9 +69,11 @@
 - **F66** T45/140：KDA双点fp32快照、数值前提与离线命中估算（W19）
 - **F67** T46 / 150：请求预热的覆盖边界与真实清理（W20）
 - **F68** T47/W21：112/113 v2 新长度不再产生精确形状JIT，原性能门通过（VERIFIED）
+- **F69** T48/W22：NEXTN sm80完整路径、兼容补丁160与KDA回滚算子（VERIFIED / 源码及L1）
 
 ## Decisions（最新在上）
 
+- **#37** T48/160仅GLM+sm80+NEXTN/EAGLE topk1启用兼容配置；复用110–113，双DSA tilelang/KDA Triton；父进程关闭101角色IDs与140，保留原verify rollback/extra_buffer；首个未执行脚本MR32、120/130 off
 - **#36** T46/150采用lifespan请求预热与全worker verified真flush；显式启用后请求/池验证失败即终止启动，MTP跳过；有限shape覆盖不承诺服务期零JIT
 - **#35** T45/140叠加101/105，以SGLANG_AX_KDA_DUAL_SNAPSHOT启动开关替换split为双点fp32导出；额外角色槽可失败降级、tail先淘汰；开启固定非融合intra，关闭走原kernel字节
 - **#34** T44选独立113叠加112：prefill先解码q/K到bf16，query-major 2×128、query复用4tile、GROUP32/4warps/stages1；保持fp32输出、110语义及112 decode/小形状回退
@@ -146,6 +148,7 @@
 - plans/active/102-role-track.md
 - plans/completed/112-sm80-indexer.md
 - plans/completed/113-prefill-indexer.md
+- plans/completed/160-nextn-sm80.md
 - plans/completed/2026-09-22-d1-role-boundary.md
 - plans/completed/2026-09-22-evaluation-strategy.md
 - plans/completed/2026-09-22-first-8gpu-session.md
@@ -158,6 +161,7 @@
 - plans/prompts/T45-M2-kda-dual-snapshot.md
 - plans/prompts/T46-startup-warmup.md
 - plans/prompts/T47-indexer-no-respecialize.md
+- plans/prompts/T48-M4-mtp-sm80.md
 
 ## Reports
 
@@ -172,6 +176,7 @@
 - research/codex/R13_agentx_mlperf_reading.md
 - research/codex/R14_recent_pr_watchlist.md
 - research/codex/R15_base_source_exploration.md
+- research/codex/R17_nextn_sm80.md
 - research/codex/R5_dp_memory_accounting.md
 - research/codex/R6_prior_art_cn_github.md
 - research/codex/R7_kda_internal_checkpoints.md

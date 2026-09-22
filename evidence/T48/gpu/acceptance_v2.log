@@ -1,0 +1,48 @@
+Tue Sep 22 22:51:49 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   32C    P0              72W / 400W |   1597MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 327, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 323, in main
+    elif args.group=='acceptance':acceptance()
+                                  ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 266, in acceptance
+    graph_check(topk,[scores])
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 48, in graph_check
+    for a,b in zip(actual,expected):compare(a,b,0,0)
+                                    ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/T48/test_mtp_sm80_160.py", line 31, in compare
+    torch.testing.assert_close(a,b,atol=atol,rtol=rtol)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/testing/_comparison.py", line 1631, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not equal!
+
+Mismatched elements: 47780 / 49152 (97.2%)
+Greatest absolute difference: 3034 at index (23, 982)
+Greatest relative difference: inf at index (2, 662)

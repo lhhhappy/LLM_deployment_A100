@@ -1,0 +1,30 @@
+Tue Sep 22 23:14:00 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 13.0     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:67:02.0 Off |                    0 |
+| N/A   30C    P0              60W / 400W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:67:03.0 Off |                    0 |
+| N/A   32C    P0              72W / 400W |   1665MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
++---------------------------------------------------------------------------------------+
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"B": 1, "H": 8, "T": 2, "accepted_lengths": 2, "errors": [], "graph_replays": 3, "kind": "kda_verify_commit", "status": "PASS"}
+{"B": 1, "H": 8, "T": 4, "accepted_lengths": 4, "errors": [{"exact": false, "max_abs": 4.656612873077393e-10, "rel_l2": 1.9325193889585535e-08}, {"exact": false, "max_abs": 9.313225746154785e-10, "rel_l2": 2.880620186829219e-09}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}], "graph_replays": 3, "kind": "kda_verify_commit", "status": "PASS"}
+{"B": 6, "H": 8, "T": 4, "accepted_lengths": 4, "errors": [{"exact": false, "max_abs": 5.820766091346741e-11, "rel_l2": 1.0369159975098796e-09}, {"exact": false, "max_abs": 3.725290298461914e-09, "rel_l2": 1.0464422217637548e-08}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}], "graph_replays": 3, "kind": "kda_verify_commit", "status": "PASS"}
+{"B": 6, "H": 8, "T": 6, "accepted_lengths": 6, "errors": [{"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": false, "max_abs": 3.725290298461914e-09, "rel_l2": 8.834987852424092e-09}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}], "graph_replays": 3, "kind": "kda_verify_commit", "status": "PASS"}
+{"B": 1, "H": 64, "T": 4, "accepted_lengths": 4, "errors": [{"exact": false, "max_abs": 7.450580596923828e-09, "rel_l2": 1.0926088833684844e-07}, {"exact": false, "max_abs": 3.725290298461914e-09, "rel_l2": 1.042994224320637e-08}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}, {"exact": true, "max_abs": 0.0, "rel_l2": 0.0}], "graph_replays": 3, "kind": "kda_verify_commit", "status": "PASS"}
+{"group": "kda", "kind": "complete", "status": "PASS"}

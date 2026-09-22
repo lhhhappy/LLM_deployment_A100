@@ -1,0 +1,25 @@
+{
+  "torch": "2.13.0",
+  "triton": "3.7.1",
+  "tilelang": "0.1.12",
+  "sgl-kernel": null,
+  "apache-tvm-ffi": "0.1.11",
+  "transformers": "5.12.1",
+  "z3-solver": "4.15.4.0",
+  "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+  "driver": "0, NVIDIA A100-SXM4-80GB, 535.129.03, 4 MiB, 0 %\n1, NVIDIA A100-SXM4-80GB, 535.129.03, 1665 MiB, 0 %\n",
+  "scripts": {
+    "test_mtp_sm80_160.py": "d38b87220d3e2707fc05bbeb22b1717cd1ff901054bb7a7fbb09c0e1d9f6a18f",
+    "test_mtp_resolve_160.py": "2f5818d4eb6478da6d59c72e20541aea093b30ccbfd20902fd5cfae31b277375",
+    "test_mtp_marlin_160.py": "568cff0708eb9d585ec2f800f592279dc66e9c0326fb0f895dfa81f4d233b1af",
+    "test_fp8_moe_marlin_sm80.py": "1af5855a440f17e0451c211690dacb9d99e8b8b878778ebc59ea941049af50ae"
+  },
+  "config_hash": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+  "sgl_kernel_path": "/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/sgl_kernel",
+  "sgl_kernel_version_file": "__version__ = \"0.4.6.post1\"\n",
+  "cuda_home": "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/nvidia/cu13",
+  "cuda_compat": "/sjtu/linhang/arena/env/cuda-compat-13-0/usr/local/cuda-13.0/compat",
+  "runner_sha256": "eef49561f59e084929de802e32d8d7a466fd6d7ea3c518cf27811203228409c2",
+  "sglang-kernel": "0.4.6.post1",
+  "SGLANG_JIT_CACHE_DIR": "/sjtu/linhang/arena/cache/T48/sglang/jit"
+}

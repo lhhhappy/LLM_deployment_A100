@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/T48/test_mtp_resolve_160.py", line 21, in <module>
+    assert out['dsa_prefill_backend']==out['dsa_decode_backend']=='tilelang',out
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'speculative_algorithm': 'NEXTN', 'max_running_requests': 32, 'speculative_num_steps': 3, 'speculative_num_draft_tokens': 4, 'dsa_prefill_backend': 'fa3', 'dsa_decode_backend': 'fa3', 'linear_attn_verify_backend': None, 'kv_cache_dtype': 'auto'}

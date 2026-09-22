@@ -1,0 +1,64 @@
+{
+  "label": "INFERRED resource/steady-decode model, NOT measured service performance",
+  "ssm_and_conv_bytes_per_request_per_rank": 18452480,
+  "steps": 3,
+  "topk": 1,
+  "draft_tokens": 4,
+  "scratch_gib": {
+    "6": 0.4811859130859375,
+    "32": 2.2684478759765625,
+    "48": 3.3683013916015625
+  },
+  "scratch_saved_mr48_to_32_gib": 1.099853515625,
+  "persistent_slots_ratio_approx": 0.5555555555555556,
+  "cases": [
+    {
+      "cost_ratio": 1.2,
+      "accept_length": 1.6,
+      "tpot_ratio": 0.7499999999999999,
+      "throughput_ratio": 1.3333333333333335,
+      "example_base35ms_spec_ms": 26.25,
+      "base_ms_required_for_27_3ms": 36.400000000000006
+    },
+    {
+      "cost_ratio": 1.2,
+      "accept_length": 2.0,
+      "tpot_ratio": 0.6,
+      "throughput_ratio": 1.6666666666666667,
+      "example_base35ms_spec_ms": 21.0,
+      "base_ms_required_for_27_3ms": 45.5
+    },
+    {
+      "cost_ratio": 1.4,
+      "accept_length": 1.6,
+      "tpot_ratio": 0.8749999999999999,
+      "throughput_ratio": 1.142857142857143,
+      "example_base35ms_spec_ms": 30.625,
+      "base_ms_required_for_27_3ms": 31.200000000000006
+    },
+    {
+      "cost_ratio": 1.4,
+      "accept_length": 2.0,
+      "tpot_ratio": 0.7,
+      "throughput_ratio": 1.4285714285714286,
+      "example_base35ms_spec_ms": 24.5,
+      "base_ms_required_for_27_3ms": 39.0
+    },
+    {
+      "cost_ratio": 1.6,
+      "accept_length": 1.6,
+      "tpot_ratio": 1.0,
+      "throughput_ratio": 1.0,
+      "example_base35ms_spec_ms": 35.0,
+      "base_ms_required_for_27_3ms": 27.300000000000004
+    },
+    {
+      "cost_ratio": 1.6,
+      "accept_length": 2.0,
+      "tpot_ratio": 0.8,
+      "throughput_ratio": 1.25,
+      "example_base35ms_spec_ms": 28.0,
+      "base_ms_required_for_27_3ms": 34.125
+    }
+  ]
+}

@@ -256,3 +256,16 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P47-01 | GPU算子 | 两版四kernel有限类别预热后50不同NQ/NK/P/batch，实际JIT miss/编译0，逐调用日志 | pass（634预热/286 miss/153编译/133磁盘命中；200随机+8回归调用三类计数全0，286实际key审计通过；cache.log） |
 | P47-02 | GPU微基准 | 原112/113全数值/graph及六个大prefill对110；同机v1/v2六prefill+两decode graph各版退步≤5% | pass（112 88组/12重放，113 222组/30重放；16行配对最大+3.38%，evidence/T47） |
 | P47-03 | CPU打包 | 11补丁fuzz0、确定生成、py_compile、反向全字节还原、base未改 | pass（3623源码+6工具编译；113/stack_receipt.json，含runtime参数审计） |
+
+## P160 — NEXTN/MTP A100兼容与状态/图验证（T48，2026-09-22）
+
+证据索引`evidence/T48/README.md`，完整路径与行号`research/codex/R17_nextn_sm80.md`。全部GPU用例只在开发机随机算子/小权重；不晋级为8卡服务/能力/SLO通过。
+
+| ID | 环境 | 通过标准 | 状态 |
+|---|---|---|---|
+| P160-01 | CPU/L1参数解析 | sm80/架构/spec作用域、topk/path约束；真实resolve_once保持MR32、两DSA tilelang/关闭140/101；draft无KDA、width2051与quant mapper；准确加权日志 | pass（10 CPU；resolve_v4.log，未构建模型） |
+| P160-02 | L1 GPU算子 | T2/4/6、B1/6、H8/64的KDA verify不提前提交SSM；fused对unfused数值、全部接受长度active/tracking/scatter与单步续算；动态graph相同 | pass（5形状、20个接受长度；输出max_abs7.45e-9、SSM3.73e-9，回写exact；kda_final.log） |
+| P160-03 | L1 GPU算子 | spec多pool写缓存/partial/pad、量化、BF16 TileLang DSA、112/113 verify/pre MQA、共享seed生命周期；torch数值与graph | pass（kpool3形状误差0；DSA4形状relL2≤0.001980；indexer两路径max_abs1.431e-6；width2051共享/清理；对应final/v1日志） |
+| P160-04 | L1 GPU算子 | EH norm、draft argmax、greedy/target-only采样、accept/prologue、两topk、mHC、111 MoE clip10与原生dense FP8 Marlin；数值与graph | pass（MoE clip10四形状+graph relL2≤0.00589；dense9形状及27次动态graph relL2≤0.00285；EH/mHC等误差和范围见证据README；非采样分布等价证明） |
+| P160-05 | CPU打包/源码核对 | 12补丁fuzz0、确定生成、3624源码+8工具编译、反向还原、base未改、GPU源码/测试/config SHA一致、shell语法通过 | pass（stack_receipt.json、remote_source_hashes.json、shell_syntax.log；源码4689文件一致） |
+| P160-06 | L2/T8 | 真实draft载权/TP8、三完整graph、输出与能力、accept分布、overlap/槽压力/abort/retract/flush；原dev全TTFT/TPOT/N@SLO门 | todo（仅准备dev_b160_mtp_n6.sh，MR32/D4/topk1/steps3；未执行、未入队、无镜像/提交） |

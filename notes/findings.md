@@ -394,3 +394,13 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - P47-01：A100独立cache有限类别预热634调用，286 JIT miss＝153实际编译＋133磁盘命中（两版共用代码）；随后50个不同NQ/NK/P/batch×两版×prefill/decode＝200调用，另600→601×两CLEAN×两版8调用，JIT miss/实际编译/磁盘命中均0。修复F67/T46的112/113 v1长度反例；不推翻F67对其它kernel/整服务预热范围的限制。
 - P47-02：原112 88数值/12动态graph，113 222数值/30graph全部通过；对110最大逐行相对L∞1.11846e-5/3.95682e-5，最低topk99.95117%。同机v1/v2 16行配对性能，最大退步3.38%<5%；原tile保留。数据为随机激活，完整表见`evidence/T47/performance_table.md`。
 - P47-03：完整11补丁fuzz0，3623源码+6工具py_compile，确定再生成/反向字节还原/base未改通过；12远端输入SHA与本地一致。生产补丁原名更新，v1在`patches/drafts/*-v1.*`。最终汇总`evidence/T47/summary.json`，仅开发机arena GPU0算子，未操作8卡/服务/镜像/提交；固定模型/dtype/布局类别未热时仍可发生有限首次编译，TP8/SLO交Claude。
+
+## F69 — T48/W22：NEXTN sm80完整路径、兼容补丁160与KDA回滚算子（VERIFIED / 源码及L1）
+
+- **源码**：NEXTN解析为EAGLE，GLM必须显式`--speculative-draft-model-path /mnt/models`；48仅在MR未指定时写入（`base_exact/sglang/srt/arg_groups/speculative_hook.py:654`）。draft构造单层Deepseek NextN DSA/MoE，没有KDA和target mHC；target verify仍经过34 KDA+11 DSA。共享索引seed宽2051，3个proposal来自draft-extend首个及2次draft-decode。全文件/行号、不兼容入口和权重ignore映射见`research/codex/R17_nextn_sm80.md`。
+- **修复/交互**：110已修spec多pool FP8写，111覆盖draft专家，112/113代理覆盖verify logits。160只补sm80 GLM EAGLE兼容配置（两DSA tilelang、BF16 KV、KDA Triton、禁DeepGEMM HC/TOPK计划V2），复用这些kernel。140角色槽与spec scratch没有已证实物理别名；140显式拒绝spec，组合生命周期未验证，160启动时关闭140并清101角色IDs，保留原extra_buffer和verify tracking/rollback。120首轮off，150对MTP跳过。
+- **P160-01/02/03**：10CPU+真实ServerArgs.resolve_once/draft ModelConfig/quant mapper通过。A100 KDA 5形状、20个接受长度，fused对unfused输出最大绝对误差7.45e-9、SSM3.73e-9；verify不提前提交SSM，接受后active/tracking/conv回写逐元素相同，含graph。kpool T2/4/6量化误差0；TileLang DSA4形状relL2≤0.001980；112/113两个indexer路径max_abs1.431e-6；共享seed选择/carry/finally清理通过。
+- **P160-04/05**：EH norm、argmax、greedy/单热点target-only采样、accept prologue、普通2048与pool512 topk、mHC pre/post、FP8 MoE clip10数值/graph通过；MoE缩小专家数33，真实288+1未完整加载。12补丁fuzz0、3624源码+8工具编译、确定再生成/整栈反向还原/base未改，4689远端候选文件与本地hash一致。全部最终覆盖/数值以`evidence/T48/README.md`和`summary.json`为准，不作全kernel/服务证明。
+- **统计/INFERRED资源**：160原日志新增同窗口spec tokens/rounds，采集器按Σtokens/Σrounds求每request-step接受长度（包含target保证token，不冒充HTTP输出数）。D4/MR32 scratch约2.268GiB/rank，MR48约3.368GiB；auto-fit可能使持久KDA槽约为普通的55.6%，并非保持原容量。稳态TPOT倍率=r/A，r1.4且A1.6–2.0时约0.875–0.700；这是敏感性假设，不是SLO实测。
+- **边界/纠正**：仅开发机随机算子，没有TP8/完整权重/服务/能力/flush/SLO证据；未触碰bohr/Trisol/pod、镜像或提交。早期C++ JIT实际读取SGLANG_JIT_CACHE_DIR，7个T48 build误写根盘；发现后停自有编译，按源码路径确认归属后迁入arena，最终runner已修，迁移证据保留。准备的8卡脚本仅交Claude审阅。
+- **P160-04补充 / 最终收据**：原生dense FP8 Marlin 9形状与27次动态graph均通过，最大relL2约0.002843；clip10 MoE四形状+graph≤0.00589。KDA追加tracking卷积与masked槽直接断言后重跑通过。`scripts/summarize_160.py`校验全部最终PASS、候选/脚本/config/runner SHA与两卡空闲，输出`evidence/T48/summary.json`；完整服务资格仍保持P160-06 todo。

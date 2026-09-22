@@ -1,0 +1,509 @@
+{
+  "actual_server_args_and_draft_config_pass": true,
+  "artifact_sha256": {
+    "patches/160-nextn-sm80.patch": "3547ff7d6d583b5ca19e0474a9ed0bd3fff3a355d5298868ee9f83ee96000a40",
+    "scripts/extract_spec_stats_160.py": "81aae1a39401be566f0f99f65c748fdf7e47482b9de15d414994e9f0e08f5cd8",
+    "scripts/make_160.py": "485802028d3154a1edf6895495e8ea41481c3b7a2641894dbfbfdd76f136102e",
+    "scripts/p160/ax_mtp_sm80.py": "c8dddc710c56961028cc5e210c118fa075bc157db21329404089f970d18cd930",
+    "scripts/pod/jobs/dev_b160_mtp_n6.sh": "d49625ddf8ac74b7d9ce2d255f1ca6bebe31eddd9599151d949c6cd37d198f4c",
+    "scripts/run_mtp_sm80_160.sh": "eef49561f59e084929de802e32d8d7a466fd6d7ea3c518cf27811203228409c2",
+    "scripts/summarize_160.py": "e1377f2047cff85879b300f21bc7f57a2f17a9481cbede18526dff6607c24688",
+    "scripts/test_mtp_marlin_160.py": "568cff0708eb9d585ec2f800f592279dc66e9c0326fb0f895dfa81f4d233b1af",
+    "scripts/test_mtp_policy_160.py": "906df97b0a129cef2eb121623caaaaf7a033a6a7cb77f0d37d824aacb1fca1d3",
+    "scripts/test_mtp_resolve_160.py": "2f5818d4eb6478da6d59c72e20541aea093b30ccbfd20902fd5cfae31b277375",
+    "scripts/test_mtp_sm80_160.py": "d38b87220d3e2707fc05bbeb22b1717cd1ff901054bb7a7fbb09c0e1d9f6a18f",
+    "scripts/verify_160.py": "181c6550a08c83d8c6a7da1cbfd93efe5eb2984269cc71570e6fb0d8f2feea7f"
+  },
+  "candidate_files_matched": 4689,
+  "corrected_cache_directory_violation": {
+    "builds": 7,
+    "bytes": 9252375
+  },
+  "cpu_tests": 10,
+  "evidence_sha256": {
+    "README.md": "e23bba5d12b16a7ad80a15388c14da239df967ad11ac13b443b65466ef43d28d",
+    "check_records.log": "c2e67b13164053fe18e1f1734ca2266bd2f6ba36ea2a0945c419a6c7d6dd8c01",
+    "cpu.log": "0658d5de2b6069bde22f8465275f12af4048d14880ed6d6d77275e1d00332a49",
+    "full_stack_apply.log": "5e261523598c355aca1da663535ab09ef120d57436e4cccd090b7e6d31d52e8b",
+    "generate.log": "c7718b2de6f737608dbaec7695811b1d4aa7e5db111e9ad031a2528177384af4",
+    "generate_apply.log": "ce58a3b23619a6edf1b4736736527269d2767d33c48181a259d948f727b78510",
+    "generate_receipt.json": "3bc68c0ebb3c3a2cdf7bf9cd898b3e34bca85a5f3d8039ebbbad5e21f8886623",
+    "gpu/acceptance_v1.log": "90e7ec5ab252658aa82b57e362520730da15ae73c9f107f3b03f1da13c888e72",
+    "gpu/acceptance_v2.log": "9caa306a9e1a964b22dadb48bb396114c74ca88914af743eaa8096f95fa12d57",
+    "gpu/acceptance_v3.log": "dc89d9ae0bca03bee0680ad793623728b32a72ea8a24389aedaf5549907ef0ad",
+    "gpu/cache_relocation.json": "8103732d340cd28564019c2721db70ac1c2be67e1c4f22de0735178cb2e531b7",
+    "gpu/cache_relocation_verified.json": "e5d9fc39a2ff35b41c2477b85248a284b610a8f09038a3e576201cf0456c8f5d",
+    "gpu/deps.log": "0fcba44b0bebc4f5656f27d6809e9f18a51cdecccc530683882edf80ab84448d",
+    "gpu/deps_retry.log": "66e8fdc80317301986aa1a673395a126025bc4302ba0541309a0a72da0c0bd80",
+    "gpu/deps_retry2.log": "f2fff6f2ef418e528036be41f4ba79af655ce5cfa4af328f9b96c2ac19fb1cc3",
+    "gpu/dsa_v1.log": "1e4805ccfde118d7de148913c874b544a9bf198360187e8c892d9353c4198e1c",
+    "gpu/environment.json": "9c8cd7f02730018167a035196f6f426f3bf64dd07e5fd9884a321aea54746707",
+    "gpu/gpu_final_idle.log": "e5536d9b6d7f463325bf9632544215b79128ce67e22216ddd03fa978ca892ff6",
+    "gpu/indexer_v1.log": "fa59cf7323fef78849a39134136fa61b60aacb4a4c53d7bcbcc57292b5f49a93",
+    "gpu/kda_final.log": "62ae0094a152e05c9c5783bde6d3f120430c6ea48fa9c6e0693039f21a624dd6",
+    "gpu/kda_prior_mask_checks.log": "34cec8fd22b9ae56ad7b7bf1d2f7933b2873566d021f704e89df31e38ad1e589",
+    "gpu/kda_v1.log": "0afb74b97d9ccf5396663c89f1cd0047d75e03b4b3b2a875cc7f2b770c9afd6e",
+    "gpu/kpool_final.log": "0e9186e71e6808d40b9d8f6faddac9d09d3ac0463dbb33ef50ff2b0eed58dd8f",
+    "gpu/kpool_v1.log": "f7dfaec09e916e86cb3ac2a47a8ff7fb70ab4f8ca161efc60cb42e168c8a4fdc",
+    "gpu/kpool_v2.log": "cb145c9a2792a1e37401fb3ea1d8651675c7c0b8dd1789b0b00d6742c961fc75",
+    "gpu/kpool_v4.log": "3c6a11fb3237b5e0bcb3b2995b4e482bff13ffc66a3a08061f972e6510806f5c",
+    "gpu/marlin_final.log": "8e37d670413897f6867be8ce65500b3be92902ea9bd3f4f10baf75c9ef97cd75",
+    "gpu/marlin_interrupted_cache.log": "e54a0bccad34f15a2e7f6443e54ac04bb222a5ed5a724f866d53dc428db97ef1",
+    "gpu/marlin_v1.log": "761d74a51f3dc4605cda61ec4c3970160a331e11cc7e1157baae347de2fdb0fc",
+    "gpu/marlin_v2.log": "b37b1a03f4c68d6e22ef488775460476b1bac5851471b81aedbe5c315fbae3bd",
+    "gpu/mhc_v1.log": "87f9a787109d2f43514ba9fd371ff1f66aa7b3581c41795295117e0202f8f779",
+    "gpu/operator_queue.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/operator_queue2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/operator_queue4.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/operator_queue_final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/remote_source_hashes.json": "e1781e4fcf25e32569466aecbe64f5b4c34eec08d450e8bc59fe51c9eff1d13f",
+    "gpu/resolve_final.log": "6cfbb1673827361bbf820b0b816360b6a6be46d5d8cd2d074e2dd95e142c6a4b",
+    "gpu/resolve_v1.log": "1341c10214facf738a31d7f24ea9849a68e3c4fb1965e39b86d324af08ad5ae8",
+    "gpu/resolve_v2.log": "6e2a26becd08412827d8393a6e5475a1b021c9b8e7ad2bcd3d164bf6d4c906bb",
+    "gpu/resolve_v3.log": "4bd59b739e17bb67de59c11f91c2ba77d8dd426477b0a9d01a2ceffa6ccff3ef",
+    "gpu/resolve_v4.log": "964c0ec54c545b6d742fd828e1cb3e267cd2822ea86c92449daa8435ae719a14",
+    "gpu/sharing_final.log": "df212803d114e3ab5b7e530aa1db0d021f32c4cff978cc0e5b463bc70d9d1c00",
+    "gpu/small_final.log": "aa42da427ce67194b613c3531c8c77c109d7360b04d6c1df0c72d4399bc2b28f",
+    "gpu/small_v1.log": "bf7a1999cf31f4af5fb82f52180fcd5b63a6a702e8fe28f369b1f4b63766d53d",
+    "gpu/small_v2.log": "2349505433815a82cd15599ef8481debb187a853c1ced042159b82d249877809",
+    "gpu/small_v3.log": "d36dfe8ffe05d86ea8728bf5ae40956a047acd0b215ddb36701d8a30bf7c187c",
+    "gpu/small_v4.log": "9d80dd346d0fa0ed4fbee7ea88ffdd341a1a5f3baa7d7d459a33cabe1ef77b20",
+    "inferred_resources.json": "04c994d9f225af7e0521d79be1d76b1f997236d721cf305b47232cd3216f4859",
+    "shell_syntax.log": "864cdead2a2efbaf4acb666666d3d5313a40bde19597cbe265ededb652e120b1",
+    "stack_receipt.json": "68271c9359da4f37cf9ce58e9c5a30601efd44a8a44a7daf600258533cd75257",
+    "verify.log": "cf64d96f7f41010d30542ac239460c9c251a91cfeb0651e4f6a30988c706d006"
+  },
+  "full_model_loaded": false,
+  "gpu_idle": true,
+  "groups": {
+    "acceptance": [
+      {
+        "accepted_lengths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "kind": "greedy_target_only_sampling_commit_prologue_dsa_topk",
+        "status": "PASS"
+      }
+    ],
+    "dsa": [
+      {
+        "M": 1,
+        "error": {
+          "exact": false,
+          "max_abs": 3.11192125082016e-05,
+          "rel_l2": 0.001956232590600848
+        },
+        "kind": "tilelang_dsa",
+        "nvalid": 2051,
+        "status": "PASS"
+      },
+      {
+        "M": 6,
+        "error": {
+          "exact": false,
+          "max_abs": 2.9484741389751434e-05,
+          "rel_l2": 0.0019791345112025738
+        },
+        "kind": "tilelang_dsa",
+        "nvalid": 2051,
+        "status": "PASS"
+      },
+      {
+        "M": 24,
+        "error": {
+          "exact": false,
+          "max_abs": 3.487803041934967e-05,
+          "rel_l2": 0.001972020138055086
+        },
+        "kind": "tilelang_dsa",
+        "nvalid": 2051,
+        "status": "PASS"
+      },
+      {
+        "M": 36,
+        "error": {
+          "exact": false,
+          "max_abs": 3.480352461338043e-05,
+          "rel_l2": 0.001976038096472621
+        },
+        "kind": "tilelang_dsa",
+        "nvalid": 2051,
+        "status": "PASS"
+      }
+    ],
+    "indexer": [
+      {
+        "kind": "indexer_verify_B6N4_prefill",
+        "paged": {
+          "exact": false,
+          "max_abs": 1.430511474609375e-06,
+          "rel_l2": 8.064528600471021e-08
+        },
+        "prefill": {
+          "exact": false,
+          "max_abs": 1.430511474609375e-06,
+          "rel_l2": 7.878614383116656e-08
+        },
+        "status": "PASS"
+      }
+    ],
+    "kda": [
+      {
+        "B": 1,
+        "H": 8,
+        "T": 2,
+        "accepted_lengths": 2,
+        "errors": [],
+        "graph_replays": 3,
+        "kind": "kda_verify_commit",
+        "status": "PASS"
+      },
+      {
+        "B": 1,
+        "H": 8,
+        "T": 4,
+        "accepted_lengths": 4,
+        "errors": [
+          {
+            "exact": false,
+            "max_abs": 4.656612873077393e-10,
+            "rel_l2": 1.9325193889585535e-08
+          },
+          {
+            "exact": false,
+            "max_abs": 9.313225746154785e-10,
+            "rel_l2": 2.880620186829219e-09
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          }
+        ],
+        "graph_replays": 3,
+        "kind": "kda_verify_commit",
+        "status": "PASS"
+      },
+      {
+        "B": 6,
+        "H": 8,
+        "T": 4,
+        "accepted_lengths": 4,
+        "errors": [
+          {
+            "exact": false,
+            "max_abs": 5.820766091346741e-11,
+            "rel_l2": 1.0369159975098796e-09
+          },
+          {
+            "exact": false,
+            "max_abs": 3.725290298461914e-09,
+            "rel_l2": 1.0464422217637548e-08
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          }
+        ],
+        "graph_replays": 3,
+        "kind": "kda_verify_commit",
+        "status": "PASS"
+      },
+      {
+        "B": 6,
+        "H": 8,
+        "T": 6,
+        "accepted_lengths": 6,
+        "errors": [
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": false,
+            "max_abs": 3.725290298461914e-09,
+            "rel_l2": 8.834987852424092e-09
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          }
+        ],
+        "graph_replays": 3,
+        "kind": "kda_verify_commit",
+        "status": "PASS"
+      },
+      {
+        "B": 1,
+        "H": 64,
+        "T": 4,
+        "accepted_lengths": 4,
+        "errors": [
+          {
+            "exact": false,
+            "max_abs": 7.450580596923828e-09,
+            "rel_l2": 1.0926088833684844e-07
+          },
+          {
+            "exact": false,
+            "max_abs": 3.725290298461914e-09,
+            "rel_l2": 1.042994224320637e-08
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          },
+          {
+            "exact": true,
+            "max_abs": 0.0,
+            "rel_l2": 0.0
+          }
+        ],
+        "graph_replays": 3,
+        "kind": "kda_verify_commit",
+        "status": "PASS"
+      }
+    ],
+    "kpool": [
+      {
+        "T": 2,
+        "graph_replays": 3,
+        "kind": "kpool_spec_write_plan_quant",
+        "max_rel_l2": 0.0,
+        "status": "PASS"
+      },
+      {
+        "T": 4,
+        "graph_replays": 3,
+        "kind": "kpool_spec_write_plan_quant",
+        "max_rel_l2": 0.0,
+        "status": "PASS"
+      },
+      {
+        "T": 6,
+        "graph_replays": 3,
+        "kind": "kpool_spec_write_plan_quant",
+        "max_rel_l2": 0.0,
+        "status": "PASS"
+      }
+    ],
+    "mhc": [
+      {
+        "B": 6,
+        "kind": "target_mhc_pre_post",
+        "post": {
+          "exact": false,
+          "max_abs": 0.000244140625,
+          "rel_l2": 5.250598405837081e-06
+        },
+        "pre": [
+          {
+            "exact": false,
+            "max_abs": 6.115436553955078e-05,
+            "rel_l2": 2.54579572356306e-05
+          },
+          {
+            "exact": false,
+            "max_abs": 2.2023916244506836e-05,
+            "rel_l2": 3.216481491108425e-05
+          },
+          {
+            "exact": false,
+            "max_abs": 0.001953125,
+            "rel_l2": 0.00035002754884772
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "B": 24,
+        "kind": "target_mhc_pre_post",
+        "post": {
+          "exact": false,
+          "max_abs": 0.0009765625,
+          "rel_l2": 1.3292848962009884e-05
+        },
+        "pre": [
+          {
+            "exact": false,
+            "max_abs": 7.271766662597656e-05,
+            "rel_l2": 2.458541712258011e-05
+          },
+          {
+            "exact": false,
+            "max_abs": 3.123283386230469e-05,
+            "rel_l2": 3.842389924102463e-05
+          },
+          {
+            "exact": false,
+            "max_abs": 0.001953125,
+            "rel_l2": 0.00031941288034431636
+          }
+        ],
+        "status": "PASS"
+      }
+    ],
+    "sharing": [
+      {
+        "kind": "shared_seed_select_publish_carry_finally",
+        "status": "PASS",
+        "width": 2051
+      }
+    ],
+    "small": [
+      {
+        "kind": "draft_topk1_eh_norm",
+        "norm": {
+          "exact": false,
+          "max_abs": 0.03125,
+          "rel_l2": 0.002825201954692602
+        },
+        "status": "PASS"
+      }
+    ]
+  },
+  "image_built": false,
+  "limitations": [
+    "random activations and reduced expert count",
+    "operator graphs, not complete EAGLE runners",
+    "sampling test uses one-hot probabilities, not distribution equivalence",
+    "TileLang mhc static race-analysis warnings retained",
+    "AOT package identity with L3 not confirmed"
+  ],
+  "marlin_clip10_pass": true,
+  "marlin_dense": [
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00279582,
+      "m": 1,
+      "n": 1536,
+      "relative_l2": 0.00272921
+    },
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00279862,
+      "m": 6,
+      "n": 1536,
+      "relative_l2": 0.0027727
+    },
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00277419,
+      "m": 24,
+      "n": 1536,
+      "relative_l2": 0.00277257
+    },
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00276899,
+      "m": 1,
+      "n": 512,
+      "relative_l2": 0.00259622
+    },
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00281093,
+      "m": 6,
+      "n": 512,
+      "relative_l2": 0.00278723
+    },
+    {
+      "k": 4096,
+      "last_graph_relative_l2": 0.00276257,
+      "m": 24,
+      "n": 512,
+      "relative_l2": 0.00274562
+    },
+    {
+      "k": 512,
+      "last_graph_relative_l2": 0.00284272,
+      "m": 1,
+      "n": 4096,
+      "relative_l2": 0.00278868
+    },
+    {
+      "k": 512,
+      "last_graph_relative_l2": 0.00281546,
+      "m": 6,
+      "n": 4096,
+      "relative_l2": 0.00279771
+    },
+    {
+      "k": 512,
+      "last_graph_relative_l2": 0.00281451,
+      "m": 24,
+      "n": 4096,
+      "relative_l2": 0.00281793
+    }
+  ],
+  "service_or_slo_verified": false,
+  "stack": {
+    "applied_equals_candidate": true,
+    "base_unchanged": true,
+    "deterministic": true,
+    "full_reverse_exact": true,
+    "patch_sha256": "3547ff7d6d583b5ca19e0474a9ed0bd3fff3a355d5298868ee9f83ee96000a40",
+    "patches": [
+      "000-interface-compliance",
+      "101-d1v12-on-base",
+      "105-role-split-single-partial",
+      "110-sm80-dsa-indexer",
+      "111-sm80-fp8-moe-marlin",
+      "112-sm80-indexer-kernels",
+      "113-sm80-prefill-indexer",
+      "140-kda-dual-snapshot",
+      "120-sched-protect-chain",
+      "130-async-tokenize",
+      "150-startup-warmup",
+      "160-nextn-sm80"
+    ],
+    "python_source_files": 3624,
+    "python_tools": 8,
+    "status": "PASS"
+  },
+  "status": "PASS_L1_OPERATORS_AND_PACKAGING_ONLY",
+  "submitted": false,
+  "tp8_run": false
+}

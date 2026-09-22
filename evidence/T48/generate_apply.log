@@ -1,0 +1,56 @@
+patching file srt/entrypoints/http_server.py
+Hunk #2 succeeded at 928 (offset -10 lines).
+Hunk #3 succeeded at 1005 (offset -10 lines).
+patching file srt/managers/tokenizer_control_mixin.py
+Hunk #1 succeeded at 305 (offset 3 lines).
+patching file srt/managers/schedule_policy.py
+patching file srt/managers/schedule_policy.py
+patching file srt/layers/attention/dsa_backend.py
+patching file srt/layers/attention/dsa/dsa_indexer.py
+patching file srt/layers/attention/dsa/dsa_indexer_kpool.py
+patching file srt/layers/attention/dsa/kpool_fp8_index.py
+patching file kernels/ops/attention/dsa/triton_kernel.py
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file kernels/ops/attention/dsa/ax_soft_fp8.py
+patching file srt/layers/moe/fused_moe_triton/fused_marlin_moe.py
+patching file srt/layers/moe/moe_runner/marlin.py
+patching file srt/layers/quantization/fp8.py
+patching file srt/layers/quantization/marlin_utils_fp8.py
+patching file srt/layers/attention/dsa/sm80_deep_gemm.py
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+patching file srt/layers/attention/dsa/sm80_indexer_kernels.py
+patching file kernels/ops/attention/fla/chunk_delta_h.py
+patching file kernels/ops/attention/fla/chunk_delta_h_snapshot.py
+patching file kernels/ops/attention/fla/kda.py
+patching file kernels/ops/attention/fla/kda_snapshot.py
+patching file srt/layers/attention/linear/kda_backend.py
+patching file srt/layers/attention/linear/kernels/kda_triton.py
+patching file srt/managers/schedule_batch.py
+patching file srt/managers/schedule_policy.py
+patching file srt/mem_cache/kda_dual_snapshot.py
+patching file srt/mem_cache/memory_pool.py
+patching file srt/mem_cache/unified_cache/components/full_component.py
+patching file srt/mem_cache/unified_cache/components/mamba_component.py
+patching file srt/mem_cache/unified_radix_cache.py
+patching file srt/model_executor/forward_batch_info.py
+patching file srt/managers/schedule_policy.py
+Hunk #1 succeeded at 490 (offset 2 lines).
+Hunk #2 succeeded at 527 (offset 2 lines).
+Hunk #3 succeeded at 1051 (offset 2 lines).
+Hunk #4 succeeded at 1076 (offset 2 lines).
+Hunk #5 succeeded at 1284 (offset 2 lines).
+Hunk #6 succeeded at 1432 (offset 2 lines).
+Hunk #7 succeeded at 1509 (offset 2 lines).
+patching file srt/managers/scheduler.py
+patching file srt/entrypoints/http_server.py
+patching file srt/entrypoints/request_headers.py
+patching file srt/managers/async_text_tokenizer.py
+patching file srt/managers/io_struct.py
+patching file srt/managers/tokenizer_manager.py
+patching file srt/entrypoints/ax_shapes.py
+patching file srt/entrypoints/warmup.py
+patching file srt/managers/io_struct.py
+patching file srt/managers/tokenizer_control_mixin.py
+patching file srt/managers/scheduler_components/flush_wrapper.py
+patching file srt/managers/scheduler.py
+patching file srt/observability/request_metrics_exporter.py

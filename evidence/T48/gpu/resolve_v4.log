@@ -1,0 +1,10 @@
+Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=8, attn_tp_size=8, attention weights will be sharded across 8 ranks.
+When specifying --dsa-prefill-backend or --dsa-decode-backend, you should also explicitly set --kv-cache-dtype (e.g., 'fp8_e4m3' or 'bfloat16'). DeepSeek V3.2 defaults to FP8 KV cache which may not be compatible with all backends.
+Setting KV cache dtype to bfloat16 for DeepSeek DSA on SM8 device.
+Set DSA backends for bfloat16 KV Cache: prefill=fa3, decode=fa3.
+160 GLM sm80 NEXTN: tilelang DSA, Triton KDA, 110-113 kernels; 101/105 role splitting and 140 dual snapshots disabled. Native extra_buffer verify/accept tracking remains enabled.
+{"dsa_decode_backend": "tilelang", "dsa_prefill_backend": "tilelang", "kv_cache_dtype": "bfloat16", "linear_attn_verify_backend": "triton", "max_running_requests": 32, "speculative_algorithm": "EAGLE", "speculative_num_draft_tokens": 4, "speculative_num_steps": 3}
+{"draft_arch": ["Glm5NextForConditionalGenerationNextN"], "linear_attn_config": null, "index_share": true, "seed_width": 2051, "ignored_remap": true}
