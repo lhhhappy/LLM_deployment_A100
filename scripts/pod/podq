@@ -11,7 +11,7 @@ case "${1:-}" in
   init)
     cd "$REPO"
     "$D/ppush" $POD_AX/bin scripts/pod/podq_worker.sh scripts/pod/lib.sh scripts/m0/probe.py
-    "$D/ppush" $POD_AX patches/000-interface-compliance.patch patches/101-d1v12-on-base.patch $(ls patches/1[1-9][0-9]-*.patch 2>/dev/null)
+    "$D/ppush" $POD_AX $(ls patches/[0-9][0-9][0-9]-*.patch)
     bexec "cd $POD_AX && if [ -f worker.pid ] && kill -0 \$(cat worker.pid) 2>/dev/null; then echo worker already running; else setsid nohup bash bin/scripts/pod/podq_worker.sh > worker.out 2>&1 < /dev/null & sleep 1; echo worker started; fi" ;;
   submit)
     f=$2; n=$(bexec "ls $POD_AX/queue/*/ 2>/dev/null | grep -c '\.sh$' || true" | head -1); n=$((n+1))
