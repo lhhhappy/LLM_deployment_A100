@@ -1,0 +1,16 @@
+test_all_success_clears (test_d0_v11_review.D0Review) ... ok
+test_empty_is_not_success (test_d0_v11_review.D0Review) ... ok
+test_mixed_failure_preserves (test_d0_v11_review.D0Review) ... ok
+test_no_processor (test_d0_v11_review.D0Review) ... ok
+test_non_http_passthrough (test_d0_v11_review.D0Review) ... ok
+test_scope_stamp_precedes_body (test_d0_v11_review.D0Review) ... ok
+test_conflicting_prefix_rejected (test_e2_completion.CompletionTools) ... ok
+test_counter_denominators_not_hidden (test_e2_completion.CompletionTools) ... ok
+test_pool_pass_requires_complete_workload (test_e2_completion.CompletionTools) ... ok
+test_round_tap_returns_original_result (test_e2_completion.CompletionTools) ... ok
+test_union_keeps_longest_original_prefix (test_e2_completion.CompletionTools) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.038s
+
+OK

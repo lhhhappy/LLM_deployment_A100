@@ -1,0 +1,55 @@
+test_all_success_clears (test_d0_v11_review.D0Review) ... ok
+test_empty_is_not_success (test_d0_v11_review.D0Review) ... ok
+test_mixed_failure_preserves (test_d0_v11_review.D0Review) ... ok
+test_no_processor (test_d0_v11_review.D0Review) ... ok
+test_non_http_passthrough (test_d0_v11_review.D0Review) ... ok
+test_scope_stamp_precedes_body (test_d0_v11_review.D0Review) ... ok
+test_conflicting_prefix_rejected (test_e2_completion.CompletionTools) ... ok
+test_counter_denominators_not_hidden (test_e2_completion.CompletionTools) ... ok
+test_pool_pass_requires_complete_workload (test_e2_completion.CompletionTools) ... ok
+test_round_tap_returns_original_result (test_e2_completion.CompletionTools) ... ok
+test_union_keeps_longest_original_prefix (test_e2_completion.CompletionTools) ... ok
+test_branch_conflict (test_replay_chains.ReplayTests) ... ok
+test_chunk_boundary_is_strict (test_replay_chains.ReplayTests) ... ok
+test_flush (test_replay_chains.ReplayTests) ... ok
+test_invalid_alignment (test_replay_chains.ReplayTests) ... ok
+test_lcp (test_replay_chains.ReplayTests) ... ok
+test_path_identity (test_replay_chains.ReplayTests) ... ok
+test_role_tail_diverges (test_replay_chains.ReplayTests) ... ok
+test_answer_extraction_is_explicit_and_content_only (test_t19_tools.CapabilityTests) ... ok
+test_dataset_redirect_308_on_python310 (test_t19_tools.CapabilityTests) ... ok
+test_dataset_writes_outside_arena_cache_rejected (test_t19_tools.CapabilityTests) ... ok
+test_gpqa_loader_preserves_answers_after_option_permutation (test_t19_tools.CapabilityTests) ... ok
+test_one_answer_regression_tolerance (test_t19_tools.CapabilityTests) ... ok
+test_regression_reasoning_only_and_length_fail (test_t19_tools.CapabilityTests) ... ok
+test_runtime_aime_loader_seed_and_source_metadata (test_t19_tools.CapabilityTests) ... ok
+test_tiny_and_single_server_cannot_mark_registry_pass (test_t19_tools.CapabilityTests) ... ok
+test_two_servers_both_suites_without_any_output_clamp (test_t19_tools.CapabilityTests) ... ok
+test_all_dry_runs_offline_no_writes_or_secrets (test_t19_tools.CommandTests) ... ok
+test_cli_real_mock_run_report_and_failure_exit (test_t19_tools.CommandTests) ... ok
+test_logit_and_cap_cli_with_mock_endpoints (test_t19_tools.CommandTests) ... ok
+test_aime_chat_success_and_budget_truth (test_t19_tools.InterfaceTests) ... ok
+test_all_four_lengths_and_done_required (test_t19_tools.InterfaceTests) ... ok
+test_blocked_does_not_pass (test_t19_tools.InterfaceTests) ... ok
+test_busy_flush_fails_then_waits_and_clears (test_t19_tools.InterfaceTests) ... ok
+test_busy_flush_false_success_and_cache_leaks_rejected (test_t19_tools.InterfaceTests) ... ok
+test_chat_faults_detected (test_t19_tools.InterfaceTests) ... ok
+test_dp_all_ranks_and_unknown_route (test_t19_tools.InterfaceTests) ... ok
+test_duplicate_rid_leak_fails (test_t19_tools.InterfaceTests) ... ok
+test_harness_renderer_twenty_frozen_counts (test_t19_tools.InterfaceTests) ... ok
+test_incremental_and_cumulative_rejection (test_t19_tools.InterfaceTests) ... ok
+test_rid_reuse_completed_and_disconnect (test_t19_tools.InterfaceTests) ... ok
+test_same_host_timestamp_checks (test_t19_tools.InterfaceTests) ... ok
+test_unknown_headers_on_both_paths (test_t19_tools.InterfaceTests) ... ok
+test_cold_warm_equal_and_correct_wire_parameters (test_t19_tools.LogprobTests) ... ok
+test_missing_hit_depth_and_union_values_rejected (test_t19_tools.LogprobTests) ... ok
+test_noise_calibration_cold_only (test_t19_tools.LogprobTests) ... ok
+test_numeric_and_greedy_regressions_fail (test_t19_tools.LogprobTests) ... ok
+test_top_k_union_includes_rank_crossing (test_t19_tools.LogprobTests) ... ok
+test_two_servers_compare_both_modes (test_t19_tools.LogprobTests) ... ok
+test_two_servers_independent_boundary_depth_assertions (test_t19_tools.LogprobTests) ... ok
+
+----------------------------------------------------------------------
+Ran 50 tests in 4.366s
+
+OK

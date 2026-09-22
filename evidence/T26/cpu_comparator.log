@@ -1,0 +1,11 @@
+test_comparison (test_compare_e2b.ComparisonTests) ... ok
+test_drift_rejected (test_compare_e2b.ComparisonTests) ... ok
+test_errors_duplicates_and_bad_counts_rejected (test_compare_e2b.ComparisonTests) ... ok
+test_exact_harness_quantile (test_compare_e2b.ComparisonTests) ... ok
+test_json_flush_optional_message (test_compare_e2b.ComparisonTests) ... ok
+test_pool_leak_not_passing (test_compare_e2b.ComparisonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.005s
+
+OK

@@ -1,0 +1,5 @@
+# Two patch lines. build_image.sh defaults to the list below; pass patches explicitly to override.
+#   base line (organizer base SGLang, what we submit): 000, 1xx  — images 0922e = 000, 0922f = 000+101
+#   v0.5.20 line (L1 stand-in only; does NOT apply to the organizer base): 001, 002, 004
+000-interface-compliance.patch
+101-d1v12-on-base.patch

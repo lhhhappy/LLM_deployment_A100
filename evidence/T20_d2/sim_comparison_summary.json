@@ -1,0 +1,95 @@
+{
+  "arms": 70,
+  "runs": 560,
+  "all_spf_ceilings_equal": true,
+  "differing_rows": [
+    {
+      "candidate_id": 6,
+      "policy": "stock",
+      "N": 30,
+      "different_fields": [
+        "tpot_mean_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 6,
+      "policy": "role_conservative",
+      "N": 30,
+      "different_fields": [
+        "tpot_mean_s",
+        "wall_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 18,
+      "policy": "stock",
+      "N": 18,
+      "different_fields": [
+        "tpot_mean_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 18,
+      "policy": "role_conservative",
+      "N": 14,
+      "different_fields": [
+        "tpot_mean_s",
+        "wall_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 18,
+      "policy": "role_conservative",
+      "N": 18,
+      "different_fields": [
+        "tpot_mean_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 31,
+      "policy": "role_conservative",
+      "N": 14,
+      "different_fields": [
+        "tpot_mean_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 31,
+      "policy": "role_conservative",
+      "N": 18,
+      "different_fields": [
+        "tpot_mean_s",
+        "wall_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 42,
+      "policy": "stock",
+      "N": 14,
+      "different_fields": [
+        "ttft_gate_detail",
+        "tpot_p95_s",
+        "tpot_mean_s",
+        "gate_utilization",
+        "wall_s"
+      ],
+      "same_pass": true
+    },
+    {
+      "candidate_id": 43,
+      "policy": "role_conservative",
+      "N": 14,
+      "different_fields": [
+        "tpot_mean_s"
+      ],
+      "same_pass": true
+    }
+  ]
+}

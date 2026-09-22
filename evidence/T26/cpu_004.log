@@ -1,0 +1,16 @@
+test_alignment_works_if_manually_injected (test_d1_final_chunk.FinalChunkTests) ... ok
+test_branch_has_priority (test_d1_final_chunk.FinalChunkTests) ... ok
+test_feature_off_exact_control (test_d1_final_chunk.FinalChunkTests) ... ok
+test_full_waiter_allowed_second_partial_rejected (test_d1_final_chunk.FinalChunkTests) ... ok
+test_host_miss_reselect_rejects_second_partial (test_d1_final_chunk.FinalChunkTests) ... ok
+test_larger_page_grid (test_d1_final_chunk.FinalChunkTests) ... ok
+test_last_boundary_and_scan_window (test_d1_final_chunk.FinalChunkTests) ... ok
+test_no_boundary_short_and_unaligned (test_d1_final_chunk.FinalChunkTests) ... ok
+test_nonfinal_is_unchanged (test_d1_final_chunk.FinalChunkTests) ... ok
+test_real_fresh_adder_does_not_receive_scheduler_alignment (test_d1_final_chunk.FinalChunkTests) ... expected failure
+test_split_same_request_then_finish (test_d1_final_chunk.FinalChunkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.138s
+
+OK (expected failures=1)

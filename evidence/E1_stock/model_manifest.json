@@ -1,0 +1,539 @@
+{
+  "purpose": "E1 random-weight cache/scheduler stand-in, NOT quality/performance evaluation",
+  "sglang_commit": "94602c9c2b7cbdb8efd5c52802dac6a1c180089e",
+  "seed": 731,
+  "torch_version": "2.13.0+cu130",
+  "kda_layers_zero_based": [
+    0,
+    1,
+    2
+  ],
+  "mla_layers_zero_based": [
+    3
+  ],
+  "dsa": false,
+  "mtp": false,
+  "moe": false,
+  "q_lora_rank": null,
+  "kv_lora_rank": 512,
+  "parameter_count": 173472652,
+  "tensor_shapes": {
+    "model.embed_tokens.weight": {
+      "shape": [
+        154880,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "lm_head.weight": {
+      "shape": [
+        154880,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.norm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.input_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.post_attention_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.mlp.gate_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.mlp.up_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.mlp.down_proj.weight": {
+      "shape": [
+        512,
+        1536
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.q_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.q_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.0.self_attn.k_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.k_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.0.self_attn.v_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.v_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.0.self_attn.b_proj.weight": {
+      "shape": [
+        4,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.f_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.f_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.g_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.g_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.dt_bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.0.self_attn.A_log": {
+      "shape": [
+        1,
+        1,
+        4,
+        1
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.0.self_attn.o_norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.0.self_attn.o_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.input_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.post_attention_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.mlp.gate_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.mlp.up_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.mlp.down_proj.weight": {
+      "shape": [
+        512,
+        1536
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.q_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.q_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.1.self_attn.k_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.k_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.1.self_attn.v_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.v_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.1.self_attn.b_proj.weight": {
+      "shape": [
+        4,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.f_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.f_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.g_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.g_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.dt_bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.1.self_attn.A_log": {
+      "shape": [
+        1,
+        1,
+        4,
+        1
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.1.self_attn.o_norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.1.self_attn.o_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.input_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.post_attention_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.mlp.gate_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.mlp.up_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.mlp.down_proj.weight": {
+      "shape": [
+        512,
+        1536
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.q_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.q_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.2.self_attn.k_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.k_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.2.self_attn.v_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.v_conv1d.weight": {
+      "shape": [
+        512,
+        1,
+        4
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.2.self_attn.b_proj.weight": {
+      "shape": [
+        4,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.f_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.f_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.g_a_proj.weight": {
+      "shape": [
+        128,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.g_b_proj.weight": {
+      "shape": [
+        512,
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.dt_bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.2.self_attn.A_log": {
+      "shape": [
+        1,
+        1,
+        4,
+        1
+      ],
+      "dtype": "torch.float32"
+    },
+    "model.layers.2.self_attn.o_norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.2.self_attn.o_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.input_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.post_attention_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.mlp.gate_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.mlp.up_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.mlp.down_proj.weight": {
+      "shape": [
+        512,
+        1536
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.self_attn.q_proj.weight": {
+      "shape": [
+        768,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.self_attn.kv_a_proj_with_mqa.weight": {
+      "shape": [
+        576,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.self_attn.kv_a_layernorm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.self_attn.kv_b_proj.weight": {
+      "shape": [
+        1024,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    },
+    "model.layers.3.self_attn.o_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.bfloat16"
+    }
+  },
+  "sha256": {
+    "tokenizer.json": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+    "tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+    "chat_template.jinja": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891",
+    "config.json": "030408d0e8810c3509fdecfee1694ad254ac537e5213f068b2082f7757233375",
+    "model.safetensors": "16a4e0413d8a810f18666443b869c229ae70419c78e1c958aa91e59b461500eb"
+  }
+}

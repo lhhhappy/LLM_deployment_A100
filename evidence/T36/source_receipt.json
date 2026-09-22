@@ -1,0 +1,74 @@
+{
+  "task": "T36",
+  "scope": "Read-only source exploration and static data accounting; no model import, experiment, patch application, service, image build or submission",
+  "base_image_digest": "sha256:f24781f02a81d96f51e27741fc67d7056302c23a37d6e87b9d7c1ebe7e8580ab",
+  "archive": {
+    "archive_sha256": "025ee541e1747f620ad4ae0964f17a470697b7c2f312de175df2fbeb6c236984",
+    "archive_bytes": 1343324,
+    "files": 407,
+    "missing": [],
+    "mismatches": [],
+    "key_hashes": {
+      "srt/entrypoints/http_server.py": "d8cc81f8d9866957dd4c0aa59917afa3d4d7d0e28eefaff0a9800157ed068a43",
+      "srt/entrypoints/request_headers.py": "dcf5b40b22cfb44e56041a329b80abcc6eb420de369d40bbefc0830d99ae5c55",
+      "srt/layers/attention/hybrid_linear_attn_backend.py": "5abd518b951bef1a5bc1ba2004e722f2476fc255551c8256bc2c5e3804a47dd6",
+      "srt/layers/attention/linear/kda_backend.py": "d8406c3782d96b7fb16473da64e9fa5d33f4ee36c65b781518bfdeee5d525dab",
+      "srt/managers/data_parallel_controller.py": "96eb9b3e978ab09486098dabb005f2cb448a9d5d2ae673585a0566ac0925d18f",
+      "srt/managers/schedule_batch.py": "d9a734de42e3f63bce27af6c8a2a6e79ced65f0aae4a844c13b5dbc93c1b996d"
+    }
+  },
+  "references": {
+    "vllm_pr56960_head": "7565389f848994d5271986f74aab2af7ede0cbab",
+    "sglang_pr31170_head": "ec6e4e8b5fe4aad4b1549c68e01db1d99e185598",
+    "pr56960_diff_sha256": "f08480d83296f90ae774d93a127e80ce59f67fff3cc6515e633bc8dc4dd9adc2",
+    "pr31170_diff_sha256": "c774976788fdd4d50b53ff446c111372d822736c54370f7f9895ce5499f965ae"
+  },
+  "data": {
+    "requests_sha256": "00c79cb68219a95420bb73048e701719953c8931b5dc70dd6822cc4ff3d4d047",
+    "requests": 722,
+    "sessions": 136,
+    "families": 156,
+    "missing_family_requests": 0,
+    "sessions_spanning_families": 18,
+    "top_family_sizes_anonymized": [
+      {
+        "requests": 79,
+        "sessions": 19
+      },
+      {
+        "requests": 64,
+        "sessions": 18
+      },
+      {
+        "requests": 29,
+        "sessions": 5
+      },
+      {
+        "requests": 25,
+        "sessions": 7
+      },
+      {
+        "requests": 16,
+        "sessions": 6
+      },
+      {
+        "requests": 15,
+        "sessions": 3
+      },
+      {
+        "requests": 13,
+        "sessions": 5
+      },
+      {
+        "requests": 12,
+        "sessions": 3
+      }
+    ]
+  },
+  "limits": [
+    "407 files are a selected srt subset, not a complete installed package",
+    "Actual imported sglang.kernels implementation and dtype not included",
+    "Static request-family counts do not represent concurrent occupancy",
+    "No claim of deployed image or GPU validation"
+  ]
+}

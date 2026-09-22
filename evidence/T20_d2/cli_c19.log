@@ -1,0 +1,5 @@
+MODEL OUTPUT formal-mix_fcfs_stock_p40000_d12: passing=[]; first fail=14 ['fast_intra(uncached_expected<=4096,<=3s)', 'overall_intra(<=5s)']
+MODEL OUTPUT formal-mix_spf_stock_p40000_d12: passing=[14]; first fail=None []
+MODEL OUTPUT formal-mix_spf-upstream_stock_p40000_d12: passing=[14]; first fail=None []
+MODEL OUTPUT formal-mix_hrrn_stock_p40000_d12: passing=[]; first fail=14 ['fast_intra(uncached_expected<=4096,<=3s)', 'overall_intra(<=5s)']
+MODEL OUTPUT formal-mix_lpm_stock_p40000_d12: passing=[]; first fail=14 ['fast_intra(uncached_expected<=4096,<=3s)', 'overall_intra(<=5s)', 'turn_start(<=15s)']

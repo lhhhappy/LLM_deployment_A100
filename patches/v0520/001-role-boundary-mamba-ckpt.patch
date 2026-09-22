@@ -1,0 +1,148 @@
+--- a/python/sglang/srt/managers/schedule_policy.py	2026-09-21 23:25:28.138674285 -0700
++++ b/python/sglang/srt/managers/schedule_policy.py	2026-09-21 23:38:14.677917033 -0700
+@@ -8,6 +8,7 @@
+ from sglang.srt.runtime_context import (
+     get_disagg,
+     get_schedule,
++    mamba_checkpoint_grid,
+ )
+ from sglang.srt.utils import get_bool_env_var, is_gfx95_supported, is_hip
+ 
+@@ -29,6 +30,7 @@
+ # ==============================================================================
+ """Request scheduler policy"""
+ 
++import math
+ import os
+ import random
+ from collections import Counter
+@@ -543,6 +545,23 @@
+             logger.info(f"waiting_keys_after={waiting_keys_after}")
+ 
+ 
++@lru_cache(maxsize=1)
++def _role_boundary_token_ids() -> frozenset:
++    """[arena D1] Token ids that mark a role/message boundary (e.g. GLM
++    ``<|user|>``=154827, ``<|observation|>``=154829). Read from
++    SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS (comma-separated). Empty = disabled."""
++    raw = os.environ.get("SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS", "").strip()
++    if not raw:
++        return frozenset()
++    return frozenset(int(x) for x in raw.split(",") if x.strip())
++
++
++ROLE_BOUNDARY_STATS: Counter = Counter()
++_ROLE_BOUNDARY_SCAN_WINDOW = int(
++    os.environ.get("SGLANG_ARENA_ROLE_BOUNDARY_SCAN_WINDOW", "32768")
++)
++
++
+ class AddReqResult(Enum):
+     CONTINUE = auto()  # Continue to add requests
+     NO_TOKEN = auto()  # No token left
+@@ -1368,6 +1387,8 @@
+         # this returns 0, so the debit sites below reuse the value.
+         mamba_gap_reserve = self._mamba_gap_budget_for_req(req)
+         total_tokens += mamba_gap_reserve
++        role_split = None
++        self._arena_truncation_align = truncation_align_size
+ 
+         if total_tokens >= self.rem_total_tokens:
+             return AddReqResult.NO_TOKEN
+@@ -1385,6 +1406,17 @@
+             if isinstance(admission, AddReqResult):
+                 return admission
+ 
++            # [arena D1] At most one partial prefill per round: once this round
++            # already formed one (e.g. a role split), a candidate that would also
++            # be partial is not admitted (scheduler.py only asserts the
++            # pre-existing chunked_req). Full admissions keep flowing.
++            if (
++                _role_boundary_token_ids()
++                and admission.is_chunked
++                and self.new_chunked_req is not None
++            ):
++                return AddReqResult.OTHER
++
+             # A rejected candidate must not report prefillable or queue H2D.
+             if (self.prefill_delayer_single_pass is not None) and (
+                 not self.prefill_delayer_single_pass.negotiate_should_allow_prefill(
+@@ -1450,12 +1482,78 @@
+                 req.prefix_indices = torch.cat([req.prefix_indices, new_indices])
+                 req.kv.cache_protected_len = len(req.prefix_indices)
+ 
++            # [arena D1] Optionally end this extend at the last role boundary so
++            # the extend-end mamba track lands there (see patches/001).
++            role_split = self._maybe_role_boundary_split(
++                req, admission, has_chunked_req
++            )
++            if role_split is not None:
++                admission = role_split
++
+             # Successful materialization has no remaining admission gates.
+             self._commit_prefill_admission(req, admission, mamba_gap_reserve)
+ 
+         # This verdict controls the next candidate, not the committed request.
+         return self.budget_state()
+ 
++    def _maybe_role_boundary_split(
++        self, req: Req, admission: _PrefillAdmission, has_chunked_req: bool
++    ) -> Optional[_PrefillAdmission]:
++        """[arena D1, policy role_conservative] Return a shortened admission that
++        ends at the last role-boundary token (floored to the mamba checkpoint
++        grid), or None to keep stock behaviour. Never changes the request's
++        sampling budget; only this partial-prefill admission is shortened."""
++        boundary_ids = _role_boundary_token_ids()
++        if not boundary_ids:
++            return None
++        stats = ROLE_BOUNDARY_STATS
++        if self.dllm_config is not None or admission.is_chunked:
++            stats["skipped_already_chunked"] += 1
++            return None
++        if has_chunked_req or self.new_chunked_req is not None:
++            stats["skipped_active_chunk"] += 1
++            return None
++        if self.rem_chunk_tokens is None:
++            # Chunked prefill disabled: add_chunked_req would do min(None, int).
++            stats["skipped_no_chunked_prefill"] += 1
++            return None
++        if not getattr(self.tree_cache, "supports_mamba", lambda: False)():
++            return None
++        prefix_len = admission.prefix_len
++        full_len = prefix_len + admission.extend_len
++        branch = getattr(req, "mamba_branching_seqlen", None)
++        if branch is not None and branch > prefix_len:
++            # Conservative: the branch point owns this forward's single track.
++            stats["skipped_branch_conflict"] += 1
++            return None
++        # Same grid as schedule_batch._mamba_radix_cache_v2_req_prepare_for_extend.
++        grid = mamba_checkpoint_grid(self.tree_cache.page_size)
++        align = getattr(self, "_arena_truncation_align", None) or 1
++        grid = grid * align // math.gcd(grid, align)
++        if prefix_len % grid != 0:
++            stats["skipped_unaligned_prefix"] += 1
++            return None
++        ids = req.full_untruncated_fill_ids
++        # The next turn diverges near the tail; bound the reverse scan.
++        lo = max(prefix_len, full_len - _ROLE_BOUNDARY_SCAN_WINDOW)
++        pos = -1
++        for i in range(full_len - 1, lo - 1, -1):
++            if ids[i] in boundary_ids:
++                pos = i
++                break
++        if pos < 0:
++            stats["skipped_no_boundary"] += 1
++            return None
++        # Track position must be grid-aligned relative to the extend start.
++        split_len = (pos - prefix_len) // grid * grid
++        end_aligned_len = (full_len - prefix_len) // grid * grid
++        if split_len < grid or split_len >= end_aligned_len:
++            # Too short, or would coincide with the stock end checkpoint.
++            stats["skipped_short"] += 1
++            return None
++        stats["taken"] += 1
++        return _PrefillAdmission(prefix_len, split_len, 0, True)
++
+     def _select_prefill_admission(
+         self,
+         req: Req,

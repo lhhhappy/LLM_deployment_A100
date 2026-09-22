@@ -1,0 +1,41 @@
+# decisions.md — 决策记录（最新在上）
+
+格式：日期 · 决策 · 理由/证据 · 决策人。被推翻的决策不删，写新条目并注明 "supersedes #n"。
+
+| # | 日期 | 决策 | 理由 / 证据 | 决策人 |
+|---|---|---|---|---|
+| 30 | 2026-09-22 | 新主线（research/claude/base/00-summary-mainline.md）：M0 先证 A100 上 DSA 后端能跑（L1 装 base_exact + 带 DSA 替身）；M1 调度保护链中间请求（冷启动分块独占 GPU 是源码里的主瓶颈）；M2 KDA 双点 fp32 快照（照 vLLM#56960 在 kernel 内导出）+ 淘汰优先级，101 为过渡；M3 分词移出事件循环 + 路由键接入（#31170 思路用于单调度器会话感知排序）；M4 MTP；DP8 暂缓 | 四份底包源码地图（01–04）+ F53/F54；DP8 与负载不匹配 | 用户+Claude |
+| 29 | 2026-09-22 | 底包 SGLang 以 `build/base_exact/`（= 公开提交 fe236ea6c3 + 两处多模态修复，4686 文件指纹全对）为唯一依据；v0.5.20 线（001/002/003/004、SPF/HRRN、模拟器结论）退役，只保留为 L1 替身参考；补丁一律照底包源码写 | F53：底包与公开提交逐字节一致；v0.5.20 补丁打不上底包，模拟器已失去可信度 | 用户+Claude |
+| 28 | 2026-09-22 | 撤下 35 项纯调参 L2 任务（归档 tests/queue_archive/param_sweep_0922）；L2 只排"针对已测瓶颈的机制补丁"：先用 01–05 诊断 B 卡在哪道门、TTFT 花在哪、缓存命中率，再做 102（对话边界记状态、不拆分预填充，参考 vLLM#56960）、DP 亲和路由（X-S1-Routing-Key，参考 SGLang#31170）、MTP 等；参数只作为机制的配套 | 参数与 D1/缓存耦合，单项效果多在一档噪声内；用户判断纯调参到不了第一 | 用户+Claude |
+| 27 | 2026-09-22 | L2 改为"底包 + 与提交镜像相同的补丁（000/1xx）+ 提交原文命令/环境"，统一入口 `scripts/l2.py`，入队即由 Claude 批准、自动排队；旧 5 项（v0.5.20 补丁、SPF）退役到 tests/queue_archive | 旧项在底包上无效；用户要求提测与正式提交同一份代码、Claude 可直接批准排队、新想法可一条命令提测（tests/L2.md） | Claude |
+| 26 | 2026-09-22 | 定义三级验证体系：**L1 2 卡自测、L2 提测（Trisol 8 卡）、L3 正式提交**；逐级晋级，每级只回答它能回答的问题（tests/TIERS.md） | 用户要求把"测什么、测出来算不算数"讲清楚，保证提测结果和正式分数对得上 | 用户 |
+| 25 | 2026-09-22 | **正式提交的批准权也交给 Claude**：只提交自测证明有效的配置，每天 2 次（稳定线 + 进取线） | 用户指示；GPU 机的 bohr、trisol、playground 已由用户登录完成 | 用户 |
+| 24 | 2026-09-22 | T29 mixed-only诊断提高context到262144、KV池到524288；权重/补丁/page64/chunk8192/extra_buffer不变，旧E2矩阵不重跑、不混性能比较 | cold_heavy完整prompt达256733，131072配置在发送前拒绝；不能截断。IF-08与D1-10已在原配置取得收据；新目录单独补N4及池回收。初次D1-08工具漏查回放完成，旧raw中的pass作废，修工具并保留失败史 | Codex main（T29范围内诊断配置） |
+| 23 | 2026-09-22 | **自测队列项的批准权交给 Claude**（由 Claude 放 APPROVED）；自测与提交两个守护进程**迁到 GPU 开发机**（/sjtu/linhang/arena/repo，tmux 常驻），以免合上笔记本后停掉 | 用户指示；本容器跑在用户笔记本上 | 用户 |
+| 22 | 2026-09-22 | 〔已被 29 取代〕T25/003采用独立调度session字段、首见30s/续轮actual-miss 3或5s的保守代理；EDF/least-slack/weight2均默认关闭，交付草稿而不替代SPF默认候选 | F46/R12：仅header+cache不能判断turn/reset或冻结fast标签；896次固定R10 MODEL OUTPUT未显示胜SPF。CP条数余量不换算成固定秒数目标；live验证仍需SLO-08/09。本条不撤销I6 P0研究优先级 | Codex W12（T25实现范围） |
+| 21 | 2026-09-22 | **每天 2 次正式提交，两次都要用上；每天准备两个镜像**：A = 稳定线（只含已通过审阅和验证的补丁），B = 进取线（加上当天最新的补丁）。自动提交守护进程每天上限 2 | 用户要求；用户确认每日额度是 2（较早的平台提示写的是 3，以用户确认为准） | 用户 |
+| 20 | 2026-09-22 | **I6（SLO 感知 / EDF 调度）升为 P0**，与 D2 合并推进：优先保护链中间请求，允许链首在正式统计余量内排后 | 公开的 N=22 成绩（F40）：链中间门远低于阈值，链首 61s 仍然通过，这就是"牺牲链首、保链中间"的做法 | Claude（依据 F40） |
+| 19 | 2026-09-22 | E2采用三组（原stock / D0+D1关闭 / D0+D1开启），统一context131072，先无trace回放再独立导出raw logits | reminder_heavy包含92236-token完整prompt，E1的65536不足；不截断、不换qfull权重。D0在两个补丁组相同，增加原stock排除“关闭仍改变缓存”。数值导出会同步GPU，不混作时延证据；当前冻结D1 v1.1 sha60f98ced，HiCache禁用，作者缺陷单独交接 | Codex main（T13/E2实施） |
+| 18 | 2026-09-22 | 〔已被 29 取代〕**D2（调度，移植 #40024 SPF）升为与 D1 并列的最高优先级，立即开始写代码**；D1 继续做同引擎 A/B，在拿到实测之前**不宣称 D1 能提高临界档** | W5 校准（F38）：在拟合公开包络的参数区间里，调度策略的影响远大于 D1：FCFS 的临界档约 6–10，SPF 约 14–22；D1 让 prefill 总量少 22%，但模型里临界档没有稳定提高（fast_intra 主要卡在排队）。v0.5.20 默认就是 fcfs（`schedule.py:89-104`）。这是未经实测校准的模型，只用来排优先级，不作为结论 | Claude（依据 W5） |
+| 17 | 2026-09-22 | T8早期Codex草案全部原样归档到`research/codex/archive/`，不晋升为当前工具；E1继续使用已有`scripts/` | 核对E1脚本无这些历史依赖；11个源码/输出/patch/fixture迁移后SHA256全部相同，逐项状态见archive/README。仅删除6个可再生成的pyc；历史脚本的默认相对路径不适配归档位置，标为不可直接执行。README当前状态仍由Claude根据E1交接更新 | 用户要求，Codex整理 |
+| 16 | 2026-09-22 | E1/E2替身固定为`e1-kimi-linear-4l-qfull`，q_lora_rank=null；保留未修改stock源码与Python UnifiedTreeCore默认cache路径；F13/F24仅作理想预测，不作精确oracle | 原Kimi包装层的q_lora分支缺AttentionInputs上下文，qfull不改MLA的KV低秩池/KDA/cache/scheduler路径；E1已实测72请求通过。2处cache偏差提示模拟未建模驻留FULL-KV，源码与归因推断见experiments E1；任何新case须同权重重跑stock。仅替身验证范围，不改变完整GLM配置 | Codex main（E1实施与交接） |
+| 15 | 2026-09-22 | 借鉴 harness-template-cn：采纳 `AGENTS.md`（Codex 自动读取的入口）+ `CLAUDE.md`、`plans/active` 执行计划（含验证方式与回滚）、`notes/tech-debt.md`、`notes/quality.md`、`scripts/check_records.py`（机械检查），以及定期归档；history 目录不单独建（并入 plan 决策记录与 patches 文档）；发布记录、前端、CI 类不采纳 | 模板有成型的迭代闭环（计划 → 验证 → 记录 → 清理）；我们的缺口是按任务的计划、技术债清单和机械检查（R6） | 用户提议，Claude 评估后采纳 |
+| 14 | 2026-09-22 | 启动命令加 `--tool-call-parser glm47`，保留 `--reasoning-parser glm45` | chat template 以 `<\|assistant\|><think>` 结尾，glm45 的检测器允许省略起始标签；工具调用格式 arg_key/arg_value 与 glm47 一致；主办方验证过的示例也用这对组合（F32）。答案必须出现在 message.content，要实测确认 | Claude |
+| 12 | 2026-09-22 | 按任务启动**完全权限的独立 Codex 实例**（`scripts/codex_worker.sh`，每个任务一个新上下文）；主 Codex 会话负责审阅和讨论；Claude 也可以派自己的 subagent | 单个 Codex 会话上下文有限；用户明确授权完全权限 | 用户 |
+| 13 | 2026-09-22 | 借鉴 AgentX/ClawPerf 的经验，新增 I1–I5（directions §I） | AgentX 是与本赛最像的公开基准（闭环 agentic 多轮） | 用户要求，Claude 落实 |
+| 11 | 2026-09-22 | 〔已被 29 取代〕D1 方案 A 维持为首选，并参考 llama.cpp #22929 的实现 | llama.cpp #22929（2026-05-25 合入）为 agentic coding 在最后一条 user 消息前切 prefill batch 并保存 checkpoint，与方案 A 同构（Codex R6 §2 B1）；TRT-LLM #18724 提醒："同时保留边界快照和末尾快照"必须核实底层确实存了两个独立状态 | Claude（依据 Codex R6） |
+| 10 | 2026-09-22 | 分工：**Trisol 8 卡**做真实验证（底包内容、完整模型、开发集梯子、能力抽检）；**2 卡 GPU 机**只做小而快的事（替身模型功能测试、补丁开发与单测、数据分析、Dockerfile 预演） | 只有 Trisol 上有主办方底包、sm80 DSA 实现和完整模型；2 卡机器跑不了 GLM-5.3，但迭代成本低、不占配额 | 用户提出，Claude 采纳 |
+| 9 | 2026-09-22 | 能力分抽检加入自测流程（task.md 没有明确要求这一项） | task.md 自查清单只要求 `/chat/completions` 往返一次、检查 thinking 和输出预算有没有被压掉（task.md:430-434）。D1/HiCache/int8 这类改动可能影响正确性，而能力门是硬门，所以额外加一道回退检测 | Claude 提议 |
+| 8 | 2026-09-22 | 批准本地 2 卡验证（替身模型 E1/E2）；Trisol 8 卡和提交仍然不行 | 先用低成本方式确认 D1 的前提（stock 命中确实偏低），再动用 8 卡配额 | 用户 |
+| 7 | 2026-09-22 | 本地验证用随机权重小 Kimi-Linear 做替身，不用裁层 GLM-5.3 | 上游在 sm80 上没有 DSA 实现（R1），GLM-5.3 在本地跑不起来；我们要验证的缓存和调度逻辑与权重无关 | Claude（待 E1 验证可行） |
+| 6 | 2026-09-22 | 〔已被 29 取代〕D1 先做方案 A（在边界切 chunk），方案 B（同一 forward 导出中间状态）排在后面；若 A 验证有收益，B 优先级上调 | A 不用改 kernel；vLLM Kimi K3 已证明 B 可行且更快（R3）；Codex 指出 A 必须守住"单 active chunk"不变量（D1 §8.3） | Claude + Codex |
+| 5 | 2026-09-22 | 暂不启用 HiCache 和 `--enable-mixed-chunk` | #39156：DSA 索引不会恢复；#39526：会破坏快照（R1，Codex F11） | Claude + Codex |
+| 4 | 2026-09-22 | 〔已被 29 取代〕D2 先移植 #40024（SPF），#39717 以后再说 | #39717 以 #40024 为基线；#40024 改动小（生产代码 +82 行）（Codex R4） | Codex 提议，Claude 同意 |
+| 3 | 2026-09-22 | 撤回"vLLM main 不支持 Glm5Next"的说法 | vLLM PR #53906 已于 9 月 3 日合入（R1/R2/F11） | Claude |
+| 2 | 2026-09-22 | 撤回"MLA 在 TP8 下复制、改 DP-attention 就是最大杠杆"的初始判断，改为以 D1 为头号方向 | 模型是 34 KDA + 11 MLA/DSA 的混合结构（F1）；尾部 reminder 分叉的发现（F3/F13） | Claude |
+| 1 | 2026-09-22 | 以 SGLang 为主路线 | v0.5.20 原生有 `glm5_next`；压测接口 `/generate` 是 SGLang 原生接口 | Claude |
+
+### T12 工具实现选择（2026-09-22，Codex W2）
+
+- 保持 dev 原始 verdict，默认按 dev 搜索；可显式选择 dev+tpot / estimated。TTFT 估计采用单侧 95% Clopper–Pearson（L=Beta⁻¹(0.05;k,n−k+1)，k=0 时 L=0），全程标 estimated，不宣称与隐藏实现一致；符合 D0 §5 审阅边界。
+- 针对 F23，既做档前严格 flush，也用 S1_FLUSH_URL 本地 guard 验证原 runner 的预热后 flush；失败终止子进程而不修改 harness。VERIFIED：29 项 CPU 测试通过，证据 `evidence/T12/tools_validation.log`；具体接口/用法见脚本头与 experiments「Tools」。

@@ -1,0 +1,17 @@
+{
+  "plan_only": false,
+  "requests": 72,
+  "chains": 20,
+  "fast_intra_requests": 42,
+  "errors": 0,
+  "exact_stock_prediction_matches": 70,
+  "stock_cached_delta_min": -3712,
+  "stock_cached_delta_max": 0,
+  "fast_intra_actual_uncached_p95": 4750,
+  "fast_intra_predicted_stock_uncached_p95": 4750,
+  "ttft_source_counts": {
+    "server": 72,
+    "client_proxy": 0
+  },
+  "limitations": "F13/F24 ideal per-chain tokens; no decode/eviction/cross-chain sharing"
+}

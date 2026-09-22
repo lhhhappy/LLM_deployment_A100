@@ -1,0 +1,27 @@
+{
+  "scope": "T23 CPU/mock/dry-run only; no Trisol service exec/start/modify, no SSH/GPU calls",
+  "new_tests": 26,
+  "ladder_tests": 29,
+  "probe_preflight_tests": 38,
+  "test_env": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "ARENA_FLUSH_ATTEMPTS": "1",
+    "ARENA_FLUSH_SERVER_WAIT_S": "0"
+  },
+  "initial_ladder_attempt": "Without test retry overrides: 1 failure (expected 2 flush calls, got 4); rerun with documented bounded test overrides: 29/29 pass. Production retry semantics unchanged.",
+  "python_syntax_files": 4,
+  "scripts_sha256": {
+    "scripts/session_a/runner.py": "bdcf0c7be36ae67bbdc53cbb628c667cc73dcc2a14e4fb4c543c8b8adb72c05a",
+    "scripts/session_a/test_session_a.py": "f168214819a3e4b712320e6cee9d5d2f0c5d4364d22206430f5e3d70f41d20a6",
+    "scripts/session_a/remote.py": "ccc2aaf1850e60d8ff535b380a74a3484a9689d01acc28e752fc0e9c38f884f3",
+    "scripts/session_a/common.py": "ff8e1a46bde270ed4ccb1e683bfc2f1b313397645faf241fa0127d9ef07b5e0d"
+  },
+  "harness_sha256": {
+    "s1-dev/run_dev.py": "4e5fdbd479b22ba05173ddeb71b30c108b4bca0fb57993eb0ab91746275b783f",
+    "s1-dev/harness/s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+    "s1-dev/harness/s1_score.py": "8da35984ce6bc88e6f2cabff18d8e58ecb257fff2a50e03baec831665d49af16",
+    "s1-dev/harness/test_s1_harness.py": "eed0712856761b9bc5465f6a4b604a5aae7df0962bcef06a9abb831b33236407",
+    "s1-dev/harness/s1_loadgen.py": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f"
+  },
+  "live_verification": "SA-08 todo; transport and official base not contacted"
+}

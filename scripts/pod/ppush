@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Copy local files/dirs (on the GPU box) into the pod: scripts/pod/ppush <dest_dir_in_pod> <path>...
+# bohr exec does not forward stdin, so the tar.gz is sent base64 in ~110 KB argument chunks
+# (single-argument limit is 128 KiB), PPUSH_PAR chunks in parallel, reassembled in order, sha256-checked.
+set -euo pipefail
+source "$(dirname "$0")/common.sh"
+DEST=$1; shift
+PAR=${PPUSH_PAR:-8}
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+tar czf "$TMP/p.tgz" "$@"
+SUM=$(sha256sum "$TMP/p.tgz" | cut -d' ' -f1)
+base64 -w0 "$TMP/p.tgz" > "$TMP/p.b64"
+split -a 5 -d -b 110000 "$TMP/p.b64" "$TMP/c."
+N=$(ls "$TMP"/c.* | wc -l); ID=push$$
+bexec "mkdir -p $POD_AX/incoming/$ID" >/dev/null
+export -f bexec; export SID POD_AX ID
+send() { local c=$1 i; for i in 1 2 3; do bexec "printf %s '$(cat "$c")' > $POD_AX/incoming/$ID/$(basename "$c")" >/dev/null && return 0; sleep 2; done; echo "chunk $(basename "$c") failed" >&2; return 1; }
+export -f send
+ls "$TMP"/c.* | xargs -P "$PAR" -I{} bash -c 'send "$@"' _ {}
+bexec "cd $POD_AX/incoming/$ID && [ \$(ls c.* | wc -l) -eq $N ] && cat c.* | base64 -d > p.tgz && echo \"$SUM  p.tgz\" | sha256sum -c --quiet && mkdir -p '$DEST' && tar xzf p.tgz -C '$DEST' && cd .. && rm -rf $ID && echo PUSH_OK $N chunks"

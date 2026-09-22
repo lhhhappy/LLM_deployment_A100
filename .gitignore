@@ -1,0 +1,18 @@
+# Local version history for traceability (every change → commit; L3 submissions cite a commit).
+# Large read-only trees and regenerable outputs are excluded.
+src/
+refs/
+s1-dev/
+cache/
+logs/
+build/base_exact/
+build/l3_*/
+build/p111/a/
+build/p111/b/
+build/*.zip
+evidence/T18_calibration/
+evidence/T25_slo/calibration/
+__pycache__/
+*.pyc
+*.env
+credentials*

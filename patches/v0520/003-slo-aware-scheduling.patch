@@ -1,0 +1,286 @@
+--- a/python/sglang/srt/arg_groups/fields/schedule.py
++++ b/python/sglang/srt/arg_groups/fields/schedule.py
+@@ -100,6 +100,9 @@
+                 "routing-key",
+                 "hrrn",
+                 "shortest-prefill-first",
++                "arena-edf",
++                "arena-least-slack",
++                "arena-edf-chain-weighted",
+             ],
+         ),
+     ] = "fcfs"
+--- a/python/sglang/srt/entrypoints/http_server.py
++++ b/python/sglang/srt/entrypoints/http_server.py
+@@ -112,4 +112,5 @@
+ )
+ from sglang.srt.entrypoints.request_headers import apply_header_overrides
++from sglang.srt.managers.arena_slo import apply_slo_headers
+ from sglang.srt.entrypoints.warmup import execute_warmups
+ from sglang.srt.environ import envs
+@@ -920,4 +921,5 @@
+     if envs.SGLANG_ENABLE_REQUEST_HEADER_OVERRIDES.get():
+         apply_header_overrides(obj, request.headers)
++    apply_slo_headers(obj, request)
+     if obj.stream:
+ 
+--- /dev/null
++++ b/python/sglang/srt/managers/arena_slo.py
+@@ -0,0 +1,112 @@
++"""Opt-in SLO queue ordering, using server-observed session/cache information.
++
++No evaluator labels, timestamps or output budgets are modified. The inference
++is deliberately conservative: later session requests get 3/5s, since headers
++alone cannot distinguish turn starts or context reconstruction. TP single-DP
++is the supported draft topology; session tracking is local to each scheduler.
++"""
++from collections import OrderedDict
++import math
++import os
++import time
++
++SLO_POLICIES = ('arena-edf', 'arena-least-slack', 'arena-edf-chain-weighted')
++
++
++def apply_slo_headers(obj, request):
++    # Override these internal scheduling hints from the real request, never a
++    # client-provided timestamp. D0 supplies the earlier pre-body ASGI stamp.
++    obj.arena_slo_session = request.headers.get('x-s1-session-id') or None
++    obj.arena_slo_namespace = request.headers.get('x-s1-cache-namespace') or ''
++    obj.arena_slo_arrival = request.scope.get('arena_recv_perf')
++    if obj.arena_slo_arrival is None:
++        obj.arena_slo_arrival = time.perf_counter()
++
++
++class SloPolicy:
++    def __init__(self, policy):
++        if policy not in SLO_POLICIES:
++            raise ValueError('unknown SLO policy')
++        self.policy = policy
++        self.sessions = OrderedDict()
++        self.session_cap = 65536
++        self.chain_weight = self._setting('CHAIN_WEIGHT', 2.0, 1.0)
++        self.prefill_tps = self._setting('PREFILL_TPS', 40000.0, 1.0)
++        self.length_alpha = self._setting('LENGTH_ALPHA', 1.2, 0.0)
++        self.overhead_s = self._setting('OVERHEAD_S', 0.002, 0.0)
++
++    @staticmethod
++    def _setting(name, default, minimum):
++        value = float(os.environ.get('SGLANG_ARENA_SLO_' + name, default))
++        if not math.isfinite(value) or value < minimum:
++            raise ValueError('invalid SGLANG_ARENA_SLO_' + name)
++        return value
++
++    def register(self, req, recv_req):
++        # Once per new request; retries/retractions retain the original deadline.
++        if hasattr(req, '_arena_slo_arrival'):
++            return
++        sid = getattr(recv_req, 'arena_slo_session', None)
++        namespace = getattr(recv_req, 'arena_slo_namespace', None) or ''
++        key = (namespace, sid)
++        req._arena_slo_chain_start = bool(sid) and key not in self.sessions
++        if sid:
++            self.sessions[key] = None
++            self.sessions.move_to_end(key)
++            if len(self.sessions) > self.session_cap:
++                self.sessions.popitem(last=False)
++        arrival = getattr(recv_req, 'arena_slo_arrival', None)
++        # Non-HTTP callers lack the trusted header stamp. Use scheduler arrival
++        # for ordering only, without replacing any measured time_stats field.
++        req._arena_slo_arrival = arrival if arrival is not None else time.perf_counter()
++
++    @staticmethod
++    def work(req):
++        return max(1, len(req.origin_input_ids) + len(req.output_ids)
++                   - req.num_matched_prefix_tokens)
++
++    def prepare(self, req):
++        if not hasattr(req, '_arena_slo_deadline'):
++            # Direct/internal Req producers may bypass register; conservatively
++            # use intra. Freeze the inferred bucket before partial progress.
++            arrival = getattr(req, '_arena_slo_arrival', req.time_stats.wait_queue_entry_time)
++            cold = getattr(req, '_arena_slo_chain_start', False)
++            limit = 30.0 if cold else (3.0 if self.work(req) <= 4096 else 5.0)
++            weight = self.chain_weight if cold and self.policy == 'arena-edf-chain-weighted' else 1.0
++            req._arena_slo_arrival = arrival
++            req._arena_slo_limit = limit
++            req._arena_slo_deadline = arrival + limit
++            req._arena_slo_scheduling_deadline = arrival + limit * weight
++
++    def key(self, req, now, remaining=None):
++        self.prepare(req)
++        service = 0.0
++        if self.policy == 'arena-least-slack':
++            work = self.work(req) if remaining is None else remaining
++            prompt = len(req.origin_input_ids) + len(req.output_ids)
++            service = (work * max(1.0, prompt / 32768) ** self.length_alpha
++                       / self.prefill_tps + self.overhead_s)
++        return (req._arena_slo_scheduling_deadline - now - service, req._arena_slo_arrival)
++
++    def sort(self, waiting):
++        now = time.perf_counter()
++        # Stable ties. Prefix matching still runs; duplicate-prefix preference
++        # may not override an earlier deadline indefinitely in this policy.
++        waiting.sort(key=lambda req: self.key(req, now))
++
++    def chunk_limit(self, active, waiting, budget, page, align):
++        if budget < align + page:
++            return None
++        now = time.perf_counter()
++        remaining = len(active.full_untruncated_fill_ids) - len(active.prefix_indices)
++        active_key = self.key(active, now, remaining)
++        reserved = 0
++        for req in waiting:
++            work = self.work(req)
++            charge = math.ceil(work / page) * page
++            # Reserve only full, more urgent waiters, preserving the one-partial
++            # authority in PrefillAdder and one aligned unit of active progress.
++            if self.key(req, now) >= active_key or reserved + charge > budget - align:
++                break
++            reserved += charge
++        return (budget - reserved) // align * align if reserved else None
+--- a/python/sglang/srt/managers/io_struct.py
++++ b/python/sglang/srt/managers/io_struct.py
+@@ -178,6 +178,10 @@
+     # Stable identity shared by requests in the same session. Unlike
+     # session_params, this does not alter or reconstruct the prompt.
+     session_id: Optional[str] = field(default=None, kw_only=True)
++    # Scheduling metadata only: independent of prompt/cache session semantics.
++    arena_slo_session: Optional[str] = field(default=None, kw_only=True)
++    arena_slo_namespace: Optional[str] = field(default=None, kw_only=True)
++    arena_slo_arrival: Optional[float] = field(default=None, kw_only=True)
+     # The input prompt. It can be a single prompt or a batch of prompts.
+     text: Optional[Union[List[str], str]] = None
+     # The token ids for text.
+@@ -892,6 +896,9 @@
+         sub = GenerateReqInput(
+             rid=self.rid[i],
+             session_id=self.session_id,
++            arena_slo_session=self.arena_slo_session,
++            arena_slo_namespace=self.arena_slo_namespace,
++            arena_slo_arrival=self.arena_slo_arrival,
+             text=self.text[i] if self.text is not None else None,
+             input_ids=self.input_ids[i] if self.input_ids is not None else None,
+             input_embeds=(
+@@ -1018,6 +1025,9 @@
+ 
+     # Session info for continual prompting
+     session_id: Optional[str] = None
++    arena_slo_session: Optional[str] = None
++    arena_slo_namespace: Optional[str] = None
++    arena_slo_arrival: Optional[float] = None
+     session_params: Optional[SessionParams] = None
+ 
+     # LoRA related
+--- a/python/sglang/srt/managers/schedule_policy.py
++++ b/python/sglang/srt/managers/schedule_policy.py
+@@ -4,6 +4,7 @@
+ from array import array
+ 
+ from sglang.srt.environ import envs
++from sglang.srt.managers.arena_slo import SloPolicy, SLO_POLICIES
+ from sglang.srt.managers.prefill_delayer import PrefillDelayerSinglePassExecutor
+ from sglang.srt.runtime_context import (
+     get_disagg,
+@@ -226,6 +227,9 @@
+     DFS_WEIGHT = "dfs-weight"  # depth-first search weighting
+     HRRN = "hrrn"  # highest response ratio next, token-based aging
+     SHORTEST_PREFILL_FIRST = "shortest-prefill-first"
++    ARENA_EDF = "arena-edf"
++    ARENA_LEAST_SLACK = "arena-least-slack"
++    ARENA_EDF_CHAIN_WEIGHTED = "arena-edf-chain-weighted"
+ 
+ 
+ class CacheAgnosticPolicy(Enum):
+@@ -255,6 +259,7 @@
+         self.schedule_low_priority_values_first = schedule_low_priority_values_first
+         self.priority_sign = 1 if schedule_low_priority_values_first else -1
+         self._shortest_prefill_calls = 0
++        self._arena_slo = SloPolicy(policy) if policy in SLO_POLICIES else None
+ 
+         # It is used to find the matching prefix for in-batch prefix caching.
+         self.waiting_queue_radix_tree = RadixCache.create_simulated()
+@@ -300,6 +305,8 @@
+                 SchedulePolicy._sort_by_hrrn(
+                     waiting_queue, temporary_deprioritized, processed_tokens
+                 )
++            elif policy.value in SLO_POLICIES:
++                self._arena_slo.sort(waiting_queue)
+             elif policy == CacheAwarePolicy.SHORTEST_PREFILL_FIRST:
+                 SchedulePolicy._sort_by_shortest_prefill(
+                     waiting_queue, temporary_deprioritized
+@@ -359,7 +366,8 @@
+         try:
+             policy_enum = CacheAwarePolicy(policy)
+             if getattr(tree_cache, "disable", True):
+-                if policy_enum == CacheAwarePolicy.SHORTEST_PREFILL_FIRST:
++                if (policy_enum == CacheAwarePolicy.SHORTEST_PREFILL_FIRST
++                        or policy_enum.value in SLO_POLICIES):
+                     raise ValueError(
+                         "Experimental shortest-prefill-first requires prefix caching"
+                     )
+@@ -451,6 +459,14 @@
+             )
+         )
+ 
++    def register_slo_request(self, req, recv_req):
++        if self._arena_slo is not None:
++            self._arena_slo.register(req, recv_req)
++
++    def reset_slo_sessions(self):
++        if self._arena_slo is not None:
++            self._arena_slo.sessions.clear()
++
+     def shortest_prefill_chunk_limit(
+         self,
+         chunked_req: Req,
+@@ -465,6 +481,10 @@
+         alignment raises that minimum to one joint alignment unit.
+         """
+         align = math.lcm(page_size, truncation_align_size or 1)
++        if self._arena_slo is not None:
++            return self._arena_slo.chunk_limit(
++                chunked_req, waiting_queue, budget, page_size, align
++            )
+         if (
+             self.policy != CacheAwarePolicy.SHORTEST_PREFILL_FIRST
+             or budget < align + page_size
+@@ -1684,7 +1704,7 @@
+         elif chunk_tokens_limit is not None and chunk_fit_tokens > chunk_tokens_limit:
+             if (
+                 (
+-                    get_schedule().schedule_policy == "shortest-prefill-first"
++                    get_schedule().schedule_policy in ("shortest-prefill-first", *SLO_POLICIES)
+                     or _role_boundary_token_ids()
+                 )
+                 and not self._can_start_partial_prefill(has_chunked_req)
+--- a/python/sglang/srt/managers/scheduler.py
++++ b/python/sglang/srt/managers/scheduler.py
+@@ -2871,6 +2871,7 @@
+             self._add_request_to_queue(req)
+             return
+ 
++        self.policy.register_slo_request(req, recv_req)
+         self._maybe_namespace_elastic_radix_cache(req)
+ 
+         if mm_input_error is not None:
+@@ -4991,6 +4992,7 @@
+             self.cur_batch_for_debug = None
+             self.last_batch = None
+             self.tree_cache.reset()
++            self.policy.reset_slo_sessions()
+             self.req_to_token_pool.clear()
+             self.token_to_kv_pool_allocator.clear()
+             self.req_to_token_pool.reset_aux_cache_allocator()
+--- a/python/sglang/srt/managers/tokenizer_manager.py
++++ b/python/sglang/srt/managers/tokenizer_manager.py
+@@ -1501,6 +1501,9 @@
+                 input_embeds=input_embeds,
+                 positional_embed_overrides=obj.positional_embed_overrides,
+                 session_id=obj.session_id,
++                arena_slo_session=obj.arena_slo_session,
++                arena_slo_namespace=obj.arena_slo_namespace,
++                arena_slo_arrival=obj.arena_slo_arrival,
+                 session_params=session_params,
+                 custom_logit_processor=obj.custom_logit_processor,
+                 require_reasoning=obj.require_reasoning,

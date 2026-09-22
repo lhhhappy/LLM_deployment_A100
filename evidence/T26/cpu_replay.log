@@ -1,0 +1,12 @@
+test_branch_conflict (test_replay_chains.ReplayTests) ... ok
+test_chunk_boundary_is_strict (test_replay_chains.ReplayTests) ... ok
+test_flush (test_replay_chains.ReplayTests) ... ok
+test_invalid_alignment (test_replay_chains.ReplayTests) ... ok
+test_lcp (test_replay_chains.ReplayTests) ... ok
+test_path_identity (test_replay_chains.ReplayTests) ... ok
+test_role_tail_diverges (test_replay_chains.ReplayTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK

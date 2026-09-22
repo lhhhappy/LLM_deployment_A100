@@ -1,0 +1,4 @@
+T27 CPU/mock verification
+command: PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s scripts -p 'test_trisol_test_daemon.py'
+result: 55 tests, OK
+scope: no daemon start; no real Trisol create/exec/delete; no GPU

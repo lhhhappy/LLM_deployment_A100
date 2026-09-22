@@ -1,0 +1,9 @@
+Host GPU
+    HostName 101.126.31.72
+    User root
+    Port 53586
+    IdentityFile ~/.ssh/id_ed25519_gpu
+    IdentitiesOnly yes
+    ProxyCommand python3 /root/.ssh/httpconnect.py %h %p
+    StrictHostKeyChecking accept-new
+    ServerAliveInterval 30

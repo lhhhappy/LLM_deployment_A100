@@ -1,0 +1,37 @@
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+  物化 1/1 分片，已得 6/6
+{"chain_id": "scimaster:canon:a3b47a40-05e0-453c-9d48-246e3967db37:3", "idx_in_chain": 0, "req_id": "scimaster:canon:member-v5-team-member-bc52e3db69a083d21963769b:llm:0", "phase": "turn_start", "uncached_expected": 9169, "rendered_prompt_tokens": 9169, "prompt_sha256": "f1850d4ce3e66c1656e857f90be478c27bd0ba834f96d9d7ef0e5ea93073753f"}
+{"chain_id": "scimaster:canon:a3b47a40-05e0-453c-9d48-246e3967db37:3", "idx_in_chain": 1, "req_id": "scimaster:canon:member-v5-team-member-bc52e3db69a083d21963769b:llm:1", "phase": "intra", "uncached_expected": 528, "rendered_prompt_tokens": 9330, "prompt_sha256": "411f9fb0e4b9547f353a7ec6edd58d15cacd149ca7a6121bf0e0fd4ad8b8e640"}
+{"chain_id": "scimaster:canon:45c5328e-59ba-48b0-a81a-c836fb8d3885:0", "idx_in_chain": 0, "req_id": "scimaster:canon:qsfifb6O5y5TAtSjYBP-n:llm:0", "phase": "session_start", "uncached_expected": 14056, "rendered_prompt_tokens": 14056, "prompt_sha256": "1ee3804bd4024cdc6ce6f932eefb29e0338aa2c3ee9953e7ef1794937e556ba8"}
+{"chain_id": "scimaster:canon:45c5328e-59ba-48b0-a81a-c836fb8d3885:0", "idx_in_chain": 1, "req_id": "scimaster:canon:qsfifb6O5y5TAtSjYBP-n:llm:1", "phase": "intra", "uncached_expected": 457, "rendered_prompt_tokens": 14283, "prompt_sha256": "601ea1dddb9d85251abf514cfd9fe85cfcb2c7a5196636e88abc2565926f4301"}
+{"chain_id": "scimaster:canon:ce016ce7-1956-422b-b103-6b694ca7acf4:0", "idx_in_chain": 0, "req_id": "scimaster:canon:mYZVPABr82ScF3RsOZLIG:llm:0", "phase": "session_start", "uncached_expected": 14317, "rendered_prompt_tokens": 14317, "prompt_sha256": "03e846f14808a51c65fafb5ce2a7aa2a3821584e6d45c06ae3493252ea8c6925"}
+{"chain_id": "scimaster:canon:ce016ce7-1956-422b-b103-6b694ca7acf4:0", "idx_in_chain": 1, "req_id": "scimaster:canon:mYZVPABr82ScF3RsOZLIG:llm:1", "phase": "intra", "uncached_expected": 533, "rendered_prompt_tokens": 14507, "prompt_sha256": "c08dd831da9cd880be6894a0336fc6bf6da3b8381a660c4c4e8b0a6472b9a665"}
+{
+  "plan_only": true,
+  "requests": 6,
+  "chains": 3,
+  "fast_intra_requests": 3,
+  "errors": 0,
+  "exact_stock_prediction_matches": null,
+  "stock_cached_delta_min": null,
+  "stock_cached_delta_max": null,
+  "fast_intra_actual_uncached_p95": null,
+  "fast_intra_predicted_stock_uncached_p95": 6315,
+  "ttft_source_counts": {
+    "server": 0,
+    "client_proxy": 0
+  },
+  "limitations": "F13/F24 ideal per-chain tokens; no decode/eviction/resident-FULL-KV-truncation/per-extend-branch-placement/cross-chain sharing"
+}
+2026-09-22T09:57:48Z start control
+2026-09-22T09:59:01Z ready control
+2026-09-22T09:59:26Z completed control smoke
+2026-09-22T10:01:03Z completed control reminder_heavy
+2026-09-22T10:02:29Z completed control strict_append
+2026-09-22T10:02:35Z stopped control
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/run_e2b_batch.py", line 143, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/run_e2b_batch.py", line 131, in main
+    raise RuntimeError(f'final flush failed: {result}')
+RuntimeError: final flush failed: {'success': True, 'message': 'Cache flushed.'}

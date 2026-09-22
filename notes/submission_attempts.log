@@ -1,0 +1,9 @@
+2026-09-22 arm=A attempt_id=45734 created (upload failed: node no proxy)
+2026-09-22T11:19:13Z arm=A attempt_id=45734 uploaded
+2026-09-22T11:19:26Z arm=B attempt_id=45735 created
+2026-09-22T11:19:30Z arm=B attempt_id=45735 uploaded
+2026-09-22T11:20:00Z arm=B attempt_id=45735 uploaded (verified bundle image 0922f)
+2026-09-22T15:31:56Z arm=A attempt_id=45766 created
+2026-09-22T15:32:00Z arm=A attempt_id=45766 uploaded
+2026-09-22T15:32:25Z arm=B attempt_id=45767 created
+2026-09-22T15:32:27Z arm=B attempt_id=45767 uploaded

@@ -1,0 +1,1366 @@
+{
+  "schema_version": 1,
+  "purpose": "INTERNAL A/B mechanism cases only; official comparisons require unmodified dev cohort via run_dev.py.",
+  "selection_reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+  "source": {
+    "requests_sha256": "00c79cb68219a95420bb73048e701719953c8931b5dc70dd6822cc4ff3d4d047",
+    "cohort_sha256": "91f5061bd1c167c6",
+    "n_available_requests": 722
+  },
+  "composition": {
+    "n_requests": 67,
+    "gates": {
+      "chain_start": {
+        "n": 12,
+        "share": 0.1791044776119403,
+        "uncached_p95": 65024,
+        "band_counts": [
+          4,
+          1,
+          6,
+          1,
+          0,
+          0
+        ],
+        "band_shares": [
+          0.3333333333333333,
+          0.08333333333333333,
+          0.5,
+          0.08333333333333333,
+          0.0,
+          0.0
+        ]
+      },
+      "intra": {
+        "n": 55,
+        "share": 0.8208955223880597,
+        "uncached_p95": 7152,
+        "band_counts": [
+          23,
+          20,
+          8,
+          4,
+          0,
+          0
+        ],
+        "band_shares": [
+          0.41818181818181815,
+          0.36363636363636365,
+          0.14545454545454545,
+          0.07272727272727272,
+          0.0,
+          0.0
+        ]
+      },
+      "turn_start": {
+        "n": 0,
+        "share": 0.0,
+        "uncached_p95": null,
+        "band_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "band_shares": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "pack": {
+      "biomaster": 67
+    },
+    "split": {
+      "hidden": 61,
+      "dev": 6
+    },
+    "edge_subtype": {
+      "none": 12,
+      "strict": 55
+    },
+    "sum_output_budget": 15851,
+    "sum_frozen_uncached": 436322,
+    "fast_intra_share": 0.8909090909090909
+  },
+  "formal_target_gate_shares": {
+    "chain_start": 0.08164915117219078,
+    "intra": 0.9117825383993533,
+    "turn_start": 0.006568310428455942
+  },
+  "formal_target_difference_pp": {
+    "chain_start": 9.74553264397495,
+    "intra": -9.088701601129356,
+    "turn_start": -0.6568310428455941
+  },
+  "band_cutoffs": {
+    "chain_start": [
+      15479,
+      35018,
+      44034,
+      113977,
+      178995
+    ],
+    "intra": [
+      1581,
+      3022,
+      6232,
+      11740,
+      65881
+    ],
+    "turn_start": [
+      2368,
+      7868,
+      34244,
+      42015,
+      42015
+    ]
+  },
+  "band_target_shares": [
+    0.5,
+    0.3,
+    0.1,
+    0.05,
+    0.04,
+    0.01
+  ],
+  "band_alignment_proxy": {
+    "chain_start": {
+      "n": 12,
+      "underpowered": true,
+      "max_share_difference_pp": 40.0,
+      "tvd_pct": 43.33333333333334
+    },
+    "intra": {
+      "n": 55,
+      "underpowered": false,
+      "max_share_difference_pp": 8.181818181818185,
+      "tvd_pct": 13.181818181818183
+    },
+    "turn_start": {
+      "n": 0,
+      "underpowered": true,
+      "max_share_difference_pp": 50.0,
+      "tvd_pct": 50.0
+    }
+  },
+  "band_basis": "p95 = exact cohort gate_p95_alignment.full; p50/p80/p90/p99 = weighted dev proxies (clamped around p95); population cutoffs unavailable",
+  "alignment_source": {
+    "gate_p95_alignment": {
+      "chain_start": {
+        "n_sample": 314,
+        "full": 113977,
+        "sample": 108278,
+        "rho": 0.9499986839450064
+      },
+      "intra": {
+        "n_sample": 388,
+        "full": 11740,
+        "sample": 14033,
+        "rho": 1.1953151618398636
+      },
+      "turn_start": {
+        "n_sample": 20,
+        "full": 42015,
+        "sample": 42015,
+        "rho": 1.0
+      }
+    },
+    "composition_alignment_measured": {
+      "metric": "effect size（下一版主门口径；本轮仅记录，不作门）",
+      "gate_bands": "各门按人口 uncached_expected 的 p50/p80/p90/p95/p99 分 6 档",
+      "results": {
+        "chain_start": {
+          "n": 314,
+          "max_share_dev_pp": 4.93,
+          "tvd_pct": 4.93,
+          "fixed_2pp_bar": "FAIL",
+          "n_adaptive_tol_pp": 6.45,
+          "n_adaptive_bar": "PASS"
+        },
+        "intra": {
+          "n": 388,
+          "max_share_dev_pp": 0.98,
+          "tvd_pct": 1.1,
+          "fixed_2pp_bar": "PASS",
+          "n_adaptive_tol_pp": 2.0,
+          "n_adaptive_bar": "PASS"
+        },
+        "turn_start": {
+          "n": 20,
+          "max_share_dev_pp": 19.23,
+          "tvd_pct": 24.62,
+          "note": "n=20 低于构成检验的可用规模，不可评估"
+        }
+      },
+      "note": "rho(p95 比) 在档边界会剧烈跳动（人口 intra p95=11,740 恰为档 3 上边界），不能作对齐指标；应改用本节的档占比效应量。",
+      "fast_stratum": {
+        "definition": "uncached_expected <= 4096（数据侧冻结字段）",
+        "sample_share_pct": 84.5,
+        "population_share_pct": 85.2,
+        "dev_pp": -0.7
+      },
+      "formal_set_reference": {
+        "set": "v3 sample-50",
+        "cohort_sha256": "de7cd762",
+        "chain_start": {
+          "n": 808,
+          "max_share_dev_pp": 1.75,
+          "tvd_pct": 1.83,
+          "verdict": "PASS"
+        },
+        "intra": {
+          "n": 9023,
+          "max_share_dev_pp": 1.9,
+          "tvd_pct": 1.92,
+          "verdict": "PASS"
+        },
+        "turn_start": {
+          "n": 65,
+          "max_share_dev_pp": 0.0,
+          "tvd_pct": 0.0,
+          "verdict": "PASS（整门 = 全人口）"
+        }
+      }
+    }
+  },
+  "availability_limits": {
+    "max_intra_share_any_available_prefix": 0.875,
+    "min_chain_start_share_any_available_prefix": 0.1111111111111111,
+    "formal_mix_attainable": false,
+    "note": "722 shipped requests are source-chain prefixes; longer chains.jsonl counts do not supply additional requests. No duplicate/stitch/synthetic requests."
+  },
+  "prediction": {
+    "kind": "frozen_fields_approximation",
+    "role_tail_guess_tokens": 340,
+    "page_size": 64,
+    "chunk_size": 8192,
+    "logic_source": "scripts/sim_role_boundary.py F24; approximate role/path inputs",
+    "limitations": "current length-340 role guess; adjacent LCP ancestry only; no token path equality, old-branch resurrection, decode, eviction, timing; not F24 reproduction",
+    "exact_alternative": "scripts/replay_chains.py --case-file (Renderer/tokenizer required)"
+  },
+  "chains": [
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:53",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 51,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 36282,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 3954,
+            "band_counts": [
+              1,
+              3,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.2,
+              0.6,
+              0.2,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1167,
+        "sum_frozen_uncached": 48038,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:67",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 19,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 470,
+            "band_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 5089,
+            "band_counts": [
+              2,
+              1,
+              2,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.4,
+              0.2,
+              0.4,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 2046,
+        "sum_frozen_uncached": 13663,
+        "fast_intra_share": 0.6
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:27",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 14,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 35610,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 3769,
+            "band_counts": [
+              1,
+              3,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.2,
+              0.6,
+              0.2,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1649,
+        "sum_frozen_uncached": 47956,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:33",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 30,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 35654,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 7152,
+            "band_counts": [
+              1,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.2,
+              0.4,
+              0.2,
+              0.2,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1435,
+        "sum_frozen_uncached": 51570,
+        "fast_intra_share": 0.8
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:56",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 77,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 1962,
+            "band_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 2949,
+            "band_counts": [
+              1,
+              4,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.2,
+              0.8,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1015,
+        "sum_frozen_uncached": 11932,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:77",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 24,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 702,
+            "band_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 9623,
+            "band_counts": [
+              1,
+              1,
+              1,
+              2,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.2,
+              0.2,
+              0.2,
+              0.4,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "hidden": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1318,
+        "sum_frozen_uncached": 23974,
+        "fast_intra_share": 0.6
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:EbHEyyE8xMyiZxKvWneIo:1",
+      "selected_requests": 6,
+      "available_requests": 6,
+      "source_metadata_requests": 9,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "dev",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 5,
+      "composition": {
+        "n_requests": 6,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.16666666666666666,
+            "uncached_p95": 18145,
+            "band_counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 5,
+            "share": 0.8333333333333334,
+            "uncached_p95": 326,
+            "band_counts": [
+              5,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 6
+        },
+        "split": {
+          "dev": 6
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 5
+        },
+        "sum_output_budget": 1022,
+        "sum_frozen_uncached": 19068,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:25",
+      "selected_requests": 5,
+      "available_requests": 5,
+      "source_metadata_requests": 13,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 4,
+      "composition": {
+        "n_requests": 5,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.2,
+            "uncached_p95": 36020,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 4,
+            "share": 0.8,
+            "uncached_p95": 3144,
+            "band_counts": [
+              1,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.25,
+              0.5,
+              0.25,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 5
+        },
+        "split": {
+          "hidden": 5
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 4
+        },
+        "sum_output_budget": 1545,
+        "sum_frozen_uncached": 44992,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:104",
+      "selected_requests": 5,
+      "available_requests": 5,
+      "source_metadata_requests": 26,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 4,
+      "composition": {
+        "n_requests": 5,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.2,
+            "uncached_p95": 1012,
+            "band_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 4,
+            "share": 0.8,
+            "uncached_p95": 2579,
+            "band_counts": [
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.75,
+              0.25,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 5
+        },
+        "split": {
+          "hidden": 5
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 4
+        },
+        "sum_output_budget": 980,
+        "sum_frozen_uncached": 5731,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:170",
+      "selected_requests": 5,
+      "available_requests": 5,
+      "source_metadata_requests": 5,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 4,
+      "composition": {
+        "n_requests": 5,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.2,
+            "uncached_p95": 37661,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 4,
+            "share": 0.8,
+            "uncached_p95": 3083,
+            "band_counts": [
+              0,
+              3,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.75,
+              0.25,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 5
+        },
+        "split": {
+          "hidden": 5
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 4
+        },
+        "sum_output_budget": 799,
+        "sum_frozen_uncached": 48247,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:21",
+      "selected_requests": 5,
+      "available_requests": 5,
+      "source_metadata_requests": 5,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 4,
+      "composition": {
+        "n_requests": 5,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.2,
+            "uncached_p95": 65024,
+            "band_counts": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 4,
+            "share": 0.8,
+            "uncached_p95": 419,
+            "band_counts": [
+              4,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 5
+        },
+        "split": {
+          "hidden": 5
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 4
+        },
+        "sum_output_budget": 1178,
+        "sum_frozen_uncached": 66133,
+        "fast_intra_share": 1.0
+      }
+    },
+    {
+      "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:232",
+      "selected_requests": 5,
+      "available_requests": 5,
+      "source_metadata_requests": 6,
+      "selection": "whole_available_prefix",
+      "reason": "high append-only/strict intra density: preserve prompt-end checkpoints (F3)",
+      "pack": "biomaster",
+      "split": "hidden",
+      "reminder_intra_edges": 0,
+      "strict_intra_edges": 4,
+      "composition": {
+        "n_requests": 5,
+        "gates": {
+          "chain_start": {
+            "n": 1,
+            "share": 0.2,
+            "uncached_p95": 44034,
+            "band_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "intra": {
+            "n": 4,
+            "share": 0.8,
+            "uncached_p95": 10400,
+            "band_counts": [
+              3,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "band_shares": [
+              0.75,
+              0.0,
+              0.0,
+              0.25,
+              0.0,
+              0.0
+            ]
+          },
+          "turn_start": {
+            "n": 0,
+            "share": 0.0,
+            "uncached_p95": null,
+            "band_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "band_shares": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "pack": {
+          "biomaster": 5
+        },
+        "split": {
+          "hidden": 5
+        },
+        "edge_subtype": {
+          "none": 1,
+          "strict": 4
+        },
+        "sum_output_budget": 1697,
+        "sum_frozen_uncached": 55018,
+        "fast_intra_share": 0.75
+      }
+    }
+  ]
+}

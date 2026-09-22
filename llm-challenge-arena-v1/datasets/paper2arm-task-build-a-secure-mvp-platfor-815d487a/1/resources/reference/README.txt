@@ -1,0 +1,1 @@
+No external dataset is required. Bundle deterministic synthetic or permissively redistributable benchmark smoke fixtures with the submission. Do not include real API keys or production endpoint credentials.

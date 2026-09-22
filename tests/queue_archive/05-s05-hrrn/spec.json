@@ -1,0 +1,21 @@
+{
+  "image_ref": "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+  "profiles": [
+    "submission/candidate-b0-d0-baseline.json",
+    "submission/candidate-b1-d1.json",
+    "submission/candidate-b2-spf.json",
+    "submission/candidate-b3-spf-d1.json"
+  ],
+  "service_name": "lh-arena-sess-a",
+  "max_admission_wait_minutes": 1440,
+  "matrix": [
+    "hrrn"
+  ],
+  "ladder": {
+    "mode": "fast",
+    "hint": 10,
+    "max_n": 30
+  },
+  "time_budget_minutes": 150,
+  "notes": "Stock hrrn policy as a no-patch scheduling reference (placeholder until EDF 003 is reviewed)."
+}

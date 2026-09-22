@@ -1,0 +1,508 @@
+DRY RUN: no Trisol, SSH, downloads, subprocesses, file writes or engine starts.
+# global=240.0min final-reserve=10min; private engine port=30000
+# transfer 82 files: s1-dev, cases, scripts+dependencies, patches, candidate, R4/R7 references
+# Prepare CAP locally from --cap-file, or fixed public AIME/GPQA sources in cap_spot_check.py; include only selected questions+provenance.
+# Create base64 tar; 48KiB raw chunks -> 64KiB argv; 8 chunks/exec; no undocumented stdin forwarding and no -i/-t.
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -c 'import pathlib,sys; p=pathlib.Path(sys.argv[1]); p.mkdir(exist_ok=False); (p/'"'"'upload'"'"').mkdir()' /tmp/arena-session-a-T23-dry-run
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -c 'import base64,hashlib,pathlib,sys,json
+root=pathlib.Path(sys.argv[1]); count=0
+for i in range(2,len(sys.argv),3):
+ name,encoded,sha=sys.argv[i:i+3]
+ assert name.isdigit(),'"'"'invalid chunk name'"'"'
+ data=base64.b64decode(encoded,validate=True)
+ assert hashlib.sha256(data).hexdigest()==sha,'"'"'chunk sha256 mismatch'"'"'
+ (root/'"'"'upload'"'"'/(name+'"'"'.part'"'"')).write_bytes(data); count+=1
+print('"'"'SESSION_A_JSON:'"'"'+json.dumps({'"'"'verified_chunks'"'"':count}))
+' /tmp/arena-session-a-T23-dry-run 000000 '<chunk-base64>' '<chunk-sha256>' '<more-triples>'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -c 'import base64,hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); expected=sys.argv[2]
+parts=sorted((root/'"'"'upload'"'"').glob('"'"'*.part'"'"'))
+data=b'"'"''"'"'.join(p.read_bytes() for p in parts)
+assert hashlib.sha256(data).hexdigest()==expected,'"'"'archive sha256 mismatch'"'"'
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'r:gz'"'"') as t:
+ names=set()
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'..'"'"' not in p.parts and m.name not in names,'"'"'unsafe archive'"'"'
+  names.add(m.name)
+  assert root.resolve() in (root/p).resolve().parents,'"'"'archive escape'"'"'
+ t.extractall(root)
+manifest=json.loads((root/'"'"'TRANSFER_SHA256.json'"'"').read_text())
+for name,sha in manifest.items():
+ assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,'"'"'file sha256 mismatch: '"'"'+name
+print('"'"'SESSION_A_JSON:'"'"'+json.dumps({'"'"'verified_files'"'"':len(manifest),'"'"'archive_sha256'"'"':expected}))
+' /tmp/arena-session-a-T23-dry-run '<archive-sha256>'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "inspect", "config": "baseline", "n": null, "timeout": 600, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+# STEP1 pip show/version/commit, package diff+hashes, sm80 DSA/indexer source, nvidia-smi/free/df/models, Internet probes, stacked patch --dry-run -p3 --fuzz=0 000/001/002
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "start", "config": "stock", "n": null, "timeout": 1575.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+# engine patches=[] env={"SGLANG_OPT_USE_TOPK_V2": "0"} parent D1 unset before overrides
+# python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 30000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy fcfs
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "cap", "config": "stock", "n": null, "timeout": 1200, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "start", "config": "baseline", "n": null, "timeout": 1575.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+# engine patches=['000'] env={"SGLANG_OPT_USE_TOPK_V2": "0"} parent D1 unset before overrides
+# python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 30000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy fcfs
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "preflight", "config": "baseline", "n": null, "timeout": 1200, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "cap", "config": "baseline", "n": null, "timeout": 1200, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "warmup", "config": "baseline", "n": null, "timeout": 435.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "baseline", "n": 6, "timeout": 2684.9999999999995, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "baseline", "n": 10, "timeout": 2020.5718896603723, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "baseline", "n": 14, "timeout": 1710.8985828577988, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "baseline", "n": 18, "timeout": 1523.3006535572288, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+# DRY trace only: {6: True, 10: True, 14: True, 18: False}; reason=adjacent_bracket; real climb adapts +/-4 and reserves priority matrix pairs.
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "start", "config": "spf", "n": null, "timeout": 1575.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+# engine patches=['000', '001', '002'] env={"SGLANG_OPT_USE_TOPK_V2": "0"} parent D1 unset before overrides
+# python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 30000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy shortest-prefill-first
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "warmup", "config": "spf", "n": null, "timeout": 435.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "spf", "n": 14, "timeout": 1710.8985828577988, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "spf", "n": 18, "timeout": 1523.3006535572288, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "start", "config": "spf_d1", "n": null, "timeout": 1575.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+# engine patches=['000', '001', '002'] env={"SGLANG_OPT_USE_TOPK_V2": "0", "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS": "154827,154829"} parent D1 unset before overrides
+# python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 30000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy shortest-prefill-first
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "warmup", "config": "spf_d1", "n": null, "timeout": 435.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "spf_d1", "n": 14, "timeout": 1710.8985828577988, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "spf_d1", "n": 18, "timeout": 1523.3006535572288, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "start", "config": "d1", "n": null, "timeout": 1575.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+# engine patches=['000', '001'] env={"SGLANG_OPT_USE_TOPK_V2": "0", "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS": "154827,154829"} parent D1 unset before overrides
+# python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 30000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy fcfs
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "warmup", "config": "d1", "n": null, "timeout": 435.0, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "d1", "n": 14, "timeout": 1710.8985828577988, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "measure", "config": "d1", "n": 18, "timeout": 1523.3006535572288, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+# Restart best measured config only if needed, then CAP on the same fixed questions:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py launch '{"action": "cap", "config": "<best>", "n": null, "timeout": 1200, "deadline": "<global-work-deadline>", "id": "<unique-job-id>", "port": 30000}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py status '<unique-job-id>'
+# After action and every 120s while running:
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py export '{"known":"<verified-local-file-hashes>"}'
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py read-export '<offset>' 524288
+# verify archive+file SHA256, extract runs/session_a/<timestamp>/
+ssh -F /workspace/Agentic_science_challenge/scripts/ssh_config.GPU -o BatchMode=yes GPU 'python3 -c '"'"'import hashlib,io,json,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]); data=sys.stdin.buffer.read()
+assert hashlib.sha256(data).hexdigest()==sys.argv[2],'"'"'"'"'"'"'"'"'GPU archive sha256 mismatch'"'"'"'"'"'"'"'"'
+assert str(root).startswith('"'"'"'"'"'"'"'"'/sjtu/linhang/arena/runs/session_a/'"'"'"'"'"'"'"'"'),'"'"'"'"'"'"'"'"'GPU path outside arena'"'"'"'"'"'"'"'"'
+root.mkdir(parents=True,exist_ok=True)
+with tarfile.open(fileobj=io.BytesIO(data),mode='"'"'"'"'"'"'"'"'r:gz'"'"'"'"'"'"'"'"') as t:
+ for m in t.getmembers():
+  p=pathlib.Path(m.name)
+  assert m.isfile() and not p.is_absolute() and '"'"'"'"'"'"'"'"'..'"'"'"'"'"'"'"'"' not in p.parts,'"'"'"'"'"'"'"'"'unsafe archive'"'"'"'"'"'"'"'"'
+  assert root.resolve() in (root/p).resolve().parents,'"'"'"'"'"'"'"'"'archive escape'"'"'"'"'"'"'"'"'
+ t.extractall(root)
+print('"'"'"'"'"'"'"'"'SESSION_A_JSON:'"'"'"'"'"'"'"'"'+json.dumps({'"'"'"'"'"'"'"'"'copied'"'"'"'"'"'"'"'"':True,'"'"'"'"'"'"'"'"'sha256'"'"'"'"'"'"'"'"':sys.argv[2]}))
+'"'"' /sjtu/linhang/arena/runs/session_a/T23-dry-run '"'"'<archive-sha256>'"'"''
+# Full trace time boxes sum to 550.3min + transfer/sync + optional best restart; estimates, not measured runtimes.
+# FINALLY, independent of failures: pull, stop owned jobs/engines, pull again, copy final summary to GPU.
+bohr trisol inference exec lh-arena-sess-a --team arena -- python3 -B /tmp/arena-session-a-T23-dry-run/scripts/session_a/remote.py stop
+# Engine watchdog stops owned engine at global work deadline even after controller death.
+# Claude alone deletes after verifying artifacts: bohr trisol inference delete lh-arena-sess-a --team arena --yes

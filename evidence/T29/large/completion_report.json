@@ -1,0 +1,95 @@
+{
+  "purpose": "T29 random qfull L2 functional diagnostic; not performance",
+  "cases": {
+    "D1-05": {
+      "rounds": 306,
+      "max_partial": 1,
+      "max_batch_size": 3,
+      "new_admission_attempts": 215,
+      "new_commits": 105,
+      "continuation_commits": 229,
+      "all_commits": 334,
+      "role_stats": {
+        "skipped_no_boundary": 0,
+        "skipped_already_chunked": 34,
+        "skipped_branch_conflict": 20,
+        "taken": 45,
+        "skipped_active_chunk": 5,
+        "skipped_short": 1
+      },
+      "role_stats_sum": 105,
+      "round_errors": 0,
+      "replay_summary": {
+        "plan_only": false,
+        "requests": 105,
+        "chains": 27,
+        "fast_intra_requests": 66,
+        "errors": 0,
+        "exact_stock_prediction_matches": 30,
+        "stock_cached_delta_min": -7616,
+        "stock_cached_delta_max": 229376,
+        "fast_intra_actual_uncached_p95": 8866,
+        "fast_intra_predicted_stock_uncached_p95": 7006,
+        "ttft_source_counts": {
+          "server": 105,
+          "client_proxy": 0
+        },
+        "limitations": "F13/F24 ideal per-chain tokens; no decode/eviction/resident-FULL-KV-truncation/per-extend-branch-placement/cross-chain sharing"
+      },
+      "exit_code": 0,
+      "replay_complete": true,
+      "partial_invariant_passed": true,
+      "stats_equal_all_commits": false,
+      "stats_equal_new_commits": true,
+      "stats_equal_admission_attempts": false,
+      "status": "fail"
+    },
+    "D1-08": {
+      "status": "pass",
+      "startup": {
+        "kv_free": 524288,
+        "mamba_free": 512,
+        "request_free": 8
+      },
+      "before_mixed_after_flush": {
+        "kv_free": 524288,
+        "mamba_free": 512,
+        "request_free": 8
+      },
+      "before_final_flush": {
+        "kv_free": 8320,
+        "mamba_free": 378,
+        "request_free": 8
+      },
+      "after_final_flush": {
+        "kv_free": 524288,
+        "mamba_free": 512,
+        "request_free": 8
+      }
+    }
+  },
+  "args": {
+    "run_root": "/sjtu/linhang/arena/runs/E2_T29_20260922_large_v2",
+    "case_root": "/sjtu/linhang/arena/code/e2_cases",
+    "comparison": "/sjtu/linhang/arena/runs/E2_20260922/comparison.json",
+    "dev_root": "/sjtu/linhang/arena/s1-dev",
+    "base_url": "http://127.0.0.1:31000",
+    "max_prompt_tokens": 262144,
+    "mixed_only": true
+  },
+  "startup_pools": {
+    "kv_free": 524288,
+    "mamba_free": 512,
+    "request_free": 8
+  },
+  "mixed_input": {
+    "source_sha256": {
+      "cold_heavy.json": "5bb7e4f32a2e7687cd07e1125b60d61cc6d83fdb1bfe62c3301933de4dcce438",
+      "reminder_heavy.json": "361bffb6c8d529b2652862d809146c546ce7699e867aa44996097e5b14af2809"
+    },
+    "chains": 27,
+    "requests": 105,
+    "concurrency": 4,
+    "cache_isolation": "shared-cache; flush before/after, not between active chains"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "dataset_files_written": false,
+  "in_memory_parser_checks": {
+    "aime": 10,
+    "gpqa": 20
+  },
+  "receipts": [
+    {
+      "url": "https://hf-mirror.com/api/datasets/Maxwell-Jia/AIME_2024",
+      "resolved_url": "https://huggingface.co/api/datasets/Maxwell-Jia/AIME_2024",
+      "status": 200,
+      "bytes": 1643,
+      "sha256": "d73e2254942f3f1045c60e76c71bf84c99145fa3f9209990426ab3d7ee847a6a"
+    },
+    {
+      "url": "https://datasets-server.huggingface.co/rows?dataset=Maxwell-Jia%2FAIME_2024&config=default&split=train&offset=0&length=30",
+      "resolved_url": "https://datasets-server.huggingface.co/rows?dataset=Maxwell-Jia%2FAIME_2024&config=default&split=train&offset=0&length=30",
+      "status": 200,
+      "bytes": 50427,
+      "sha256": "cada27ac0076ef836c06d13a1760a9af751c73a3fe24643cb3489b01fe6ae4b4"
+    },
+    {
+      "url": "https://openaipublic.blob.core.windows.net/simple-evals/gpqa_diamond.csv",
+      "resolved_url": "https://openaipublic.blob.core.windows.net/simple-evals/gpqa_diamond.csv",
+      "status": 200,
+      "bytes": 1373492,
+      "sha256": "41d1213cd7a4998605a26c2798500652572007161b3a92817ba46b35befcd305"
+    }
+  ]
+}

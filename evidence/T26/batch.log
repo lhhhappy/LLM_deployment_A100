@@ -1,0 +1,11 @@
+2026-09-22T09:52:42Z start control
+2026-09-22T09:54:49Z ready control
+2026-09-22T09:54:56Z stopped control
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/E2b_T26_20260922/scripts/run_e2b_batch.py", line 136, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/E2b_T26_20260922/scripts/run_e2b_batch.py", line 120, in main
+    subprocess.run(replay, cwd=trace, env=env, stdout=out, stderr=subprocess.STDOUT,
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/sjtu/linhang/arena/env/sgl/bin/python', '/sjtu/linhang/arena/runs/E2b_T26_20260922/scripts/replay_chains.py', '--dev-root', '/sjtu/linhang/arena/s1-dev', '--case-file', '/sjtu/linhang/arena/runs/E2b_T26_20260922/cases/smoke.json', '--max-prompt-tokens', '131072', '--require-json-flush', '--output', '/sjtu/linhang/arena/runs/E2b_T26_20260922/control_smoke']' returned non-zero exit status 1.

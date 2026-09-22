@@ -1,0 +1,11 @@
+DRY RUN: no installs, tests, HTTP requests, services or file writes.
+1. Import/version-check harness requirements; pip install -r s1-dev/harness/requirements.txt only if needed
+2. python3 -m pytest -q -p no:cacheprovider s1-dev/harness/test_s1_harness.py (unittest fallback if pytest absent)
+3. GET /v1/models returns 200, nonempty model list containing default
+4. POST /flush_cache?timeout=120 returns 2xx JSON with success exactly true
+5. POST /generate SSE: every event has completion_tokens/prompt_tokens/cached_tokens; first prefill_finished_time and final request_received_ts
+6. ignore_eos=true produces exactly the requested output length; initial cached_tokens=0
+7. Repeat the identical prompt: cached_tokens increases
+8. Verified JSON flush, identical prompt again: cached_tokens=0
+9. POST /v1/chat/completions model=default: nonempty choices[0].message.content and matching response model
+10. Verified final JSON flush; save safe JSON check report (no secrets or response text)

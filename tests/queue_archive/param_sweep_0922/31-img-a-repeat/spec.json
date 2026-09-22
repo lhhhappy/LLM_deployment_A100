@@ -1,0 +1,18 @@
+{
+  "image_ref": "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+  "profiles": [
+    "submission/candidate-bA-0922e.json"
+  ],
+  "service_name": "lh-arena-sess-a",
+  "max_admission_wait_minutes": 2880,
+  "matrix": [
+    "img_a"
+  ],
+  "ladder": {
+    "mode": "fast",
+    "hint": 14,
+    "max_n": 30
+  },
+  "time_budget_minutes": 300,
+  "notes": "repeat A (noise)"
+}

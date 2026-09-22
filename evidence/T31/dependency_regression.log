@@ -1,0 +1,73 @@
+test_dry_run_no_network_process_or_output_files (test_ladder_search.DriverTests) ... ok
+test_execution_crash_and_budget_stop_are_not_slo_fails (test_ladder_search.DriverTests) ... ok
+test_failed_initial_flush_aborts_without_starting_runner (test_ladder_search.DriverTests) ... ok
+test_failed_internal_flush_prevents_measurement (test_ladder_search.DriverTests) ... ok
+test_gate_policy_keeps_point_and_estimated_results_separate (test_ladder_search.DriverTests) ... ok
+test_internal_flush_deadline_kills_ignoring_runner (test_ladder_search.DriverTests) ... ok
+test_real_unmodified_run_dev_with_synthetic_loadgen (test_ladder_search.DriverTests)
+Exercise the exact subprocess API while replacing only loadgen in /tmp. ... ok
+test_subprocess_ledger_warmup_and_dev_verdict (test_ladder_search.DriverTests) ... ok
+test_unexpected_guard_error_also_prevents_measurement (test_ladder_search.DriverTests) ... ok
+test_http_and_json_must_both_succeed (test_ladder_search.FlushTests) ... ok
+test_network_error_is_not_slo_failure (test_ladder_search.FlushTests) ... ok
+test_url_normalization_and_secret_rejection (test_ladder_search.FlushTests) ... ok
+test_binomial_analytic_endpoints_and_small_exact_sums (test_ladder_search.ScoreTests) ... ok
+test_dev_report_unchanged_and_tpot (test_ladder_search.ScoreTests) ... ok
+test_directory_selection_uses_summary_not_latest_raw (test_ladder_search.ScoreTests) ... ok
+test_empty_buckets_and_entire_run_fail (test_ladder_search.ScoreTests) ... ok
+test_error_and_coverage_gates_are_not_filtered_away (test_ladder_search.ScoreTests) ... ok
+test_exact_limit_is_not_exceedance (test_ladder_search.ScoreTests) ... ok
+test_frozen_bucket_membership_and_cache_reconciliation (test_ladder_search.ScoreTests) ... ok
+test_malformed_raw_is_execution_error (test_ladder_search.ScoreTests) ... ok
+test_missing_tpot_blocks_but_single_token_is_counted (test_ladder_search.ScoreTests) ... ok
+test_statistical_allowance_preserves_failing_dev_verdict (test_ladder_search.ScoreTests) ... ok
+test_statistically_supported_exceedance_fails (test_ladder_search.ScoreTests) ... ok
+test_tpot_gate_has_no_statistical_allowance (test_ladder_search.ScoreTests) ... ok
+test_all_official_spec_examples (test_ladder_search.SearchTests) ... ok
+test_ceiling_is_incomplete_not_capacity (test_ladder_search.SearchTests) ... ok
+test_fast_bracketing_and_bisection_exhaustive (test_ladder_search.SearchTests) ... ok
+test_fast_saves_runs_for_distant_capacity (test_ladder_search.SearchTests) ... ok
+test_invalid_rungs_and_start_above_ceiling (test_ladder_search.SearchTests) ... ok
+test_answer_extraction_is_explicit_and_content_only (test_t19_tools.CapabilityTests) ... ok
+test_dataset_redirect_308_on_python310 (test_t19_tools.CapabilityTests) ... ok
+test_dataset_writes_outside_arena_cache_rejected (test_t19_tools.CapabilityTests) ... ok
+test_gpqa_loader_preserves_answers_after_option_permutation (test_t19_tools.CapabilityTests) ... ok
+test_one_answer_regression_tolerance (test_t19_tools.CapabilityTests) ... ok
+test_regression_reasoning_only_and_length_fail (test_t19_tools.CapabilityTests) ... ok
+test_runtime_aime_loader_seed_and_source_metadata (test_t19_tools.CapabilityTests) ... ok
+test_tiny_and_single_server_cannot_mark_registry_pass (test_t19_tools.CapabilityTests) ... ok
+test_two_servers_both_suites_without_any_output_clamp (test_t19_tools.CapabilityTests) ... ok
+test_all_dry_runs_offline_no_writes_or_secrets (test_t19_tools.CommandTests) ... ok
+test_cli_real_mock_run_report_and_failure_exit (test_t19_tools.CommandTests) ... ok
+test_logit_and_cap_cli_with_mock_endpoints (test_t19_tools.CommandTests) ... ok
+test_aime_chat_success_and_budget_truth (test_t19_tools.InterfaceTests) ... ok
+test_all_four_lengths_and_done_required (test_t19_tools.InterfaceTests) ... ok
+test_blocked_does_not_pass (test_t19_tools.InterfaceTests) ... ok
+test_busy_flush_fails_then_waits_and_clears (test_t19_tools.InterfaceTests) ... ok
+test_busy_flush_false_success_and_cache_leaks_rejected (test_t19_tools.InterfaceTests) ... ok
+test_chat_faults_detected (test_t19_tools.InterfaceTests) ... ok
+test_dp_all_ranks_and_unknown_route (test_t19_tools.InterfaceTests) ... ok
+test_duplicate_rid_leak_fails (test_t19_tools.InterfaceTests) ... ok
+test_harness_renderer_twenty_frozen_counts (test_t19_tools.InterfaceTests) ... ok
+test_incremental_and_cumulative_rejection (test_t19_tools.InterfaceTests) ... ok
+test_rid_reuse_completed_and_disconnect (test_t19_tools.InterfaceTests) ... ok
+test_same_host_timestamp_checks (test_t19_tools.InterfaceTests) ... ok
+test_unknown_headers_on_both_paths (test_t19_tools.InterfaceTests) ... ok
+test_cold_warm_equal_and_correct_wire_parameters (test_t19_tools.LogprobTests) ... ok
+test_missing_hit_depth_and_union_values_rejected (test_t19_tools.LogprobTests) ... ok
+test_noise_calibration_cold_only (test_t19_tools.LogprobTests) ... ok
+test_numeric_and_greedy_regressions_fail (test_t19_tools.LogprobTests) ... ok
+test_top_k_union_includes_rank_crossing (test_t19_tools.LogprobTests) ... ok
+test_two_servers_compare_both_modes (test_t19_tools.LogprobTests) ... ok
+test_two_servers_independent_boundary_depth_assertions (test_t19_tools.LogprobTests) ... ok
+test_complete_checklist_with_stub_and_no_secrets (test_t16_tools.PreflightTests) ... ok
+test_dry_run_has_no_writes_no_auth_echo (test_t16_tools.PreflightTests) ... ok
+test_harness_installs_missing_requirements_and_uses_pytest_no_cache (test_t16_tools.PreflightTests) ... ok
+test_harness_unittest_fallback_and_no_bytecode (test_t16_tools.PreflightTests) ... ok
+test_real_failures_stop_the_checklist (test_t16_tools.PreflightTests) ... ok
+test_url_credentials_rejected_without_echo (test_t16_tools.PreflightTests) ... ok
+
+----------------------------------------------------------------------
+Ran 67 tests in 17.743s
+
+OK

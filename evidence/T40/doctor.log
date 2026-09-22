@@ -1,0 +1,20 @@
+Claude Code doctor
+
+Running: native (2.1.280)
+Commit: 80abbfe7d723
+Platform: linux-arm64
+Path: /root/.local/share/claude/versions/2.1.280
+Config install method: native
+Search: OK (bundled)
+Auto-updates: enabled
+Auto-update channel: latest
+Last update attempt: success → 2.1.278 (2026-09-22)
+Managed settings (remote): not fetched — requires an Enterprise or Team subscription
+Organization policy: not applicable to Pro and Max accounts
+
+Remote Control
+Control this session from claude.ai/code or the Claude mobile app
+
+No installation issues found.
+
+For a full setup checkup that can also fix issues, run /doctor in a Claude Code session.

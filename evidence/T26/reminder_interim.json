@@ -1,0 +1,42 @@
+{
+  "requests": 70,
+  "fast_intra_n": 54,
+  "pairs": {
+    "control_vs_v11": {
+      "better": 0,
+      "equal": 70,
+      "worse": 0
+    },
+    "candidate_vs_control": {
+      "better": 27,
+      "equal": 43,
+      "worse": 0
+    },
+    "candidate_vs_v11": {
+      "better": 27,
+      "equal": 43,
+      "worse": 0
+    },
+    "candidate_vs_stock": {
+      "better": 58,
+      "equal": 12,
+      "worse": 0
+    }
+  },
+  "fast_uncached_p95": {
+    "stock": 8135,
+    "v11": 8135,
+    "control": 8135,
+    "candidate": 2439,
+    "role_pred": 2439
+  },
+  "candidate_within_64_role_prediction": 70,
+  "candidate_within_64_fraction": 1.0,
+  "total_uncached": {
+    "stock": 700622,
+    "v11": 657678,
+    "control": 657678,
+    "candidate": 601934
+  },
+  "off_equals_stock": null
+}

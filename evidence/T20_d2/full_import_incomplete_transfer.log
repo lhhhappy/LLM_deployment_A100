@@ -1,0 +1,309 @@
+test_d1_on_fcfs_uses_same_host_miss_guard (test_spf_scheduling.SPFTests.test_d1_on_fcfs_uses_same_host_miss_guard) ... ERROR
+test_d1_shared_guard_skip_split_during_continuation (test_spf_scheduling.SPFTests.test_d1_shared_guard_skip_split_during_continuation) ... ERROR
+test_d1_split_then_full_and_no_second_partial (test_spf_scheduling.SPFTests.test_d1_split_then_full_and_no_second_partial) ... ERROR
+test_disabled_cache_rejected_and_fcfs_not_reordered (test_spf_scheduling.SPFTests.test_disabled_cache_rejected_and_fcfs_not_reordered) ... ERROR
+test_dsa_continuation_alignment (test_spf_scheduling.SPFTests.test_dsa_continuation_alignment) ... ERROR
+test_fcfs_differential_against_clean_stock (test_spf_scheduling.SPFTests.test_fcfs_differential_against_clean_stock) ... ERROR
+test_host_hit_commit_and_miss_without_partial (test_spf_scheduling.SPFTests.test_host_hit_commit_and_miss_without_partial) ... ERROR
+test_host_miss_reselect_checks_existing_and_new_partial (test_spf_scheduling.SPFTests.test_host_miss_reselect_checks_existing_and_new_partial) ... ERROR
+test_memory_mamba_and_page_debits (test_spf_scheduling.SPFTests.test_memory_mamba_and_page_debits) ... ERROR
+test_minimum_page_no_reservation_and_scan_break (test_spf_scheduling.SPFTests.test_minimum_page_no_reservation_and_scan_break) ... ERROR
+test_order_by_uncached_output_ties_and_deprioritized (test_spf_scheduling.SPFTests.test_order_by_uncached_output_ties_and_deprioritized) ... ERROR
+test_patch_chain_matches_all_production_files (test_spf_scheduling.SPFTests.test_patch_chain_matches_all_production_files) ... ERROR
+test_preserved_budget_and_commit_methods_are_ast_identical (test_spf_scheduling.SPFTests.test_preserved_budget_and_commit_methods_are_ast_identical) ... ERROR
+test_reject_second_partial_before_delayer_or_load (test_spf_scheduling.SPFTests.test_reject_second_partial_before_delayer_or_load) ... ERROR
+test_short_waiters_share_continuation_budget (test_spf_scheduling.SPFTests.test_short_waiters_share_continuation_budget) ... ERROR
+test_tile_gate_and_dsa_candidate_alignment (test_spf_scheduling.SPFTests.test_tile_gate_and_dsa_candidate_alignment) ... ERROR
+
+======================================================================
+ERROR: test_d1_on_fcfs_uses_same_host_miss_guard (test_spf_scheduling.SPFTests.test_d1_on_fcfs_uses_same_host_miss_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_d1_shared_guard_skip_split_during_continuation (test_spf_scheduling.SPFTests.test_d1_shared_guard_skip_split_during_continuation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_d1_split_then_full_and_no_second_partial (test_spf_scheduling.SPFTests.test_d1_split_then_full_and_no_second_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_disabled_cache_rejected_and_fcfs_not_reordered (test_spf_scheduling.SPFTests.test_disabled_cache_rejected_and_fcfs_not_reordered)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_dsa_continuation_alignment (test_spf_scheduling.SPFTests.test_dsa_continuation_alignment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_fcfs_differential_against_clean_stock (test_spf_scheduling.SPFTests.test_fcfs_differential_against_clean_stock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_host_hit_commit_and_miss_without_partial (test_spf_scheduling.SPFTests.test_host_hit_commit_and_miss_without_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_host_miss_reselect_checks_existing_and_new_partial (test_spf_scheduling.SPFTests.test_host_miss_reselect_checks_existing_and_new_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_memory_mamba_and_page_debits (test_spf_scheduling.SPFTests.test_memory_mamba_and_page_debits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_minimum_page_no_reservation_and_scan_break (test_spf_scheduling.SPFTests.test_minimum_page_no_reservation_and_scan_break)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_order_by_uncached_output_ties_and_deprioritized (test_spf_scheduling.SPFTests.test_order_by_uncached_output_ties_and_deprioritized)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_patch_chain_matches_all_production_files (test_spf_scheduling.SPFTests.test_patch_chain_matches_all_production_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_preserved_budget_and_commit_methods_are_ast_identical (test_spf_scheduling.SPFTests.test_preserved_budget_and_commit_methods_are_ast_identical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_reject_second_partial_before_delayer_or_load (test_spf_scheduling.SPFTests.test_reject_second_partial_before_delayer_or_load)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_short_waiters_share_continuation_budget (test_spf_scheduling.SPFTests.test_short_waiters_share_continuation_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+======================================================================
+ERROR: test_tile_gate_and_dsa_candidate_alignment (test_spf_scheduling.SPFTests.test_tile_gate_and_dsa_candidate_alignment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 114, in setUp
+    self.ns = load_source()
+              ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/code/d2-worker-w7/scripts/test_spf_scheduling.py", line 39, in load_source
+    nodes = [n for n in ast.parse(path.read_text()).body if getattr(n, 'name', '') in names]
+                                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sjtu/linhang/arena/code/d2-worker-w7/build/d2/b/python/sglang/srt/managers/schedule_policy.py'
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.007s
+
+FAILED (errors=16)

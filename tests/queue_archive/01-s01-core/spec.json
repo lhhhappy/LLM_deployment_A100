@@ -1,0 +1,22 @@
+{
+  "image_ref": "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+  "profiles": [
+    "submission/candidate-b0-d0-baseline.json",
+    "submission/candidate-b1-d1.json",
+    "submission/candidate-b2-spf.json",
+    "submission/candidate-b3-spf-d1.json"
+  ],
+  "service_name": "lh-arena-sess-a",
+  "max_admission_wait_minutes": 1440,
+  "matrix": [
+    "baseline",
+    "spf",
+    "spf_d1"
+  ],
+  "ladder": {
+    "mode": "official-climb",
+    "max_n": 30
+  },
+  "time_budget_minutes": 330,
+  "notes": "Baseline (D0 only, fcfs) N6/N10 + official climb; then SPF and SPF+D1v1.1 at P/P+4. Calibrates the simulator."
+}

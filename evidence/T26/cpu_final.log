@@ -1,0 +1,60 @@
+test_alignment_works_if_manually_injected (test_d1_final_chunk.FinalChunkTests) ... ok
+test_branch_has_priority (test_d1_final_chunk.FinalChunkTests) ... ok
+test_feature_off_exact_control (test_d1_final_chunk.FinalChunkTests) ... ok
+test_full_waiter_allowed_second_partial_rejected (test_d1_final_chunk.FinalChunkTests) ... ok
+test_host_miss_reselect_rejects_second_partial (test_d1_final_chunk.FinalChunkTests) ... ok
+test_larger_page_grid (test_d1_final_chunk.FinalChunkTests) ... ok
+test_last_boundary_and_scan_window (test_d1_final_chunk.FinalChunkTests) ... ok
+test_no_boundary_short_and_unaligned (test_d1_final_chunk.FinalChunkTests) ... ok
+test_nonfinal_is_unchanged (test_d1_final_chunk.FinalChunkTests) ... ok
+test_real_fresh_adder_does_not_receive_scheduler_alignment (test_d1_final_chunk.FinalChunkTests) ... expected failure
+test_split_same_request_then_finish (test_d1_final_chunk.FinalChunkTests) ... ok
+test_d1_on_fcfs_uses_same_host_miss_guard (test_spf_scheduling.SPFTests) ... ok
+test_d1_shared_guard_skip_split_during_continuation (test_spf_scheduling.SPFTests) ... ok
+test_d1_split_then_full_and_no_second_partial (test_spf_scheduling.SPFTests) ... ok
+test_disabled_cache_rejected_and_fcfs_not_reordered (test_spf_scheduling.SPFTests) ... ok
+test_dsa_continuation_alignment (test_spf_scheduling.SPFTests) ... ok
+test_fcfs_differential_against_clean_stock (test_spf_scheduling.SPFTests) ... ok
+test_host_hit_commit_and_miss_without_partial (test_spf_scheduling.SPFTests) ... ok
+test_host_miss_reselect_checks_existing_and_new_partial (test_spf_scheduling.SPFTests) ... ok
+test_memory_mamba_and_page_debits (test_spf_scheduling.SPFTests) ... ok
+test_minimum_page_no_reservation_and_scan_break (test_spf_scheduling.SPFTests) ... ok
+test_order_by_uncached_output_ties_and_deprioritized (test_spf_scheduling.SPFTests) ... ok
+test_patch_chain_matches_all_production_files (test_spf_scheduling.SPFTests) ... ok
+test_preserved_budget_and_commit_methods_are_ast_identical (test_spf_scheduling.SPFTests) ... ok
+test_reject_second_partial_before_delayer_or_load (test_spf_scheduling.SPFTests) ... ok
+test_short_waiters_share_continuation_budget (test_spf_scheduling.SPFTests) ... ok
+test_tile_gate_and_dsa_candidate_alignment (test_spf_scheduling.SPFTests) ... ok
+test_active_chunk (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_already_chunked_and_dllm (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_boundary_at_stock_end_checkpoint_skipped (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_branch_conflict (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_disabled_and_non_mamba_are_noops (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_grid_and_truncation_lcm (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_new_chunked_req (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_no_boundary (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_no_chunk_budget (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_normal_split_and_sampling_budget_unchanged (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_patch_matches_working_method (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_scan_uses_last_boundary_not_first (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_scan_window_excludes_old_boundary_and_includes_lower_edge (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_short_prompt_less_than_two_grids (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_unaligned_prefix (test_role_boundary_split.RoleBoundaryTests) ... ok
+test_comparison (test_compare_e2b.ComparisonTests) ... ok
+test_drift_rejected (test_compare_e2b.ComparisonTests) ... ok
+test_errors_duplicates_and_bad_counts_rejected (test_compare_e2b.ComparisonTests) ... ok
+test_exact_harness_quantile (test_compare_e2b.ComparisonTests) ... ok
+test_json_flush_optional_message (test_compare_e2b.ComparisonTests) ... ok
+test_pool_leak_not_passing (test_compare_e2b.ComparisonTests) ... ok
+test_branch_conflict (test_replay_chains.ReplayTests) ... ok
+test_chunk_boundary_is_strict (test_replay_chains.ReplayTests) ... ok
+test_flush (test_replay_chains.ReplayTests) ... ok
+test_invalid_alignment (test_replay_chains.ReplayTests) ... ok
+test_lcp (test_replay_chains.ReplayTests) ... ok
+test_path_identity (test_replay_chains.ReplayTests) ... ok
+test_role_tail_diverges (test_replay_chains.ReplayTests) ... ok
+
+----------------------------------------------------------------------
+Ran 55 tests in 0.601s
+
+OK (expected failures=1)

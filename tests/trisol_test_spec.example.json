@@ -1,0 +1,15 @@
+{
+  "image_ref": "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+  "profiles": [
+    "submission/candidate-b0-d0-baseline.json",
+    "submission/candidate-b2-spf.json",
+    "submission/candidate-b1-d1.json",
+    "submission/candidate-b3-spf-d1.json"
+  ],
+  "ladder": {"mode": "official-climb", "max_n": 30},
+  "matrix": ["baseline", "spf", "d1", "spf_d1"],
+  "time_budget_minutes": 240,
+  "max_admission_wait_minutes": 1440,
+  "notes": "Example only. The default 12 GPU-hour daily cap limits eight-GPU occupancy to 90 minutes including cleanup; review configuration before approving a longer session.",
+  "promote": {"min_n": 18}
+}

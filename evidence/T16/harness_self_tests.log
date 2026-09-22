@@ -1,0 +1,37 @@
+test_execution_exit_mode_keeps_failed_evaluation_job_green (test_s1_harness.EvaluationLifecycleTest) ... ok
+test_formal_requires_server_ttft_but_dev_allows_proxy (test_s1_harness.EvaluationLifecycleTest) ... ok
+test_both_intra_gates_pass_at_acceptable_tail (test_s1_harness.FastOverallIntraGateTest) ... ok
+test_fast_can_pass_while_overall_fails (test_s1_harness.FastOverallIntraGateTest) ... ok
+test_cap_is_deterministic (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_capped_chain_hits_cap_exactly_and_keeps_ratios (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_gap_cap_default_is_on_and_legacy_restorable (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_main_tpm_is_steady_window_not_whole_wall (test_s1_harness.PacingAndSteadyTpmTest)
+主 TPM 必须是稳态窗口；窗口无效时**为 null**，绝不退回全程墙钟平均。 ... ok
+test_no_cap_means_no_plan_change (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_steady_window_computes_tpm_and_value (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_steady_window_invalid_when_cohort_drained_early (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_steady_window_invalid_without_timestamps (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_steady_window_prefers_server_timestamp_when_fully_covered (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_tpm_is_null_when_window_invalid (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_uncapped_chains_are_byte_identical (test_s1_harness.PacingAndSteadyTpmTest) ... ok
+test_workload_hash_is_added_when_cfg_is_initialized (test_s1_harness.PacingAndSteadyTpmTest)
+回归：main 不能在 cfg 初始化前写入 workload_hash。 ... ok
+test_memory_key_idx_underscore_still_hits_chain_start_gate (test_s1_harness.PhaseGateKeyRegressionTest) ... ok
+test_raw_key_idx_in_chain_zero_hits_chain_start_gate (test_s1_harness.PhaseGateKeyRegressionTest) ... ok
+test_scorer_populates_chain_start_from_raw_records (test_s1_harness.PhaseGateKeyRegressionTest) ... ok
+test_chain_start_definition_exposes_union_semantics (test_s1_harness.ReviewerRulingTest) ... ok
+test_chain_start_strata_present_and_disjoint (test_s1_harness.ReviewerRulingTest) ... ok
+test_dev_lane_conflict_is_reported_but_not_verdict_changing (test_s1_harness.ReviewerRulingTest) ... ok
+test_formal_100pct_server_coverage_makes_mixed_basis_impossible (test_s1_harness.ReviewerRulingTest)
+记录真实语义：formal 覆盖门 100% server 后，混基在结构上不可能， ... ok
+test_formal_requires_full_server_ttft_and_auto_strict (test_s1_harness.ReviewerRulingTest) ... ok
+test_huge_prefill_is_overlapping_and_stays_in_main_gate (test_s1_harness.ReviewerRulingTest) ... ok
+test_shape_pressure_field_renamed (test_s1_harness.ReviewerRulingTest) ... ok
+test_extracts_same_clock_domain_ttft (test_s1_harness.ServerTimingTest) ... ok
+test_missing_metrics_does_not_invent_server_ttft (test_s1_harness.ServerTimingTest) ... ok
+test_set_cover_is_deterministic_and_complete (test_s1_harness.ShapeWarmupTest) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.043s
+
+OK

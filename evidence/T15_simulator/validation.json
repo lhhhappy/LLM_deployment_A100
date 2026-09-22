@@ -1,0 +1,25 @@
+{
+  "label": "VERIFIED CPU artifact checks; numerical predictions remain MODEL OUTPUTS",
+  "checks": [
+    {
+      "artifact": "sensitivity",
+      "groups": 72,
+      "runs": 576,
+      "hashes_match": true
+    },
+    {
+      "artifact": "source_output",
+      "groups": 18,
+      "runs": 144,
+      "hashes_match": true
+    },
+    {
+      "artifact": "reference",
+      "groups": 2,
+      "runs": 4,
+      "hashes_match": true
+    }
+  ],
+  "tests": "30 CPU unit tests passed; see tests.log",
+  "input_sources_unchanged": true
+}

@@ -1,0 +1,24 @@
+MOCK ONLY: isolated simulation, no network/credentials/production writes
+SUBMITTED 01-mock attempt=mock-1
+RESULT 01-mock n_at_slo=14 tpot=0.021 aime=97.7 gpqa=96.8 status=succeeded attempt=mock-1
+{
+  "aime26": {
+    "points": 97.7
+  },
+  "gpqa": {
+    "points": 96.8
+  },
+  "gate_passed": true,
+  "gate_reason": null,
+  "stress": {
+    "n_at_slo": 14,
+    "tpot_mean": 0.021,
+    "tpot_p95": 0.033,
+    "chain_start_p95": 12.0,
+    "turn_start_p95": 8.0,
+    "overall_intra_p95": 4.0,
+    "fast_intra_p95": 2.0,
+    "evaluation_status": "PASS",
+    "reason": null
+  }
+}

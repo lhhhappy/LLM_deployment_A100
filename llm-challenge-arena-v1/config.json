@@ -1,0 +1,11 @@
+{
+  "id": "llm-challenge-arena-v1",
+  "wenyon": {
+    "datasets": [
+      {
+        "dataset": "paper2arm-task-build-a-secure-mvp-platfor-815d487a",
+        "version": "1"
+      }
+    ]
+  }
+}

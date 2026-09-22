@@ -1,0 +1,29 @@
+{
+  "required_help_flags": [
+    "--service-id",
+    "--profiles",
+    "--matrix",
+    "--ladder-mode",
+    "--levels",
+    "--hint",
+    "--budget-minutes",
+    "--run-id",
+    "--out",
+    "--collect-only",
+    "--max-n",
+    "--max-levels"
+  ],
+  "help_pass": true,
+  "queue_items": [
+    "01-s01-core",
+    "02-s02-d1v12",
+    "03-s03-d1",
+    "04-s04-repeat",
+    "05-s05-hrrn"
+  ],
+  "queue_no_BLOCKED": true,
+  "service_operations_performed": false,
+  "stop_modified_by_W14": false,
+  "stop_exists_at_final_check": false,
+  "bohr_service_resolution": "Installed exec --help documents <id|name>; forwarded unchanged."
+}

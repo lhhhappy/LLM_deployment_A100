@@ -1,0 +1,20 @@
+{
+  "kind": "development_only_reduced_checkpoint",
+  "config_only": true,
+  "layers": 5,
+  "source_config_sha256": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+  "selected_tensors": 3958,
+  "source_shards_needed": [
+    "model-00001-of-00062.safetensors",
+    "model-00002-of-00062.safetensors",
+    "model-00003-of-00062.safetensors",
+    "model-00017-of-00062.safetensors",
+    "model-00031-of-00062.safetensors",
+    "model-00032-of-00062.safetensors",
+    "model-00046-of-00062.safetensors",
+    "model-00047-of-00062.safetensors",
+    "model-00062-of-00062.safetensors"
+  ],
+  "complete": false,
+  "note": "Original attention dimensions, experts, tokenizer and vision retained; MTP removed."
+}

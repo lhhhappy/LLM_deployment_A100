@@ -1,0 +1,146 @@
+--- a/python/sglang/srt/managers/schedule_policy.py	2026-09-22 03:07:51.900493407 -0700
++++ b/python/sglang/srt/managers/schedule_policy.py	2026-09-22 03:09:21.515597494 -0700
+@@ -8,6 +8,7 @@
+ from sglang.srt.runtime_context import (
+     get_disagg,
+     get_schedule,
++    mamba_checkpoint_grid,
+ )
+ from sglang.srt.utils import get_bool_env_var, is_hip
+ 
+@@ -30,6 +31,8 @@
+ """Request scheduler policy"""
+ 
+ import os
++from functools import lru_cache
++import math
+ import random
+ from collections import Counter
+ from contextlib import contextmanager
+@@ -469,6 +472,22 @@
+             logger.info(f"waiting_keys_after={waiting_keys_after}")
+ 
+ 
++@lru_cache(maxsize=1)
++def _role_boundary_token_ids() -> frozenset:
++    """[ax] Role/message boundary token ids (GLM <|user|>=154827, <|observation|>=154829),
++    from SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS. Empty = feature off (stock behaviour)."""
++    raw = os.environ.get("SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS", "").strip()
++    if not raw:
++        return frozenset()
++    return frozenset(int(x) for x in raw.split(",") if x.strip())
++
++
++ROLE_BOUNDARY_STATS: Counter = Counter()
++_ROLE_BOUNDARY_SCAN_WINDOW = int(
++    os.environ.get("SGLANG_ARENA_ROLE_BOUNDARY_SCAN_WINDOW", "32768")
++)
++
++
+ class AddReqResult(Enum):
+     CONTINUE = auto()  # Continue to add requests
+     NO_TOKEN = auto()  # No token left
+@@ -975,6 +994,44 @@
+             else AddReqResult.CONTINUE
+         )
+ 
++    def _role_split_len(self, req, prefix_len: int, extend_len: int, tag: str):
++        """[ax] Length to prefill so this extend ends at the last role boundary
++        (grid-aligned relative to prefix_len), or None for stock behaviour."""
++        if not _role_boundary_token_ids() or self.dllm_config is not None:
++            return None
++        stats = ROLE_BOUNDARY_STATS
++        if self.rem_chunk_tokens is None:
++            stats[tag + "skip_no_chunked_prefill"] += 1
++            return None
++        if not getattr(self.tree_cache, "supports_mamba", lambda: False)():
++            return None
++        full_len = prefix_len + extend_len
++        branch = getattr(req, "mamba_branching_seqlen", None)
++        if branch is not None and prefix_len < branch <= full_len:
++            stats[tag + "skip_branch_conflict"] += 1
++            return None
++        grid = mamba_checkpoint_grid(self.tree_cache.page_size)
++        if prefix_len % grid != 0:
++            stats[tag + "skip_unaligned_prefix"] += 1
++            return None
++        ids = req.full_untruncated_fill_ids
++        boundary_ids = _role_boundary_token_ids()
++        lo = max(prefix_len, full_len - _ROLE_BOUNDARY_SCAN_WINDOW)
++        pos = -1
++        for i in range(full_len - 1, lo - 1, -1):
++            if ids[i] in boundary_ids:
++                pos = i
++                break
++        if pos < 0:
++            stats[tag + "skip_no_boundary"] += 1
++            return None
++        split_len = (pos - prefix_len) // grid * grid
++        if split_len < grid or split_len >= extend_len // grid * grid:
++            stats[tag + "skip_short"] += 1
++            return None
++        stats[tag + "taken"] += 1
++        return split_len
++
+     def add_chunked_req(self, req: Req):
+         if self.dllm_config is not None:
+             _rem_tokens = self._get_dllm_remain_tokens()
+@@ -1009,6 +1066,14 @@
+         )
+         truncated = cand_extend_input_len > _rem_tokens
+         new_len = min(cand_extend_input_len, _rem_tokens)
++        if not truncated:
++            # [ax] final chunk: end it at the last role boundary so a reusable KDA state
++            # is saved there; the same chunked request finishes the remainder next round.
++            role_len = self._role_split_len(
++                req, len(req.prefix_indices), cand_extend_input_len, "tail_"
++            )
++            if role_len is not None:
++                new_len, truncated = role_len, True
+         req.set_extend_range(len(req.prefix_indices), len(req.prefix_indices) + new_len)
+         self.can_run_list.append(req)
+         self._update_prefill_budget(
+@@ -1338,6 +1403,33 @@
+                 ) is not None:
+                     return tile_stop
+ 
++                # [ax] Optionally end this extend at the last role boundary (becomes this
++                # round's chunked request; at most one partial per round).
++                role_len = None
++                if not has_chunked_req and self.new_chunked_req is None:
++                    role_len = self._role_split_len(
++                        req,
++                        len(req.prefix_indices),
++                        len(req.full_untruncated_fill_ids) - len(req.prefix_indices),
++                        "admit_",
++                    )
++                if role_len is not None:
++                    req.set_extend_range(
++                        len(req.prefix_indices), len(req.prefix_indices) + role_len
++                    )
++                    self.can_run_list.append(req)
++                    self.new_chunked_req = req
++                    self._req_inc_lock_ref(req)
++                    self._update_prefill_budget(
++                        prefix_len,
++                        role_len,
++                        0,
++                        req.retracted_stain,
++                        mamba_gap_reserve=self._mamba_gap_budget_for_req(req),
++                        host_hit_len=req.host_hit_length,
++                        storage_hit_len=req.storage_hit_length,
++                    )
++                    return self.budget_state()
+                 # Non-chunked prefill — the whole sequence is committed this iter.
+                 req.set_extend_range(
+                     len(req.prefix_indices), len(req.full_untruncated_fill_ids)
+@@ -1358,6 +1450,9 @@
+                     storage_hit_len=req.storage_hit_length,
+                 )
+             else:
++                # [ax] at most one partial prefill per round while the role split is on
++                if _role_boundary_token_ids() and self.new_chunked_req is not None:
++                    return AddReqResult.OTHER
+                 # Make sure at least one page is available
+                 trunc_len = chunk_tokens_limit // self.page_size * self.page_size
+ 

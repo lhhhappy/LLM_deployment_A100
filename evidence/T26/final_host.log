@@ -1,0 +1,16 @@
+index, memory.used [MiB], utilization.gpu [%]
+0, 4 MiB, 0 %
+1, 4 MiB, 0 %
+pid, process_name
+State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/patches/000-interface-compliance.patch
+60f98ced6d618a086bda7d49670d176fa75564168d594274bb4a0c63035663c2  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/patches/001-role-boundary-mamba-ckpt.patch
+8fe23c5a30519ac35fb235941d464f2806e52cc8e707f574f33430e6a37ac159  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/patches/002-spf-scheduling.patch
+7a6fd39aa3b26bfaba20dfdf1e199b75fca3b29ca99c86e24ea0bc42cc1e6a2c  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/patches/004-role-boundary-final-chunk.patch
+1035b858233c9e82f14c2dfb55213f37633ca347c2fa4b5d4b7faad30c3f9a8d  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/scripts/compare_e2b.py
+21ef5746daa97d6e1cbf9d54b47b2aba7200881e55e13b738b6b738bf6a95f97  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/scripts/e2b_trace.py
+6a50b1bbd41d0c904c06f203565f5e4675a6221c53b8b0d67463dc6773831cb6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/scripts/make_case_sets.py
+5e79a71c47625fea50efce378b5919a14f9526c8ff3f664b1015dfa372601aa6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/scripts/replay_chains.py
+830ff12ae7ebbc70f7a9a9438db57e0a4102513fea6ead1ecfb246697d7c9256  /sjtu/linhang/arena/runs/E2b_T26_20260922_v3/scripts/run_e2b_batch.py
+6ea708d247c0bd057b4c0aaa613ae56e98a47c522ee17087275b727237a52706  /sjtu/linhang/arena/code/sglang-e2b-control/python/sglang/srt/managers/schedule_policy.py
+e5fd71c550670c6b298272573bb8bf38269a3e60bf0dec01647ecd5d20c5bd2b  /sjtu/linhang/arena/code/sglang-e2b-candidate/python/sglang/srt/managers/schedule_policy.py

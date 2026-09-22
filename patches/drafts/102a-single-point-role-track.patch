@@ -1,0 +1,70 @@
+--- a/python/sglang/srt/managers/schedule_batch.py
++++ b/python/sglang/srt/managers/schedule_batch.py
+@@ -55,6 +55,7 @@
+ import copy
+ import dataclasses
+ import logging
++import os
+ import re
+ import sys
+ from array import array
+@@ -160,6 +161,32 @@
+ _MM_HASH_MASK = (1 << 64) - 1
+ 
+ logger = logging.getLogger(__name__)
++
++
++@lru_cache(maxsize=1)
++def _role_track_token_ids() -> frozenset:
++    """[ax] Role boundary token ids (GLM <|user|>=154827, <|observation|>=154829) from
++    SGLANG_ARENA_ROLE_TRACK_TOKEN_IDS. Empty = feature off (stock tracking)."""
++    raw = os.environ.get("SGLANG_ARENA_ROLE_TRACK_TOKEN_IDS", "").strip()
++    return frozenset(int(x) for x in raw.split(",") if x.strip()) if raw else frozenset()
++
++
++_ROLE_TRACK_SCAN_WINDOW = int(os.environ.get("SGLANG_ARENA_ROLE_TRACK_SCAN_WINDOW", "32768"))
++
++
++def _role_track_seqlen(req, prefix_len: int, end_len: int, grid: int):
++    """[ax] Last role boundary in (prefix_len, end_len), aligned down to `grid` relative to
++    prefix_len, so the tracked KDA state is the one the chain's next turn resumes from."""
++    ids = _role_track_token_ids()
++    if not ids:
++        return None
++    fill = req.full_untruncated_fill_ids
++    lo = max(prefix_len, end_len - _ROLE_TRACK_SCAN_WINDOW)
++    for i in range(min(end_len, len(fill)) - 1, lo - 1, -1):
++        if fill[i] in ids:
++            aligned = prefix_len + (i - prefix_len) // grid * grid
++            return aligned if aligned > prefix_len else None
++    return None
+ 
+ 
+ ReturnHiddenStatesMode = Union[bool, Literal["last"]]
+@@ -2851,6 +2878,26 @@
+                     # See _force_track_h() for more details.
+                     mamba_track_seqlen = _force_track_h(req.mamba_branching_seqlen)
+                     mamba_track_seqlen_aligned = req.mamba_branching_seqlen
++            # [ax] 102: prefer the last role boundary inside this extend (the chain's next turn
++            # resumes there, F3); it beats a branch point only when it lies after it.
++            role_seqlen = _role_track_seqlen(
++                req,
++                len(req.prefix_indices),
++                len(req.prefix_indices) + req.extend_range.length,
++                checkpoint_grid,
++            )
++            if (
++                role_seqlen is not None
++                and role_seqlen < len(req.prefix_indices) + req.extend_range.length
++                and role_seqlen != mamba_track_seqlen_aligned
++                and (
++                    req.mamba_branching_seqlen is None
++                    or mamba_track_seqlen_aligned != req.mamba_branching_seqlen
++                    or role_seqlen > req.mamba_branching_seqlen
++                )
++            ):
++                mamba_track_seqlen = _force_track_h(role_seqlen)
++                mamba_track_seqlen_aligned = role_seqlen
+             req.kv.mamba_last_track_seqlen = mamba_track_seqlen_aligned
+ 
+         return _MambaRadixCacheV2TrackEntry(

@@ -1,0 +1,43 @@
+test_dry_run_no_network_process_or_output_files (test_ladder_search.DriverTests) ... ok
+test_execution_crash_and_budget_stop_are_not_slo_fails (test_ladder_search.DriverTests) ... ok
+test_failed_initial_flush_aborts_without_starting_runner (test_ladder_search.DriverTests) ... ok
+test_failed_internal_flush_prevents_measurement (test_ladder_search.DriverTests) ... FAIL
+test_gate_policy_keeps_point_and_estimated_results_separate (test_ladder_search.DriverTests) ... ok
+test_internal_flush_deadline_kills_ignoring_runner (test_ladder_search.DriverTests) ... ok
+test_real_unmodified_run_dev_with_synthetic_loadgen (test_ladder_search.DriverTests)
+Exercise the exact subprocess API while replacing only loadgen in /tmp. ... ok
+test_subprocess_ledger_warmup_and_dev_verdict (test_ladder_search.DriverTests) ... ok
+test_unexpected_guard_error_also_prevents_measurement (test_ladder_search.DriverTests) ... ok
+test_http_and_json_must_both_succeed (test_ladder_search.FlushTests) ... ok
+test_network_error_is_not_slo_failure (test_ladder_search.FlushTests) ... ok
+test_url_normalization_and_secret_rejection (test_ladder_search.FlushTests) ... ok
+test_binomial_analytic_endpoints_and_small_exact_sums (test_ladder_search.ScoreTests) ... ok
+test_dev_report_unchanged_and_tpot (test_ladder_search.ScoreTests) ... ok
+test_directory_selection_uses_summary_not_latest_raw (test_ladder_search.ScoreTests) ... ok
+test_empty_buckets_and_entire_run_fail (test_ladder_search.ScoreTests) ... ok
+test_error_and_coverage_gates_are_not_filtered_away (test_ladder_search.ScoreTests) ... ok
+test_exact_limit_is_not_exceedance (test_ladder_search.ScoreTests) ... ok
+test_frozen_bucket_membership_and_cache_reconciliation (test_ladder_search.ScoreTests) ... ok
+test_malformed_raw_is_execution_error (test_ladder_search.ScoreTests) ... ok
+test_missing_tpot_blocks_but_single_token_is_counted (test_ladder_search.ScoreTests) ... ok
+test_statistical_allowance_preserves_failing_dev_verdict (test_ladder_search.ScoreTests) ... ok
+test_statistically_supported_exceedance_fails (test_ladder_search.ScoreTests) ... ok
+test_tpot_gate_has_no_statistical_allowance (test_ladder_search.ScoreTests) ... ok
+test_all_official_spec_examples (test_ladder_search.SearchTests) ... ok
+test_ceiling_is_incomplete_not_capacity (test_ladder_search.SearchTests) ... ok
+test_fast_bracketing_and_bisection_exhaustive (test_ladder_search.SearchTests) ... ok
+test_fast_saves_runs_for_distant_capacity (test_ladder_search.SearchTests) ... ok
+test_invalid_rungs_and_start_above_ceiling (test_ladder_search.SearchTests) ... ok
+
+======================================================================
+FAIL: test_failed_internal_flush_prevents_measurement (test_ladder_search.DriverTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/scripts/test_ladder_search.py", line 442, in test_failed_internal_flush_prevents_measurement
+    self.assertEqual(len(calls), 2)
+AssertionError: 4 != 2
+
+----------------------------------------------------------------------
+Ran 29 tests in 173.594s
+
+FAILED (failures=1)

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# One-glance pod status: GPUs, engine processes, queue, last lines of the running job's log.
+source "$(dirname "$0")/common.sh"
+bexec "nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader | tr '\n' ' '; echo;
+echo '-- engines:'; pgrep -af 'sglang.launch_server' | grep -v bash | cut -c1-150 | head -3;
+echo '-- worker:'; pgrep -af podq_worker | grep -v 'bash -c' | head -1 || echo none;
+for s in pending running done failed; do echo \"\$s: \$(ls $POD_AX/queue/\$s 2>/dev/null | tr '\n' ' ')\"; done; [ -e $POD_AX/queue/PAUSE ] && echo '(queue PAUSED)';
+r=\$(ls $POD_AX/queue/running 2>/dev/null | head -1); if [ -n \"\$r\" ]; then echo \"-- tail runs/\${r%.sh}/job.log:\"; tail -5 $POD_AX/runs/\${r%.sh}/job.log 2>/dev/null | cut -c1-200; fi"

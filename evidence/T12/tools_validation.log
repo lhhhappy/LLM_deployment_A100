@@ -1,0 +1,66 @@
+T12 / Codex W2 / 2026-09-22T06:43:38.742572+00:00
+CPU only; no inference engine, GPU, Trisol or submission.
+Command: python3 -B -m unittest discover -s scripts -p test_ladder_search.py -v
+
+test_dry_run_no_network_process_or_output_files (test_ladder_search.DriverTests) ... ok
+test_execution_crash_and_budget_stop_are_not_slo_fails (test_ladder_search.DriverTests) ... ok
+test_failed_initial_flush_aborts_without_starting_runner (test_ladder_search.DriverTests) ... ok
+test_failed_internal_flush_prevents_measurement (test_ladder_search.DriverTests) ... ok
+test_gate_policy_keeps_point_and_estimated_results_separate (test_ladder_search.DriverTests) ... ok
+test_internal_flush_deadline_kills_ignoring_runner (test_ladder_search.DriverTests) ... ok
+test_real_unmodified_run_dev_with_synthetic_loadgen (test_ladder_search.DriverTests)
+Exercise the exact subprocess API while replacing only loadgen in /tmp. ... ok
+test_subprocess_ledger_warmup_and_dev_verdict (test_ladder_search.DriverTests) ... ok
+test_unexpected_guard_error_also_prevents_measurement (test_ladder_search.DriverTests) ... ok
+test_http_and_json_must_both_succeed (test_ladder_search.FlushTests) ... ok
+test_network_error_is_not_slo_failure (test_ladder_search.FlushTests) ... ok
+test_url_normalization_and_secret_rejection (test_ladder_search.FlushTests) ... ok
+test_binomial_analytic_endpoints_and_small_exact_sums (test_ladder_search.ScoreTests) ... ok
+test_dev_report_unchanged_and_tpot (test_ladder_search.ScoreTests) ... ok
+test_directory_selection_uses_summary_not_latest_raw (test_ladder_search.ScoreTests) ... ok
+test_empty_buckets_and_entire_run_fail (test_ladder_search.ScoreTests) ... ok
+test_error_and_coverage_gates_are_not_filtered_away (test_ladder_search.ScoreTests) ... ok
+test_exact_limit_is_not_exceedance (test_ladder_search.ScoreTests) ... ok
+test_frozen_bucket_membership_and_cache_reconciliation (test_ladder_search.ScoreTests) ... ok
+test_malformed_raw_is_execution_error (test_ladder_search.ScoreTests) ... ok
+test_missing_tpot_blocks_but_single_token_is_counted (test_ladder_search.ScoreTests) ... ok
+test_statistical_allowance_preserves_failing_dev_verdict (test_ladder_search.ScoreTests) ... ok
+test_statistically_supported_exceedance_fails (test_ladder_search.ScoreTests) ... ok
+test_tpot_gate_has_no_statistical_allowance (test_ladder_search.ScoreTests) ... ok
+test_all_official_spec_examples (test_ladder_search.SearchTests) ... ok
+test_ceiling_is_incomplete_not_capacity (test_ladder_search.SearchTests) ... ok
+test_fast_bracketing_and_bisection_exhaustive (test_ladder_search.SearchTests) ... ok
+test_fast_saves_runs_for_distant_capacity (test_ladder_search.SearchTests) ... ok
+test_invalid_rungs_and_start_above_ceiling (test_ladder_search.SearchTests) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 8.632s
+
+OK
+
+VERIFIED: run_dev.py and harness file inventory and SHA256 unchanged (7 files).
+{
+  "s1-dev/run_dev.py": "4e5fdbd479b22ba05173ddeb71b30c108b4bca0fb57993eb0ab91746275b783f",
+  "s1-dev/harness/s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+  "s1-dev/harness/requirements.txt": "7e72a9f379931a520cb88fe59826ec80b86b0497c4e2d41e79d75ca2eb27cbfd",
+  "s1-dev/harness/s1_score.py": "8da35984ce6bc88e6f2cabff18d8e58ecb257fff2a50e03baec831665d49af16",
+  "s1-dev/harness/test_s1_harness.py": "eed0712856761b9bc5465f6a4b604a5aae7df0962bcef06a9abb831b33236407",
+  "s1-dev/harness/s1_loadgen.py": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f",
+  "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json": "9221a2fae6470e552dfb4ac707927f0ce3c4d8c1ef823f7ec90ca55ca7578f19"
+}
+
+Tool SHA256:
+{
+  "scripts/ladder_search.py": "123157745b4ac45e74b5c99f647c435bce83ae8ca369cc1490c260528ac866f9",
+  "scripts/score_formal.py": "70af34dbc57e3cd18c73915c3533d728bc9949b44730d86e27eaca35a0f8ea43",
+  "scripts/test_ladder_search.py": "23a8eb02730590e33bb5f4290beb66421cece49c734b0906e23ebee49514a2d3"
+}
+
+Dry-run (example.invalid; no HTTP, subprocess runner, or output-directory creation):
+/usr/bin/python3 /workspace/Agentic_science_challenge/scripts/ladder_search.py --base-url http://example.invalid:8000 --out /tmp/t12-preview-only --mode official-climb --hint 18 --gate-policy dev --harness-dir /workspace/Agentic_science_challenge/s1-dev/harness --root /workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1 --cohort /workspace/Agentic_science_challenge/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json --tok-dir /workspace/Agentic_science_challenge/s1-dev/glm_tok --model glm-5.3-flash --set dev-combined-v1 --python /usr/bin/python3 --warmup-min-chains 16 --flush-timeout 30
+# POST http://example.invalid:8000/flush_cache require=2xx,JSON-success:true
+# /usr/bin/python3 /workspace/Agentic_science_challenge/s1-dev/run_dev.py --base-url http://example.invalid:8000 --n 10 --model glm-5.3-flash --root /workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1 --cohort /workspace/Agentic_science_challenge/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json --tok-dir /workspace/Agentic_science_challenge/s1-dev/glm_tok --set dev-combined-v1 --out /tmp/t12-preview-only/level_001_N10 --warmup-min-chains 16
+# /usr/bin/python3 /workspace/Agentic_science_challenge/scripts/score_formal.py --run-dir /tmp/t12-preview-only/level_001_N10 --harness-dir /workspace/Agentic_science_challenge/s1-dev/harness --out /tmp/t12-preview-only/level_001_N10/score_estimated.json
+# POST http://example.invalid:8000/flush_cache require=2xx,JSON-success:true
+# /usr/bin/python3 /workspace/Agentic_science_challenge/s1-dev/run_dev.py --base-url http://example.invalid:8000 --n 14 --model glm-5.3-flash --root /workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1 --cohort /workspace/Agentic_science_challenge/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json --tok-dir /workspace/Agentic_science_challenge/s1-dev/glm_tok --set dev-combined-v1 --out /tmp/t12-preview-only/level_002_N14 --warmup-min-chains 16 --skip-warmup
+# /usr/bin/python3 /workspace/Agentic_science_challenge/scripts/score_formal.py --run-dir /tmp/t12-preview-only/level_002_N14 --harness-dir /workspace/Agentic_science_challenge/s1-dev/harness --out /tmp/t12-preview-only/level_002_N14/score_estimated.json

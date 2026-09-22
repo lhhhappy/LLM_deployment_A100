@@ -1,0 +1,21 @@
+test_clean_patch_chain_and_d0_composition (test_slo_scheduling.ProductionTests) ... ok
+test_edf_age_overdue_and_weighted_order (test_slo_scheduling.ProductionTests) ... ok
+test_first_session_namespace_missing_flush_and_bounded_state (test_slo_scheduling.ProductionTests) ... ok
+test_freeze_gate_threshold_and_no_future_or_eval_labels (test_slo_scheduling.ProductionTests) ... ok
+test_header_fields_are_separate_and_timestamp_is_server_owned (test_slo_scheduling.ProductionTests) ... ok
+test_least_slack_uses_service_and_can_favor_long_cold (test_slo_scheduling.ProductionTests) ... ok
+test_legacy_disabled_path_and_budget_ast_unchanged (test_slo_scheduling.ProductionTests) ... ok
+test_real_passthrough_ast_fields_and_unconditional_http_call (test_slo_scheduling.ProductionTests) ... ok
+test_reserve_more_urgent_full_waiter_and_align (test_slo_scheduling.ProductionTests) ... ok
+test_shared_partial_guard_host_miss_and_d1_reuse (test_slo_scheduling.ProductionTests) ... ok
+test_label_changes_do_not_change_scheduling_trace (test_slo_scheduling.SimulatorTests) ... ok
+test_random_reservation_matches_actual_production_and_one_partial (test_slo_scheduling.SimulatorTests) ... ok
+test_weight_one_is_edf_and_old_policies_retain_trace (test_slo_scheduling.SimulatorTests) ... ok
+test_61_seconds_and_arbitrary_magnitude_can_pass (test_slo_scheduling.StatisticsTests) ... ok
+test_count_frontiers_against_independent_decimal_cdf (test_slo_scheduling.StatisticsTests) ... ok
+test_estimate_keeps_non_ttft_gate_and_strict_report (test_slo_scheduling.StatisticsTests) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 4.500s
+
+OK

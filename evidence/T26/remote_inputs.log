@@ -1,0 +1,16 @@
+030408d0e8810c3509fdecfee1694ad254ac537e5213f068b2082f7757233375  /sjtu/linhang/arena/models/e1-kimi-linear-4l-qfull/config.json
+16a4e0413d8a810f18666443b869c229ae70419c78e1c958aa91e59b461500eb  /sjtu/linhang/arena/models/e1-kimi-linear-4l-qfull/model.safetensors
+63099fcb54f99423873261c87ed66cf2586ffdc91fb537ea2404b5c64866129c  /sjtu/linhang/arena/code/e1_env.sh
+{"kind": "startup", "pid": 1110165, "at": 1790071127.2805982, "pools": {"kv_free": 131072, "mamba_free": 512, "request_free": 8}, "truncation_align": null}
+e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/patches/000-interface-compliance.patch
+60f98ced6d618a086bda7d49670d176fa75564168d594274bb4a0c63035663c2  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/patches/001-role-boundary-mamba-ckpt.patch
+8fe23c5a30519ac35fb235941d464f2806e52cc8e707f574f33430e6a37ac159  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/patches/002-spf-scheduling.patch
+7a6fd39aa3b26bfaba20dfdf1e199b75fca3b29ca99c86e24ea0bc42cc1e6a2c  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/patches/004-role-boundary-final-chunk.patch
+bf70b0dd5429c2b851a054acf9e96b9b4df69bf3a9a74b5bc4b8be1cbe285d64  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/compare_e2b.py
+21ef5746daa97d6e1cbf9d54b47b2aba7200881e55e13b738b6b738bf6a95f97  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/e2b_trace.py
+6a50b1bbd41d0c904c06f203565f5e4675a6221c53b8b0d67463dc6773831cb6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/make_case_sets.py
+5e79a71c47625fea50efce378b5919a14f9526c8ff3f664b1015dfa372601aa6  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/replay_chains.py
+069d3e9be2eb99c8d2efad4fca6f6eb6df3512109f1b9666612d86b72f042d3e  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/scripts/run_e2b_batch.py
+361bffb6c8d529b2652862d809146c546ce7699e867aa44996097e5b14af2809  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/cases/reminder_heavy.json
+2480f2d972e5a628557e989d16d9e091f4872d9b8fc7c6ac51bb70256294316b  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/cases/smoke.json
+46ebe2a6f60b4c5955992f9235d8f92159ed508dafedc2937883065bba1d4c80  /sjtu/linhang/arena/runs/E2b_T26_20260922_v2/cases/strict_append.json

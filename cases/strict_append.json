@@ -1,0 +1,141 @@
+[
+  {
+    "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:53",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:0",
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:1",
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:2",
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:3",
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:4",
+      "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:5"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:67",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:3",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:4",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:5",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:6",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:7"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:27",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:0",
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:1",
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:2",
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:3",
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:4",
+      "biomaster:canon:member-v5-subagent-b72bfe44b7455e7e6ba1bcca:llm:5"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:33",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:0",
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:1",
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:2",
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:3",
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:4",
+      "biomaster:canon:member-v5-subagent-30ac813d545ea0db79e9dfe0:llm:5"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:56",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:3",
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:4",
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:5",
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:6",
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:7",
+      "biomaster:canon:member-v5-subagent-0a2eeaec2feeebba55f430ec:llm:8"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:77",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:2",
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:3",
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:4",
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:5",
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:6",
+      "biomaster:canon:member-v5-subagent-b284ad54e2c61c3b827566e6:llm:7"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:EbHEyyE8xMyiZxKvWneIo:1",
+    "prefix_len": 6,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:0",
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:1",
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:2",
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:3",
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:4",
+      "biomaster:canon:member-v5-subagent-90e2ffbb81b78e489bb5c8a4:llm:5"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:25",
+    "prefix_len": 5,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:0",
+      "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:1",
+      "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:2",
+      "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:3",
+      "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:4"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:104",
+    "prefix_len": 5,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:4",
+      "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:5",
+      "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:6",
+      "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:7",
+      "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:8"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:170",
+    "prefix_len": 5,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:3",
+      "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:4",
+      "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:5",
+      "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:6",
+      "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:7"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:21",
+    "prefix_len": 5,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:7",
+      "biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:8",
+      "biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:9",
+      "biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:10",
+      "biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:11"
+    ]
+  },
+  {
+    "chain_id": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:232",
+    "prefix_len": 5,
+    "req_ids": [
+      "biomaster:canon:member-v5-subagent-dc75cab57cdb045fa334cd95:llm:10",
+      "biomaster:canon:member-v5-subagent-dc75cab57cdb045fa334cd95:llm:11",
+      "biomaster:canon:member-v5-subagent-dc75cab57cdb045fa334cd95:llm:12",
+      "biomaster:canon:member-v5-subagent-dc75cab57cdb045fa334cd95:llm:13",
+      "biomaster:canon:member-v5-subagent-dc75cab57cdb045fa334cd95:llm:14"
+    ]
+  }
+]

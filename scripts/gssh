@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ssh GPU with retries on transient tunnel failures (exit 255 = connection-level error only).
+# Usage: scripts/gssh '<remote command>'   (stdin is not forwarded on retries; pipe payloads via ssh directly)
+for i in 1 2 3 4 5 6; do
+  timeout "${GSSH_TIMEOUT:-600}" ssh -o ConnectTimeout=20 -o ServerAliveInterval=15 GPU "$@"
+  rc=$?
+  [ $rc -ne 255 ] && exit $rc
+  echo "[gssh] connection failed, retry $i" >&2
+  sleep 6
+done
+exit 255

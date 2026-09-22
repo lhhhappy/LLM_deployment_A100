@@ -1,0 +1,114 @@
+{
+  "dry_run": true,
+  "plans": [
+    {
+      "item": "03-s03-d1",
+      "approved": true,
+      "spec": {
+        "image_ref": "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+        "profiles": [
+          "submission/candidate-b0-d0-baseline.json",
+          "submission/candidate-b1-d1.json",
+          "submission/candidate-b2-spf.json",
+          "submission/candidate-b3-spf-d1.json"
+        ],
+        "service_name": "lh-arena-sess-a",
+        "max_admission_wait_minutes": 1440,
+        "matrix": [
+          "d1"
+        ],
+        "ladder": {
+          "mode": "fast",
+          "hint": 14,
+          "max_n": 30
+        },
+        "time_budget_minutes": 180,
+        "notes": "D1 v1.1 alone (fcfs) to separate the D1 effect from scheduling."
+      },
+      "profile_sha256": {
+        "submission/candidate-b0-d0-baseline.json": "8789ba2a0f706011e982a8aadcaeb88652a31dae4218e449608cb3bd730a7367",
+        "submission/candidate-b1-d1.json": "0b1dc0342b89aa802044e3603ee5e924fb051037f81fc179f1bda0d20397c55b",
+        "submission/candidate-b2-spf.json": "b48942fa7e0fedb82560239408592ea55ffa576ea627f6007ee6b51271b37694",
+        "submission/candidate-b3-spf-d1.json": "06ccf4a07a22429c3135eecb9f02b39a5bb1c997d8d9e60fef83d5c17e57c0de"
+      },
+      "create_or_adopt": [
+        "create",
+        "--name",
+        "lh-arena-sess-a",
+        "--cluster",
+        "w1",
+        "--gpu-product-id",
+        "2099127850496946176",
+        "--gpu-model",
+        "A100-SXM4-80GB",
+        "--gpu-count",
+        "8",
+        "--replicas",
+        "1",
+        "--model",
+        "glm-5-3-flash:2",
+        "--image-ref",
+        "registry.dp.tech/dptech/dp/native/prod-3732438/20675/arena-sglang-glm53:260918",
+        "--command",
+        "python3,-m,http.server,8000",
+        "--startup-timeout-seconds",
+        "3600",
+        "--idempotency-key",
+        "UUID_AT_EXECUTION"
+      ],
+      "runner": [
+        "bash",
+        "scripts/session_a/run_session_a.sh",
+        "--service-id",
+        "SERVICE_ID",
+        "--run-id",
+        "03-s03-d1",
+        "--out",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1",
+        "--profiles",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b0-d0-baseline.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b1-d1.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b2-spf.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b3-spf-d1.json",
+        "--matrix",
+        "d1",
+        "--ladder-mode",
+        "fast",
+        "--budget-minutes",
+        "179.99999834696453",
+        "--hint",
+        "14",
+        "--max-n",
+        "30"
+      ],
+      "collect": [
+        "bash",
+        "scripts/session_a/run_session_a.sh",
+        "--service-id",
+        "SERVICE_ID",
+        "--run-id",
+        "03-s03-d1",
+        "--out",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1",
+        "--profiles",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b0-d0-baseline.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b1-d1.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b2-spf.json",
+        "/workspace/Agentic_science_challenge/runs/03-s03-d1/profiles/candidate-b3-spf-d1.json",
+        "--matrix",
+        "d1",
+        "--ladder-mode",
+        "fast",
+        "--budget-minutes",
+        "179.99999822775524",
+        "--hint",
+        "14",
+        "--max-n",
+        "30",
+        "--collect-only"
+      ],
+      "daily_gpu_hours": 0,
+      "daily_8gpu_minutes": 0.0
+    }
+  ]
+}

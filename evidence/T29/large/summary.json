@@ -1,0 +1,17 @@
+{
+  "plan_only": false,
+  "requests": 105,
+  "chains": 27,
+  "fast_intra_requests": 66,
+  "errors": 0,
+  "exact_stock_prediction_matches": 30,
+  "stock_cached_delta_min": -7616,
+  "stock_cached_delta_max": 229376,
+  "fast_intra_actual_uncached_p95": 8866,
+  "fast_intra_predicted_stock_uncached_p95": 7006,
+  "ttft_source_counts": {
+    "server": 105,
+    "client_proxy": 0
+  },
+  "limitations": "F13/F24 ideal per-chain tokens; no decode/eviction/resident-FULL-KV-truncation/per-extend-branch-placement/cross-chain sharing"
+}

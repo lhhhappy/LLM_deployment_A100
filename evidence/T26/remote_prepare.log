@@ -1,0 +1,69 @@
+Cloning into '/sjtu/linhang/arena/code/sglang-e2b-control'...
+warning: source repository is shallow, ignoring --local
+warning: --local is ignored
+Note: switching to '94602c9c2b7cbdb8efd5c52802dac6a1c180089e'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Updating files:  33% (3036/9169)Updating files:  34% (3118/9169)Updating files:  35% (3210/9169)Updating files:  36% (3301/9169)Updating files:  37% (3393/9169)Updating files:  38% (3485/9169)Updating files:  39% (3576/9169)Updating files:  40% (3668/9169)Updating files:  41% (3760/9169)Updating files:  42% (3851/9169)Updating files:  43% (3943/9169)Updating files:  44% (4035/9169)Updating files:  45% (4127/9169)Updating files:  46% (4218/9169)Updating files:  47% (4310/9169)Updating files:  48% (4402/9169)Updating files:  48% (4413/9169)Updating files:  49% (4493/9169)Updating files:  50% (4585/9169)Updating files:  51% (4677/9169)Updating files:  52% (4768/9169)Updating files:  53% (4860/9169)Updating files:  54% (4952/9169)Updating files:  55% (5043/9169)Updating files:  56% (5135/9169)Updating files:  57% (5227/9169)Updating files:  58% (5319/9169)Updating files:  59% (5410/9169)Updating files:  60% (5502/9169)Updating files:  61% (5594/9169)Updating files:  62% (5685/9169)Updating files:  63% (5777/9169)Updating files:  64% (5869/9169)Updating files:  65% (5960/9169)Updating files:  66% (6052/9169)Updating files:  67% (6144/9169)Updating files:  68% (6235/9169)Updating files:  69% (6327/9169)Updating files:  70% (6419/9169)Updating files:  71% (6510/9169)Updating files:  72% (6602/9169)Updating files:  73% (6694/9169)Updating files:  74% (6786/9169)Updating files:  75% (6877/9169)Updating files:  76% (6969/9169)Updating files:  77% (7061/9169)Updating files:  78% (7152/9169)Updating files:  79% (7244/9169)Updating files:  80% (7336/9169)Updating files:  81% (7427/9169)Updating files:  82% (7519/9169)Updating files:  83% (7611/9169)Updating files:  84% (7702/9169)Updating files:  85% (7794/9169)Updating files:  86% (7886/9169)Updating files:  86% (7939/9169)Updating files:  87% (7978/9169)Updating files:  88% (8069/9169)Updating files:  89% (8161/9169)Updating files:  90% (8253/9169)Updating files:  91% (8344/9169)Updating files:  92% (8436/9169)Updating files:  93% (8528/9169)Updating files:  94% (8619/9169)Updating files:  95% (8711/9169)Updating files:  96% (8803/9169)Updating files:  97% (8894/9169)Updating files:  98% (8986/9169)Updating files:  99% (9078/9169)Updating files: 100% (9169/9169)Updating files: 100% (9169/9169), done.
+patching file python/sglang/srt/entrypoints/http_server.py
+patching file python/sglang/srt/managers/tokenizer_control_mixin.py
+patching file python/sglang/srt/managers/schedule_policy.py
+patching file python/sglang/srt/arg_groups/fields/schedule.py
+patching file python/sglang/srt/managers/schedule_policy.py
+patching file python/sglang/srt/managers/scheduler.py
+ python/sglang/srt/arg_groups/fields/schedule.py    |   1 +
+ python/sglang/srt/entrypoints/http_server.py       |  40 ++++-
+ python/sglang/srt/managers/schedule_policy.py      | 183 +++++++++++++++++++++
+ python/sglang/srt/managers/scheduler.py            |   7 +
+ .../sglang/srt/managers/tokenizer_control_mixin.py |  17 +-
+ 5 files changed, 234 insertions(+), 14 deletions(-)
+6ea708d247c0bd057b4c0aaa613ae56e98a47c522ee17087275b727237a52706  python/sglang/srt/managers/schedule_policy.py
+Cloning into '/sjtu/linhang/arena/code/sglang-e2b-candidate'...
+warning: source repository is shallow, ignoring --local
+warning: --local is ignored
+Note: switching to '94602c9c2b7cbdb8efd5c52802dac6a1c180089e'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Updating files:  32% (3001/9169)Updating files:  33% (3026/9169)Updating files:  34% (3118/9169)Updating files:  35% (3210/9169)Updating files:  36% (3301/9169)Updating files:  37% (3393/9169)Updating files:  38% (3485/9169)Updating files:  39% (3576/9169)Updating files:  40% (3668/9169)Updating files:  41% (3760/9169)Updating files:  42% (3851/9169)Updating files:  42% (3915/9169)Updating files:  43% (3943/9169)Updating files:  44% (4035/9169)Updating files:  45% (4127/9169)Updating files:  46% (4218/9169)Updating files:  47% (4310/9169)Updating files:  48% (4402/9169)Updating files:  49% (4493/9169)Updating files:  50% (4585/9169)Updating files:  51% (4677/9169)Updating files:  52% (4768/9169)Updating files:  52% (4800/9169)Updating files:  53% (4860/9169)Updating files:  54% (4952/9169)Updating files:  55% (5043/9169)Updating files:  56% (5135/9169)Updating files:  57% (5227/9169)Updating files:  58% (5319/9169)Updating files:  59% (5410/9169)Updating files:  60% (5502/9169)Updating files:  61% (5594/9169)Updating files:  62% (5685/9169)Updating files:  62% (5740/9169)Updating files:  63% (5777/9169)Updating files:  64% (5869/9169)Updating files:  65% (5960/9169)Updating files:  66% (6052/9169)Updating files:  67% (6144/9169)Updating files:  68% (6235/9169)Updating files:  69% (6327/9169)Updating files:  70% (6419/9169)Updating files:  71% (6510/9169)Updating files:  72% (6602/9169)Updating files:  73% (6694/9169)Updating files:  74% (6786/9169)Updating files:  75% (6877/9169)Updating files:  75% (6900/9169)Updating files:  76% (6969/9169)Updating files:  77% (7061/9169)Updating files:  78% (7152/9169)Updating files:  79% (7244/9169)Updating files:  80% (7336/9169)Updating files:  81% (7427/9169)Updating files:  82% (7519/9169)Updating files:  83% (7611/9169)Updating files:  84% (7702/9169)Updating files:  85% (7794/9169)Updating files:  86% (7886/9169)Updating files:  87% (7978/9169)Updating files:  87% (8061/9169)Updating files:  88% (8069/9169)Updating files:  89% (8161/9169)Updating files:  90% (8253/9169)Updating files:  91% (8344/9169)Updating files:  92% (8436/9169)Updating files:  93% (8528/9169)Updating files:  94% (8619/9169)Updating files:  95% (8711/9169)Updating files:  96% (8803/9169)Updating files:  97% (8894/9169)Updating files:  98% (8986/9169)Updating files:  99% (9078/9169)Updating files:  99% (9090/9169)Updating files: 100% (9169/9169)Updating files: 100% (9169/9169), done.
+patching file python/sglang/srt/entrypoints/http_server.py
+patching file python/sglang/srt/managers/tokenizer_control_mixin.py
+patching file python/sglang/srt/managers/schedule_policy.py
+patching file python/sglang/srt/arg_groups/fields/schedule.py
+patching file python/sglang/srt/managers/schedule_policy.py
+patching file python/sglang/srt/managers/scheduler.py
+patching file python/sglang/srt/managers/schedule_policy.py
+ python/sglang/srt/arg_groups/fields/schedule.py    |   1 +
+ python/sglang/srt/entrypoints/http_server.py       |  40 +++-
+ python/sglang/srt/managers/schedule_policy.py      | 238 +++++++++++++++++++++
+ python/sglang/srt/managers/scheduler.py            |   7 +
+ .../sglang/srt/managers/tokenizer_control_mixin.py |  17 +-
+ 5 files changed, 289 insertions(+), 14 deletions(-)
+e5fd71c550670c6b298272573bb8bf38269a3e60bf0dec01647ecd5d20c5bd2b  python/sglang/srt/managers/schedule_policy.py

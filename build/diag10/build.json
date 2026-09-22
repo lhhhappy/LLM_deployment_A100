@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "data": {
+    "buildType": 2,
+    "buildTypeText": "dockerfile",
+    "createTime": "2026-09-22T23:38:06+08:00",
+    "errorDetail": "failed to solve: process \"/bin/sh -c set -u; echo \\\"DIAG python=$(python3 --version 2\u003e\u00261) which=$(which python3)\\\"; python3 -m pip list --format=freeze 2\u003e/dev/null | sed 's/^/DIAGPIP /'; ls -d /usr/local/cuda* 2\u003e/dev/null | sed 's/^/DIAGCUDA /'; python3 -c \\\"import importlib.util as u; [print('DIAGMOD', m, (u.find_spec(m).origin if u.find_spec(m) else 'absent')) for m in ['sgl_kernel','flash_mla','deep_gemm','tilelang','flashinfer','flash_attn']]\\\" 2\u003e\u00261 | tail -8; exit 1\" did not complete successfully: exit",
+    "errorMsg": "BUILDKIT_STEP_FAILED: provider=\"buildkit\" podName=\"prod-image-build-4650601-163427\" namespace=\"lebesgue\" instanceId=\"eci-8vbbnm82ldnr63chzwrp\" containerName=\"main\" failedStage=\"RUN set -u; echo \\\"DIAG python=$(python3 --version 2\u003e\u00261) which=$(which python3)\\\"; python3 -m pip list --format=freeze 2\u003e/dev/null | sed 's/^/DIAGPIP /'; ls -d /usr/local/cuda* 2\u003e/dev/null | sed 's/^/DIAGCUDA /'; python3 -c \\\"import importlib.util as u; [prin\" reason=\"Error\" exitCode=1 detail=\"failed to solve: process \\\"/bin/sh -c set -u; echo \\\\\\\"DIAG python=$(python3 --version 2\u003e\u00261) which=$(which python3)\\\\\\\"; python3 -m pip list --format=freeze 2\u003e/dev/null | sed 's/^/DIAGPIP /'; ls -d /usr/local/cuda* 2\u003e/dev/null | sed 's/^/DIAGCUDA /'; python3 -c \\\\\\\"import importlib.util as u; [print('DIAGMOD', m, (u.find_spec(m).origin if u.find_spec(m) else 'absent')) for m in ['sgl_kernel','flash_mla','deep_gemm','tilelang','flashinfer','flash_attn']]\\\\\\\" 2\u003e\u00261 | tail -8; exit 1\\\" did not complete successfully: exit\"",
+    "id": 163427,
+    "imageDesc": "",
+    "imageName": "dp/native/prod-4727808/4650601/lh-img:diag10b",
+    "imageUrl": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:diag10b",
+    "lbgImageId": 163427,
+    "projectId": 4727808,
+    "repoName": "dp/native/prod-4727808/4650601/lh-img",
+    "sandboxId": "",
+    "status": 3,
+    "statusText": "failed",
+    "tag": "diag10b",
+    "updateTime": "2026-09-22T23:38:21+08:00"
+  },
+  "meta": {
+    "request_id": "a682e0e1-fe31-4f90-b9e3-efba2ef90c83",
+    "cli_version": "2.7.7",
+    "cli_commit": "f4868539d66dffeb6fb2ef217c36342155e97eda",
+    "cli_modified": false,
+    "command": "bohr image build",
+    "timestamp": 1790091502
+  }
+}

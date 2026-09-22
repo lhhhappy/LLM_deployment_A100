@@ -1,0 +1,1 @@
+PASS: sim_closed_loop.py CLI C19 N14 all five schedulers match cross-check wrapper output exactly.

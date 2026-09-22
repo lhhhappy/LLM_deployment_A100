@@ -1,0 +1,121 @@
+{
+  "purpose": "T29 random qfull L2 functional diagnostic; not performance",
+  "cases": {
+    "IF-08": {
+      "exit_code": 0,
+      "report": "if08.json"
+    },
+    "D1-10": {
+      "status": "pass",
+      "role_restore_proven": true,
+      "pair": {
+        "req_id": "biomaster:canon:8cWp9eyYICLwWN7yD-a7K:llm:4",
+        "chain_id": "biomaster:canon:QjNZDOYsbE-pjv7uHS20n:5",
+        "idx_in_chain": 3,
+        "prompt_sha256": "212ef4da97ef053407dd57eb6531e691d32b6f04264d3ab44d6211603e22d698",
+        "prompt_tokens": 91819,
+        "fast_intra": true,
+        "stock_cached": 90176,
+        "off_cached": 90176,
+        "on_cached": 90624,
+        "role_pred_cached": 90624,
+        "stock_pred_cached": 90432
+      },
+      "history": [
+        {
+          "rid": "t29-role-0",
+          "prompt_tokens": 91145,
+          "cached_tokens": 0
+        },
+        {
+          "rid": "t29-role-1",
+          "prompt_tokens": 91386,
+          "cached_tokens": 90112
+        },
+        {
+          "rid": "t29-role-2",
+          "prompt_tokens": 91612,
+          "cached_tokens": 90176
+        },
+        {
+          "rid": "t29-role-3",
+          "prompt_tokens": 91819,
+          "cached_tokens": 90624
+        }
+      ],
+      "previous_splits": [
+        {
+          "kind": "split",
+          "pid": 1106770,
+          "at": 1790068593.439911,
+          "rid": "t29-role-2",
+          "depth": 90624,
+          "prefix": 90176,
+          "original_end": 91612
+        }
+      ],
+      "flush": {
+        "success": true,
+        "http_status": 200
+      },
+      "after_flush_cached_tokens": 0
+    },
+    "D1-05": {
+      "rounds": 0,
+      "max_partial": null,
+      "max_batch_size": 0,
+      "new_admission_attempts": 0,
+      "new_commits": 0,
+      "continuation_commits": 0,
+      "all_commits": 0,
+      "role_stats": {},
+      "role_stats_sum": 0,
+      "round_errors": 0,
+      "replay_summary": null,
+      "exit_code": 1,
+      "partial_invariant_passed": false,
+      "stats_equal_all_commits": true,
+      "stats_equal_new_commits": true,
+      "stats_equal_admission_attempts": true,
+      "status": "fail"
+    },
+    "D1-08": {
+      "status": "pass",
+      "startup": {
+        "kv_free": 131072,
+        "mamba_free": 512,
+        "request_free": 8
+      },
+      "before_mixed_after_flush": {
+        "kv_free": 131072,
+        "mamba_free": 512,
+        "request_free": 8
+      },
+      "before_final_flush": {
+        "kv_free": 131072,
+        "mamba_free": 512,
+        "request_free": 8
+      },
+      "after_final_flush": {
+        "kv_free": 131072,
+        "mamba_free": 512,
+        "request_free": 8
+      }
+    }
+  },
+  "startup_pools": {
+    "kv_free": 131072,
+    "mamba_free": 512,
+    "request_free": 8
+  },
+  "mixed_input": {
+    "source_sha256": {
+      "cold_heavy.json": "5bb7e4f32a2e7687cd07e1125b60d61cc6d83fdb1bfe62c3301933de4dcce438",
+      "reminder_heavy.json": "361bffb6c8d529b2652862d809146c546ce7699e867aa44996097e5b14af2809"
+    },
+    "chains": 27,
+    "requests": 105,
+    "concurrency": 4,
+    "cache_isolation": "shared-cache; flush before/after, not between active chains"
+  }
+}

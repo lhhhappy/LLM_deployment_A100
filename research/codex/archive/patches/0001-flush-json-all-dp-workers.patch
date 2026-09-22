@@ -1,0 +1,40 @@
+--- a/python/sglang/srt/managers/tokenizer_control_mixin.py
++++ b/python/sglang/srt/managers/tokenizer_control_mixin.py
+@@ -302,9 +302,14 @@
+         self: TokenizerManager, timeout_s: Optional[float] = None
+     ) -> FlushCacheReqOutput:
+         self.auto_create_handle_loop()
+-        result = (
+-            await self.flush_cache_communicator(FlushCacheReqInput(timeout_s=timeout_s))
+-        )[0]
++        results = await self.flush_cache_communicator(
++            FlushCacheReqInput(timeout_s=timeout_s)
++        )
++        # A DP flush is successful only when every worker has acknowledged it.
++        result = FlushCacheReqOutput(
++            success=bool(results) and all(r.success for r in results),
++            message=" | ".join(r.message for r in results if r.message),
++        )
+         if result.success and self.mm_processor is not None:
+             self.mm_processor.clear_preprocess_cache()
+         return result
+--- a/python/sglang/srt/entrypoints/http_server.py
++++ b/python/sglang/srt/entrypoints/http_server.py
+@@ -992,15 +992,8 @@
+ async def flush_cache(timeout: float = Query(0.0, ge=0.0)):
+     """Flush the radix cache."""
+     ret = await _global_state.tokenizer_manager.flush_cache(timeout_s=timeout)
+-    if ret.success:
+-        content = (
+-            "Cache flushed.\nPlease check backend logs for more details. "
+-            "(When there are running or waiting requests, the operation will not be performed.)\n"
+-        )
+-    else:
+-        content = ret.message or "Flush cache failed.\n"
+-    return Response(
+-        content=content,
++    return ORJSONResponse(
++        content={"success": ret.success, "message": ret.message or ""},
+         status_code=200 if ret.success else HTTPStatus.BAD_REQUEST,
+     )
+ 

@@ -1,0 +1,362 @@
+{
+  "purpose": "random-stand-in functional replay; NOT a benchmark score",
+  "args": {
+    "dev_root": "/sjtu/linhang/arena/s1-dev",
+    "base_url": "http://127.0.0.1:31000",
+    "output": "/sjtu/linhang/arena/runs/E1_20260922/stock20",
+    "num_chains": 20,
+    "chain_id": [],
+    "concurrency": 1,
+    "max_new_tokens": 4,
+    "max_prompt_tokens": 65536,
+    "chunk_size": 8192,
+    "page_size": 64,
+    "request_timeout": 1200,
+    "require_json_flush": false,
+    "smoke": false,
+    "plan_only": false
+  },
+  "selection": [
+    {
+      "chain_id": "biomaster:canon:-6wE5LvA9TMlv6zs7Ueq3:0",
+      "req_ids": [
+        "biomaster:canon:f-g3nsALsyhEAtkwy97pN:llm:0",
+        "biomaster:canon:f-g3nsALsyhEAtkwy97pN:llm:1"
+      ],
+      "prompt_lengths": [
+        18678,
+        18880
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:-KJ6YKeyLT5CttiVyDSE7:0",
+      "req_ids": [
+        "biomaster:canon:tn-7M_Qm9Vs78vbJBjiXu:llm:0",
+        "biomaster:canon:tn-7M_Qm9Vs78vbJBjiXu:llm:1",
+        "biomaster:canon:tn-7M_Qm9Vs78vbJBjiXu:llm:2",
+        "biomaster:canon:tn-7M_Qm9Vs78vbJBjiXu:llm:3",
+        "biomaster:canon:tn-7M_Qm9Vs78vbJBjiXu:llm:4"
+      ],
+      "prompt_lengths": [
+        34170,
+        35306,
+        37119,
+        37362,
+        37582
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:161af3cf11ca4f4ea7dcd:0",
+      "req_ids": [
+        "biomaster:canon:l0M9zwstbuWcIplEntflo:llm:0",
+        "biomaster:canon:l0M9zwstbuWcIplEntflo:llm:1"
+      ],
+      "prompt_lengths": [
+        34150,
+        52558
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:1pPrjEyiGWyX94rVHqApF:0",
+      "req_ids": [
+        "biomaster:canon:7C-cOWwfTx6TX6m99lPGd:llm:0",
+        "biomaster:canon:7C-cOWwfTx6TX6m99lPGd:llm:1",
+        "biomaster:canon:7C-cOWwfTx6TX6m99lPGd:llm:2"
+      ],
+      "prompt_lengths": [
+        34174,
+        35452,
+        37616
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:3c848ec83da94d9b916a4:37",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:0",
+        "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:1",
+        "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:2",
+        "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:3"
+      ],
+      "prompt_lengths": [
+        35172,
+        35762,
+        38132,
+        43267
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:3c848ec83da94d9b916a4:5",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-cfae8adc9bc2962e50c7a6e0:llm:0",
+        "biomaster:canon:member-v5-subagent-cfae8adc9bc2962e50c7a6e0:llm:1"
+      ],
+      "prompt_lengths": [
+        35110,
+        49143
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:1",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-1b50b38c970553e3c5604f74:llm:0",
+        "biomaster:canon:member-v5-subagent-1b50b38c970553e3c5604f74:llm:1"
+      ],
+      "prompt_lengths": [
+        36392,
+        36636
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:13",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-052279c44817855c551a33f8:llm:0",
+        "biomaster:canon:member-v5-subagent-052279c44817855c551a33f8:llm:1"
+      ],
+      "prompt_lengths": [
+        36082,
+        37772
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:25",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:0",
+        "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:1",
+        "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:2",
+        "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:3",
+        "biomaster:canon:member-v5-subagent-6df7192d99370806d3b3ca0e:llm:4"
+      ],
+      "prompt_lengths": [
+        36020,
+        39164,
+        39812,
+        42717,
+        44992
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:31",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-27321775c06ce265d00e42ee:llm:0",
+        "biomaster:canon:member-v5-subagent-27321775c06ce265d00e42ee:llm:1"
+      ],
+      "prompt_lengths": [
+        36078,
+        38989
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:53",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:0",
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:1",
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:2",
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:3",
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:4",
+        "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:5"
+      ],
+      "prompt_lengths": [
+        36282,
+        36680,
+        40634,
+        42565,
+        45089,
+        48038
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:67",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2",
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:3",
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:4",
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:5",
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:6",
+        "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:7"
+      ],
+      "prompt_lengths": [
+        37751,
+        38088,
+        38414,
+        41077,
+        46166,
+        50944
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:4HsN0fpakHkbM99Ze9Tas:0",
+      "req_ids": [
+        "biomaster:canon:y2_sjGo_eKBKj_XRW1WtU:llm:0",
+        "biomaster:canon:y2_sjGo_eKBKj_XRW1WtU:llm:1",
+        "biomaster:canon:y2_sjGo_eKBKj_XRW1WtU:llm:2"
+      ],
+      "prompt_lengths": [
+        34180,
+        35309,
+        40474
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:521d1764cd2e4799af4c3:0",
+      "req_ids": [
+        "biomaster:canon:KF4xNsDjdLQoOy88dN2Cu:llm:0",
+        "biomaster:canon:KF4xNsDjdLQoOy88dN2Cu:llm:1",
+        "biomaster:canon:KF4xNsDjdLQoOy88dN2Cu:llm:2",
+        "biomaster:canon:KF4xNsDjdLQoOy88dN2Cu:llm:4",
+        "biomaster:canon:KF4xNsDjdLQoOy88dN2Cu:llm:5"
+      ],
+      "prompt_lengths": [
+        34128,
+        37851,
+        38533,
+        42653,
+        42830
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5a843d8f8e8b4ec0a13fc:0",
+      "req_ids": [
+        "biomaster:canon:VVg_RHi7ROdJj2sJgqEEU:llm:0",
+        "biomaster:canon:VVg_RHi7ROdJj2sJgqEEU:llm:1"
+      ],
+      "prompt_lengths": [
+        34125,
+        46475
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:103",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:0",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:1",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:2",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:3"
+      ],
+      "prompt_lengths": [
+        35705,
+        36126,
+        36487,
+        44708
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:104",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:4",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:5",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:6",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:7",
+        "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:8"
+      ],
+      "prompt_lengths": [
+        37626,
+        38126,
+        38630,
+        41209,
+        42345
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:13",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-b53fb6ac104a17b00d1ab179:llm:0",
+        "biomaster:canon:member-v5-subagent-b53fb6ac104a17b00d1ab179:llm:1"
+      ],
+      "prompt_lengths": [
+        35764,
+        41996
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:148",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:0",
+        "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:1",
+        "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:2",
+        "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:3"
+      ],
+      "prompt_lengths": [
+        35851,
+        36206,
+        36637,
+        38107
+      ]
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:186",
+      "req_ids": [
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:0",
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:1",
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:2",
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:3",
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:4",
+        "biomaster:canon:member-v5-subagent-b8e5152b6a1b163ea739fe25:llm:5"
+      ],
+      "prompt_lengths": [
+        36078,
+        37723,
+        37974,
+        38307,
+        37945,
+        38446
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "chain_id": "biomaster:canon:-KJ6YKeyLT5CttiVyDSE7:1",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 70234
+    },
+    {
+      "chain_id": "biomaster:canon:-KJ6YKeyLT5CttiVyDSE7:3",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 72757
+    },
+    {
+      "chain_id": "biomaster:canon:2ce05248-bcd9-4698-9d21-0102973d09cb:0",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 82199
+    },
+    {
+      "chain_id": "biomaster:canon:2ce05248-bcd9-4698-9d21-0102973d09cb:18",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 111599
+    },
+    {
+      "chain_id": "biomaster:canon:3c848ec83da94d9b916a4:43",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 73940
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:24",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 113353
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:35",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 71691
+    },
+    {
+      "chain_id": "biomaster:canon:46t-yXAxpoX_2cmAOMQWp:39",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 71749
+    },
+    {
+      "chain_id": "biomaster:canon:5f5b5fc16f0e43f5b26c6:16",
+      "reason": "entire_chain_over_limit",
+      "max_prompt_tokens": 89656
+    }
+  ],
+  "ignore_eos": true,
+  "pacing": "none(functional)",
+  "cache_isolation": "flush-per-chain",
+  "prediction_scope": "F13/F24 ideal per-chain tokens; no decode/eviction/cross-chain sharing",
+  "hashes": {
+    "s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+    "s1_loadgen.py": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f"
+  },
+  "tokenizer_sha256": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+  "replay_sha256": "ed3eb0d77fd6e9beb4988b1037f28aed58577899b45b171f3ef9df5accb1e278"
+}

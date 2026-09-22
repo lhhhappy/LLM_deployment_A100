@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "case": "IF-08",
+      "status": "pass",
+      "details": {
+        "busy_status": 400,
+        "wait_status": 200,
+        "wait_elapsed_s": 54.40936332009733,
+        "after_flush_cached_tokens": 0,
+        "rank": null
+      }
+    }
+  ],
+  "passed": true
+}

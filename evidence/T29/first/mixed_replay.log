@@ -1,0 +1,8 @@
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+  物化 1/1 分片，已得 105/105
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/code/replay_chains.py", line 285, in <module>
+    main()
+  File "/sjtu/linhang/arena/code/replay_chains.py", line 171, in main
+    raise RuntimeError(f"Explicit chain {cid} has {longest} tokens; increase limit")
+RuntimeError: Explicit chain biomaster:canon:5f5b5fc16f0e43f5b26c6:109 has 256733 tokens; increase limit

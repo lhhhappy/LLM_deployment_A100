@@ -1,0 +1,63 @@
+usage: runner.py [-h] [--dry-run] [--service-id SERVICE] [--team TEAM]
+                 [--budget-minutes MINUTES]
+                 [--profiles PROFILES [PROFILES ...]] [--matrix MATRIX]
+                 [--ladder-mode {official-climb,fast,levels}]
+                 [--levels LEVELS] [--hint HINT] [--max-levels MAX_LEVELS]
+                 [--out OUT] [--collect-only]
+                 [--collect-seconds COLLECT_SECONDS]
+                 [--final-minutes FINAL_MINUTES] [--time-factor TIME_FACTOR]
+                 [--preflight-minutes PREFLIGHT_MINUTES]
+                 [--transfer-minutes TRANSFER_MINUTES]
+                 [--transfer-batch-chunks {1,2,3,4,5,6,7,8}]
+                 [--cap-minutes CAP_MINUTES] [--sync-seconds SYNC_SECONDS]
+                 [--port PORT] [--max-n MAX_N] [--hrrn] [--cap-count {2,3}]
+                 [--cap-file CAP_FILE] [--cap-cache CAP_CACHE]
+                 [--run-id RUN_ID] [--dry-run-outcomes DRY_RUN_OUTCOMES]
+
+Unattended full session A controller. --dry-run never invokes Trisol/SSH. No
+service creation/deletion/image build/submission. Live use is an explicit
+coordinator launch against an already-running, separately authorized hang pod.
+
+options:
+  -h, --help            show this help message and exit
+  --dry-run
+  --service-id SERVICE, --service SERVICE
+                        Trisol service ID or name (exec resolves either)
+  --team TEAM
+  --budget-minutes MINUTES, --minutes MINUTES
+                        required for live launch: global wall budget; dry-run
+                        default 480
+  --profiles PROFILES [PROFILES ...]
+                        candidate JSON paths; matched by policy and D1 switch
+  --matrix MATRIX       comma-separated configs:
+                        baseline,spf,d1,spf_d1,hrrn,d1v12,spf_d1v12
+  --ladder-mode {official-climb,fast,levels}
+  --levels LEVELS
+  --hint HINT
+  --max-levels MAX_LEVELS
+                        maximum unique ladder measurements per config
+                        (includes baseline N6/N10)
+  --out OUT             artifact root; an existing profiles/ snapshot
+                        directory is allowed
+  --collect-only        only pull existing artifacts; accepts budget-minutes=0
+  --collect-seconds COLLECT_SECONDS
+                        independent recovery pull time box
+  --final-minutes FINAL_MINUTES
+  --time-factor TIME_FACTOR
+                        multiplier on planner's 21m startup / 5m warmup / rung
+                        estimate
+  --preflight-minutes PREFLIGHT_MINUTES
+  --transfer-minutes TRANSFER_MINUTES
+  --transfer-batch-chunks {1,2,3,4,5,6,7,8}
+  --cap-minutes CAP_MINUTES
+  --sync-seconds SYNC_SECONDS
+  --port PORT
+  --max-n MAX_N
+  --hrrn
+  --cap-count {2,3}
+  --cap-file CAP_FILE   prepared questions/provenance JSON; avoids controller
+                        downloads
+  --cap-cache CAP_CACHE
+  --run-id RUN_ID
+  --dry-run-outcomes DRY_RUN_OUTCOMES
+                        N6,N10,... assumed outcomes, not measurements
