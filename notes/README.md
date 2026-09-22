@@ -68,6 +68,7 @@
 - **F65** T44/113：预填充131–186等效TFLOPS，decode保持112（W18）
 - **F66** T45/140：KDA双点fp32快照、数值前提与离线命中估算（W19）
 - **F67** T46 / 150：请求预热的覆盖边界与真实清理（W20）
+- **F68** T47/W21：112/113 v2 新长度不再产生精确形状JIT，原性能门通过（VERIFIED）
 
 ## Decisions（最新在上）
 
@@ -149,12 +150,14 @@
 - plans/completed/2026-09-22-evaluation-strategy.md
 - plans/completed/2026-09-22-first-8gpu-session.md
 - plans/completed/2026-09-23-T45-kda-dual-snapshot.md
+- plans/completed/T47-indexer-runtime-shapes.md
 - plans/prompts/T41-M1-scheduler.md
 - plans/prompts/T42-M3-tokenize.md
 - plans/prompts/T43-sm80-indexer-kernels.md
 - plans/prompts/T44-prefill-indexer-roofline.md
 - plans/prompts/T45-M2-kda-dual-snapshot.md
 - plans/prompts/T46-startup-warmup.md
+- plans/prompts/T47-indexer-no-respecialize.md
 
 ## Reports
 

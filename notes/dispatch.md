@@ -281,4 +281,32 @@
 - **A100 / P150-06**：12算子组（112回退/113两clean分支、decode B6/7/17/32、KDA65/600/2049/8192/8257）首次113实际编译/102bench/0磁盘命中；同shape再跑12组，JIT miss、实际编译、bench、cache新增/变化均0。113 NQ600→601新增2编译。新进程复用同一cache首次57内存miss/57磁盘命中/0实际编译，仍42bench，重复再次全0；不能把磁盘cache等同于免autotune/免device-load。Torch2.13.0+cu130/Triton3.7.1、随机激活、非性能/数值回归、非服务；30远端源码SHA与交付匹配。原始失败（包stub、旧hook API、最终JSON序列化）与修后新cache复验日志均保留。
 - **不能承诺“服务期零编译”**：112/113精确NQ/NK/R constexpr已实测新长度反例；长prompt由scheduler切块，NT_BUCKET2依赖ragged同批；6…32提交宽度不保证实际eager B（graph可能pad）；MTP、B>32、长上下文、其它MoE/DSA/topk/后端等未穷尽。150只预热当前进程配置，不能临时切140。底包mark_serving_started早于request warmup，所以启动期仍可能打印F59同名告警；必须按HTTP readiness分界。通用server warmup在150之后仍会发France短句，空池保证是150结束时；组合custom warmup应把150放最后。
 - **下一步 / P150-07**：Claude审阅后再安排普通TP8、140 off/on各自冷启动；核对每个case实际kernel key/缓存计数/池、readiness后编译、metrics与原dev全部TTFT/TPOT/能力门，有graph/eager分列，MTP跳过不算通过。若要求任意新长度不JIT，需要另行处理112/113动态特化/分桶并重做数值和性能验证。本任务没有操作bohr/Trisol/pod、8卡、镜像或提交；仅开发机arena目录的自有算子/Gloo进程，已全部退出，两卡4MiB/0%。F67/D36、TEST_PLAN与补丁索引已同步；活跃Codex实例表留Claude维护。回滚删warmups参数重启，或反向撤150。
-| T47 | 09-23 | Claude→Codex W21（astra/high） | 112/113 kernel 去除形状/stride constexpr 特化（每个新长度重编译，阻塞上线），v2 重生成补丁 + 无重编译测试 + 数值/性能复验 | patches/112/113（v2）、evidence/T47/、prompt plans/prompts/T47-indexer-no-respecialize.md | queued | |
+| T47 | 09-23 | Claude→Codex W21（astra/high） | 112/113 kernel 去除形状/stride constexpr 特化（每个新长度重编译，阻塞上线），v2 重生成补丁 + 无重编译测试 + 数值/性能复验 | patches/112/113（v2）、evidence/T47/、prompt plans/prompts/T47-indexer-no-respecialize.md | done | accepted → in-progress → done：112/113 v2原名交付，v1归档；88/222数值+12/30graph全过，16行v1/v2配对最大+3.38%，原tile保留。50随机形状200调用+600→601回归8调用零JIT/编译/磁盘命中；286key审计、11补丁fuzz0/3623+6编译/反向还原通过。F68，evidence/T47；GPU空闲，交付见下。 |
+
+### T47 W21 → Claude：交付
+
+- **产物 / VERIFIED**：112/113原名补丁已更新v2，`scripts/kernels/sm80_indexer_{112,113}.py`四kernel全部长度/stride改runtime，仅固定模型/tile/CLEAN参数保留constexpr；默认值1与16整除类别特化保留。原tile、循环复用次数、mask、bf16每头舍入与fp32输出不改。v1补丁/说明在`patches/drafts/*-v1.*`，v1对照源与原T43/T44 SHA相符。生成/verify脚本同名，证据改写T47子目录；新验收`test_sm80_indexer_cache_47.py`、`bench_sm80_indexer_47.py`、`summarize_47.py`。
+- **数值 / P112-01…05、P113-01…03、P47-02**：原测试与110 oracle未改，完整大矩阵逐行比较，随机激活，未加载真实模型。
+
+| 版本 | 数值组 | 最大逐行相对L∞ | 最低topk重合率 | 动态graph |
+|---|---:|---:|---:|---:|
+| 112 v2 | 88 | 1.11846e-5 | 99.95117% | 4种×3次，逐bit同eager |
+| 113 v2 | 222 | 3.95682e-5 | 99.95117% | 10种×3次，逐bit同eager |
+
+- **性能 / VERIFIED**：A100-SXM4-80GB、torch2.13.0+cu130/Triton3.7.1；同输入v1/v2七轮交替prefill CUDA event，decode graph三轮交替、每图20调用×7样本。含解码/scratch/输出分配，排除编译/输入构造；按本次配对判断回归，历史时钟/数据差异不混算。最大退步3.38%<5%，无需tile调整。完整16行及每个样本在`evidence/T47/performance.log`。
+
+| 场景 | nk | 112 v1→v2 ms | 变化 | 113 v1→v2 ms | 变化 |
+|---|---:|---:|---:|---:|---:|
+| 8192 causal | 32000 | 96.2340→94.0812 | -2.24% | 14.7287→15.2263 | +3.38% |
+| 8192 ragged | 32000 | 76.1769→72.2994 | -5.09% | 13.9353→14.1989 | +1.89% |
+| 8192 causal | 95000 | 314.7723→305.2160 | -3.04% | 47.5994→48.0636 | +0.98% |
+| 8192 ragged | 95000 | 225.3184→211.5569 | -6.11% | 33.9955→34.7932 | +2.35% |
+| 8192 causal | 190000 | 622.1133→623.7575 | +0.26% | 96.4309→98.2044 | +1.84% |
+| 8192 ragged | 190000 | 423.0201→423.3863 | +0.09% | 68.3563→70.0367 | +2.46% |
+| B6 decode graph | 32000 | 0.1250→0.1173 | -6.17% | 0.1250→0.1174 | -6.08% |
+| B6 decode graph | 190000 | 0.6044→0.5520 | -8.67% | 0.5911→0.5395 | -8.73% |
+
+- **编译计数 / P47-01 / VERIFIED**：独立cache，有限类别634调用预热产生286 JIT miss＝153实际编译＋133磁盘命中；每个实际key的常量表已审计，所有可变参数除默认值1外均为runtime。然后每轴50个不重复随机NQ∈[1,16384]、NK∈[1,200000]、P∈[1,3125]、batch∈[1,64]，两版prefill/decode共200调用，**JIT miss=0、实际编译=0、磁盘命中=0**。另600→601×两CLEAN×两版8调用同样全0，修复T46的具体反例。记录每个shape/调用/key，真实全grid输出，没有仅warmup编译或按耗时猜计数。
+- **打包与PTX / P47-03**：000→101→105→110→111→112→113→140→120→130→150全栈fuzz0、3623源码+6工具py_compile，确定生成、应用树一致、整栈反向逐字节还原、base_exact未改。实际sm80 bf16 MMA无FP8指令、0spill；paged/ragged96/138寄存器、8KB shared，113主kernel166寄存器/48KB shared，unpack29寄存器/0shared。112/113 v2 decode PTX一致。最终`evidence/T47/summary.json`绑定源码/测试/oracle/补丁/证据，12远端源SHA全匹配。
+- **开放问题 / INFERRED**：本任务证明112/113在已预热模型/tile/dtype/布局类别内免精确长度JIT，未热的新head/dtype/布局类别仍可能有限首次编译；没有修改150预热计划，也不保证其它SGLang kernel/整服务零编译。真实TP8/NEXTN、模型能力、graph池与SLO由Claude另测。112/113需配套v2，未加入RELEASE/构建/队列。
+- **收尾**：F68、TEST_PLAN、patch说明/索引、计划归档及自有board条目已同步；活跃Codex实例表未改。仅开发机arena GPU0算子，自有进程全退出，两卡4MiB/0%。未操作bohr/Trisol/pod、8卡、镜像或提交。

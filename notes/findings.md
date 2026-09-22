@@ -387,3 +387,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **INFERRED / 待L2**：应把已实际执行的冷形状编译移到HTTP ready前，但未证明任意服务形状无编译、实际模型启动/缓存恢复或SLO改善；NT_BUCKET2、graph外形状与其它路径见说明缺口。没有8卡/Trisol/pod/镜像/提交操作。开发机仅算子验证单列收据，不替代全栈。
 - **VERIFIED（P150-06，A100算子）**：最终新cache运行`operators_cold5.log`的12组首次调用共113个JIT miss/113实际编译/102次autotuner._bench，编译磁盘命中0；同tensor/shape再跑12组，JIT miss/编译/autotune/新增或变化cache文件全部0。113 query长度600→601新增2次编译（16文件），证明150不能用有限请求覆盖所有新长度。开发机A100-SXM4-80GB、Torch2.13.0+cu130/Triton3.7.1；随机激活，未加载模型，取证秒数不是SLO。30个远端测试/算子源码SHA与交付匹配。早期夹具/JSON序列化失败原始日志保留。
 - **VERIFIED（P150-06，跨进程缓存）**：同A100环境新进程复用cache，首次12组57 JIT内存miss/57编译磁盘命中/0实际编译，仍42次autotune benchmark；12组重复再次全0。`operators_persistent.log`说明FLA部分未传cache_results的装饰器仍会调优，预置cubin不能取代启动期请求预热。测试已退出，两卡4MiB/0%，见`gpu_final_idle.log`。
+
+## F68 — T47/W21：112/113 v2 新长度不再产生精确形状JIT，原性能门通过（VERIFIED）
+
+- `scripts/kernels/sm80_indexer_{112,113}.py`四kernel的N/NQ/NK/R/P/S与全部stride去掉显式constexpr，仅模型/tile/CLEAN常量保留；默认值1和16整除特化保留。`evidence/T47/kernel_keys.md`与`cache.log`实际286个编译键核对，可变参数进入常量表的值仅1，没有其它精确长度或stride。
+- P47-01：A100独立cache有限类别预热634调用，286 JIT miss＝153实际编译＋133磁盘命中（两版共用代码）；随后50个不同NQ/NK/P/batch×两版×prefill/decode＝200调用，另600→601×两CLEAN×两版8调用，JIT miss/实际编译/磁盘命中均0。修复F67/T46的112/113 v1长度反例；不推翻F67对其它kernel/整服务预热范围的限制。
+- P47-02：原112 88数值/12动态graph，113 222数值/30graph全部通过；对110最大逐行相对L∞1.11846e-5/3.95682e-5，最低topk99.95117%。同机v1/v2 16行配对性能，最大退步3.38%<5%；原tile保留。数据为随机激活，完整表见`evidence/T47/performance_table.md`。
+- P47-03：完整11补丁fuzz0，3623源码+6工具py_compile，确定再生成/反向字节还原/base未改通过；12远端输入SHA与本地一致。生产补丁原名更新，v1在`patches/drafts/*-v1.*`。最终汇总`evidence/T47/summary.json`，仅开发机arena GPU0算子，未操作8卡/服务/镜像/提交；固定模型/dtype/布局类别未热时仍可发生有限首次编译，TP8/SLO交Claude。

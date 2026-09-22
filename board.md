@@ -27,7 +27,7 @@
 | W18（`codex exec`，astra/xhigh） | logs/codex/W18.log | T44 预填充 indexer 逼近算力上限（补丁 113） | 已结束（Claude 核验 PASS，6.2–6.7×） |
 | W19（`codex exec`，astra/xhigh） | logs/codex/W19.log | T45 M2 KDA 双点 fp32 快照（补丁 140） | 已结束（Claude 核验：数值逐位一致；待 8 卡 A/B） |
 | W20（`codex exec`，astra/high） | logs/codex/W20.log | T46 启动期预热补丁 150 | 已结束（发现 112/113 按长度重编译 → T47） |
-| W21（`codex exec`，astra/high） | logs/codex/W21.log | T47 112/113 去形状特化 v2 | 进行中 |
+| W21（`codex exec`，astra/high） | logs/codex/W21.log | T47 112/113 去形状特化 v2 | 已结束（Claude 核验：50 随机形状 0 编译） |
 
 **进行中**
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
@@ -38,6 +38,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex W21] T47 112/113 v2去形状特化 — F68、`evidence/T47/`；88/222数值与12/30graph全过，16行配对最大+3.38%，50随机形状+600→601共208热调用零JIT；11补丁fuzz0/3623+6编译/反向还原，GPU空闲。
 - [Codex W20] T46 / 150 启动期预热 — `patches/150-*`、`evidence/T46/summary.json`；21CPU+双Gloo、完整11补丁栈、A100同形状12组零新增JIT/bench，持久cache命中另测；新长度仍可编译，完整服务覆盖待Claude。F67/D36；GPU进程已退出。
 - [Codex W19] T45 / 140 KDA双点fp32快照 — `patches/140-kda-dual-snapshot.*`、`scripts/make_140.py`、`evidence/T45/`；8组GPU（7组边界）最大误差0、21CPU、960轮off调度、完整补丁栈通过；722请求离线命中估算已交付。F66/D35，算子任务结束，8卡服务与性能验证交Claude。
 - [Codex W18] T44 / 113 预填充indexer（叠加112）— `patches/113-sm80-prefill-indexer.*`、`evidence/T44/`；六档131–186等效TFLOPS/6.19–6.69×，222数值/30graph/9补丁栈全过，decode源码/PTX保留112。F65/D34，GPU任务已结束，L2交Claude。

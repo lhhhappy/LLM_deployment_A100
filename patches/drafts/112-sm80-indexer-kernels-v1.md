@@ -1,6 +1,6 @@
 # 112 — A100 DSA indexer 融合kernel（T43 / W17）
 
-状态：T47/W21 v2已交付（F68；开发机算子/全栈全门通过）；以下T43为v1历史记录，v2见文末。T43交付；A100算子与完整补丁栈验证通过，待Claude交叉审阅及L2集成，未加入 RELEASE。
+状态：T43交付；A100算子与完整补丁栈验证通过，待Claude交叉审阅及L2集成，未加入 RELEASE。
 
 ## 问题与实现
 
@@ -83,17 +83,3 @@ Prefill均clean=True；causal为长度`nk-nq+i+1`，ragged为每query不同ks/ke
 - 单卡开发机的算子耗时不能换算8卡TPOT、TTFT、N@SLO；L2服务、实际MTP集成与端到端开发集由Claude审阅安排。
 - cold compile不包含在微基准；服务期首次新形状编译仍需初始化预热策略。
 - 必须保留输出矩阵（8192×190000约6.23GB），尚未融合topk；prefill clean=False全宽计算是110兼容代价。
-
-## v2：去除形状特化（T47 / W21）
-
-- 移除所有可变长度与stride的`tl.constexpr`；`N/NQ/NK/R/P/S`及所有地址stride均为运行时整数。保留Triton默认标量特化（等于1、16整除类别），所以启动只需预热有限类别。`H/D/PAGE/BQ/BK/HH/DD/CLEAN/GROUP/LOOP/BLOCK`保留模型/tile常量。
-- 沿用原tile、mask、每头bf16舍入和完整fp32输出；113的分组数量由运行时`tl.cdiv(NQ,BQ)`与`tl.cdiv(NK,BK*LOOP)`计算，`LOOP=4`是固定tile复用次数。没有按精确长度循环展开。
-- v1补丁和说明归档`patches/drafts/112-sm80-indexer-kernels-v1.*`、`113-sm80-prefill-indexer-v1.*`；性能对照源在`evidence/T47/sm80_indexer_{112,113}_v1.py`。两个v2补丁需配套，113仍叠加112。
-- 生成与verify仍用原脚本名；新证据写`evidence/T47/112`和`113`，不覆盖T43/T44。113 verify覆盖完整000→101→105→110→111→112→113→140→120→130→150、运行时参数白名单及反向字节还原。
-- 新验收入口：`scripts/run_sm80_indexer_47.sh`、`test_sm80_indexer_cache_47.py`、`bench_sm80_indexer_47.py`、`summarize_47.py`。原测试/110 oracle/误差阈值不变；T43/T44 summary是v1历史收据，当前v2请用`python3 scripts/summarize_47.py`。
-- **VERIFIED / F68 / P47-01…03**：112全部88组数值/12次graph、113全部222组数值/30次graph通过，原误差/topk门不变。11补丁fuzz0、3623源码+6工具编译、确定生成/反向字节还原/base未改通过。
-- 有限类别预热634调用：286 JIT miss、153实际编译、133磁盘命中；随后50随机形状的200调用及600→601回归8调用，JIT miss/实际编译/磁盘命中全部0。286个实际key中可变参数仅默认值1进入常量表。
-- v1/v2同机16行配对性能全过≤5%门，最大退步+3.38%；112 prefill −6.11%…+0.26%，113 prefill +0.98%…+3.38%，decode graph约−6.1%…−8.7%。原tile保留。完整毫秒/样本见`evidence/T47/performance_table.md`与`performance.log`，按本次同输入配对判断，不把不同时钟状态的历史耗时直接当回归。
-- 实际sm80 bf16 MMA、无FP8指令、0spill；112 paged/ragged为96/138寄存器、8KB shared；113主kernel166寄存器、48KB shared，两次unpack各29寄存器/0shared，decode PTX与112 v2相同。12远端输入SHA吻合，最终`evidence/T47/summary.json`绑定源码/oracle/测试/补丁/证据。GPU自有进程退出、两卡空闲。
-
-本变更仅证明112/113在已预热模型、tile、dtype及布局特化类别中的行为；其它SGLang kernel、服务graph池/真实权重、TP8/NEXTN和SLO仍需L2验证。T46的新长度反例针对v1；不能据此称整服务已零编译。

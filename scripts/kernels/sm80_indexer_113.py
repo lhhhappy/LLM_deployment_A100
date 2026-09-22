@@ -2,6 +2,7 @@
 
 The 110 oracle rounds each head's GEMM result to bf16 BEFORE relu/weighting.
 Keep that rounding, and disable FMA in the epilogue. No tensor data reaches Python.
+v2: lengths and strides are runtime integers; only model/tile constants specialize.
 """
 import torch
 import triton
@@ -22,11 +23,11 @@ def _e4m3_to_bf16(x):
 
 @triton.jit
 def _paged(Q, K, W, C, BT, O,
-           N: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
-           P: tl.constexpr, S: tl.constexpr, PAGE: tl.constexpr,
-           QB: tl.constexpr, QN: tl.constexpr, QH: tl.constexpr, QD: tl.constexpr,
-           WB: tl.constexpr, WH: tl.constexpr, CB: tl.constexpr, CN: tl.constexpr,
-           TB: tl.constexpr, TP: tl.constexpr, KB: tl.constexpr,
+           N, H: tl.constexpr, D: tl.constexpr,
+           P, S, PAGE: tl.constexpr,
+           QB, QN, QH, QD,
+           WB, WH, CB, CN,
+           TB, TP, KB,
            HH: tl.constexpr, DD: tl.constexpr):
     row = tl.program_id(0)
     page = tl.program_id(1)
@@ -58,10 +59,10 @@ def _paged(Q, K, W, C, BT, O,
 
 @triton.jit
 def _ragged(Q, K, SC, W, KS, KE, O,
-            NQ: tl.constexpr, NK: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
-            QQ: tl.constexpr, QH: tl.constexpr, QD: tl.constexpr,
-            KK: tl.constexpr, KD: tl.constexpr, SS: tl.constexpr,
-            WQ: tl.constexpr, WH: tl.constexpr, KSS: tl.constexpr, KES: tl.constexpr,
+            NQ, NK, H: tl.constexpr, D: tl.constexpr,
+            QQ, QH, QD,
+            KK, KD, SS,
+            WQ, WH, KSS, KES,
             CLEAN: tl.constexpr, BQ: tl.constexpr, BK: tl.constexpr,
             HH: tl.constexpr, DD: tl.constexpr):
     qi = tl.program_id(0) * BQ + tl.arange(0, BQ)
@@ -152,8 +153,8 @@ def _fp8_mqa_logits_112(q, kv, weights, ks, ke, clean_logits=False, max_seqlen_k
 
 
 @triton.jit
-def _unpack_prefill(X, Y, R: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
-           XR: tl.constexpr, XH: tl.constexpr, XD: tl.constexpr, BLOCK: tl.constexpr):
+def _unpack_prefill(X, Y, R, H: tl.constexpr, D: tl.constexpr,
+           XR, XH, XD, BLOCK: tl.constexpr):
     i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)
     x = tl.load(X + i // (H*D) * XR + (i // D % H) * XH + i % D * XD,
                 i < R*H*D, other=0)
@@ -162,9 +163,9 @@ def _unpack_prefill(X, Y, R: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
 
 
 @triton.jit
-def _prefill(Q,K,SC,W,KS,KE,O, NQ:tl.constexpr,NK:tl.constexpr,H:tl.constexpr,
-           QQ:tl.constexpr,QH:tl.constexpr,QD:tl.constexpr,KK:tl.constexpr,KD:tl.constexpr,
-           SS:tl.constexpr,WQ:tl.constexpr,WH:tl.constexpr,KSS:tl.constexpr,KES:tl.constexpr,
+def _prefill(Q,K,SC,W,KS,KE,O, NQ,NK,H:tl.constexpr,
+           QQ,QH,QD,KK,KD,
+           SS,WQ,WH,KSS,KES,
            CLEAN:tl.constexpr,BQ:tl.constexpr,BK:tl.constexpr,HH:tl.constexpr,
            GROUP:tl.constexpr,LOOP:tl.constexpr):
     # Group nearby query tiles to share K through L2. Reuse Q over LOOP key tiles.

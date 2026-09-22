@@ -19,7 +19,7 @@ def hashes(root):
 
 
 def main():
-    ev = ROOT / 'evidence/T43'
+    ev = ROOT / 'evidence/T47/112'
     before = hashes(ROOT / 'build/base_exact/sglang')
     target = ROOT / 'patches/112-sm80-indexer-kernels.patch'
     expected = target.read_bytes()

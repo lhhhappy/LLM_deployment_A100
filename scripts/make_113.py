@@ -43,7 +43,7 @@ def main():
                                        'b/python/sglang/' + rel))
     patch = ROOT / 'patches/113-sm80-prefill-indexer.patch'
     patch.write_text(''.join(diff))
-    ev = ROOT / 'evidence/T44'
+    ev = ROOT / 'evidence/T47/113'
     ev.mkdir(exist_ok=True, parents=True)
     (ev / 'generate_apply.log').write_text(''.join(logs))
     (ev / 'generate_receipt.json').write_text(json.dumps({

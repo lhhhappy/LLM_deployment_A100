@@ -13,3 +13,5 @@
 - `113-sm80-prefill-indexer`（T44，A100算子/全栈验证通过，待Claude交叉审阅/L2）：**叠加112**，预填充fp8预解码到bf16再用分组MMA；六档8192×32k/95k/190k causal/ragged达131–186等效TFLOPS，decode源码/PTX保持112。未加入RELEASE；生成器 `scripts/make_113.py`，说明与证据见同名 `.md` / `evidence/T44/`。
 
 - `150-startup-warmup`（T46，启动期代表形状预热）：完整000→101→105→110→111→112→113→140→120→130后叠加，`--warmups ax_shapes`开启；真实请求/真flush与池断言，异常失败启动，MTP跳过。CPU与key审计见同名说明，GPU算子证据在`evidence/T46/`；有限采样不保证新长度零JIT。未加入RELEASE。
+
+- **T47 / F68 更新**：112/113原名补丁现为v2，四kernel可变长度/stride改runtime。原数值/graph全过，v1/v2配对最大退步3.38%；50随机形状+600→601预热后208调用零JIT/编译。v1归档`drafts/*-v1.*`，当前证据`evidence/T47/`，仍未加入RELEASE，L2交Claude。

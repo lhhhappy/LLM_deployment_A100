@@ -1,0 +1,49 @@
+{
+  "source_sha256": "2c6302f7e9c5403d973bf2ee2bf6834926bb399679d802ef3ffaba39c23822d3",
+  "kernels": [
+    {
+      "name": "_unpack_prefill",
+      "registers": 29,
+      "spills": 0,
+      "shared": 0,
+      "num_warps": 4,
+      "ptx_sha256": "bd8bf61c771cb479dc1800b7fbaa2317f750736f0697523962079c9b48c2e95c",
+      "target_sm80": true,
+      "bf16_mma": false,
+      "fp8_instruction": false
+    },
+    {
+      "name": "_unpack_prefill",
+      "registers": 29,
+      "spills": 0,
+      "shared": 0,
+      "num_warps": 4,
+      "ptx_sha256": "68171cc372b2d38400aee0863308d6ca43352bf773103fcfb3b3d1b8aece758b",
+      "target_sm80": true,
+      "bf16_mma": false,
+      "fp8_instruction": false
+    },
+    {
+      "name": "_prefill",
+      "registers": 166,
+      "spills": 0,
+      "shared": 49152,
+      "num_warps": 4,
+      "ptx_sha256": "b1c715b36d24b5bf3be91472b45a9ea8dcac31458f429c66efad80d86301aafd",
+      "target_sm80": true,
+      "bf16_mma": true,
+      "fp8_instruction": false
+    },
+    {
+      "name": "_paged",
+      "registers": 96,
+      "spills": 0,
+      "shared": 8192,
+      "num_warps": 4,
+      "ptx_sha256": "a9ecb00ef036b4d48367ed9e39a9a24d9d96c6be2f4445bd037a095766e5a4b3",
+      "target_sm80": true,
+      "bf16_mma": true,
+      "fp8_instruction": false
+    }
+  ]
+}

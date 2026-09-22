@@ -2,7 +2,6 @@
 
 The 110 oracle rounds each head's GEMM result to bf16 BEFORE relu/weighting.
 Keep that rounding, and disable FMA in the epilogue. No tensor data reaches Python.
-v2: lengths and strides are runtime integers; only model/tile constants specialize.
 """
 import torch
 import triton
@@ -23,11 +22,11 @@ def _e4m3_to_bf16(x):
 
 @triton.jit
 def _paged(Q, K, W, C, BT, O,
-           N, H: tl.constexpr, D: tl.constexpr,
-           P, S, PAGE: tl.constexpr,
-           QB, QN, QH, QD,
-           WB, WH, CB, CN,
-           TB, TP, KB,
+           N: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
+           P: tl.constexpr, S: tl.constexpr, PAGE: tl.constexpr,
+           QB: tl.constexpr, QN: tl.constexpr, QH: tl.constexpr, QD: tl.constexpr,
+           WB: tl.constexpr, WH: tl.constexpr, CB: tl.constexpr, CN: tl.constexpr,
+           TB: tl.constexpr, TP: tl.constexpr, KB: tl.constexpr,
            HH: tl.constexpr, DD: tl.constexpr):
     row = tl.program_id(0)
     page = tl.program_id(1)
@@ -59,10 +58,10 @@ def _paged(Q, K, W, C, BT, O,
 
 @triton.jit
 def _ragged(Q, K, SC, W, KS, KE, O,
-            NQ, NK, H: tl.constexpr, D: tl.constexpr,
-            QQ, QH, QD,
-            KK, KD, SS,
-            WQ, WH, KSS, KES,
+            NQ: tl.constexpr, NK: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
+            QQ: tl.constexpr, QH: tl.constexpr, QD: tl.constexpr,
+            KK: tl.constexpr, KD: tl.constexpr, SS: tl.constexpr,
+            WQ: tl.constexpr, WH: tl.constexpr, KSS: tl.constexpr, KES: tl.constexpr,
             CLEAN: tl.constexpr, BQ: tl.constexpr, BK: tl.constexpr,
             HH: tl.constexpr, DD: tl.constexpr):
     qi = tl.program_id(0) * BQ + tl.arange(0, BQ)

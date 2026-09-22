@@ -60,7 +60,7 @@ def main():
                                        'b/python/sglang/' + rel))
     patch = ROOT / 'patches/112-sm80-indexer-kernels.patch'
     patch.write_text(''.join(diff))
-    ev = ROOT / 'evidence/T43'
+    ev = ROOT / 'evidence/T47/112'
     ev.mkdir(exist_ok=True, parents=True)
     (ev / 'generate_apply.log').write_text(''.join(logs))
     (ev / 'generate_receipt.json').write_text(json.dumps({

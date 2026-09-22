@@ -1,0 +1,74 @@
+{
+  "status": "PASS",
+  "numeric": {
+    "112": {
+      "comparisons": 88,
+      "max_relative_linf": 1.1184635695826728e-05,
+      "max_relative_l2": 2.66578149421548e-06,
+      "min_topk_overlap": 0.99951171875,
+      "graph_variants": 4,
+      "graph_replays": 12,
+      "environment": {
+        "bf16_reduced_precision_reduction": true,
+        "capability": [
+          8,
+          0
+        ],
+        "device": "NVIDIA A100-SXM4-80GB",
+        "kind": "environment",
+        "mode": "all",
+        "oracle_sha256": "3ffe82c74402aed9ceb0ba6113209850cdc8c1b21eb8f36c330e895578bd103f",
+        "seed": 43,
+        "source_sha256": "3c0b20b4332b83449bbcdbaffbdfebc2cd6a7a16647d182904c84b41af6673f4",
+        "test_sha256": "2d1f6406f6fe578aac58e618fbbf831b15abb26a02c23b9b062eb3f9c9c27d89",
+        "torch": "2.13.0+cu130",
+        "triton": "3.7.1"
+      }
+    },
+    "113": {
+      "comparisons": 222,
+      "max_relative_linf": 3.9568240026710555e-05,
+      "max_relative_l2": 3.9568240026710555e-05,
+      "min_topk_overlap": 0.99951171875,
+      "graph_variants": 10,
+      "graph_replays": 30,
+      "environment": {
+        "baseline_sha256": "3c0b20b4332b83449bbcdbaffbdfebc2cd6a7a16647d182904c84b41af6673f4",
+        "bf16_reduced_precision_reduction": true,
+        "capability": [
+          8,
+          0
+        ],
+        "device": "NVIDIA A100-SXM4-80GB",
+        "kind": "environment",
+        "mode": "all",
+        "oracle_sha256": "3ffe82c74402aed9ceb0ba6113209850cdc8c1b21eb8f36c330e895578bd103f",
+        "reused_test_sha256": "2d1f6406f6fe578aac58e618fbbf831b15abb26a02c23b9b062eb3f9c9c27d89",
+        "seed": 44,
+        "source_sha256": "2c6302f7e9c5403d973bf2ee2bf6834926bb399679d802ef3ffaba39c23822d3",
+        "test_sha256": "520cb0fbb187bf4632659a7ae6fd1f53bfbf0591c1c0b6c2c154fd78f671326a",
+        "torch": "2.13.0+cu130",
+        "triton": "3.7.1"
+      }
+    }
+  },
+  "cache": {
+    "kind": "complete",
+    "random": {
+      "compiled": 0,
+      "disk_hits": 0,
+      "jit_misses": 0
+    },
+    "random_calls": 200,
+    "random_shapes": 50,
+    "status": "PASS",
+    "t46_regression_calls": 8,
+    "warmup": {
+      "compiled": 153,
+      "disk_hits": 133,
+      "jit_misses": 286
+    },
+    "audited_jit_keys": 286
+  },
+  "max_regression_percent": 3.378875549626237
+}

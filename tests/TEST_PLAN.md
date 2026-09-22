@@ -248,3 +248,11 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P150-05 | 源码审计 | 枚举autotune keys、constexpr、特化排除；固定模型预期域、调度依赖、未覆盖路径与无法穷尽的反例 | pass（667显式JIT、63重点函数/12autotune；jit_inventory.json、kernel_keys.md及说明表。不是完整运行覆盖） |
 | P150-06 | L1 GPU算子 | 独立cache冷调用→同shape重复；记录JIT miss/编译cache hit/autotune调用，重复不得新增；另示新shape反例 | pass（cold5：12组首次113编译/102bench，同形状12组全0新增；600→601新2编译。新进程持久cache结果另见summary；非服务/模型） |
 | P150-07 | L2/T8 | Claude安排实际普通TP8启动/metrics/flush/池/graph与eager、逐key观测、readiness后编译数量及原dev全部SLO/能力门；140开关单列 | todo（本任务禁止8卡/Trisol/pod/镜像/提交；不能声称服务期零编译） |
+
+## P47 — T47 112/113 v2 形状去特化（W21）
+
+| ID | 环境 | 通过标准 | 状态 |
+|---|---|---|---|
+| P47-01 | GPU算子 | 两版四kernel有限类别预热后50不同NQ/NK/P/batch，实际JIT miss/编译0，逐调用日志 | pass（634预热/286 miss/153编译/133磁盘命中；200随机+8回归调用三类计数全0，286实际key审计通过；cache.log） |
+| P47-02 | GPU微基准 | 原112/113全数值/graph及六个大prefill对110；同机v1/v2六prefill+两decode graph各版退步≤5% | pass（112 88组/12重放，113 222组/30重放；16行配对最大+3.38%，evidence/T47） |
+| P47-03 | CPU打包 | 11补丁fuzz0、确定生成、py_compile、反向全字节还原、base未改 | pass（3623源码+6工具编译；113/stack_receipt.json，含runtime参数审计） |
