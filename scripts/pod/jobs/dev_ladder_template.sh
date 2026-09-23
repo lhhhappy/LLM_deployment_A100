@@ -12,9 +12,10 @@ kv=$(grep -oh "max_total_num_tokens=[0-9]*" $AX/engine_current.log | tail -1 | c
 echo "PRECHECK kv_tokens=${kv:-?} min_required=${LADDER_MIN_KV:-900000} patches=$(cat $AX/src/$G_NAME/PATCHES | tr ' ' ',') args=[$G_ARGS] env=[${G_ENV:-}]"
 [ -n "$kv" ] && [ "$kv" -ge "${LADDER_MIN_KV:-900000}" ] || { echo "PRECHECK FAIL: KV tokens ${kv:-unknown} < ${LADDER_MIN_KV:-900000}"; exit 5; }
 S1=$AX/s1/s1-dev; first=1
-# Start high (target is N22/26): climb LADDER_UP; if the FIRST level already fails, descend LADDER_DOWN to find the
+# Start high (target is N22/26): climb LADDER_UP; stop at the first failure. No descending by default (user 09-23:
+# a failed N18 means diagnose + fix, lower levels carry no decision value). LADDER_DOWN only if explicitly set; old note:
 # highest passing level (same logic as the formal climb: pass -> +4, fail -> -4, stop).
-UP=${LADDER_UP:-${LADDER:-18 22 26}}; DOWN=${LADDER_DOWN:-14 10}
+UP=${LADDER_UP:-${LADDER:-18 22 26}}; DOWN=${LADDER_DOWN:-}
 run_level() {  # $1 = N ; returns 0 if formal-est pass
   local N=$1
   local out=$RUN_DIR/N$N; mkdir -p $out; local extra=""; [ $first = 1 ] || extra="--skip-warmup"; first=0
@@ -36,6 +37,7 @@ for N in $UP; do
   [ $rc -eq 0 ] && continue
   [ $rc -ge 3 ] && exit $rc          # engine dead / no data: a crash is a failure of its own, report and stop
   if [ $lvl -eq 1 ]; then
+    [ -z "$DOWN" ] && { echo "LADDER first level N=$N failed -> stop (no descent; diagnose and fix)"; exit 1; }
     echo "LADDER first level N=$N failed -> descending: $DOWN"
     for M in $DOWN; do run_level $M && { echo "LADDER highest pass = N=$M"; break; }; r=$?; [ $r -ge 3 ] && exit $r; done
   else echo "LADDER stop at N=$N (formal-est FAIL); highest pass = previous level"; fi

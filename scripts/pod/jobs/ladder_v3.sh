@@ -12,9 +12,10 @@ export SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_OPT_DEEPGEMM_HC
 ensure_engine "$G_NAME" --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang $G_ARGS || exit 1
 grep -h "KV Cache is allocated\|max_total_num_tokens" $AX/engine_current.log | tail -2 | cut -c1-200
 S1=$AX/s1/s1-dev; first=1
-# Start high (target is N22/26): climb LADDER_UP; if the FIRST level already fails, descend LADDER_DOWN to find the
+# Start high (target is N22/26): climb LADDER_UP; stop at the first failure. No descending by default (user 09-23:
+# a failed N18 means diagnose + fix, lower levels carry no decision value). LADDER_DOWN only if explicitly set; old note:
 # highest passing level (same logic as the formal climb: pass -> +4, fail -> -4, stop).
-UP=${LADDER_UP:-${LADDER:-18 22 26}}; DOWN=${LADDER_DOWN:-14 10}
+UP=${LADDER_UP:-${LADDER:-18 22 26}}; DOWN=${LADDER_DOWN:-}
 run_level() {  # $1 = N ; returns 0 if formal-est pass
   local N=$1
   local out=$RUN_DIR/N$N; mkdir -p $out; local extra=""; [ $first = 1 ] || extra="--skip-warmup"; first=0
@@ -36,6 +37,7 @@ for N in $UP; do
   [ $rc -eq 0 ] && continue
   [ $rc -ge 3 ] && exit $rc          # engine dead / no data: a crash is a failure of its own, report and stop
   if [ $lvl -eq 1 ]; then
+    [ -z "$DOWN" ] && { echo "LADDER first level N=$N failed -> stop (no descent; diagnose and fix)"; exit 1; }
     echo "LADDER first level N=$N failed -> descending: $DOWN"
     for M in $DOWN; do run_level $M && { echo "LADDER highest pass = N=$M"; break; }; r=$?; [ $r -ge 3 ] && exit $r; done
   else echo "LADDER stop at N=$N (formal-est FAIL); highest pass = previous level"; fi

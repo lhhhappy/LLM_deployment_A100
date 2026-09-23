@@ -7,6 +7,15 @@
 #   probe    : chunkcost.py fixed-cost fit  -> $T/chunkcost/
 #   mk45     : build the 45-layer surrogate ($T/model45); then serve/probe/profile with MODEL=$T/model45 MEM=0.88 MAXTOK=262144
 #   profile  : torch-profiler traces of one extend (c=1024) at P=98304 and P=0 -> $T/prof/<tag>/
+# Analysis (on the box, python = /sjtu/linhang/arena/env/m0/bin/python, cwd = repo):
+#   scripts/analysis/t51_trace_stats.py <trace.gz> --kernels-out k.json   GPU span/busy/idle(CPU-starved), launches, top kernels, components
+#   scripts/analysis/t51_pytree.py <stack trace.gz> '<regex>' [depth] [min_ms]  python call tree (LONGEST=1 -> only longest call)
+#   scripts/analysis/t51_pyself.py <stack trace.gz> '<root regex>'        python self time, grouped by framework
+# Full T51 sequence (GPU0 only; each server in its own gjob window; stop the server afterwards):
+#   build; serve & -> probe; profile                                      (8-layer surrogate)
+#   mk45; MODEL=$T/model45 MEM=0.88 MAXTOK=262144 serve & ->
+#     OUT=$T/chunkcost45 PS=0,98304,180224 CS=256,1024,2048,4096,8192,16384 probe
+#     OUT=$T/prof45 MODES=nostack profile                                  (45-layer surrogate)
 set -euo pipefail
 R=/sjtu/linhang/arena/repo; T=${T:-/sjtu/linhang/arena/runs/T51}; PORT=${PORT:-31000}
 MODEL=${MODEL:-/sjtu/linhang/arena/runs/rankprof/p8192/model}  # model45: MODEL=$T/model45 (build with: mk45)
