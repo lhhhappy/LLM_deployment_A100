@@ -485,3 +485,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 024（KV 63 万）N10 warmup 中冷请求 16384 分块续算，KV 0.96→1.00 后 `allocation.py:217` 抛错，全 rank 退出（LADDER N=10 ENGINE_DEAD）。
 - 根因：`add_chunked_req` 在 rem_total_tokens≤0 时强制 rem_chunk_tokens（SWA 分支则跳过本轮）。120 v2 无等待时不封顶加速了 KV 耗尽，但原版同样有此隐患。
 - 修复：补丁 106（本轮跳过续算）。回归：025b（024 同配置 + 106），026 带 106。**正式评测中引擎崩溃 = 该档失败，此项优先级最高。**
+
+## F83 — DCP8 梯子 N10 崩溃：带前缀命中的预填充触发 CUDA illegal memory access
+- 025（DCP8 + 114 + 115 + 120v2，mem 0.75，逻辑 KV 818,112×8）：N10 测量约 2.5 分钟时，一次 extend（新 576、命中 77,312）后全 rank "an illegal memory access"；KV 仅用 8%。
+- 冷启动探针未覆盖前缀命中路径。INFERRED：DCP 下每卡只存 1/8 KV，112/113/114 indexer（及稀疏注意力的索引）按全量 KV 寻址 → 越界（Codex R18 已提示"DSA 地址协议须核验"）。
+- 处置：DCP 暂退出梯子；派 Codex 做 DCP 下 indexer/稀疏注意力地址协议的定位与修复（开发机 DCP2 复现）。
