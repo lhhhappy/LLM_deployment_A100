@@ -520,3 +520,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 对照 026（v2，cap 仅在有等待时生效、无 interval）N18：TTFT 四门全过、tpot_p95 0.219。
 - 结论：调度只能在 TTFT 和 TPOT 之间换，因为 2048 块要付约 150ms 的固定开销（F85），预填充吞吐大约掉一半，请求就排起队。要两头都过，必须先降低每块的固定开销（T51 诊断、T52 BCG 170），再回来定块大小。
 - N10 没跑完，Claude 用 stopjob 停了该任务（只停任务，服务与引擎未动），让出卡给探针 026g/h/i。
+
+## F87 — 预填充每块固定开销的成因（T51 + T52 + 8 卡 026g，VERIFIED）
+- 8 卡 026g（v3+114，TP8 真模型）：P=0 时 c=512 耗 162ms、c=1024 177、2048 224、4096 338、16384 1109；拟合固定约 107ms + 60µs/token；P 从 0 到 32k 固定只多约 10ms。
+- T51（45 层替身，单卡，R10）：P98k c1024 墙钟 251ms，其中 GPU kernel 仅 100ms，GPU 空闲 151ms（99.3% 是 CPU 喂不上）；2358 次 kernel launch，平均每个约 104µs host 时间；约 85% 与 P 无关。host 时间分摊：KDA ~76ms、MoE ~56、mHC ~51、DSA+indexer ~50。与 P 相关的部分在 indexer `_prefill`（按 c·P 增长）。
+- T52（补丁 170 = 上游 #38522 移植 + 140 字段直通修复）：替身 8 层小块 40→27ms，数值落在重启噪声以内。但 BCG 只把 MoE/mHC/norm 放进图里，KDA 与 DSA/indexer 仍是 eager 断点 ⇒ 估计能去掉约 100ms 的 host 时间，剩下约 125ms 在断点里。下一个机制目标：让 KDA/DSA 断点内的 host 开销变小，或把它们也放进图里。

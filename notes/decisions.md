@@ -79,3 +79,7 @@
 - 新增并优先：`--enable-attn-tp-input-scattered`（mHC 每卡 1/8 token）；容量零风险杠杆（cuda-graph max bs 64、KDA 槽 200）。
 - CP 不做主线（每轮只准入 1 请求、关闭 120、decode 头切分白名单无 Glm5Next）；DCP 仅作容量后备（需 115）。
 - lib.sh：引擎复用键加入 SGLANG_AX_*/NCCL_* 环境变量（防止只差环境变量的实验误复用引擎）。
+
+## 2026-09-23 — 梯子不降级；预填充主瓶颈定为 host 侧 eager 开销
+- 用户：N18 失败就停下诊断修复，不再降到 N14/N10（模板 LADDER_DOWN 默认改为空）。
+- 依据 F85–F87：调度参数只能在 TTFT 和 TPOT 之间换（027）；真正的杠杆是每块约 150ms 的 host 侧开销。顺序：170 的 8 卡 A/B（026j/k/l）→ 通过后做 170 + v3 小块 N18 → 下一步机制 T53（KDA/DSA 断点的 host 开销）→ MTP 叠加。
