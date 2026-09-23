@@ -473,3 +473,6 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 ## F80 — 容量零风险杠杆实测：KV 94.3 万 → 156.9 万 token（+66%）
 - `--cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200`（探针 022）：KV 每卡 1,569,152 token（18.58GB，原 943,360/11.17GB），KDA 槽 200（ssm 3.34GB，原 9.71GB），max_running_requests 40；冷预填充不变（2.08/6.12/19.17s）。
 - 仍有约 16GB 可用显存（available_gpu_mem 16.08GB）→ mem-fraction 可再加。与 DCP（逻辑 ×7.8）互为替代/叠加，待梯子对比。
+
+> 更正（09-23，Codex R18 核验）：① F75/F76 的 "KV 峰值 50%、KDA 4%" 是**扣除可淘汰缓存后的占用**（`pool_stats_observer.py:249,271`），不是物理驻留；完整 N6 测量期 KV 不可淘汰峰值 **863,296 token / 92%**。② 012 的 decode CUDA graph 实际增量 **1.31GiB**（非 6.1GB）；容量探针的 +66% 主要来自 KDA 池 10.05→3.46GiB。
+> ③ "25 万 prompt cached=64" 等最大损失例均为**本次 cohort 链首**（无同链前驱），不是运行中丢缓存；"19 个 intra" 实为 18 intra + 1 turn_start，其中 5 条短回退符合"101 只在最后 chunk 拆角色点"机制，140 可覆盖（但压力下额外角色槽可能被跳过）。详见 research/codex/R18_cache_loss_and_capacity.md。

@@ -48,7 +48,7 @@ for g in LIM:
 print("\n== cache efficiency (actual cached vs frozen expectation)")
 tot_exp = sum(max(0, r["prompt_tokens"] - (r.get("uncached_expected") or 0)) for r in ok if r.get("prompt_tokens"))
 tot_act = sum(r.get("cached_tokens") or 0 for r in ok)
-lost = [(r, max(0, r["prompt_tokens"] - (r.get("uncached_expected") or 0)) - (r.get("cached_tokens") or 0)) for r in ok if r.get("prompt_tokens")]
+lost = [(r, max(0, r["prompt_tokens"] - (r.get("uncached_expected") or 0)) - (r.get("cached_tokens") or 0)) for r in ok if r.get("prompt_tokens") and (r.get("idx_in_chain") or 0) > 0]  # chain heads have no in-cohort predecessor (R18)
 print(f"  expected cached={tot_exp:,}  actual cached={tot_act:,}  ratio={tot_act / max(1, tot_exp):.3f}")
 big = sorted(lost, key=lambda x: -x[1])[:8]
 print(f"  requests with actual cached < expected-1024: {sum(1 for _, l in lost if l > 1024)}; lost tokens total={sum(max(0,l) for _, l in lost):,}")

@@ -104,6 +104,6 @@ HiCache（DSA indexer 未恢复→错误输出）、`--enable-mixed-chunk`（破
 依据 F76（N6 基线）、F77（120 实测）、Fable 审阅（T49）。
 1. **调度 120 v2**（已证明 v1 把 intra 排队 6.4s→0.36s；v2 修 chain_start 尾部）— 8 卡队列 023。
 2. **mHC 输入分散** `--enable-attn-tp-input-scattered`（底包现成，预计预填充 −10%）— 探针 020，组合压测 024/025。
-3. **容量**：`--cuda-graph-max-bs-decode 64`（约 6GB）+ `--max-mamba-cache-size 200`（KDA 槽用 4%）→ KV 约 ×2，零风险 — 探针 022。FP8 KV、DCP（需 115，预填充注意力约 3× 慢，只作容量后备）靠后。
+3. **容量**：`--cuda-graph-max-bs-decode 64`（实际只省约 1.3GB/+3.8% KV）+ `--max-mamba-cache-size 200`（主要来源：KDA 池 10.05→3.46GB）→ 实测 KV +66%（F 最新）；注意 KDA 槽减少会增加状态淘汰，须看梯子结果 — 探针 022。FP8 KV、DCP（需 115，预填充注意力约 3× 慢，只作容量后备）靠后。
 4. **缓存丢失**：140（短间隔丢 5–8k）— 压测 025；长空闲/超长 prompt 几乎全丢疑为 LRU 驱逐（T49 Codex 分析中）。
 5. allreduce（NCCL_PROTO LL128/Simple 探针 021）；114（仅超长请求有益）；MoE kernel（F2）；EDF（F3）；F1 角色边界快照。

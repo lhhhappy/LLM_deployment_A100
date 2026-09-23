@@ -33,7 +33,7 @@
 启动参数固定：`--dsa-prefill-backend tilelang --dsa-decode-backend tilelang`（fa3 仅 Hopper，F57），env `SGLANG_OPT_DEEPGEMM_HC_PRENORM=0`、`SGLANG_OPT_USE_TOPK_V2=0`、`SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829`。
 
 ## 3. 8 卡状态与队列（2026-09-23）
-- 服务 `lh-arena-sess-b` 在线。已完成：b113 探测、能力冒烟 12/12、真机 kernel 复核 11/11、N6 基线（intra 两门 FAIL，排队所致）、120 N6（四门全过，自估）、冷预填充探针（1 万 tok/s）。
+- 服务 `lh-arena-sess-b` 在线。已完成：b113 探测、能力冒烟 12/12、真机 kernel 复核 11/11、N6 基线（intra 两门 FAIL，排队所致；KV 实际峰值 92%）、120 N6（四门全过，自估）、冷预填充探针（1 万 tok/s）。
 - 队列：013b DCP+115 探针 → 020 mHC 输入分散探针 → 021 NCCL LL128 探针 → 022 容量探针 → 023 120v2 N6 → 024 最佳组合 N10 → 025 最佳+140 N10。
 - 分析工具：`build/verify_kit/`（pod 内 `/tmp/ax/verify_kit/`）：analyze_run.py（逐请求门禁/排队/缓存）、logstat.py（日志+metrics）、coldprobe.py、component_table.py。
 - 优先级见 `research/claude/R8_next_directions.md` §8。

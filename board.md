@@ -29,7 +29,7 @@
 | W20（`codex exec`，astra/high） | logs/codex/W20.log | T46 启动期预热补丁 150 | 已结束（发现 112/113 按长度重编译 → T47） |
 | W21（`codex exec`，astra/high） | logs/codex/W21.log | T47 112/113 去形状特化 v2 | 已结束（Claude 核验：50 随机形状 0 编译） |
 | W22（`codex exec`，astra/xhigh） | logs/codex/W22.log | T48 M4 MTP/NEXTN sm80（补丁 160） | 已结束（Claude 核验；8 卡待测） |
-| W23（`codex exec` 新会话，astra/xhigh） | logs/codex/W23.log | T49 缓存丢失根因 + 容量账 + 过时结论清单（R18） | 进行中 |
+| W23（`codex exec` 新会话，astra/xhigh） | logs/codex/W23.log | T49 缓存丢失根因 + 容量账 + 过时结论清单（R18） | 已结束（R18；Claude 已据此更正文档） |
 
 **进行中**
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6

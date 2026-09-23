@@ -32,7 +32,7 @@ GPU 开发机（2×A100）：`ssh GPU`，只在 `/sjtu/linhang/arena/` 下工作
 ## 当前状态（2026-09-23，8 卡实测后）
 - **8 卡服务** `lh-arena-sess-b`（2102486579267252224）在线；旧守护进程已退役（scripts/archive/retired/），任何在用脚本都不含停/删服务。实验全部走 pod 队列 `scripts/pod/podq`。
 - **能跑 + 能力**：b113（000+101+105+110–113，tilelang DSA）在比赛镜像上启动、探测、能力冒烟 12/12；开发机 kernel 结论在真机 11/11 复现（F73/F74）。
-- **N6 基线（F76）**：fast_intra / overall_intra FAIL（p95 7.5s，主因**排队** p95 6.4s）；turn_start、chain_start PASS；TPOT 0.0304；KV 峰值已 50%（容量将先于算力约束）。
+- **N6 基线（F76）**：fast_intra / overall_intra FAIL（p95 7.5s，主因**排队** p95 6.4s）；turn_start、chain_start PASS；TPOT 0.0304；KV 实际峰值 92%（日志显示的 50% 未计可淘汰缓存；R18）→ 容量已是约束。
 - **正在测**：120（调度）N6 A/B → 114/CP/DCP(+115) 探针 → 140 A/B → N10/N14。代码级分析：T49（Codex W23：缓存丢失根因+容量；Fable：排队+预填充结构）。
 - **排行榜**：无人过 N=26；3 人 N=22（LewyM tpot 0.0273）。正式提交暂停（用户指示先跑通测评）。
 - **方向与问题清单**：`research/claude/R8_next_directions.md`；逐条事实 `notes/findings.md`（F56–F76）；决策 `notes/decisions.md`。
