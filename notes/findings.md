@@ -423,3 +423,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 ## F72 — 补丁 114（indexer 按查询行切分）逐位等价；TP2 6.5 万 token 预填充 −3.8%
 - 见 `patches/114-indexer-row-shard.md`。开发机结果，8 卡待测（TP8、真实长 prompt）。
 - 附带：开发机双卡 NCCL 在 SGLang 进程内需 `--disable-custom-all-reduce`、`NCCL_CUMEM_ENABLE=0`、降低 mem-fraction（纯 NCCL 冒烟正常）。
+
+## F73 — 8 卡 b113 启动探测通过；能力冒烟 12/12（长思维链正常）
+- lh-arena-sess-b，任务 001（b113 = 000+101+105+110+111+112v2+113v2，tilelang）：500–20000 token 探测全 200、前缀命中正常、flush 正常；首次新形状仍有约 60s KDA Triton 编译（补丁 150 待测）。
+- 任务 002 能力冒烟（`scripts/pod/jobs/cap_smoke.sh`，12 道 Python 校验答案的数学题，/v1/chat/completions，不限长度）：**12/12 正确**，全部 finish=stop，平均 2209 输出 token，最长 13964 token（163s，12 路并发）。
+- 含义：长 decode 路径（112 decode indexer、Marlin、tilelang decode）数值未坏；不代表官方 AIME/GPQA >90 门槛。
