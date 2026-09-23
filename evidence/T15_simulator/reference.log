@@ -1,2 +1,0 @@
-MODEL OUTPUT dev_fcfs_stock_p40000_d50: passing=[6, 10]; first fail=None []
-MODEL OUTPUT dev_fcfs_role_conservative_p40000_d50: passing=[6, 10]; first fail=None []
