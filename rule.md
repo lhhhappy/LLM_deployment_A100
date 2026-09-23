@@ -67,6 +67,8 @@
 5. `command` 是 argv 不是 shell；A100 上 SGLang 必须 `SGLANG_OPT_USE_TOPK_V2=0`（放 `env`）。
 6. 审批：L2 自测（Trisol 8 卡）与每天 2 次正式提交由用户授权 Claude 批准，每次正式提交向用户汇报（决策 23/25/27）；其他 agent 不自行提交、不起 8 卡、不打镜像。
 
+7. **pod 只读权限（09-23 用户批准）**：Codex/Fable 可用 `scripts/pod/pread`（status/ls/tail/head/cat/grep/analyze，路径限 /tmp/ax 的 runs/queue/verify 等）查看 8 卡 pod；**禁止**直接用 bexec/pexec/podq/ppush，禁止任何启停引擎、写文件、提交任务、触碰服务生命周期的操作。
+
 ## 4.1 技术路线保密（对外可见的元数据一律中性）
 arena 队友（即竞争对手）能看到：Trisol 镜像目录里的**镜像名和 tag**，以及推理服务的**名字、描述、启动命令、环境变量**。所以：
 - 镜像名和 tag 一律中性，例如 `lh-img:0922a`，不带 spf、d1、kda、snapshot、edf 之类的词；
@@ -125,3 +127,4 @@ arena 队友（即竞争对手）能看到：Trisol 镜像目录里的**镜像�
 - 2026-09-22 Claude：新增 §4.1 技术路线保密（用户要求）；已清空会话 A 的服务描述。
 - 2026-09-22 Claude：新增 §4.2 模型分配（用户要求：用 luna/haiku 处理简单任务）。
 - 2026-09-22 Claude：整理 notes/：原始证据移到 evidence/（已完成的 T12/T15/T16/T18/T19/T20/T22/E1），引用路径全部改写；新增 notes/README.md 自动索引。进行中的 t25_slo、e2_d1 等任务结束后再移。
+- 2026-09-23 Claude：新增 §4 第 7 条：Codex/Fable 经 `scripts/pod/pread` 获得 pod 只读权限（用户批准）。

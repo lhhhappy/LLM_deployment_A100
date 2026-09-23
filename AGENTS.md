@@ -20,6 +20,7 @@
 - 不关 thinking、不压输出、不截历史、不删 tools；`meta_info` 时间戳与 token 计数必须如实；`/flush_cache` 必须真清。
 - 不碰其他选手的镜像或服务；不探测评测平台。
 - **技术路线保密（rule.md §4.1）**：Trisol 上的镜像名、tag、服务名、描述、command、env 都是 arena 队友可见的，一律中性（例如 `lh-img:0922a`、`lh-t1`，描述留空；command 用 `/opt/ax/serve <profile>`）。
+- **8 卡 pod 只读**：只能用 `scripts/pod/pread`（见 rule.md §4 第 7 条）；不得用 bexec/pexec/podq/ppush，不得启停引擎或写入。
 - 审批：L2 自测与每天 2 次正式提交由用户授权 Claude 批准（决策 23/25/27）；Codex 不自行提交、不起 8 卡、不打镜像。GPU 开发机只在 `/sjtu/linhang/arena/` 下工作。
 - 写补丁照 `build/base_exact/`（L3 实际代码），不要照 `src/sglang/`（v0.5.20，不是底包）。
 - `s1-dev/`、`src/sglang/`、`build/base_exact/`、`llm-challenge-arena-v1/` 只读。

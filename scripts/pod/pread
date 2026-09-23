@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# READ-ONLY access to the L2 pod for reviewers (Codex/Fable). Cannot start/stop engines, write files or queue jobs.
+# Run from the local repo (it goes local -> gssh -> GPU box -> bohr exec). Paths must be under the allowed roots.
+#   scripts/pod/pread status                       queue state (running/pending/done/failed)
+#   scripts/pod/pread ls   <path>                  list a directory
+#   scripts/pod/pread tail <file> [n]              last n lines (default 50, max 2000)
+#   scripts/pod/pread head <file> [n]              first n lines
+#   scripts/pod/pread cat  <file>                  whole file (refuses > 5 MB)
+#   scripts/pod/pread grep <regex> <file> [max]    matching lines (default max 200)
+#   scripts/pod/pread analyze <run_dir>            analyze_run.py + logstat.py on a finished dev run dir (read-only)
+set -uo pipefail
+ROOTS="^/tmp/ax/(runs|queue|verify|verify_kit|src/[^/]+/(PATCHES|PATCHES_SIG))(/|$)|^/tmp/ax/(worker\.out|engine_current\.log|engine\.sig)$"
+G="$(cd "$(dirname "$0")/../.." && pwd)/scripts/gssh"
+ok_path() { case "$1" in *..*|*\;*|*\|*|*\&*|*\$*|*\`*|*\'*|*\"*|*\ *) return 1;; esac; [[ "$1" =~ $ROOTS ]]; }
+q() { printf '%q' "$1"; }
+num() { [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -le "${2:-2000}" ]; }
+remote() { GSSH_TIMEOUT=300 "$G" "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh >/dev/null 2>&1 && PEXEC_TIMEOUT=280 bexec $(q "$1")"; }
+cmd=${1:-}; shift || true
+case "$cmd" in
+  status) remote 'cd /tmp/ax/queue && for d in running pending done failed cancelled; do echo "$d: $(ls $d 2>/dev/null | tr "\n" " ")"; done' ;;
+  ls)   ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; remote "ls -la $(q "$1")" ;;
+  tail|head) ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; n=${2:-50}; num "$n" || { echo "bad n"; exit 2; }
+        remote "$cmd -n $n $(q "$1")" ;;
+  cat)  ok_path "${1:-}" || { echo "path not allowed"; exit 2; }
+        remote "f=$(q "$1"); [ \$(stat -c %s \"\$f\") -le 5242880 ] && cat \"\$f\" || echo 'file too large (>5MB); use tail/grep'" ;;
+  grep) re=${1:-}; f=${2:-}; m=${3:-200}; ok_path "$f" || { echo "path not allowed"; exit 2; }; num "$m" 5000 || { echo "bad max"; exit 2; }
+        remote "grep -E -m $m -- $(q "$re") $(q "$f")" ;;
+  analyze) d=${1:-}; ok_path "$d" || { echo "path not allowed"; exit 2; }
+        remote "d=$(q "$d"); python3 /tmp/ax/verify_kit/analyze_run.py /tmp/ax/s1/s1-dev/harness \$(ls -t \$d/dev/raw_*.jsonl | head -1); python3 /tmp/ax/verify_kit/logstat.py \$d/server.log" ;;
+  *) sed -n 2,11p "$0"; exit 1 ;;
+esac
