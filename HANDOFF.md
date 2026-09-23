@@ -1,49 +1,101 @@
-# HANDOFF：交接给下一个 session（2026-09-23 早，Claude）
+# HANDOFF — 仓库整理（交给 Codex；2026-09-24，Claude 起草，依据用户当天的要求）
 
-先读：`CLAUDE.md` → `AGENTS.md` → **本文件** → `research/README.md` → `research/claude/base/00-summary-mainline.md`。
-版本库：工作区已 `git init`（大只读目录排除），每个里程碑一个提交；`git log --oneline` 看历史。
+分工：**Codex 整理仓库**（本地仓库 + GPU 机上的镜像仓库与脚本）；**Claude 继续跑 8 卡实验、提交任务、改补丁**。
 
-## 0. 一句话现状
-底包已能在真实 8×A100 上启动并通过功能探测（F59）。一批性能/机制补丁已在 CPU/开发机验证完毕、等 8 卡验证。
-**8 卡服务 `lh-arena-sess-a` 已被旧守护进程误删（见 notes/decisions.md「8 卡服务被守护进程误删后的处置」，idle_hold 配置未生效）**；已重建 `lh-arena-sess-b`
-（service id `2102486579267252224`），在 Trisol 准入队列里。GPU 机 tmux `arena-daemons:boot` 运行 `scripts/pod/autostart.sh`：
-准入后自动 `scripts/pod/bootstrap`（重建 pod 的 worker/补丁/开发集/工具）并按序排队任务。日志 `/sjtu/linhang/arena/runs/autostart.log`。
-**用户指示：先把测评跑通并记录，暂不正式提交。**
+## 1. 用户要什么（原话摘录）
+- "我觉得这些东西太乱了，太影响你的上下文和迭代了……做一次大的整理，把 harness-template 完全移除，文档重写。"
+- "保留调研/过去的必要的 patch 以及尝试和经验。"
+- "任务管理机制……层层硬编码，匹配……比对哈希，这些都和我们想要做的任务无关，我想变得干净清晰：简单的任务排队，然后分析各种脚本，保留可复用的脚本，维护整个仓库干净迭代，全部清理。"
+- "以后就是：跑实验，分析问题，改进，记录，跑实验。"
+- "这个 T 什么的、数字什么的，我觉得太乱了！" "我不想要层层审批。" "notes/findings.md 已经那么长了！"
+- "过时的……清理干净，我很怕误导了后面的迭代和智能，能不能只维护正确的文档！" "那就直接删除吧，反正以后不再需要读到！"
+- 评测只要求**准确**：按 task.md 的规则、用 harness 自己的评分器、在完整数据上算。"不希望你老是纠结我们自己给自己设置的硬门槛。"
 
-## 1. 必守规则（用户明确要求）
-- 8 卡服务不停、不删、不释放，停必须用户同意。旧守护进程 `trisol_test_daemon.py` 已停且**不再启用**（它按启动时配置 3h 空闲释放）。
-- 调研优先、大胆读源码改源码；调参放最后。每次压缩/新会话先重读 `research/`。
-- 每处改动可回溯：补丁编号文件 + 说明 + 生成器 + 证据；git 提交；L3 提交记录 commit + 补丁清单 + 镜像 tag。
-- 跑通修复是前提，**优化修复更重要**（用户 09-23）。
-- 省 token：后台任务用 Monitor/后台命令唤醒，不轮询；不做"每 25 分钟自我唤醒"（缓存 TTL 1h，事件会唤醒）。
-- 路线保密；中文沟通；正式提交每天 2 次（目前暂停）。
+据此：**工作区只留正确、现行、有用的东西；过时或错误的直接删（git 保留历史），不建归档目录；不要编号体系、不要审批流程、不要自设门槛。**
 
-## 2. 补丁栈（全部 `patch -p3 --fuzz=0` 按序可打：000→101→105→110→111→112→113→140→120→130→150）
-| 补丁 | 作用 | 验证 |
-|---|---|---|
-| 000 | 接口合规 | 已有 |
-| 101 / 105 | 角色边界拆分 / 修双 partial 崩溃（F62） | 105：CPU；8 卡待测 |
-| 110 / 111 | sm80 DSA indexer shim / FP8 MoE→Marlin W8A16（F58） | 8 卡启动+探测通过（F59） |
-| 112 / 113（v2） | sm80 indexer 融合 kernel：decode ~4.5–5×；prefill 再 ~6×；v2 去形状特化（200 随机形状 0 编译，T47） | 开发机 A100 PASS；8 卡待测 |
-| 120 | M1 调度保护链中间请求（W15/T41），`SGLANG_AX_SCHED_PROTECT`/`_COLD_CAP` | CPU 27 测；8 卡 A/B 待测 |
-| 130 | 分词线程池+路由键（W16/T42），`SGLANG_AX_ASYNC_TOKENIZE` | 722/722 token 一致 |
-| 140 | M2 KDA 双点 fp32 快照（W19/T45），`SGLANG_AX_KDA_DUAL_SNAPSHOT=1` | 数值逐位一致；离线 extend 轮数 -20% |
-| 150 | 启动期预热（W20/T46），`--warmups ax_shapes` | CPU+算子；8 卡待测 |
+## 2. 红线（整理过程中任何时候都不能破）
+1. **8 卡 Trisol 服务绝不能停、删、暂停**：不运行 `bohr trisol inference delete|stop`，不写 STOP 文件，不动 pod 里的进程。pod 只能用 `scripts/pod/pread` 只读。
+2. **不要执行 `scripts/pod/qpush`、`podq init`、`ppush`**：它们会往 pod 推补丁和脚本，而 Claude 正在用队列（037–039 在跑/排队）。
+3. **队列工具链每次提交后都必须仍然可用**。路径可以调整，但 Claude 要能照 README 继续入队、判分。涉及的文件：
+   - `scripts/pod/` 下的 `common.sh lib.sh qpush podq podq_worker.sh ppush pexec pexec_codex pread pstatus stopjob stopjob_inpod.sh`；
+   - `scripts/pod/jobs/dev_ladder_template.sh`；
+   - `scripts/pod/verify/` 下的 `level_verdict.py make_kit.sh cap_smoke_body.sh metrics_sampler.py logstat.py coldprobe.py interference.py chunkcost.py`；
+   - `scripts/score_formal.py`（会被拷进 kit）；
+   - `scripts/gssh`、`scripts/gjob`、`scripts/ssh_*`。
+4. **只读输入不删**：`llm-challenge-arena-v1/`、`s1-dev/`、`build/base_exact/`、`refs/sglang-fe236ea6c3/` 及仍被引用的 `refs/*.diff`。`src/sglang/`（v0.5.20，不是底包）先从文档里去掉引用；目录本身删不删问用户（它可能不在 git 里，删了不可恢复）。
+5. **`patches/` 不改补丁文件**：今天已整理成每个机制一个版本，并证明源码树逐字节不变，见 `patches/README.md` 和 `evidence/T57/`。Claude 可能继续新增候选补丁。
+6. GPU 机只在 `/sjtu/linhang/arena/` 下操作；`/sjtu/linhang` 下其他目录是用户别的项目，不要碰。
+7. 每一步都是一个 git 提交，提交信息写清删了什么、为什么删。
 
-启动参数固定：`--dsa-prefill-backend tilelang --dsa-decode-backend tilelang`（fa3 仅 Hopper，F57），env `SGLANG_OPT_DEEPGEMM_HC_PRENORM=0`、`SGLANG_OPT_USE_TOPK_V2=0`、`SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829`。
+## 3. 目标结构（建议；以"干净、能直接用"为准，可调整）
+```
+README.md        唯一入口（内容见 §4）
+AGENTS.md        ≤20 行：先读 README；红线
+CLAUDE.md        ≤20 行：先读 README；红线
+llm-challenge-arena-v1/ s1-dev/ build/base_exact/ refs/   只读输入
+patches/         引擎补丁 + README（栈、开关、耦合）——保持现状
+scripts/
+  pod/           8 卡队列与访问（保持可用）
+  analysis/      可复用离线分析：level_verdict、score_formal、patch_stack、raw/日志分析
+  submit/        build_image.sh、submit_official.sh、check_submission.py（按 B4 修好，它现在会误报）
+  gpu/           gssh、gjob、ssh 配置
+  devbox/        仍有用的开发机算子/数值测试
+tests/           只留测试现行补丁/工具的 CPU 测试（如 test_sched_protect_chain.py，27/27 通过）
+notes/
+  experiments.md 实验记录：每次 8 卡运行一条（相对基线改了什么、正确判分的结果、结论）；
+                 开头一段"09-24 之前的历史"，把过去的尝试和教训压缩成要点
+  knowledge.md   当前已核实的事实与经验教训（把 findings/decisions/research 里仍正确的部分压缩，不带编号）
+  submissions.md 正式提交与成绩（按 B1 更正）
+research/        只留仍正确、仍有用的调研（按 B2 判定），其余删除
+evidence/        只留仍被保留文档引用的原始证据，例如 L035、T53 的 026 raw、T56、T57；其余删除
+data/            只留最新的榜单快照
+```
 
-## 3. 8 卡状态与队列（2026-09-23）
-- 服务 `lh-arena-sess-b` 在线。已完成：b113 探测、能力冒烟 12/12、真机 kernel 复核 11/11、N6 基线（intra 两门 FAIL，排队所致；KV 实际峰值 92%）、120 N6（四门全过，自估）、冷预填充探针（1 万 tok/s）。
-- 队列：013b DCP+115 探针 → 020 mHC 输入分散探针 → 021 NCCL LL128 探针 → 022 容量探针 → 023 120v2 N6 → 024 最佳组合 N10 → 025 最佳+140 N10。
-- 分析工具：`build/verify_kit/`（pod 内 `/tmp/ax/verify_kit/`）：analyze_run.py（逐请求门禁/排队/缓存）、logstat.py（日志+metrics）、coldprobe.py、component_table.py。
-- 优先级见 `research/claude/R8_next_directions.md` §8。
+建议整个删除的（具体逐项以四份审查为准）：
+- 根目录：旧的 `HANDOFF.md`（本文件用完后也删）、`rule.md`、`board.md`；
+- 整个目录：`plans/`、`docs/`、`cases/`、`logs/`；
+- `notes/` 里除上面三份之外的全部；
+- `tests/` 里的 `TEST_PLAN.md`、`TIERS.md`、`L2.md`、`queue*`；
+- `scripts/` 里的 `archive/`、`session_a/`、`l2.py`、`test_status.py`、`check_records.py`、`next_id.py`、`index_notes.py`，以及 L1/v0.5.20 时期和一次性任务的脚本；
+- `research/` 里的 `archive/`、`codex/archive/`，以及过时的报告；
+- `refs/harness-template-cn/`；
+- `build/` 下可再生成的目录。
 
-## 4. pod 工作方式（`scripts/pod/`，在 GPU 机上运行）
-`pexec`/`ppush`（保留相对路径！dest 是目录）/`pstatus`/`podq init|submit|ls|log|pause|resume|cancel`/`bootstrap`/`autostart.sh`。
-`podq init` 推送全部 `patches/NNN-*.patch`。任务模板 `scripts/pod/jobs/dev_template.sh`、`dev_b120_template.sh`（变体用不同源码名避免误复用引擎）。
-小心：`pkill -f <模式>` 会杀掉包含该模式的 bexec 外壳，用 PID；前台 `sleep` 链式等待会被拦截，用 Monitor。
-**远端命令**：`scripts/gssh` 只重试建连，命令只执行一次（中途断线不重跑、会提示检查远端状态）；超过几分钟的任务一律用 `scripts/gjob run <名> '<命令>'`（GPU 机 tmux、日志 `/sjtu/linhang/arena/runs/jobs/<名>.log`、末行 `DONE rc=`），用 `scripts/gjob wait <名>` 后台等待。
+## 4. README 必须写清楚的内容（新会话只读它就能干活）
+1. **赛题要什么**（以 task.md 为准）：
+   - 排名：`n_at_slo` → `tpot_mean`；TPM 只回报不排名。
+   - 每档 11 道硬门：TTFT 四门带统计余量；tpot_p95 ≤0.10，无余量。
+   - 爬坡：从 N10 起 +4/−4，单档约 4 小时。
+   - 能力门：两科 >90。本地用 12 题冒烟即可，这是用户的决定。
+   - 开发集只能做 A/B 相对比较（task.md:354）。
+   - 诚实与 flush 要求。
+2. **目标**：榜首 CalvinCao，N26、tpot_mean 0.0551。
+3. **现状**：
+   - S0 基线的定义（见 `patches/README.md`）；
+   - dev N22 结果：11 门里过 10 门，只挂 tpot_p95 0.296；
+   - 正在跑的实验；
+   - 当前主要假设：重 prefill 时 decode 被饿住；缓存可修上限 8%。
+4. **循环与操作**：
+   - 复制一个 job 文件，只改一处；
+   - `scripts/pod/qpush NNN-名字.sh=路径` 入队；
+   - job 日志的 `LEVEL` 行就是判定（`level_verdict.py`：完整性 + harness 评分器 + task.md 规则）；
+   - 用 `scripts/analysis/*` 分析，结果记进 `notes/experiments.md`。
+5. 仓库地图（短）；GPU 机与 pod 的访问方式和安全规则。
 
-## 5. Codex 分工
-worker W15–W21 均已结束并经 Claude 核验（见 board.md 实例表、notes/dispatch.md T41–T47）。主 Codex 会话 `01a0c731-…`（T37）未再活动。
-下一批方向见 `research/claude/R8_next_directions.md`（P0：能力门自测 + 8 卡基线/profile；P1：冷预填充吞吐 INT8 W8A8、EDF；P2：容量 cuda-graph bs、状态池、驱逐、FP8 KV、DP2）。
+## 5. GPU 机（`/sjtu/linhang/arena/`）
+- `repo/` 是本地仓库的镜像，由 qpush 用 tar 同步。本地整理完之后，把镜像同步成同样的内容（多余文件也删掉），不要碰 `runs/`、`models/`、`env/`、`cache/`。
+- tmux 会话 `arena`、`arena-daemons`（窗口 `submit`、`boot`）：先列出里面在跑什么，特别是有没有任何能删、停服务或自动提交的代码路径。列出后交给用户或 Claude 决定，不要自己杀进程。
+- 其它目录：列清单、提建议，由用户决定。
+
+## 6. 输入材料
+- 逐文件的判定清单：
+  - `evidence/T55/B1-notes.md`：notes；
+  - `B2-docs-research.md`：入口文档与调研；
+  - `B3-patches-tests-scripts.md`：补丁、测试、脚本、build、data、evidence、logs；
+  - `B4-rules.md`：与 task.md 不一致的 38 处，含工具实现问题。
+- 已核实事实：`plans/prompts/_context-0924.md`、`research/codex/R19_*`、`R20_*`、`evidence/L035/`、`patches/README.md`。
+
+## 7. 与 Claude 并行时的约定
+- Claude 在整理期间把新实验结果**追加**到 `notes/runs-0924.md`，新 job 文件放在 `scripts/pod/jobs/`（`s0_*.sh`）。这些文件保留；最后把 `runs-0924.md` 并进 `notes/experiments.md`。
+- Claude 可能新增 `patches/12x-*.patch` 候选；不要动 `patches/`。
+- 整理完成后，在 README 顶部写一行"整理完成（日期、提交号）"，并通知用户。
