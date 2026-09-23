@@ -525,3 +525,9 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 8 卡 026g（v3+114，TP8 真模型）：P=0 时 c=512 耗 162ms、c=1024 177、2048 224、4096 338、16384 1109；拟合固定约 107ms + 60µs/token；P 从 0 到 32k 固定只多约 10ms。
 - T51（45 层替身，单卡，R10）：P98k c1024 墙钟 251ms，其中 GPU kernel 仅 100ms，GPU 空闲 151ms（99.3% 是 CPU 喂不上）；2358 次 kernel launch，平均每个约 104µs host 时间；约 85% 与 P 无关。host 时间分摊：KDA ~76ms、MoE ~56、mHC ~51、DSA+indexer ~50。与 P 相关的部分在 indexer `_prefill`（按 c·P 增长）。
 - T52（补丁 170 = 上游 #38522 移植 + 140 字段直通修复）：替身 8 层小块 40→27ms，数值落在重启噪声以内。但 BCG 只把 MoE/mHC/norm 放进图里，KDA 与 DSA/indexer 仍是 eager 断点 ⇒ 估计能去掉约 100ms 的 host 时间，剩下约 125ms 在断点里。下一个机制目标：让 KDA/DSA 断点内的 host 开销变小，或把它们也放进图里。
+
+## F88 — 8 卡探针 026g–k（档 1）：114 有效；MTP+v3 兼容；**170 BCG 在 TP8+scatter 下输出错误**
+- 代价曲线探针（chunk 16384）：114 在 P=180k 时每 token 从 97.9 降到 65.1µs（−33%），P=98k 时 81.7→63.1；固定开销与 decode 基本不变（026h vs 026g）。
+- MTP+v3（026i）：12/12；stream TPOT 0.0184（不带 MTP 的 v3 026c 为 0.026）；短请求 TTFT p50 0.63；冷 TTFT 39.3s；接受长度 3.0（随机 token 输入）。
+- 170（chunk 4096，scatter 开）：BCG 捕获耗时 37s、占 4.7GB；拟合固定开销 43–58ms，同补丁 eager（026k）为 77–92ms；decode bs12 14.9 vs 16.9ms。但 **能力冒烟 BCG 0/12（多条跑到长度上限），eager 12/12** ⇒ graph 回放在真模型 TP8 上结果错误。开发机 TP1 替身未能暴露。026l（BCG 不带 scatter）用来区分是否 scatter 引起。
+- 注意：chunk=4096 时代价曲线探针里 c>4096 的样本被切成多块，拟合截距不能与 16384 的配置直接比，应按每个 c 的原始数字比较。

@@ -1,3 +1,43 @@
+--- a/python/sglang/kernels/ops/kvcache/mla_buffer.py
++++ b/python/sglang/kernels/ops/kvcache/mla_buffer.py
+@@ -93,6 +93,8 @@
+     nope_dim: tl.constexpr,
+     BLOCK: tl.constexpr,
+     USE_GDC: tl.constexpr = False,
++    DCP_RANK: tl.constexpr = 0,  # [ax] 116
++    DCP_WORLD_SIZE: tl.constexpr = 1,  # [ax] 116
+ ):
+     pid_loc = tl.program_id(0)
+     pid_blk = tl.program_id(1)
+@@ -105,13 +107,18 @@
+         tl.extra.cuda.gdc_wait()
+ 
+     loc = tl.load(loc_ptr + pid_loc).to(tl.int64)
++    # [ax] 116: DCP owner rule, as in set_mla_kv_buffer_kernel (the rope variant): only loc % W == rank is
++    # stored, at local row loc // W. The stock norope kernel (GLM: qk_rope_head_dim == 0) wrote every token at
++    # its VIRTUAL loc on every rank -> out of bounds once a loc exceeds the per-rank rows (8-card crash 025).
++    is_valid = loc % DCP_WORLD_SIZE == DCP_RANK
++    loc = tl.where(is_valid, loc, 0) // DCP_WORLD_SIZE
+     dst_ptr = kv_buffer_ptr + loc * buffer_stride + offs
+ 
+     src = tl.load(
+         cache_k_nope_ptr + pid_loc * nope_stride + offs,
+         mask=mask,
+     )
+-    tl.store(dst_ptr, src, mask=mask)
++    tl.store(dst_ptr, src, mask=mask & is_valid)
+ 
+     if USE_GDC:
+         tl.extra.cuda.gdc_launch_dependents()
+@@ -176,6 +183,8 @@
+             cache_k_nope.stride(0),
+             nope_dim,
+             BLOCK=BLOCK,
++            DCP_RANK=get_parallel().attn_dcp_rank,  # [ax] 116
++            DCP_WORLD_SIZE=get_parallel().attn_dcp_size,  # [ax] 116
+             **pdl_kwargs,
+         )
+         return
 --- a/python/sglang/srt/layers/attention/dsa_backend.py
 +++ b/python/sglang/srt/layers/attention/dsa_backend.py
 @@ -163,6 +163,59 @@

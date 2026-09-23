@@ -21,5 +21,15 @@ for k in ("cold", "ext", "dec"):
     ok = fin and rel <= tol
     bad |= not ok
     print(f"{k}: shape={tuple(x.shape)} finite={fin} rel_linf={rel:.3e} max_abs={d:.3e} argmax_agree={agree:.3f} {'PASS' if ok else 'FAIL'}")
+# sensitive oracle: per-DSA-layer o_proj input (this rank's heads) per stage
+at, bt = a.get("attn", {}), b.get("attn", {})
+for st in ("cold", "ext", "dec"):
+    for n in sorted(bt.get(st, {})):
+        y = bt[st][n]; x = at.get(st, {}).get(n)
+        if x is None or x.shape != y.shape:
+            print(f"attn {st} {n}: missing/shape {None if x is None else tuple(x.shape)} vs {tuple(y.shape)}"); bad = True; continue
+        d = (x - y).abs().max().item(); rel = d / max(y.abs().max().item(), 1e-30)
+        fin = bool(torch.isfinite(x).all()); ok = fin and rel <= tol; bad |= not ok
+        print(f"attn {st} {n}: shape={tuple(x.shape)} finite={fin} rel_linf={rel:.3e} max_abs={d:.3e} ref_max={y.abs().max().item():.3e} {'PASS' if ok else 'FAIL'}")
 print("RESULT", "FAIL" if bad else "PASS")
 sys.exit(1 if bad else 0)
