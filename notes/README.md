@@ -70,6 +70,13 @@
 - **F67** T46 / 150：请求预热的覆盖边界与真实清理（W20）
 - **F68** T47/W21：112/113 v2 新长度不再产生精确形状JIT，原性能门通过（VERIFIED）
 - **F69** T48/W22：NEXTN sm80完整路径、兼容补丁160与KDA回滚算子（VERIFIED / 源码及L1）
+- **F70** INT8 W8A8 MoE 在 A100 上不值得（开发机实测）；MoE 预填充只有 bf16 峰值约 27–30%
+- **F71** GLM-5.3 单卡（TP8 份额）逐组件成本表：DSA 稀疏注意力 + mHC ≈ 37%（两者在 8 卡上重复），MoE 33%，KDA 仅 5%
+- **F72** 补丁 114（indexer 按查询行切分）逐位等价；TP2 6.5 万 token 预填充 −3.8%
+- **F73** 8 卡 b113 启动探测通过；能力冒烟 12/12（长思维链正常）
+- **F74** 真机（L2 pod，比赛镜像）复核：开发机 kernel 结论 11/11 成立
+- **F75** 8 卡 b113 实时日志（dev N6 进行中）：decode 已修好（bs6 16.4ms/步）；冷预填充 746ms/8192 块；N6 时 KV 峰值已占 50%
+- **F76** 8 卡 b113 开发集 N6 基线：卡在 intra 两门（排队所致），chain_start 有余量；冷预填充约 1 万 tok/s；真机 profile
 
 ## Decisions（最新在上）
 
@@ -162,6 +169,8 @@
 - plans/prompts/T46-startup-warmup.md
 - plans/prompts/T47-indexer-no-respecialize.md
 - plans/prompts/T48-M4-mtp-sm80.md
+- plans/prompts/T49-brief-8card-n6.md
+- plans/prompts/T49-codex-astra.md
 
 ## Reports
 
@@ -173,6 +182,8 @@
 - research/claude/R4_similar_competitions.md
 - research/claude/R6_harness_template_review.md
 - research/claude/R7_top_players_analysis.md
+- research/claude/R8_next_directions.md
+- research/claude/R9_upstream_since_base.md
 - research/codex/R13_agentx_mlperf_reading.md
 - research/codex/R14_recent_pr_watchlist.md
 - research/codex/R15_base_source_exploration.md

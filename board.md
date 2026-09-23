@@ -32,6 +32,7 @@
 | W23（`codex exec` 新会话，astra/xhigh） | logs/codex/W23.log | T49 缓存丢失根因 + 容量账 + 过时结论清单（R18） | 进行中 |
 
 **进行中**
+- [Codex main / T49] 缓存丢失根因、容量账与过时结论审计（只读分析）— `research/codex/R18_cache_loss_and_capacity.md`
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）

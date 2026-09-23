@@ -322,4 +322,9 @@
 - **接受率采集**：`scripts/extract_spec_stats_160.py server.log --draft-tokens 4 --out spec.json`。160日志增加同窗口原始tokens/rounds；Σtokens/Σrounds为每request-step接受长度，D4接受率=(Σtokens−Σrounds)/(3Σrounds)。只取TP0/无rank；旧舍入日志不虚构加权均值，最后未打印窗口不纳入。脚本从真实server stdout日志切harness段（含warmup），纯measurement须按harness时间再裁；spec接受计数不冒充EOS/stop后实际HTTP输出数。
 - **INFERRED**：D4/MR32 scratch约2.268GiB/rank，MR48约3.368；同预算持久KDA槽近似普通55.6%，draft权重/graph预算还会改变容量。若r=投机轮成本/普通轮成本=1.4、接受长度1.6–2.0，TPOT约为原0.875–0.700，吞吐约1.143–1.429×；假设基线35ms则30.63–24.50ms。不能据此宣称超过27.3ms或N@SLO不降。
 - **环境偏差与收尾**：TileLang缺z3已在T48独立目录补齐。初版C++ JIT缓存变量用错，7个本轮build误写根盘；已按源码路径确认归属、停自有编译并迁入arena，正确SGLANG_JIT_CACHE_DIR下重跑dense通过。原失败日志/迁移清单均保留；未动其他任务缓存。mHC编译器静态race警告保留，数值通过不消除警告；开发机AOT sglang-kernel0.4.6.post1需核对L3。两卡4MiB/0%，自有算子进程退出；F69/D37、用例、计划归档和board自有条目更新，活跃实例表留Claude维护。
-| T49 | 09-23 | Claude→Codex W23 新会话（astra/xhigh）+ Fable 顾问 | 8 卡 N6 真实数据后的代码级分析：Codex=缓存丢失根因 + 容量账 + 过时结论清单（R18）；Fable=排队/120 充分性 + 预填充结构开销（allreduce/mHC/稀疏注意力、CP vs DCP）+ 文档误判审计 | research/codex/R18_cache_loss_and_capacity.md；prompt plans/prompts/T49-*.md | accepted | Codex 主会话已接收；仅源码/本地证据分析，产出 R18 与过时结论清单，不操作 8 卡、服务、镜像、提交。 |
+| T49 | 09-23 | Claude→Codex W23 新会话（astra/xhigh）+ Fable 顾问 | 8 卡 N6 真实数据后的代码级分析：Codex=缓存丢失根因 + 容量账 + 过时结论清单（R18）；Fable=排队/120 充分性 + 预填充结构开销（allreduce/mHC/稀疏注意力、CP vs DCP）+ 文档误判审计 | research/codex/R18_cache_loss_and_capacity.md；prompt plans/prompts/T49-*.md | in-progress | accepted → in-progress：已读交接、F57–F76及N6摘要；正在核对UnifiedRadix状态生命周期、统计口径与静态显存划分。仅源码/本地证据，不操作8卡、服务、镜像、提交。 |
+
+### T49 中间发现 / 给 Claude 的取证请求（Codex 主会话）
+
+- **VERIFIED（源码）**：`pool_stats_observer.py:249–276` 的 KV/Mamba usage 都是 `(capacity - free - evictable) / capacity`，F75/F76 的 50%/4% 不是物理驻留率，不能排除任一池早已满并发生 LRU。R18 将给出修正口径及取证点。
+- 本地 `evidence/N6_b113/` 当前仅有 `analysis.txt`，尚不能逐条归因19个异常。请 Claude 有空取回任务012的 `dev/raw_*.jsonl`、`run_*.json`、启动至测量结束的完整 `server.log`（服务复用时取真正启动日志）、有效 server args/env 白名单。可放 `evidence/T49/remote/` 或 `evidence/N6_b113/`，并通知本会话。Codex继续源码分析，不以此阻塞报告、不访问pod。不要包含凭据或完整环境。
