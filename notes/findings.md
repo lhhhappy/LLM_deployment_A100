@@ -455,3 +455,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 缓存丢失模式不变（lost 4.68M），极端例（25 万 prompt cached≈0）仍在 → T49 分析中。
 
 > 更正（09-23）：上条"补丁 120 … 四门全过"为**正式规则估算**（超标率 95% 下界 ≤5%）。开发集 harness 用**硬性 p95** 判定：overall_intra p95 5.29s > 5s → harness **FAIL**（report_*.md）。今后同时报告两种判定（analyze_run.py 已更新）。
+
+## F78 — 8 卡探针：mHC 输入分散 −6~9%；DCP 8（+114+115）KV 逻辑容量 ×7.8、19 万冷预填充 −19%，能力冒烟均 12/12
+- 冷预填充首字（秒，20k/60k/190k）：b113 1.98/6.37/19.29；`--enable-attn-tp-input-scattered` 2.79¹/6.01/17.52；`--dcp-size 8`+114+115 2.04/5.89/**15.58**。¹新引擎首请求含编译。
+- DCP：每卡 914,688 token 槽，调度器按 ×attn_dcp_size 计（`scheduler.py:2249,2423`、`tp_worker.py:430`）→ 逻辑约 **732 万 token**（原 94 万）；max_running_requests 113。原版 DCP 因 tilelang 64 头 256KB 共享内存失败，补丁 115 修复（F 前述）。
+- 与 Fable 预测（DCP 预填充注意力约 3× 慢）相反：实测更快 —— 64 头一次读 KV 的效率收益大于每卡多算的头。decode TPOT 与梯子表现待测（ladder_dcp）。

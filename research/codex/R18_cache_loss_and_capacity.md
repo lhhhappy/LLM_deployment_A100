@@ -70,7 +70,7 @@ physical_resident_fraction = 1 - free / capacity
 
 **两池谁先满尚未VERIFIED**。即使总KV尚有真空位，584状态槽也可能被历史chunk/角色/分支状态填满；反之FULL压力会同时删状态。普通chunk8192、无path cap会积累中间状态；许多短分支每新增不到1451个KV token就占一个状态，状态池相对更易成为历史缓存约束。长单链每8192 token一个状态则偏向KV先满。这个密度判断比活动4%更有用，但不能代替事件日志。
 
-**补回完整日志后的VERIFIED**：measurement为04:55:54.865–05:25:54.477 UTC，峰值863296 token/0.92（`012_server.log:5644`），Mamba非evictable最大24/584。50%并非完整N6峰值。raw`:476`隔244.00s后cached77952→33600，实际两prompt LCP78561；raw`:626`再隔300.81s后cached33600→1216，LCP78972。两个当前LCP都超过上次已使用的命中深度，证明**原可复用路径退化**，不能用“下一prompt不同”或“前请求没存end”解释全部损失；谁驱逐了它仍是INFERRED。raw`:695`也有短idle5.28s+排队14.77s后17664→576，LCP17938，容量淘汰不只发生在长idle。
+**补回完整日志后的VERIFIED**：measurement为04:55:54.865–05:25:54.477 UTC，峰值863296 token/0.92（`012_server.log:5540`），Mamba非evictable最大24/584。50%并非完整N6峰值。raw`:476`隔244.00s后cached77952→33600，实际两prompt LCP78561；raw`:626`再隔300.81s后cached33600→1216，LCP78972。两个当前LCP都超过上次已使用的命中深度，证明**原可复用路径退化**，不能用“下一prompt不同”或“前请求没存end”解释全部损失；谁驱逐了它仍是INFERRED。raw`:695`也有短idle5.28s+排队14.77s后17664→576，LCP17938，容量淘汰不只发生在长idle。
 
 **flush/namespace的证据边界**：
 
@@ -147,9 +147,9 @@ scorer按 `idx_in_chain==0` 优先归为chain_start，见 `s1-dev/harness/s1_com
 | 695（690） | 18472 | 576 | 17938 | 17362 | 5.28 | P；另排队14.77秒 |
 | 721（714） | 16982 | 9600 | **14653** | **5053** | 9.83 | B；phase是turn_start |
 
-**C类的具体机制**：以raw255→257为例，前请求从cached23040开始，两个8192块分别到31232、39424，最后剩50；最后角色在38720对齐点，落在**第二个仍被truncated的chunk**。101的`:92`只在not truncated时尝试role split，而最后50-token块扫描起点39424已越过角色。因此树可能有31232和39424，却没有38720状态；下一prompt在38781分叉，39424及更深decode状态都在分叉后，实际回落31232、额外7549。真实批日志`012_server.log:3004`、`:3005`给出8192/8192及pending8242/50，与此一致。即使decode保存到39680，也不能用于38781以内的前缀。
+**C类的具体机制**：以raw255→257为例，前请求从cached23040开始，两个8192块分别到31232、39424，最后剩50；最后角色在38720对齐点，落在**第二个仍被truncated的chunk**。101的`:92`只在not truncated时尝试role split，而最后50-token块扫描起点39424已越过角色。因此树可能有31232和39424，却没有38720状态；下一prompt在38781分叉，39424及更深decode状态都在分叉后，实际回落31232、额外7549。真实批日志`012_server.log:2900`、`:2901`给出8192/8192及pending8242/50，与此一致。即使decode保存到39680，也不能用于38781以内的前缀。
 
-其余4个C类同样满足`cached=前请求cached+k×8192`，k分别6、3、5、5；下一个chunk末尾已越过前请求最后角色，最终剩余分别137、99、438、560。raw292日志`:3268`/`:3269`还能直接看见最终pending99、尾128对齐。**这些已有真实token与批日志支持，比笼统“上一轮角色滞后”更精确**；但缺少节点事件仍不排除同时有LRU/branch作用。140在角色所在的任意extend导出快照，直接覆盖这类最后chunk限制，前提是角色槽成功分配。
+其余4个C类同样满足`cached=前请求cached+k×8192`，k分别6、3、5、5；下一个chunk末尾已越过前请求最后角色，最终剩余分别137、99、438、560。raw292日志`:3164`/`:3165`还能直接看见最终pending99、尾128对齐。**这些已有真实token与批日志支持，比笼统“上一轮角色滞后”更精确**；但缺少节点事件仍不排除同时有LRU/branch作用。140在角色所在的任意extend导出快照，直接覆盖这类最后chunk限制，前提是角色槽成功分配。
 
 D类证明冻结LCP本身需审计：raw374冻结93013而实际与raw371只有52400，差40613；不能要求本次未处理过的“源输出”前缀被缓存。raw721冻结LCP16136而实际14653也有1483差。剩余B类保留明确的rid/前驱/track取证位置，不用单点机制图替代运行时证据。
 
@@ -216,14 +216,28 @@ KV_budget = R - (state_slots+1) × one_state
 | KDA一槽 | 34×[8×128×128×4 + 3×3072×2] = **18452480 B = 17.59766 MiB** | fp32 SSM+bf16 conv；`S/configs/mamba_utils.py:116`、`:294`；`S/configs/glm5_next.py:264` |
 | KDA池 | (584+1)槽：SSM **9.71191** + conv **0.34143** = **10.05335 GiB** | 0号padding也分配；`S/mem_cache/memory_pool.py:583`、`:608`；F59 `notes/findings.md:325` |
 | 两池总量 | **约21.2253 GiB** | 不含小元数据、KV哨兵页与以下运行内存 |
-| 请求映射/小池 | 116×约context_len×4字节；约0.11GiB量级，另kpool K/score tails约数MiB、分配器表 | `S/mem_cache/memory_pool.py:254`、`:4807`；真实shape为准 |
-| decode graph | **简报/R8报告约6.1GiB** | 是capture前后free差，不是单独查出的纯graph张量；可能含capture/warmup相关持久分配。`S/model_executor/model_runner_components/cuda_graph_setup.py:530`、`:570` |
-| 权重与加载后常驻开销 | **本地缺启动原日志，不能报精确实测值** | `S/model_executor/model_runner.py:1128`、`:1225` 有load前后记录；磁盘328GB/8不是运行权重显存 |
-| 激活/通信/graph预留 | 默认启发式见下，**预算而非实测占用** | 不能把它与6.1GiB再全部相加计费 |
+| 请求映射/小池 | (116+1)×context_len×4字节；约0.114GiB，另kpool K/score tails、分配器表等 | `S/mem_cache/memory_pool.py:279`、`:4807`；启动中两池以外同期增量共约0.245GiB，不能全部归给映射表 |
+| decode graph | **实际capture增量1.31GiB/rank** | `evidence/T49/remote/012_server.log:156`、`:199`；before17.23→after15.92（TP0）。capture/warmup阶段free差，非纯graph张量的逐项归属。简报6.1GiB不适用于012 |
+| 权重加载阶段 | **39.15GiB/rank** | TP0 free77.87→38.72，其他rank77.73→38.58；`012_server.log:50`、`:57`、`:95`、`:101`。这是load阶段显存增量，含量化重排/持久工作区，非仅参数张量理论字节 |
+| 激活/通信/graph预留 | **实际f=0.77805，静态运行余量约17.25GiB**；另MM post-sizing reserve0.10GiB | `012_server.log:14`、`:111`；预算而非已经分配的激活。不能与graph增量重复相加 |
 
-按默认8192 chunk、TP8、配置graph512、KDA prefill graph disabled，`S/arg_groups/memory_hook.py:245`、`:292` 的预留为：512MiB元数据 + **12288MiB激活启发式** + 1024MiB并行余量 + 1024MiB graph启发式 = **14848MiB=14.5GiB**，再按设备容量算并舍入mem-fraction。精确预留用 `pre_load_free×(1−实际f)`，不会与此完全相等。
+按默认8192 chunk、TP8、配置graph512、KDA prefill graph disabled，`S/arg_groups/memory_hook.py:245`、`:292`首先算：512MiB元数据 + **12288MiB激活启发式** + 1024MiB并行余量 + 1024MiB graph启发式 = **14848MiB=14.5GiB**。**还有VLM折减**（`:271`、`:352`）：本模型vision_config默认复杂度因子1，预算比例0.819再乘0.95，得到日志中的**0.77805**。池预算采用分布式最小free，实际运行预留约`77.73×(1−0.77805)=17.252GiB`，另扣0.10GiB MM池。只按14.5GiB反算权重会多算约2.75GiB；本轮原稿的条件反算已被真实日志替换。
 
-**INFERRED条件反算**：如果pre-load free约79–80GiB、实际预留约14.5GiB且两池如上，则load及此前常驻开销约 **43.3–44.3GiB**；不是已读出的权重测量。graph6.1GiB属于14.5GiB运行余量内的后续消耗，理论余下约8.4GiB供其它运行峰值，不能声称“另有14.5GiB空闲”。精确账需启动阶段free/allocated/reserved及prefill峰值闭合。
+**VERIFIED的启动账闭合（以free较小的rank，日志两位小数精度）**：
+
+```text
+载权前 free                         77.73 GiB
+−载权阶段增量                     39.15
+=载权后 free                       38.58
+−KV11.17193−KDA10.05335             21.22528
+−同期请求表/其它小池等约             0.24472
+=memory pool end free              17.11
+−capture前其它分配约                 0.02
+−capture阶段增量                    1.31
+=capture后 free                    15.78 GiB
+```
+
+依据`012_server.log:95`、`:127`、`:135`、`:139`、`:152`、`:194`。载权前已有CUDA/NCCL等驻留；初始free不等于设备总容量。**15.78GiB是capture后的空余，不是prefill峰值剩余**；尚缺运行中高水位，不能据此承诺全转KV。load、池、graph已能闭合；激活临时峰值仍须T49-06记录。保持多模态能力不变，不能为多拿预算随意关vision路径。
 
 ### 7.2 N26需要多少KV
 
@@ -233,10 +247,11 @@ KV_budget = R - (state_slots+1) × one_state
 |---|---:|---:|
 | 26×请求均值 | 1239385 | 14.68GiB |
 | 26×50000 | 1300000 | 15.40GiB |
-| N6不可淘汰峰值0.50线性放大26/6 | 2043947 | 24.21GiB |
+| 早期N6不可淘汰0.50线性放大26/6（已非全程峰值） | 2043947 | 24.21GiB |
+| 完整N6不可淘汰峰值863296线性放大26/6 | 3740949 | 44.30GiB |
 | 26×257000长上下文压力情景 | 6682000 | 79.13GiB |
 
-前两项给设计中心，第三项给压力参考，第四项说明尾部不能忽略；全都不是N26容量实测。N是agent槽，sleep和等待不一定拥有active KV；长请求服务时间偏置会抬高同时驻留均值，共享前缀则降低唯一token数。真正需要的是：**同时运行的唯一受保护KV + decode增长/页碎片/重算重复的瞬时空间 + 希望留给空闲链的历史缓存**。历史cache目标还取决于reuse distance，而非只看N。不能把50%按N外推成“N14开始首次淘汰”：N6可能早已淘汰历史缓存。
+前两项给设计中心，峰值线性情景给压力参考，极端长context情景说明尾部不能忽略；全都不是N26容量实测。N是agent槽，sleep和等待不一定拥有active KV；长请求服务时间偏置会抬高同时驻留均值，共享前缀则降低唯一token数。真正需要的是：**同时运行的唯一受保护KV + decode增长/页碎片/重算重复的瞬时空间 + 希望留给空闲链的历史缓存**。历史cache目标还取决于reuse distance，而非只看N。不能把50%外推成“N14开始首次淘汰”：N6完整峰值已92%，空闲历史可能更早被逐出。
 
 KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬时峰值；并发预算5N=130槽≈2.23GiB；140额外角色的同时在途上界可再加N槽≈0.447GiB。这些是当前活动部分，**不是历史状态总需求**，不能据此把584直接缩成130。
 
@@ -244,15 +259,15 @@ KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬�
 
 ### 8.1 先收graph，再根据真实峰值调静态预算（较低风险、收益须分两步）
 
-**VERIFIED**：配置默认max_bs512（`memory_hook.py:102`），但实际capture列表还按请求池大小裁剪（`S/model_executor/runner/base_cuda_graph_runner.py:64`）。F59并发cap116，所以不能用“已经capture512”计算节省。需读capture日志 `bs=[...]`；考虑padding时也不能机械断言最大恰为116。
+**VERIFIED**：配置默认max_bs512（`memory_hook.py:102`），实际capture列表按请求池大小裁剪（`S/model_executor/runner/base_cuda_graph_runner.py:64`）。012日志`:156`明确列到116、总capture增量1.31GiB。因此不能用“capture512/graph6.1GiB”计算节省。
 
 建议普通N26先试 `--cuda-graph-max-bs-decode 64`（旧 `--cuda-graph-max-bs` 仍是alias，`S/server_args.py:3929`）。实际batch超过capture上界会走eager，正式能力门并发、MTP verify宽度也要另看，不能只按dev N26保证所有请求都进graph。
 
-- 如果mem-fraction仍自动：512→64只少预留 **896MiB**；r不变时约52.63%变KV，约47.37%变状态，预计 **KV +38887 token，约4.1%**。f舍入、其它分配有小误差。
+- 如果mem-fraction仍自动：启发式512→64少预留 **896MiB**；本模型舍入及VLM折减后，f预计0.77805→0.78850，按77.73GiB pre-load free增池约0.8123GiB；r不变约52.63%变KV，预计 **KV +36099 token，约3.8%**。忽略VLM的通用算式才是38887/4.1%；两者均非已启动的新配置实测。
 - 如果显式固定mem-fraction：减少graph本身通常只增加运行空余，**KV初始大小基本不变**。
-- 如果实测真省5GiB且据此安全提高静态预算：r=0.9时也只约2.63GiB给KV，即+22.2万token、约23.6%；只有固定/缩小MAMBA池并把全部5GiB转给KV，才接近+42万token/+44.8%。5GiB本身尚未实测。
+- 原“graph能省5–6GiB”与本轮**总capture增量1.31GiB**不符。即使假设1.31GiB全回收并重分池，r=0.9也仅约+5.8万KV token；graph64仍占一部分，实际收益更小。若另从prefill峰值余量加f，收益应归于预算重配，不能算作graph节省。
 
-**INFERRED建议**：保持prefill工作量/120/140一致，先收graph测峰值，再小步提高f。每增加0.01f，若pre-load free≈79–80GiB，池预算约+0.79–0.80GiB，固定r时KV约+3.5万。激活随chunk、长context indexer、ragged batch变化；不能照其它模型的0.9/0.95直接套。
+**INFERRED建议**：保持prefill工作量/120/140一致，先收graph测峰值，再小步提高f。按已测pre-load free77.73GiB，每增加0.01f增池0.7773GiB，固定r时KV约+3.45万。激活随chunk、长context indexer、ragged batch变化；不能照其它模型的0.9/0.95直接套。
 
 ### 8.2 `mamba_full_memory_ratio`（中等风险，必须知道触发池）
 
@@ -268,6 +283,8 @@ KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬�
 输入R由已分配两池反算，原始budget的取整剩余未取回，槽数可能相差1；重启后graph/weight/workspace变化也会改变R。0.9→0.5不是旧文所说1.5×。0.3可覆盖130万中心情景但缺历史KV余量，状态槽减半也可能增加重算；若当前MAMBA先触发，盲减r可能变慢。
 
 `extra_buffer_lazy`节省的是每活动请求约一个槽，N26约0.447GiB可用于更多历史状态，**固定池大小下不直接增KV**；并发预算比例5→4。当前140明确拒绝lazy（`patches/140-kda-dual-snapshot.patch:708`），不能直接组合。`--max-mamba-cache-size`可在扩大f时固定状态池，使增量更多给KV，但须用历史状态/slot_skip证据确定大小。
+
+**针对R8新§8容量探针的审阅**：固定状态200槽时并发cap40；按相同总预算KV约**1500544（1.59×）**，再按上述graph64自动f约**1569152（1.66×）**。不是自动2×，也不是零风险：N26活动78槽、树锁及临时捐赠/role槽之外只剩有限历史状态；若原先MAMBA先满，会放大重算。可以做受控探针，但应同时记录slot free/evict、140 skip、峰值和SLO，不能用4%作安全论据。
 
 ### 8.3 DCP `--dcp-size` +115（理论容量收益最大，但正确性风险高于上述调参）
 

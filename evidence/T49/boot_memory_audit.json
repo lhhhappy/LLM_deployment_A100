@@ -1,0 +1,33 @@
+{
+  "provenance": "012 server log plus source arithmetic; predicted alternatives are not executed",
+  "boot": {
+    "mem_fraction": 0.77805,
+    "weight_loading_delta_GiB": 39.15,
+    "preload_free_min_GiB": 77.73,
+    "postload_free_min_GiB": 38.58,
+    "post_pool_free_min_GiB": 17.11,
+    "capture_before_min_GiB": 17.09,
+    "capture_after_min_GiB": 15.78,
+    "capture_delta_GiB": 1.31,
+    "capture_max_bs": 116
+  },
+  "graph64_conditional": {
+    "mem_fraction": 0.7885,
+    "extra_pool_GiB": 0.8122784999999969,
+    "extra_kv_tokens": 36099.46019875419
+  },
+  "fixed_states_200": [
+    {
+      "graph64": false,
+      "kv_tokens": 1500544
+    },
+    {
+      "graph64": true,
+      "kv_tokens": 1569152
+    }
+  ],
+  "N26_full_N6_peak_linear": {
+    "tokens": 3740949.3333333335,
+    "KV_GiB": 44.30293265978496
+  }
+}
