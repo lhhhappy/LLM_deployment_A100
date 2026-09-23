@@ -1,5 +1,7 @@
 # Agentic Science Challenge：GLM-5.3-Flash 推理服务
 
+本地仓库整理于 2026-09-24 完成（`bb5dd6e`、`a17ba7c`、`ad54148`）；GPU 镜像同步待 SSH 恢复且现有队列结束。
+
 这是 8×A100-80GB 上的推理服务部署赛。唯一赛规是 [task.md](llm-challenge-arena-v1/task.md)：能力评测 AIME26 与 GPQA Diamond 都须严格高于 90 分；压测先比通过全部硬门的最大并发档 `n_at_slo`，同档再比越小越好的 `tpot_mean`。TPM 只作诊断。平台从 N=10 开始，成功加 4、失败减 4；单档约 4 小时。每档有完整性、错误率、四道 TTFT 和 `tpot_p95 ≤ 0.10 s/token` 等 11 道硬门；TTFT 按题面规定的统计余量判定，TPOT p95 没有余量。开发集只能比较我们自己的 A/B 和回归，不能预测正式 N@SLO（task.md「开发集」与「压测」节）。
 
 ## 现在做什么
