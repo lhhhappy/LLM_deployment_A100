@@ -8,7 +8,10 @@ set -uo pipefail
 D=/sjtu/linhang/arena/runs/jobs; G="$(dirname "$0")/gssh"
 case "${1:-}" in
   run)  name=$2; shift 2; cmd="$*"
-        printf '%s\n' "$cmd" | timeout 60 ssh -o ConnectTimeout=20 GPU "mkdir -p $D && cat > $D/$name.cmd" || { echo "cannot upload job"; exit 1; }
+        ok=0; for i in 1 2 3 4 5 6; do   # upload is idempotent (overwrites the same file) => safe to retry
+          printf '%s\n' "$cmd" | timeout 60 ssh -o ConnectTimeout=20 GPU "mkdir -p $D && cat > $D/$name.cmd" 2>/dev/null && { ok=1; break; }
+          echo "[gjob] upload failed ($i/6), retrying" >&2; sleep 6; done
+        [ $ok = 1 ] || { echo "cannot upload job"; exit 1; }
         GSSH_TIMEOUT=60 "$G" "if tmux list-windows -t arena-daemons -F '#W' | grep -qx '$name'; then echo 'job $name already running'; exit 3; fi;
           : > $D/$name.log; tmux new-window -d -t arena-daemons -n '$name' \"bash $D/$name.cmd > $D/$name.log 2>&1; echo DONE rc=\\\$? >> $D/$name.log\"; echo started $name" ;;
   wait) name=$2; until GSSH_TIMEOUT=60 "$G" "grep -q '^DONE rc=' $D/$name.log" 2>/dev/null; do sleep 60; done
