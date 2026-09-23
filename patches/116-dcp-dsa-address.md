@@ -63,7 +63,13 @@ DCP 下调度器与分配器使用**虚拟 loc**（`[0,(rows+64)·W)`，页 64·
   - W=2 时原栈越界（1.2 倍）没有 fault，只是读到 0；8 卡越界可达 8 倍，推断会 fault。
 - **CUDA graph decode 未覆盖**：r5 的 fix_dcp_graph 用 `--batch-size 1` 捕获，而 decode 批为 2 → 实际走了 eager（与 fix_dcp 数值相同）。
   - 已修正：harness 改为 `--batch-size 2`，并在捕获时把 o_proj 输入拷进静态缓冲区，每次 replay 后读取，`graph_dec_steps>0` 证明 graph 确实跑过；verdict 要求 >0。
-  - r6 全矩阵（gjob `t50_dcp7`）运行中，结论自动写入 `/sjtu/linhang/arena/runs/T50/r6/SUMMARY.txt`。
+  - r6（`evidence/T50/devbox_r6_*`）：eager 用例全部重现 r5 的 PASS。graph 用例确实走了 graph（没有 eager 的 decode 前向），但 graph 在 load_model 内部捕获，早于钩子注册，所以 replay 输出没有观测到（graph_dec_steps=0 → verdict 判 FAIL＝未验证，不是数值错误）。
+  - 修正：通过包装 `ModelRunner.init_cuda_graphs` 在捕获前安装钩子。
+- **r7（最终，`evidence/T50/devbox_r7_*`，开发机 `/sjtu/linhang/arena/runs/T50/r7/SUMMARY.txt`）：VERDICT_116 PASS**。
+  - 9 个用例都没有崩溃；
+  - fix_dcp / fix_dcp_hi / fix_dcp_graph / full_dcp_hi 对非 DCP 参考：cold ≤1.4e-4、ext ≤2.0e-3、dec ≤5.2e-3；
+  - **CUDA graph decode 观测到 8 次 replay**（4 步 × 2 个 DSA 层），dec 4.4e-3 / 5.2e-3；
+  - 原栈 orig_dcp_hi 三阶段仍为 1.0（复现）。
 
 ## 风险
 - 只修了 tilelang DSA 路径（A100 唯一可用的路径）。flashmla/fa3/trtllm/aiter 在 DCP 下仍按原样（Hopper 路径，这里不用）。
@@ -75,7 +81,7 @@ DCP 下调度器与分配器使用**虚拟 loc**（`[0,(rows+64)·W)`，页 64·
 - 容量只有约 ×4.4，而且 decode 仍要对 64 头 all-gather Q。性能与 TPOT 要看 8 卡梯子。
 
 ## 8 卡复验方案（交 Claude 执行，本任务不提交）
-前提：r5 已 PASS（eager）；r6 的 CUDA graph decode 用例也需 PASS。作业文件已写好：`scripts/pod/jobs/dcp116_probe.sh`（容量、numcheck 对非 DCP 参考、180k×5 高负载下的前缀命中、能力冒烟；需加载两次引擎，约 45 分钟）。以下为等价参数：patch 列表 = RELEASE TIER1 + `114 115 116`（+ 原 025 的 120）。
+前提（已满足）：开发机 r7 全部 PASS，含 CUDA graph decode。作业文件已写好：`scripts/pod/jobs/dcp116_probe.sh`（容量、numcheck 对非 DCP 参考、180k×5 高负载下的前缀命中、能力冒烟；需加载两次引擎，约 45 分钟）。以下为等价参数：patch 列表 = RELEASE TIER1 + `114 115 116`（+ 原 025 的 120）。
 1. **冷探针 + 能力冒烟 + 容量**（仿 `scripts/pod/jobs/coldprobe_b115_dcp8.sh`）：
    ```
    CP_NAME=b116dcp

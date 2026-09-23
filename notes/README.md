@@ -84,6 +84,13 @@
 - **F81** chunked_prefill 16384 使自动 mem_fraction_static 从 0.7885 降到 0.646 → KV 从 157 万掉到 63 万，运行时 27GB 闲置
 - **F82** 梯子 024 在 N10 引擎崩溃："Prefill out of memory"（底包续算强制整块分配）→ 补丁 106
 - **F83** DCP8 梯子 N10 崩溃：带前缀命中的预填充触发 CUDA illegal memory access
+- **F84** 106 生效（KV 三次打满不崩）；N10 四道 TTFT 门两口径全过，但 tpot_p95 0.13 > 0.10 → 120 v3
+- **F85** 干扰探针 026a–f（8 卡，档 1，12 路 decode + 190k 冷预填充 + 每秒短命中）
+- **F86** 梯子 027（v3 cap2048 + interval 3，档 3 全量）：TPOT 护住了，TTFT 全崩 → 小块的固定开销吃掉预填充吞吐
+- **F87** 预填充每块固定开销的成因（T51 + T52 + 8 卡 026g，VERIFIED）
+- **F88** 8 卡探针 026g–k（档 1）：114 有效；MTP+v3 兼容；**170 BCG 在 TP8+scatter 下输出错误**
+- **F89** 梯子 028（MTP+114+v3 cap4096 i2，eager prefill）N18：TPOT 两项都过，TTFT 仍败
+- **F90** 今晚（09-23 离线队列）结论
 
 ## Decisions（最新在上）
 
@@ -160,6 +167,8 @@
 ## Plans
 
 - plans/active/2026-09-23-8card-selftest-ladder.md
+- plans/active/2026-09-23-offline-queue-3h.md
+- plans/active/T50-dcp-prefix.md
 - plans/completed/102-role-track.md
 - plans/completed/112-sm80-indexer.md
 - plans/completed/113-prefill-indexer.md
@@ -185,6 +194,8 @@
 
 - research/README.md
 - research/archive/R5_patch_review.md
+- research/claude/R10_prefill_fixed_overhead.md
+- research/claude/R11_retro_unverified_assumptions.md
 - research/claude/R1_model_and_engines.md
 - research/claude/R2_serving_techniques.md
 - research/claude/R3_prior_art_en.md

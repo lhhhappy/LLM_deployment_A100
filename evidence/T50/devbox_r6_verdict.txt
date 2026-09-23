@@ -1,0 +1,25 @@
+T50/116 dev-box verdict (TP2, DCP2, gate rel L-inf <= 1e-2 on DSA attention output + logits)
+
+cases:
+  orig_ref       rc=0 done=True 
+  orig_dcp       rc=0 done=True 
+  orig_dcp_hi    rc=0 done=True 
+  fix_ref        rc=0 done=True 
+  fix_dcp        rc=0 done=True 
+  fix_dcp_hi     rc=0 done=True 
+  fix_dcp_graph  rc=0 done=True 
+  full_ref       rc=0 done=True 
+  full_dcp_hi    rc=0 done=True 
+comparisons (worst rel L-inf per stage):
+  orig_dcp vs orig_ref         PASS    cold=7.04e-05 dec=0.00e+00 ext=1.96e-03
+  orig_dcp_hi vs orig_ref      FAIL    cold=1.00e+00 dec=1.00e+00 ext=1.00e+00
+  fix_ref vs orig_ref          PASS    cold=7.04e-05 dec=0.00e+00 ext=1.96e-03
+  fix_dcp vs fix_ref           PASS    cold=5.83e-05 dec=5.24e-03 ext=1.96e-03
+  fix_dcp_hi vs fix_ref        PASS    cold=1.41e-04 dec=5.24e-03 ext=9.80e-04
+  fix_dcp_graph vs fix_ref     FAIL    cold=5.83e-05 dec=0.00e+00 ext=4.90e-04
+  full_dcp_hi vs full_ref      PASS    cold=7.04e-05 dec=5.24e-03 ext=1.96e-03
+
+orig_dcp_hi (stock stack, high virtual locs): FAIL (expected FAIL = reproduces wrong/OOB reads)
+fix_dcp_graph CUDA-graph decode steps observed: 0
+116 cases crashed/errored/unverified: ['fix_dcp_graph: decode did not replay a CUDA graph (graph_dec_steps=0)']
+VERDICT_116 FAIL

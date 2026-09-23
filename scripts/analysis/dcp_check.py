@@ -55,31 +55,42 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
         import sglang.srt.model_loader.loader as _ld
         _ld.initialize_dummy_weights = _ax_well_scaled_init(_ld.initialize_dummy_weights)
     ob.initialize_moe_config(); ob.initialize_fp8_gemm_config(); ob.initialize_fp4_gemm_config()
+    # hooks must exist BEFORE the decode CUDA graphs are captured (init_cuda_graphs runs inside load_model)
+    from sglang.srt.model_executor.model_runner import ModelRunner
+    _orig_icg = ModelRunner.init_cuda_graphs
+    def _icg(self, *a, **k):
+        install(self.model)
+        return _orig_icg(self, *a, **k)
+    ModelRunner.init_cuda_graphs = _icg
+    cap, stage, static, seen, names = {}, ["load"], {}, set(), []
+    def install(model):
+        from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
+        if names:
+            return
+        boost = float(os.environ.get("AX_ATTN_BOOST", "1"))
+        for name, m in model.named_modules():
+            if isinstance(m, DeepseekV2AttentionMLA):
+                if boost != 1:  # o_proj is quantized (int-packed): scale its OUTPUT (hook is captured into graphs too)
+                    def post(mod, args, out, _b=boost):
+                        return (out[0] * _b, *out[1:]) if isinstance(out, tuple) else out * _b
+                    m.o_proj.register_forward_hook(post)
+                names.append(name)
+                def pre(mod, args, _n=name):
+                    if torch.cuda.is_current_stream_capturing():  # graph: record a copy into a static buffer
+                        b = static.get((_n, args[0].shape[0]))
+                        if b is None:
+                            b = static[(_n, args[0].shape[0])] = torch.empty_like(args[0])
+                        b.copy_(args[0])
+                        return
+                    seen.add(_n)
+                    x = args[0].detach().float()
+                    if stage[0] == "cold":
+                        x = torch.cat([x[::16], x[-64:]])
+                    cap.setdefault(stage[0], {}).setdefault(_n, []).append(x.cpu())
+                m.o_proj.register_forward_pre_hook(pre)
+
     runner, _ = ob.load_model(server_args, port_args, gpu_id, tp_rank)
     mr = runner.torch_runner
-    from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
-    cap, stage, static, seen, names = {}, ["load"], {}, set(), []
-    boost = float(os.environ.get("AX_ATTN_BOOST", "1"))
-    for name, m in mr.model.named_modules():
-        if isinstance(m, DeepseekV2AttentionMLA):
-            if boost != 1:  # o_proj is quantized (int-packed): scale its OUTPUT (hook is captured into graphs too)
-                def post(mod, args, out, _b=boost):
-                    return (out[0] * _b, *out[1:]) if isinstance(out, tuple) else out * _b
-                m.o_proj.register_forward_hook(post)
-            names.append(name)
-            def pre(mod, args, _n=name):
-                if torch.cuda.is_current_stream_capturing():  # graph: record a copy into a static buffer
-                    b = static.get((_n, args[0].shape[0]))
-                    if b is None:
-                        b = static[(_n, args[0].shape[0])] = torch.empty_like(args[0])
-                    b.copy_(args[0])
-                    return
-                seen.add(_n)
-                x = args[0].detach().float()
-                if stage[0] == "cold":
-                    x = torch.cat([x[::16], x[-64:]])
-                cap.setdefault(stage[0], {}).setdefault(_n, []).append(x.cpu())
-            m.o_proj.register_forward_pre_hook(pre)
     alloc = mr.token_to_kv_pool_allocator
     pre = [int(x) for x in os.environ.get("AX_PREFIX", "8192,6144").split(",")]
     ext = [int(x) for x in os.environ.get("AX_EXT", "1000,700").split(",")]

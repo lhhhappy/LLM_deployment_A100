@@ -39,8 +39,8 @@
 - [x] （T50b）116 最终版：norope 写入按 owner 规则分片 + extend 读 dcp_kv_buffer + decode/verify 转本卡行 + indexer K 虚拟空间复制 + 显存核算。全栈 fuzz=0（本地、开发机）。`patches/116-dcp-dsa-address.{patch,md}`（含 8 卡方案）。
 - [x] r5 全矩阵（eager）VERDICT PASS：116 各用例 DSA 输出相对 L∞ cold≤1.4e-4、ext≤2.0e-3（=噪声基线）、dec≤5.2e-3；原栈高 slot（orig_dcp_hi）三阶段均 1.0（读到 0）。证据 `evidence/T50/devbox_r5_*`。
 - [x] 8 卡作业文件 `scripts/pod/jobs/dcp116_probe.sh`（未入队，由 Claude 执行）。
-- [ ] r6：CUDA graph decode 覆盖（r5 的 graph 用例因 bs=1 捕获实际走了 eager）。gjob `t50_dcp7`，结论写入 `/sjtu/linhang/arena/runs/T50/r6/SUMMARY.txt`。
-- [ ] 交付。
+- [x] r6：graph 用例的钩子装得晚于捕获 → 未观测（判为未验证）；r7 把钩子移到捕获前：**VERDICT_116 PASS**，含 CUDA graph decode 8 次 replay（dec ≤5.2e-3）。证据 `evidence/T50/devbox_r6_*`、`devbox_r7_*`。
+- [x] 交付（09-23）。8 卡复验：`scripts/pod/jobs/dcp116_probe.sh` 由 Claude 入队。
 
 ## 决策记录
 - 2026-09-23：先确认各池地址域，禁止用冷请求通过替代前缀命中正确性。
