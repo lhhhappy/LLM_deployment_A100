@@ -1,6 +1,6 @@
 CP_NAME=b113cp
 CP_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch"
-CP_ARGS="--enable-prefill-cp --attn-cp-size 8"
+CP_ARGS="--enable-prefill-cp --attn-cp-size 8 --cp-strategy zigzag"
 # Cold-prefill probe: start/reuse engine VARIANT, then single-request cold prefills (20k/60k/190k) + profile of 60k,
 # + capability smoke subset (correctness guard for structural variants). Wrapper sets:
 #   CP_NAME (unique src name), CP_PATCHES (patch list), CP_ARGS (extra launch args), CP_ENV (extra env assignments)

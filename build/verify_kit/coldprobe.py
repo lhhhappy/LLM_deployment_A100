@@ -8,8 +8,13 @@ port = os.environ.get("PORT", "30000"); base = f"http://127.0.0.1:{port}"
 def post(path, body, timeout=1800):
     return urllib.request.urlopen(urllib.request.Request(base + path, json.dumps(body).encode(), {"Content-Type": "application/json"}), timeout=timeout).read()
 rows = []
+def flush():  # right after startup the engine may still be running its own warmup -> flush returns 400; retry
+    for i in range(30):
+        try: post("/flush_cache", {}); return
+        except Exception as e: time.sleep(2)
+    raise RuntimeError("flush_cache kept failing")
 for L in lens:
-    post("/flush_cache", {}); rnd = random.Random(L)
+    flush(); rnd = random.Random(L)
     ids = [rnd.randrange(1000, 150000) for _ in range(L)]
     if L == prof_len:
         os.makedirs(f"{out}/prof_{L}", exist_ok=True)
