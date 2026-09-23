@@ -4,7 +4,7 @@
 
 | 顺序 | 问题与对照 | Job / 状态（2026-09-24 记录） | 决定下一步的读数 |
 |---|---|---|---|
-| 当前 | S1 上固定解码间隔 16 会不会保住 114 的 TTFT 收益？对照 036，只改 `--prefill-decode-interval 16`；037 的同开关在 S0 上使三道 TTFT 门失败 | `scripts/pod/jobs/s1_i16_n22.sh`（037b；运行记录称进行中） | 与 036 对照 11 门及 TPOT；尤其看 overall、turn、chain 是否回退 |
+| 当前 | S1 上固定解码间隔 16 会不会保住 114 的 TTFT 收益？对照 036，只改 `--prefill-decode-interval 16`；037 的同开关在 S0 上使三道 TTFT 门失败 | `scripts/pod/jobs/s1_i16_n22.sh`（037b；**已完成**：TPOT 0 超标、均值 0.056，但 overall 29/27、turn 5/3、chain 78/22 失败，`evidence/L037b/`） | 与 036 对照 11 门及 TPOT；尤其看 overall、turn、chain 是否回退 |
 | 随后 | S1 + 122 自适应 decode 轮次能否降低 TPOT p95，同时守住 chain_start？037 的固定 16 轮过度挤压 prefill | `scripts/pod/jobs/s1_122_n22.sh`（037c；已排队，参数 0.17；N22 通过则自动接测 N26；pod 实跑版本见 `evidence/jobs-0924/pending/`） | 对照 036 和 037b 的完整 11 门、轮次数与重 prefill 停顿；0.17 是调度估计参数，需实测验证 |
 | 随后 | 在 037c 上只加 123（冷请求按剩余 prefill 量排序，老化 2000 token/s）：037 的 87 条 chain_start 超标里 60 条是中小链首在一个大冷请求后面排队约 54 秒 | 037d（`evidence/jobs-0924/pending/037d-s1_122_123_n22.sh`；已排队；N22 通过则自动接测 N26） | 对照 037c：chain/turn 超标条数与排队时间、大链首 TTFT、TPOT 应不变 |
 | 随后 | 去掉 140 的额外 KDA 快照能否减少状态槽压力、保持 S1 的 TTFT？ | `scripts/pod/jobs/s1_no140_n22.sh`（038；已排队） | 11 门、KV/状态池、真实缓存命中、对 036 的变化 |
