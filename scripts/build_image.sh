@@ -73,7 +73,7 @@ for p in "${PATCHES[@]}"; do
   b="$(basename "$p")"
   [[ "$b" =~ ^[A-Za-z0-9._-]+$ ]] || die "unsafe patch filename: $b"
   # Every file path in the patch must be a/python/sglang/... so that -p$STRIP lands in the pkg dir.
-  bad="$(grep -E '^(\+\+\+|---) ' "$p" | awk '{print $2}' | grep -vE '^[ab]/python/sglang/' || true)"
+  bad="$(grep -E '^(\+\+\+|---) ' "$p" | awk '{print $2}' | grep -vE '^([ab]/python/sglang/|/dev/null$)' || true)"
   [ -z "$bad" ] || die "$b has paths outside a|b/python/sglang/: $bad"
   # Neutral in-image name (p0.patch, p1.patch, ...): the image is deployable by other arena members (rule.md §4.1).
   nb="p${#NAMES[@]}.patch"

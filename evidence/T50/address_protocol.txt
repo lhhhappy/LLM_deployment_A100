@@ -1,34 +1,40 @@
-T50b — DCP address protocol on the DSA path (CPU-side source reading, base = build/base_exact/sglang, 000..115 applied)
-Line numbers are in build/base_exact (B:) unless marked. VERIFIED = read in source; INFERRED = reasoning, still to be confirmed on GPU.
+T50b — DCP address protocol on the GLM DSA path. Base = build/base_exact/sglang (B:), stack 000..115 applied.
+VERIFIED-src = read in source; MEASURED = dev box TP2 (devbox_r*_summary.txt); INFERRED = reasoning only.
+(Rev 2, 09-23 ~11:40: the first CPU-only reading assumed the latent write was sharded; r3 measurement disproved that.)
 
-1. Virtual loc space (VERIFIED)
-   - Allocator under DCP: PagedTokenToKVPoolAllocator(size = max_total*W, page = 64*W)   B:srt/mem_cache/kv_cache_configurator.py:1995
-   - Tree cache page = 64*W (512 on DCP8)                                                 B:srt/mem_cache/kv_cache_builder.py:307-314
-   - Scheduler counts capacity x W                                                        B:srt/managers/scheduler.py:2249,2423; tp_worker.py:430
-   => req_to_token / out_cache_loc / page_table_1 / real_page_table / topk-transform output are VIRTUAL locs in [0,(rows+64)*W).
-2. Per-rank pools are NOT virtual-sized (VERIFIED)
-   - DSA pool (latent + indexer K) is built with the per-rank max_total (loc_space_scale=1 for the target)
-       B:srt/mem_cache/kv_cache_configurator.py:337-351, 1498-1560
-   - IndexKeyCache pages = (index_buf_size + 65)//64 with index_buf_size = size (per-rank)    B:srt/mem_cache/memory_pool.py:4738; index_key_cache.py:17
-3. Latent write IS sharded (VERIFIED): owner = loc % W == rank, stored at loc // W   B:kernels/ops/kvcache/mla_buffer.py:42-44
-4. Nothing on the DSA read side translates (VERIFIED: grep 'dcp' in layers/attention/dsa/*, dsa_backend.py, index_key_cache.py)
-   - extend (sm80: use_mha is always False, B:dsa_backend.py:4461 needs SM90/100): kv_cache = local pool (3001),
-     page_table_1 = virtual locs (3042), tilelang sparse attention reads kv_cache[virtual] (3091)
-   - decode: same with transform_index_page_table_decode / fused top-k (3312, 3345, 3393); only LSE is returned for DCP.
-   - indexer K store (index_key_cache.store_quantized) and reads (paged logits via real_page_table; 112 `_paged`
-     kernel loads BT without an upper bound: patches/112 `physical = max(BT,0)`) use virtual locs/pages on a per-rank buffer.
-   - The base already gathers the full prefix KV for MLA extend under DCP (forward_mla.py:643 ->
-     dcp/comm.py:267 all_gather_kv_cache_for_mla_extend -> attn_dcp_metadata.dcp_kv_buffer), but only the FlashInfer-MLA
-     backend consumes dcp_kv_buffer; the DSA backend ignores it.
-5. Consequences (INFERRED from 1-4, to be measured on the dev box)
-   a. Whenever a virtual loc >= per-rank rows (818,112 in 025) is read/written: out-of-bounds -> illegal memory access.
-      The allocator hands out the lowest free pages first, so this only happens once the virtual high-water mark passes
-      1/W of the logical space. 025 crashed at "full token usage 0.07-0.10" of 6.54M logical = 0.46-0.65M live tokens,
-      plus fragmentation from freed pages -> high-water mark over 818k is plausible. The crash is NOT specific to prefix hits;
-      prefix hits (long retained trees) just push the high-water mark up. Cold probes (013b) never got there.
-   b. Below that threshold, DCP runs WITHOUT crashing but the DSA layers read the wrong KV rows (row v holds virtual token
-      v*W+rank) in both prefill and decode -> DSA attention output is wrong. 11 of 45 GLM layers are DSA, so the capability
-      smoke (12/12 in F78) could still pass. Any DCP numbers so far (F78 −19% cold prefill, 025 N10) were measured on
-      wrong attention.
-6. None of 110/112/113/114/115 introduced the bug; they inherited the base's non-DCP addressing. 115 only made the
-   64-head decode kernel fit A100 smem, which is what let DCP start at all.
+1. Virtual loc space (VERIFIED-src)
+   - DCP allocator: PagedTokenToKVPoolAllocator(size=max_total*W, page=64*W)            B:srt/mem_cache/kv_cache_configurator.py:1995
+   - Tree-cache page = 64*W (512 on DCP8)                                                 B:srt/mem_cache/kv_cache_builder.py:307-314
+   - Scheduler / max_req_len count capacity x W                                           B:srt/managers/scheduler.py:2249,2423; tp_worker.py:430
+   => req_to_token / out_cache_loc / page_table_1 / real_page_table / top-k outputs are VIRTUAL locs in [0,(rows+64)*W).
+2. Per-rank pools are per-rank sized (VERIFIED-src)
+   - DSA pool (latent + indexer K) gets the per-rank max_total                           B:kv_cache_configurator.py:337-351, 1498-1560
+   - IndexKeyCache pages = (index_buf_size+65)//64, index_buf_size = size                 B:srt/mem_cache/memory_pool.py:4738; index_key_cache.py:17
+3. ROOT CAUSE — the GLM latent write is NOT sharded (VERIFIED-src + MEASURED)
+   - GLM-5.3 has qk_rope_head_dim = 0 -> set_mla_kv_buffer_triton takes the no-rope branch
+     `set_mla_kv_buffer_kernel_norope` (B:kernels/ops/kvcache/mla_buffer.py:87-114, launched at :171), which stores
+     every token at its VIRTUAL loc (`dst = kv_buffer + loc*stride`) on every rank. Only the rope variant
+     (:42-44) applies the DCP owner rule `loc % W == rank -> row loc // W`.
+   - Indexer K (index_key_cache.store_quantized / kpool kernels) also stores at the virtual loc.
+   - All DSA reads (tilelang sparse prefill/decode via page_table_1, B:dsa_backend.py:3001/3042/3091, 3312/3345/3393;
+     indexer paged logits via real_page_table; 112 `_paged` loads BT with no upper bound) use virtual locs too.
+   => On the stock stack DCP is "replicated KV addressed by virtual loc in a per-rank-sized buffer":
+      a. correct while every live virtual loc < per-rank rows                                   (MEASURED r3: orig_dcp == orig_ref,
+         DSA attention output rel L-inf <= 1.9e-3 at cold/ext/decode, same as run-to-run noise fix_ref vs orig_ref 2.0e-3)
+      b. no real capacity gain (the x W the scheduler reports does not exist)
+      c. once the allocator's high-water mark passes the per-rank rows (818,112 on 025), reads AND writes go out of
+         bounds. INFERRED: that is the 025 crash (usage 0.07-0.10 of 6.54M logical = 0.46-0.65M live + freed-page
+         fragmentation -> high-water mark over 818k). It is not specific to prefix hits; long prefix trees just raise the
+         high-water mark. Cold probes (013b) never got there.
+      d. decode also computes all 64 heads over ALL tokens on every rank and LSE-merges W identical partials (W x redundant).
+   - MEASURED r1/r2: at W=2 with the requests pushed to virtual locs 1.2x the per-rank rows, the stock stack did NOT fault
+     (2x overrun stays inside mapped CUDA memory); INFERRED: at W=8 the overrun reaches up to 8x the buffer and faults.
+4. What 110–115 did: nothing address-related. 115 only made the 64-head DCP decode kernel fit A100 smem, which is what
+   let DCP start at all; 112's `_paged` kernel inherits the unbounded page-table load from the DeepGEMM contract.
+5. Base facility reused by 116: for MLA extend under DCP the base already all-gathers each request's prefix from the
+   local shards into attn_dcp_metadata.dcp_kv_buffer (B:forward_mla.py:643 -> dcp/comm.py:267; layout B:dcp/planner.py:48-53),
+   but only FlashInfer-MLA consumed it; the DSA backend ignored it. Decode LSE return + combine for DSA exists
+   (B:dsa_backend.py:157, forward_mla.py:768-800).
+6. Harness lesson (MEASURED r1/r2): with the stock dummy weights (+-1e-3, one seed for all params) the logits do not depend
+   on attention at all (every DCP variant matched bit-exactly, DSA o_proj input ~1e-13 = noise). The oracle must be the DSA
+   attention output with well-scaled attention weights (dcp_check.py AX_WELL_SCALED, AX_ATTN_BOOST).

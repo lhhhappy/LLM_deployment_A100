@@ -14,11 +14,13 @@
 # TESTPATCH=t52_test_dummy_init.patch + AX_T52_DUMMY_INIT=1: context-sensitive dummy weights (norms=1, scales=1,
 #   matrices +-1/sqrt(fan_in)). REQUIRED for a meaningful numerics test: with stock +-1e-3 dummy init the negative control
 #   (chunk 2048 vs 4096) was also bit-identical, i.e. logits only saw the current token.
-# Env: GPU_ID (default 1), ARMS (default "eager170 bcg170 base"), CHUNKCOST=1/0, CORRECTNESS=1/0, SUFFIX (output dir suffix), PORT (default 31952).
+# T52b arms (need TP>=2, GPU_ID=0,1): eager170sc / bcg170sc = eager170 / bcg170 + --enable-attn-tp-input-scattered.
+# Env: TP (default 1), GPU_ID (default 1), ARMS (default "eager170 bcg170 base"), CHUNKCOST=1/0, CORRECTNESS=1/0, SUFFIX (output dir suffix), PORT (default 31952).
 # On the 8-card pod: same client scripts; use the real model, TP8, VOCAB_MAX=150000, and the launch flags in patches/170-*.md.
 set -uo pipefail
-T=${T:-/sjtu/linhang/arena/runs/T52}; K=$T/kit; R=/sjtu/linhang/arena/repo
-GPU_ID=${GPU_ID:-1}; PORT=${PORT:-31952}; ARMS=${ARMS:-"eager170 bcg170 base"}; CHUNKCOST=${CHUNKCOST:-1}; CORRECTNESS=${CORRECTNESS:-1}
+T=${T:-/sjtu/linhang/arena/runs/T52};  # T52b uses T=/sjtu/linhang/arena/runs/T52b
+ K=$T/kit; R=/sjtu/linhang/arena/repo
+GPU_ID=${GPU_ID:-1}; TP=${TP:-1}; PORT=${PORT:-31952}; ARMS=${ARMS:-"eager170 bcg170 base"}; CHUNKCOST=${CHUNKCOST:-1}; CORRECTNESS=${CORRECTNESS:-1}
 MODEL=/sjtu/linhang/arena/runs/rankprof/p8192/model
 STACK="000-interface-compliance 101-d1v12-on-base 105-role-split-single-partial 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 112-sm80-indexer-kernels 113-sm80-prefill-indexer 114-indexer-row-shard 115-sm80-sparse-attn-many-heads 140-kda-dual-snapshot 120-sched-protect-chain 130-async-tokenize 150-startup-warmup 160-nextn-sm80"
 build() {  # build <dir> <patches...>
@@ -39,7 +41,7 @@ export NCCL_CUMEM_ENABLE=0 CUDA_VISIBLE_DEVICES=$GPU_ID SGLANG_OPT_USE_TOPK_V2=0
 export SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829
 export TRITON_CACHE_DIR=/sjtu/linhang/arena/runs/rankprof/cache/triton SGLANG_JIT_CACHE_DIR=/sjtu/linhang/arena/runs/rankprof/cache/jit SGLANG_CACHE_DIR=/sjtu/linhang/arena/runs/rankprof/cache/sgl TILELANG_CACHE_DIR=/sjtu/linhang/arena/runs/rankprof/cache/tl
 PY=/sjtu/linhang/arena/env/m0/bin/python
-COMMON="--model-path $MODEL --load-format dummy --tp-size 1 --page-size 64 --dsa-prefill-backend tilelang --dsa-decode-backend tilelang
+COMMON="--model-path $MODEL --load-format dummy --tp-size $TP --page-size 64 --dsa-prefill-backend tilelang --dsa-decode-backend tilelang
  --mamba-radix-cache-strategy extra_buffer --mamba-ssm-dtype float32 --disable-custom-all-reduce --chunked-prefill-size 4096
  --mem-fraction-static 0.8 --context-length 131072 --random-seed 42 --schedule-policy lpm --skip-server-warmup --enable-metrics --host 127.0.0.1 --port $PORT"
 
@@ -49,6 +51,8 @@ for arm in $ARMS; do
     eager170) SRC=$T/src/s170; EXTRA="--cuda-graph-backend-prefill disabled" ;;
     bcg170)   SRC=$T/src/s170; EXTRA="--cuda-graph-backend-prefill breakable" ;;
     base)     SRC=$T/src/s0;   EXTRA="" ;;
+    eager170sc) SRC=$T/src/s170; EXTRA="--cuda-graph-backend-prefill disabled --enable-attn-tp-input-scattered" ;;
+    bcg170sc)   SRC=$T/src/s170; EXTRA="--cuda-graph-backend-prefill breakable --enable-attn-tp-input-scattered" ;;
     negctl)   SRC=$T/src/s170; EXTRA="--cuda-graph-backend-prefill disabled --chunked-prefill-size 2048" ;;  # comparator must see diffs
   esac
   echo "=== $arm $(date +%T) $EXTRA"
@@ -73,5 +77,7 @@ cd $T
 X=${SUFFIX:-}
 [ -f eager170$X/correctness.json ] && [ -f bcg170$X/correctness.json ] && $PY $K/bcg_compare.py eager170$X/correctness.json bcg170$X/correctness.json cmp_eager_vs_bcg$X.json | tail -1
 [ -f eager170$X/correctness.json ] && [ -f base$X/correctness.json ] && $PY $K/bcg_compare.py base$X/correctness.json eager170$X/correctness.json cmp_base_vs_eager170$X.json | tail -1
+[ -f eager170sc$X/correctness.json ] && [ -f bcg170sc$X/correctness.json ] && $PY $K/bcg_compare.py eager170sc$X/correctness.json bcg170sc$X/correctness.json cmp_eagersc_vs_bcgsc$X.json | tail -1
+[ -f eager170$X/correctness.json ] && [ -f eager170sc$X/correctness.json ] && $PY $K/bcg_compare.py eager170$X/correctness.json eager170sc$X/correctness.json cmp_eager_vs_eagersc$X.json | tail -1
 [ -f eager170$X/correctness.json ] && [ -f negctl$X/correctness.json ] && $PY $K/bcg_compare.py eager170$X/correctness.json negctl$X/correctness.json cmp_negctl_chunk2048$X.json | tail -1
 echo ALLDONE

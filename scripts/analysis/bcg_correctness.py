@@ -2,7 +2,7 @@
 #   PORT=<port> python3 bcg_correctness.py <out.json> [prefixes=0,20000,100000] [chunks=100,1000,3000]
 # For each cached prefix P (cached first by a 1-token request) and each new-token count c, sends prefix+c random ids,
 # greedy 32 tokens, return_logprob with top-5 per output position. Then a 2-request concurrent (mixed) batch.
-# Records output ids, per-token logprobs, first-token top-5, cached_tokens. Compare two runs with bcg_compare.py.
+# COLD env: comma list of cold exact-length prompts (default numcheck set). Records output ids, per-token logprobs, first-token top-5, cached_tokens. Compare two runs with bcg_compare.py.
 import json, os, random, sys, threading, urllib.request
 
 out = sys.argv[1]
@@ -36,6 +36,12 @@ def gen(prompt, max_new=NEW):
 
 post("/flush_cache", {})
 rows = []
+# cold single requests at exact lengths: graph buckets (512/1024/4096) AND padded sizes (37/100/500/1000/3000/5000)
+COLD = [int(x) for x in os.environ.get("COLD", "37,100,500,512,1000,1024,3000,4096,5000").split(",") if x]
+for L in COLD:
+    r = gen(ids(L, 3000 + L)); r.update(tag=f"cold L={L}"); rows.append(r)
+    print(json.dumps({k: r[k] for k in ("tag", "n_in", "cached")}), flush=True)
+post("/flush_cache", {})
 for P in PS:
     prefix = ids(P, 500 + P) if P else []
     if P:

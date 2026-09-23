@@ -28,3 +28,9 @@
 
 ## 决策记录
 - 梯子全部走 BCG 无 scatter（scatter 下 BCG 错误未修）；MTP+BCG 由冒烟闸门保护。
+
+### 11:55 重排（用户：直接走 18，今晚提交一个 18 的方案；镜像等结果出来再建）
+顺序：028（方案一：MTP+114+v3，eager prefill，N18）→ 028b（方案二：+170 BCG 无 scatter，N18→22）→ 028c（BCG 不带 MTP，N18 对照）→ 029a–d（scatter 数值诊断）。031（纯调参）已取消。028c 去掉 NUMREF（参考文件那时还不存在）。
+提交判据：谁过 N18（两种口径 + tpot_p95≤0.10 + 冒烟 12/12）就提交谁；两个都过，按 tpot_mean 排序，同时提交两个（一个镜像，两条命令）。
+镜像：build/image/Dockerfile（lh-img:0923a，15 个补丁，56.7KB，scratch 应用 + 编译 OK），未构建。build_image.sh 已修：允许新建文件补丁（/dev/null）。
+正式规则要点（task.md）：爬坡从 N10 起；tpot_p95≤0.10 是每档硬门（没有统计余量）；aime26/gpqa 都要 >90；昨天 45766/45767 部署失败（镜像没有 A100 适配补丁），没计入额度。
