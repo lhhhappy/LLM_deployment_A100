@@ -428,3 +428,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - lh-arena-sess-b，任务 001（b113 = 000+101+105+110+111+112v2+113v2，tilelang）：500–20000 token 探测全 200、前缀命中正常、flush 正常；首次新形状仍有约 60s KDA Triton 编译（补丁 150 待测）。
 - 任务 002 能力冒烟（`scripts/pod/jobs/cap_smoke.sh`，12 道 Python 校验答案的数学题，/v1/chat/completions，不限长度）：**12/12 正确**，全部 finish=stop，平均 2209 输出 token，最长 13964 token（163s，12 路并发）。
 - 含义：长 decode 路径（112 decode indexer、Marlin、tilelang decode）数值未坏；不代表官方 AIME/GPQA >90 门槛。
+
+## F74 — 真机（L2 pod，比赛镜像）复核：开发机 kernel 结论 11/11 成立
+- 任务 003（`scripts/pod/jobs/verify_kernels.sh`，全补丁树 000–160，单卡）：F57 tilelang 稀疏注意力、F58 Marlin MoE、112/113 数值+graph、T47 换长度不重编译、140 KDA 快照、160 MTP 四组算子、INT8/MoE 基准 —— **全部 PASS**。
+- 环境：8×A100-SXM4-80GB，驱动 580.105.08，torch 2.13.0+cu130（与开发机同版本 torch）。
+- INT8/MoE 基准与开发机一致（M=8192：Marlin 4.99ms/82.7TF；INT8 逐通道 95.4TF 但误差 2.6e-2）→ findings 中 INT8 结论在真机确认。
