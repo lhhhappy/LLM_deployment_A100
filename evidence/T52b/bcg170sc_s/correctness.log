@@ -1,0 +1,21 @@
+{"tag": "cold L=37", "n_in": 37, "cached": 0}
+{"tag": "cold L=100", "n_in": 100, "cached": 0}
+{"tag": "cold L=500", "n_in": 500, "cached": 0}
+{"tag": "cold L=512", "n_in": 512, "cached": 0}
+{"tag": "cold L=1000", "n_in": 1000, "cached": 0}
+{"tag": "cold L=1024", "n_in": 1024, "cached": 0}
+{"tag": "cold L=3000", "n_in": 3000, "cached": 0}
+{"tag": "cold L=4096", "n_in": 4096, "cached": 0}
+{"tag": "cold L=5000", "n_in": 5000, "cached": 0}
+{"tag": "P=0 c=100", "n_in": 100, "cached": 0}
+{"tag": "P=0 c=1000", "n_in": 1000, "cached": 0}
+{"tag": "P=0 c=3000", "n_in": 3000, "cached": 0}
+{"tag": "P=20000 c=100", "n_in": 20100, "cached": 19968}
+{"tag": "P=20000 c=1000", "n_in": 21000, "cached": 19968}
+{"tag": "P=20000 c=3000", "n_in": 23000, "cached": 19968}
+{"tag": "P=100000 c=100", "n_in": 100100, "cached": 99968}
+{"tag": "P=100000 c=1000", "n_in": 101000, "cached": 99968}
+{"tag": "P=100000 c=3000", "n_in": 103000, "cached": 99968}
+{"tag": "mixB cold 1500", "n_in": 1500, "cached": 0}
+{"tag": "mixA P=20000 c=500", "n_in": 20500, "cached": 19968}
+DONE /sjtu/linhang/arena/runs/T52b/bcg170sc_s/correctness.json

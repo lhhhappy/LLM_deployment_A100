@@ -535,3 +535,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 ## F89 — 梯子 028（MTP+114+v3 cap4096 i2，eager prefill）N18：TPOT 两项都过，TTFT 仍败
 - tpot_mean 0.0528（027 为 0.0823）、**tpot_p95 0.0824 ≤ 0.10 过**；turn_start 16.93（1/3）过；fast_intra 5.45（31/23）、overall 10.96（44/27）、chain_start 78.54（45/22）FAIL（两种口径）。
 - 解读：MTP 解决了解码门；剩下的瓶颈是预填充吞吐（eager 下每块的固定开销）→ 028b（加 BCG）正是检验这一点。
+
+## F90 — 今晚（09-23 离线队列）结论
+- 028b（MTP+114+BCG 无 scatter，chunk 4096，cap4096 i2）N18：tpot_mean 0.0483；fast_intra 18.14（138/23）、overall 18.14（117/27）、chain 71.1 FAIL；turn 14.24 过；冒烟 12/12。028c（BCG，不带 MTP，chunk 4096，cap2048 i3）：tpot 0.0715，四门里三门 FAIL。⇒ 块从 8192 缩到 4096，吞吐的损失比 BCG 省下的更多；028b 同时改了多个变量，不能单独归因。
+- 029：数值指纹工具用随机 token 输入太敏感，噪声对照 029d（eager 下 scatter 开 vs 关）也判出 6/18 WRONG ⇒ 这个判据无效，要改成真实文本或"参考 token 的 logprob 差"。029b（v1 BCG+scatter）18/18 WRONG，与 v1 的 bug 一致。
+- T52b：170 v2 修好 BCG+scatter。根因（纠正 Claude 的"补齐错位"推断）：BCG 捕获时直接调 layer_model.forward，绕过了外层 forward 里的 `maybe_input_scattered()`，所以捕获用的是非 scatter 布局；回放时外层按 scatter 走，embedding 跳过了 all-reduce ⇒ 每卡把部分和喂进 graph。TP2 22/22 与 eager 一致（evidence/T52b）。8 卡待复测。
+- T50b：116 VERDICT PASS（开发机 TP2+DCP2，包括高地址、graph、全栈）。**纠正 F78**：底包在 GLM 的 norope 路径上，latent 写入没分片，"逻辑 KV ×7.8"并不存在；025 崩溃是分配器高水位超过每卡行数后越界。8 卡待复测。
+- B1（MTP+114，chunk 16384，mem 0.74）：能启动，但 KV 只有 821,504，低于 PRECHECK 的 900k ⇒ 方案 B 用 chunk 8192（B2）。

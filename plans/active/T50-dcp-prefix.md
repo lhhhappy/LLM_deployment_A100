@@ -37,7 +37,10 @@
 - [x] （T50b）开发机 r1/r2：dummy 权重下 logits 与注意力无关（所有变体逐位相同）→ 改为 well-scaled 初始化 + DSA o_proj 输入判据。
 - [x] （T50b）r3 实测纠正根因：GLM rope 维=0，latent 写入走 `set_mla_kv_buffer_kernel_norope`（`mla_buffer.py:87-114`），**没有 DCP 分片**，每卡按虚拟 loc 写全部 token。原栈 DCP = 复制 KV（低 slot 正确、无容量增益、高水位超过每卡行数时越界 → 025 崩溃）。116 v1（只换算读路径）在 ext/dec 上不通过（相对误差 1.2–1.7）。
 - [x] （T50b）116 最终版：norope 写入按 owner 规则分片 + extend 读 dcp_kv_buffer + decode/verify 转本卡行 + indexer K 虚拟空间复制 + 显存核算。全栈 fuzz=0（本地、开发机）。`patches/116-dcp-dsa-address.{patch,md}`（含 8 卡方案）。
-- [ ] r5 全矩阵（orig/fix/full × ref/dcp/dcp_hi/graph）：开发机让给 T52b；gjob `t50_dcp6` 在 `T52b/DONE` 出现后自动跑。
-- [ ] 根据 r5 回填 116.md、evidence，交付。
+- [x] r5 全矩阵（eager）VERDICT PASS：116 各用例 DSA 输出相对 L∞ cold≤1.4e-4、ext≤2.0e-3（=噪声基线）、dec≤5.2e-3；原栈高 slot（orig_dcp_hi）三阶段均 1.0（读到 0）。证据 `evidence/T50/devbox_r5_*`。
+- [x] 8 卡作业文件 `scripts/pod/jobs/dcp116_probe.sh`（未入队，由 Claude 执行）。
+- [ ] r6：CUDA graph decode 覆盖（r5 的 graph 用例因 bs=1 捕获实际走了 eager）。gjob `t50_dcp7`，结论写入 `/sjtu/linhang/arena/runs/T50/r6/SUMMARY.txt`。
+- [ ] 交付。
+
 ## 决策记录
 - 2026-09-23：先确认各池地址域，禁止用冷请求通过替代前缀命中正确性。

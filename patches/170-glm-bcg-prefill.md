@@ -1,4 +1,4 @@
-# 170 — GLM-5.3-Flash 预填充 breakable CUDA graph（移植上游 PR #38522，T52）
+# 170 — GLM-5.3-Flash 预填充 breakable CUDA graph（移植上游 PR #38522，T52；v2 修 scatter，T52b）
 
 ## 问题
 - 底包把 KDA 模型的 prefill CUDA graph 默认关掉（`arg_groups/cuda_graph_hook.py::disable_breakable_cudagraph_if_incompatible` 的 "KDA hybrid linear attention" 规则），GLM 每个 chunked-prefill 前向都是 eager。8 卡上反推每块截距 ≈150ms（F 条目，INFERRED），限制了用小 chunk 保护 decode TPOT。
@@ -21,7 +21,31 @@
 2. **本栈补丁（上游没有）**：
    - `prefill_cuda_graph_runner.load_batch`：把 140 的 `ax_kda_snapshot_offsets/slots` 透传到 static batch。白名单里没有这两个字段；不透传的话，BCG 下 KDA break 读到 None，140 的角色快照会被静默跳过，调度器却照样把额外槽交给 radix 树（旧状态被当成缓存命中）。这两个张量只在 eager KDA break 里读，用 live 张量即可。没有 140 的栈上用 getattr，是空操作。
    - GLM 捕获上限改成 `min(4096, chunked_prefill_size)`（上游固定 4096）：本栈没有 mixed chunk，单次 prefill 前向不超过 chunk，大桶只浪费 capture 时间和池内存。只在用户没锁 `max_bs/bs` 时生效。
-   - `_ax170_align_prefill_buckets_for_attn_tp_scatter`：开 `--enable-attn-tp-input-scattered` 且 tp>1 时，把桶向上对齐到 tp_size 的倍数。原桶 4/12/20/28 不是 8 的倍数，TP8 scatter 在 capture 时会 all-gather 不等长分片；真实 batch 已由 `prepare_attn_tp_scatter_input` 补齐到 tp 倍数。做法同 `apply_deepep_adjustments`。**开发机只有 TP1，未实测。**
+   - `_ax170_align_prefill_buckets_for_attn_tp_scatter`：开 `--enable-attn-tp-input-scattered` 且 tp>1 时，把桶向上对齐到 tp_size 的倍数，做法同 `apply_deepep_adjustments`。**这只是必要条件，不能单独修复 scatter**，真正的修复见 v2。
+
+## v2（T52b）：`--enable-attn-tp-input-scattered` 下输出错误的根因与修复
+- **现象（8 卡，coordinator 提供）**：026j（BCG + scatter）能力冒烟 0/12，输出看似流畅但错误；026k（eager + scatter）12/12；026l（BCG 无 scatter）12/12。v1 旧版保存在 `patches/drafts/170-v1.patch`、`170-v1.md`。
+- **开发机复现（实测，TP2，GPU0+1，上下文敏感测试权重）**：BCG+scatter 对 eager+scatter，22 个请求中首 token 只有 10 个相同，top-5 logprob 最大差 4.22。**正好是桶大小的长度（512/1024/4096）也错**，所以根因不是 n≠B 的 padding 问题。
+- **根因（读代码确认）**：
+  - `prefill_cuda_graph_runner.py::_run_forward` 的 BCG/Full 分支 capture 时直接调用 `self.layer_model.forward(...)`，绕过了外层 `Glm5NextForConditionalGeneration.forward`（glm5_next.py:1535）里的 `get_attn_tp_context().maybe_input_scattered(forward_batch)`。`attn_input_scattered` 只由各模型外层 forward 设置，默认 False（runtime_context.py:606）。
+  - 所以 warmup 和 capture 都在**非 scatter 布局**下录制：all-reduce、完整 residual、第一层不做 reduce-scatter。
+  - replay 时 `_execute_body_capture` 仍 eager 执行外层 forward，**scatter 为开**：`VocabParallelEmbedding.forward`（vocab_parallel_embedding.py:573）在 scatter 下不做 all-reduce，于是把每卡的部分和 embedding 拷进 input_embeds 槽，捕获的图当成完整 embedding 使用，每一层都算错。
+  - 这是底包 BCG 的通用缺陷，DeepSeek-V2/V4 等所有在外层包 `maybe_input_scattered` 的模型都一样，不是 170 的桥或 slicing 引入的；只是 170 让 GLM 第一次走到这条路径。coordinator 怀疑的 eager break `x[:n]` 切片：scatter 下 DSA/线性层输入都已预先 all-gather 成 B 行（`dsa_pre_gather`；线性层 `qkv_latent_func=None`），n 是全局真实 token 数，所以切片没问题。
+- **修复（v2，`[ax] 170 v2`）**：
+  1. capture 时用 `maybe_input_scattered(forward_batch)` 包住 `layer_model.forward`，决策与 replay 时外层 forward 相同（`use_input_scattered`：extend 且不是 verify）。scatter 下断言桶是 tp_size 的倍数（v1 已按 tp 对齐）。
+  2. `can_run_graph` 增加保护：replay 时的 scatter 决策与 capture 时不同就回退 eager（按逻辑不应触发，只作兜底）。
+- **验证（实测，`evidence/T52b/SUMMARY_v2.txt`，22 个请求：冷启动长度 37/100/500/512/1000/1024/3000/4096/5000、P=2万/10万 前缀命中 × c=100/1000/3000、并发混合对）**：
+  | 配置 | 首 token 相同 | 生成 logprob 最大差 | 首 token top-5 最大差 |
+  |---|---|---|---|
+  | TP2 scatter，eager 对 BCG，**v1** | **10/22** | **1.53** | **4.22** |
+  | TP2 scatter，eager 对 BCG，**v2** | 22/22（全部 token 相同） | 0.141 | 0.277 |
+  | TP2 无 scatter，eager 对 BCG，v2 | 22/22 | 0.067 | 0.106 |
+  | TP1，eager 对 BCG，v2 | 22/22 | 3.8e-4 | 0.219 |
+  | 参照：TP2 eager 无 scatter 对 eager scatter | 22/22 | 0.145 | 0.150 |
+  所有 BCG 臂的 prefill 都走图（51/51）。v2 在 TP2 scatter 下的残差（0.14）与“只换通信布局”的参照（0.145）同量级；v1 是 10 倍以上的错误，并且首 token 翻转。
+- **未做**：TP2 同配置 eager 两次重启的噪声底；DONE 已交给 T50b，GPU 让出，没有再跑。0.14 的残差按推断归为 TP2 下 NCCL 归约顺序差异，最终要以 8 卡能力冒烟 12/12 + numcheck 为准。
+- **fuzz=0（实测）**：全栈（…160 170，含 MTP 顺序）、tier-1+140+120+170、tier-1+170、026 栈 B+114+140+120+170 都通过，全栈结果与移植树逐字节相同。
+- **复跑**：`T=/sjtu/linhang/arena/runs/T52b GPU_ID=0,1 TP=2 ARMS="bcg170sc eager170sc bcg170 eager170" SUFFIX=_v2tp2 TESTPATCH=t52_test_dummy_init.patch CHUNKCOST=0 bash scripts/analysis/devbox_bcg_check.sh`，再运行 `scripts/analysis/t52b_summary.sh`。
 
 ## 按请求变化的部分：graph-safe 还是 eager break（静态审查）
 | 组件 | BCG 下 | 依据 |
@@ -64,7 +88,7 @@
 - 4096 块几乎不省；收益集中在小块，正好对应“用小 chunk 保护 TPOT”的方向。
 
 ## 风险
-1. `--enable-attn-tp-input-scattered` + BCG + TP8：桶对齐是按代码推断的修正，未跑过，是 8 卡首测重点。
+1. `--enable-attn-tp-input-scattered` + BCG：v1 在 8 卡上确实出错（026j），v2 已修，TP2 实测正确；TP8 需重跑能力冒烟 + numcheck 确认（命令见 v2 节）。
 2. MTP（160）+ BCG：未验证。draft 的 prefill graph 与 kpool 桥条件（`is_extend_without_speculative`）的交互没审完；140 本身也禁止 NEXTN。先不要组合。
 3. decode 步小幅变慢（见上）。
 4. 超过捕获上限（`chunked_prefill_size`）的前向回退 eager；padding 超过 2 倍也回退 eager。
@@ -72,4 +96,4 @@
 
 ## 启动参数（8 卡首测）
 在现有 G_ARGS 基础上：`--cuda-graph-backend-prefill breakable --chunked-prefill-size 4096`（或 2048/8192 做 A/B；上限自动取 min(4096, chunk)，要捕获更大的块需显式给 `--cuda-graph-max-bs-prefill`）。
-建议先做 A/B：同一配置只切换 `--cuda-graph-backend-prefill breakable|disabled`，看 chunkcost 截距、decode 步和 TPOT。scatter 先分别跑开/关两组，再合并。不要同时开 MTP。
+建议先做 A/B：同一配置只切换 `--cuda-graph-backend-prefill breakable|disabled`，看 chunkcost 截距、decode 步和 TPOT。**scatter + BCG 必须用 v2**，并先过能力冒烟 12/12 和 `numcheck.py`（对 eager 参照做 `numcheck_cmp` wrong=0），再进梯子。不要同时开 MTP。

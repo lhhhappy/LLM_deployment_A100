@@ -1,0 +1,14 @@
+T52b v2 verdicts Wed Sep 23 12:04:23 UTC 2026  patch md5 1563bb95b20237f41c896e47b6806a18
+== TP2-scatter:eager-vs-BCG(v2)
+SUMMARY {"n": 22, "first_token_same": 22, "all_tokens_identical": 22, "max_first_top5_lp_diff": 0.27726268768310547, "max_lp_diff_common_prefix": 0.14142298698425293}
+== TP2-noscatter:eager-vs-BCG
+SUMMARY {"n": 22, "first_token_same": 22, "all_tokens_identical": 22, "max_first_top5_lp_diff": 0.1058664321899414, "max_lp_diff_common_prefix": 0.06719636917114258}
+== TP1:eager-vs-BCG
+SUMMARY {"n": 22, "first_token_same": 22, "all_tokens_identical": 22, "max_first_top5_lp_diff": 0.21874618530273438, "max_lp_diff_common_prefix": 0.00038160476833581924}
+== TP2:eager-noscatter-vs-eager-scatter(noise-ref)
+SUMMARY {"n": 22, "first_token_same": 22, "all_tokens_identical": 22, "max_first_top5_lp_diff": 0.15042591094970703, "max_lp_diff_common_prefix": 0.14530861377716064}
+== TP2-scatter:eager-vs-BCG(v1-repro)
+SUMMARY {"n": 22, "first_token_same": 10, "all_tokens_identical": 10, "max_first_top5_lp_diff": 4.217962265014648, "max_lp_diff_common_prefix": 1.5297402404248714}
+bcg170sc_v2tp2 graph=True prefill: 51/51
+bcg170_v2tp2 graph=True prefill: 51/51
+bcg170_v2tp1 graph=True prefill: 51/51

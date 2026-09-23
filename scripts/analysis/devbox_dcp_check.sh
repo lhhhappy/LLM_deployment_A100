@@ -5,7 +5,7 @@
 # Run ON the dev box from the repo copy:  bash scripts/analysis/devbox_dcp_check.sh [cases...]
 #   env: T (out dir, default /sjtu/linhang/arena/runs/T50), AX_MEM (0.55), AX_PREFIX/AX_EXT/AX_DECODE (see dcp_check.py)
 #   cases (default all): orig_ref orig_dcp orig_dcp_hi fix_ref fix_dcp fix_dcp_hi fix_dcp_graph full_ref full_dcp_hi
-# Needs BOTH GPUs free. Each case is one engine start (~2-4 min). Results: $T/<case>.pt, $T/<case>.log, $T/summary.txt
+# Needs BOTH GPUs free. Each case is one engine start (~2-4 min). Results: $T/<case>.pt, $T/<case>.log, $T/matrix_log.txt
 set -uo pipefail
 R=/sjtu/linhang/arena/repo; T=${T:-/sjtu/linhang/arena/runs/T50}; mkdir -p $T/src
 BASE_STACK="000 101 105 106 110 111 112 113 114 115"
@@ -33,19 +33,19 @@ run() {  # run <case> <stack> <dcp 1|2> <fill_frac> <graph 0|1>
   local c=$1 s=$2 d=$3 f=$4 g=$5 extra=""
   [ $d = 2 ] && extra="--dcp-size 2"
   [ $g = 0 ] && extra="$extra --cuda-graph-backend-decode disabled"
-  echo "== $c stack=$s dcp=$d fill=$f graph=$g" | tee -a $T/summary.txt
+  echo "== $c stack=$s dcp=$d fill=$f graph=$g" | tee -a $T/matrix_log.txt
   PYTHONPATH=$T/src/$s:/sjtu/linhang/arena/cache/T48/deps AX_FILL_FRAC=$f AX_CHECK_OUT=$T/$c.pt timeout 1500 \
     $PY scripts/analysis/dcp_check.py --model-path $MODEL --load-format dummy --tp-size 2 $extra --page-size 64 \
     --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --mamba-radix-cache-strategy extra_buffer \
-    --batch-size 1 --input-len 1024 --output-len 1 --chunked-prefill-size 16384 --mem-fraction-static ${AX_MEM:-0.55} \
+    --batch-size 2 --input-len 1024 --output-len 1 --chunked-prefill-size 16384 --mem-fraction-static ${AX_MEM:-0.55} \
     --disable-custom-all-reduce > $T/$c.log 2>&1
-  echo "rc=$? $(grep -m1 'AX_CHECK done' $T/$c.log | cut -c1-300)" | tee -a $T/summary.txt
-  grep -m3 -E "illegal memory|device-side assert|Error|Traceback" $T/$c.log | cut -c1-240 | tee -a $T/summary.txt
+  echo "rc=$? $(grep -m1 'AX_CHECK done' $T/$c.log | cut -c1-300)" | tee -a $T/matrix_log.txt
+  grep -m3 -E "illegal memory|device-side assert|Error|Traceback" $T/$c.log | cut -c1-240 | tee -a $T/matrix_log.txt
 }
-cmp() { [ -f $T/$1.pt ] && [ -f $T/$2.pt ] && { echo "-- compare $1 vs $2" | tee -a $T/summary.txt; $PY scripts/analysis/dcp_compare.py $T/$1.pt $T/$2.pt 2>&1 | tee -a $T/summary.txt; }; }
+cmp() { [ -f $T/$1.pt ] && [ -f $T/$2.pt ] && { echo "-- compare $1 vs $2" | tee -a $T/matrix_log.txt; $PY scripts/analysis/dcp_compare.py $T/$1.pt $T/$2.pt 2>&1 | tee -a $T/matrix_log.txt; }; }
 
 CASES=${*:-"orig_ref orig_dcp orig_dcp_hi fix_ref fix_dcp fix_dcp_hi fix_dcp_graph full_ref full_dcp_hi"}
-date | tee -a $T/summary.txt
+date | tee -a $T/matrix_log.txt
 for c in $CASES; do case $c in
   orig_ref)      run $c orig 1 0 0 ;;
   orig_dcp)      run $c orig 2 0 0 ;;
@@ -59,4 +59,5 @@ for c in $CASES; do case $c in
 esac; done
 cmp orig_dcp orig_ref; cmp orig_dcp_hi orig_ref; cmp fix_ref orig_ref
 cmp fix_dcp fix_ref; cmp fix_dcp_hi fix_ref; cmp fix_dcp_graph fix_ref; cmp full_dcp_hi full_ref
-echo ALLDONE | tee -a $T/summary.txt
+echo ALLDONE | tee -a $T/matrix_log.txt
+$PY scripts/analysis/devbox_dcp_verdict.py $T   # -> $T/SUMMARY.txt (verdict)

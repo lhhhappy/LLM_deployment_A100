@@ -8,7 +8,9 @@
 # Random dummy weights make the logits almost independent of attention (09-23: stock DCP2 matched non-DCP bit-exactly),
 # so the SENSITIVE oracle is "attn": the input of each DSA layer's o_proj (this rank's heads, after the DCP LSE combine),
 # captured by a forward pre-hook in eager passes (rows subsampled for the cold prefill). AX_ATTN_BOOST (default 1) scales
-# the DSA o_proj outputs identically in both arms so attention also drives the logits (incl. CUDA-graph decode).
+# the DSA o_proj outputs identically in both arms (09-23: the logits stayed insensitive even so; attn is the oracle).
+# CUDA-graph decode: the hook copies the o_proj input into a static buffer during capture and it is read after each
+# replay (info.graph_dec_steps > 0 proves the graph ran). Pass --batch-size >= number of requests so decode is captured.
 # Compare a DCP run against a non-DCP run of the same stack with dcp_compare.py.
 # Usage: python dcp_check.py <one_batch CLI args ...> (--batch-size/--input-len are ignored except for arg parsing)
 import os
@@ -56,7 +58,7 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     runner, _ = ob.load_model(server_args, port_args, gpu_id, tp_rank)
     mr = runner.torch_runner
     from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
-    cap, stage = {}, ["load"]
+    cap, stage, static, seen, names = {}, ["load"], {}, set(), []
     boost = float(os.environ.get("AX_ATTN_BOOST", "1"))
     for name, m in mr.model.named_modules():
         if isinstance(m, DeepseekV2AttentionMLA):
@@ -64,9 +66,15 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
                 def post(mod, args, out, _b=boost):
                     return (out[0] * _b, *out[1:]) if isinstance(out, tuple) else out * _b
                 m.o_proj.register_forward_hook(post)
+            names.append(name)
             def pre(mod, args, _n=name):
-                if torch.cuda.is_current_stream_capturing():
+                if torch.cuda.is_current_stream_capturing():  # graph: record a copy into a static buffer
+                    b = static.get((_n, args[0].shape[0]))
+                    if b is None:
+                        b = static[(_n, args[0].shape[0])] = torch.empty_like(args[0])
+                    b.copy_(args[0])
                     return
+                seen.add(_n)
                 x = args[0].detach().float()
                 if stage[0] == "cold":
                     x = torch.cat([x[::16], x[-64:]])
@@ -106,9 +114,16 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     info["max_loc_ext"] = int(locs.max().item())
     dec = []
     stage[0] = "dec"
+    info["graph_dec_steps"] = 0
     for _ in range(n_dec):
+        seen.clear()
         nxt, lg = runner.decode(nxt, batch)
         dec.append(lg.float().cpu())
+        for n in names:  # replayed CUDA graph: no Python hook ran -> read the captured static buffer
+            b = static.get((n, len(reqs)))
+            if n not in seen and b is not None:
+                cap.setdefault("dec", {}).setdefault(n, []).append(b[: len(reqs)].float().cpu())
+                info["graph_dec_steps"] += 1
     if dec:
         out["dec"] = torch.stack(dec)
     torch.cuda.synchronize()

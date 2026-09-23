@@ -9,8 +9,9 @@ cd "$(dirname "$0")/.."
 ARM="${1:?usage: submit_official.sh A|B [existing_attempt_id]}"
 ID="${2:-}"
 CH=llm-challenge-arena-v1
-OUT="build/submit_0922_${ARM}"
-ZIP="build/submit_0922_${ARM}.zip"
+DAY="${DAY:-0922}"
+OUT="build/submit_${DAY}_${ARM}"
+ZIP="build/submit_${DAY}_${ARM}.zip"
 TRACE=submission/stub-trace.jsonl
 set -a; . ~/.config/playground/credentials.env; set +a
 

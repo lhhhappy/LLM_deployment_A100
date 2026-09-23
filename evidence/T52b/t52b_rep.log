@@ -1,0 +1,14 @@
+trees built (fuzz=0)
+=== bcg170sc 11:41:39 --cuda-graph-backend-prefill breakable --enable-attn-tp-input-scattered
+ready=1 after ~105s
+correctness rc=0
+/sjtu/linhang/arena/runs/T52b/kit/devbox_bcg_check.sh: line 48: 1472951 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+graph=True prefill lines: 51  total prefill lines: 51
+=== eager170sc 11:43:37 --cuda-graph-backend-prefill disabled --enable-attn-tp-input-scattered
+ready=1 after ~75s
+correctness rc=0
+/sjtu/linhang/arena/runs/T52b/kit/devbox_bcg_check.sh: line 48: 1474477 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+graph=True prefill lines: 0  total prefill lines: 51
+SUMMARY {"n": 22, "first_token_same": 10, "all_tokens_identical": 10, "max_first_top5_lp_diff": 4.217962265014648, "max_lp_diff_common_prefix": 1.5297402404248714}
+ALLDONE
+DONE rc=0

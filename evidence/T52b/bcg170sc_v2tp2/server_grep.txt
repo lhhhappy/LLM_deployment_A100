@@ -1,0 +1,20 @@
+[2026-09-23 11:51:04 TP0] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-23 11:51:04 TP0] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:04 TP0] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-23 11:51:13 TP1] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-23 11:51:13 TP1] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:13 TP1] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-23 11:51:14] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-23 11:51:14] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:14] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-23 11:51:15 TP0] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-23 11:51:15 TP1] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-23 11:51:15 TP1] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:15 TP0] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:23] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-23 11:51:23] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-23 11:51:28 TP0] Capture target prefill CUDA graph begin. backend=breakable, num_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096], avail mem=13.28 GB
+[2026-09-23 11:51:28 TP1] Capture target prefill CUDA graph begin. backend=breakable, num_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096], avail mem=13.28 GB
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/cuda/graphs.py:169: UserWarning: The CUDA Graph is empty. This usually means that the graph was attempted to be captured on wrong device or stream. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/cuda/CUDAGraph.cpp:210.)
+  super().capture_end()
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/cuda/graphs.py:169: UserWarning: The CUDA Graph is empty. This usually means that the graph was attempted to be captured on wrong device or stream. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/cuda/CUDAGraph.cpp:210.)

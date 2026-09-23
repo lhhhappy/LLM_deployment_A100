@@ -18,3 +18,9 @@ Results: check with `playground` attempt status for 45734 / 45735 (~18 h). Daily
 | A | 45766 | 24040 | lh-img:0922e | 000 + lpm | queued |
 | B | 45767 | 24041 | lh-img:0922f | 000 + 101 (D1 on) + lpm | queued |
 45734/45735 failed at deploy (image name format), not scored, not charged.
+
+## 2026-09-23 提交（用户批准：A、B 用同一个镜像，打完直接提交，不先跑冒烟）
+- 镜像 lh-img:0923a（15 个补丁：000,101,105,106,110,111,112,113,114,140,120,130,150,160,170v2；清单在 build/image/0923a.patches.txt）
+- A：028 配置（MTP+114+v3 cap4096 interval2，eager prefill，chunk 自动）；8 卡 N18：tpot 0.0528/p95 0.082，TTFT 三门 FAIL ⇒ 预期 N10–14。
+- B：026 式大块（不限块、无 interval）+ MTP+114，chunk 8192（B2，034 同时在 8 卡验证）。未测，搏一把。
+- 生成器 scripts/make_submission_0923.py；提交 `DAY=0923 bash scripts/submit_official.sh A|B`。

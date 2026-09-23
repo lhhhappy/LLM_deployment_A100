@@ -43,12 +43,27 @@ DCP 下调度器与分配器使用**虚拟 loc**（`[0,(rows+64)·W)`，页 64·
 - **判据要点（实测教训）**：底包 dummy 权重（±1e-3，所有参数同一个种子）下 logits 与注意力无关，任何 DCP 变体都与参考逐位相同，DSA 输出约 1e-13，是纯噪声。因此：
   - harness 用按参数名播种的 well-scaled 初始化（DSA 注意力 2D ~N(0,1/fan_in)、norm=1、embedding ~N(0,1)，两臂一致）；
   - 以每个 DSA 层 `o_proj` 的输入（DCP 合并后、本卡头）作为判据；
-  - 并用 `AX_ATTN_BOOST=100` 放大 DSA 输出，让 logits（含 CUDA graph decode）也敏感。
+  - `AX_ATTN_BOOST=100`（放大 DSA o_proj 输出）实测**仍不能**让 logits 敏感：r5 中连注意力完全错的 orig_dcp_hi 也与参考 logits 逐位相同。所以只有注意力判据有效。
 - r3（well-scaled，116 v1 未改写入 kernel）：
   - orig_dcp vs orig_ref：DSA 输出 cold/ext/dec 相对 L∞ ≤1.9e-3，**通过** → 证实原栈是复制式、低 slot 下正确；
   - fix_ref vs orig_ref（非 DCP 下 116 恒等）：≤2.0e-3（同为运行间噪声水平），logits 逐位相同；
   - fix_dcp（v1：读路径按分片换算但写入未分片）：ext/dec 相对误差 1.2–1.7 → **不通过**，这正是发现 norope 写入 kernel 的依据。
-- r5（116 最终版，含写入分片；全矩阵 orig/fix/full × ref/dcp/dcp_hi/graph）：**待跑**（开发机让给 T52b，gjob `t50_dcp6` 在 `T52b/DONE` 出现后自动运行）。结果写入 `evidence/T50/devbox_r5_summary.txt`。
+- **r5（116 最终版，`evidence/T50/devbox_r5_compare_detail.txt`、`devbox_r5_verdict.txt`）：VERDICT PASS**。DSA 输出的最大相对 L∞：
+
+  | 对比 | cold | ext（前缀命中） | dec |
+  |---|---|---|---|
+  | orig_dcp_hi vs orig_ref（原栈、虚拟 loc 达每卡行数 1.2 倍） | **1.0** | **1.0** | **1.0**（输出全 0 = 越界读）|
+  | fix_dcp vs fix_ref | 2.2e-6 | 2.0e-3 | 5.2e-3 |
+  | fix_dcp_hi vs fix_ref（高 slot） | 1.4e-4 | 2.0e-3 | 5.2e-3 |
+  | full_dcp_hi vs full_ref（全栈含 140/120/130/150/160） | 1.4e-4 | 2.0e-3 | 5.2e-3 |
+  | 噪声基线 fix_ref vs orig_ref（同为非 DCP） | 1.4e-4 | 2.0e-3 | 0 |
+
+  - dec 的 5.2e-3 来自 LSE 分卡合并的舍入，低于 1e-2 门槛；
+  - 116 的所有用例都没有崩溃，输出全部有限；
+  - W=2 时原栈越界（1.2 倍）没有 fault，只是读到 0；8 卡越界可达 8 倍，推断会 fault。
+- **CUDA graph decode 未覆盖**：r5 的 fix_dcp_graph 用 `--batch-size 1` 捕获，而 decode 批为 2 → 实际走了 eager（与 fix_dcp 数值相同）。
+  - 已修正：harness 改为 `--batch-size 2`，并在捕获时把 o_proj 输入拷进静态缓冲区，每次 replay 后读取，`graph_dec_steps>0` 证明 graph 确实跑过；verdict 要求 >0。
+  - r6 全矩阵（gjob `t50_dcp7`）运行中，结论自动写入 `/sjtu/linhang/arena/runs/T50/r6/SUMMARY.txt`。
 
 ## 风险
 - 只修了 tilelang DSA 路径（A100 唯一可用的路径）。flashmla/fa3/trtllm/aiter 在 DCP 下仍按原样（Hopper 路径，这里不用）。
@@ -60,7 +75,7 @@ DCP 下调度器与分配器使用**虚拟 loc**（`[0,(rows+64)·W)`，页 64·
 - 容量只有约 ×4.4，而且 decode 仍要对 64 头 all-gather Q。性能与 TPOT 要看 8 卡梯子。
 
 ## 8 卡复验方案（交 Claude 执行，本任务不提交）
-前提：r5 全部 PASS。patch 列表 = RELEASE TIER1 + `114 115 116`（+ 原 025 的 120）。
+前提：r5 已 PASS（eager）；r6 的 CUDA graph decode 用例也需 PASS。作业文件已写好：`scripts/pod/jobs/dcp116_probe.sh`（容量、numcheck 对非 DCP 参考、180k×5 高负载下的前缀命中、能力冒烟；需加载两次引擎，约 45 分钟）。以下为等价参数：patch 列表 = RELEASE TIER1 + `114 115 116`（+ 原 025 的 120）。
 1. **冷探针 + 能力冒烟 + 容量**（仿 `scripts/pod/jobs/coldprobe_b115_dcp8.sh`）：
    ```
    CP_NAME=b116dcp

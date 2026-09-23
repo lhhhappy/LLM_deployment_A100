@@ -749,12 +749,33 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
                         if embeds_name in kwargs:
                             kwargs[embeds_name] = None
                             break
-                return self.layer_model.forward(
-                    input_ids,
-                    positions,
-                    forward_batch,
-                    **kwargs,
-                )
+                # [ax] 170 v2 (T52b root cause): capture calls layer_model.forward directly,
+                # bypassing the outer *ForConditionalGeneration.forward that wraps the body in
+                # get_attn_tp_context().maybe_input_scattered(). With
+                # --enable-attn-tp-input-scattered the body was therefore captured in the
+                # NON-scattered layout (all-reduce, full residual), while replay runs the outer
+                # forward eagerly WITH scatter on: VocabParallelEmbedding skips its all-reduce
+                # and the graph consumes per-rank partial embeddings -> fluent garbage at every
+                # length (8-card 026j 0/12; dev-box TP2 repro in evidence/T52b). Capture under
+                # the same scatter decision the replay-time outer forward will make.
+                from sglang.srt.layers.communicator import get_attn_tp_context
+
+                attn_tp_ctx = get_attn_tp_context()
+                scattered = attn_tp_ctx.use_input_scattered(forward_batch)
+                if scattered:
+                    tp = get_parallel().tp_size
+                    assert num_tokens % tp == 0, (
+                        f"[ax] 170: prefill graph bucket {num_tokens} is not a multiple of "
+                        f"tp_size={tp} under --enable-attn-tp-input-scattered"
+                    )
+                self._ax170_capture_input_scattered = scattered
+                with attn_tp_ctx.maybe_input_scattered(forward_batch):
+                    return self.layer_model.forward(
+                        input_ids,
+                        positions,
+                        forward_batch,
+                        **kwargs,
+                    )
             # tc_piecewise: compile/capture the outer model.forward path.
             pp_kwargs = self.model_runner._pp_kwargs(pp_proxy_tensors)
             return self.model_runner.model.forward(
@@ -1230,6 +1251,17 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
             ),
         ):
             return False
+        # [ax] 170 v2: replay is only valid if the replay-time outer forward makes the same
+        # attn-tp scatter decision the body was captured with; otherwise run eager.
+        captured_scattered = getattr(self, "_ax170_capture_input_scattered", None)
+        if captured_scattered is not None and self._uses_eager_prefill_tail():
+            from sglang.srt.layers.communicator import get_attn_tp_context
+
+            if (
+                get_attn_tp_context().use_input_scattered(forward_batch)
+                != captured_scattered
+            ):
+                return False
         if getattr(self, "enable_cp_v2_bcg_capture", False) and is_cp_v2_active(
             forward_batch
         ):
