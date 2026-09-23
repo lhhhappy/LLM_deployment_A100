@@ -45,11 +45,9 @@
 
 结果索引：`evidence/T45/README.md`、`summary.json`；完整数字以该收据为准。
 
-- `python3 scripts/verify_140.py`（旧栈顺序，T57 前）：完整000→101→110→111→140→120实际应用、编译、确定再生成、整栈反向逐字节恢复。
-- `python3 scripts/test_kda_snapshot_scheduler_140.py`：真实调度/准入AST，关闭32组×30轮JSON轨迹字节相同；开启8组；role prompt从2次extend变为1次。
-- 开发机CPU：`test_kda_snapshot_cache_140.py --source candidate/sglang`。真实controller/tree/components和tracking/pool/flush方法；checked CPU allocator与session服务stub。覆盖插入、重复、分叉、COW源、锁、淘汰、chunk续算、资源压力、namespace与真flush；每项结束调用原tree sanity_check。
-- 开发机GPU：`run_kda_snapshot_140.sh --baseline baseline`。随机projection/conv/gate权重，64×128真实KDA尺寸，含8×128的TP8分片；实际patched `forward_extend→dispatcher→TritonKDAKernel` 和底包conv/chunk kernel。假package初始化只绕过无关服务依赖，不替换计算；不是完整模型或服务验证。
-- 离线：`replay_kda_snapshot_140.py --dataset /sjtu/linhang/arena/s1-dev --out ...`。原Renderer+glm_tok，722请求全部长度对齐冻结glm_tokens。311链各自从空缓存顺序回放，不跨链复用，不模拟生成decode、容量淘汰、真实并发准入、retraction；不是oracle，不是测得cached_tokens或SLO。
+- **历史栈校验**：当时的完整000→101→110→111→140→120旧栈应用、编译、再生成和反向恢复见[收据](../evidence/T45/verify.log)；旧 runner 已清理。现行合并补丁按[patches/README.md](README.md)使用。
+- **历史调度/准入测试**：关闭32组×30轮JSON轨迹字节相同，开启8组；role prompt从2次extend变为1次。[测试日志](../evidence/T45/scheduler_tests.log)保留，原一次性 runner 已清理。
+- **开发机 CPU/GPU 与离线回放**：真实 controller/tree/components 的缓存测试、64×128 KDA 随机权重数值、原 Renderer+glm_tok 的722请求回放分别见[证据索引](../evidence/T45/README.md)。这些一次性 runner 已清理；离线回放不模拟真实并发、淘汰或解码，不能当作缓存命中或 SLO 结果。
 
 | 调度chunk | off命中token（101+105） | on命中token | 增加 | off→on extend次数 |
 |---:|---:|---:|---:|---:|

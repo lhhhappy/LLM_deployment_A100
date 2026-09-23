@@ -20,11 +20,9 @@
 
 ## 启动/采集
 
-未执行的完整任务：`scripts/pod/jobs/dev_b160_mtp_n6.sh`。唯一源码名`b160_mtp_s3_k1_d4_mr32_n6`，显式steps3/topk1/D4、MR32/graph32。MR32为后续N22/26保留cap空间，主池足够且MR起效时相比默认48少约1.10GiB/rank verify scratch；不保证N@SLO。120/130固定off；150 warmup对spec跳过，所以不传ax_shapes。未加入RELEASE、镜像构建或队列。
+本任务当时准备过一个 N6 完整测试 job，**未入队，旧 job 文件现已清理**。设计使用唯一源码名`b160_mtp_s3_k1_d4_mr32_n6`，显式steps3/topk1/D4、MR32/graph32。MR32为后续N22/26保留cap空间，主池足够且MR起效时相比默认48少约1.10GiB/rank verify scratch；这只是预算推算，不保证N@SLO。当时计划120/130固定off、150 warmup跳过spec。后续实际 8 卡组合测试见[实验记录](../notes/experiments.md)和原始证据；本段不是可直接执行的任务入口。
 
-```
-python3 scripts/extract_spec_stats_160.py server.log --draft-tokens 4 --out spec.json
-```
+当时用一次性采集脚本从 `server.log` 统计 spec tokens/rounds；脚本已从现行 `scripts/` 清理，不能再按旧命令运行。原始[运行记录与验算](../evidence/T48/README.md)保留。
 
 `accept len`包含每request-round保证的1个target token；`accept rate`只计正确draft。加权长度=`Σspec_tokens/Σspec_rounds`，D4接受率=`(Σtokens−Σrounds)/(3Σrounds)`。旧日志无原始计数时仅保留逐窗口值，不算伪精确平均。默认只取TP0/无rank行；每个日志应只含一个服务进程/一次测量，重启/多个测量先裁剪。`--start-line`辅助切片；不能用最后一行的#running-req替代窗口round计数。未打印的最后窗口不可恢复。任务脚本输出`spec_harness.log`含warmup，纯measurement需按harness时间进一步裁剪。
 

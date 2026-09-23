@@ -24,11 +24,7 @@
 
 ## CPU 复现与证据
 
-```bash
-# 在独立 CPU Python 环境；不需要 torch / GPU
-python -m pip install transformers==5.12.1 tokenizers==0.22.2 jinja2
-python -B scripts/test_async_tokenize.py --real --benchmark-real-only --evidence evidence/T42
-```
+本次历史 CPU 复现使用 `transformers==5.12.1`、`tokenizers==0.22.2` 和 `jinja2`，不需要 torch/GPU。一次性 runner 已从现行 `scripts/` 清理，不能直接照旧命令重跑；[evidence/T42/](../evidence/T42/)保留逐请求比较、覆盖率、性能结果、依赖锁定和当时的运行日志。
 
 脚本自动复制只读底包到临时目录，按顺序应用补丁，执行生产方法抽取测试。真实输入用未修改的 `s1-dev/harness/s1_common.py:Renderer` 渲染；对所有 bodies 验证开启/关闭/原版的 IDs 完全相同，并对照 requests 的冻结 `glm_tokens`。逐请求只保存 ID、长度和 token IDs 的 SHA256，不保存 prompt 正文。
 

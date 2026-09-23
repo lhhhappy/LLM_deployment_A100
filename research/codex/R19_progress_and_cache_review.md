@@ -22,19 +22,21 @@ VERIFIED 表示源码、完整原始记录或本轮 CPU 复现；INFERRED 表示
 
 F91 所称 43 个 fast 超时也可复现错误来源：按 `phase=intra && uncached_expected<=4096 && ttft>3` 得 43，其中 33 个 `idx_in_chain=0`。原 `s1_common.in_ttft_gate` 正确结果是 fast 共 328、超时 **10**。这 33 条应走 30 秒链首门，不能拿 3 秒判失败。
 
-证据：`evidence/T53/026_accounting.json`；复现 `python3 -B evidence/T53/reproduce_review.py`。F93 已追加，原报告保留供追溯。
+证据：`evidence/T53/026_accounting.json`。可复用的现行原始记录审阅入口是 `python3 -B scripts/analysis/review_raw.py evidence/T53/026_N18_raw.jsonl`；`evidence/T53/reproduce_review.py` 依赖已移除的旧分析器及后来修正的数值比较器，只作为当时漏洞复现的历史快照保留，不能直接执行或覆盖原证据。F93 已追加，原报告保留供追溯。
 
 ## 2. 已证实的脚本问题（按影响排序）
 
+本节审计的是当时的脚本版本；相关一次性分析器已从现行 `scripts/` 清理，不能把旧缺陷直接套到新判分链。
+
 ### S1 — 严重：不完整的测量可被判全通过
 
-`scripts/pod/verify/analyze_run.py:29–38`：空桶 `hard=(not t) or ...` 为真；缺 TPOT 时赋 0；无完整 cohort/重复 ID 检查；错误只按混合总数判 `<=1%`，不保留 harness 对 data/render/infra/engine 的各自硬门，1% 边界也与 `<1%` 不同。
+历史已删除的简化分析器 `analyze_run.py`（当时代码 29–38 行）：空桶 `hard=(not t) or ...` 为真；缺 TPOT 时赋 0；无完整 cohort/重复 ID 检查；错误只按混合总数判 `<=1%`，不保留 harness 对 data/render/infra/engine 的各自硬门，1% 边界也与 `<1%` 不同。
 
 **CPU 实测：空 raw 输出两种 ALL_PASS=true、TPOT=0。** 不是假设。`evidence/T53/empty_verdict.json`。
 
-`scripts/pod/jobs/dev_ladder_template.sh:34–40` 忽略 `run_dev.py` 退出码、选目录里最新 raw，且不检查分析器退出码。预检后失败、运行中断或同目录旧结果均可能进入错误判定。当前 026 完整且真实失败，不能说它已经发生假通过；确认的是这道门存在漏洞。
+当时的 `dev_ladder_template.sh`（历史版本 34–40 行）忽略 `run_dev.py` 退出码、选目录里最新 raw，且不检查分析器退出码。预检后失败、运行中断或同目录旧结果均可能进入错误判定。当前 026 完整且真实失败，不能说它已经发生假通过；确认的是当时这道门存在漏洞。
 
-建议统一使用已有 `scripts/score_formal.py` 的原 scorer/完整门口径，并额外核验 run manifest、cohort ID 集合、测量 raw、各进程退出状态；不要再维护第二套简化硬门。已有 `scripts/test_ladder_search.py` 包含空桶、缺 TPOT、coverage 反例，却未保护 pod 的另一个实现。
+建议统一使用 `scripts/score_formal.py` 的原 scorer/完整门口径，并额外核验 run manifest、cohort ID 集合、测量 raw、各进程退出状态；不要再维护第二套简化硬门。早期离线测试曾覆盖空桶、缺 TPOT、coverage 反例，却未保护 pod 的另一套实现；该一次性测试脚本已清理。真正观察到的空 raw 假通过保留在 [evidence/T53/empty_verdict.json](../../evidence/T53/empty_verdict.json)。
 
 ### S2 — 严重：分桶/浪费统计重复实现，已实际误导结论
 
@@ -70,7 +72,7 @@ CPU 反例：参考 `[1,2,3]`，候选 `[1]` → `ok; wrong=0/1`；候选 `[1,9,
 
 ### S7 — 中等：前缀潜力模拟的顺序不是实际闭环派发顺序
 
-`scripts/analysis/prefix_reuse_potential.py:20/:33–37` 按原数据 `dispatch_offset_ms` 排序，并以原 `chain_index` 判断链首。实际 N 路闭环从 cohort 链队列取任务，随各链完成速度改变派发顺序。模拟中“更早出现”的前缀可能在该次测量里尚未出现；未计是否已经计算入树、状态槽、淘汰。
+当时的前缀潜力模拟脚本（现已清理）按原数据 `dispatch_offset_ms` 排序，并以原 `chain_index` 判断链首。实际 N 路闭环从 cohort 链队列取任务，随各链完成速度改变派发顺序。模拟中“更早出现”的前缀可能在该次测量里尚未出现；未计是否已经计算入树、状态槽、淘汰。
 
 它可以作为指定排序下的无容量限制潜力情景，不能作为026/034每条请求应命中的证据。实际根因需按 raw 的派发/执行/插入时间核对。
 

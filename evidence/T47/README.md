@@ -1,6 +1,6 @@
 # T47 / W21 — 112/113 v2 去除形状特化
 
-生产源`scripts/kernels/sm80_indexer_{112,113}.py`；同名112/113补丁重新生成，旧补丁+说明在`patches/drafts/*-v1.*`，旧源在本目录`sm80_indexer_*_v1.py`。112/113需配套更新。
+当时的生产源现归档于 `tests/gpu/kernels/` 的 112、113 两份源文件；同名 112/113 补丁已合并进当前 [110 补丁](../../patches/110-sm80-dsa-indexer.patch)，旧源在本目录 `sm80_indexer_*_v1.py`。本页描述 T47 原实验版本和证据，不是当前补丁生成步骤。
 
 - P112-01…05：`112_all.log`，原测试完全未改，110 oracle对照。88组数值、4种graph×3动态重放，全256 FP8编码/空维断言；全部通过。
 - P113-01…03：`113_all.log`，原测试未改，对110及112 v2。222组数值、10种graph×3动态重放，含六个8192×32k/95k/190k大矩阵，全通过。
@@ -10,21 +10,9 @@
 - `112/compiler/`、`113/compiler/`：代表形状实际PTX、寄存器/spill/shared及sm80 bf16 MMA证据。
 - `gpu_initial.log`、最终`gpu_final_idle.log`：开发机占用与自有进程退出。只用GPU0和既有环境，全部远端工作在arena目录。
 
-## 复现
+## 历史实验来源
 
-本地先顺序运行`make_112.py`、`make_113.py`、`verify_112.py`、`verify_113.py`（均在scripts/）。把两个kernel源、原112/113测试、`build/p110/sm80_deep_gemm.py`、本目录v1源与47测试/runner传到`/sjtu/linhang/arena/code/T47/`。
-开发机先`source /sjtu/linhang/arena/env.sh`、`nvidia-smi`确认空闲，再从该目录按顺序运行：
-
-```bash
-bash run_sm80_indexer_47.sh test_sm80_indexer_112.py --mode all
-bash run_sm80_indexer_47.sh test_sm80_indexer_113.py --mode all
-bash run_sm80_indexer_47.sh bench_sm80_indexer_47.py
-T47_CACHE=new-empty-cache bash run_sm80_indexer_47.sh test_sm80_indexer_cache_47.py
-bash run_sm80_indexer_47.sh inspect_sm80_indexer_112.py /sjtu/linhang/arena/runs/T47/112/compiler
-bash run_sm80_indexer_47.sh inspect_sm80_indexer_113.py /sjtu/linhang/arena/runs/T47/113/compiler
-```
-
-日志重定向至`/sjtu/linhang/arena/runs/T47/`，长任务nohup。回收后`python3 scripts/summarize_47.py`核验源码/oracle/测试/补丁/证据SHA与全部门，输出`summary.json`及`performance_table.md`。T43/T44证据原样保留，旧summarize脚本针对v1，不用于v2。
+当时先生成 112/113 补丁、校验全栈，再把两份 kernel、数值测试、v1 源与 T47 runner 传到开发机 `/sjtu/linhang/arena/code/T47/`。在 GPU0 上依次跑 112/113 数值、v1/v2 性能配对、随机长度缓存键测试与编译器检查；日志回收到本目录。一次性生成、runner、benchmark、汇总和编译器检查脚本已清理，旧命令不能直接执行。保留的核心测试是 `tests/gpu/test_sm80_indexer_112.py`、`test_sm80_indexer_113.py`、`test_sm80_indexer_cache_47.py`；如需复验，应以当前补丁树重新搭建环境。T43/T44 原证据仍按当时版本解读。
 
 范围：只证明这些kernel在固定模型/tile/dtype与已热标量/布局类别下不因精确长度重编译；不保证其它服务kernel、未热head数/布局、整服务/TP8/NEXTN或真实模型输出/SLO。150预热形状计划本轮未改。
 

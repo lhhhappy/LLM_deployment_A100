@@ -75,7 +75,7 @@ JSON flush、全 worker 成功归并、服务端时间戳路径启用 metrics、
 冻结补丁SHA256=`e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6`，基线94602c9；D1配套版本仍是001 v1.1，不包含002/003/004。上面的“未实现/仅设计”是历史状态；本节审阅已实现补丁，E2已验证单worker空闲JSON路径，其余live结果追加到experiments/TEST_PLAN，不提前宣布通过。
 
 - **VERIFIED / 有条件同意**：ASGI middleware在调用下游之前采样perf_counter到请求scope私有键；typed `/generate`用此值覆盖客户端的received_time，沿用原epoch换算，不去掉排队时间。不消费body、不聚合SSE；应用层入口不等于网络首字节，外层middleware的耗时仍不在此时间内。
-- **VERIFIED**：HTTP flush使用ORJSONResponse和真实布尔值，保留200/400；tokenizer层要求非空且all成功，任一失败不清本地多模态预处理缓存；timeout原样传到调度器。`scripts/test_d0_v11_review.py`对实际build/d0 AST的6项CPU检查通过：全成功、混合失败、空结果、无processor、body前私有scope采样、非HTTP透传。它们不是DP live验证。
+- **VERIFIED（历史 v1.1 检查）**：HTTP flush使用ORJSONResponse和真实布尔值，保留200/400；tokenizer层要求非空且all成功，任一失败不清本地多模态预处理缓存；timeout原样传到调度器。当时的6项CPU检查覆盖全成功、混合失败、空结果、无processor、body前私有scope采样、非HTTP透传；[运行日志](../evidence/T29/cpu_regression.log)保留，原一次性检查脚本已从现行 `scripts/` 清理，不能按本段重跑。它们不是DP live验证。
 - **VERIFIED / 未解决的可靠性边界**：`FanOutCommunicator`依赖配置的fan_out响应计数收齐，D0没有新增通信超时或rank身份校验。`timeout=N`约束调度器等待空闲，不给失联worker的communicator await提供硬截止。客户端必须有独立HTTP截止；不能把卡住/连接中断视为flush成功。错误字符串`worker{i}`只是响应到达序号，**不是DP rank**，排障不要据此定位具体卡。
 - **验收范围**：本轮可在原qfull TP1验证IF-08忙碌400/等待200及flush后归零；IF-09多worker混合失败、HiCache/L3清理仍未测，HiCache/L3保持关闭。D0不改变模型输出或修复D1-04数值门；既有D1-02/04失败不因接口检查通过而解除。
 - **T29结果回填**：W6 IF-08实际4096-token流验证busy400/false、等待54.409s后200/true、同prompt冷命中0；同流经过严格DONE/逐事件字段与计数/首末时间戳检查，IF-03附带通过。只限L2 TP1、无MTP/HiCache，不代替IF-09或IF-12；证据`evidence/T29/first/if08.json`，完整说明见experiments T29/F47。

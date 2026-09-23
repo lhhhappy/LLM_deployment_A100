@@ -19,7 +19,7 @@ for m in ("triton", "tilelang", "sgl_kernel", "flashinfer", "transformers"):
 PY
   cat $AX/src/$SRC/PATCHES; } > $OUT/env.txt 2>&1
 W=$OUT/work; mkdir -p $W; cp $KIT/*.py $W/
-# 112/113 tests load colocated kernels: use the SERVED tree's file (== scripts/kernels/sm80_indexer_113.py)
+# 112/113 tests load colocated kernels copied from the served tree.
 cp $TREE/srt/layers/attention/dsa/sm80_indexer_kernels.py $W/sm80_indexer_112.py
 cp $TREE/srt/layers/attention/dsa/sm80_indexer_kernels.py $W/sm80_indexer_113.py
 cp $KIT/oracle110_sm80_deep_gemm.py $W/sm80_deep_gemm.py
@@ -33,5 +33,4 @@ check t44_indexer113_all   1800  python3 test_sm80_indexer_113.py --mode all
 check t47_no_recompile     1200  python3 test_sm80_indexer_cache_47.py
 [ -f $TREE/srt/mem_cache/kda_dual_snapshot.py ] && check t45_kda_snapshot140 1800 python3 test_kda_snapshot_140.py --source $TREE
 for g in kda kpool dsa indexer; do check t48_mtp160_$g 1200 python3 test_mtp_sm80_160.py --source $TREE --group $g; done
-[ -f $KIT/bench_moe_int8.py ] && check int8_moe_bench 1200 python3 bench_moe_int8.py
 echo "== $OUT"; cat $OUT/summary.txt

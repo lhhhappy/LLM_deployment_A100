@@ -17,15 +17,7 @@
 | records_check.log | 收尾账本检查结果 |
 | delivery_sha256.json | 最终交付源码/说明/测试/方案的哈希 |
 
-复现：
+当时的补丁生成、全栈校验、job 模板及记录检查脚本已清理，旧命令不能直接复跑。仍保留的 CPU 回归可运行 `python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py -v`；如需重建补丁树，使用现行 `scripts/patch_stack.py` 和当前补丁索引。
 
-```bash
-python3 scripts/make_120.py
-python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py -v
-python3 scripts/verify_120.py
-bash -n scripts/pod/jobs/dev_b120_template.sh
-python3 scripts/check_records.py
-```
-
-结论边界与测试 ID P120-01…10 见 `patches/120-sched-protect-chain.md` / `tests/TEST_PLAN.md`。
+结论边界与当时的测试 ID P120-01…10 见 [120 补丁说明](../../patches/120-sched-protect-chain.md)；旧测试总表已清理。
 CPU 通过不代表 GPU logits/overlap/NEXTN/池回收或 SLO 通过；LPM 未准入请求公平性保持原状。

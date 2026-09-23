@@ -7,7 +7,7 @@
 #   scripts/pod/pread head <file> [n]              first n lines
 #   scripts/pod/pread cat  <file>                  whole file (refuses > 5 MB)
 #   scripts/pod/pread grep <regex> <file> [max]    matching lines (default max 200)
-#   scripts/pod/pread analyze <run_dir>            analyze_run.py + logstat.py on a finished dev run dir (read-only)
+#   scripts/pod/pread analyze <run_dir>            show existing level verdicts and server-log tail (read-only)
 set -uo pipefail
 ROOTS="^/tmp/ax/(runs|queue|verify|verify_kit|src/[^/]+/(PATCHES|PATCHES_SIG))(/|$)|^/tmp/ax/(worker\.out|engine_current\.log|engine\.sig)$"
 G="$(cd "$(dirname "$0")/../.." && pwd)/scripts/gssh"
@@ -26,6 +26,6 @@ case "$cmd" in
   grep) re=${1:-}; f=${2:-}; m=${3:-200}; ok_path "$f" || { echo "path not allowed"; exit 2; }; num "$m" 5000 || { echo "bad max"; exit 2; }
         remote "grep -E -m $m -- $(q "$re") $(q "$f")" ;;
   analyze) d=${1:-}; ok_path "$d" || { echo "path not allowed"; exit 2; }
-        remote "d=$(q "$d"); python3 /tmp/ax/verify_kit/analyze_run.py /tmp/ax/s1/s1-dev/harness \$(ls -t \$d/dev/raw_*.jsonl | head -1); python3 /tmp/ax/verify_kit/logstat.py \$d/server.log" ;;
+        remote "d=$(q "$d"); found=0; for f in \"\$d\"/level_verdict.json \"\$d\"/score_formal.json \"\$d\"/N*/level_verdict.json \"\$d\"/N*/score_formal.json; do if [ -f \"\$f\" ]; then echo \"-- \$f\"; cat \"\$f\"; found=1; fi; done; [ \$found = 1 ] || echo '无已保存判定'; log=\"\$d/server.log\"; [ -f \"\$log\" ] || log=\"\$(dirname \"\$d\")/server.log\"; if [ -f \"\$log\" ]; then tail -40 \"\$log\"; fi" ;;
   *) sed -n 2,11p "$0"; exit 1 ;;
 esac

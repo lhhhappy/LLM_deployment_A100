@@ -1,6 +1,6 @@
 # T52 evidence — patch 170 (GLM breakable prefill CUDA graph)
 Dev box GPU1, TP1, 8-layer rank surrogate, dummy weights, full stack 000…160 + 170, SGLANG_AX_KDA_DUAL_SNAPSHOT=1.
-Rerun: scripts/analysis/devbox_bcg_check.sh (client: bcg_correctness.py, compare: bcg_compare.py, test-only init: t52_test_dummy_init.patch).
+Historical runner and its client/compare helpers were removed during cleanup. The test-only initialization patch is preserved as [t52_test_dummy_init.patch](t52_test_dummy_init.patch); it was applied only to the surrogate test tree, never to the product patch stack.
 
 | dir / file | what |
 |---|---|
@@ -9,5 +9,5 @@ Rerun: scripts/analysis/devbox_bcg_check.sh (client: bcg_correctness.py, compare
 | *_s + cmp_*_s.json | context-sensitive test init (t52_test_dummy_init.patch): the real numerics comparison (see patches/170-*.md table) |
 | bcg170_t, eager170_t | chunkcost with --enable-metrics (extend cost + decode step); bcg170/eager170 chunkcost has 0 extend times (no metrics) but valid decode curve |
 | */server_excerpt.txt | capture lines, every Prefill batch line (cuda graph: True/False), errors |
-| test140.jsonl | scripts/test_kda_snapshot_140.py on the s170 tree vs base_exact fla kernels: 8/8 pass |
+| test140.jsonl | `tests/gpu/test_kda_snapshot_140.py` (moved from `scripts/`) on the s170 tree vs base_exact fla kernels: 8/8 pass |
 | jobs/ | gjob logs (t52_bcg, t52_bcg2, t52_neg, t52_strong, t52_strong_e, t52_140) |

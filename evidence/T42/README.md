@@ -1,6 +1,6 @@
 # T42 / W16 CPU evidence
 
-交付：`patches/130-async-tokenize.patch` / `.md`；测试 `scripts/test_async_tokenize.py`。
+交付：[130 补丁](../../patches/130-async-tokenize.patch)及[说明](../../patches/130-async-tokenize.md)。当时的 CPU 一次性测试脚本已清理，本目录保留原日志与结果。
 CPU 依赖 transformers 5.12.1 / tokenizers 0.22.2 / jinja2；完整版本见 requirements-lock.txt。
 
 - `cpu_tests.log`：14 单测 + 722 真实对话全量三路径逐 token 对照 + 7 边界/21 并发/3 batch-pair 对照。
@@ -11,5 +11,5 @@ CPU 依赖 transformers 5.12.1 / tokenizers 0.22.2 / jinja2；完整版本见 re
 - `unit_tests_initial.log`：首次14单测；`cpu_tests_dependency_mismatch.log` / `cpu_tests_metadata_attempt.log` 保留测试准备失败史（旧 tokenizer 依赖不支持、metadata 字段名假设），后续已全量重跑。
 - `records_check.log`：最终记录一致性检查。
 
-复现：在 CPU Python 环境运行 `python -B scripts/test_async_tokenize.py --real --benchmark-real-only --evidence evidence/T42`。
+原实验使用锁定的 CPU Python 依赖和一次性测试脚本；脚本现已清理，旧命令不能直接复跑。需要重新验证 130 时，应基于当前补丁树重建测试，并把新运行与本目录历史证据分开。
 未导入完整 GPU 服务、未运行 GPU/Trisol/bohr、未打镜像/提交；8卡验证仍待 Claude 安排（M3-06）。

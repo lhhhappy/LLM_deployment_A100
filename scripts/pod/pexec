@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# Run a shell command inside the L2 8-GPU pod: scripts/pod/pexec '<cmd>'
-source "$(dirname "$0")/common.sh"
-bexec "$1"

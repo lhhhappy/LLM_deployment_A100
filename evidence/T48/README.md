@@ -1,6 +1,6 @@
 # T48 / W22 原始证据索引
 
-任务限定2×A100开发机算子/随机小权重；没有完整checkpoint、8卡模型、服务或评分测量。源码路径审计与INFERRED容量/TPOT模型见[R17](../../research/codex/R17_nextn_sm80.md)，补丁和启动约束见[160说明](../../patches/160-nextn-sm80.md)。用例ID登记于`tests/TEST_PLAN.md`。
+任务限定 2×A100 开发机算子/随机小权重；没有完整 checkpoint、8 卡模型、服务或评分测量。源码路径审计与 INFERRED 容量/TPOT 模型见 [R17](../../research/codex/R17_nextn_sm80.md)，补丁和启动约束见 [160 说明](../../patches/160-nextn-sm80.md)。当时的用例 ID 与通过范围以下表及原始证据为准；旧测试总表已清理。
 
 ## 最终证据与通过范围
 
@@ -15,22 +15,11 @@
 
 精确数值摘要、文件哈希及通过标志见`summary.json`。随机激活/小权重不代表真实模型激活或能力。MoE仅缩小专家数为33（真实模型288 routed+1 shared），保留TP8每专家K4096/N256/top8；没有覆盖真实router分布或完整专家权重/显存。Marlin微秒/毫秒日志含首次编译和开发机环境影响，不用作TPOT外推。
 
-## 环境与复现
+## 环境与历史实验来源
 
 `gpu/environment.json`记录Python、torch/Triton/TileLang、驱动、CUDA toolkit/compat、模型config与测试脚本hash。`gpu/remote_source_hashes.json`是完整候选文件清单。显式工作目录为`/sjtu/linhang/arena/code/T48`、`runs/T48`、`cache/T48`；早期C++ JIT隐式根盘缓存偏差与纠正见下。z3-solver4.15.4.0仅装入`cache/T48/deps`；没有全局安装。两个开发GPU只运行独立单卡算子，无TP进程组。
 
-```bash
-# 本地副本打包验证
-python3 scripts/make_160.py
-python3 scripts/verify_160.py
-python3 scripts/test_mtp_policy_160.py
-bash -n scripts/run_mtp_sm80_160.sh scripts/pod/jobs/dev_b160_mtp_n6.sh
-# 开发机：先source env.sh/nvidia-smi，复制candidate和脚本至code/T48。
-# model/只放s1-dev/glm_tok/config.json，不放模型权重。
-bash run_mtp_sm80_160.sh --resolve
-bash run_mtp_sm80_160.sh --group kda   # small/kpool/dsa/acceptance/indexer/mhc/sharing分别运行
-T48_GPU=1 bash run_mtp_sm80_160.sh --marlin
-```
+当时先打包、全栈校验和参数策略 CPU 测试，再把候选源码及 runner 传到开发机 `code/T48`。开发机只放 config，不放模型权重；按 resolve、KDA、小算子、kpool、DSA、acceptance、indexer、mHC、sharing 和 Marlin 分组测试。原一次性打包、runner 与策略脚本已清理，`dev_b160_mtp_n6.sh` 从未入队，**不能按历史命令直接运行**。保留的 GPU 数值测试位于 `tests/gpu/test_mtp_sm80_160.py`；本目录的日志与收据说明当时实际覆盖范围。
 
 算子脚本的bootstrap仅跳过服务包初始化，并提供平台/分布式组/分配策略查询。被测数值kernel来自候选，没有替换运算。mHC禁DeepGEMM；DSA BF16路径的dtype谓词固定false。真实参数解析、ModelConfig/mapper及Marlin走完整正常导入。算子图不包含完整模型runner、TP通信、真实调度metadata或采样分布等价证明。普通BF16 embedding/head/EH投影/BMM/RMSNorm、完整router分布、全模型MLA cache写入与prefill KDA未在本轮逐一独立重测；已有110–113/F58/F59/T45证据仅作背景，不算本轮全覆盖。
 

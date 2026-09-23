@@ -10,6 +10,7 @@ Patch names are relative to patches/ with or without ".patch". Patches apply wit
 scripts/pod/lib.sh and scripts/build_image.sh do. The base is build/base_exact (the byte-exact L3 base, F54).
 Used to prove that a patch-stack refactor leaves the final source tree of every recorded configuration unchanged.
 """
+import argparse
 import filecmp
 import os
 import shutil
@@ -76,12 +77,26 @@ def make(old, new, out, rels):
 
 
 if __name__ == "__main__":
-    cmd, args = (sys.argv[1], sys.argv[2:]) if len(sys.argv) > 1 else ("", [])
-    if cmd == "apply" and len(args) >= 1:
-        apply(args[0], args[1:])
-    elif cmd == "same" and len(args) == 2:
-        sys.exit(same(*args))
-    elif cmd == "make" and len(args) >= 4:
-        make(args[0], args[1], args[2], args[3:])
-    else:
-        sys.exit(__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    commands = parser.add_subparsers(dest="command")
+    apply_parser = commands.add_parser("apply", help="copy the exact base and apply patches")
+    apply_parser.add_argument("out")
+    apply_parser.add_argument("patches", nargs="*")
+    same_parser = commands.add_parser("same", help="compare two patched trees")
+    same_parser.add_argument("tree_a")
+    same_parser.add_argument("tree_b")
+    make_parser = commands.add_parser("make", help="write a patch between two trees")
+    make_parser.add_argument("old")
+    make_parser.add_argument("new")
+    make_parser.add_argument("out")
+    make_parser.add_argument("files", nargs="+")
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+    args = parser.parse_args()
+    if args.command == "apply":
+        apply(args.out, args.patches)
+    elif args.command == "same":
+        sys.exit(same(args.tree_a, args.tree_b))
+    elif args.command == "make":
+        make(args.old, args.new, args.out, args.files)

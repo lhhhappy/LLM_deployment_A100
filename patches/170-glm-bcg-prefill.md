@@ -45,7 +45,7 @@
   所有 BCG 臂的 prefill 都走图（51/51）。v2 在 TP2 scatter 下的残差（0.14）与“只换通信布局”的参照（0.145）同量级；v1 是 10 倍以上的错误，并且首 token 翻转。
 - **未做**：TP2 同配置 eager 两次重启的噪声底；DONE 已交给 T50b，GPU 让出，没有再跑。0.14 的残差按推断归为 TP2 下 NCCL 归约顺序差异，最终要以 8 卡能力冒烟 12/12 + numcheck 为准。
 - **fuzz=0（实测）**：全栈（…160 170，含 MTP 顺序）、tier-1+140+120+170、tier-1+170、026 栈 B+114+140+120+170 都通过，全栈结果与移植树逐字节相同。
-- **复跑**：`T=/sjtu/linhang/arena/runs/T52b GPU_ID=0,1 TP=2 ARMS="bcg170sc eager170sc bcg170 eager170" SUFFIX=_v2tp2 TESTPATCH=t52_test_dummy_init.patch CHUNKCOST=0 bash scripts/analysis/devbox_bcg_check.sh`，再运行 `scripts/analysis/t52b_summary.sh`。
+- **历史复跑条件**：TP2、GPU0/1，BCG/eager 与 scatter/no-scatter 四臂，使用只在测试树应用的[上下文敏感初始化补丁](../evidence/T52/t52_test_dummy_init.patch)。原一次性 runner 和汇总脚本已清理；[T52b 原始结果](../evidence/T52b/)保留，本段不是现行命令。
 
 ## 按请求变化的部分：graph-safe 还是 eager break（静态审查）
 | 组件 | BCG 下 | 依据 |
@@ -59,12 +59,12 @@
 | logits / 采样 / logprob | eager 尾部 | BCG 只 capture 层体（body capture），`return_logprob` 仍可 replay |
 
 ## 验证（开发机 GPU1，TP1，8 层 rank 替身，dummy 权重，全栈 000…160+170，`SGLANG_AX_KDA_DUAL_SNAPSHOT=1`）
-复跑：`scripts/analysis/devbox_bcg_check.sh`。证据：`evidence/T52/`。
+当时的运行脚本已清理；实验事实见[证据](../evidence/T52/)。
 - **fuzz=0**：全栈（000 101 105 106 110 111 112 113 114 115 140 120 130 150 160 170）、tier-1+140+120+170、tier-1+170 都能应用；全栈结果与移植树逐字节相同；开发机上也重新从补丁构建过。
 - **启动/capture（实测）**：`--cuda-graph-backend-prefill breakable --chunked-prefill-size 4096` 时捕获 50 个桶 `[4,8,…,1024,1280,…,4096]`，17–27 s，池 1.25 GB。所有 prefill 行都显示 `cuda graph: True`（173/173、132/132、41/41）。
 - **数值（实测）**：13 个请求。P∈{0, 2万, 10万}（实际命中 0/19968/99968）× c∈{100, 1000, 3000}（都不是桶大小，replay 时 padding 到最近的桶），外加两个预热请求，以及并发混合对（2万前缀+500，冷 1500）。每个请求 greedy 生成 32 个 token，带 top-5 logprob。
   - 默认 ±1e-3 dummy 权重下，BCG、eager、base（无 170）逐位相同。但**负对照**（eager、chunk 2048 对 4096）也逐位相同，说明 logits 只看当前 token，这组结果不能作为证据。
-  - 改用仅测试用的 `scripts/analysis/t52_test_dummy_init.patch`（norm=1，scale=1，矩阵 ±1/√fan_in，只在测试树）后：
+  - 改用仅测试用的[初始化补丁](../evidence/T52/t52_test_dummy_init.patch)（norm=1，scale=1，矩阵 ±1/√fan_in，只在测试树，**不能进入产品补丁栈**）后：
     | 对比 | token 一致 | 生成 token logprob 最大差 | 首 token top-5 最大差 |
     |---|---|---|---|
     | eager170 对 BCG | 13/13（32/32） | 3.4e-4 | 0.156 |
@@ -81,7 +81,7 @@
   | 4096 | 64.2 → 62.8 | 98.6 → 96.1 |
   线性拟合：P=0 从 33.7ms+7.0µs/tok 变为 20.3ms+10.1µs/tok；P=98k 从 55.0+10.2 变为 39.2+13.6。曲线是凸的，拟合斜率会误导；应看小块固定开销：c≤1024 时 8 层省 9.9–15.1 ms（约 1.2–1.9 ms/层）。
 - **decode（实测，同一 chunkcost）**：BCG 服务的 decode 步略慢，bs1 p50 2.95 对 2.74 ms，bs32 3.34 对 3.26 ms；另一轮是 2.79 对 2.72。原因未查（推测是更多 graph/闭包对象带来的 Python GC 或调度开销）。**TPOT 是决胜项，8 卡必须同时看 TPOT。**
-- **单测**：`scripts/test_kda_snapshot_140.py --source <s170> --baseline base_exact fla`，8/8 case 通过（逐位相等）。170 没有改 140 的任何文件。
+- **单测**：当时的 140 快照对照 8/8 case 通过（逐位相等）；测试已迁至 `tests/gpu/test_kda_snapshot_140.py`，170 没有改 140 的任何文件。
 
 ## 推断（未测）
 - 真模型 45 层（替身 8 层）。如果每层省的 launch 开销同比例放大，小块能省约 55–85 ms（1.2–1.9 ms/层 × 45），相对 8 卡约 150 ms 的截距是大头；但 TP8 的 kernel 和通信不同，必须 8 卡实测。capture 时间估计 ×5–6（约 1.5–2.5 分钟），池内存待测。

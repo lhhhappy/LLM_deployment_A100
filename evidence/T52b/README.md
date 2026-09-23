@@ -1,8 +1,8 @@
 # T52b evidence — patch 170 wrong outputs with --enable-attn-tp-input-scattered (8-card 026j 0/12)
-Dev box, surrogate 8-layer model, context-sensitive test init (scripts/analysis/t52_test_dummy_init.patch), full stack 000…160+170,
+Dev box, surrogate 8-layer model, context-sensitive [test-only init](../T52/t52_test_dummy_init.patch), full stack 000…160+170,
 SGLANG_AX_KDA_DUAL_SNAPSHOT=1, chunk 4096. 22 requests: cold exact lengths 37/100/500/512/1000/1024/3000/4096/5000, prefix hits
 P=20k/100k × c=100/1000/3000 (+warm), concurrent mixed pair. Greedy 32 tokens + top-5 logprobs.
-Verdict file: SUMMARY_v2.txt (written unattended by scripts/analysis/t52b_summary.sh after job t52b_v2).
+Verdict file: SUMMARY_v2.txt (written by the historical one-off summary runner after job t52b_v2; that runner has been removed).
 
 | dirs | what |
 |---|---|

@@ -1,6 +1,6 @@
 # Agentic Science Challenge：GLM-5.3-Flash 推理服务
 
-本地仓库整理于 2026-09-24 完成（`bb5dd6e`、`a17ba7c`、`ad54148`）；GPU 镜像同步待 SSH 恢复且现有队列结束。
+本地脚本已完成第二轮清理（2026-09-24）；GPU 机仓库镜像待现有队列结束且 SSH 恢复后同步。
 
 这是 8×A100-80GB 上的推理服务部署赛。唯一赛规是 [task.md](llm-challenge-arena-v1/task.md)：能力评测 AIME26 与 GPQA Diamond 都须严格高于 90 分；压测先比通过全部硬门的最大并发档 `n_at_slo`，同档再比越小越好的 `tpot_mean`。TPM 只作诊断。平台从 N=10 开始，成功加 4、失败减 4；单档约 4 小时。每档有完整性、错误率、四道 TTFT 和 `tpot_p95 ≤ 0.10 s/token` 等 11 道硬门；TTFT 按题面规定的统计余量判定，TPOT p95 没有余量。开发集只能比较我们自己的 A/B 和回归，不能预测正式 N@SLO（task.md「开发集」与「压测」节）。
 
@@ -12,12 +12,14 @@
 
 ## 操作入口
 
+日常直接使用的入口约十个，集中在下表；`scripts/` 其余主要是当前队列的 job、pod 运行与验证逻辑，不需要逐个作为任务入口阅读。
+
 | 要做的事 | 入口 |
 |---|---|
 | 查看 8 卡队列和日志 | `scripts/pod/pread status`；队列说明见 [scripts/pod/README.md](scripts/pod/README.md) |
-| 提交经检查的 8 卡 job | 在本地仓库运行 `scripts/pod/qpush <队列名>.sh=<scripts/pod/jobs/文件.sh>`；它会同步到 GPU 机并入队 |
+| 准备下一项 8 卡实验 | 先看 [任务队列](notes/queue.md) 和已入队[原始 job 快照](evidence/jobs-0924/)。当前旧名队列（037b–042）冻结，**不要用本地 job 重新 `qpush`**；这批任务全部开跑、GPU 镜像同步后，再按 [pod 工具说明](scripts/pod/README.md)入队新实验 |
 | 判定单档 | job 的 `LEVEL` 行由 `scripts/pod/verify/level_verdict.py` 生成：先查 cohort、runner 与原始记录，再调用 `scripts/score_formal.py`（harness 评分器）并补上题面 TPOT 门 |
-| 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；可复用脚本见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
+| 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
 | 修改引擎 | 补丁照只读的 `build/base_exact/` 写；一个机制保留一个可用版本，说明写在同名 `.md`；不要照旧的 v0.5.20 源码写 |
 | 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)；只在明确安排正式提交时使用 |
 

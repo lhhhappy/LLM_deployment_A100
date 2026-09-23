@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Pod job queue controller (run on the GPU box).
-#   podq init                 push worker/lib/patches/probe into the pod and start the worker (idempotent)
+#   podq init                 push worker/lib/patches into the pod and start the worker (idempotent)
 #   podq submit <job.sh>      enqueue a job script (numbered in order)
 #   podq ls                   queue state + running job tail      podq log <job> [lines]
 #   podq pause|resume         stop/start picking new jobs (does NOT stop the service)
@@ -10,7 +10,7 @@ D=$(cd "$(dirname "$0")" && pwd); source "$D/common.sh"; REPO=$(cd "$D/../.." &&
 case "${1:-}" in
   init)
     cd "$REPO"
-    "$D/ppush" $POD_AX/bin scripts/pod/podq_worker.sh scripts/pod/lib.sh scripts/m0/probe.py
+    "$D/ppush" $POD_AX/bin scripts/pod/podq_worker.sh scripts/pod/lib.sh
     "$D/ppush" $POD_AX $(ls patches/[0-9][0-9][0-9]-*.patch)
     bexec "cd $POD_AX && if [ -f worker.pid ] && kill -0 \$(cat worker.pid) 2>/dev/null; then echo worker already running; else setsid nohup bash bin/scripts/pod/podq_worker.sh > worker.out 2>&1 < /dev/null & sleep 1; echo worker started; fi" ;;
   submit)

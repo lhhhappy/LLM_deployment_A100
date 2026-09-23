@@ -1,6 +1,6 @@
 # T45 / W19 — 140 交付证据
 
-补丁与设计：`patches/140-kda-dual-snapshot.patch` / `.md`。最终可机读收据：`summary.json`；生成器 `scripts/make_140.py`，汇总 `scripts/summarize_140.py`。
+补丁与设计：[140 补丁](../../patches/140-kda-dual-snapshot.patch)及[说明](../../patches/140-kda-dual-snapshot.md)。最终可机读收据为 `summary.json`；当时的一次性生成与汇总脚本已清理，不能按旧命令重跑。
 
 ## VERIFIED
 
@@ -20,4 +20,4 @@
 - `cpu_01.log` / `cpu_02.log`：夹具缺enum/session无操作接口，补齐后`cpu_03.log`11项通过；`cpu_04.log`20项通过。`cpu_final.log`配置守卫测试读取旧远端helper失败（同步和本地再生成重叠导致一次scp丢文件）；重新顺序同步后的`cpu_final_v2.log`21项通过。最终`source_hashes.json`核对远端实际文件与交付文件。
 - 不证明模型能力、TP8/overlap长跑或SLO；固定非融合intra可能增加短extend启动成本；额外slot可能因压力跳过；NEXTN、HiCache、lazy等显式不支持。8卡A/B方案见补丁说明，交Claude审阅安排。
 
-参考：`refs/vllm-pr56960/vllm/model_executor/layers/mamba/kda_checkpoint.py` 与 `tests/models/glm5next/test_kda_recurrent.py` 的exporter/conv恢复检验；底包为本仓库base_exact，不是v0.5.20。
+参考：[vLLM PR 56960 的 KDA checkpoint 实现](../../refs/vllm-pr56960/vllm/model_executor/layers/mamba/kda_checkpoint.py)及其 [recurrent 测试](../../refs/vllm-pr56960/tests/models/glm5next/test_kda_recurrent.py)；底包为本仓库 `base_exact`，不是 v0.5.20。

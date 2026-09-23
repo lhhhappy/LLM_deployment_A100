@@ -32,14 +32,14 @@
 
 ## 1. 方法
 
-- **启动：** `devbox_chunkcost.sh serve`，参数为 TP1、`--page-size 64 --mamba-radix-cache-strategy extra_buffer --chunked-prefill-size 16384`、tilelang DSA、`--enable-metrics`（`chunkcost.py` 读 `meta_info` 时间戳需要它）、`--skip-server-warmup`。
+- **历史启动配置：** TP1、`--page-size 64 --mamba-radix-cache-strategy extra_buffer --chunked-prefill-size 16384`、tilelang DSA、`--enable-metrics`（当时的成本探针读取 `meta_info` 时间戳需要它）、`--skip-server-warmup`。当时的一次性服务脚本已清理。
   - 替身词表是 vocab/8 = 19360，所以探针 token id 取 < 19000（`VOCAB_MAX`）。服务自带的 warmup 用了真实 token id，会越界，所以跳过。
   - 8 层版把 KV 池限制为 1M token。不限制时池子有 13M token，首个 forward 就在 cuBLAS 报错，原因未深究。
-- **成本探针：** `scripts/pod/verify/chunkcost.py`。它量的是 `prefill_finished_time − request_received_ts`，包含调度开销；每个 (P,c) 取 2 次中较小的一次。
-- **Profiler：** `scripts/analysis/t51_profile_extend.py`，用 `/start_profile` 和 `/stop_profile`（CPU+GPU）各做两种：
+- **成本探针：** 当时的一次性探针量的是 `prefill_finished_time − request_received_ts`，包含调度开销；每个 (P,c) 取 2 次中较小的一次。探针已清理，原始结果保留在 `evidence/T51/chunkcost8/` 与 `chunkcost45/`。
+- **Profiler：** 当时的采集脚本使用 `/start_profile` 和 `/stop_profile`（CPU+GPU）各做两种；脚本已清理，原始结果保留在 `evidence/T51/prof8/` 与 `prof45/`：
   - `nostack`：计时准确，是本文的主数据；
   - `stack`：带 Python 调用栈，用于归因。它把 host 时间拉长约 1.6 倍，只用来看比例。
-- **统计：** `t51_trace_stats.py` 只统计 `step[EXTEND…]` 这个 GPU annotation 窗口，从而排除 overlap 调度顺带跑的一个 decode step。
+- **统计：** 当时的 trace 分析只统计 `step[EXTEND…]` 这个 GPU annotation 窗口，从而排除 overlap 调度顺带跑的一个 decode step；一次性分析器已清理。
   - "CPU-starved gap" 的定义：下一个 kernel 的 launch 调用结束时刻 ≥ 前一个 kernel 的结束时刻。
   - profiler 本身有开销：45 层时 profiler 下的 step 为 251ms，不开 profiler 时 e2e 为 212ms（`prof45/profile_summary.json`）。所以绝对值要按约 0.8 倍理解，比例不受影响。
 
@@ -202,26 +202,6 @@ tilelang/tvm eager dispatch 被单独列出，是因为它每次调用都要走 
    - match_prefix 和 cache insert 是 O(P/page)，但量级只有毫秒；
    - kpool plan 的 H2D 拷贝可以合并。
 
-## 7. 复跑
+## 7. 历史实验与证据
 
-所有步骤在开发机上执行，只用 GPU0，脚本为 `scripts/analysis/devbox_chunkcost.sh`（头部有完整序列说明）。
-
-```bash
-S=/sjtu/linhang/arena/repo/scripts/analysis/devbox_chunkcost.sh
-scripts/gjob run t51_build "bash $S build"
-# 8 层
-scripts/gjob run t51_serve "bash $S serve"          # 等 /v1/models
-scripts/gjob run t51_probe "bash $S probe"          # -> runs/T51/chunkcost/chunkcost.json
-scripts/gjob run t51_prof  "bash $S profile"        # -> runs/T51/prof/P{98304,0}_c1024_{nostack,stack}/
-# 45 层（先停掉 8 层服务）
-scripts/gssh "bash $S mk45"
-scripts/gjob run t51_serve45 "MODEL=/sjtu/linhang/arena/runs/T51/model45 MEM=0.88 MAXTOK=262144 bash $S serve"
-scripts/gjob run t51_probe45 "OUT=/sjtu/linhang/arena/runs/T51/chunkcost45 PS=0,98304,180224 CS=256,1024,2048,4096,8192,16384 bash $S probe"
-scripts/gjob run t51_prof45  "OUT=/sjtu/linhang/arena/runs/T51/prof45 MODES=nostack bash $S profile"
-# 分析
-python scripts/analysis/t51_trace_stats.py <trace.gz> --kernels-out kernels.json
-LONGEST=1 python scripts/analysis/t51_pytree.py <stack trace.gz> 'scheduler.py\(3418\): get_next_batch_to_run' 5 0.25
-python scripts/analysis/t51_pyself.py <stack trace.gz> 'glm5_next.py\(1078\): forward'
-```
-
-**真机复跑：** `chunkcost.py` 原样可用（默认 `VOCAB_MAX=150000`）。可以对 L2 pod 上的服务跑同一个探针，也可以用 `/start_profile` 抓一次 c=1024 的 extend，再用 `t51_trace_stats.py` 对照 §3 的表。需要协调者按 pod 规则执行。
+当时在开发机 GPU0 上依次运行 8 层、45 层 TP1 替身，采集不同前缀长度与块长的成本曲线、无栈与带栈 profiler，再分析 `step[EXTEND…]` 窗口。原服务、采集与 trace 汇总脚本都是一次性实验工具，仓库清理后已移除；旧命令不能在当前仓库直接复跑。保留的输入配置和统计口径见 §1，数值及 profiler 输出见 [T51 原始证据](../../evidence/T51/)；新的复验需要依当前底包、环境和 pod 规则另建实验。

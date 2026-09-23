@@ -84,7 +84,7 @@ physical_resident_fraction = 1 - free / capacity
 
 ### 4.1 短间隔5–8k回退的精确机制
 
-**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。`patches/101-d1v12-on-base.patch:47`、`:59`、`:92`、`:110`；`patches/105-role-split-single-partial.patch:3`。
+**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。当时独立的105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。旧 `101-d1v12-on-base` 与 105 已合并为当前 [101 补丁](../../patches/101-role-boundary-split.patch)；本节的旧行号只可在 git 历史中核对。
 
 一个可手工检查的机制例子（**合成，不是那19条的伪造trace**）：
 

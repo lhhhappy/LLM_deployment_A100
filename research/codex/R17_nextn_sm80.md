@@ -79,7 +79,7 @@ D4时A1.6–2.0对应candidate接受率`(A−1)/3=20.0%–33.3%`。采集用160�
 
 ## 5. 8卡验证任务（仅准备；Claude审阅/执行）
 
-`scripts/pod/jobs/dev_b160_mtp_n6.sh` 使用唯一源码名、完整12补丁栈、MR32/graph32、steps3/topk1/D4、两DSA tilelang。补充采集器需一同随scripts目录同步，脚本未入队、未改build_image/RELEASE。
+本报告当时准备的 N6 job 使用唯一源码名、完整12补丁栈、MR32/graph32、steps3/topk1/D4、两DSA tilelang；**该 job 未入队，原文件已从现行 `scripts/` 清理**。补充采集器当时需随 scripts 目录同步；本任务未改镜像构建或 RELEASE。后续 MTP 的真实 8 卡组合实验另见[实验记录](../../notes/experiments.md)，不能把本节当作当前入队命令。
 
 1. 先核对真实45层target+45号draft权重、ignored modules映射、每rank后端、KDA主槽/verify scratch、三种graph捕获及首次ready日志。
 2. eager与graph分别跑短prompt、长>2048、4-token池边界、接受长度1/2/3/4、批次增删/pad、前缀命中、跨256 tracking边界、abort/retract/并发finish、busy/idle flush。检查pool/tree sanity与flush后cached_tokens0。
