@@ -71,6 +71,14 @@
 HiCache（DSA indexer 未恢复→错误输出）、`--enable-mixed-chunk`（破坏 mamba 快照）、单机 PD 分离（权重放不下两份）、PDMux、DeepEP/TBO/deep_gemm EP（需 sm90）、
 `--enable-linear-replayssm`（与 page_size=64 不兼容）、改写客户端 prompt（违反冻结负载）。
 
+## 4b. 已调研的参考 PR 与方向对应（refs/）
+| 参考 | 内容 | 对应方向 | 状态 |
+|---|---|---|---|
+| `refs/vllm-pr56960`（vLLM #56960） | GLM-5.3-Flash KDA 预填充中途快照：kernel 内导出 + 卷积历史 + 验证方法 | M2 → 补丁 140 | 已采用（W19/T45） |
+| `refs/sglang-pr31170`（SGLang #31170） | DP `prefix_affinity` 路由：按 routing key（或前 4096 token 哈希）固定 DP rank；rank 负载 >1.5× 均值则绕开（fallback total_tokens） | C5 DP2 + 会话亲和；其"亲和+过载退让"思路也可用于单调度器内的会话感知排序（A4/121） | 未采用，C5 时移植 |
+| `refs/sglang-fe236ea6c3` | 底包对应的公开提交（2026-09-01） | 所有补丁的基线 | — |
+| （同一克隆内）SGLang main 至 09-22 | 底包之后三周的上游改动 | 可能含 GLM-5.3/KDA/DSA/sm80 修复与优化 → 见 R9 上游扫描 | 扫描中 |
+
 ## 5. 战略问题：引擎选择（待 V2 数据后决策）
 主办方的 vLLM sm80 backport 开箱即跑通全链路（含 MTP），而 SGLang 底包需要 110–113 才能跑且性能待测。
 若 V2 显示 SGLang 栈冷预填充吞吐明显落后，应评估"vLLM backport + 我们的机制移植（120/140 思路）"。在 V2 之前不下结论。
