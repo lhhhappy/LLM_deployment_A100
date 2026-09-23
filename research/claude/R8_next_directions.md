@@ -87,6 +87,15 @@ HiCache（DSA indexer 未恢复→错误输出）、`--enable-mixed-chunk`（破
 | F3 | 按截止时间排队 + "注定超时"请求降级：门槛允许约 5% 超时（统计下界规则），把时间让给还来得及的请求 | 前排约束门都是 chain_start；LewyM 的 chain p95 61s 仍通过 | 待做（补丁 121） |
 注：链中间请求的对比在该口径下不准（它们复用上一轮输出，脚本只比 prompt），已忽略；-56% 为理论值，实际受显存/淘汰影响；开发集冷启动占比高于正式集。
 
+## 7. 结构层方向：GLM-5.3 × SGLang 实现 × A100（09-23，用户要求"从底层原理适配架构"）
+| # | 发现 | 证据 | 下一步 |
+|---|---|---|---|
+| G1 | **DSA 稀疏注意力按头切分 = 每卡重复读同一份 KV**：吸收式 MLA 64 头共用 512 维潜在 KV，TP8 下每卡 8 头但完整读 KV（每 token 2112 行×1KB）；实测 tilelang v1 4096 token/层 6.4ms ≈ 22 TFLOPS，属带宽受限 | F57 数据；dsa_backend `_forward_tilelang`；模型 config | 按 token 切分（每卡 1/8 token × 64 头），KV 流量 /8 |
+| G2 | **DSA indexer 8 卡完全冗余**：`dsa_indexer.py` 的 wq_b/wk/weights_proj 全为 `ReplicatedLinear`，每卡独立算 32 头 × 全部历史打分 + top-2048 | `dsa_indexer.py:259-285` | 按查询行切到 8 卡，all-gather top-k 下标（8192×2048×4B≈64MB） |
+| G3 | **底包已有 GLM 专用的混合上下文并行**：DSA 层按序列切、KDA 层在 CP 组内按头切、`communicator_mhc_hybrid_cp` 负责层间换布局；开关 `--attn-cp-size`、`--enable-prefill-cp`（`is_deepseek_dsa` 包含 Glm5Next） | `glm5_next.py:337-346,522-543`；`configs/model_config.py:122-134`；`server_args.py:991,1044` | 验证与我们 A100 补丁（tilelang、110–113、101/140）的兼容性，写 8 卡任务 |
+| G4 | mHC（hc_mult=4，残差流 4 倍宽，每层 Sinkhorn 20 轮）在 TP 未分散输入时可能 8 卡重复计算 | `communicator_mhc.py` 的 scatter/gather 路径 | 纳入逐组件成本表确认 |
+方法：先做"逐组件成本表"（开发机按 TP8 每卡真实形状计时并对照硬件上限），再用 8 卡 profile 核对，最后决定启用 G3 或只做 G1/G2。
+
 ## 5. 战略问题：引擎选择（待 V2 数据后决策）
 主办方的 vLLM sm80 backport 开箱即跑通全链路（含 MTP），而 SGLang 底包需要 110–113 才能跑且性能待测。
 若 V2 显示 SGLang 栈冷预填充吞吐明显落后，应评估"vLLM backport + 我们的机制移植（120/140 思路）"。在 V2 之前不下结论。
