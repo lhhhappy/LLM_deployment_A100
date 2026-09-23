@@ -190,7 +190,6 @@
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 /tmp/t42-venv/bin/python evidence/T56/attribute.py
-python3 scripts/check_records.py
 ```
 
 **VERIFIED（T56-01至04）**：本地全量重渲染、分桶、LCP账、批token闭合、时间锚点、22个窗口区间并集检查已通过，详见 [validation.json](../../evidence/T56/validation.json) 与 [reproduction.log](../../evidence/T56/reproduction.log)。只分析脚本写入 evidence/T56；没有修改 readonly 输入。`--reuse-render` 是相同输入SHA的迭代快捷路径，正式复现应执行上面的完整命令。

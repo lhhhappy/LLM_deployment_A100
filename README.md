@@ -1,38 +1,39 @@
-# Agentic Science Challenge — 推理服务部署赛（llm-challenge-arena-v1）
+# Agentic Science Challenge：GLM-5.3-Flash 推理服务
 
-GLM-5.3-Flash 部署在 8×A100-80GB 上，比 **N@SLO**（能过全部硬门的最大并发档），同档再比 **tpot_mean**。
-**分工**：用户决策；Claude 统筹（派活、维护记录、自测与提交审批由用户授权给 Claude）；Codex 协同开发与交叉审阅。
+这是 8×A100-80GB 上的推理服务部署赛。唯一赛规是 [task.md](llm-challenge-arena-v1/task.md)：能力评测 AIME26 与 GPQA Diamond 都须严格高于 90 分；压测先比通过全部硬门的最大并发档 `n_at_slo`，同档再比越小越好的 `tpot_mean`。TPM 只作诊断。平台从 N=10 开始，成功加 4、失败减 4；单档约 4 小时。每档有完整性、错误率、四道 TTFT 和 `tpot_p95 ≤ 0.10 s/token` 等 11 道硬门；TTFT 按题面规定的统计余量判定，TPOT p95 没有余量。开发集只能比较我们自己的 A/B 和回归，不能预测正式 N@SLO（task.md「开发集」与「压测」节）。
 
-## 从哪里开始读（按顺序）
-0. **`HANDOFF.md` — 最新交接（新会话先读）**；`AGENTS.md` — 导航与红线；`CLAUDE.md` — Claude 的入口
-1. **`research/README.md` → `research/claude/base/00-summary-mainline.md`** — 底包源码地图、当前主线、L1 复盘（每次会话与每次压缩后先读）
-2. `rule.md` — 协作规则、目录约定、红线
-3. `board.md` — 看板；`notes/dispatch.md` — 派发日志（T 编号）
-4. `notes/decisions.md`（决策，最新在上）、`notes/findings.md`（事实，顶部有"当前事实基线"）
-5. `tests/TIERS.md`（L1/L2/L3 三级验证）、`tests/L2.md`（L2 队列用法）、`plans/active/`
+## 现在做什么
 
-## 目录索引
+截至 2026-09-24 已复核的 8 卡完整开发集 N22 结果：S0（035）只挂解码门，`tpot_p95=0.296`；S0+114 的 S1（036）改善 TTFT 与均值 TPOT，`tpot_p95=0.253` 仍失败；S0+固定 16 轮 decode（037）把 `tpot_p95` 降到 0.0775，却使 overall、turn、chain 三道 TTFT 门失败。当前要找同时保住 prefill 与 decode 的调度点。后续作业状态看 [任务队列](notes/queue.md)和 pod 实时状态，完整结果见 [实验记录](notes/experiments.md)。补丁与 S0/S1 的精确定义见 [patches/README.md](patches/README.md)；当前 7 个 S0 补丁已按 [等价性记录](evidence/T57/equivalence.log)验证与 026/035 源码树一致。
+
+每轮按这个循环：从 [任务队列](notes/queue.md) 取一个明确的问题 → 复制现行 job，优先只改一个变量 → 入队跑完整开发集 → 用原 harness 评分器和题面规则核对完整性及 11 门 → 看原始记录解释瓶颈 → 更新补丁和 [实验记录](notes/experiments.md) → 再跑。多变量组合只评价组合，后续再拆分归因。失败或数据不完整就记失败或 INVALID。12 题能力测试只用于冒烟，不能证明能力门通过。
+
+## 操作入口
+
+| 要做的事 | 入口 |
+|---|---|
+| 查看 8 卡队列和日志 | `scripts/pod/pread status`；队列说明见 [scripts/pod/README.md](scripts/pod/README.md) |
+| 提交经检查的 8 卡 job | 在本地仓库运行 `scripts/pod/qpush <队列名>.sh=<scripts/pod/jobs/文件.sh>`；它会同步到 GPU 机并入队 |
+| 判定单档 | job 的 `LEVEL` 行由 `scripts/pod/verify/level_verdict.py` 生成：先查 cohort、runner 与原始记录，再调用 `scripts/score_formal.py`（harness 评分器）并补上题面 TPOT 门 |
+| 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；可复用脚本见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
+| 修改引擎 | 补丁照只读的 `build/base_exact/` 写；一个机制保留一个可用版本，说明写在同名 `.md`；不要照旧的 v0.5.20 源码写 |
+| 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)；只在明确安排正式提交时使用 |
+
+GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/linhang/arena/` 下工作**；仓库镜像位于 `/sjtu/linhang/arena/repo`。8 卡 Trisol 服务与正在运行的队列任务不能停、删或杀进程。整理者对 pod 只使用 `scripts/pod/pread` 只读查看，或 `scripts/pod/pexec_codex` 在 `/tmp/ax/codex` 做 CPU 分析；不要改队列、运行目录或向引擎发请求。实验入队和提交由当前负责运行的协作者协调，避免碰撞。
+
+## 仓库地图
+
 | 路径 | 内容 |
 |---|---|
-| `llm-challenge-arena-v1/task.md` | 赛题原文（只读，以它为准） |
-| `build/base_exact/` | **底包 SGLang 逐字节副本** = 公开提交 fe236ea6c3 + 两处多模态修复；4686 文件指纹与镜像全对（F53/F54）。写补丁一律照它 |
-| `build/l3_0922e/`、`build/l3_0922f/` | 正式提交 A/B 实际运行的代码（base_exact + 补丁） |
-| `patches/` | 现行 000、101（`RELEASE`）；`drafts/` 草稿；`v0520/` 已退役的 v0.5.20 线 |
-| `research/` | 调研（索引见 `research/README.md`）；已退役内容在 `archive/` |
-| `scripts/` | 工具：`l2.py`（L2 队列）、`submit_official.sh`（正式提交）、`build_image.sh`（打镜像）等；`archive/` 为模拟器与旧线 |
-| `tests/` | 三级验证、L2 队列 `tests/queue/`（守护进程在 GPU 机自动跑） |
-| `submission/` | 正式提交 JSON 与候选 profile |
-| `data/` | 公开成绩（`all_att_2026-09-22b.json`，523 条） |
-| `s1-dev/` | 公开开发集与 harness（只读） |
-| `src/sglang/` | SGLang v0.5.20（只读；**不是底包**，仅 L1 旧替身参考） |
-| `refs/` | 参考代码：底包公开提交 `sglang-fe236ea6c3`、vLLM #56960、SGLang #31170 |
+| `llm-challenge-arena-v1/`、`s1-dev/` | 赛题原文、公开开发集与 harness；只读 |
+| `build/base_exact/`、`refs/sglang-fe236ea6c3/` | 底包副本与上游参考；只读 |
+| `patches/` | 引擎补丁、精确基线、机制开关 |
+| `scripts/pod/` | 8 卡队列、job 模板、判定与只读访问 |
+| `research/` | 源码地图、仍有效的分析；入口见 `research/README.md` |
+| `notes/queue.md` | 下一步问题与实验顺序；一条任务只写问题、判据、状态 |
+| `notes/knowledge.md` | 当前成立的事实、已纠正的误区与未决问题 |
+| `notes/experiments.md` | 完整实验的配置差异、结果、结论、证据 |
+| `notes/submissions.md` | 正式提交及官方结果 |
+| `evidence/` | 原始日志、JSON、复算脚本；文档只链接需要的证据 |
 
-GPU 开发机（2×A100）：`ssh GPU`，只在 `/sjtu/linhang/arena/` 下工作；仓库镜像在 `/sjtu/linhang/arena/repo`。
-
-## 当前状态（2026-09-23，8 卡实测后）
-- **8 卡服务** `lh-arena-sess-b`（2102486579267252224）在线；旧守护进程已退役（scripts/archive/retired/），任何在用脚本都不含停/删服务。实验全部走 pod 队列 `scripts/pod/podq`。
-- **能跑 + 能力**：b113（000+101+105+110–113，tilelang DSA）在比赛镜像上启动、探测、能力冒烟 12/12；开发机 kernel 结论在真机 11/11 复现（F73/F74）。
-- **N6 基线（F76）**：fast_intra / overall_intra FAIL（p95 7.5s，主因**排队** p95 6.4s）；turn_start、chain_start PASS；TPOT 0.0304；KV 实际峰值 92%（日志显示的 50% 未计可淘汰缓存；R18）→ 容量已是约束。
-- **正在测**：120（调度）N6 A/B → 114/CP/DCP(+115) 探针 → 140 A/B → N10/N14。代码级分析：T49（Codex W23：缓存丢失根因+容量；Fable：排队+预填充结构）。
-- **排行榜**：无人过 N=26；3 人 N=22（LewyM tpot 0.0273）。正式提交暂停（用户指示先跑通测评）。
-- **方向与问题清单**：`research/claude/R8_next_directions.md`；逐条事实 `notes/findings.md`（F56–F76）；决策 `notes/decisions.md`。
+赛题合规底线：不关 thinking、不压输出、不截历史、不删 tools；`meta_info` 时间戳与 token 计数如实；`/flush_cache` 必须真清；不探测评测平台或其他选手。Trisol 镜像和服务的可见名称、标签、描述、command、env 保持中性，技术路线放镜像内部。服务 `command` 是 argv，不是 shell；A100 SGLang 使用 `SGLANG_OPT_USE_TOPK_V2=0`。具体依据见 task.md 与 [notes/knowledge.md](notes/knowledge.md)。

@@ -1,6 +1,6 @@
 # patches/ — our changes to the organizer's SGLang (one version per mechanism)
 
-Every patch applies with `patch -p3 --fuzz=0` onto `build/base_exact/sglang` (the byte-exact L3 base, F54), in
+Every patch applies with `patch -p3 --fuzz=0` onto `build/base_exact/sglang` (the byte-exact L3 base), in
 **numeric order**. Each mechanism has exactly one patch and one `.md`; a change is made in place, and old versions live only
 in git history (user policy 2026-09-24). To try a change, add a small single-purpose patch on top of the baseline; fold it
 in if it wins, delete it if it loses.
@@ -13,7 +13,9 @@ Build or compare trees on the CPU: `python3 scripts/patch_stack.py apply OUT <pa
 --max-mamba-cache-size 200 --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang` and env
 `SGLANG_OPT_USE_TOPK_V2=0 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829
 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192`.
-Dev N22 (035, scored with the harness scorer): 10 of 11 gates pass; tpot_p95 0.296 fails (F96).
+Dev N22 (035, scored with the harness scorer): 10 of 11 gates pass; tpot_p95 0.296 fails; see `evidence/L035/`.
+
+S1 = S0 + `114-indexer-row-shard.patch`, with the same launch configuration; run 036 tested this single change at dev N22. Its 11-gate verdict still fails only `tpot_p95` (0.253); see `evidence/L036/`.
 
 ## Patches
 | Patch | Mechanism | In S0 | Switches (default) | Verified on 8 cards |

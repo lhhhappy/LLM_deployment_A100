@@ -1,5 +1,7 @@
 # R9 — Upstream scan since our serving base (SGLang + vLLM, 2026-09-01 → 2026-09-23)
 
+> 这是 09-23 的上游快照，不是当前任务优先级。#38522 已移植为候选补丁 170；A100/SM80 的 110/111 与当前 S0 已解决基础启动问题。下表的 HIGH/MED 表示当时的移植兴趣，不代表已经验证过本负载收益。当前实验结果看根目录 README、patches/README 和 R19–R21。
+
 Scope note (VERIFIED): our stated base hash `fe236ea6c3` is **not itself an ancestor of `sgl-project/sglang` main**. It resolves (via GitHub API) to author date 2026-09-01T07:15Z, commit message `fix(modelopt_fp4): skip NVFP4 swiglu-fusion interleave for shared experts with swiglu_limit`, which is the same fix that landed on main as **`32a1d554` / PR #37378** ("fix(modelopt_fp4): ... swiglu_limit", merged 2026-09-05). I used `32a1d554` as the practical diff boundary on main (`git log 32a1d554..origin/main`): **916 commits** total since base, of which **204** touch the path list in the task (GLM-5.3-Flash/Glm5Next, DSA/indexer/kpool, KDA/FLA, unified/mamba mem_cache, scheduler, fp8/marlin quant, speculative/nextn).
 
 Also VERIFIED, and important context: **neither SGLang nor vLLM main had GLM-5.3-Flash support at our 2026-09-01 base.** SGLang's first upstream GLM-5.3-Flash commit is `97c69783` / **PR #36507**, merged 2026-09-06 (5 days after base). vLLM's is `98ed0856` / **PR #53906**, merged 2026-09-04. Whatever GLM-5.3-Flash implementation we're serving from `fe236ea6c3` must be a pre-upstream/custom port — so PR #36507's diff is effectively "the canonical upstream Glm5Next" and is worth a direct structural diff against our own `glm5_next.py`/`configs/glm5_next.py`, independent of anything ranked below.
@@ -364,4 +366,4 @@ Cross-project confirmation that this is a live, still-unsolved gap upstream, wit
 | #40024 SPF / #32911 HRRN 调度 | 与 120 同目标，机制不同；**120 A/B 后作为对照组**考虑 | VERIFIED |
 | #34820、#39688/#39695/#38845 | 与 140、KPool 元数据相关的小幅优化；底包是早于上游的 GLM-5.3 分支，结构差异大，移植成本需逐项看；**低优先级** | INFERRED |
 
-**总结**：上游三周的改动里，没有能对"冷预填充吞吐（chain_start）"带来大幅提升、且能在 A100 上用的现成项。大头仍在我们自己的方向（R8：INT8 W8A8、EDF、容量）。
+**截至本次快照的结论**：当时没有证实可在 A100 直接带来大幅冷预填充收益的现成项。此后 170 已移植 #38522，INT8 W8A8 方向经 F70 降级；后续选择应由完整开发集 A/B 的 11 门结果决定。

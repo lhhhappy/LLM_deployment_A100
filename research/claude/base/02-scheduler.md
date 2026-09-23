@@ -1,8 +1,8 @@
 # 02 — Scheduler source map (base image SGLang, fe236ea6c3)
 
 > **2026-09-23 更正（8 卡实测 + Fable 审阅）**：① "冷预填充独占 GPU 伤 intra" 已被 8 卡证实为 N6 主瓶颈（intra 排队 p95 6.4s，F76），补丁 120 把它降到 0.36s（F77 起）。
-> ② 120 v1 的续算封顶在无等待时也生效 → chain_start 尾部变差；v2 只在 `waiting_queue_len>0` 时封顶，短请求阈值 4096 太小（实测丢 5–8k 状态的请求被挡）→ v2 用 chunk 16384 / cap 8192 / short 8192。
-> ③ max_running_requests=116=584/5 成立，但先满的是 KV（N6 峰值 50%），不是 KDA 槽。④ NO_TOKEN 使 `batch_is_full` 粘住（`scheduler.py:3755,3581`），N≥14 KV 吃紧时会重现排队，需配合容量措施。
+> ② 120 v1 的续算封顶在无等待时也生效 → chain_start 尾部变差；S0 使用的当前补丁 120 在有等待时封顶，配合 chunk 16384 / cap 8192 / short 8192。当前文件与 026/035 的 120 逐字节等价（`evidence/T57/equivalence.log`）。
+> ③ 底包默认 `max_running_requests=116=584/5`，但日志的 KV 百分比不等于物理余量；哪一池先限制更高并发尚未证实（R18 §1、§3）。④ NO_TOKEN 使 `batch_is_full` 粘住（`scheduler.py:3755,3581`），KV 吃紧时可能重现排队。
 
 Source root: `build/base_exact/sglang/`. All paths are relative to `srt/`. "unverified" = not confirmed in code.
 Deployment assumed: TP8, 8×A100, `--page-size 64 --mamba-radix-cache-strategy extra_buffer --schedule-policy lpm`. No mixed chunk, no priority, no DP-attention. MTP may or may not be on.
@@ -54,7 +54,7 @@ Deployment assumed: TP8, 8×A100, `--page-size 64 --mamba-radix-cache-strategy e
   - The value is `min(clamp(token_capacity/context_len×512, 2048, 4096), token_capacity//2, max_mamba_cache_size // ratio)`.
   - `ratio = 3 + 2 = 5` for extra_buffer with overlap (`:2100-2129`, constants `:159-163`). The mamba cap is usually the binding one here (unverified numerically).
   - If a spec algorithm (EAGLE/MTP family) is on and the flag is unset, it is **forced to 48** (`arg_groups/speculative_hook.py:657`).
-- **`schedule_conservativeness`** (default 1.0, `server_args.py:803`) only scales the initial `new_token_ratio`. The ratio is `init = min(0.7×c, 1)`, and it decays over 600 steps down to `0.14×init` (`scheduler_components/new_token_ratio_tracker.py:20-34`, `environ.py:559-561`). This ratio multiplies each running request's reserved future tokens in `rem_total_tokens`. Outputs here are ≤240, but `max_new_tokens` defaults to near the context length when unset (`scheduler.py:2396-2427`). Each running request can then reserve up to 4096×ratio tokens (unverified whether the harness sends `max_tokens`).
+- **`schedule_conservativeness`** (default 1.0, `server_args.py:803`) only scales the initial `new_token_ratio`. The ratio is `init = min(0.7×c, 1)`, and it decays over 600 steps down to `0.14×init` (`scheduler_components/new_token_ratio_tracker.py:20-34`, `environ.py:559-561`). This ratio multiplies each running request's reserved future tokens in `rem_total_tokens`. In the public dev set, requested `max_output_i` has p50=198, p90=554, max=5644; the harness sends each request's `max_new_tokens` (`s1-dev/harness/s1_loadgen.py:103,258`). The reservation can therefore vary greatly across requests.
 
 ## 3. Policies
 
@@ -130,8 +130,7 @@ Deployment assumed: TP8, 8×A100, `--page-size 64 --mamba-radix-cache-strategy e
    - Risk: big requests starve; the mamba slot free-on-reject path (`:3757-3770`) must run for each skipped request.
 5. **Decode interleaving during cold chunks.** Turn on `--enable-mixed-chunk` (only if the spec algorithm allows it), or add a "one decode every k chunks" rule next to `_should_defer_prefill` (`scheduler.py:1256`) that applies only while `chunked_req` is a cold request.
    - Risk: mixed batches change CUDA-graph and kernel paths (MLA/KDA mixed extend is untested); TTFT is traded for TPOT.
-6. **Tighten reservations.** Set `SGLANG_CLIP_MAX_NEW_TOKENS_ESTIMATION` to about 512, or have the harness send `max_tokens` ≈ 256, so that `rem_total_token_offset` (`schedule_policy.py:531,630`) and `add_one_req` (`:1201-1208`) don't over-reserve 4096×ratio per running request.
-   - Risk: more retractions if outputs are ever long; re-prefill is costly for 36k+ contexts.
+6. **Reservation estimate as an experiment.** The existing `SGLANG_CLIP_MAX_NEW_TOKENS_ESTIMATION` affects `rem_total_token_offset` (`schedule_policy.py:531,630`) and `add_one_req` (`:1201-1208`). Any lower cap needs an A/B that checks retractions and long outputs; the harness sends frozen per-request budgets and must not be changed for a performance gain.
 7. **Retraction order** (`schedule_batch.py:3118`): prefer retracting cold/long-remaining requests over mid-chain ones that are near completion. `retraction_policy=priority` needs priority scheduling, which conflicts with lpm.
    - Risk: cold requests pay again at 30s.
 8. **Raise `max_running_requests` explicitly** (it is 48 if spec is on) and check that the mamba cap `max_mamba_cache_size/5` is not the limit.

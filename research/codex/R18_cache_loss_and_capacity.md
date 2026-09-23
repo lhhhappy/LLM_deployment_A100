@@ -2,6 +2,8 @@
 
 作者：Codex 主会话；2026-09-23。范围：只读底包、补丁与本地证据；未修改引擎/补丁，未访问开发机、pod、bohr、Trisol，未构建或提交。
 
+**时效提示**：本报告是早期 N6 代码/容量审计；026/N18 的真实 LCP 可修缺口上限与 035/N22 的 TPOT 归因已由 [R20](R20_true_lcp_attribution.md)、[R21](R21_N22_tpot_failures.md) 更新。§8 是当时的候选情景，不是当前队列优先级。
+
 **标记**：VERIFIED = 本轮读源码、执行原方法的 CPU 夹具或本地数据计算；INFERRED = 机制对真实异常的解释、容量情景或待验证方案。引用 `S/...` = `build/base_exact/sglang/srt/...`，`K/...` = `build/base_exact/sglang/kernels/...`；补丁引用为 `.patch` 文件本身的行号，不冒充应用后行号。实测性能引用 F59/F73–F76 与 `evidence/N6_b113/analysis.txt`，不把源码推断写成 8 卡实测。
 
 ## 1. 可以立即纠正的结论
@@ -159,7 +161,7 @@ D类证明冻结LCP本身需审计：raw374冻结93013而实际与raw371只有52
 
 - 开启后101 helper返回空，避免额外拆分与105相应限制；tracking不再让branch覆盖end；每个extend可导出end及当前最后user/observation角色点，含fp32 SSM和conv历史。`patches/140-kda-dual-snapshot.patch:638`、`:669`、`:748`。
 - 先提交常规end，再临时锁住end，用**树拥有的KV**插入角色状态，处理duplicate，不重用已free的请求旧KV。`同文件:784`。它不是每多一个状态就复制一整条KV。
-- 同时改变FULL叶子优先级、MAMBA扫描和path-cap顺序，优先牺牲标记为tail且非role的状态。`同文件:845`、`:878`、`:892`、`:910`。R8把“tail优先淘汰”全部留给141已过时。
+- 同时改变FULL叶子优先级、MAMBA扫描和path-cap顺序，优先牺牲标记为tail且非role的状态。`同文件:845`、`:878`、`:892`、`:910`。更早把“tail优先淘汰”全部留给141的方案已过时。
 - 额外role槽条件是 `available_size() > len(batch.reqs)`，**不把evictable算成free，也不先淘汰**。因此状态池满时140可能只存end。`同文件:762`。
 
 **INFERRED，建议优先级**：
@@ -214,7 +216,7 @@ KV_budget = R - (state_slots+1) × one_state
 | indexer K+scale | 11×(128+4) = **1452 B/token** | uint8存FP8+fp32 scale，物理按原token容量分配；kpool4并未令分配/预算除4。`S/mem_cache/index_key_cache.py:15`、`:32`；`pool_configurator.py:426` |
 | KV合计 | **12716 B/token**；943360→**11.17193 GiB**，另哨兵页不到1MiB | TP8每rank复制这一完整逻辑KV；不能乘8当可服务token容量 |
 | KDA一槽 | 34×[8×128×128×4 + 3×3072×2] = **18452480 B = 17.59766 MiB** | fp32 SSM+bf16 conv；`S/configs/mamba_utils.py:116`、`:294`；`S/configs/glm5_next.py:264` |
-| KDA池 | (584+1)槽：SSM **9.71191** + conv **0.34143** = **10.05335 GiB** | 0号padding也分配；`S/mem_cache/memory_pool.py:583`、`:608`；F59 `notes/findings.md:325` |
+| KDA池 | (584+1)槽：SSM **9.71191** + conv **0.34143** = **10.05335 GiB** | 0号padding也分配；`S/mem_cache/memory_pool.py:583`、`:608`；`evidence/T49/boot_memory_audit.json` |
 | 两池总量 | **约21.2253 GiB** | 不含小元数据、KV哨兵页与以下运行内存 |
 | 请求映射/小池 | (116+1)×context_len×4字节；约0.114GiB，另kpool K/score tails、分配器表等 | `S/mem_cache/memory_pool.py:279`、`:4807`；启动中两池以外同期增量共约0.245GiB，不能全部归给映射表 |
 | decode graph | **实际capture增量1.31GiB/rank** | `evidence/T49/remote/012_server.log:156`、`:199`；before17.23→after15.92（TP0）。capture/warmup阶段free差，非纯graph张量的逐项归属。简报6.1GiB不适用于012 |
@@ -284,7 +286,7 @@ KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬�
 
 `extra_buffer_lazy`节省的是每活动请求约一个槽，N26约0.447GiB可用于更多历史状态，**固定池大小下不直接增KV**；并发预算比例5→4。当前140明确拒绝lazy（`patches/140-kda-dual-snapshot.patch:708`），不能直接组合。`--max-mamba-cache-size`可在扩大f时固定状态池，使增量更多给KV，但须用历史状态/slot_skip证据确定大小。
 
-**针对R8新§8容量探针的审阅**：固定状态200槽时并发cap40；按相同总预算KV约**1500544（1.59×）**，再按上述graph64自动f约**1569152（1.66×）**。不是自动2×，也不是零风险：N26活动78槽、树锁及临时捐赠/role槽之外只剩有限历史状态；若原先MAMBA先满，会放大重算。可以做受控探针，但应同时记录slot free/evict、140 skip、峰值和SLO，不能用4%作安全论据。
+**早期容量探针情景的审阅**：固定状态200槽时并发cap40；按相同总预算KV约**1500544（1.59×）**，再按上述graph64自动f约**1569152（1.66×）**。不是自动2×，也不是零风险：N26活动78槽、树锁及临时捐赠/role槽之外只剩有限历史状态；若原先MAMBA先满，会放大重算。可以做受控探针，但应同时记录slot free/evict、140 skip、峰值和SLO，不能用4%作安全论据。
 
 ### 8.3 DCP `--dcp-size` +115（理论容量收益最大，但正确性风险高于上述调参）
 
@@ -309,35 +311,3 @@ KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬�
 sm80的当前tilelang CUDA v1输入为bf16（`K/ops/attention/dsa/tilelang_kernel.py:303`、`:325`、`:1403`），不是只改dtype flag便可用FP8 MMA。需要在KV store与稀疏gather处做正确量化/核内解码，并覆盖有前缀/无前缀、decode、graph、DCP、kpool tail。若整池解码成持久bf16副本会抵消容量收益；全context反量化也可能吃掉带宽收益。112/113负责indexer本来就读其FP8编码，不应笼统重写成“它们尚不支持FP8”。长上下文输出/logits与正式能力门必须验证。
 
 int8 KDA checkpoint/降低SSM dtype排在更后：当前源实现另建int8池（`S/mem_cache/memory_pool.py:1282`），不能假定直接把fp32原池一半字节返给KV；140也明确拒绝int8。递归状态精度风险与额外池预算需要独立解决。
-
-## 9. 请Claude更新的过时/被纠正结论清单
-
-以下仅列改写建议，**未覆盖Claude的research文件，也未改旧findings原文**。区分“真实数据更新”与“源码/口径纠正”，保留历史版本条件。
-
-| 文件:位置 | 原结论/问题 | 应改成什么 |
-|---|---|---|
-| `notes/findings.md:441`（F75） | KV峰值50%、状态4%→N14起才满/驱逐 | 是不可淘汰占用；完整measurement已92%；物理free未知，不能确定哪个池先满或第一次淘汰发生在N14 |
-| `notes/findings.md:448`（F76缓存段） | 19个intra都相对同链前驱丢>4096；统一解释“上一轮角色边界” | 冻结筛选是18 intra+1 turn_start；真实prompt LCP后只有18条仍>4096。5条落在较早chunk末尾，另有3条已用深度退化，剩余须树事件 |
-| `research/claude/R8_next_directions.md:57` | KDA584槽9.7GB，graph6.1GB | KDA=SSM9.71+conv0.34=10.05GiB；012真实graph增量1.31GiB、capture≤116；6.1须标原测量栈而非沿用到b113 |
-| `research/claude/R8_next_directions.md:58` | 130万>94万→容量将先于算力约束 | 是中心容量情景；**实测N6先卡intra排队**。容量/状态/调度共同测，不能先确定约束顺序 |
-| `research/claude/R8_next_directions.md:61`、`:107` | graph64腾5–6GB；再设状态200可零风险KV×2 | 本轮总capture只有1.31GiB；graph64自动预算约+3.8%KV；再固定状态200约1.66×，须测历史状态淘汰与140 slot_skip，不能称零风险 |
-| `research/claude/R8_next_directions.md:62` | lazy/int8列为状态池参数，未写140组合限制 | 当前140拒绝lazy/int8；lazy固定池不增加KV；int8是额外池，先闭合预算 |
-| `research/claude/R8_next_directions.md:63` | tail优先淘汰列为141待实现 | 140已改FULL/MAMBA/path-cap优先级；141新增共享首边界/网格，另测池压力 |
-| `research/claude/R8_next_directions.md:64` | FP8 KV容量×2 | 当前布局固定预算约1.75×，需sm80 MLA KV解码与能力验证 |
-| `research/claude/R8_next_directions.md:20` | system-tools-changed“结构性零命中” | 改为可能在变更点前复用共同前缀；R8自身§6已给非零潜力，F76总命中也显示跨链复用，不能字面全零 |
-| `research/claude/R8_next_directions.md:48` | 以chain_start为当前约束门安排P1 | 前排画像不能替代本栈：F76 fast/overall FAIL、chain有余量；预填充仍通过队头阻塞影响intra |
-| `research/claude/base/00-summary-mainline.md:20`、`:58`（M0行） | A100长prefill风险运行时未证，候选fa3 | 顶部`:6`已作历史纠正：F57/F59/F73已证tilelang+110/111可启动；正文读者应先看更正，不再把fa3当当前候选 |
-| `research/claude/base/00-summary-mainline.md:8`、`:40`；`03-hybrid-cache.md:221` | “先耗尽KV不是状态槽”，新更正仍以4%支持 | 状态约占总池47%本来正确；4%是另一分母/口径。哪个池先触发取决于状态密度，必须看free/驱逐原因 |
-| `research/claude/base/03-hybrid-cache.md:221` | ratio0.9→0.5使KV约1.5× | 固定总预算为1.9/1.5≈1.267×；本轮943k→约1196k |
-| `research/claude/base/03-hybrid-cache.md:139`、`:240` | 深状态之后KV“never served”、回收低风险 | 当前匹配不能用不等于全树永远无用；有状态后代/活锁依赖祖先KV，回收应限无依赖无锁叶子 |
-| `research/claude/base/03-hybrid-cache.md:206`、`:208` | 输出<256必不保存decode状态；interval64 “No new risk” | 看绝对seq是否跨网格，不能只看输出长度；复制频率/overlap压力需实测；不修角色分叉，DCP8有效grid仍512 |
-| `research/claude/base/04-model-kernels.md:15`、`:81`、`:82` | 当前FP8 MoE走Triton，Marlin不可用/待实现 | 顶部`:3`已纠正；b113用111 Marlin W8A16，F58/F73/F74已验证，正文应标仅原版源码 |
-| `research/claude/base/04-model-kernels.md:71` | 冷36k约1–2s；40–60% MFU猜测 | 顶部`:4`已纠正；F76约1万tok/s，36k粗推约3.6s，不是实测36k；保留原文应标历史估算 |
-| `notes/findings.md:351`（F63） | indexer占60%主瓶颈 | 明确仅110 torch版本；b113真机F76 indexer4.3%，主要预算已迁到MoE/DSA/GEMM/mHC/通信 |
-| `notes/findings.md:415`（F71）、R8结构方向 | 单卡成本外推19.5万约15s | 保留“无allreduce估算”，生产规划用F76 19万19.3s；稀疏attention+ mHC实测28.8%，非整服务必减1/3 |
-| `research/claude/base/04-model-kernels.md:36`、`:46`、`:85` | MTP可用，预计1.5–2×/笼统无A100验证 | 原版不能直接推可用；160已有算子证据、普通TP8服务与接受率未测；r/A情景不是TPOT承诺，140组合仍拒绝 |
-| `notes/findings.md:442`（F75） | cache_hit_rate=0疑似Unified不更新 | decode reporter会显式写0；先区分prefill/decode采样，再判统计缺陷 |
-| `evidence/N6_b113/analysis.txt:46`（不改原证据）；`notes/findings.md:455`（F77） | 最大“lost”视为同链缓存丢失，25万cached≈0仍是缓存缺陷 | 给衍生分析增加idx_in_chain/前驱是否实发；本轮最大五条均链首。跨栈仍cached≈0不证明120/140未修某个已存在前驱的缓存 |
-| `research/claude/R8_next_directions.md:107`（§8 DCP排序理由） | DCP预填充注意力慢3倍，故只作容量后备 | 新F78报告19万冷TTFT19.29→15.58s；须区分kernel预测与整请求实测，DCP优先级应结合数值/TPOT/SLO再定 |
-
-收尾：本轮止于源码、已有8卡日志及本地CPU重渲染/夹具审计。已列出19条的事实与候选机制；未宣称各节点已逐条定责、N26已可容纳、DCP/FP8/140完整服务已通过。

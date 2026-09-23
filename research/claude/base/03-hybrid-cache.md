@@ -93,18 +93,14 @@ Source root: `build/base_exact/sglang/`. Paths are relative to `srt/` unless the
 - Per KDA layer per rank:
   - SSM: 8 heads × 128 × 128 × 4 B = 524,288 B;
   - conv: 3 × (1024+2×1024) × 2 B = 18,432 B.
-- × 34 layers = **18,452,480 B/rank (17.6 MiB)**, matching `notes/findings.md` F44. With `--mamba-ssm-dtype bfloat16` it is 9.54 MB.
+- × 34 layers = **18,452,480 B/rank (17.6 MiB)**. With `--mamba-ssm-dtype bfloat16` it is 9.54 MB.
 
 **KV per token.**
 - On SM80 the DSA KV dtype defaults to **bf16** (`arg_groups/overrides.py:633`).
 - MLA `kv_lora_rank` 512 × 2 B = 1024 B, plus the indexer K+scale (~132 B, **unverified exact layout**). About 1.16 KB × 11 layers ≈ **12.7 KB/token/rank**. MLA KV is replicated per TP rank.
 - **One KDA state costs about as much as 1,450 KV tokens.**
 
-**Estimate, INFERRED.**
-- FP8 weights are about 41 GB per GPU. Assume `rest ≈ 25 GB`, **unverified**; read the real value from the boot log lines "Mamba Cache is allocated…" and "KV Cache is allocated…".
-- Mamba ≈ 11.8 GB → **~690 slots**. KV ≈ 13.2 GB → **~1.1 M tokens**.
-- Running-request cap ≈ 690/5 = **~138**.
-- 1.1 M tokens is about 30 median prompts of 36k. **KV, not state slots, binds residency.** Each running request pins 3 slots (5 with lazy off, counting transients).
+**Measured pool sizes for the earlier default allocation.** The 8-card boot log gave 584 KDA slots, 10.05 GiB of KDA state and 943,360 KV tokens per rank; the extra-buffer running-request cap was 116 (F59, R18 §7). S0 explicitly sets `--max-mamba-cache-size 200` and `mem_fraction_static=0.75`, giving about 1.32M KV tokens (F80). These are different configurations. Pool sizes alone do not prove which resource limits a later concurrency level; include live slots, tree locks, evictions, decode reservation and prefill queue observations.
 
 **Unaccounted.**
 - The `--enable-int8-mamba-checkpoint` pool (`memory_pool.py:1281-1295`, default 2× the slots) does not appear in the configurator. Where its memory is charged is unverified.
@@ -136,10 +132,9 @@ Source root: `build/base_exact/sglang/`. Paths are relative to `srt/` unless the
 **Likely waste for this workload (INFERRED).**
 - **(a) Decode states and the finish-insert.** They sit after the reminder. On a replace edge they are unreachable, yet they keep 18 MB plus the KV of reminder + output alive until LRU catches them. They are useful only on strict-append edges.
 - **(b) Prompt-end states when no branch is present,** for example the first turn of a chain. These are also past the reminder.
-- **(c) KV between the deepest state and the LCP.** It stays resident but is never served (§1).
+- **(c) KV between the deepest state and this request's LCP.** It stays resident but this request cannot use it (§1); another branch may use it before eviction.
 - **(d) One-turn staleness.** The branch tracked on turn N sits at `LCP(P_{N-1},P_N) = b_{N-1}`, not at `b_N`. So turn N+1 recomputes from `b_{N-1}`.
   - If turn N−1's KV past its state was freed, turn N sees no branch. It tracks its prompt end, and turn N+1 falls back even further.
-  - This matches the E1 mismatches in `notes/findings.md` (F36).
 
 ## 5. flush
 
@@ -179,62 +174,8 @@ With `--enable-int8-mamba-checkpoint`, cached states are int8.
 
 Backends: FlashKDA/NVIDIA/CuteDSL have different `h` contracts (see the F-lines). On A100 the default Triton path applies.
 
-## Levers (for KDA state reuse on this workload)
+## Current implementation and open questions
 
-**L1. Role-boundary branch, no split.** Effort: low. Memory: none.
-- Change: in `_mamba_radix_cache_v2_req_prepare_for_extend`, set `branching = floor64(b_N)`, where `b_N` is the position of the last `<|user|>` that starts the `<system-reminder>` in the current prompt. Look it up at request creation from token ids, and resolve the id of `<|user|>` from the tokenizer (**unverified id**).
-- The existing guards (`> prefix`, `< track seqlen`, 64-aligned relative to prefix) stay as they are.
-- Effect: the next turn resumes at `b_N` instead of `b_{N-1}`. It then recomputes only the reminder plus the new delta instead of a whole extra turn delta.
-- Cost: none. The state is still from bf16 h, the same as today's branch.
-- Risks:
-  - it loses the chunk-end/prompt-end state in that chunk; append edges then rely on the decode states;
-  - a wrong boundary (a reminder inside tool output) only costs a hit, not correctness;
-  - `b_N` must fall in the **last** chunk, otherwise the earlier chunk's end is tracked instead.
+The preceding sections map the unpatched base. S0 uses 101 to track a role boundary and 140 to retain both the boundary and prompt-tail state, including an fp32 intermediate snapshot. Patch 140 also changes state retention priority. Read [their patch notes](../../../patches/README.md) before applying base-only suggestions from older reports.
 
-**L2. Keep both role-boundary and end states.** Effort: medium.
-- Change:
-  - make `_MambaRadixCacheV2TrackEntry` carry two (seqlen, dst) pairs, one for each ping-pong slot;
-  - make `_init_track_ssm_indices` and `_init_track_conv_indices` emit two rows per request (they already work on index vectors);
-  - in `MambaComponent.prepare_for_caching_req` and `UnifiedRadixCache.cache_unfinished_req`, donate both slots, with two `_alloc_mamba_slot` replacements, and insert `key[:b]` and then `key[:end64]`.
-- Cost: +1 state (18.4 MB/rank) per turn in the tree, +1 transient slot.
-- Risks:
-  - rematch/lock bookkeeping, since `last_node` must end up as the deepest node;
-  - lazy mode has one slot, so it would need an on-demand allocation;
-  - the overlap-scheduled ping-pong must not already be carrying a live state (**unverified**).
-
-**L2'. `--mamba-track-interval 64` (flag only).**
-- The decode state is inserted at finish within 63 tokens of the end instead of 255. That helps append-only edges with outputs shorter than 256 tokens, which today insert no decode state at all.
-- It is valid because 64 % page == 0 (`arg_groups/mamba_hook.py:122`).
-- Cost: one 18 MB copy every 64 decode steps. No new risk.
-
-**L3. Eviction priority: drop states past the reminder first.**
-- Change:
-  - add `past_role_boundary` to `InsertParams`, set when `cache_len > b_N`;
-  - in `MambaComponent.commit_insert_component_data`, insert such nodes at the **LRU tail** instead of MRU. That needs a new `UnifiedLRUList.insert_lru`;
-  - optionally, at finish on a replace edge, skip the insert entirely (`is_insert=False` path).
-- Cost: none.
-- Risks:
-  - strict-append edges need those states. Demote them rather than drop them, or decide per session if append-vs-replace can be predicted;
-  - evicting such a leaf also deletes its KV, which is desired.
-
-**L4. Pool sizing.**
-- KV binds, not slots. Lower `--mamba-full-memory-ratio`, for example to 0.5, which gives about 1.5× the KV tokens at the same `rest`.
-- But the running-request cap = slots/5 drops with it (~138 → ~100). Offset that with `extra_buffer_lazy` (ratio 4) or `SGLANG_OPT_MAMBA_SKIP_DECODE_LOCK` (base 3 → 2).
-- An alternative is a fixed `--max-mamba-cache-size`.
-- `--mamba-ssm-dtype bfloat16` halves the state size, at the risk of recurrent drift over 257k tokens. Not recommended without an accuracy check.
-- Also consider `--mamba-max-states-per-path 3` to prune stale older branch states `b_{N-2…}`. It is a soft cap and keeps forks.
-
-**L5. fp32 snapshot at a chosen chunk.**
-- Change:
-  - in `chunk_gated_delta_rule_fwd_kernel_h_blockdim64`, add `track_chunk_idx[N]` and a fp32 `track_out[N,H,V,K]`. Inside the `for i_t` loop (`chunk_delta_h.py:152`), when `i_t == track_chunk_idx[i_n]`, store `b_h1..4` in fp32;
-  - thread these through `chunk_kda_fwd` and `kda_triton.extend`;
-  - make `_track_mamba_state_extend` copy from `track_out` instead of `h`.
-- Effect: branch and role-boundary states become bit-exact with a split-prefill state.
-- Cost: an extra fp32 store for one chunk per sequence, plus a Triton recompile.
-- Risks:
-  - varlen `chunk_offsets` indexing;
-  - the index-convention off-by-one (h is *pre*-chunk);
-  - the autotune key.
-- Cheaper alternative: split the extend at `b_N` so the boundary becomes a final state. This costs an extra forward, or a chunk boundary forced at `b_N` in the PrefillAdder.
-
-**L6. Reclaim unservable KV.** KV between the deepest state and the LCP (§4c) is tree-resident but never served; only FULL LRU frees it. Let `MambaComponent._evict_device_next_node` (or a FULL-strategy tweak) prefer mamba-less leaves. Low risk; benefit size **unverified**.
+The remaining measurable issue is how often a reachable state is evicted or skipped under pressure. R20 measured the maximum useful LCP gap on 026/N18 at 850,432 tokens (8.0% of actual prefill), so cache changes alone cannot be assumed to solve the N22 TPOT failure. Check each proposal against actual LCP, slot free/evict counts, skipped snapshots, KV use, and all 11 scoring gates. A lower-precision state or KV format also needs numerical and ability validation.

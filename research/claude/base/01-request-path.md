@@ -65,7 +65,7 @@ Source: `build/base_exact/sglang` (fe236ea6c3). All paths below are relative to 
 
 ## 3. /flush_cache
 - **Handler:** `http_server.py:977-991`, GET or POST, with an optional `?timeout=` (default 0.0).
-- **Return format (VERIFIED): it does NOT return JSON.** On success it is a plain-text `Response` with body "Cache flushed.\nPlease check backend logs..." and status 200. On failure the body is `ret.message` or "Flush cache failed." with **status 400**. The harness's `{"success": true}` check will fail against stock.
+- **Stock return format (VERIFIED): it does NOT return JSON.** On success it is a plain-text `Response` with body "Cache flushed.\nPlease check backend logs..." and status 200. On failure the body is `ret.message` or "Flush cache failed." with **status 400**. The public `run_dev.py` only checks whether the HTTP call raises, not the returned JSON (`run_dev.py:46-56,232`); task.md requires a real flush. Patch 000 supplies the JSON/all-worker behaviour in S0.
 - **Fan-out:** `TokenizerManager.flush_cache` (`srt/managers/tokenizer_control_mixin.py:304-312`) awaits a `FanOutCommunicator` with `fan_out = dp_size` (`:161-173`). It returns **only `[0]`**, so with DP>1 another rank's failure is masked.
 - **Scheduler side:**
   - The request is a control message broadcast to all TP ranks.
@@ -73,7 +73,7 @@ Source: `build/base_exact/sglang` (fe236ea6c3). All paths below are relative to 
   - With timeout>0 it defers the flush and re-checks every loop (`flush_wrapper.py:40-64`, called at `scheduler.py:2025`).
   - Only rank 0 has a real `send_to_tokenizer`; other ranks use `SenderWrapper(None)` (`ipc_channels.py:67-73`).
 - **What gets cleared (`scheduler.py:4765-4779`):**
-  - `tree_cache.reset()`, which for MambaRadixCache rebuilds the root and resets the full and mamba LRU lists and counters (`srt/mem_cache/mamba_radix_cache.py:486-500`).
+  - `tree_cache.reset()` resets the live `UnifiedRadixCache` tree and its FULL/MAMBA components (see [03](03-hybrid-cache.md)). `MambaRadixCache` is legacy code here and is not constructed by this base image.
   - `req_to_token_pool.clear()`, i.e. `HybridReqToTokenPool.clear`: free slots, the mamba allocator and the int8 checkpoint pool (`srt/mem_cache/memory_pool.py:1591-1600`).
   - `token_to_kv_pool_allocator.clear()`, `reset_aux_cache_allocator()`, the grammar cache, metrics, the draft (MTP) cache pool (`clear_cache_pool`), and `empty_cache()`.
   - State tensors are freed via the allocators, not zeroed (unverified that no zeroing happens elsewhere).
@@ -117,7 +117,7 @@ What can set it:
   `routing_key` already reaches the controller inside `TokenizedGenerateReqInput`. A cheaper alternative with no controller code: the proxy or HTTP layer computes `routed_dp_rank = hash(key) % dp` and sets `obj.routed_dp_rank` in `generate_request` (`http_server.py:907`).
 
 ## 6. TTFT latency sources in this path
-1. **Single event loop doing tokenization synchronously** (`tokenizer_manager.py:926-938`). Arrivals of 36k–250k-token prompts serialize here, and output streaming stalls during each encode. This is likely the largest front-end cost (unverified, estimated at 0.1–2 s per long prompt).
+1. **Single event loop doing tokenization synchronously** (`tokenizer_manager.py:926-938`). Arrivals of long prompts serialize here, and output streaming can stall during each encode. The earlier 0.1–2 s estimate was unmeasured; later 8-card observations did not establish the front end as the main N22 constraint (R19 and F91).
 2. **Pickle and IPC of about 3 MB per 250k-token request:** tokenizer → rank 0, then a gloo broadcast to 7 ranks (`common.py:2467-2512`) inside the scheduler's `recv_requests`, which **blocks the scheduler loop**. Estimated tens of ms per long request (unverified). With DP there is one more hop.
 3. **Request pickup waits for the scheduler iteration:** a new request is only received between forward steps (`request_receiver.py:82-108`), so queue time is bounded below by the current batch time (e.g. a long chunked-prefill step).
 4. `request_received_ts` omits the body JSON parse (~ms per MB, unverified) and the time spent waiting for the event loop, because it is stamped late (§1). The TTFT the server reports therefore understates what the client sees when the loop is congested.
@@ -136,5 +136,5 @@ What can set it:
 - **L6 — shrink IPC.**
   - In `_create_tokenized_object` (`tokenizer_manager.py:1381`), drop `input_text` when the text is not needed downstream. Unverified: `Req.origin_input_text` may be used by some features.
   - Try `SGLANG_USE_PICKLE_IPC=0` (msgpack) and measure.
-- **L7 — truthful timestamps.** In `generate_request` (`http_server.py:907`), set `obj.received_time = time.perf_counter()` at handler entry, mirroring `serving_base.py:79,99`, so that `request_received_ts` includes front-end queueing.
+- **L7 — truthful timestamps.** Patch 000 stamps `received_time` at the earliest available typed-handler entry. This includes body normalization and tokenization after that point, but not time before the handler runs. Further timestamp changes must report exactly where the stamp is taken; they cannot backdate or otherwise distort TTFT.
 - **L8 (unverified, large).** `SGLANG_RUST_SERVER=1` (`srt/environ.py:1622`, `srt/rust_server/server.py`) replaces the Python api-server, tokenizer and detokenizer with Rust threads inside the scheduler process. Its `/generate`, `/flush_cache`, meta_info and header behavior were not checked.

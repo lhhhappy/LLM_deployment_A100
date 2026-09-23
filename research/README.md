@@ -1,15 +1,17 @@
-# research/ — 调研索引（每次会话开始与每次上下文压缩后先读这里）
+# 调研与源码地图
 
-**先读**：`claude/base/00-summary-mainline.md`（源码地图汇总 + 当前主线 + L1 复盘），再按需读 01–04 分图。
+从仓库根部 [README](../README.md) 了解当前实验、队列和成绩；赛题以 [task.md](../llm-challenge-arena-v1/task.md) 为准。本目录只保留能支持现行代码或解释已核实实验结果的研究。历史版本留在 git，不作为当前结论。
 
-| 文件 | 内容 | 状态 |
-|---|---|---|
-| claude/base/00–04 | 底包（= L3 实际代码，F54）源码地图：请求入口、调度器、混合缓存、模型与算子 | **现行** |
-| **claude/R9_upstream_since_base** | **底包之后上游（SGLang/vLLM 09-01→09-22）可移植改动：15 项排序候选 + 冲突分析** | **现行** |
-| **claude/R8_next_directions** | **下一步方向（09-23）：赛规要点、开发集负载形状、最新前排、按"冲 N=26"排序的方向与放置位置** | **现行** |
-| claude/R7_top_players_analysis | 前排选手公开成绩画像（顶部有 09-22 更新：3 人 N=22） | 现行 |
-| claude/R1, R2 | 模型/引擎、服务技术综述（路径引用为 v0.5.20，结论多数仍可用） | 参考 |
-| claude/R3, R4, R6 | 先例、同类比赛、工作流模板 | 参考 |
-| codex/R5, R6, R7, R8, R13, R14, R15 | DP 显存账、中文先例、KDA 快照先例、AgentX、近期 PR、底包源码探索 | 参考（R15 现行） |
-| shared/pipeline.md | 提交流水线说明 | 参考 |
-| archive/、codex/archive/ | v0.5.20 线、SPF、模拟器、旧方向与旧状态 | 已归档 |
+| 文件 | 用途 |
+|---|---|
+| [底包与当前认识](claude/base/00-summary-mainline.md) | 底包来源、S0 与主要约束、过时结论的更正 |
+| [请求入口](claude/base/01-request-path.md)、[调度器](claude/base/02-scheduler.md)、[混合缓存](claude/base/03-hybrid-cache.md)、[模型与算子](claude/base/04-model-kernels.md) | `build/base_exact/sglang` 的源码地图；运行时结论需结合现行补丁与实验 |
+| [上游候选](claude/R9_upstream_since_base.md) | 以底包为起点的上游差异；候选不代表已在本栈验证 |
+| [prefill 固定开销](claude/R10_prefill_fixed_overhead.md) | 开发机替身模型 profile 和 8 卡推断的边界 |
+| [MTP 路径](codex/R17_nextn_sm80.md) | 补丁 160 的实现与兼容性 |
+| [缓存与显存](codex/R18_cache_loss_and_capacity.md) | 早期 N6 账本；可修缺口的最新量化看 R20 |
+| [分析与工具复核](codex/R19_progress_and_cache_review.md) | 纠正原先的缓存归因、发现会导致假通过的分析脚本问题 |
+| [真实 LCP 归因](codex/R20_true_lcp_attribution.md) | 026/N18 的逐请求 LCP、fast 超时与短输出 TPOT |
+| [035/N22 TPOT](codex/R21_N22_tpot_failures.md) | 205 条超标请求、时间聚集与 prefill 干扰证据 |
+
+旧研究中把冻结 `uncached_expected` 当真实可复用量、把在飞 prompt 总长当物理 KV 驻留、把公开榜单当对手实现证据的推断已撤回。需要复核具体说法时查 R19–R21 与相应 `evidence/`，不要从 git 历史直接恢复旧结论。
