@@ -15,6 +15,7 @@ export SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1
 export SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=
 export SGLANG_AX_SCHED_PROTECT=0 SGLANG_AX_ASYNC_TOKENIZE=0
 export SGLANG_MAMBA_SSM_DTYPE=float32
+export SGLANG_OPT_FUSED_KDA_VERIFY=0   # fused verify writes conv_state in-kernel (race; upstream fix #39524 not in base) — keep off
 # 32 permits N22/26 follow-ups but saves up to ~1.10 GiB/rank of four-step scratch
 # versus implicit 48 (if main-pool capacity permits those request counts).
 # This is a request cap, not the number of KV/SSM cache slots.

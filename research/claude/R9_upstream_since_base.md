@@ -350,3 +350,18 @@ Cross-project confirmation that this is a live, still-unsolved gap upstream, wit
 - For the 204-row SGLang path-matched table, only 19 commits were actually opened with `git show`/`git show --stat` (marked VERIFIED); the rest are INFERRED from commit subject and the path filter that surfaced them, which is a much weaker signal — treat LOW/MED tags on INFERRED rows as a starting triage, not a final verdict.
 - I did not check out any tree state or run a structural diff of our actual serving source against upstream `glm5_next.py`/`dsa_backend.py`/`kda_backend.py` — that comparison (called out above for candidates #1, #4, #9, #10) is the natural next step and needs our current source, which isn't in this scan's scope/directory.
 - vLLM's full commit log (1204 commits) was filtered by `--grep` on GLM/KDA/sm80/A100/marlin/scheduler-path keywords rather than walked exhaustively; a commit that touches the same files without those words in its subject would be missed.
+
+---
+
+## Claude 核验结论（2026-09-23，逐项看源码/PR，开发机 2×A100 已确认可用：bf16 matmul 241 TFLOPS）
+| 候选 | 结论 | 依据 |
+|---|---|---|
+| #39524 KDA 融合验证写回卷积状态（竞态） | **底包有此缺陷**（`fused_kda_conv_recurrent_verify.py:325-333`），但该 kernel 仅在 `SGLANG_OPT_FUSED_KDA_VERIFY=1` 时启用，默认 False（`environ.py:1211`）；默认路径由 `update_mamba_state_after_mtp_verify` 从中间窗口提交，正确。**不移植**；`dev_b160_mtp_n6.sh` 显式写死 `=0` 防误开 | VERIFIED 源码 |
+| vLLM #55737 FlashKDA 预填充 1.7–3.8× | 仅 capability.major ∈ {9,10,12}，**A100 不可用** | VERIFIED diff |
+| #39422 十项优化（+10% 主要来自 DSA 草稿元数据 graph） | 测于 4×GB300、1000/1000 decode 密集负载；最大项只在 MTP decode 生效；mHC/RMSNorm 为 GB300 调优；FP8 专家 autotune 针对 Triton FP8 MoE（我们用 Marlin）。对预填充主导的本负载价值低；**待 160 MTP 实测后再评估** DSA 草稿元数据 graph 与 KDA 预填充少同步（+0.63%） | VERIFIED PR 正文 |
+| #35429 上游 SM80 DSA | 设计同我们 112 decode（查询×页、软件 e4m3、bf16 dot）；**无预填充 kernel**、注意力仍是 torch 回退 → 不优于 110–113（113 预填充约 185 TFLOPS、tilelang 注意力）。**不移植** | VERIFIED PR 文件列表与正文 |
+| #38859 SM80 FP8 E4M3（Triton FP8 MoE 走字节解码） | 与 111 Marlin W8A16 同目标；Marlin 通常更快。**仅当 8 卡 profile 显示 MoE 为瓶颈时再对比** | INFERRED |
+| #40024 SPF / #32911 HRRN 调度 | 与 120 同目标，机制不同；**120 A/B 后作为对照组**考虑 | VERIFIED |
+| #34820、#39688/#39695/#38845 | 与 140、KPool 元数据相关的小幅优化；底包是早于上游的 GLM-5.3 分支，结构差异大，移植成本需逐项看；**低优先级** | INFERRED |
+
+**总结**：上游三周的改动里，没有能对"冷预填充吞吐（chain_start）"带来大幅提升、且能在 A100 上用的现成项。大头仍在我们自己的方向（R8：INT8 W8A8、EDF、容量）。
