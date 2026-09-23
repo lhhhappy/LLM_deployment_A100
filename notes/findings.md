@@ -531,3 +531,7 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - MTP+v3（026i）：12/12；stream TPOT 0.0184（不带 MTP 的 v3 026c 为 0.026）；短请求 TTFT p50 0.63；冷 TTFT 39.3s；接受长度 3.0（随机 token 输入）。
 - 170（chunk 4096，scatter 开）：BCG 捕获耗时 37s、占 4.7GB；拟合固定开销 43–58ms，同补丁 eager（026k）为 77–92ms；decode bs12 14.9 vs 16.9ms。但 **能力冒烟 BCG 0/12（多条跑到长度上限），eager 12/12** ⇒ graph 回放在真模型 TP8 上结果错误。开发机 TP1 替身未能暴露。026l（BCG 不带 scatter）用来区分是否 scatter 引起。
 - 注意：chunk=4096 时代价曲线探针里 c>4096 的样本被切成多块，拟合截距不能与 16384 的配置直接比，应按每个 c 的原始数字比较。
+
+## F89 — 梯子 028（MTP+114+v3 cap4096 i2，eager prefill）N18：TPOT 两项都过，TTFT 仍败
+- tpot_mean 0.0528（027 为 0.0823）、**tpot_p95 0.0824 ≤ 0.10 过**；turn_start 16.93（1/3）过；fast_intra 5.45（31/23）、overall 10.96（44/27）、chain_start 78.54（45/22）FAIL（两种口径）。
+- 解读：MTP 解决了解码门；剩下的瓶颈是预填充吞吐（eager 下每块的固定开销）→ 028b（加 BCG）正是检验这一点。
