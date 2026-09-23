@@ -29,9 +29,10 @@ GLM-5.3-Flash 部署在 8×A100-80GB 上，比 **N@SLO**（能过全部硬门的
 
 GPU 开发机（2×A100）：`ssh GPU`，只在 `/sjtu/linhang/arena/` 下工作；仓库镜像在 `/sjtu/linhang/arena/repo`。
 
-## 当前状态（2026-09-22 晚）
-- **正式提交**：45734（A = 底包 + 000）、45735（B = A + 101 D1），排队评分中（约 18 小时）。每天 2 次。
-- **L2**：会话 `lh-arena-sess-a` 排队等卡；守护进程在 GPU 机 tmux `arena-daemons:l2` 自动运行队列。
-- **排行榜**：3 人 N=22（LewyM tpot 0.0273 领先，Jinbo hu 各门都在限内）。夺第一需 N=26，或 N=22 且 tpot_mean < 0.0273。
-- **主线（决策 30）**：M0 证明 A100 上 DSA 后端能跑 → M1 调度保护链中间请求 → M2 KDA 双点 fp32 快照 → M3 分词与路由键 → M4 MTP；调参放最后。
-- **最大风险**：A100 默认 DSA 预填充后端在 index_kpool=4 下可能对 >2048 token 报错（源码成立，运行时未证），A/B 都未显式指定后端。
+## 当前状态（2026-09-23，8 卡实测后）
+- **8 卡服务** `lh-arena-sess-b`（2102486579267252224）在线；旧守护进程已退役（scripts/archive/retired/），任何在用脚本都不含停/删服务。实验全部走 pod 队列 `scripts/pod/podq`。
+- **能跑 + 能力**：b113（000+101+105+110–113，tilelang DSA）在比赛镜像上启动、探测、能力冒烟 12/12；开发机 kernel 结论在真机 11/11 复现（F73/F74）。
+- **N6 基线（F76）**：fast_intra / overall_intra FAIL（p95 7.5s，主因**排队** p95 6.4s）；turn_start、chain_start PASS；TPOT 0.0304；KV 峰值已 50%（容量将先于算力约束）。
+- **正在测**：120（调度）N6 A/B → 114/CP/DCP(+115) 探针 → 140 A/B → N10/N14。代码级分析：T49（Codex W23：缓存丢失根因+容量；Fable：排队+预填充结构）。
+- **排行榜**：无人过 N=26；3 人 N=22（LewyM tpot 0.0273）。正式提交暂停（用户指示先跑通测评）。
+- **方向与问题清单**：`research/claude/R8_next_directions.md`；逐条事实 `notes/findings.md`（F56–F76）；决策 `notes/decisions.md`。
