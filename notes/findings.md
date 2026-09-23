@@ -404,3 +404,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - **统计/INFERRED资源**：160原日志新增同窗口spec tokens/rounds，采集器按Σtokens/Σrounds求每request-step接受长度（包含target保证token，不冒充HTTP输出数）。D4/MR32 scratch约2.268GiB/rank，MR48约3.368GiB；auto-fit可能使持久KDA槽约为普通的55.6%，并非保持原容量。稳态TPOT倍率=r/A，r1.4且A1.6–2.0时约0.875–0.700；这是敏感性假设，不是SLO实测。
 - **边界/纠正**：仅开发机随机算子，没有TP8/完整权重/服务/能力/flush/SLO证据；未触碰bohr/Trisol/pod、镜像或提交。早期C++ JIT实际读取SGLANG_JIT_CACHE_DIR，7个T48 build误写根盘；发现后停自有编译，按源码路径确认归属后迁入arena，最终runner已修，迁移证据保留。准备的8卡脚本仅交Claude审阅。
 - **P160-04补充 / 最终收据**：原生dense FP8 Marlin 9形状与27次动态graph均通过，最大relL2约0.002843；clip10 MoE四形状+graph≤0.00589。KDA追加tracking卷积与masked槽直接断言后重跑通过。`scripts/summarize_160.py`校验全部最终PASS、候选/脚本/config/runner SHA与两卡空闲，输出`evidence/T48/summary.json`；完整服务资格仍保持P160-06 todo。
+
+## F70 — INT8 W8A8 MoE 在 A100 上不值得（开发机实测）；MoE 预填充只有 bf16 峰值约 27–30%
+- 形状：GLM TP8 每卡 E=288、K=4096、N=256、top-8、FP8 块 128×128；随机权重（块内幅度抖动）；参考 = FP8 反量化权重的 fp32 精确计算。
+- M=8192：Marlin FP8 W8A16 4.99ms/82.5TF/误差 6.1e-3；Triton INT8 分块 4.88ms/84.6TF/**4.6e-2**；Triton INT8 逐通道 4.32ms/95.6TF/**2.6e-2**；Triton bf16 4.70ms/87.7TF/4.9e-3。M=16384 结论相同。
+- 结论：现有 Triton INT8 只快 0–16%，而精度差 4–8 倍（FP8→INT8 重量化损失块内小值），能力门风险大 → R8 A1 降级。
+  所有路径都停在约 85–95 TFLOPS（每专家约 230 token 的小 GEMM + 镜像无 A100/E=288/N=256 调优配置）→ 新方向"A100 MoE 形状调优"。
+- 开发机环境（torch 2.13/Triton 3.7.1），**须在 pod 复测**：`scripts/pod/verify/bench_moe_int8.py` 已进验证套件。证据 `evidence/INT8/`。

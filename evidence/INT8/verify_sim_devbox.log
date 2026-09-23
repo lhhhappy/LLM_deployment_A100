@@ -1,0 +1,22 @@
+PASS f57_tilelang_sparse 19s
+FAIL f58_marlin_moe_fp8 14s rc=1
+PASS t43_indexer112_all 55s
+PASS t44_indexer113_all 42s
+PASS t47_no_recompile 157s
+PASS t45_kda_snapshot140 166s
+PASS t48_mtp160_kda 25s
+PASS t48_mtp160_kpool 6s
+PASS t48_mtp160_dsa 6s
+PASS t48_mtp160_indexer 5s
+== /sjtu/linhang/arena/runs/verify_sim/verify/20260923T010148Z_bverify
+PASS f57_tilelang_sparse 19s
+FAIL f58_marlin_moe_fp8 14s rc=1
+PASS t43_indexer112_all 55s
+PASS t44_indexer113_all 42s
+PASS t47_no_recompile 157s
+PASS t45_kda_snapshot140 166s
+PASS t48_mtp160_kda 25s
+PASS t48_mtp160_kpool 6s
+PASS t48_mtp160_dsa 6s
+PASS t48_mtp160_indexer 5s
+DONE

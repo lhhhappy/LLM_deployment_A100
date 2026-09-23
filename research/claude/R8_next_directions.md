@@ -48,7 +48,7 @@
 ### P1 冷预填充吞吐 = chain_start（约束门）
 | # | 方向 | 机制 | 放哪里 |
 |---|---|---|---|
-| A1 | **INT8 W8A8 MoE（及稠密层）** | A100 int8 张量核 624 TOPS vs bf16 312；预填充 MoE 是算力瓶颈，Marlin W8A16 在大 batch 下只能跑 bf16 MMA。块量化 FP8→INT8 重量化 + 激活逐 token 量化。镜像名 `actquant` 显示有队伍在做 | 补丁 170；须过 V1 能力门 |
+| A1 | ~~INT8 W8A8 MoE~~ **（09-23 开发机实测：只快 0–16%、误差 ×4–8，降级；见 findings）** → 改为 **A100 MoE 形状调优**（所有路径只有峰值 27–30%） | A100 int8 张量核 624 TOPS vs bf16 312；预填充 MoE 是算力瓶颈，Marlin W8A16 在大 batch 下只能跑 bf16 MMA。块量化 FP8→INT8 重量化 + 激活逐 token 量化。镜像名 `actquant` 显示有队伍在做 | 补丁 170；须过 V1 能力门 |
 | A2 | 8 卡预填充 profile 驱动的逐项优化：KDA chunk 核（A100 调优配置）、Marlin MoE 大 M 配置、tilelang 稀疏注意力、allreduce | 先测再定 | 17x 系列 |
 | A3 | chunked_prefill 8192→16k/32k（与 120 配合） | 减少轮数与每轮固定开销；单独调大会恶化 decode 停顿，必须与 120 的 cap/穿插一起调 | 参数，放在 120 A/B 之后 |
 | A4 | EDF/按门截止期排序（在 120 之上） | 按请求所属门的剩余时间排序，chain_start 不被无限推后；利用统计余量把"必然超标"的少数请求留在预算内 | 补丁 121 |

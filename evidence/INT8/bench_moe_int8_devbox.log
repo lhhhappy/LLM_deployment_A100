@@ -1,0 +1,35 @@
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+{"path": "marlin_fp8_w8a16", "M": 64, "ms": 0.602, "tflops": 5.4, "rel_err": 0.006073}
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB,dtype=int8_w8a8,block_shape=[128, 128].json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB,dtype=int8_w8a8,block_shape=[128, 128]_down.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+{"path": "triton_int8_block", "M": 64, "ms": 0.819, "tflops": 3.9, "rel_err": 0.04573}
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB,dtype=int8_w8a8,per_channel_quant=True.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB,dtype=int8_w8a8,per_channel_quant=True_down.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+{"path": "triton_int8_chan", "M": 64, "ms": 0.747, "tflops": 4.3, "rel_err": 0.0257}
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/verify_sim/src/bverify/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=288,N=256,device_name=NVIDIA_A100-SXM4-80GB_down.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+{"path": "triton_bf16", "M": 64, "ms": 0.938, "tflops": 3.4, "rel_err": 0.004638}
+{"path": "marlin_fp8_w8a16", "M": 512, "ms": 0.96, "tflops": 26.8, "rel_err": 0.006064}
+{"path": "triton_int8_block", "M": 512, "ms": 1.283, "tflops": 20.1, "rel_err": 0.04664}
+{"path": "triton_int8_chan", "M": 512, "ms": 1.249, "tflops": 20.6, "rel_err": 0.02578}
+{"path": "triton_bf16", "M": 512, "ms": 1.605, "tflops": 16.1, "rel_err": 0.004793}
+{"path": "marlin_fp8_w8a16", "M": 2048, "ms": 1.409, "tflops": 73.2, "rel_err": 0.006129}
+{"path": "triton_int8_block", "M": 2048, "ms": 1.669, "tflops": 61.8, "rel_err": 0.04635}
+{"path": "triton_int8_chan", "M": 2048, "ms": 1.546, "tflops": 66.7, "rel_err": 0.02563}
+{"path": "triton_bf16", "M": 2048, "ms": 1.992, "tflops": 51.8, "rel_err": 0.004798}
+{"path": "marlin_fp8_w8a16", "M": 8192, "ms": 4.995, "tflops": 82.5, "rel_err": 0.006065}
+{"path": "triton_int8_block", "M": 8192, "ms": 4.875, "tflops": 84.6, "rel_err": 0.04611}
+{"path": "triton_int8_chan", "M": 8192, "ms": 4.315, "tflops": 95.6, "rel_err": 0.02602}
+{"path": "triton_bf16", "M": 8192, "ms": 4.703, "tflops": 87.7, "rel_err": 0.004867}
+{"path": "marlin_fp8_w8a16", "M": 16384, "ms": 9.76, "tflops": 84.5, "rel_err": 0.005886}
+{"path": "triton_int8_block", "M": 16384, "ms": 9.614, "tflops": 85.8, "rel_err": 0.04645}
+{"path": "triton_int8_chan", "M": 16384, "ms": 9.02, "tflops": 91.4, "rel_err": 0.02583}
+{"path": "triton_bf16", "M": 16384, "ms": 10.054, "tflops": 82.0, "rel_err": 0.004658}
+
+| M | marlin_fp8_w8a16 | triton_int8_block | triton_int8_chan | triton_bf16 |
+| 64 | 0.602ms/5.4TF/err6.1e-03 | 0.819ms/3.9TF/err4.6e-02 | 0.747ms/4.3TF/err2.6e-02 | 0.938ms/3.4TF/err4.6e-03 |
+| 512 | 0.96ms/26.8TF/err6.1e-03 | 1.283ms/20.1TF/err4.7e-02 | 1.249ms/20.6TF/err2.6e-02 | 1.605ms/16.1TF/err4.8e-03 |
+| 2048 | 1.409ms/73.2TF/err6.1e-03 | 1.669ms/61.8TF/err4.6e-02 | 1.546ms/66.7TF/err2.6e-02 | 1.992ms/51.8TF/err4.8e-03 |
+| 8192 | 4.995ms/82.5TF/err6.1e-03 | 4.875ms/84.6TF/err4.6e-02 | 4.315ms/95.6TF/err2.6e-02 | 4.703ms/87.7TF/err4.9e-03 |
+| 16384 | 9.76ms/84.5TF/err5.9e-03 | 9.614ms/85.8TF/err4.6e-02 | 9.02ms/91.4TF/err2.6e-02 | 10.054ms/82.0TF/err4.7e-03 |
+DONE
