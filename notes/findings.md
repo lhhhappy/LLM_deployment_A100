@@ -497,3 +497,19 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - TPOT 对照：b113 N6 p95 0.073；120v1 N6 p95 0.104（已碰线）。原因：预填充与 decode 交替时，出字请求每 token 要等一整轮预填充；v2 无等待时不封顶（16384/轮 ≈1.2–1.5s）放大了它。
 - 对策：120 v3（有请求在 decode 时也封顶，cap 2048）+ `--prefill-decode-interval 3`（每轮预填充后连跑 3 步 decode）→ 梯子 027。026（v2+140）跑完 N18 后停止，不再下探。
 - 意义：随 N 上升 **TPOT 门与 TTFT 门同为约束**；tpot_mean 也是同档名次依据（第一名 0.0273）。
+
+## F84 — 干扰探针 026a–f（8 卡，档 1，12 路 decode + 190k 冷预填充 + 每秒短命中）
+| 配置 | 冷 TTFT | 纯 decode 间隔 | 冷期间 decode 间隔 p50/p95/max | 短命中 TTFT p50/p95 |
+|---|---|---|---|---|
+| a b113 base 调度 | 18.96s | – | 18.6/253/**20230**ms | 9.15/16.97s |
+| b v3 cap2048 | 29.18 | – | 270/412/539 | 0.54/0.68 |
+| c v3 cap2048 i3 | 33.14 | 16.9 | 23.8/375/414 | 0.53/0.72 |
+| d v3 cap4096 i2 | 23.46 | 16.6 | 25.8/567/606 | 0.69/0.99 |
+| e v3 cap1024 i4 | 54.78 | 16.6 | 19.5/289/339 | 0.42/0.55 |
+| f MTP(160) base 调度 | 21.36 | 多 token 同达 | –/72/22458 | 9.63/19.36 |
+- 由墙钟减去插入的 decode 步反推单块耗时（平均前缀 ~95k）：1024→~220ms、2048→~294、4096→~460、16384→~1640 ⇒ 斜率 72–96µs/token，**截距 ≈150ms/块**（INFERRED，待 T51 在开发机实测拆分）。
+- 截距是调度两难的根源：小块护 TPOT 但冷 TTFT 爆涨（e：54.8s）。
+- 日志 VERIFIED：`Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.` → 预填充全程 eager。上游 #38522 已为 GLM-5.3-Flash 加显式 opt-in（refs/pr38522.diff）→ T52 移植为 170。
+- decode 图实际捕获 bs=[1..40]（max_running_requests 所限），N≤26 足够。
+- MTP：12/12 能力正确；接受长度 3.0/4（随机 token 输入，偏乐观）；stream tpot 0.0165 vs 同调度 b113 0.0226。f 未叠加 120 → 下一步测 MTP+v3。
+- 证据：pod `/tmp/ax/runs/026{a..f}-*/job.log`（INTERFERENCE 行）。

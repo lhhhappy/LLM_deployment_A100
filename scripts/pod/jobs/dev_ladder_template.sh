@@ -7,6 +7,10 @@ export SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_OPT_DEEPGEMM_HC
 [ -n "${G_ENV:-}" ] && export $G_ENV
 ensure_engine "$G_NAME" --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang $G_ARGS || exit 1
 grep -h "KV Cache is allocated\|max_total_num_tokens" $AX/engine_current.log | tail -2 | cut -c1-200
+# Fail fast on wrong preconditions (a mis-sized KV pool silently wasted a whole level once).
+kv=$(grep -oh "max_total_num_tokens=[0-9]*" $AX/engine_current.log | tail -1 | cut -d= -f2)
+echo "PRECHECK kv_tokens=${kv:-?} min_required=${LADDER_MIN_KV:-900000} patches=$(cat $AX/src/$G_NAME/PATCHES | tr ' ' ',') args=[$G_ARGS] env=[${G_ENV:-}]"
+[ -n "$kv" ] && [ "$kv" -ge "${LADDER_MIN_KV:-900000}" ] || { echo "PRECHECK FAIL: KV tokens ${kv:-unknown} < ${LADDER_MIN_KV:-900000}"; exit 5; }
 S1=$AX/s1/s1-dev; first=1
 # Start high (target is N22/26): climb LADDER_UP; if the FIRST level already fails, descend LADDER_DOWN to find the
 # highest passing level (same logic as the formal climb: pass -> +4, fail -> -4, stop).

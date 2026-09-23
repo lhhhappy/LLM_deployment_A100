@@ -52,16 +52,23 @@ tc.join(); cold_end = time.time()
 for _, th in shorts: th.join()
 for t in ths: t.join()
 def q(v, p): v = sorted(v); return v[min(len(v) - 1, int(p * len(v)))] if v else float("nan")
-gaps_during, tpots = [], []
+gaps_during, gaps_before, tpots = [], [], []
 for r in recs:
     tt = r.get("times", [])
     if len(tt) > 2: tpots.append((tt[-1] - tt[0]) / (len(tt) - 1))
     gaps_during += [b - a for a, b in zip(tt, tt[1:]) if cold_start <= a <= cold_end]
+    gaps_before += [b - a for a, b in zip(tt, tt[1:]) if a < cold_start]  # pure decode, no prefill interference
 def ttft(r): m = r.get("meta", {}); return (m.get("prefill_finished_time") or 0) - (m.get("request_received_ts") or 0)
 st = [ttft(r) for r, _ in shorts if r.get("meta")]
 res = dict(decode_streams=D, cold_len=COLD, cold_ttft=round(ttft(cold), 2), cold_wall=round(cold_end - cold_start, 2),
+           decode_gap_before_cold_ms=dict(p50=round(1000 * q(gaps_before, .5), 1), p95=round(1000 * q(gaps_before, .95), 1)),
            decode_gap_during_cold_ms=dict(p50=round(1000 * q(gaps_during, .5), 1), p95=round(1000 * q(gaps_during, .95), 1), max=round(1000 * max(gaps_during or [0]), 1)),
            stream_tpot=dict(mean=round(sum(tpots) / max(1, len(tpots)), 4), max=round(max(tpots or [0]), 4)),
            short_hit_ttft=dict(n=len(st), p50=round(q(st, .5), 2), p95=round(q(st, .95), 2), max=round(max(st or [0]), 2)))
+try:  # speculative decoding stats if any (MTP)
+    import re as _re
+    txt = urllib.request.urlopen(base + "/metrics", timeout=10).read().decode()
+    res["spec"] = {k: float(v) for k, v in _re.findall(r'^sglang:(spec_accept_(?:length|rate))\{[^}]*\} ([0-9.eE+-]+)', txt, _re.M)}
+except Exception as e: res["spec"] = str(e)[:80]
 json.dump(res, open(f"{out}/interference.json", "w"), indent=1)
 print("INTERFERENCE", json.dumps(res), flush=True)

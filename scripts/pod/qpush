@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Run LOCALLY. Sync repo (patches, scripts/pod, verify kit) to the GPU box, push kit + all numbered patches into the
+# pod, and enqueue job files under explicit names (sorted order = run order).
+#   scripts/pod/qpush <queue_name>=<scripts/pod/jobs/file.sh> ...     e.g. 026g-cc_a_v3_114.sh=scripts/pod/jobs/cc_a_v3_114.sh
+set -euo pipefail; cd "$(dirname "$0")/../.."
+bash scripts/pod/verify/make_kit.sh >/dev/null
+tar cf - build/verify_kit patches scripts/pod | timeout 120 ssh GPU 'tar xf - -C /sjtu/linhang/arena/repo'
+files=""; mvs=""
+for a in "$@"; do n=${a%%=*}; f=${a#*=}; [ -f "$f" ] && bash -n "$f" || { echo "bad job $f"; exit 2; }
+  files="$files $f"; mvs="$mvs mv tmpj/$f $n;"; done
+GSSH_TIMEOUT=500 scripts/gssh "cd /sjtu/linhang/arena/repo && (cd build && ../scripts/pod/ppush /tmp/ax verify_kit >/dev/null) \
+ && scripts/pod/ppush /tmp/ax \$(ls patches/[0-9][0-9][0-9]-*.patch) >/dev/null \
+ && scripts/pod/ppush /tmp/ax/queue/pending/tmpj $files >/dev/null && source scripts/pod/common.sh \
+ && bexec 'cd /tmp/ax/queue/pending && $mvs rm -rf tmpj; echo PENDING: \$(ls | tr \"\\n\" \" \"); echo RUN: \$(ls ../running)'"
