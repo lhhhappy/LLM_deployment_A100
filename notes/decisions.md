@@ -53,3 +53,15 @@
 - 处置：守护进程已停止且不再启用（pod 内队列 `scripts/pod/podq` 已承担全部实验；服务不需要"保活"动作）；
   按原参数重建 `lh-arena-sess-b`（2102486579267252224，底包镜像 arena-sglang-glm53:260918，命令 http.server 挂起，描述空），排队等待准入；`scripts/pod/common.sh` 默认 SID 已切换。
 - 规则：任何会删/停服务的自动化一律不运行；改长驻进程配置后必须重启并在日志中核对生效值。
+
+## 决策 38（2026-09-23）— 方向排序（请教 Fable 后，结合逐组件成本表）
+- 依据：R8 §6/§7；逐组件成本表（findings 最新条）；Fable 审阅意见（核对了 dsa_indexer.py:259-288 ReplicatedLinear、113/MoE/tilelang 微基准、F31/F46 正式集桶大小与允许超标条数：chain_start 808/51、intra 9023/485、turn_start 65/6；底包 DCP `--dcp-size` 与 prefill CP 存在）。
+- 分歧：Fable 认为 mHC（G4）FLOPs 可忽略；实测 mHC 占预填充 13%（带宽受限：4 倍宽残差流）→ G4 保留但靠后。
+- **排序**：
+  0. 服务回来先跑：pod 验证套件 → **能力门自测（AIME/GPQA 样题，含长输出 decode 路径）** → 单请求冷预填充分解（20k/60k/190k，/start_profile）。
+  1. **G2 indexer 按查询行切分到 TP 组 + all-gather top-k**（O(L²) 且 8 卡冗余；114k 约 −4s、190k 约 −11s；零精度风险）。Claude 自做，开发机 TP2 先验证。
+  2. 8 卡开关探针：`--enable-prefill-cp --attn-cp-size 8`（G3，= G1+G2 现成实现）与 `--dcp-size`（KV 容量 ×N）；各一个任务。
+  3. 容量：C1（cuda-graph max bs）+ 读驱逐计数（N=26 时 fast_intra 可能先挂）。
+  4. F3 EDF + 注定超时降级（合规，追平前排）。
+  5. F1 仅角色边界快照（不做网格，避免吃容量）。
+  6. G4 mHC、F2 MoE kernel 最后。
