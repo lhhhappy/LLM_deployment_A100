@@ -1,0 +1,34 @@
+T50b — DCP address protocol on the DSA path (CPU-side source reading, base = build/base_exact/sglang, 000..115 applied)
+Line numbers are in build/base_exact (B:) unless marked. VERIFIED = read in source; INFERRED = reasoning, still to be confirmed on GPU.
+
+1. Virtual loc space (VERIFIED)
+   - Allocator under DCP: PagedTokenToKVPoolAllocator(size = max_total*W, page = 64*W)   B:srt/mem_cache/kv_cache_configurator.py:1995
+   - Tree cache page = 64*W (512 on DCP8)                                                 B:srt/mem_cache/kv_cache_builder.py:307-314
+   - Scheduler counts capacity x W                                                        B:srt/managers/scheduler.py:2249,2423; tp_worker.py:430
+   => req_to_token / out_cache_loc / page_table_1 / real_page_table / topk-transform output are VIRTUAL locs in [0,(rows+64)*W).
+2. Per-rank pools are NOT virtual-sized (VERIFIED)
+   - DSA pool (latent + indexer K) is built with the per-rank max_total (loc_space_scale=1 for the target)
+       B:srt/mem_cache/kv_cache_configurator.py:337-351, 1498-1560
+   - IndexKeyCache pages = (index_buf_size + 65)//64 with index_buf_size = size (per-rank)    B:srt/mem_cache/memory_pool.py:4738; index_key_cache.py:17
+3. Latent write IS sharded (VERIFIED): owner = loc % W == rank, stored at loc // W   B:kernels/ops/kvcache/mla_buffer.py:42-44
+4. Nothing on the DSA read side translates (VERIFIED: grep 'dcp' in layers/attention/dsa/*, dsa_backend.py, index_key_cache.py)
+   - extend (sm80: use_mha is always False, B:dsa_backend.py:4461 needs SM90/100): kv_cache = local pool (3001),
+     page_table_1 = virtual locs (3042), tilelang sparse attention reads kv_cache[virtual] (3091)
+   - decode: same with transform_index_page_table_decode / fused top-k (3312, 3345, 3393); only LSE is returned for DCP.
+   - indexer K store (index_key_cache.store_quantized) and reads (paged logits via real_page_table; 112 `_paged`
+     kernel loads BT without an upper bound: patches/112 `physical = max(BT,0)`) use virtual locs/pages on a per-rank buffer.
+   - The base already gathers the full prefix KV for MLA extend under DCP (forward_mla.py:643 ->
+     dcp/comm.py:267 all_gather_kv_cache_for_mla_extend -> attn_dcp_metadata.dcp_kv_buffer), but only the FlashInfer-MLA
+     backend consumes dcp_kv_buffer; the DSA backend ignores it.
+5. Consequences (INFERRED from 1-4, to be measured on the dev box)
+   a. Whenever a virtual loc >= per-rank rows (818,112 in 025) is read/written: out-of-bounds -> illegal memory access.
+      The allocator hands out the lowest free pages first, so this only happens once the virtual high-water mark passes
+      1/W of the logical space. 025 crashed at "full token usage 0.07-0.10" of 6.54M logical = 0.46-0.65M live tokens,
+      plus fragmentation from freed pages -> high-water mark over 818k is plausible. The crash is NOT specific to prefix hits;
+      prefix hits (long retained trees) just push the high-water mark up. Cold probes (013b) never got there.
+   b. Below that threshold, DCP runs WITHOUT crashing but the DSA layers read the wrong KV rows (row v holds virtual token
+      v*W+rank) in both prefill and decode -> DSA attention output is wrong. 11 of 45 GLM layers are DSA, so the capability
+      smoke (12/12 in F78) could still pass. Any DCP numbers so far (F78 −19% cold prefill, 025 N10) were measured on
+      wrong attention.
+6. None of 110/112/113/114/115 introduced the bug; they inherited the base's non-DCP addressing. 115 only made the
+   64-head decode kernel fit A100 smem, which is what let DCP start at all.

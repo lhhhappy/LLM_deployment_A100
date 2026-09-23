@@ -15,7 +15,8 @@ def flush():
     for _ in range(30):
         try: post("/flush_cache", {}).read(); return
         except Exception: time.sleep(2)
-def ids(n, seed): r = random.Random(seed); return [r.randrange(1000, 150000) for _ in range(n)]
+VMAX = int(os.environ.get("VOCAB_MAX", "150000"))  # dev-box surrogate model has vocab/8 -> set VOCAB_MAX=19000
+def ids(n, seed): r = random.Random(seed); return [r.randrange(1000, VMAX) for _ in range(n)]
 def gen(prompt, max_new=1):
     d = json.loads(post("/generate", {"input_ids": prompt, "sampling_params": {"max_new_tokens": max_new, "temperature": 0, "ignore_eos": True}}).read())
     m = d.get("meta_info", {})

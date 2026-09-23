@@ -513,3 +513,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - decode 图实际捕获 bs=[1..40]（max_running_requests 所限），N≤26 足够。
 - MTP：12/12 能力正确；接受长度 3.0/4（随机 token 输入，偏乐观）；stream tpot 0.0165 vs 同调度 b113 0.0226。f 未叠加 120 → 下一步测 MTP+v3。
 - 证据：pod `/tmp/ax/runs/026{a..f}-*/job.log`（INTERFERENCE 行）。
+
+## F86 — 梯子 027（v3 cap2048 + interval 3，档 3 全量）：TPOT 护住了，TTFT 全崩 → 小块的固定开销吃掉预填充吞吐
+- N18：tpot_mean 0.0823、**tpot_p95 0.111**（026 v2 为 0.219）；但 fast_intra p95 14.74s（27/23 超）、overall 18.93（48/27）、turn_start 173（6/3）、chain_start 107（66/22）→ 两口径 FAIL。
+- N14：tpot 0.0678；fast 1.48 过，overall 10.89（37/27）、chain 91.97（47/22）FAIL。
+- 对照 026（v2，cap 仅在有等待时生效、无 interval）N18：TTFT 四门全过、tpot_p95 0.219。
+- 结论：调度只能在 TTFT 和 TPOT 之间换，因为 2048 块要付约 150ms 的固定开销（F85），预填充吞吐大约掉一半，请求就排起队。要两头都过，必须先降低每块的固定开销（T51 诊断、T52 BCG 170），再回来定块大小。
+- N10 没跑完，Claude 用 stopjob 停了该任务（只停任务，服务与引擎未动），让出卡给探针 026g/h/i。

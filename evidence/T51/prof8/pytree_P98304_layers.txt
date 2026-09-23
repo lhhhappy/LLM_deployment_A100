@@ -1,0 +1,50 @@
+roots matching 'deepseek_v2.py\\(2078\\): forward': 2, total 14.55 ms
+   14.55 ms/call-of-root  x2.0   sglang/srt/models/deepseek_v2.py(2078): forward
+-- children (normalized per root call) --
+      5.42 ms/call-of-root  x1.0   sglang/srt/models/deepseek_v2.py(2099): forward_prepare
+          5.31 ms/call-of-root  x1.0   sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py(279): forward_absorb_prep
+      1.85 ms/call-of-root  x1.0   sglang/srt/models/deepseek_v2.py(2211): forward_core
+          1.84 ms/call-of-root  x1.0   sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py(672): forward_absorb_core
+roots matching 'glm5_next.py\\(562\\): forward': 6, total 21.69 ms
+   21.69 ms/call-of-root  x6.0   sglang/srt/models/glm5_next.py(562): forward
+-- children (normalized per root call) --
+      0.62 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_0
+          0.62 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+      0.54 ms/call-of-root  x1.0   sglang/srt/models/glm5_next.py(521): forward_qkvbfg
+      0.40 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_3
+          0.40 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+      0.39 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_1
+          0.39 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+      0.38 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_4
+          0.38 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+      0.38 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_5
+          0.38 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+      0.38 ms/call-of-root  x0.2   nn.Module: RadixLinearAttention_2
+          0.38 ms/call-of-root  x0.2   torch/nn/modules/module.py(1782): _call_impl
+roots matching 'deepseek_v2.py\\(903\\): forward': 8, total 16.14 ms
+   16.14 ms/call-of-root  x8.0   sglang/srt/models/deepseek_v2.py(903): forward
+-- children (normalized per root call) --
+      2.00 ms/call-of-root  x1.0   sglang/srt/models/deepseek_v2.py(1069): forward_normal
+          0.19 ms/call-of-root  x0.1   nn.Module: FusedMoE_0
+          0.15 ms/call-of-root  x0.1   nn.Module: FusedMoE_1
+roots matching 'glm5_next.py\\(1078\\): forward': 1, total 70.04 ms
+   70.04 ms/call-of-root  x1.0   sglang/srt/models/glm5_next.py(1078): forward
+-- children (normalized per root call) --
+     12.40 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_3
+         12.40 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+     10.26 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_0
+         10.25 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+     10.13 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_7
+         10.12 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      7.36 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_1
+          7.36 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      7.36 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_4
+          7.35 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      7.24 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_5
+          7.24 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      7.18 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_6
+          7.18 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      7.16 ms/call-of-root  x1.0   nn.Module: Glm5NextDecoderLayer_2
+          7.15 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl
+      0.15 ms/call-of-root  x1.0   nn.Module: RMSNorm_4
+          0.15 ms/call-of-root  x1.0   torch/nn/modules/module.py(1782): _call_impl

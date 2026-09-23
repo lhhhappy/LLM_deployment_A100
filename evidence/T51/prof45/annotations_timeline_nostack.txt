@@ -1,0 +1,31 @@
+P98304
+  scheduler.recv_requests                  t=   -8.24ms dur=   1.34ms
+  scheduler.process_input_requests         t=   -6.87ms dur=   0.28ms
+  scheduler.get_next_batch_to_run          t=   -6.56ms dur=   5.82ms
+  scheduler.run_batch                      t=   -0.68ms dur= 252.35ms
+  step[EXTEND bs=1 toks=1024]              t=    0.00ms dur= 250.97ms
+  sglang.vlm.language_model_prefill        t=    5.96ms dur= 244.44ms
+  copy_result_to_cpu                       t=  251.48ms dur=   0.16ms
+  scheduler.recv_requests                  t=  251.79ms dur=   0.11ms
+  scheduler.get_next_batch_to_run          t=  251.96ms dur=   1.16ms
+  scheduler.run_batch                      t=  253.16ms dur=   5.59ms
+  step[DECODE bs=1]                        t=  253.72ms dur=   4.42ms
+  copy_result_to_cpu                       t=  258.55ms dur=   0.17ms
+  scheduler.process_batch_result           t=  258.82ms dur=   4.48ms
+  scheduler.process_batch_result           t=  263.62ms dur=   5.20ms
+P0
+  scheduler.recv_requests                  t=   -4.89ms dur=   0.20ms
+  scheduler.process_input_requests         t=   -4.67ms dur=   0.26ms
+  scheduler.get_next_batch_to_run          t=   -4.39ms dur=   3.67ms
+  scheduler.run_batch                      t=   -0.67ms dur= 246.59ms
+  step[EXTEND bs=1 toks=1024]              t=    0.00ms dur= 245.21ms
+  sglang.vlm.language_model_prefill        t=    5.98ms dur= 238.65ms
+  copy_result_to_cpu                       t=  245.71ms dur=   0.18ms
+  scheduler.recv_requests                  t=  246.04ms dur=   0.11ms
+  scheduler.get_next_batch_to_run          t=  246.20ms dur=   1.16ms
+  scheduler.run_batch                      t=  247.40ms dur=   5.61ms
+  step[DECODE bs=1]                        t=  247.96ms dur=   4.44ms
+  copy_result_to_cpu                       t=  252.81ms dur=   0.17ms
+  scheduler.process_batch_result           t=  253.09ms dur=   2.22ms
+  scheduler.recv_requests                  t=  255.39ms dur=   0.11ms
+  scheduler.process_batch_result           t=  255.64ms dur=   7.00ms

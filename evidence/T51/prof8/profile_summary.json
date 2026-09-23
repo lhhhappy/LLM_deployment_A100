@@ -1,0 +1,78 @@
+[
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   55.5,
+   98304
+  ]
+ },
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   52.4,
+   98304
+  ]
+ },
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "nostack",
+  "ms_cached": [
+   74.6,
+   98304
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof/P98304_c1024_nostack"
+ },
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "stack",
+  "ms_cached": [
+   107.2,
+   98304
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof/P98304_c1024_stack"
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   46.9,
+   0
+  ]
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   47.0,
+   0
+  ]
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "nostack",
+  "ms_cached": [
+   60.6,
+   0
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof/P0_c1024_nostack"
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "stack",
+  "ms_cached": [
+   91.3,
+   0
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof/P0_c1024_stack"
+ }
+]

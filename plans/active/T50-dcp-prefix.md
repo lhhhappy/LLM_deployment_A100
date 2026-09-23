@@ -1,6 +1,6 @@
 # T50 DCP 前缀命中寻址修复
 
-- 状态：active　负责人：Codex W24　创建：2026-09-23
+- 状态：active　负责人：Codex W24 → Claude subagent T50b（09-23 接手）　创建：2026-09-23
 - 关联：dispatch T50，F78/F83，R18 §8.3
 
 ## 目标
@@ -33,8 +33,10 @@
 
 ## 进度记录
 - [x] 规则/交接/已有证据阅读，任务in-progress。
-- [ ] 原栈复现、根因与补丁。
-- [ ] 开发机验证、全栈、交付。
-
+- [x] （T50b）CPU 侧根因：底包 DSA 读路径（latent 稀疏注意力、indexer K 读写）全部按虚拟 loc 访问每卡大小的池，只有 latent 写入按 loc%W 分片 → 越界崩溃 + 未越界时读错行。110–115 未引入、是继承。证据 `evidence/T50/address_protocol.txt`。
+- [x] （T50b）补丁 `patches/116-dcp-dsa-address.patch`：extend 读 dcp_kv_buffer（虚拟 loc→行号表）、decode/verify 转本卡行+NaN 清零、indexer K 在虚拟空间复制、显存核算 ×W。全栈 000→…→115→116→140→120→130→150→160 fuzz=0（本地与开发机）。
+- [x] （T50b）开发机脚本 `scripts/analysis/devbox_dcp_check.sh`（+ dcp_check.py / dcp_compare.py），源码树已在开发机建好；gjob `t50_dcp` 等两卡空闲后自动跑。
+- [ ] 开发机结果：原栈复现（数值偏差 + 高 slot 越界）、116 后 DCP2 与非 DCP logits 对比、decode/cuda graph。
+- [ ] 116 .md（含 8 卡复验方案）、交付。
 ## 决策记录
 - 2026-09-23：先确认各池地址域，禁止用冷请求通过替代前缀命中正确性。

@@ -1,0 +1,66 @@
+roots 'scheduler.py\\(4115\\): run_batch|scheduler.py\\(4459\\): process_batch_result|scheduler.py\\(3591\\): get_new_batch_prefill': n=1201 total=106.21 ms; python frames=36981
+-- top python self time --
+    3.29 ms x1197   sglang/srt/managers/scheduler.py(3618): _get_new_batch_prefill_raw
+    3.28 ms x326    <built-in method empty of type object at 0x7fa568df4f20>
+    3.09 ms x48     <built-in function linear>
+    2.65 ms x1197   sglang/srt/managers/scheduler.py(3591): get_new_batch_prefill
+    2.59 ms x77     triton/runtime/jit.py(708): run
+    2.00 ms x77     <built-in function launch>
+    1.76 ms x251    <built-in method view of Tensor object at 0x7fa16847a620>
+    1.60 ms x50     tvm_ffi/module.py(296): __call__
+    1.51 ms x6      sglang/srt/layers/attention/linear/kda_backend.py(710): forward_extend
+    1.39 ms x74     <built-in method to of Tensor object at 0x7fa168478b90>
+    1.29 ms x25     <built-in method zeros of type object at 0x7fa568df4f20>
+    1.25 ms x18     <built-in method cat of type object at 0x7fa568df4f20>
+    1.21 ms x16     sglang/kernels/ops/moe/moe_wna16_marlin.py(42): moe_wna16_marlin_gemm
+    1.16 ms x84     <built-in method empty_like of type object at 0x7fa568df4f20>
+    1.06 ms x50     tilelang/jit/adapter/tvm_ffi.py(234): func
+    1.04 ms x3594   <built-in function len>
+    1.01 ms x16     sglang/kernels/ops/layernorm/mhc.py(955): mhc_pre
+    1.00 ms x8      sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py(134): fused_marlin_moe
+    0.96 ms x64     tvm/runtime/script_printer.py(109): _script
+    0.92 ms x48     tilelang/language/eager/builder.py(1074): _parse_phase2_key
+    0.89 ms x10     <built-in method mm of type object at 0x7fa568df4f20>
+    0.86 ms x48     tilelang/language/eager/builder.py(1261): _bind_fast
+    0.86 ms x77     <string>(2): dynamic_func
+    0.85 ms x24     triton/runtime/autotuner.py(212): run
+    0.83 ms x57     <built-in method contiguous of Tensor object at 0x7fa1686c1950>
+    0.81 ms x6      sglang/srt/layers/attention/hybrid_linear_attn_backend.py(857): _track_mamba_state_extend
+    0.74 ms x1197   sglang/srt/constrained/grammar_manager.py(69): has_waiting_grammars
+    0.74 ms x10     torch/_dynamo/eval_frame.py(1076): compile_wrapper
+    0.72 ms x2656   <built-in function isinstance>
+    0.70 ms x288    tvm_ffi/container.py(505): __iter__
+-- python self time by group --
+   42.36 ms  39.9%  sglang python
+   36.40 ms  34.3%  builtin C calls (torch ops, launch, pybind)
+    8.73 ms   8.2%  tilelang/tvm eager dispatch
+    6.40 ms   6.0%  triton launcher (triton/*)
+    6.08 ms   5.7%  other
+    4.52 ms   4.3%  torch python (nn.Module etc.)
+    1.72 ms   1.6%  torch.compile/dynamo wrappers
+-- top cpu_op / runtime inclusive (note: cpu_ops nest) --
+    7.38 ms x8      cpu_op       sglang::fused_marlin_moe
+    3.47 ms x367    cuda_runtime cudaLaunchKernel
+    3.16 ms x59     cpu_op       aten::mm
+    2.86 ms x457    cpu_op       aten::empty
+    2.83 ms x48     cpu_op       aten::linear
+    2.52 ms x125    cpu_op       aten::copy_
+    2.45 ms x49     cpu_op       aten::matmul
+    2.24 ms x161    cpu_op       aten::to
+    2.06 ms x67     cpu_op       aten::_to_copy
+    1.72 ms x2      cpu_op       Torch-Compiled Region: 3/0
+    1.68 ms x35     cpu_op       aten::index
+    1.37 ms x6      cpu_op       LayerNormGatedFunction
+    1.28 ms x6      cpu_op       sglang::apply_fp8_marlin_linear
+    1.23 ms x22     cpu_op       aten::cat
+    1.17 ms x89     cuda_runtime cudaMemcpyAsync
+    1.15 ms x155    cpu_op       aten::empty_strided
+    1.10 ms x445    cpu_op       aten::view
+    1.09 ms x2      cpu_op       ## Call CompiledFxGraph fa3ejg6slebnfazaltrp7ugrnt7bmiwbcyoqx3jhrgl2my
+    1.03 ms x25     cpu_op       aten::zeros
+    1.02 ms x103    cpu_op       aten::empty_like
+    0.84 ms x21     cpu_op       aten::clone
+    0.83 ms x77     cuda_driver  cuLaunchKernelEx
+    0.76 ms x149    cpu_op       aten::slice
+    0.73 ms x60     cuda_driver  cuLaunchKernel
+    0.69 ms x18     cpu_op       aten::contiguous

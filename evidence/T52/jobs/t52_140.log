@@ -1,0 +1,4 @@
+rc=0
+{"boundaries": [4096, 2048], "boundary": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "conv": {"elements": 147456, "equal": true, "max_abs": 0.0, "rms": 0.0}, "dim": 128, "end": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "exporter_final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "exporter_output": {"elements": 100147200, "equal": true, "max_abs": 0.0, "rms": 0.0}, "final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "guard_untouched": true, "heads": 64, "kind": "numeric", "lengths": [8192, 4033], "off_baseline_final": {"elements": 2097152, "equal": true, "max_abs": 0.0, "rms": 0.0}, "off_baseline_output": {"elements": 100147200, "equal": true, "max_abs": 0.0, "rms": 0.0}, "resume": {"elements": 49815552, "equal": true, "max_abs": 0.0, "rms": 0.0}, "seed": 49, "strided": true, "warm_prefix": false}
+{"cases": 8, "kind": "complete", "passed": true}
+DONE rc=0

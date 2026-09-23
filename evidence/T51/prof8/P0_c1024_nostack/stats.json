@@ -1,0 +1,284 @@
+{
+ "trace": "/sjtu/linhang/arena/runs/T51/prof/P0_c1024_nostack/P0_nostack-1790157109.4869163-TP-0.trace.json.gz",
+ "cpu_annotations_ms": {
+  "scheduler.run_batch": 53.55,
+  "step[EXTEND bs=1 toks=1024]": 48.65,
+  "sglang.vlm.language_model_prefill": 42.39,
+  "copy_result_to_cpu": 0.32,
+  "step[DECODE bs=1]": 2.43,
+  "scheduler.process_batch_result": 2.26
+ },
+ "gpu_span_ms": 48.46,
+ "kernel_sum_ms": 13.95,
+ "gpu_idle_ms": 34.51,
+ "idle_cpu_starved_ms": 34.37,
+ "idle_other_ms": 0.15,
+ "n_kernels": 479,
+ "n_memcpy": 45,
+ "n_memset": 0,
+ "gaps_hist": {
+  "<5us": 121,
+  "5-20us": 29,
+  "20-100us": 240,
+  "0.1-1ms": 133,
+  ">=1ms": 0
+ },
+ "gaps_sum_by_bucket_ms": {
+  "<5us": 0.15,
+  "5-20us": 0.4,
+  "20-100us": 11.05,
+  "0.1-1ms": 22.92,
+  ">=1ms": 0.0
+ },
+ "biggest_gaps": [
+  {
+   "us": 749,
+   "after": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_",
+   "before": "main_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 616,
+   "after": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_",
+   "before": "main_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 433,
+   "after": "Memcpy DtoH (Device -> Pageable)",
+   "before": "Memcpy HtoD (Pageable -> Device)",
+   "cpu_starved": true
+  },
+  {
+   "us": 335,
+   "after": "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 302,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 286,
+   "after": "_router_triton_kernel",
+   "before": "void at::native::vectorized_elementwise_kernel<4, at::native",
+   "cpu_starved": true
+  },
+  {
+   "us": 268,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 243,
+   "after": "void at::native::(anonymous namespace)::multi_tensor_apply_k",
+   "before": "void at::native::vectorized_elementwise_kernel<2, at::native",
+   "cpu_starved": true
+  },
+  {
+   "us": 241,
+   "after": "mhc_post_tilelang_kernel",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 228,
+   "after": "Memcpy DtoH (Device -> Pageable)",
+   "before": "Memcpy HtoD (Pinned -> Device)",
+   "cpu_starved": true
+  },
+  {
+   "us": 226,
+   "after": "void cublasLt::splitKreduce_kernel<32, 16, int, float, float",
+   "before": "_router_triton_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 221,
+   "after": "void at::native::index_elementwise_kernel<128, 4, at::native",
+   "before": "layer_norm_gated_fwd_kernel",
+   "cpu_starved": true
+  }
+ ],
+ "runtime_calls": {
+  "cudaLaunchKernel": {
+   "n": 317,
+   "ms": 2.7
+  },
+  "cuLaunchKernel": {
+   "n": 56,
+   "ms": 0.62
+  },
+  "cudaMemcpyAsync": {
+   "n": 45,
+   "ms": 0.59
+  },
+  "cuLaunchKernelEx": {
+   "n": 62,
+   "ms": 0.57
+  },
+  "cudaLaunchKernelExC": {
+   "n": 44,
+   "ms": 0.36
+  },
+  "cudaStreamSynchronize": {
+   "n": 29,
+   "ms": 0.24
+  },
+  "cudaFuncGetAttributes": {
+   "n": 32,
+   "ms": 0.15
+  },
+  "cudaEventQuery": {
+   "n": 17,
+   "ms": 0.08
+  },
+  "cudaFuncSetAttribute": {
+   "n": 22,
+   "ms": 0.08
+  },
+  "cudaOccupancyMaxActiveBlocksPerMultiprocessor": {
+   "n": 14,
+   "ms": 0.06
+  },
+  "cudaDeviceGetAttribute": {
+   "n": 55,
+   "ms": 0.05
+  },
+  "cudaStreamIsCapturing": {
+   "n": 49,
+   "ms": 0.03
+  }
+ },
+ "host_first_launch_to_gpu_end_ms": 48.48,
+ "top_kernels": [
+  {
+   "ms": 4.117,
+   "n": 16,
+   "comp": "moe",
+   "name": "void sglang::device::marlin_moe::Marlin"
+  },
+  {
+   "ms": 2.424,
+   "n": 2,
+   "comp": "dsa_sparse_attn",
+   "name": "main_kernel"
+  },
+  {
+   "ms": 0.711,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel"
+  },
+  {
+   "ms": 0.638,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_post_tilelang_kernel"
+  },
+  {
+   "ms": 0.623,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_64x3_tn"
+  },
+  {
+   "ms": 0.569,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_big_fuse_with_norm_tilelang_kernel"
+  },
+  {
+   "ms": 0.542,
+   "n": 88,
+   "comp": "norm_elementwise",
+   "name": "void at::native::vectorized_elementwise_kernel"
+  },
+  {
+   "ms": 0.539,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "void sglang::device::marlin::Marlin"
+  },
+  {
+   "ms": 0.429,
+   "n": 8,
+   "comp": "moe",
+   "name": "void moe_sum_reduce_warp_per_token_vec_kernel"
+  },
+  {
+   "ms": 0.421,
+   "n": 6,
+   "comp": "kda",
+   "name": "chunk_kda_fwd_kernel_inter_solve_fused"
+  },
+  {
+   "ms": 0.406,
+   "n": 36,
+   "comp": "norm_elementwise",
+   "name": "void at::native::elementwise_kernel"
+  },
+  {
+   "ms": 0.361,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_32x3_tn"
+  },
+  {
+   "ms": 0.204,
+   "n": 16,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_64x3_tn"
+  },
+  {
+   "ms": 0.191,
+   "n": 6,
+   "comp": "kda",
+   "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64"
+  },
+  {
+   "ms": 0.175,
+   "n": 32,
+   "comp": "norm_elementwise",
+   "name": "void at::native::index_elementwise_kernel"
+  }
+ ],
+ "components": {
+  "moe": {
+   "ms": 4.67,
+   "n": 40
+  },
+  "dsa_sparse_attn": {
+   "ms": 2.46,
+   "n": 9
+  },
+  "dense_gemm": {
+   "ms": 2.35,
+   "n": 96
+  },
+  "mhc": {
+   "ms": 1.92,
+   "n": 48
+  },
+  "norm_elementwise": {
+   "ms": 1.56,
+   "n": 262
+  },
+  "kda": {
+   "ms": 0.86,
+   "n": 36
+  },
+  "other": {
+   "ms": 0.1,
+   "n": 28
+  },
+  "dsa_indexer": {
+   "ms": 0.03,
+   "n": 5
+  }
+ }
+}

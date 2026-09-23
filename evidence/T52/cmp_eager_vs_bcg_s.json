@@ -1,0 +1,180 @@
+{
+ "rows": [
+  {
+   "tag": "P=0 c=100",
+   "n_in": 100,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.015625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 1.788110239431262e-06
+  },
+  {
+   "tag": "P=0 c=1000",
+   "n_in": 1000,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.14060211181640625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 9.862752631306648e-05
+  },
+  {
+   "tag": "P=0 c=3000",
+   "n_in": 3000,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": false,
+   "first_top5_max_abs_lp_diff": 0.062160491943359375,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 0.00034190714359283447
+  },
+  {
+   "tag": "P=100000 c=100",
+   "n_in": 100100,
+   "cached": [
+    99968,
+    99968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.03125,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 2.980161298182793e-06
+  },
+  {
+   "tag": "P=100000 c=1000",
+   "n_in": 101000,
+   "cached": [
+    99968,
+    99968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.015625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 4.0994491428136826e-05
+  },
+  {
+   "tag": "P=100000 c=3000",
+   "n_in": 103000,
+   "cached": [
+    99968,
+    99968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.12499046325683594,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 8.940041880123317e-06
+  },
+  {
+   "tag": "P=20000 c=100",
+   "n_in": 20100,
+   "cached": [
+    19968,
+    19968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.0625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 0.00011076638475060463
+  },
+  {
+   "tag": "P=20000 c=1000",
+   "n_in": 21000,
+   "cached": [
+    19968,
+    19968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.015625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 0.0002668148372322321
+  },
+  {
+   "tag": "P=20000 c=3000",
+   "n_in": 23000,
+   "cached": [
+    19968,
+    19968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.15625,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 9.059251169674098e-06
+  },
+  {
+   "tag": "mixA P=20000 c=500",
+   "n_in": 20500,
+   "cached": [
+    19968,
+    19968
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 1.1918018572032452e-07,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 1.1919473763555288e-07
+  },
+  {
+   "tag": "mixB cold 1500",
+   "n_in": 1500,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.0,
+   "tokens_identical": "32/32",
+   "max_abs_lp_diff_on_common_prefix": 2.8484617359936237e-05
+  },
+  {
+   "tag": "warm P=100000",
+   "n_in": 100000,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.015625953674316406,
+   "tokens_identical": "1/1",
+   "max_abs_lp_diff_on_common_prefix": 2.382439561188221e-07
+  },
+  {
+   "tag": "warm P=20000",
+   "n_in": 20000,
+   "cached": [
+    0,
+    0
+   ],
+   "first_token_same": true,
+   "first_top5_same_set": true,
+   "first_top5_max_abs_lp_diff": 0.0078125,
+   "tokens_identical": "1/1",
+   "max_abs_lp_diff_on_common_prefix": 0.0
+  }
+ ],
+ "summary": {
+  "n": 13,
+  "first_token_same": 13,
+  "all_tokens_identical": 13,
+  "max_first_top5_lp_diff": 0.15625,
+  "max_lp_diff_common_prefix": 0.00034190714359283447
+ }
+}

@@ -1,0 +1,28 @@
+trees built (fuzz=0)
+=== bcg170 09:57:34 --cuda-graph-backend-prefill breakable
+ready=1 after ~80s
+correctness rc=0
+chunkcost rc=0
+FIT 0 {'fixed_ms': 0.0, 'us_per_tok': 0.0}
+FIT 98304 {'fixed_ms': 0.0, 'us_per_tok': 0.0}
+CHUNKCOST {"fit": {"0": {"fixed_ms": 0.0, "us_per_tok": 0.0}, "98304": {"fixed_ms": 0.0, "us_per_tok": 0.0}}, "decode": [{"bs": 1, "step_ms_p50": 2.79, "step_ms_p90": 2.93}, {"bs": 4, "step_ms_p50": 2.89, "step_ms_p90": 3.13}, {"bs": 8, "step_ms_p50": 2.94, "step_ms_p90": 3.25}, {"bs": 12, "step_ms_p50": 3.01, "step_ms_p90": 3.48}, {"bs": 16, "step_ms_p50": 3.05, "step_ms_p90": 3.61}, {"bs": 20, "step_ms_p50": 3.28, "step_ms_p90": 4.03}, {"bs": 24, "step_ms_p50": 3.18, "step_ms_p90": 3.95}, {"bs": 32, "step_ms_p50": 3.32, "step_ms_p90": 4.31}]}
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 39: 1425518 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+graph=True prefill lines: 173  total prefill lines: 173
+=== eager170 09:59:19 --cuda-graph-backend-prefill disabled
+ready=1 after ~60s
+correctness rc=0
+chunkcost rc=0
+FIT 0 {'fixed_ms': 0.0, 'us_per_tok': 0.0}
+FIT 98304 {'fixed_ms': 0.0, 'us_per_tok': 0.0}
+CHUNKCOST {"fit": {"0": {"fixed_ms": 0.0, "us_per_tok": 0.0}, "98304": {"fixed_ms": 0.0, "us_per_tok": 0.0}}, "decode": [{"bs": 1, "step_ms_p50": 2.72, "step_ms_p90": 2.83}, {"bs": 4, "step_ms_p50": 2.8, "step_ms_p90": 2.96}, {"bs": 8, "step_ms_p50": 2.84, "step_ms_p90": 3.11}, {"bs": 12, "step_ms_p50": 2.91, "step_ms_p90": 3.29}, {"bs": 16, "step_ms_p50": 2.96, "step_ms_p90": 3.47}, {"bs": 20, "step_ms_p50": 3.23, "step_ms_p90": 4.0}, {"bs": 24, "step_ms_p50": 3.14, "step_ms_p90": 3.86}, {"bs": 32, "step_ms_p50": 3.26, "step_ms_p90": 4.06}]}
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 39: 1426872 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+graph=True prefill lines: 0  total prefill lines: 171
+=== base 10:00:49 
+ready=1 after ~65s
+correctness rc=0
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 39: 1428279 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+graph=True prefill lines: 0  total prefill lines: 41
+SUMMARY {"n": 13, "first_token_same": 13, "all_tokens_identical": 13, "max_first_top5_lp_diff": 0, "max_lp_diff_common_prefix": 0.0}
+SUMMARY {"n": 13, "first_token_same": 13, "all_tokens_identical": 13, "max_first_top5_lp_diff": 0, "max_lp_diff_common_prefix": 0.0}
+ALLDONE
+DONE rc=0

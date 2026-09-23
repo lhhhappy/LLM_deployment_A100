@@ -1,0 +1,12 @@
+{"tag": "P=0 c=100", "n_in": 100, "cached": 0}
+{"tag": "P=0 c=1000", "n_in": 1000, "cached": 0}
+{"tag": "P=0 c=3000", "n_in": 3000, "cached": 0}
+{"tag": "P=20000 c=100", "n_in": 20100, "cached": 19968}
+{"tag": "P=20000 c=1000", "n_in": 21000, "cached": 19968}
+{"tag": "P=20000 c=3000", "n_in": 23000, "cached": 19968}
+{"tag": "P=100000 c=100", "n_in": 100100, "cached": 99968}
+{"tag": "P=100000 c=1000", "n_in": 101000, "cached": 99968}
+{"tag": "P=100000 c=3000", "n_in": 103000, "cached": 99968}
+{"tag": "mixA P=20000 c=500", "n_in": 20500, "cached": 19968}
+{"tag": "mixB cold 1500", "n_in": 1500, "cached": 0}
+DONE /sjtu/linhang/arena/runs/T52/eager170_s/correctness.json

@@ -1,0 +1,66 @@
+roots 'scheduler.py\\(4115\\): run_batch|scheduler.py\\(4459\\): process_batch_result|scheduler.py\\(3591\\): get_new_batch_prefill': n=1169 total=98.42 ms; python frames=34493
+-- top python self time --
+    3.18 ms x1165   sglang/srt/managers/scheduler.py(3618): _get_new_batch_prefill_raw
+    3.13 ms x320    <built-in method empty of type object at 0x7fa568df4f20>
+    3.07 ms x46     <built-in function linear>
+    2.63 ms x1165   sglang/srt/managers/scheduler.py(3591): get_new_batch_prefill
+    2.06 ms x67     triton/runtime/jit.py(708): run
+    1.83 ms x67     <built-in function launch>
+    1.74 ms x20     <built-in method cat of type object at 0x7fa568df4f20>
+    1.70 ms x235    <built-in method view of Tensor object at 0x7fa1684664e0>
+    1.60 ms x50     tvm_ffi/module.py(296): __call__
+    1.52 ms x6      sglang/srt/layers/attention/linear/kda_backend.py(710): forward_extend
+    1.39 ms x27     <built-in method zeros of type object at 0x7fa568df4f20>
+    1.37 ms x68     <built-in method to of Tensor object at 0x7fa16847a940>
+    1.19 ms x16     sglang/kernels/ops/moe/moe_wna16_marlin.py(42): moe_wna16_marlin_gemm
+    1.18 ms x50     tilelang/jit/adapter/tvm_ffi.py(234): func
+    1.13 ms x80     <built-in method empty_like of type object at 0x7fa568df4f20>
+    0.99 ms x8      sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py(134): fused_marlin_moe
+    0.96 ms x3242   <built-in function len>
+    0.95 ms x64     tvm/runtime/script_printer.py(109): _script
+    0.94 ms x48     tilelang/language/eager/builder.py(1074): _parse_phase2_key
+    0.86 ms x24     triton/runtime/autotuner.py(212): run
+    0.86 ms x16     sglang/kernels/ops/layernorm/mhc.py(955): mhc_pre
+    0.85 ms x48     tilelang/language/eager/builder.py(1261): _bind_fast
+    0.83 ms x6      sglang/srt/layers/attention/hybrid_linear_attn_backend.py(857): _track_mamba_state_extend
+    0.80 ms x49     <built-in method contiguous of Tensor object at 0x7fa168465bd0>
+    0.75 ms x67     <string>(2): dynamic_func
+    0.73 ms x2518   <built-in function isinstance>
+    0.73 ms x288    tvm_ffi/container.py(505): __iter__
+    0.73 ms x8      <built-in method mm of type object at 0x7fa568df4f20>
+    0.72 ms x126    torch/nn/modules/module.py(1782): _call_impl
+    0.71 ms x1165   sglang/srt/constrained/grammar_manager.py(69): has_waiting_grammars
+-- python self time by group --
+   38.52 ms  39.1%  sglang python
+   34.92 ms  35.5%  builtin C calls (torch ops, launch, pybind)
+    8.89 ms   9.0%  tilelang/tvm eager dispatch
+    5.67 ms   5.8%  other
+    5.45 ms   5.5%  triton launcher (triton/*)
+    4.08 ms   4.1%  torch python (nn.Module etc.)
+    0.88 ms   0.9%  torch.compile/dynamo wrappers
+-- top cpu_op / runtime inclusive (note: cpu_ops nest) --
+    7.52 ms x8      cpu_op       sglang::fused_marlin_moe
+    3.56 ms x363    cuda_runtime cudaLaunchKernel
+    2.97 ms x55     cpu_op       aten::mm
+    2.82 ms x46     cpu_op       aten::linear
+    2.78 ms x451    cpu_op       aten::empty
+    2.50 ms x125    cpu_op       aten::copy_
+    2.41 ms x47     cpu_op       aten::matmul
+    2.29 ms x153    cpu_op       aten::to
+    2.11 ms x68     cpu_op       aten::_to_copy
+    1.71 ms x24     cpu_op       aten::cat
+    1.61 ms x89     cuda_runtime cudaMemcpyAsync
+    1.56 ms x34     cpu_op       aten::index
+    1.39 ms x6      cpu_op       LayerNormGatedFunction
+    1.29 ms x6      cpu_op       sglang::apply_fp8_marlin_linear
+    1.16 ms x152    cpu_op       aten::empty_strided
+    1.13 ms x27     cpu_op       aten::zeros
+    0.98 ms x99     cpu_op       aten::empty_like
+    0.97 ms x416    cpu_op       aten::view
+    0.80 ms x44     cpu_op       aten::fill_
+    0.79 ms x21     cpu_op       aten::clone
+    0.72 ms x67     cuda_driver  cuLaunchKernelEx
+    0.69 ms x29     cpu_op       aten::zero_
+    0.68 ms x56     cuda_driver  cuLaunchKernel
+    0.67 ms x18     cpu_op       aten::contiguous
+    0.66 ms x20     cpu_op       aten::index_put_

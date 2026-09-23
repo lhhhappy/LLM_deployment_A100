@@ -1,0 +1,284 @@
+{
+ "trace": "/sjtu/linhang/arena/runs/T51/prof/P98304_c1024_nostack/P98304_nostack-1790157074.7978766-TP-0.trace.json.gz",
+ "cpu_annotations_ms": {
+  "scheduler.run_batch": 54.63,
+  "step[EXTEND bs=1 toks=1024]": 49.84,
+  "sglang.vlm.language_model_prefill": 43.64,
+  "copy_result_to_cpu": 0.3,
+  "step[DECODE bs=1]": 2.38,
+  "scheduler.process_batch_result": 4.25
+ },
+ "gpu_span_ms": 49.9,
+ "kernel_sum_ms": 18.38,
+ "gpu_idle_ms": 31.52,
+ "idle_cpu_starved_ms": 31.38,
+ "idle_other_ms": 0.14,
+ "n_kernels": 504,
+ "n_memcpy": 45,
+ "n_memset": 0,
+ "gaps_hist": {
+  "<5us": 173,
+  "5-20us": 23,
+  "20-100us": 226,
+  "0.1-1ms": 126,
+  ">=1ms": 0
+ },
+ "gaps_sum_by_bucket_ms": {
+  "<5us": 0.22,
+  "5-20us": 0.31,
+  "20-100us": 10.27,
+  "0.1-1ms": 20.72,
+  ">=1ms": 0.0
+ },
+ "biggest_gaps": [
+  {
+   "us": 445,
+   "after": "_kpool_assemble_softmax_rotate_write_cache_kernel",
+   "before": "triton_poi_fused__to_copy_0",
+   "cpu_starved": true
+  },
+  {
+   "us": 435,
+   "after": "Memcpy DtoH (Device -> Pageable)",
+   "before": "Memcpy HtoD (Pageable -> Device)",
+   "cpu_starved": true
+  },
+  {
+   "us": 342,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 331,
+   "after": "_kpool_assemble_softmax_rotate_write_cache_kernel",
+   "before": "triton_poi_fused__to_copy_0",
+   "cpu_starved": true
+  },
+  {
+   "us": 330,
+   "after": "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 287,
+   "after": "_router_triton_kernel",
+   "before": "void at::native::vectorized_elementwise_kernel<4, at::native",
+   "cpu_starved": true
+  },
+  {
+   "us": 258,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 254,
+   "after": "Memcpy DtoH (Device -> Pageable)",
+   "before": "Memcpy HtoD (Pinned -> Device)",
+   "cpu_starved": true
+  },
+  {
+   "us": 246,
+   "after": "void cublasLt::splitKreduce_kernel<32, 16, int, float, float",
+   "before": "_router_triton_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 241,
+   "after": "void at::native::(anonymous namespace)::multi_tensor_apply_k",
+   "before": "void at::native::vectorized_elementwise_kernel<2, at::native",
+   "cpu_starved": true
+  },
+  {
+   "us": 216,
+   "after": "void at::native::index_elementwise_kernel<128, 4, at::native",
+   "before": "void at::native::vectorized_gather_kernel<16, long>(char*, c",
+   "cpu_starved": true
+  },
+  {
+   "us": 214,
+   "after": "_router_triton_kernel",
+   "before": "void at::native::vectorized_elementwise_kernel<4, at::native",
+   "cpu_starved": true
+  }
+ ],
+ "runtime_calls": {
+  "cudaLaunchKernel": {
+   "n": 322,
+   "ms": 2.78
+  },
+  "cuLaunchKernelEx": {
+   "n": 72,
+   "ms": 0.63
+  },
+  "cudaMemcpyAsync": {
+   "n": 45,
+   "ms": 0.62
+  },
+  "cuLaunchKernel": {
+   "n": 60,
+   "ms": 0.61
+  },
+  "cudaLaunchKernelExC": {
+   "n": 50,
+   "ms": 0.43
+  },
+  "cudaStreamSynchronize": {
+   "n": 28,
+   "ms": 0.22
+  },
+  "cudaFuncGetAttributes": {
+   "n": 32,
+   "ms": 0.15
+  },
+  "cudaEventQuery": {
+   "n": 16,
+   "ms": 0.09
+  },
+  "cudaFuncSetAttribute": {
+   "n": 22,
+   "ms": 0.07
+  },
+  "cudaOccupancyMaxActiveBlocksPerMultiprocessor": {
+   "n": 16,
+   "ms": 0.06
+  },
+  "cudaDeviceGetAttribute": {
+   "n": 56,
+   "ms": 0.05
+  },
+  "cudaStreamIsCapturing": {
+   "n": 48,
+   "ms": 0.03
+  }
+ },
+ "host_first_launch_to_gpu_end_ms": 49.88,
+ "top_kernels": [
+  {
+   "ms": 4.134,
+   "n": 16,
+   "comp": "moe",
+   "name": "void sglang::device::marlin_moe::Marlin"
+  },
+  {
+   "ms": 3.215,
+   "n": 2,
+   "comp": "dsa_indexer",
+   "name": "_prefill"
+  },
+  {
+   "ms": 2.589,
+   "n": 2,
+   "comp": "dsa_sparse_attn",
+   "name": "main_kernel"
+  },
+  {
+   "ms": 0.711,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel"
+  },
+  {
+   "ms": 0.642,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_post_tilelang_kernel"
+  },
+  {
+   "ms": 0.624,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_64x3_tn"
+  },
+  {
+   "ms": 0.592,
+   "n": 2,
+   "comp": "dsa_indexer",
+   "name": "void sglang::(anonymous namespace)::kpool_topk_transform_kernel"
+  },
+  {
+   "ms": 0.571,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_big_fuse_with_norm_tilelang_kernel"
+  },
+  {
+   "ms": 0.538,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "void sglang::device::marlin::Marlin"
+  },
+  {
+   "ms": 0.53,
+   "n": 8,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_32x3_tn"
+  },
+  {
+   "ms": 0.529,
+   "n": 85,
+   "comp": "norm_elementwise",
+   "name": "void at::native::vectorized_elementwise_kernel"
+  },
+  {
+   "ms": 0.43,
+   "n": 8,
+   "comp": "moe",
+   "name": "void moe_sum_reduce_warp_per_token_vec_kernel"
+  },
+  {
+   "ms": 0.423,
+   "n": 6,
+   "comp": "kda",
+   "name": "chunk_kda_fwd_kernel_inter_solve_fused"
+  },
+  {
+   "ms": 0.406,
+   "n": 36,
+   "comp": "norm_elementwise",
+   "name": "void at::native::elementwise_kernel"
+  },
+  {
+   "ms": 0.226,
+   "n": 38,
+   "comp": "norm_elementwise",
+   "name": "void at::native::index_elementwise_kernel"
+  }
+ ],
+ "components": {
+  "moe": {
+   "ms": 4.68,
+   "n": 40
+  },
+  "dsa_indexer": {
+   "ms": 3.88,
+   "n": 13
+  },
+  "dsa_sparse_attn": {
+   "ms": 2.62,
+   "n": 9
+  },
+  "dense_gemm": {
+   "ms": 2.58,
+   "n": 102
+  },
+  "mhc": {
+   "ms": 1.92,
+   "n": 48
+  },
+  "norm_elementwise": {
+   "ms": 1.65,
+   "n": 268
+  },
+  "kda": {
+   "ms": 0.87,
+   "n": 36
+  },
+  "other": {
+   "ms": 0.16,
+   "n": 33
+  }
+ }
+}

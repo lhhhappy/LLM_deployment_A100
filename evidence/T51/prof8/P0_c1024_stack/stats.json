@@ -1,0 +1,511 @@
+{
+ "trace": "/sjtu/linhang/arena/runs/T51/prof/P0_c1024_stack/P0_stack-1790157114.4047387-TP-0.trace.json.gz",
+ "cpu_annotations_ms": {
+  "scheduler.run_batch": 80.16,
+  "step[EXTEND bs=1 toks=1024]": 73.1,
+  "sglang.vlm.language_model_prefill": 65.15,
+  "copy_result_to_cpu": 0.47,
+  "step[DECODE bs=1]": 3.17,
+  "scheduler.process_batch_result": 4.86
+ },
+ "gpu_span_ms": 72.71,
+ "kernel_sum_ms": 16.73,
+ "gpu_idle_ms": 55.98,
+ "idle_cpu_starved_ms": 55.81,
+ "idle_other_ms": 0.17,
+ "n_kernels": 479,
+ "n_memcpy": 45,
+ "n_memset": 0,
+ "gaps_hist": {
+  "<5us": 116,
+  "5-20us": 18,
+  "20-100us": 188,
+  "0.1-1ms": 201,
+  ">=1ms": 0
+ },
+ "gaps_sum_by_bucket_ms": {
+  "<5us": 0.17,
+  "5-20us": 0.25,
+  "20-100us": 8.5,
+  "0.1-1ms": 47.06,
+  ">=1ms": 0.0
+ },
+ "biggest_gaps": [
+  {
+   "us": 760,
+   "after": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_",
+   "before": "main_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 738,
+   "after": "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 713,
+   "after": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_",
+   "before": "main_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 566,
+   "after": "_router_triton_kernel",
+   "before": "void at::native::vectorized_elementwise_kernel<4, at::native",
+   "cpu_starved": true
+  },
+  {
+   "us": 550,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 485,
+   "after": "Memcpy DtoH (Device -> Pageable)",
+   "before": "Memcpy HtoD (Pageable -> Device)",
+   "cpu_starved": true
+  },
+  {
+   "us": 464,
+   "after": "void cublasLt::splitKreduce_kernel<32, 16, int, float, float",
+   "before": "_router_triton_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 454,
+   "after": "void at::native::index_elementwise_kernel<128, 4, at::native",
+   "before": "void at::native::vectorized_gather_kernel<16, long>(char*, c",
+   "cpu_starved": true
+  },
+  {
+   "us": 428,
+   "after": "ampere_bf16_s16816gemm_bf16_128x64_ldg8_f2f_stages_64x3_tn",
+   "before": "set_mla_kv_buffer_kernel_norope",
+   "cpu_starved": true
+  },
+  {
+   "us": 426,
+   "after": "mhc_pre_big_fuse_with_norm_tilelang_kernel",
+   "before": "void sglang::device::marlin::Marlin<__nv_bfloat16, 281474976",
+   "cpu_starved": true
+  },
+  {
+   "us": 406,
+   "after": "mhc_post_tilelang_kernel",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  },
+  {
+   "us": 404,
+   "after": "mhc_post_tilelang_kernel",
+   "before": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel",
+   "cpu_starved": true
+  }
+ ],
+ "runtime_calls": {
+  "cudaLaunchKernel": {
+   "n": 317,
+   "ms": 3.09
+  },
+  "cuLaunchKernel": {
+   "n": 56,
+   "ms": 0.68
+  },
+  "cuLaunchKernelEx": {
+   "n": 62,
+   "ms": 0.66
+  },
+  "cudaMemcpyAsync": {
+   "n": 45,
+   "ms": 0.64
+  },
+  "cudaLaunchKernelExC": {
+   "n": 44,
+   "ms": 0.39
+  },
+  "cudaStreamSynchronize": {
+   "n": 29,
+   "ms": 0.25
+  },
+  "cudaFuncGetAttributes": {
+   "n": 32,
+   "ms": 0.15
+  },
+  "cudaEventQuery": {
+   "n": 17,
+   "ms": 0.09
+  },
+  "cudaFuncSetAttribute": {
+   "n": 22,
+   "ms": 0.08
+  },
+  "cudaOccupancyMaxActiveBlocksPerMultiprocessor": {
+   "n": 14,
+   "ms": 0.06
+  },
+  "cudaDeviceGetAttribute": {
+   "n": 55,
+   "ms": 0.05
+  },
+  "cudaStreamIsCapturing": {
+   "n": 49,
+   "ms": 0.04
+  }
+ },
+ "host_first_launch_to_gpu_end_ms": 72.72,
+ "top_kernels": [
+  {
+   "ms": 5.042,
+   "n": 16,
+   "comp": "moe",
+   "name": "void sglang::device::marlin_moe::Marlin"
+  },
+  {
+   "ms": 2.964,
+   "n": 2,
+   "comp": "dsa_sparse_attn",
+   "name": "main_kernel"
+  },
+  {
+   "ms": 0.856,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel"
+  },
+  {
+   "ms": 0.763,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_64x3_tn"
+  },
+  {
+   "ms": 0.674,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_post_tilelang_kernel"
+  },
+  {
+   "ms": 0.669,
+   "n": 16,
+   "comp": "mhc",
+   "name": "mhc_pre_big_fuse_with_norm_tilelang_kernel"
+  },
+  {
+   "ms": 0.655,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "void sglang::device::marlin::Marlin"
+  },
+  {
+   "ms": 0.613,
+   "n": 88,
+   "comp": "norm_elementwise",
+   "name": "void at::native::vectorized_elementwise_kernel"
+  },
+  {
+   "ms": 0.51,
+   "n": 6,
+   "comp": "kda",
+   "name": "chunk_kda_fwd_kernel_inter_solve_fused"
+  },
+  {
+   "ms": 0.487,
+   "n": 36,
+   "comp": "norm_elementwise",
+   "name": "void at::native::elementwise_kernel"
+  },
+  {
+   "ms": 0.443,
+   "n": 6,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_32x3_tn"
+  },
+  {
+   "ms": 0.443,
+   "n": 8,
+   "comp": "moe",
+   "name": "void moe_sum_reduce_warp_per_token_vec_kernel"
+  },
+  {
+   "ms": 0.248,
+   "n": 16,
+   "comp": "dense_gemm",
+   "name": "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_64x3_tn"
+  },
+  {
+   "ms": 0.231,
+   "n": 6,
+   "comp": "kda",
+   "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64"
+  },
+  {
+   "ms": 0.216,
+   "n": 32,
+   "comp": "norm_elementwise",
+   "name": "void at::native::index_elementwise_kernel"
+  }
+ ],
+ "components": {
+  "moe": {
+   "ms": 5.63,
+   "n": 40
+  },
+  "dsa_sparse_attn": {
+   "ms": 3.01,
+   "n": 9
+  },
+  "dense_gemm": {
+   "ms": 2.85,
+   "n": 96
+  },
+  "mhc": {
+   "ms": 2.2,
+   "n": 48
+  },
+  "norm_elementwise": {
+   "ms": 1.84,
+   "n": 262
+  },
+  "kda": {
+   "ms": 1.05,
+   "n": 36
+  },
+  "other": {
+   "ms": 0.12,
+   "n": 28
+  },
+  "dsa_indexer": {
+   "ms": 0.04,
+   "n": 5
+  }
+ },
+ "py_inclusive": [
+  {
+   "ms": 901.25,
+   "n": 1,
+   "fn": "sglang/srt/managers/scheduler.py(1939): event_loop_overlap"
+  },
+  {
+   "ms": 218.37,
+   "n": 1165,
+   "fn": "sglang/srt/managers/scheduler.py(842): publish_load_snapshot"
+  },
+  {
+   "ms": 103.72,
+   "n": 4656,
+   "fn": "sglang/srt/managers/scheduler_components/pool_stats_observer.py(245): _get_mamba_token_info"
+  },
+  {
+   "ms": 97.55,
+   "n": 1166,
+   "fn": "sglang/srt/managers/scheduler.py(3418): get_next_batch_to_run"
+  },
+  {
+   "ms": 87.86,
+   "n": 1166,
+   "fn": "sglang/srt/managers/scheduler_components/request_receiver.py(81): recv_requests"
+  },
+  {
+   "ms": 80.07,
+   "n": 2,
+   "fn": "sglang/srt/managers/scheduler.py(4115): run_batch"
+  },
+  {
+   "ms": 77.86,
+   "n": 2,
+   "fn": "sglang/srt/managers/tp_worker.py(593): forward_batch_generation"
+  },
+  {
+   "ms": 76.47,
+   "n": 2,
+   "fn": "sglang/srt/model_executor/model_runner.py(1568): forward"
+  },
+  {
+   "ms": 76.1,
+   "n": 2,
+   "fn": "sglang/srt/model_executor/model_runner.py(1712): _forward_raw"
+  },
+  {
+   "ms": 72.53,
+   "n": 1,
+   "fn": "sglang/srt/model_executor/runner/eager_runner.py(272): _execute_extend"
+  },
+  {
+   "ms": 66.2,
+   "n": 1,
+   "fn": "sglang/srt/models/glm5_next.py(1520): forward"
+  },
+  {
+   "ms": 65.06,
+   "n": 1,
+   "fn": "sglang/srt/models/glm5_next.py(1078): forward"
+  },
+  {
+   "ms": 64.04,
+   "n": 8,
+   "fn": "sglang/srt/models/glm5_next.py(830): forward"
+  },
+  {
+   "ms": 44.37,
+   "n": 1164,
+   "fn": "sglang/srt/managers/load_snapshot.py(344): write"
+  },
+  {
+   "ms": 31.28,
+   "n": 4664,
+   "fn": "sglang/srt/mem_cache/allocator/base.py(90): available_size"
+  },
+  {
+   "ms": 25.39,
+   "n": 1164,
+   "fn": "sglang/srt/managers/load_snapshot.py(353): _write_payload"
+  },
+  {
+   "ms": 22.04,
+   "n": 6,
+   "fn": "sglang/srt/models/glm5_next.py(562): forward"
+  },
+  {
+   "ms": 13.65,
+   "n": 1163,
+   "fn": "sglang/srt/managers/scheduler_components/invariant_checker.py(161): _check_mamba_pool"
+  },
+  {
+   "ms": 13.6,
+   "n": 1165,
+   "fn": "sglang/srt/managers/scheduler.py(3591): get_new_batch_prefill"
+  },
+  {
+   "ms": 12.88,
+   "n": 4657,
+   "fn": "sglang/srt/mem_cache/allocator/mamba.py(48): available_size"
+  },
+  {
+   "ms": 12.88,
+   "n": 4657,
+   "fn": "sglang/srt/mem_cache/allocator/mamba.py(48): available_size"
+  },
+  {
+   "ms": 10.97,
+   "n": 1165,
+   "fn": "sglang/srt/managers/scheduler.py(3618): _get_new_batch_prefill_raw"
+  },
+  {
+   "ms": 6.95,
+   "n": 1166,
+   "fn": "sglang/srt/managers/scheduler.py(2044): process_input_requests"
+  },
+  {
+   "ms": 6.56,
+   "n": 1163,
+   "fn": "sglang/srt/managers/scheduler_components/pool_stats_observer.py(195): session_held_mamba_slots"
+  },
+  {
+   "ms": 5.95,
+   "n": 4656,
+   "fn": "sglang/srt/mem_cache/unified_radix_cache.py(2996): mamba_evictable_size"
+  },
+  {
+   "ms": 5.55,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/hybrid_linear_attn_backend.py(1103): init_forward_metadata"
+  },
+  {
+   "ms": 4.75,
+   "n": 2,
+   "fn": "sglang/srt/managers/scheduler.py(4459): process_batch_result"
+  },
+  {
+   "ms": 4.34,
+   "n": 1164,
+   "fn": "sglang/srt/managers/load_snapshot.py(285): file_lock"
+  },
+  {
+   "ms": 4.0,
+   "n": 1,
+   "fn": "sglang/srt/managers/scheduler_components/batch_result_processor.py(240): process_batch_result_prefill"
+  },
+  {
+   "ms": 3.72,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/dsa_backend.py(1258): init_forward_metadata"
+  },
+  {
+   "ms": 3.65,
+   "n": 1164,
+   "fn": "sglang/srt/managers/load_snapshot.py(262): _enc_hook"
+  },
+  {
+   "ms": 3.5,
+   "n": 4656,
+   "fn": "sglang/srt/mem_cache/unified_cache/unified_tree_core.py(2546): mamba_evictable_size"
+  },
+  {
+   "ms": 3.37,
+   "n": 1,
+   "fn": "sglang/srt/managers/schedule_batch.py(2514): prepare_for_extend"
+  },
+  {
+   "ms": 1.92,
+   "n": 1,
+   "fn": "sglang/srt/mem_cache/allocation.py(282): alloc_for_extend"
+  },
+  {
+   "ms": 1.91,
+   "n": 1163,
+   "fn": "sglang/srt/mem_cache/unified_radix_cache.py(2978): session_held_mamba_slots"
+  },
+  {
+   "ms": 1.91,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/hybrid_linear_attn_backend.py(1064): init_forward_metadata_out_graph"
+  },
+  {
+   "ms": 1.8,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/linear/kda_backend.py(534): init_forward_metadata"
+  },
+  {
+   "ms": 1.79,
+   "n": 1164,
+   "fn": "sglang/srt/managers/load_snapshot.py(289): file_lock"
+  },
+  {
+   "ms": 1.64,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/dsa_backend.py(1239): init_forward_metadata_out_graph"
+  },
+  {
+   "ms": 1.62,
+   "n": 1,
+   "fn": "sglang/srt/layers/attention/hybrid_linear_attn_backend.py(306): init_forward_metadata"
+  },
+  {
+   "ms": 1.55,
+   "n": 1163,
+   "fn": "sglang/srt/mem_cache/unified_radix_cache.py(3002): mamba_protected_size"
+  },
+  {
+   "ms": 1.32,
+   "n": 6,
+   "fn": "sglang/kernels/ops/mamba/causal_conv1d_triton.py(388): causal_conv1d_fn"
+  },
+  {
+   "ms": 1.31,
+   "n": 6987,
+   "fn": "sglang/srt/mem_cache/unified_radix_cache.py(2944): supports_mamba"
+  },
+  {
+   "ms": 1.12,
+   "n": 1,
+   "fn": "sglang/srt/mem_cache/allocator/mamba.py(66): alloc_group_end"
+  },
+  {
+   "ms": 1.12,
+   "n": 1,
+   "fn": "sglang/srt/mem_cache/allocator/mamba.py(66): alloc_group_end"
+  }
+ ]
+}

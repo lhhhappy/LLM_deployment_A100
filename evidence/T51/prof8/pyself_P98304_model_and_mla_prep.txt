@@ -1,0 +1,61 @@
+roots 'glm5_next.py\\(1078\\): forward': n=1 total=70.04 ms; python frames=21354
+-- top python self time --
+    3.14 ms x316    <built-in method empty of type object at 0x7fa568df4f20>
+    3.09 ms x48     <built-in function linear>
+    2.35 ms x70     triton/runtime/jit.py(708): run
+    1.80 ms x70     <built-in function launch>
+    1.74 ms x248    <built-in method view of Tensor object at 0x7fa16847a620>
+    1.60 ms x50     tvm_ffi/module.py(296): __call__
+    1.51 ms x6      sglang/srt/layers/attention/linear/kda_backend.py(710): forward_extend
+    1.21 ms x16     sglang/kernels/ops/moe/moe_wna16_marlin.py(42): moe_wna16_marlin_gemm
+    1.21 ms x23     <built-in method zeros of type object at 0x7fa568df4f20>
+    1.13 ms x83     <built-in method empty_like of type object at 0x7fa568df4f20>
+    1.06 ms x50     tilelang/jit/adapter/tvm_ffi.py(234): func
+    1.01 ms x16     sglang/kernels/ops/layernorm/mhc.py(955): mhc_pre
+    1.00 ms x8      sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py(134): fused_marlin_moe
+    0.96 ms x64     tvm/runtime/script_printer.py(109): _script
+    0.92 ms x48     tilelang/language/eager/builder.py(1074): _parse_phase2_key
+    0.89 ms x10     <built-in method mm of type object at 0x7fa568df4f20>
+    0.86 ms x48     tilelang/language/eager/builder.py(1261): _bind_fast
+    0.85 ms x24     triton/runtime/autotuner.py(212): run
+    0.83 ms x54     <built-in method contiguous of Tensor object at 0x7fa1686c1950>
+    0.81 ms x70     <string>(2): dynamic_func
+    0.81 ms x6      sglang/srt/layers/attention/hybrid_linear_attn_backend.py(857): _track_mamba_state_extend
+    0.74 ms x10     torch/_dynamo/eval_frame.py(1076): compile_wrapper
+    0.70 ms x288    tvm_ffi/container.py(505): __iter__
+    0.66 ms x2442   <built-in function isinstance>
+    0.64 ms x123    torch/nn/modules/module.py(1782): _call_impl
+    0.62 ms x74     <built-in method reshape of Tensor object at 0x7fa1686c3a20>
+    0.61 ms x676    <built-in function native_specialize_impl>
+    0.60 ms x8      sglang/srt/models/glm5_next.py(830): forward
+    0.59 ms x514    torch/nn/modules/module.py(1954): __getattr__
+    0.55 ms x50     tilelang/jit/__init__.py(495): __call__
+    0.52 ms x16     <built-in method clamp of type object at 0x7fa568df4f20>
+    0.51 ms x8      sglang/srt/models/deepseek_v2.py(1069): forward_normal
+    0.51 ms x8      <built-in method fused_marlin_moe of pybind11_builtins.pybind11_detail_function_record_v1_system_libstdcpp_gxx
+    0.50 ms x16     <built-in method  of pybind11_builtins.pybind11_detail_function_record_v1_system_libstdcpp_gxx_abi_1xxx_use_cx
+    0.49 ms x70     triton/runtime/jit.py(370): <lambda>
+    0.47 ms x1      sglang/srt/models/glm5_next.py(1078): forward
+    0.46 ms x8      sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py(106): swiglu_limit_func
+    0.44 ms x60     triton/runtime/jit.py(1109): __call__
+    0.43 ms x224    tilelang/language/eager/builder.py(1116): _freeze_jit_key_part
+    0.39 ms x48     tilelang/language/eager/builder.py(1437): parse_args
+    0.39 ms x40     torch/_dynamo/eval_frame.py(1423): _fn
+    0.39 ms x6      sglang/kernels/ops/quantization/gptq_marlin.py(35): gptq_marlin_gemm
+    0.37 ms x8      sglang/kernels/ops/moe/moe_fused_gate.py(254): moe_fused_gate
+    0.37 ms x49     torch/cuda/_utils.py(557): _get_device_index
+    0.35 ms x6      sglang/srt/models/glm5_next.py(521): forward_qkvbfg
+-- top cpu_op / runtime inclusive (note: cpu_ops nest) --
+    7.38 ms x8      cpu_op       sglang::fused_marlin_moe
+    3.10 ms x58     cpu_op       aten::mm
+roots matching 'forward_mla.py\\(279\\): forward_absorb_prep': 2, total 10.63 ms
+   10.63 ms/call-of-root  x2.0   sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py(279): forward_absorb_prep
+-- children (normalized per root call) --
+      2.33 ms/call-of-root  x0.5   nn.Module: IndexerKPool_0
+          2.33 ms/call-of-root  x0.5   torch/nn/modules/module.py(1782): _call_impl
+      1.52 ms/call-of-root  x0.5   nn.Module: IndexerKPool_1
+          1.52 ms/call-of-root  x0.5   torch/nn/modules/module.py(1782): _call_impl
+      0.31 ms/call-of-root  x1.0   sglang/srt/layers/communicator.py(345): fetch_qkv_latent
+          0.31 ms/call-of-root  x1.0   sglang/srt/layers/communicator.py(271): fetch_qkv_latent
+      0.25 ms/call-of-root  x1.0   sglang/srt/models/deepseek_v2.py(2272): q_b_proj_forward
+      0.25 ms/call-of-root  x1.0   <built-in method bmm of type object at 0x7fa568df4f20>

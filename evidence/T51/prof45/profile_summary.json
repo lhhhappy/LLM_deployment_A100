@@ -1,0 +1,58 @@
+[
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   214.3,
+   98304
+  ]
+ },
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   211.7,
+   98304
+  ]
+ },
+ {
+  "P": 98304,
+  "c": 1024,
+  "mode": "nostack",
+  "ms_cached": [
+   278.3,
+   98304
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof45/P98304_c1024_nostack"
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   213.6,
+   0
+  ]
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "plain",
+  "ms_cached": [
+   211.2,
+   0
+  ]
+ },
+ {
+  "P": 0,
+  "c": 1024,
+  "mode": "nostack",
+  "ms_cached": [
+   259.3,
+   0
+  ],
+  "dir": "/sjtu/linhang/arena/runs/T51/prof45/P0_c1024_nostack"
+ }
+]

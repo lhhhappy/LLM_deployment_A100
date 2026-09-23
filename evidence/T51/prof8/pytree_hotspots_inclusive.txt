@@ -1,0 +1,11 @@
+roots matching 'tilelang/jit/__init__.py\\(495\\): __call__': 50, total 8.57 ms
+roots matching 'triton/runtime/jit.py\\(708\\): run': 78, total 8.73 ms
+roots matching 'eval_frame.py\\(1076\\): compile_wrapper': 10, total 3.02 ms
+roots matching 'glm5_next.py\\(793\\): hc_attn_pre': 8, total 4.96 ms
+roots matching 'communicator_mhc.py\\(95\\): attn_to_mlp': 8, total 7.15 ms
+roots matching 'communicator_mhc.py\\(108\\): mlp_combine': 8, total 2.45 ms
+roots matching 'kda_backend.py\\(710\\): forward_extend': 6, total 14.94 ms
+roots matching 'deepseek_v2.py\\(1069\\): forward_normal': 8, total 15.98 ms
+roots matching 'dsa_indexer_kpool.py.*: forward$': 0, total 0.00 ms
+roots matching 'forward_mla.py\\(672\\): forward_absorb_core': 2, total 3.67 ms
+roots matching 'glm5_next.py\\(1078\\): forward': 1, total 70.04 ms

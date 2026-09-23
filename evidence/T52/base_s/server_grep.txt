@@ -1,0 +1,20 @@
+[2026-09-23 10:16:17] Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.
+[2026-09-23 10:16:39] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-23 10:16:40] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-23 10:16:40] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-23 10:16:40] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-23 10:16:40] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-23 10:16:40] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-23 10:16:41] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-23 10:16:41] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-23 10:16:51] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-23 10:16:51] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-23 10:16:53] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-23 10:16:53] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256], avail mem=14.99 GB
+[2026-09-23 10:17:03] Capture target decode CUDA graph end. elapsed=10.17 s, mem usage=0.40 GB, avail mem=14.59 GB.
+Traceback (most recent call last):
+ConnectionRefusedError: [Errno 111] Connection refused
+Traceback (most recent call last):
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f298ac1ec90>: Failed to establish a new connection: [Errno 111] Connection refused
+Traceback (most recent call last):

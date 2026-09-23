@@ -1,0 +1,22 @@
+trees built (fuzz=0)
+=== eager170 10:19:12 --cuda-graph-backend-prefill disabled
+ready=1 after ~65s
+correctness rc=0
+graph=True prefill lines: 0  total prefill lines: 41
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/T52/kit/bcg_compare.py", line 6, in <module>
+    assert [r["tag"] for r in a] == [r["tag"] for r in b], "request lists differ"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: request lists differ
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/T52/kit/bcg_compare.py", line 6, in <module>
+    assert [r["tag"] for r in a] == [r["tag"] for r in b], "request lists differ"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: request lists differ
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/T52/kit/bcg_compare.py", line 6, in <module>
+    assert [r["tag"] for r in a] == [r["tag"] for r in b], "request lists differ"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: request lists differ
+ALLDONE
+DONE rc=0

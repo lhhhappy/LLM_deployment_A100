@@ -1,0 +1,19 @@
+trees built (fuzz=0)
+=== bcg170 09:49:08 --cuda-graph-backend-prefill breakable
+ready=1 after ~85s
+correctness rc=1
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 37: 1421891 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+chunkcost rc=1
+graph=True prefill lines: 1  total prefill lines: 1
+=== eager170 09:51:45 --cuda-graph-backend-prefill disabled
+ready=1 after ~60s
+correctness rc=1
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 37: 1422990 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+chunkcost rc=1
+graph=True prefill lines: 0  total prefill lines: 0
+=== base 09:53:56 
+/sjtu/linhang/arena/runs/T52/kit/devbox_bcg_check.sh: line 47: 1424126 Killed                  PYTHONPATH=$SRC:/sjtu/linhang/arena/cache/T48/deps setsid $PY -m sglang.launch_server $COMMON $EXTRA > $O/server.log 2>&1
+ready=0 after ~75s
+graph=True prefill lines: 0  total prefill lines: 0
+ALLDONE
+DONE rc=0
