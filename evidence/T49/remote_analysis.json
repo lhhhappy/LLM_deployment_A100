@@ -28,7 +28,36 @@
       "prev_finish": 1790139699.3376424,
       "recv": 1790139701.718136,
       "exec": 1790139710.1802397,
-      "first": 1790139711.5991843
+      "first": 1790139711.5991843,
+      "prev_role_positions_near_cached": [
+        34955,
+        35771
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.1796875,
+      "prev_prompt_sha256_i64_le": "aa68f53f43e283ccbfb1bcd1625760ca1ccd7214a2326f2f975d4c89ae7b9ca6",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 2474,
+          "text": "[2026-09-23 05:01:34 TP0] Prefill batch, #new-seq: 1, #new-token: 6464, #cached-token: 34176, full token usage: 0.04, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1639.38"
+        },
+        {
+          "line": 2475,
+          "text": "[2026-09-23 05:01:35 TP0] Prefill batch, #new-seq: 1, #new-token: 128, #cached-token: 35776, full token usage: 0.05, mamba usage: 0.01, #running-req: 1, #queue-req: 0, #pending-token: 398, cuda graph: False, input throughput (token/s): 828.91"
+        },
+        {
+          "line": 2476,
+          "text": "[2026-09-23 05:01:35 TP0] Prefill batch, #new-seq: 1, #new-token: 448, #cached-token: 0, full token usage: 0.05, mamba usage: 0.01, #running-req: 1, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 96635.05"
+        },
+        {
+          "line": 2479,
+          "text": "[2026-09-23 05:01:35 TP0] Prefill batch, #new-seq: 1, #new-token: 896, #cached-token: 34112, full token usage: 0.05, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 776, cuda graph: False, input throughput (token/s): 1622.03"
+        },
+        {
+          "line": 2480,
+          "text": "[2026-09-23 05:01:35 TP0] Prefill batch, #new-seq: 1, #new-token: 832, #cached-token: 0, full token usage: 0.05, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 183342.46"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:member-v5-subagent-f3fc6c87545e0e2bbe03293e:llm:3",
@@ -58,7 +87,35 @@
       "prev_finish": 1790139714.8330395,
       "recv": 1790139717.6544898,
       "exec": 1790139718.0028284,
-      "first": 1790139718.9169772
+      "first": 1790139718.9169772,
+      "prev_role_positions_near_cached": [
+        40732
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.6015625,
+      "prev_prompt_sha256_i64_le": "38fd69d0aee54fa234bc0fa179c1882229d2d1f372b393436755e55c5c966dd8",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 2511,
+          "text": "[2026-09-23 05:01:49 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.22, mamba usage: 0.02, #running-req: 2, #queue-req: 3, #pending-token: 155011, cuda graph: False, input throughput (token/s): 9733.02"
+        },
+        {
+          "line": 2512,
+          "text": "[2026-09-23 05:01:50 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.24, mamba usage: 0.03, #running-req: 2, #queue-req: 2, #pending-token: 146819, cuda graph: False, input throughput (token/s): 11436.52"
+        },
+        {
+          "line": 2513,
+          "text": "[2026-09-23 05:01:50 TP0] Prefill batch, #new-seq: 2, #new-token: 7232, #cached-token: 45568, full token usage: 0.26, mamba usage: 0.04, #running-req: 2, #queue-req: 0, #pending-token: 94048, cuda graph: False, input throughput (token/s): 9741.17"
+        },
+        {
+          "line": 2514,
+          "text": "[2026-09-23 05:01:51 TP0] Prefill batch, #new-seq: 3, #new-token: 8192, #cached-token: 78144, full token usage: 0.27, mamba usage: 0.04, #running-req: 3, #queue-req: 0, #pending-token: 7789, cuda graph: False, input throughput (token/s): 12061.80"
+        },
+        {
+          "line": 2515,
+          "text": "[2026-09-23 05:01:51 TP0] Prefill batch, #new-seq: 1, #new-token: 7808, #cached-token: 0, full token usage: 0.27, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1522186.90"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:member-v5-subagent-d73e7dcb2b3202895c6291ea:llm:5",
@@ -88,7 +145,21 @@
       "prev_finish": 1790139813.3321342,
       "recv": 1790139817.1418514,
       "exec": 1790139817.2369368,
-      "first": 1790139817.8144622
+      "first": 1790139817.8144622,
+      "prev_role_positions_near_cached": [
+        35909,
+        36704,
+        37373
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.015625,
+      "prev_prompt_sha256_i64_le": "231bb67983a57fca0cc07924e77eb899cdae411e47e10e8b775d29d7b1742246",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 2729,
+          "text": "[2026-09-23 05:03:18 TP0] Prefill batch, #new-seq: 1, #new-token: 4480, #cached-token: 36544, full token usage: 0.07, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1741.76"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:hFjiFiHzQA85d5ESOklT7:llm:5",
@@ -118,7 +189,29 @@
       "prev_finish": 1790139909.135318,
       "recv": 1790139909.777208,
       "exec": 1790139909.8785908,
-      "first": 1790139910.7361305
+      "first": 1790139910.7361305,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 1.0,
+      "prev_prompt_sha256_i64_le": "897a143489b651ce54ee8123536be2731e8ddeeec4ad75f6fe8c375ed6a51ac1",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3004,
+          "text": "[2026-09-23 05:05:02 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 23040, full token usage: 0.09, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 8242, cuda graph: False, input throughput (token/s): 1283.92"
+        },
+        {
+          "line": 3005,
+          "text": "[2026-09-23 05:05:03 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.12, mamba usage: 0.03, #running-req: 2, #queue-req: 0, #pending-token: 50, cuda graph: False, input throughput (token/s): 11846.78"
+        },
+        {
+          "line": 3006,
+          "text": "[2026-09-23 05:05:03 TP0] Prefill batch, #new-seq: 2, #new-token: 8192, #cached-token: 25792, full token usage: 0.13, mamba usage: 0.03, #running-req: 2, #queue-req: 1, #pending-token: 28199, cuda graph: False, input throughput (token/s): 11801.05"
+        },
+        {
+          "line": 3007,
+          "text": "[2026-09-23 05:05:04 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.14, mamba usage: 0.03, #running-req: 3, #queue-req: 1, #pending-token: 55367, cuda graph: False, input throughput (token/s): 11563.39"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:UpZLPgRdVY2zIA0pT9VHm:llm:5",
@@ -148,7 +241,36 @@
       "prev_finish": 1790139943.172329,
       "recv": 1790139944.2069697,
       "exec": 1790139944.3729684,
-      "first": 1790139945.2427554
+      "first": 1790139945.2427554,
+      "prev_role_positions_near_cached": [
+        20820,
+        21480
+      ],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 0.0,
+      "prev_prompt_sha256_i64_le": "ff6566c5ad4b1eaac208dab003fdca9b8c1faf2983119b2d894e6c494f709a1f",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3064,
+          "text": "[2026-09-23 05:05:30 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.15, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 107925, cuda graph: False, input throughput (token/s): 10793.31"
+        },
+        {
+          "line": 3065,
+          "text": "[2026-09-23 05:05:31 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.16, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 99733, cuda graph: False, input throughput (token/s): 10591.49"
+        },
+        {
+          "line": 3066,
+          "text": "[2026-09-23 05:05:31 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.20, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 91541, cuda graph: False, input throughput (token/s): 13127.11"
+        },
+        {
+          "line": 3067,
+          "text": "[2026-09-23 05:05:32 TP0] Prefill batch, #new-seq: 3, #new-token: 7104, #cached-token: 84032, full token usage: 0.20, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 468, cuda graph: False, input throughput (token/s): 45271.21"
+        },
+        {
+          "line": 3068,
+          "text": "[2026-09-23 05:05:32 TP0] Prefill batch, #new-seq: 1, #new-token: 512, #cached-token: 0, full token usage: 0.20, mamba usage: 0.03, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 93769.46"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:8cWp9eyYICLwWN7yD-a7K:llm:2",
@@ -178,7 +300,60 @@
       "prev_finish": 1790139934.3686035,
       "recv": 1790139935.3642375,
       "exec": 1790139935.5793664,
-      "first": 1790139936.5104542
+      "first": 1790139936.5104542,
+      "prev_role_positions_near_cached": [
+        81901,
+        82089,
+        82301,
+        82518,
+        82728,
+        82914,
+        83179,
+        83397,
+        83566,
+        83735
+      ],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 6.0,
+      "prev_prompt_sha256_i64_le": "a1b7ef09e307789c2ebae167f65f27422599fa541367233da35643ac2c06fb88",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3060,
+          "text": "[2026-09-23 05:05:27 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 33664, full token usage: 0.12, mamba usage: 0.02, #running-req: 3, #queue-req: 1, #pending-token: 49289, cuda graph: False, input throughput (token/s): 2955.24"
+        },
+        {
+          "line": 3061,
+          "text": "[2026-09-23 05:05:28 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.13, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 68993, cuda graph: False, input throughput (token/s): 11363.68"
+        },
+        {
+          "line": 3062,
+          "text": "[2026-09-23 05:05:29 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.13, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 124309, cuda graph: False, input throughput (token/s): 11175.54"
+        },
+        {
+          "line": 3063,
+          "text": "[2026-09-23 05:05:29 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.14, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 116117, cuda graph: False, input throughput (token/s): 10968.90"
+        },
+        {
+          "line": 3064,
+          "text": "[2026-09-23 05:05:30 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.15, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 107925, cuda graph: False, input throughput (token/s): 10793.31"
+        },
+        {
+          "line": 3065,
+          "text": "[2026-09-23 05:05:31 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.16, mamba usage: 0.02, #running-req: 3, #queue-req: 2, #pending-token: 99733, cuda graph: False, input throughput (token/s): 10591.49"
+        },
+        {
+          "line": 3066,
+          "text": "[2026-09-23 05:05:31 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.20, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 91541, cuda graph: False, input throughput (token/s): 13127.11"
+        },
+        {
+          "line": 3067,
+          "text": "[2026-09-23 05:05:32 TP0] Prefill batch, #new-seq: 3, #new-token: 7104, #cached-token: 84032, full token usage: 0.20, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 468, cuda graph: False, input throughput (token/s): 45271.21"
+        },
+        {
+          "line": 3068,
+          "text": "[2026-09-23 05:05:32 TP0] Prefill batch, #new-seq: 1, #new-token: 512, #cached-token: 0, full token usage: 0.20, mamba usage: 0.03, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 93769.46"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:XTNNU5jfWvCYOGpmGIG8Z:llm:1",
@@ -208,7 +383,33 @@
       "prev_finish": 1790140028.294476,
       "recv": 1790140034.4143574,
       "exec": 1790140034.5221217,
-      "first": 1790140035.5396824
+      "first": 1790140035.5396824,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 3.0,
+      "prev_prompt_sha256_i64_le": "12ff2e0ebac4f083ac296dedb991b0cde4c47d7c13d76d467f55f7e8e882d4f2",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3265,
+          "text": "[2026-09-23 05:07:01 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 1216, full token usage: 0.18, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 24675, cuda graph: False, input throughput (token/s): 1597.70"
+        },
+        {
+          "line": 3266,
+          "text": "[2026-09-23 05:07:01 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.18, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 16483, cuda graph: False, input throughput (token/s): 12233.84"
+        },
+        {
+          "line": 3267,
+          "text": "[2026-09-23 05:07:02 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.19, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 8291, cuda graph: False, input throughput (token/s): 12032.96"
+        },
+        {
+          "line": 3268,
+          "text": "[2026-09-23 05:07:02 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.19, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 99, cuda graph: False, input throughput (token/s): 54371.84"
+        },
+        {
+          "line": 3269,
+          "text": "[2026-09-23 05:07:02 TP0] Prefill batch, #new-seq: 1, #new-token: 128, #cached-token: 0, full token usage: 0.19, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 29365.70"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:iBtHBu-khBu7IMGLxvyUK:llm:4",
@@ -238,7 +439,39 @@
       "prev_finish": 1790140156.6804762,
       "recv": 1790140174.3118513,
       "exec": 1790140176.8874989,
-      "first": 1790140177.5554996
+      "first": 1790140177.5554996,
+      "prev_role_positions_near_cached": [
+        37416
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.2109375,
+      "prev_prompt_sha256_i64_le": "e21891e81e76634ba41420cc25dea2265fe3c913dfc0b6981ecfe58a617338c9",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3572,
+          "text": "[2026-09-23 05:09:11 TP0] Prefill batch, #new-seq: 1, #new-token: 1344, #cached-token: 93248, full token usage: 0.26, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 1211, cuda graph: False, input throughput (token/s): 387.98"
+        },
+        {
+          "line": 3573,
+          "text": "[2026-09-23 05:09:11 TP0] Prefill batch, #new-seq: 1, #new-token: 1216, #cached-token: 0, full token usage: 0.26, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 215459.93"
+        },
+        {
+          "line": 3577,
+          "text": "[2026-09-23 05:09:12 TP0] Prefill batch, #new-seq: 1, #new-token: 512, #cached-token: 35584, full token usage: 0.30, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 985, cuda graph: False, input throughput (token/s): 843.46"
+        },
+        {
+          "line": 3578,
+          "text": "[2026-09-23 05:09:12 TP0] Prefill batch, #new-seq: 2, #new-token: 1408, #cached-token: 56576, full token usage: 0.30, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 852, cuda graph: False, input throughput (token/s): 8210.65"
+        },
+        {
+          "line": 3579,
+          "text": "[2026-09-23 05:09:12 TP0] Prefill batch, #new-seq: 1, #new-token: 896, #cached-token: 0, full token usage: 0.30, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 172313.71"
+        },
+        {
+          "line": 3581,
+          "text": "[2026-09-23 05:09:13 TP0] Prefill batch, #new-seq: 1, #new-token: 7168, #cached-token: 35584, full token usage: 0.31, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 7714.60"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:2",
@@ -268,7 +501,62 @@
       "prev_finish": 1790140157.754928,
       "recv": 1790140159.2345405,
       "exec": 1790140159.3948107,
-      "first": 1790140160.3265636
+      "first": 1790140160.3265636,
+      "prev_role_positions_near_cached": [
+        69730,
+        70029,
+        70169,
+        70542,
+        70927,
+        71084,
+        71308,
+        71480
+      ],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 5.0,
+      "prev_prompt_sha256_i64_le": "0a9ec46a9b2366c6925940250aafc39b75bb527df1d268ffd4e7e7862308cf32",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3553,
+          "text": "[2026-09-23 05:09:03 TP0] Prefill batch, #new-seq: 1, #new-token: 1728, #cached-token: 33856, full token usage: 0.17, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 968, cuda graph: False, input throughput (token/s): 346.01"
+        },
+        {
+          "line": 3554,
+          "text": "[2026-09-23 05:09:03 TP0] Prefill batch, #new-seq: 1, #new-token: 1024, #cached-token: 0, full token usage: 0.17, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 225067.86"
+        },
+        {
+          "line": 3559,
+          "text": "[2026-09-23 05:09:04 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 29696, full token usage: 0.22, mamba usage: 0.03, #running-req: 3, #queue-req: 1, #pending-token: 41398, cuda graph: False, input throughput (token/s): 4526.05"
+        },
+        {
+          "line": 3560,
+          "text": "[2026-09-23 05:09:05 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.23, mamba usage: 0.03, #running-req: 3, #queue-req: 2, #pending-token: 90661, cuda graph: False, input throughput (token/s): 11457.89"
+        },
+        {
+          "line": 3561,
+          "text": "[2026-09-23 05:09:06 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.24, mamba usage: 0.03, #running-req: 3, #queue-req: 2, #pending-token: 120224, cuda graph: False, input throughput (token/s): 11258.25"
+        },
+        {
+          "line": 3562,
+          "text": "[2026-09-23 05:09:07 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.25, mamba usage: 0.03, #running-req: 3, #queue-req: 2, #pending-token: 112032, cuda graph: False, input throughput (token/s): 11038.38"
+        },
+        {
+          "line": 3563,
+          "text": "[2026-09-23 05:09:07 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.26, mamba usage: 0.03, #running-req: 3, #queue-req: 2, #pending-token: 103840, cuda graph: False, input throughput (token/s): 10879.30"
+        },
+        {
+          "line": 3564,
+          "text": "[2026-09-23 05:09:08 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.30, mamba usage: 0.04, #running-req: 3, #queue-req: 0, #pending-token: 95648, cuda graph: False, input throughput (token/s): 21844.74"
+        },
+        {
+          "line": 3565,
+          "text": "[2026-09-23 05:09:08 TP0] Prefill batch, #new-seq: 3, #new-token: 3584, #cached-token: 91200, full token usage: 0.30, mamba usage: 0.04, #running-req: 3, #queue-req: 0, #pending-token: 879, cuda graph: False, input throughput (token/s): 20282.06"
+        },
+        {
+          "line": 3566,
+          "text": "[2026-09-23 05:09:08 TP0] Prefill batch, #new-seq: 1, #new-token: 896, #cached-token: 0, full token usage: 0.30, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 176827.78"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:5",
@@ -298,7 +586,43 @@
       "prev_finish": 1790140236.077904,
       "recv": 1790140480.08642,
       "exec": 1790140480.2428808,
-      "first": 1790140484.927956
+      "first": 1790140484.927956,
+      "prev_role_positions_near_cached": [
+        33650,
+        33701,
+        34040,
+        34205,
+        34388
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": -5.4140625,
+      "prev_prompt_sha256_i64_le": "3ff82ca13a2422f2020024565e4449d2ea602acc98069606820bb08c3d0210d4",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3622,
+          "text": "[2026-09-23 05:09:28 TP0] Prefill batch, #new-seq: 1, #new-token: 1472, #cached-token: 32768, full token usage: 0.10, mamba usage: 0.01, #running-req: 1, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 404.17"
+        },
+        {
+          "line": 3624,
+          "text": "[2026-09-23 05:09:29 TP0] Prefill batch, #new-seq: 1, #new-token: 2304, #cached-token: 77952, full token usage: 0.18, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 4150.04"
+        },
+        {
+          "line": 3627,
+          "text": "[2026-09-23 05:09:30 TP0] Prefill batch, #new-seq: 1, #new-token: 768, #cached-token: 95488, full token usage: 0.25, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 1222, cuda graph: False, input throughput (token/s): 745.65"
+        },
+        {
+          "line": 3628,
+          "text": "[2026-09-23 05:09:30 TP0] Prefill batch, #new-seq: 1, #new-token: 1280, #cached-token: 0, full token usage: 0.25, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 214176.90"
+        },
+        {
+          "line": 3631,
+          "text": "[2026-09-23 05:09:30 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 33664, full token usage: 0.28, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 483, cuda graph: False, input throughput (token/s): 114.54"
+        },
+        {
+          "line": 3632,
+          "text": "[2026-09-23 05:09:30 TP0] Prefill batch, #new-seq: 1, #new-token: 512, #cached-token: 0, full token usage: 0.28, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 114722.59"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:6",
@@ -328,7 +652,45 @@
       "prev_finish": 1790140493.3216884,
       "recv": 1790140794.136966,
       "exec": 1790140798.4144542,
-      "first": 1790140805.3605514
+      "first": 1790140805.3605514,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": -3.953125,
+      "prev_prompt_sha256_i64_le": "4667f5ec59b7fd5c6f7c60de17bd62b1b4acef646db44daf7827253c934d727a",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 4321,
+          "text": "[2026-09-23 05:14:41 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 33600, full token usage: 0.05, mamba usage: 0.01, #running-req: 0, #queue-req: 2, #pending-token: 38815, cuda graph: False, input throughput (token/s): 1488.47"
+        },
+        {
+          "line": 4322,
+          "text": "[2026-09-23 05:14:42 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.06, mamba usage: 0.01, #running-req: 0, #queue-req: 2, #pending-token: 94703, cuda graph: False, input throughput (token/s): 11380.39"
+        },
+        {
+          "line": 4324,
+          "text": "[2026-09-23 05:14:43 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.07, mamba usage: 0.01, #running-req: 0, #queue-req: 2, #pending-token: 86511, cuda graph: False, input throughput (token/s): 11149.54"
+        },
+        {
+          "line": 4325,
+          "text": "[2026-09-23 05:14:43 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.08, mamba usage: 0.01, #running-req: 0, #queue-req: 3, #pending-token: 78319, cuda graph: False, input throughput (token/s): 10965.28"
+        },
+        {
+          "line": 4326,
+          "text": "[2026-09-23 05:14:44 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.15, mamba usage: 0.02, #running-req: 0, #queue-req: 1, #pending-token: 90645, cuda graph: False, input throughput (token/s): 14543.92"
+        },
+        {
+          "line": 4327,
+          "text": "[2026-09-23 05:14:44 TP0] Prefill batch, #new-seq: 3, #new-token: 5952, #cached-token: 62528, full token usage: 0.17, mamba usage: 0.03, #running-req: 0, #queue-req: 0, #pending-token: 22213, cuda graph: False, input throughput (token/s): 15919.00"
+        },
+        {
+          "line": 4328,
+          "text": "[2026-09-23 05:14:44 TP0] Prefill batch, #new-seq: 2, #new-token: 3648, #cached-token: 18240, full token usage: 0.17, mamba usage: 0.03, #running-req: 2, #queue-req: 0, #pending-token: 358, cuda graph: False, input throughput (token/s): 23842.08"
+        },
+        {
+          "line": 4329,
+          "text": "[2026-09-23 05:14:44 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 0, full token usage: 0.17, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 85758.32"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:oR1Sqi2ol7caHCcHIKmDV:llm:1",
@@ -358,7 +720,65 @@
       "prev_finish": 1790140253.78294,
       "recv": 1790140255.281997,
       "exec": 1790140263.6172419,
-      "first": 1790140268.1362345
+      "first": 1790140268.1362345,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 6.0,
+      "prev_prompt_sha256_i64_le": "ec3c384c87fa744a24baa259e6c5d74ad4f6e5f8823ac797999bc50cf2d56e03",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 3728,
+          "text": "[2026-09-23 05:10:24 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 64, full token usage: 0.36, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 81812, cuda graph: False, input throughput (token/s): 2238.87"
+        },
+        {
+          "line": 3729,
+          "text": "[2026-09-23 05:10:24 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.37, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 73620, cuda graph: False, input throughput (token/s): 12217.91"
+        },
+        {
+          "line": 3730,
+          "text": "[2026-09-23 05:10:25 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.37, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 173706, cuda graph: False, input throughput (token/s): 11991.12"
+        },
+        {
+          "line": 3731,
+          "text": "[2026-09-23 05:10:26 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.38, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 165514, cuda graph: False, input throughput (token/s): 11793.62"
+        },
+        {
+          "line": 3732,
+          "text": "[2026-09-23 05:10:26 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.39, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 157322, cuda graph: False, input throughput (token/s): 11573.45"
+        },
+        {
+          "line": 3733,
+          "text": "[2026-09-23 05:10:27 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.40, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 149130, cuda graph: False, input throughput (token/s): 11379.95"
+        },
+        {
+          "line": 3734,
+          "text": "[2026-09-23 05:10:28 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.41, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 140938, cuda graph: False, input throughput (token/s): 11165.80"
+        },
+        {
+          "line": 3735,
+          "text": "[2026-09-23 05:10:29 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.42, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 132746, cuda graph: False, input throughput (token/s): 10973.09"
+        },
+        {
+          "line": 3736,
+          "text": "[2026-09-23 05:10:29 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.43, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 124554, cuda graph: False, input throughput (token/s): 10788.84"
+        },
+        {
+          "line": 3737,
+          "text": "[2026-09-23 05:10:30 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.43, mamba usage: 0.03, #running-req: 4, #queue-req: 1, #pending-token: 116362, cuda graph: False, input throughput (token/s): 13172.33"
+        },
+        {
+          "line": 3738,
+          "text": "[2026-09-23 05:10:31 TP0] Prefill batch, #new-seq: 1, #new-token: 6400, #cached-token: 0, full token usage: 0.44, mamba usage: 0.04, #running-req: 4, #queue-req: 0, #pending-token: 109962, cuda graph: False, input throughput (token/s): 8557.20"
+        },
+        {
+          "line": 3739,
+          "text": "[2026-09-23 05:10:31 TP0] Prefill batch, #new-seq: 2, #new-token: 8192, #cached-token: 57408, full token usage: 0.45, mamba usage: 0.04, #running-req: 4, #queue-req: 0, #pending-token: 44406, cuda graph: False, input throughput (token/s): 11015.64"
+        },
+        {
+          "line": 3740,
+          "text": "[2026-09-23 05:10:32 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.46, mamba usage: 0.04, #running-req: 5, #queue-req: 0, #pending-token: 36214, cuda graph: False, input throughput (token/s): 10873.87"
+        }
+      ]
     },
     {
       "req_id": "biomaster:canon:4Z-YUZOO_NSeqORxCgpbX:llm:11",
@@ -388,7 +808,55 @@
       "prev_finish": 1790140426.7034197,
       "recv": 1790140430.1302452,
       "exec": 1790140432.8140357,
-      "first": 1790140433.9967608
+      "first": 1790140433.9967608,
+      "prev_role_positions_near_cached": [
+        75148
+      ],
+      "previous_prompt_chunk_grid_hit": true,
+      "chunk_grid_steps": 5.0,
+      "prev_prompt_sha256_i64_le": "dd6e085a3277ab5178735cbb9b5759e27c94d649b86cab2cd98e459744b14947",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 4160,
+          "text": "[2026-09-23 05:13:37 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 61440, full token usage: 0.07, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 2171, cuda graph: False, input throughput (token/s): 49.70"
+        },
+        {
+          "line": 4161,
+          "text": "[2026-09-23 05:13:37 TP0] Prefill batch, #new-seq: 1, #new-token: 2176, #cached-token: 0, full token usage: 0.07, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 403378.14"
+        },
+        {
+          "line": 4165,
+          "text": "[2026-09-23 05:13:39 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 33600, full token usage: 0.12, mamba usage: 0.01, #running-req: 1, #queue-req: 1, #pending-token: 41520, cuda graph: False, input throughput (token/s): 4536.42"
+        },
+        {
+          "line": 4166,
+          "text": "[2026-09-23 05:13:40 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.13, mamba usage: 0.01, #running-req: 1, #queue-req: 1, #pending-token: 68540, cuda graph: False, input throughput (token/s): 11399.74"
+        },
+        {
+          "line": 4167,
+          "text": "[2026-09-23 05:13:41 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.14, mamba usage: 0.01, #running-req: 1, #queue-req: 1, #pending-token: 60348, cuda graph: False, input throughput (token/s): 11175.49"
+        },
+        {
+          "line": 4168,
+          "text": "[2026-09-23 05:13:41 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.15, mamba usage: 0.01, #running-req: 1, #queue-req: 1, #pending-token: 52156, cuda graph: False, input throughput (token/s): 10973.95"
+        },
+        {
+          "line": 4169,
+          "text": "[2026-09-23 05:13:42 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.16, mamba usage: 0.01, #running-req: 1, #queue-req: 1, #pending-token: 43964, cuda graph: False, input throughput (token/s): 10779.42"
+        },
+        {
+          "line": 4170,
+          "text": "[2026-09-23 05:13:42 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.16, mamba usage: 0.02, #running-req: 1, #queue-req: 0, #pending-token: 35772, cuda graph: False, input throughput (token/s): 35648.67"
+        },
+        {
+          "line": 4171,
+          "text": "[2026-09-23 05:13:43 TP0] Prefill batch, #new-seq: 2, #new-token: 1728, #cached-token: 33728, full token usage: 0.16, mamba usage: 0.02, #running-req: 1, #queue-req: 0, #pending-token: 332, cuda graph: False, input throughput (token/s): 11141.63"
+        },
+        {
+          "line": 4172,
+          "text": "[2026-09-23 05:13:43 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 0, full token usage: 0.16, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 78535.39"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:7l9Wwl2lO9se-ZXfo7sP8:llm:1",
@@ -418,7 +886,33 @@
       "prev_finish": 1790140754.9125106,
       "recv": 1790140755.1864724,
       "exec": 1790140755.230749,
-      "first": 1790140755.9841936
+      "first": 1790140755.9841936,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.1484375,
+      "prev_prompt_sha256_i64_le": "52256264fc2ebb19ac3b1155d2dbe72c66cf5135804a02ad7827f3daeb98c708",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5032,
+          "text": "[2026-09-23 05:19:10 TP0] Prefill batch, #new-seq: 1, #new-token: 7360, #cached-token: 8064, full token usage: 0.05, mamba usage: 0.03, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 2132.51"
+        },
+        {
+          "line": 5033,
+          "text": "[2026-09-23 05:19:10 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 17920, full token usage: 0.05, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 291, cuda graph: False, input throughput (token/s): 2536.16"
+        },
+        {
+          "line": 5034,
+          "text": "[2026-09-23 05:19:10 TP0] Prefill batch, #new-seq: 1, #new-token: 320, #cached-token: 0, full token usage: 0.05, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 70509.71"
+        },
+        {
+          "line": 5037,
+          "text": "[2026-09-23 05:19:11 TP0] Prefill batch, #new-seq: 1, #new-token: 192, #cached-token: 16896, full token usage: 0.06, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 387, cuda graph: False, input throughput (token/s): 271.37"
+        },
+        {
+          "line": 5038,
+          "text": "[2026-09-23 05:19:11 TP0] Prefill batch, #new-seq: 1, #new-token: 448, #cached-token: 0, full token usage: 0.06, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 98596.19"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:43w4ekIeUUXRHkscOY8BJ:llm:1",
@@ -448,7 +942,41 @@
       "prev_finish": 1790140758.5450532,
       "recv": 1790140764.3599317,
       "exec": 1790140764.4247453,
-      "first": 1790140766.3403738
+      "first": 1790140766.3403738,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.0234375,
+      "prev_prompt_sha256_i64_le": "a13aa20cb08be0450bdcd16f73726d1c1ddb641814f2b698c31a38037e8d5493",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5002,
+          "text": "[2026-09-23 05:19:00 TP0] Prefill batch, #new-seq: 1, #new-token: 7616, #cached-token: 6720, full token usage: 0.03, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 5298.88"
+        },
+        {
+          "line": 5005,
+          "text": "[2026-09-23 05:19:01 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 17536, full token usage: 0.05, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 307, cuda graph: False, input throughput (token/s): 824.69"
+        },
+        {
+          "line": 5006,
+          "text": "[2026-09-23 05:19:01 TP0] Prefill batch, #new-seq: 1, #new-token: 320, #cached-token: 0, full token usage: 0.05, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 73697.52"
+        },
+        {
+          "line": 5008,
+          "text": "[2026-09-23 05:19:02 TP0] Prefill batch, #new-seq: 1, #new-token: 5824, #cached-token: 8704, full token usage: 0.04, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 7172.43"
+        },
+        {
+          "line": 5013,
+          "text": "[2026-09-23 05:19:03 TP0] Prefill batch, #new-seq: 1, #new-token: 6208, #cached-token: 2496, full token usage: 0.06, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 4336.85"
+        },
+        {
+          "line": 5014,
+          "text": "[2026-09-23 05:19:03 TP0] Prefill batch, #new-seq: 1, #new-token: 256, #cached-token: 16640, full token usage: 0.06, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 354, cuda graph: False, input throughput (token/s): 1704.86"
+        },
+        {
+          "line": 5015,
+          "text": "[2026-09-23 05:19:03 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 0, full token usage: 0.06, mamba usage: 0.03, #running-req: 4, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 83431.92"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:0ewI6BH69Sl8KUdV0XOuy:llm:3",
@@ -478,7 +1006,19 @@
       "prev_finish": 1790140861.353979,
       "recv": 1790140861.869151,
       "exec": 1790140862.0536761,
-      "first": 1790140868.9931924
+      "first": 1790140868.9931924,
+      "prev_role_positions_near_cached": [
+        16874
+      ],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.1796875,
+      "prev_prompt_sha256_i64_le": "5670044b22958057c81099cfb4e877e606639371c092b978f0c5d4e8960b4314",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5299,
+          "text": "[2026-09-23 05:20:56 TP0] Prefill batch, #new-seq: 1, #new-token: 7168, #cached-token: 15104, full token usage: 0.15, mamba usage: 0.02, #running-req: 2, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1351.50"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:member-v5-team-member-928dbc44fffdccf185a7927f:llm:4",
@@ -508,7 +1048,33 @@
       "prev_finish": 1790141074.0273795,
       "recv": 1790141079.3136632,
       "exec": 1790141094.0865347,
-      "first": 1790141097.012122
+      "first": 1790141097.012122,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": -2.0859375,
+      "prev_prompt_sha256_i64_le": "bc9736f9ff7d2d3f891ab9929658911842b8b8306580c171e4d84737b5c2d824",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5505,
+          "text": "[2026-09-23 05:22:28 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.16, mamba usage: 0.01, #running-req: 1, #queue-req: 2, #pending-token: 321035, cuda graph: False, input throughput (token/s): 9788.68"
+        },
+        {
+          "line": 5506,
+          "text": "[2026-09-23 05:22:29 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.17, mamba usage: 0.01, #running-req: 1, #queue-req: 3, #pending-token: 312843, cuda graph: False, input throughput (token/s): 9644.12"
+        },
+        {
+          "line": 5507,
+          "text": "[2026-09-23 05:22:30 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.19, mamba usage: 0.02, #running-req: 1, #queue-req: 2, #pending-token: 322853, cuda graph: False, input throughput (token/s): 16835.84"
+        },
+        {
+          "line": 5508,
+          "text": "[2026-09-23 05:22:30 TP0] Prefill batch, #new-seq: 2, #new-token: 4352, #cached-token: 17664, full token usage: 0.20, mamba usage: 0.03, #running-req: 1, #queue-req: 1, #pending-token: 300875, cuda graph: False, input throughput (token/s): 6298.28"
+        },
+        {
+          "line": 5509,
+          "text": "[2026-09-23 05:22:31 TP0] Prefill batch, #new-seq: 2, #new-token: 8192, #cached-token: 64, full token usage: 0.20, mamba usage: 0.03, #running-req: 2, #queue-req: 1, #pending-token: 292620, cuda graph: False, input throughput (token/s): 12443.43"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:member-v5-team-member-eccae907b8452b2213bf84e4:llm:1",
@@ -538,7 +1104,21 @@
       "prev_finish": 1790140854.4970741,
       "recv": 1790140863.4649942,
       "exec": 1790140868.3643477,
-      "first": 1790140868.9994867
+      "first": 1790140868.9994867,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.1953125,
+      "prev_prompt_sha256_i64_le": "aad1a81eaefc9842c1d43c9edc41fa01bcf9d6c937f2ad9bd36c511240780615",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5284,
+          "text": "[2026-09-23 05:20:49 TP0] Prefill batch, #new-seq: 1, #new-token: 5824, #cached-token: 9280, full token usage: 0.15, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 5981.38"
+        },
+        {
+          "line": 5288,
+          "text": "[2026-09-23 05:20:51 TP0] Prefill batch, #new-seq: 1, #new-token: 7040, #cached-token: 2496, full token usage: 0.15, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 4778.51"
+        }
+      ]
     },
     {
       "req_id": "scimaster:canon:ZLFL2Obk-sWmSWzRMLbUY:llm:0",
@@ -568,7 +1148,25 @@
       "prev_finish": 1790141134.1560059,
       "recv": 1790141143.9897244,
       "exec": 1790141144.03978,
-      "first": 1790141144.6516657
+      "first": 1790141144.6516657,
+      "prev_role_positions_near_cached": [],
+      "previous_prompt_chunk_grid_hit": false,
+      "chunk_grid_steps": 0.0390625,
+      "prev_prompt_sha256_i64_le": "8bbf01329ee76d32524bbc80129b0a33dcb1160aa71de8c081f78dfa12ce073a",
+      "prev_prefill_log_candidates": [
+        {
+          "line": 5280,
+          "text": "[2026-09-23 05:20:48 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 15424, full token usage: 0.17, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 378, cuda graph: False, input throughput (token/s): 29.90"
+        },
+        {
+          "line": 5281,
+          "text": "[2026-09-23 05:20:48 TP0] Prefill batch, #new-seq: 1, #new-token: 384, #cached-token: 0, full token usage: 0.17, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 84969.51"
+        },
+        {
+          "line": 5284,
+          "text": "[2026-09-23 05:20:49 TP0] Prefill batch, #new-seq: 1, #new-token: 5824, #cached-token: 9280, full token usage: 0.15, mamba usage: 0.03, #running-req: 3, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 5981.38"
+        }
+      ]
     }
   ],
   "stats": {

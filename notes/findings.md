@@ -453,3 +453,5 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - b113+120（cap 2048、short 4096），dev N6（`evidence/N6_b120on/analysis.txt`）对比 F76：fast_intra p95 7.51→**1.01s**（超标 55→9）、overall_intra 7.52→**5.29s**（44→21，允许约 27，余量仅 +6）、turn_start 4.01→5.69s、chain_start 19.86→21.56s（max 73.5→**120.7s**，超标 5→12）。
 - intra 排队 p95 6.41→**0.36s**；chain_start 排队 p95 6.8→10.7s、exec→首 token p95 10.3→14.2s（冷续块被切成 2048 → Fable 指出 cap 在无等待时也生效）。
 - 缓存丢失模式不变（lost 4.68M），极端例（25 万 prompt cached≈0）仍在 → T49 分析中。
+
+> 更正（09-23）：上条"补丁 120 … 四门全过"为**正式规则估算**（超标率 95% 下界 ≤5%）。开发集 harness 用**硬性 p95** 判定：overall_intra p95 5.29s > 5s → harness **FAIL**（report_*.md）。今后同时报告两种判定（analyze_run.py 已更新）。

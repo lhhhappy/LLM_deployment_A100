@@ -23,11 +23,20 @@ def allowed_over(n, p=0.05):
     return k
 LIM = {"fast_intra": 3.0, "overall_intra": 5.0, "turn_start": 15.0, "chain_start": 30.0}
 print(f"requests={len(rows)} ok={len(ok)} errors={len(rows) - len(ok)}")
-print("\n== gates")
+print("\n== gates  (dev harness = hard p95<=limit; formal-est = task.md rule: FAIL only if 95% lower bound of exceed-rate > 5%)")
+verdict = {"gates": {}, "errors": len(rows) - len(ok)}
 for g, lim in LIM.items():
     rs = [r for r in ok if C.in_ttft_gate(r, g)]; t = [r["ttft_s"] for r in rs]; over = sum(x > lim for x in t)
-    ao = allowed_over(len(rs)) if rs else 0
-    print(f"  {g:14s} n={len(rs):4d} p50={q(t,.5):6.2f} p95={q(t,.95):6.2f} max={max(t) if t else 0:6.1f} over={over:3d} allowed_over={ao:3d} -> {'PASS' if over <= ao else 'FAIL'} (margin {ao - over:+d})")
+    ao = allowed_over(len(rs)) if rs else 0; p95 = q(t, .95) if t else 0.0
+    hard = (not t) or p95 <= lim; formal = over <= ao
+    verdict["gates"][g] = dict(n=len(rs), p95=round(p95, 3), over=over, allowed_over=ao, harness_pass=hard, formal_est_pass=formal)
+    print(f"  {g:14s} n={len(rs):4d} p50={q(t,.5):6.2f} p95={p95:6.2f} max={max(t) if t else 0:6.1f} over={over:3d} allowed={ao:3d} | harness {'PASS' if hard else 'FAIL'} | formal-est {'PASS' if formal else 'FAIL'} (margin {ao - over:+d})")
+tp_ = sorted(r["tpot_s"] for r in ok if r.get("tpot_s"))
+verdict["tpot_mean"] = sum(tp_) / max(1, len(tp_)); verdict["tpot_p95"] = q(tp_, .95) if tp_ else 0
+err_ok = verdict["errors"] <= 0.01 * len(rows) and verdict["tpot_p95"] <= 0.10
+verdict["harness_all_pass"] = err_ok and all(v["harness_pass"] for v in verdict["gates"].values())
+verdict["formal_est_all_pass"] = err_ok and all(v["formal_est_pass"] for v in verdict["gates"].values())
+print(f"  => harness ALL_PASS={verdict['harness_all_pass']}  formal-est ALL_PASS={verdict['formal_est_all_pass']}  tpot_mean={verdict['tpot_mean']:.4f} tpot_p95={verdict['tpot_p95']:.4f}")
 print("\n== TTFT decomposition (server timestamps)")
 dec = []
 for r in ok:
@@ -57,4 +66,4 @@ worst = sorted(ok, key=lambda r: -r["ttft_s"] / C.phase_gate(r))[:10]
 for r in worst:
     qw = (r.get("t_exec_start_s") or 0) - (r.get("t_recv_s") or 0)
     print(f"  ttft={r['ttft_s']:6.1f}/{C.phase_gate(r):4.0f}s queue={qw:6.1f} prompt={r['prompt_tokens']:7d} cached={r.get('cached_tokens'):7d} exp_unc={r.get('uncached_expected'):7d} phase={r.get('phase')} idx={r.get('idx_in_chain')} edge={r.get('edge_type')}")
-if len(sys.argv) > 3: json.dump(dict(n=len(rows)), open(sys.argv[3], "w"))
+if len(sys.argv) > 3: json.dump(verdict, open(sys.argv[3], "w"), indent=1)

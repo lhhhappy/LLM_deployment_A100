@@ -8,13 +8,13 @@
 
 1. **VERIFIED：KV 50%、KDA 4% 是扣除可淘汰缓存后的占用，不是物理驻留率。** 两个池都可能已满。这解除了“只用一半显存却淘汰”的表面矛盾，也推翻了由 4% 推出状态槽不紧张的依据。`S/managers/scheduler_components/pool_stats_observer.py:249`、`:271`。
 2. **VERIFIED：252115-token / cached=64 的请求是本次 cohort 的链首，且该链只发送这一条。** 冻结未命中 1281 不等于本轮应当仅计算 1281；本轮没有发送它的同链前驱。摘要中损失最大的五条均是 cohort 链首。不能用它们证明运行中丢了 25 万缓存。见 §4。
-3. **VERIFIED：短间隔丢几千 token 有完整源码机制。** 单点 tracking 的 branch 优先、101 的 branch-conflict 跳过、跨请求前缀分叉、结束时释放未提交尾部，可共同造成 5–8k 回退；decode 每 256 token 追踪并不保证下一请求能用到该状态。**INFERRED：19 条中每条分别属于哪条路径仍需 raw + 树事件。**
+3. **VERIFIED：原“19个intra”实际是18个intra+1个turn_start，且其中一条冻结LCP并非本次相邻prompt的LCP。** 5条短回退精确落在前请求8192网格的较早chunk末尾，101只在最后chunk拆角色点，能解释这个现象；另有branch覆盖end的源码路径。逐条表见§4.3，具体树事件仍须区分INFERRED。
 4. **VERIFIED：140 已同时涉及快照和淘汰。** 它保存当前角色与末尾、关闭101拆分、修改 FULL/MAMBA/path-cap 的尾部优先淘汰；不是只改 kernel。但额外角色槽只用 allocator 真空位，压力下直接跳过，不能保证长期一直获得双快照。见 §5。
 5. **VERIFIED：每卡当前两池约 21.23 GiB，其中 KV 11.17、KDA 10.05（不是 9.7）。** 584 是缓存与活动请求共同使用的总槽数；“5槽/请求”是并发上限的预算比例，活动态本身通常是 active+两个 ping-pong。见 §7。
-6. **VERIFIED：graph max bs 512→64 的默认预算直接增益约 3.9 万 KV token（约4.1%），不能直接承诺 +40%。** 更大收益需要实际 graph 测量后上调静态预算/重分池；默认静态分池不会在 capture 后自动扩张。见 §8。
-7. **INFERRED：N26 活动 KV 先按 124–130 万 token 作中心情景，约204万作压力情景。** 这不是已证实需求，更不是 N14 必满的证明。优先改状态/淘汰机制和量对两个池，再谨慎收 graph、调预算；DCP 有高容量潜力，但115只修共享内存，还有 DSA 地址映射需要专门验证。
+6. **VERIFIED：012真实graph捕获增量是1.31GiB、实际bs≤116，不是简报的6.1GiB。** graph配置512→64，连同本模型VLM预算折减，直接约+3.6万KV token（3.8%），不能承诺+40%或腾6GB。见§7/§8。
+7. **VERIFIED：完整measurement的KV不可淘汰峰值达到863296 token / 0.92，50%只是较早实时观察。** **INFERRED：N26中心情景124–130万；按完整N6峰值线性放大是374万压力情景**，不能保证N26可容纳。优先测状态/淘汰和静态预算；DCP有容量潜力，但115以外仍须核验DSA地址协议。
 
-本轮 CPU/数据收据：`evidence/T49/local_audit.json`；包含输入源码 SHA256、原统计/追踪方法夹具、cohort定位、容量算式。真实19条的raw和完整启动/淘汰日志尚未在本地，已在T49账本向Claude列取证清单；报告不伪造逐条归因。
+本轮收据：`evidence/T49/local_audit.json`（最初源码夹具/算术，含尚未套VLM折减的预算情景）；`remote_analysis.json`（Claude补回raw/日志后，真实prompt重渲染、19对LCP、日志行号与SHA）；`previous_prefill_slices.txt`。原始数据在`evidence/T49/remote/`，本会话只读本地回传文件。日志有批量统计，无逐节点eviction/track事件；报告不伪造这些事件。
 
 ## 2. 缓存生命周期：实际使用的是哪一个池、哪一个状态
 
@@ -52,7 +52,7 @@
 - FULL按可淘汰叶子的LRU堆取节点，删除叶子会一并释放它的MAMBA；之后父节点可能成为下一可淘汰叶子。`full_component.py:194`；`unified_tree_core.py:1429`。
 - MAMBA按状态LRU取未锁节点；**内部节点**只丢状态，FULL可留下；**可删除叶子**会连KV删除。一次状态槽短缺可能导致大量KV被连带释放，尤其长路径已被删去中间状态时。`mamba_component.py:360`、`:402`。
 - MAMBA匹配只刷新实际使用的最深状态，不刷新祖先；FULL只刷新选中匹配节点向根的路径。LRU时钟是事件计数，不是秒数。`mamba_component.py:118`；`unified_tree_core.py:823`；`S/mem_cache/unified_cache/components/tree_component.py:110`。
-- `mamba_max_states_per_path` 默认 **-1无限**。显式启用才删浅层、单子、未锁内部状态，保留tail/fork/leaf，是软上限。b113本地启动模板未设置它，不应当假定cap=2/3。`S/server_args.py:2595`；`mamba_component.py:252`；`scripts/pod/lib.sh:18`。
+- `mamba_max_states_per_path` 默认 **-1无限**。显式启用才删浅层、单子、未锁内部状态，保留tail/fork/leaf，是软上限。012真实args也为-1、extra_buffer、interval256、无统一内存/HiCache/session。`S/server_args.py:2595`；`mamba_component.py:252`；`evidence/T49/remote/012_server.log:14`。
 
 ## 3. (a) 244–300秒空闲后几乎全丢：先纠正观测，再定位触发池
 
@@ -70,9 +70,11 @@ physical_resident_fraction = 1 - free / capacity
 
 **两池谁先满尚未VERIFIED**。即使总KV尚有真空位，584状态槽也可能被历史chunk/角色/分支状态填满；反之FULL压力会同时删状态。普通chunk8192、无path cap会积累中间状态；许多短分支每新增不到1451个KV token就占一个状态，状态池相对更易成为历史缓存约束。长单链每8192 token一个状态则偏向KV先满。这个密度判断比活动4%更有用，但不能代替事件日志。
 
+**补回完整日志后的VERIFIED**：measurement为04:55:54.865–05:25:54.477 UTC，峰值863296 token/0.92（`012_server.log:5644`），Mamba非evictable最大24/584。50%并非完整N6峰值。raw`:476`隔244.00s后cached77952→33600，实际两prompt LCP78561；raw`:626`再隔300.81s后cached33600→1216，LCP78972。两个当前LCP都超过上次已使用的命中深度，证明**原可复用路径退化**，不能用“下一prompt不同”或“前请求没存end”解释全部损失；谁驱逐了它仍是INFERRED。raw`:695`也有短idle5.28s+排队14.77s后17664→576，LCP17938，容量淘汰不只发生在长idle。
+
 **flush/namespace的证据边界**：
 
-- 本地 `run_dev.py:231` 只在warmup之后、measurement之前调用flush；`S/managers/scheduler.py:4763` 明确只在全闲时真清。没有按链间隔自动flush的源码证据。仍需server日志中的flush/restart代次排除外部操作。
+- 本地 `run_dev.py:231` 在warmup之后、measurement之前调用flush；`S/managers/scheduler.py:4763` 只在全闲时真清。012日志最后一次测前flush在04:55:48（`:1538`），下一次在05:25:55（`:5754`）；**measurement中没有flush成功、重启/重新载权或retraction日志**，也没有TTL证据。无法从未打印的eviction行推导“没淘汰”。
 - harness `X-S1-Cache-Namespace` 只在header；b113的000/101/105/110–113没有把它接入 `cache_salt`，原header表也没有X-S1项。`s1-dev/harness/s1_loadgen.py:100`、`:110`；`S/entrypoints/request_headers.py:10`。故不能用这个header解释本轮跨请求隔离；但必须记录有效 `extra_key/cache_salt` 才能排除实际部署额外配置。
 - 同理X-S1-Session-ID不自动建立有锁的引擎streaming session；只知道同一个session_id不能证明历史缓存被保护。
 
@@ -80,7 +82,7 @@ physical_resident_fraction = 1 - free / capacity
 
 ### 4.1 短间隔5–8k回退的精确机制
 
-**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。`patches/101-d1v12-on-base.patch:42`、`:83`、`:102`；`patches/105-role-split-single-partial.patch:3`。
+**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。`patches/101-d1v12-on-base.patch:47`、`:59`、`:92`、`:110`；`patches/105-role-split-single-partial.patch:3`。
 
 一个可手工检查的机制例子（**合成，不是那19条的伪造trace**）：
 
@@ -95,7 +97,7 @@ physical_resident_fraction = 1 - free / capacity
 - **有更深decode快照也可回退**：下一prompt在reminder处改变，末尾/decode状态处于已分叉的旧后缀，不能拿来恢复。只能找该LCP以内最深状态。降低decode间隔不能修复这个位置错误。
 - **101不在所有chunk补角色点**：冷长请求只在最后可完成chunk尝试role split；若最后角色位于较早chunk中间，原chunk-end网格未必正好有该点。即使角色被保存，LRU也可删它。不能把任何5–8k损失直接断言为一个固定branch-conflict。
 
-**INFERRED**：F76“短间隔停在上一轮角色边界”符合上述路径，但要逐条确认，需要前后实际token LCP、每次extend的branch/role/chosen_track和finish free区间。只用冻结 `glm_lcp_with_prev` 或 `uncached_expected` 不够：harness重放冻结prompt，上一请求**本次生成的输出不会直接拼进下一次prompt**（`s1_loadgen.py:359`），历史输出与这次生成输出也可能不同。
+F76“短间隔停在上一轮角色边界”应收窄：下面19条没有一条cached恰等于前请求**最后**user/observation标记floor64；有的落在更早chunk/分叉点。仍需branch/chosen_track/finish事件将每条分类。只用冻结 `glm_lcp_with_prev` 不够：harness重放冻结prompt，本次生成输出不会直接拼入下一prompt（`s1_loadgen.py:359`）。
 
 ### 4.2 252115→cached64：本地已有更直接的解释
 
@@ -111,9 +113,45 @@ physical_resident_fraction = 1 - free / capacity
 
 第一条rid=`scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1`，cohort只含这一条，没有该链的`:llm:0`。完整chain元数据中的 `n_requests=4` 是原链规模，不能替代measurement cohort。五条的cohort位置/ID详见本轮JSON；数据集一共有115个cohort链首仍标 `phase=intra`。
 
+回传raw再次确认：252115这条在`012_dev_raw__.jsonl:688`（若后续重排行号，以rid定位），`idx_in_chain=0`；其余四条也均为0。
+
 scorer按 `idx_in_chain==0` 优先归为chain_start，见 `s1-dev/harness/s1_common.py:107`、`:131`；`analyze_run.py:39` 的缓存损失榜仅用 frozen expected减actual，并未排除这些链首。因此1281不是本轮可实现命中的保证，27.47秒也不是fast_intra的27.47秒超标。**已证实的是缺少同链前驱，不是证明从未存在任何跨链可复用内容。** 缓存64到底来自哪个其他请求、是否曾有更长跨链路径被淘汰，仍需树日志。
 
 对真正有已完成本次前驱、LCP约25万却只命中64的情形，才依次查：FULL被删；FULL仍在但MAMBA内部状态被删；namespace/flush/restart；实际输入早期差异；retract/abort不提交。普通末页对齐最多损失63、decode末尾网格最多约255，**都不能单独解释25万回退**。
+
+### 4.3 回传raw的19条逐项核对（T49-08）
+
+**VERIFIED**：筛选`idx_in_chain>0 && prompt−uncached_expected−cached>4096`，得18 intra+1 turn_start。使用原harness Renderer、原tokenizer本地重渲染这19对涉及的36个prompt，长度逐一等于raw；计算真正的prompt-prompt LCP。raw不含本次生成token文本，若下一prompt完整包含前prompt，其后的生成输出匹配仍未知，因此下表LCP是已能直接验证的基准。
+
+表中行号均指`evidence/T49/remote/012_dev_raw__.jsonl`；Δ为**实际prompt LCP−cached**；gap为前请求完成到当前dispatch，未包含queue。C=chunk角色点漏存证据强；P=已有命中深度退化，压力淘汰解释强；B=branch/准入保护/其他树状态原因待事件；D=冻结前驱口径不适用。分类均为**INFERRED**，数值为VERIFIED。
+
+| raw行（前驱行） | prompt | cached | 实际LCP | Δ | gap秒 | 分类 |
+|---|---:|---:|---:|---:|---:|---|
+| 165（158） | 45229 | 35648 | 40604 | 4956 | 2.34 | B |
+| 169（165） | 48633 | 40576 | 45229 | 4653 | 2.82 | B |
+| 210（206） | 41775 | 36672 | 40994 | 4322 | 3.81 | B |
+| 257（255） | 40098 | 31232 | 38781 | 7549 | 0.64 | C |
+| 265（264） | 91386 | 82816 | 90193 | 7377 | 0.99 | C |
+| 270（267） | 29533 | 21312 | 27195 | 5883 | 1.03 | B |
+| 299（292） | 35212 | 25792 | 33673 | 7881 | 6.12 | C |
+| 347（346） | 79629 | 70656 | 77651 | 6995 | 1.48 | C |
+| 358（344） | 44486 | 37312 | 42304 | 4992 | 17.63 | B |
+| 374（371） | 95880 | 49216 | **52400** | **3184** | 1.50 | D；原冻结“丢43797”不能成立 |
+| 451（447） | 83794 | 74560 | 81124 | 6564 | 3.38 | C |
+| 476（366） | 80607 | 33600 | 78561 | 44961 | 244.00 | P |
+| 608（606） | 16553 | 9280 | 14960 | 5680 | 0.27 | B |
+| 623（609） | 29162 | 8896 | 14117 | 5221 | 5.81 | B |
+| 626（476） | 80803 | 1216 | 78972 | 77756 | 300.81 | P |
+| 660（658） | 87765 | 16576 | 21884 | 5308 | 0.51 | B |
+| 661（655） | 9618 | 4096 | 9115 | 5019 | 8.97 | B |
+| 695（690） | 18472 | 576 | 17938 | 17362 | 5.28 | P；另排队14.77秒 |
+| 721（714） | 16982 | 9600 | **14653** | **5053** | 9.83 | B；phase是turn_start |
+
+**C类的具体机制**：以raw255→257为例，前请求从cached23040开始，两个8192块分别到31232、39424，最后剩50；最后角色在38720对齐点，落在**第二个仍被truncated的chunk**。101的`:92`只在not truncated时尝试role split，而最后50-token块扫描起点39424已越过角色。因此树可能有31232和39424，却没有38720状态；下一prompt在38781分叉，39424及更深decode状态都在分叉后，实际回落31232、额外7549。真实批日志`012_server.log:3004`、`:3005`给出8192/8192及pending8242/50，与此一致。即使decode保存到39680，也不能用于38781以内的前缀。
+
+其余4个C类同样满足`cached=前请求cached+k×8192`，k分别6、3、5、5；下一个chunk末尾已越过前请求最后角色，最终剩余分别137、99、438、560。raw292日志`:3268`/`:3269`还能直接看见最终pending99、尾128对齐。**这些已有真实token与批日志支持，比笼统“上一轮角色滞后”更精确**；但缺少节点事件仍不排除同时有LRU/branch作用。140在角色所在的任意extend导出快照，直接覆盖这类最后chunk限制，前提是角色槽成功分配。
+
+D类证明冻结LCP本身需审计：raw374冻结93013而实际与raw371只有52400，差40613；不能要求本次未处理过的“源输出”前缀被缓存。raw721冻结LCP16136而实际14653也有1483差。剩余B类保留明确的rid/前驱/track取证位置，不用单点机制图替代运行时证据。
 
 ## 5. 修复建议及140的边界
 
@@ -134,7 +172,7 @@ scorer按 `idx_in_chain==0` 优先归为chain_start，见 `s1-dev/harness/s1_com
 
 ## 6. 交给Claude的8卡取证与最小验证
 
-原raw只够确定先后、gap、计数和门，不够区分FULL/MAMBA淘汰。请取回任务012的 `dev/raw_*.jsonl`、`run_*.json`、measurement日志，以及**真实启动来源**的server.log/args（ensure_engine可能复用；`scripts/pod/lib.sh:30`）。仅白名单env：role IDs、140、mamba锁/path-cap/内存相关开关；不取凭据。
+Claude已回传任务012 raw/run/job/server四文件，`012_job.log:1`绑定b113源码签名、`:3`记录role IDs。已有证据能确认实际参数、flush边界、批次与真实LCP，**仍不能区分每次FULL/MAMBA淘汰**。下一次只需增加下列事件；不要重复拉全环境或凭据。
 
 建议TP0事件日志（其余rank只报不一致校验），用单调时间+forward迭代+rid+节点ID，避免每步打印大张量或同步GPU：
 
