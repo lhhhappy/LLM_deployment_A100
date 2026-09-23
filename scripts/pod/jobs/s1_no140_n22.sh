@@ -1,11 +1,11 @@
-# 038 S0-140@N22: exactly job 035 (S0) with ONE change: SGLANG_AX_KDA_DUAL_SNAPSHOT=0 (patch 140's dual snapshot off;
+# 038 S1-140 (S1 = S0 + 114, the 036 winner)@N22: exactly job 036 (S1 = S0 + 114) with ONE change: SGLANG_AX_KDA_DUAL_SNAPSHOT=0 (patch 140's dual snapshot off;
 # 101's role-boundary split takes over). Why: (1) measure what 140 is worth at N22 (R20: 61 follow-ups lost the tail state
 # anyway); (2) MTP (160) forces 140 off, so this isolates that forced change before the MTP run.
 # Verdict: LEVEL line from level_verdict.py (complete data + harness scorer + task.md rules).
-G_NAME=s0v2
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch"
+G_NAME=s0v2_114
+G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200 "
-G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=0"
+G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0"
 LADDER_UP="22"
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:

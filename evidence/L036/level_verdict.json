@@ -1,0 +1,53 @@
+{
+ "status": "VALID",
+ "n": 22,
+ "passed": false,
+ "failed_gates": [
+  "tpot_p95<=0.10"
+ ],
+ "tpot_mean": 0.09378162171485799,
+ "tpot_p95": 0.2531506063087898,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 328,
+   "p95": 2.052917003631592,
+   "over_limit": 7,
+   "allowed_over": 23,
+   "rate_ci_lower": 0.010058010160333485,
+   "pass_estimated": true,
+   "pass_point": true
+  },
+  "overall_intra": {
+   "n": 388,
+   "p95": 3.73016619682312,
+   "over_limit": 15,
+   "allowed_over": 27,
+   "rate_ci_lower": 0.02397887326860411,
+   "pass_estimated": true,
+   "pass_point": true
+  },
+  "turn_start": {
+   "n": 20,
+   "p95": 6.745682954788208,
+   "over_limit": 0,
+   "allowed_over": 3,
+   "rate_ci_lower": 0.0,
+   "pass_estimated": true,
+   "pass_point": true
+  },
+  "chain_start": {
+   "n": 314,
+   "p95": 32.70822834968567,
+   "over_limit": 17,
+   "allowed_over": 22,
+   "rate_ci_lower": 0.03478694631360313,
+   "pass_estimated": true,
+   "pass_point": false
+  }
+ },
+ "rows": 722,
+ "raw": "raw_dev-combined-v1_N22_1790186736.jsonl",
+ "run": "run_dev-combined-v1_N22_1790186736.json",
+ "wall_s": 1179.1835944652557,
+ "harness_point_all_pass": false
+}

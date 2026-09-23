@@ -1,14 +1,14 @@
-# 039 S0-140+MTP@N22: job 038 (S0 with 140 off) plus ONE feature: MTP/NEXTN as validated on 8 cards (026f/026i/028):
+# 039 S1-140 (S1 = S0 + 114, the 036 winner)+MTP@N22: job 038 (S1 with 140 off) plus ONE feature: MTP/NEXTN as validated on 8 cards (026f/026i/028):
 # patch 160, --speculative-algorithm NEXTN (draft /mnt/models, steps 3, topk 1, draft tokens 4), --max-running-requests 32,
 # --cuda-graph-max-bs 32 (replaces S0's --cuda-graph-max-bs-decode 64), bf16 KV + Triton KDA backends (what 160 sets anyway),
 # env SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0. Known cost: smaller KV pool (033: ~0.82M tokens).
 # Why: N22 fails only tpot_p95 (0.296). MTP gives 2-3 tokens per decode step, so decode needs about half the GPU share to
 # keep streams under 0.10 s/token during heavy prefill. Compare with 038 (TTFT gates, tpot_p95, tpot_mean, KV tokens).
 # Verdict: LEVEL line from level_verdict.py (complete data + harness scorer + task.md rules).
-G_NAME=s0v2_mtp
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch 160-nextn-sm80.patch"
+G_NAME=s0v2_114_mtp
+G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch 160-nextn-sm80.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --max-mamba-cache-size 200 --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32"
-G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0"
+G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0"
 LADDER_UP="22"
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
