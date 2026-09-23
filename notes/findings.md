@@ -433,3 +433,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 任务 003（`scripts/pod/jobs/verify_kernels.sh`，全补丁树 000–160，单卡）：F57 tilelang 稀疏注意力、F58 Marlin MoE、112/113 数值+graph、T47 换长度不重编译、140 KDA 快照、160 MTP 四组算子、INT8/MoE 基准 —— **全部 PASS**。
 - 环境：8×A100-SXM4-80GB，驱动 580.105.08，torch 2.13.0+cu130（与开发机同版本 torch）。
 - INT8/MoE 基准与开发机一致（M=8192：Marlin 4.99ms/82.7TF；INT8 逐通道 95.4TF 但误差 2.6e-2）→ findings 中 INT8 结论在真机确认。
+
+## F75 — 8 卡 b113 实时日志（dev N6 进行中）：decode 已修好（bs6 16.4ms/步）；冷预填充 746ms/8192 块；N6 时 KV 峰值已占 50%
+- 工具：`scripts/pod/verify/logstat.py <server.log> [port]`（解析 TP0 调度行 + /metrics）。
+- decode（连续 decode 日志行）：bs1 10.8ms/步、bs6 16.4ms/步（110 torch 版为 18/69ms）→ 每增一请求约 +1.1ms（原 +10ms）。
+- 冷预填充续块（cached=0，n=291）：约 11k tok/s ≈ 746ms/8192 块（成本表估算 580ms + allreduce 等，吻合）→ 19 万 token 冷启动预填充约 18s。
+- 池占用：KV 峰值 0.50（N6！整机约 94 万 token）、KDA 状态 0.04。→ 推断约 N14 起 KV 满、开始驱逐；**容量（DCP/cuda-graph bs/FP8 KV）优先级上调**。
+- 注意：日志 "input throughput" 以日志间隔计，首块含等待/decode 时间，不可直接用；/metrics cache_hit_rate=0 疑似统一缓存未更新 → 以 harness 逐请求 cached_tokens 为准。
