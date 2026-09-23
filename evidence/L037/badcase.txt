@@ -1,0 +1,22 @@
+== raw_dev-combined-v1_N22_1790188861.jsonl: 722 requests, wall 1245 s, 1197 prefill batches logged in the window
+prefill batches >=8192 new tokens: 1000; of these with requests decoding and an EMPTY queue: 34 (3%)
+prefill new tokens in window: 10.21M
+
+== TPOT: 0/722 requests > 0.10 s/token (0.0%); mean 0.0599, p95 0.0775
+  output tokens [0,100): 0/80 over (0%)
+  output tokens [100,300): 0/506 over (0%)
+  output tokens [300,1000): 0/104 over (0%)
+  output tokens [1000,inf): 0/32 over (0%)
+  prompt tokens [0,16384): 0/76 over (0%)
+  prompt tokens [16384,65536): 0/498 over (0%)
+  prompt tokens [65536,131072): 0/122 over (0%)
+  prompt tokens [131072,inf): 0/26 over (0%)
+  worst minutes (first token, UTC): 18:41 0/24, 18:42 0/32, 18:43 0/49, 18:44 0/42, 18:45 0/45
+
+== TTFT gate overs (harness buckets)
+  fast_intra: 19/328 over | queue p50 3.0s exec p50 1.4s | lost cache (>4096 over frozen) 11
+  overall_intra: 28/388 over | queue p50 9.0s exec p50 4.6s | lost cache (>4096 over frozen) 9
+  turn_start: 7/20 over | queue p50 25.5s exec p50 4.2s | lost cache (>4096 over frozen) 5
+  chain_start: 87/314 over | queue p50 53.9s exec p50 3.7s | lost cache (>4096 over frozen) 29
+
+wrote 141 rows to evidence/L037/badcases.csv

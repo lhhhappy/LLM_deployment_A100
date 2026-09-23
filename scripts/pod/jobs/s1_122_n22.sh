@@ -1,13 +1,10 @@
-# 037c S1+122@N22: job 036 (S1 = S0 + 114) with ONE change: patch 122 (adaptive decode rounds) on, SGLANG_AX_TPOT_TARGET=0.085.
-# Why: 035/036 fail only tpot_p95; 243 of 858 big chunks in 035 ran while requests were decoding with an empty queue, one
-# decode round per ~1.2 s chunk. 122 owes decode rounds proportional to each prefill batch's estimated time (19 after a 16k
-# chunk, 3 after a 512-token hit) and none when nobody decodes. Compare with 036 (base) and 037b (fixed interval 16).
-# Verdict: LEVEL line from level_verdict.py (complete data + harness scorer + task.md rules).
+# S1 + adaptive decode rounds (122) at N22; compare against S1 and fixed interval 16.
 G_NAME=s1_122
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch 122-adaptive-decode-rounds.patch"
+G_PATCHES="000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 122-adaptive-decode-rounds.patch 140-kda-dual-snapshot.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200"
-G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_TPOT_TARGET=0.085"
+G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_TPOT_TARGET=0.17"
 LADDER_UP="22"
+
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
 #   G_NAME, G_PATCHES, G_ARGS, G_ENV (same as dev_generic_template.sh), optional LADDER.
@@ -67,3 +64,4 @@ for N in $UP; do
   else echo "LADDER stop at N=$N (formal-est FAIL); highest pass = previous level"; fi
   break
 done
+
