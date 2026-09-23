@@ -411,3 +411,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 结论：现有 Triton INT8 只快 0–16%，而精度差 4–8 倍（FP8→INT8 重量化损失块内小值），能力门风险大 → R8 A1 降级。
   所有路径都停在约 85–95 TFLOPS（每专家约 230 token 的小 GEMM + 镜像无 A100/E=288/N=256 调优配置）→ 新方向"A100 MoE 形状调优"。
 - 开发机环境（torch 2.13/Triton 3.7.1），**须在 pod 复测**：`scripts/pod/verify/bench_moe_int8.py` 已进验证套件。证据 `evidence/INT8/`。
+
+## F71 — GLM-5.3 单卡（TP8 份额）逐组件成本表：DSA 稀疏注意力 + mHC ≈ 37%（两者在 8 卡上重复），MoE 33%，KDA 仅 5%
+- 方法：SGLang 真实模型代码 + 随机权重，8 层缩小版（[KDA×3, DSA]×2，全 MoE），形状 = TP8 单卡份额（注意力/KDA 8 头、MoE N=256×288 专家、indexer 32 头与低秩投影全量、mHC hc_mult=4），`sglang.benchmark.one_batch` + torch profiler；
+  脚本 `scripts/analysis/{make_rank_model.py,rank_profile.sh,component_table.py}`（pod 可原样重跑）。开发机 A100，全补丁树（000–160）。
+- 预填充 8192 token（冷，上下文 8k），8 层 GPU 111.4ms：MoE 36.4（32.7%）、DSA 稀疏注意力 24.1（21.6%，每 DSA 层约 12ms）、稠密 GEMM 17.3（15.5%）、mHC 14.8（13.3%）、逐元素 9.1、KDA 5.2（4.7%）、indexer 3.7（3.3%，随上下文增长）。
+- 外推到 45 层每卡每个 8192 块约 580ms（不含 allreduce；indexer 在 10 万上下文约 +110ms）→ 19.5 万 token 冷启动单独约 15s。
+- decode（bs=1，上下文 8k）每步 GPU 2.5ms：稠密 GEMM 32%、MoE 17%、mHC 14%、稀疏注意力 13%。
+- 含义：稀疏注意力（每卡重读同一潜在 KV）与 mHC（每卡算全量 token）是结构性 8× 冗余，按 token 切分可去掉约 1/3 预填充时间 → 支持 R8 §7 G1/G3/G4；MoE 为 F2。开发机结果，须 pod 复测。
