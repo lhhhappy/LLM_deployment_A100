@@ -340,4 +340,4 @@
 - 长idle两条及短idle一条已确认此前可用深度退化，LRU/分配压力最有依据，但现有日志不能识别FULL还是MAMBA触发；无测量中flush/restart/retract证据。新增事件应记两池free/evictable、触发调用点、节点深度/锁、branch/chosen_track、140 skip。
 - 容量探针不要按“4%状态/腾6GB/零风险2×”解释。当前预算graph64+固定状态200估算约157万token/1.66×；减状态池可能加剧历史淘汰。F78 DCP已有积极实测，R18保留的DSA/indexer高虚拟地址疑点交T49-07验证，未宣称已发生错误。
 - 最终本地输入/源码SHA、19对LCP/5个chunk算式、日志引用与显存账闭合通过；原证据`evidence/T49/`，本轮未使用新增pod权限、未改引擎/补丁、未操作任何GPU/服务/镜像/提交。活跃Codex实例表请Claude维护。
-| T50 | 09-23 | Claude→Codex W24（astra/xhigh） | DCP 下带前缀命中的越界访问：定位 110–115 中按全量 KV 寻址的路径，开发机 DCP2 复现并修复（补丁 116） | patches/116-*、evidence/T50/、prompt plans/prompts/T50-dcp-address.md | queued | |
+| T50 | 09-23 | Claude→Codex W24（astra/xhigh） | DCP 下带前缀命中的越界访问：定位 110–115 中按全量 KV 寻址的路径，开发机 DCP2 复现并修复（补丁 116） | patches/116-*、evidence/T50/、prompt plans/prompts/T50-dcp-address.md | in-progress | accepted → in-progress：W24 核对底包 DCP 地址协议；准备 TP2+DCP2 两次 extend、非 DCP logits oracle 与高虚拟地址回归。 |

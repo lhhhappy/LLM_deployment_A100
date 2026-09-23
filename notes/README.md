@@ -80,6 +80,10 @@
 - **F77** 补丁 120 在 8 卡 N6 上消除了 intra 排队：四门全过（自估规则）；chain_start 尾部变差
 - **F78** 8 卡探针：mHC 输入分散 −6~9%；DCP 8（+114+115）KV 逻辑容量 ×7.8、19 万冷预填充 −19%，能力冒烟均 12/12
 - **F79** T49：b113 N6缓存/容量口径纠正与逐请求源码归因（VERIFIED；候选根因单列INFERRED）
+- **F80** 容量零风险杠杆实测：KV 94.3 万 → 156.9 万 token（+66%）
+- **F81** chunked_prefill 16384 使自动 mem_fraction_static 从 0.7885 降到 0.646 → KV 从 157 万掉到 63 万，运行时 27GB 闲置
+- **F82** 梯子 024 在 N10 引擎崩溃："Prefill out of memory"（底包续算强制整块分配）→ 补丁 106
+- **F83** DCP8 梯子 N10 崩溃：带前缀命中的预填充触发 CUDA illegal memory access
 
 ## Decisions（最新在上）
 
@@ -155,7 +159,8 @@
 
 ## Plans
 
-- plans/active/102-role-track.md
+- plans/active/2026-09-23-8card-selftest-ladder.md
+- plans/completed/102-role-track.md
 - plans/completed/112-sm80-indexer.md
 - plans/completed/113-prefill-indexer.md
 - plans/completed/160-nextn-sm80.md
@@ -174,6 +179,7 @@
 - plans/prompts/T48-M4-mtp-sm80.md
 - plans/prompts/T49-brief-8card-n6.md
 - plans/prompts/T49-codex-astra.md
+- plans/prompts/T50-dcp-address.md
 
 ## Reports
 

@@ -1,0 +1,528 @@
+18:from sglang.srt.configs.model_config import get_dsa_index_topk, is_deepseek_dsa
+36:    transform_index_page_table_decode,
+37:    transform_index_page_table_prefill,
+48:    q8kv8_topk_length_from_indices,
+53:    get_dsa_index_kpool,
+54:    get_dsa_index_topk,
+65:from sglang.srt.layers.attention.dsa.dsa_topk_backend import (
+69:from sglang.srt.layers.attention.dsa.kpool_plan import (
+72:    init_kpool_extend_metadata,
+73:    init_kpool_write_plan,
+74:    init_kpool_write_plan_capture,
+76:    refresh_kpool_pool_schedule_from,
+77:    update_kpool_write_plan,
+90:    should_use_dsa_fused_topk,
+157:def _should_return_dsa_dcp_lse(*, forward_mode: ForwardMode, dcp_enabled: bool) -> bool:
+158:    return dcp_enabled and (forward_mode.is_decode() or forward_mode.is_target_verify())
+218:def _is_kpool_metadata_fusion_supported(
+219:    index_kpool: int, page_size: int, index_topk: int
+222:        index_kpool > 1
+224:        and page_size % index_kpool == 0
+225:        and index_topk % index_kpool == 0
+229:def _get_plan_topk_v2():
+232:    Deliberately NOT a module-scope import: sglang.kernels.ops.attention.dsv4.topk
+239:        from sglang.kernels.ops.attention.dsv4.topk import plan_topk_v2
+241:        _PLAN_TOPK_V2 = plan_topk_v2
+280:    # never read (attention uses topk_indices, indexer uses real_page_table); the
+281:    # graph then only materializes the compact real_page_table. See
+282:    # `dsa_drop_wide_page_table`.
+283:    page_table_1: Optional[torch.Tensor]
+286:    # 1. dense decode/prefill, we use paged flash attention, need real_page_table
+287:    # 2. sparse decode/prefill, indexer need real_page_table to compute the score
+288:    real_page_table: torch.Tensor
+291:    dsa_cache_seqlens_int32: torch.Tensor  # this seqlens is clipped to `topk`
+308:    topk_v2_plan: Optional[torch.Tensor] = None
+313:    page_table_1_flattened: Optional[torch.Tensor] = None
+314:    # The offset of topk indices in ragged kv, prefill only
+316:    topk_indices_offset: Optional[torch.Tensor] = None
+327:    pooled_index_kpool: int = 1
+329:    pooled_real_page_table: Optional[torch.Tensor] = None
+331:    kpool_extend_plan: Optional[KPoolExtendPlan] = None
+332:    kpool_write_plan: Optional[KPoolWritePlan] = None
+337:    full_real_page_table: Optional[torch.Tensor] = None
+431:        topk=0,
+433:        seed_dsa_topk_from_draft_extend: bool = False,
+449:        self.dsa_index_topk = get_dsa_index_topk(hf_config)
+450:        self.dsa_index_kpool = get_dsa_index_kpool(hf_config)
+451:        self.needs_cpu_seq_lens = self.dsa_index_kpool > 1
+453:        _kpool_fusion_requested = (
+456:        _kpool_fusion_supported = _is_kpool_metadata_fusion_supported(
+457:            self.dsa_index_kpool,
+459:            self.dsa_index_topk,
+461:        _kpool_fusion_platform_ok = is_cuda() and not _is_hip
+462:        self.experimental_kpool_metadata_fusion = (
+463:            _kpool_fusion_requested
+464:            and _kpool_fusion_supported
+465:            and _kpool_fusion_platform_ok
+468:            _kpool_fusion_requested
+469:            and self.dsa_index_kpool > 1
+470:            and not _kpool_fusion_supported
+475:                "(index_kpool=%s, page_size=%s, index_topk=%s; required: "
+476:                "page_size=64, page-aligned pool, pool-aligned topk) — keeping "
+478:                self.dsa_index_kpool,
+480:                self.dsa_index_topk,
+509:        self.dsa_topk_backend: DSATopKBackend = DSATopKBackend.resolve(model_runner)
+546:                max_bs * self.dsa_index_topk,
+576:        self.topk = get_spec().speculative_eagle_topk or 0
+580:        self.use_fused_topk = should_use_dsa_fused_topk(seed_dsa_topk_from_draft_extend)
+581:        if envs.SGLANG_DSA_FUSE_TOPK.get() and not self.use_fused_topk:
+626:        # `topk` -1-sentinel landing-pad rows need zeroing each call, and
+630:        # Per-row valid-topk early-exit (SGLANG_ENABLE_DSA_Q8KV8_TOPK_LENGTH):
+631:        # rows whose topk indices end in a -1 pad run skip whole topk blocks
+633:        self._q8kv8_topk_length_enabled: bool = (
+821:            topk=self.dsa_index_topk,
+840:    def _check_kpool_tail_backend(
+842:        topk_indices: Optional[torch.Tensor],
+847:            topk_indices is None
+848:            or self.dsa_index_kpool <= 1
+853:            "index_kpool > 1 appends tail tokens to topk_indices and is "
+858:    def _resolve_kpool_tail_backend(
+860:        topk_indices: Optional[torch.Tensor],
+864:            topk_indices is None
+865:            or self.dsa_index_kpool <= 1
+875:    def _pad_trtllm_sparse_page_table(
+876:        self, page_table_1: torch.Tensor
+878:        sparse_mla_top_k = page_table_1.shape[1]
+881:            return page_table_1, sparse_mla_top_k
+883:            (page_table_1.shape[0], padded_top_k - sparse_mla_top_k),
+885:            dtype=page_table_1.dtype,
+886:            device=page_table_1.device,
+888:        return torch.cat([page_table_1, padding], dim=1), padded_top_k
+926:    def _build_topk_v2_plan(
+932:        # that dispatches to `_topk_transform_v2_paged` -- decode AND MTP
+936:        if not self.dsa_topk_backend.should_use_topk_v2():
+938:        from sglang.kernels.ops.attention.dsv4.topk import plan_topk_v2
+940:        return plan_topk_v2(seqlens_expanded)
+942:    def _refresh_topk_v2_plan(self, metadata: DSAMetadata) -> None:
+949:        if metadata.topk_v2_plan is None:
+952:        # construction (it was built by plan_topk_v2 at capture), so the
+954:        _get_plan_topk_v2()(metadata.dsa_seqlens_expanded, out=metadata.topk_v2_plan)
+956:    def _get_fused_topk_page_table(self, topk_indices: torch.Tensor) -> torch.Tensor:
+958:            self.dsa_topk_backend.is_sgl_kernel()
+959:            or self.dsa_topk_backend.is_flashinfer()
+961:            return topk_indices
+963:            f"Unsupported {self.dsa_topk_backend = } for SGLANG_DSA_FUSE_TOPK."
+977:    def _graph_page_table_width(self, metadata: DSAMetadata) -> int:
+979:        page_table_1 width when present, else req_to_token's width (the wide table
+980:        is dropped for fused decode graphs, see `dsa_drop_wide_page_table`)."""
+981:        if metadata.page_table_1 is not None:
+982:            return metadata.page_table_1.shape[1]
+985:    def _transform_table_1_to_real(self, page_table: torch.Tensor) -> torch.Tensor:
+988:            return page_table
+989:        max_seqlen_k = page_table.shape[1]
+991:            0, max_seqlen_k, page_size, device=page_table.device, dtype=torch.int32
+993:        return page_table[:, strided_indices] // page_size
+995:    def _kpool_slots_per_page(self) -> int:
+998:    def _build_kpool_paged_mqa_schedule_metadata(self) -> bool:
+1003:    def _init_kpool_metadata(
+1007:        topk_transform_method: Optional[TopkTransformMethod] = None,
+1008:        kpool_inputs: Optional[_KPoolForwardInputs] = None,
+1010:        if self.dsa_index_kpool <= 1:
+1014:        slots_per_page = self._kpool_slots_per_page()
+1015:        build_schedule_metadata = self._build_kpool_paged_mqa_schedule_metadata()
+1017:            assert topk_transform_method is not None
+1018:            assert kpool_inputs is not None
+1019:            return init_kpool_extend_metadata(
+1022:                pool_size=self.dsa_index_kpool,
+1025:                topk_transform_method=topk_transform_method,
+1026:                full_real_page_table=kpool_inputs.full_real_page_table,
+1027:                full_seqlens_expanded=kpool_inputs.full_seqlens_expanded,
+1028:                **kpool_inputs.cp_overrides,
+1036:                pool_size=self.dsa_index_kpool,
+1041:            return init_kpool_write_plan(
+1044:                pool_size=self.dsa_index_kpool,
+1046:                real_page_table=metadata.real_page_table,
+1054:            return init_kpool_write_plan(
+1057:                pool_size=self.dsa_index_kpool,
+1059:                real_page_table=metadata.real_page_table,
+1074:            return init_kpool_write_plan(
+1077:                pool_size=self.dsa_index_kpool,
+1079:                real_page_table=metadata.real_page_table,
+1091:    def _init_kpool_metadata_capture(
+1094:        if self.dsa_index_kpool <= 1:
+1097:        slots_per_page = self._kpool_slots_per_page()
+1098:        build_schedule_metadata = self._build_kpool_paged_mqa_schedule_metadata()
+1104:                pool_size=self.dsa_index_kpool,
+1117:            metadata = init_kpool_write_plan_capture(
+1120:                pool_size=self.dsa_index_kpool,
+1134:    def _update_kpool_metadata_replay(
+1143:        if self.dsa_index_kpool <= 1:
+1146:        slots_per_page = self._kpool_slots_per_page()
+1147:        build_schedule_metadata = self._build_kpool_paged_mqa_schedule_metadata()
+1153:                pool_size=self.dsa_index_kpool,
+1176:        update_kpool_write_plan(
+1180:            real_page_table=metadata.real_page_table,
+1181:            pool_size=self.dsa_index_kpool,
+1190:    def _update_kpool_metadata_from_precomputed(
+1196:        if self.dsa_index_kpool <= 1:
+1199:        slots_per_page = self._kpool_slots_per_page()
+1200:        build_schedule_metadata = self._build_kpool_paged_mqa_schedule_metadata()
+1206:                pool_size=self.dsa_index_kpool,
+1222:        update_kpool_write_plan(
+1226:            real_page_table=metadata.real_page_table,
+1227:            pool_size=self.dsa_index_kpool,
+1275:        page_table = self.req_to_token_pool.req_to_token[
+1279:        page_table_1_flattened = None
+1280:        topk_indices_offset = None
+1294:        topk_transform_method = self.get_topk_transform_method(
+1305:        use_kpool = self.dsa_index_kpool > 1
+1306:        if use_kpool:
+1309:                and self.real_page_size % self.dsa_index_kpool == 0
+1311:                f"kpool path requires page_size == 64 and page_size % pool_size == 0; "
+1312:                f"got page_size={self.real_page_size}, pool_size={self.dsa_index_kpool}."
+1314:        kpool_inputs = _KPoolForwardInputs()
+1340:            page_table = torch.repeat_interleave(
+1341:                page_table, repeats=self.speculative_num_draft_tokens, dim=0
+1380:                page_table = torch.repeat_interleave(
+1381:                    page_table, repeats=self.speculative_num_draft_tokens, dim=0
+1387:                page_table = torch.repeat_interleave(
+1388:                    page_table, repeats=forward_batch.extend_seq_lens, dim=0
+1415:            if use_kpool:
+1416:                kpool_inputs.full_real_page_table = self._transform_table_1_to_real(
+1417:                    page_table
+1419:                kpool_inputs.full_seqlens_expanded = seqlens_expanded
+1444:                page_table = page_table[bs_idx, :max_seqlen_k]
+1445:                if use_kpool:
+1446:                    kpool_inputs.cp_overrides = dict(
+1447:                        local_real_page_table=self._transform_table_1_to_real(
+1448:                            page_table
+1538:                local_page_table = torch.cat(
+1539:                    [page_table[:cp_bs], page_table[:cp_bs]], dim=0
+1541:                page_table = local_page_table[:, :max_seqlen_k]
+1550:                if use_kpool:
+1551:                    kpool_inputs.cp_overrides = dict(
+1552:                        local_real_page_table=self._transform_table_1_to_real(
+1553:                            page_table
+1580:            # page_table_1_flattened is only used when prefix sharing is enabled:
+1583:                topk_transform_method == TopkTransformMethod.RAGGED
+1586:                page_table_1_flattened = torch.cat(
+1588:                        page_table[i, :kv_len]
+1594:                assert page_table_1_flattened.shape[0] == sum(
+1596:                ), f"{page_table_1_flattened.shape[0] = } must be the same as {sum(indexer_seq_lens_cpu) = }"
+1604:                    max_idx = page_table_1_flattened.max().item()
+1610:            if topk_transform_method == TopkTransformMethod.RAGGED:
+1611:                topk_indices_offset = torch.repeat_interleave(
+1624:            dsa_index_topk=self.dsa_index_topk,
+1625:            index_kpool=self.dsa_index_kpool,
+1668:            page_table_1=page_table,
+1669:            page_table_1_flattened=page_table_1_flattened,
+1685:            real_page_table=self._transform_table_1_to_real(page_table),
+1687:            topk_indices_offset=topk_indices_offset,
+1692:            topk_v2_plan=self._build_topk_v2_plan(seqlens_expanded),
+1694:        metadata = self._init_kpool_metadata(
+1697:            topk_transform_method=topk_transform_method,
+1698:            kpool_inputs=kpool_inputs,
+1794:        # decode top-k routes to the fused v2 kernel: attention reads topk_indices
+1795:        # and the indexer reads the compact real_page_table, so nothing reads the
+1797:        # `DSATopKBackend.topk_transform` dispatches decode PAGED to
+1798:        # `_topk_transform_v2_paged` -- otherwise the legacy transform would read a
+1800:        # enabled AND index_topk in the kernel's supported range, on CUDA with
+1801:        # page_size>1. Excludes HIP (its indexer reads page_table_1), hisparse
+1805:        self.dsa_drop_wide_page_table = (
+1811:            # kpool's PAGED fused-topk mapping still reads page_table_1.
+1812:            and self.dsa_index_kpool <= 1
+1813:            and self.use_fused_topk
+1814:            and self.dsa_topk_backend.should_use_topk_v2()
+1815:            and self.dsa_index_topk is not None
+1816:            and 0 < self.dsa_index_topk <= 2048
+1830:            # fake page_table for sparse_prefill
+1836:            "real_page_table": (
+1843:                if self.dsa_drop_wide_page_table
+1846:            "page_table": (
+1848:                if self.dsa_drop_wide_page_table
+1891:            if self.dsa_drop_wide_page_table:
+1892:                page_table_1 = None
+1895:                page_table_1 = self.decode_cuda_graph_metadata["page_table"][:bs, :]
+1896:                max_seqlen_k = page_table_1.shape[1]
+1906:                dsa_index_topk=self.dsa_index_topk,
+1907:                index_kpool=self.dsa_index_kpool,
+1931:            if self.dsa_drop_wide_page_table:
+1932:                page_table_1 = None
+1935:                page_table_1 = self.decode_cuda_graph_metadata["page_table"][
+1938:                max_seqlen_k = page_table_1.shape[1]
+1971:                dsa_index_topk=self.dsa_index_topk,
+1972:                index_kpool=self.dsa_index_kpool,
+1992:        if self.dsa_drop_wide_page_table:
+1995:            real_page_table = self.decode_cuda_graph_metadata["real_page_table"][
+1999:            real_page_table = self._transform_table_1_to_real(page_table_1)
+2022:            page_table_1=page_table_1,
+2030:            real_page_table=real_page_table,
+2032:            topk_v2_plan=self._build_topk_v2_plan(seqlens_expanded),
+2034:        metadata = self._init_kpool_metadata_capture(metadata, bs, forward_mode)
+2109:            max_len = self._graph_page_table_width(metadata)
+2115:                    self.dsa_index_kpool <= 1 or self.experimental_kpool_metadata_fusion
+2124:                    page_table_1=metadata.page_table_1,
+2127:                    real_page_table=metadata.real_page_table,
+2130:                    dsa_index_topk=self.dsa_index_topk,
+2132:                    index_kpool=self.dsa_index_kpool,
+2147:                metadata.page_table_1[:, :max_len].copy_(page_indices)
+2150:                    dsa_index_topk=self.dsa_index_topk,
+2151:                    index_kpool=self.dsa_index_kpool,
+2156:            max_seqlen_k = self._graph_page_table_width(metadata)
+2162:                    self.dsa_index_kpool <= 1 or self.experimental_kpool_metadata_fusion
+2183:                    page_table_1=metadata.page_table_1,
+2187:                    real_page_table=metadata.real_page_table,
+2190:                    dsa_index_topk=self.dsa_index_topk,
+2194:                    index_kpool=self.dsa_index_kpool,
+2219:                metadata.page_table_1[:, :max_seqlen_k].copy_(page_indices)
+2238:                    self.dsa_index_topk,
+2239:                    index_kpool=self.dsa_index_kpool,
+2249:            max_seqlen_k = self._graph_page_table_width(metadata)
+2265:                    self.dsa_index_kpool <= 1 or self.experimental_kpool_metadata_fusion
+2275:                    page_table_1=metadata.page_table_1,
+2279:                    real_page_table=metadata.real_page_table,
+2283:                    dsa_index_topk=self.dsa_index_topk,
+2288:                    index_kpool=self.dsa_index_kpool,
+2307:                metadata.page_table_1[:, :max_seqlen_k].copy_(page_indices)
+2320:                    self.dsa_index_topk,
+2321:                    index_kpool=self.dsa_index_kpool,
+2345:            self._refresh_topk_v2_plan(metadata)
+2356:            and self.dsa_index_topk is not None
+2371:                metadata.real_page_table[:new_rows, :new_cols].copy_(real_table)
+2373:            assert metadata.real_page_table is metadata.page_table_1
+2380:        self._update_kpool_metadata_replay(
+2407:        (kpool > 1 without the fusion gate), DCP, HIP, or flashmla_kv (whose
+2414:            and not get_parallel().dcp_enabled
+2415:            and (self.dsa_index_kpool <= 1 or self.experimental_kpool_metadata_fusion)
+2452:        max_seqlen_k = self._graph_page_table_width(metadata)
+2494:            page_table_1=metadata.page_table_1,
+2498:            real_page_table=metadata.real_page_table,
+2501:            dsa_index_topk=self.dsa_index_topk,
+2505:            index_kpool=self.dsa_index_kpool,
+2518:        if metadata.topk_v2_plan is not None:
+2520:            _get_plan_topk_v2()(
+2521:                metadata.dsa_seqlens_expanded, out=metadata.topk_v2_plan
+2524:        self._update_kpool_metadata_replay(
+2573:        pool_size = self.dsa_index_kpool
+2574:        slots_per_page = self._kpool_slots_per_page()
+2575:        kpool_plan = metadata.kpool_write_plan if pool_size > 1 else None
+2577:            kpool_plan is not None and kpool_plan.pool_schedule_metadata is not None
+2607:                refresh_kpool_pool_schedule_from(
+2649:            self._refresh_topk_v2_plan(metadata)
+2655:        self._update_kpool_metadata_from_precomputed(
+2711:                    precomputed.real_page_table,
+2717:                    metadata.page_table_1,
+2722:                        metadata.real_page_table
+2723:                        if precomputed.real_page_table is not None
+2758:                metadata.page_table_1[:, : precomputed.max_len].copy_(
+2766:                metadata.page_table_1[:, : precomputed.max_seqlen_k].copy_(
+2779:            if precomputed.real_page_table is not None:
+2780:                rows, cols = precomputed.real_page_table.shape
+2781:                metadata.real_page_table[:rows, :cols].copy_(
+2782:                    precomputed.real_page_table
+2800:            and _match(dst.topk_v2_plan, src.topk_v2_plan)
+2802:            and _match(dst.pooled_real_page_table, src.pooled_real_page_table)
+2807:            and _match(dst.kpool_write_plan, src.kpool_write_plan)
+2810:        dst_plan, src_plan = dst.kpool_write_plan, src.kpool_write_plan
+2820:    def _copy_kpool_metadata_from_sibling(
+2824:        if self.dsa_index_kpool <= 1 or not is_cuda():
+2831:        if metadata.pooled_real_page_table is not None:
+2832:            metadata.pooled_real_page_table.copy_(src_metadata.pooled_real_page_table)
+2838:        dst_plan = metadata.kpool_write_plan
+2839:        src_plan = src_metadata.kpool_write_plan
+2868:            # leave the DeepGEMM schedule / top-k plan / kpool metadata
+2893:            if metadata.topk_v2_plan is not None:
+2894:                metadata.topk_v2_plan.copy_(src_metadata.topk_v2_plan)
+2905:        self._copy_kpool_metadata_from_sibling(metadata, src_metadata)
+2920:        topk_indices: Optional[torch.Tensor] = None,
+2947:        dsa_impl = self._resolve_kpool_tail_backend(topk_indices, dsa_impl)
+2948:        self._check_kpool_tail_backend(topk_indices, dsa_impl, phase)
+2961:                topk_indices,
+3016:        topk_transform_method = self.get_topk_transform_method(
+3020:        if self.use_fused_topk:
+3021:            if topk_indices is not None:
+3022:                topk_indices = self._pad_topk_indices(topk_indices, q_nope.shape[0])
+3024:            page_table_1 = self._get_fused_topk_page_table(topk_indices)
+3026:            if topk_transform_method == TopkTransformMethod.RAGGED:
+3027:                if topk_indices is not None:
+3028:                    topk_indices = self._pad_topk_indices(topk_indices, q_nope.shape[0])
+3029:                topk_indices_offset = metadata.topk_indices_offset
+3030:                assert topk_indices_offset is not None
+3031:                mask = topk_indices != -1
+3032:                topk_indices_offset = (
+3033:                    topk_indices_offset.unsqueeze(1)
+3034:                    if topk_indices_offset.ndim == 1
+3035:                    else topk_indices_offset
+3037:                topk_indices = torch.where(
+3038:                    mask, topk_indices + topk_indices_offset, topk_indices
+3040:            elif topk_transform_method == TopkTransformMethod.PAGED:
+3042:                page_table_1 = transform_index_page_table_prefill(
+3043:                    page_table=metadata.page_table_1,
+3044:                    topk_indices=topk_indices,
+3048:                    page_table_is_expanded=(
+3058:            page_table_1 = self.token_to_kv_pool.translate_loc_to_hisparse_device(
+3059:                page_table_1
+3067:                # tail=64, topk=2048); everything else uses TileLang.
+3075:                    and page_table_1.shape[-1] == 2048
+3086:                        indices=page_table_1.unsqueeze(1),
+3094:                page_table_1=page_table_1,
+3097:                return_lse=_should_return_dsa_dcp_lse(
+3099:                    dcp_enabled=get_parallel().dcp_enabled,
+3103:            if topk_transform_method == TopkTransformMethod.RAGGED:
+3105:                page_table_1 = topk_indices
+3114:                        page_table_1_flattened = (
+3115:                            self.forward_metadata.page_table_1_flattened
+3117:                        assert page_table_1_flattened is not None
+3123:                            page_table_1_flattened=page_table_1_flattened,
+3124:                            page_table_1=page_table_1,
+3140:                            page_table_1_flattened=None,
+3141:                            page_table_1=page_table_1,
+3152:                        page_table_1_flattened=None,
+3153:                        page_table_1=page_table_1,
+3161:                    page_table_1_flattened = (
+3162:                        self.forward_metadata.page_table_1_flattened
+3164:                    assert page_table_1_flattened is not None
+3166:                        kv_cache, page_table_1_flattened
+3176:                page_table_1=page_table_1,
+3179:                topk_length=metadata.dsa_cache_seqlens_int32,
+3184:            if topk_transform_method == TopkTransformMethod.RAGGED:
+3185:                page_table_1 = topk_indices
+3189:                page_table_1=page_table_1,
+3205:                page_table_1=page_table_1,
+3208:            fa3_page_table = page_table_1
+3225:                    if fa3_page_table.shape[0] > q_nope.shape[0]:
+3226:                        fa3_page_table = fa3_page_table.index_select(0, row_select)
+3232:                page_table=fa3_page_table,
+3247:                page_table_1=page_table_1,
+3266:        topk_indices: Optional[torch.Tensor] = None,
+3276:        dsa_impl = self._resolve_kpool_tail_backend(topk_indices, self.dsa_decode_impl)
+3277:        self._check_kpool_tail_backend(topk_indices, dsa_impl, "decode")
+3290:                topk_indices,
+3331:        # Align topk_indices with q dimensions
+3332:        if topk_indices is not None:
+3333:            topk_indices = self._pad_topk_indices(topk_indices, q_nope.shape[0])
+3336:            page_table_1 = self.hisparse_coordinator.swap_in_selected_pages(
+3339:                topk_indices,
+3342:        elif self.use_fused_topk:
+3343:            page_table_1 = self._get_fused_topk_page_table(topk_indices)
+3345:            page_table_1 = transform_index_page_table_decode(
+3346:                page_table=metadata.page_table_1,
+3347:                topk_indices=topk_indices,
+3357:                page_table_1=page_table_1,
+3360:                topk_length=metadata.dsa_cache_seqlens_int32,
+3368:                page_table_1=page_table_1,
+3384:                page_table_1=page_table_1,
+3396:                page_table_1=page_table_1,
+3399:                return_lse=_should_return_dsa_dcp_lse(
+3401:                    dcp_enabled=get_parallel().dcp_enabled,
+3410:                page_table=page_table_1,
+3425:                page_table_1=page_table_1,
+3440:        page_table: torch.Tensor,
+3459:        if self.dsa_index_kpool > 1:
+3460:            page_table = page_table.clamp(min=0)
+3467:            page_table=page_table,
+3485:        page_table_1: torch.Tensor,
+3487:        topk_length: Optional[torch.Tensor] = None,
+3513:        # indices shape must be (s_q, h_kv=1, topk), keep h_kv=1 unchanged
+3514:        indices_input = page_table_1.unsqueeze(1)
+3516:        # topk_length is the per-row count of valid indices
+3517:        # (`dsa_cache_seqlens_int32` = seqlens clipped to `index_topk`). Rows
+3518:        # whose context is shorter than `index_topk` have their indices
+3520:        # the padded tail instead of scanning the full topk width. The output
+3522:        if topk_length is not None and topk_length.shape[0] != num_tokens:
+3526:            topk_length = None
+3534:            topk_length=topk_length,
+3572:            self.get_topk_transform_method(forward_batch.forward_mode)
+3640:        page_table_1: torch.Tensor,
+3643:        page_table_1_flattened: Optional[torch.Tensor] = None,
+3654:        The kernel runs via its fixed full-topk entry (``attn_sink`` /
+3655:        ``topk_length`` left None), keeping control flow identical across DP
+3656:        ranks; -1 topk sentinels are clamped to distinct zero pad rows inside
+3750:        # KV: append `topk` trailing zero rows so the kernel's -1-sentinel
+3751:        # clamp can map every padded topk slot to a DISTINCT zero row.
+3759:        # [num_kv_tokens, num_kv_tokens + topk) - exactly the rows the SM90
+3764:        topk = page_table_1.shape[-1]
+3766:            num_kv_tokens = page_table_1_flattened.shape[0]
+3771:        total_kv_rows = num_kv_tokens + topk
+3783:                page_table_1_flattened,
+3784:                extra_rows=topk,
+3804:        # Per-row valid-topk count = last non-pad position + 1.  Bit-exact
+3805:        # vs topk_length=None: the skipped tail blocks contain only -1 pads
+3809:        # with a full topk (all rows at long context) pay ~one block read.
+3810:        topk_length = None
+3811:        if self._q8kv8_topk_length_enabled:
+3812:            topk_length = q8kv8_topk_length_from_indices(page_table_1)
+3837:            indices=page_table_1.unsqueeze(1),
+3843:            topk_length=topk_length,
+3858:        page_table_1: torch.Tensor,
+3871:            indices=page_table_1,
+3891:        page_table_1,
+3918:        indices = page_table_1.unsqueeze(1)
+3920:            indices.shape[-1] == self.dsa_index_topk
+4016:        page_table_1: torch.Tensor,
+4022:        # KPool appends up to index_kpool - 1 live tail tokens to the fixed
+4023:        # index_topk columns. TileLang processes indices in 64-column blocks,
+4025:        padding = (-page_table_1.shape[-1]) % 64
+4027:            page_table_1 = torch.cat(
+4029:                    page_table_1,
+4030:                    page_table_1.new_full((*page_table_1.shape[:-1], padding), -1),
+4039:                indices=page_table_1.unsqueeze(1),
+4044:            # [1, tokens, H] -> [tokens, H], the [B, H] dcp_pack_a2a_send expects.
+4049:            indices=page_table_1.unsqueeze(1),
+4058:        page_table_1: torch.Tensor,
+4093:        non_minus1_mask = page_table_1 != -1
+4098:        get_valid_kv_indices(page_table_1, kv_indptr, kv_indices, bs)
+4137:        page_table_1: torch.Tensor,
+4169:        non_minus1_mask = page_table_1 != -1
+4175:        # Allocate kv_indices with upper-bound size (num_tokens * topk)
+4176:        topk = page_table_1.shape[1]
+4178:            num_tokens * topk, dtype=torch.int32, device=self.device
+4182:        get_valid_kv_indices(page_table_1, kv_indptr, kv_indices, num_tokens)
+4234:        topk_indices: Optional[torch.Tensor] = None,
+4321:        if self.use_fused_topk:
+4322:            if topk_indices is not None:
+4323:                topk_indices = self._pad_topk_indices(topk_indices, q.shape[0])
+4324:            page_table_1 = self._get_fused_topk_page_table(topk_indices)
+4326:            page_table_1 = transform_index_page_table_prefill(
+4327:                page_table=metadata.page_table_1,
+4328:                topk_indices=topk_indices,
+4332:                page_table_is_expanded=(
+4339:            if topk_indices is not None:
+4340:                topk_indices = self._pad_topk_indices(topk_indices, q.shape[0])
+4341:            page_table_1 = transform_index_page_table_decode(
+4342:                page_table=metadata.page_table_1,
+4343:                topk_indices=topk_indices,
+4346:        page_table_1, sparse_mla_top_k = self._pad_trtllm_sparse_page_table(
+4347:            page_table_1
+4351:            sparse_mla_top_k_lens = prepare_trtllm_nope_sparse_metadata(page_table_1)
+4361:        batch_size = page_table_1.shape[0]
+4375:        block_tables = page_table_1.unsqueeze(1)
+4403:            return_lse=_should_return_dsa_dcp_lse(
+4405:                dcp_enabled=get_parallel().dcp_enabled,
+4411:    def _pad_topk_indices(
+4412:        self, topk_indices: torch.Tensor, num_tokens: int
+4414:        current_tokens = topk_indices.shape[0]
+4416:            return topk_indices
+4419:            f"topk_indices rows ({current_tokens}) > num_tokens ({num_tokens}); "
+4425:            (pad_size, topk_indices.shape[1]),
+4427:            dtype=topk_indices.dtype,
+4428:            device=topk_indices.device,
+4430:        return torch.cat([topk_indices, padding], dim=0)
+4498:    def get_topk_transform_method(
+4502:        SGLANG_DSA_FUSE_TOPK controls whether to fuse the topk transform into the topk kernel.
+4503:        This method is used to select the topk transform method which can be fused or unfused.
+4515:            topk_transform_method = TopkTransformMethod.RAGGED
+4517:            topk_transform_method = TopkTransformMethod.PAGED
+4518:        return topk_transform_method
+4523:        force_unfused = not self.use_fused_topk or (
+4529:            topk_transform_method=self.get_topk_transform_method(
+4532:            topk_backend=self.dsa_topk_backend,
+4535:            force_unfused_topk=force_unfused,
+4551:            topk=self.dsa_index_topk,
+4569:        topk: int,
+4571:        seed_dsa_topk_from_draft_extend: bool = False,
+4573:        self.topk = topk
+4581:                    topk=self.topk,
+4583:                    seed_dsa_topk_from_draft_extend=seed_dsa_topk_from_draft_extend,
+4594:            self.attn_backends[0], "experimental_kpool_metadata_fusion", False
+4682:                    precomputed.real_page_table,
+4688:                    metadata0.page_table_1,
+4692:                        metadata0.real_page_table
+4693:                        if precomputed.real_page_table is not None
+4701:                    metadata1.page_table_1,
+4705:                        metadata1.real_page_table
+4706:                        if precomputed.real_page_table is not None
+4714:                    metadata2.page_table_1,
+4718:                        metadata2.real_page_table
+4719:                        if precomputed.real_page_table is not None
+4735:                    backend._update_kpool_metadata_from_precomputed(

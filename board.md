@@ -33,6 +33,7 @@
 | W24（`codex exec` 新会话，astra/xhigh） | logs/codex/W24.log | T50 DCP 前缀命中越界修复（补丁 116） | 进行中 |
 
 **进行中**
+- [Codex W24] T50 DCP 前缀命中寻址修复 — `patches/116-*`、`evidence/T50/`；将登记测试与补丁说明，不改其它实现。
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）

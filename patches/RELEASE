@@ -1,5 +1,33 @@
-# Two patch lines. build_image.sh defaults to the list below; pass patches explicitly to override.
-#   base line (organizer base SGLang, what we submit): 000, 1xx  — images 0922e = 000, 0922f = 000+101
-#   v0.5.20 line (L1 stand-in only; does NOT apply to the organizer base): 001, 002, 004
+# patches/RELEASE — what goes into the submission image (build_image.sh applies the uncommented lines, in order,
+# with `patch -p3 --fuzz=0` on the organizer base SGLang). Updated 2026-09-23.
+#
+# TIER 1 — run + correctness + stability. ALWAYS in the image.
 000-interface-compliance.patch
 101-d1v12-on-base.patch
+105-role-split-single-partial.patch
+106-defer-chunk-on-no-kv.patch
+110-sm80-dsa-indexer.patch
+111-sm80-fp8-moe-marlin.patch
+112-sm80-indexer-kernels.patch
+113-sm80-prefill-indexer.patch
+#
+# TIER 2 — performance / mechanisms. Uncomment ONLY after the 8-card self-test ladder passes the target level with
+# no engine crash and capability smoke 12/12 (plans/active/2026-09-23-8card-selftest-ladder.md). Keep this order.
+# 114-indexer-row-shard.patch              # bit-exact; helps very long prompts (TP2 65k −3.8%)
+# 115-sm80-sparse-attn-many-heads.patch    # needed for DCP; H=8 path bit-identical
+# 116-...                                   # DCP address fix (T50, in progress) — DCP must NOT ship before this
+# 140-kda-dual-snapshot.patch              # replaces 101 split when SGLANG_AX_KDA_DUAL_SNAPSHOT=1 (ladder 026)
+# 120-sched-protect-chain.patch            # v2; v1 cut intra queue p95 6.4s→0.36s on 8 cards
+# 130-async-tokenize.patch                 # small; not yet on 8 cards
+# 150-startup-warmup.patch                 # needs --warmups ax_shapes; not yet on 8 cards
+# 160-nextn-sm80.patch                     # MTP; ops-level only
+#
+# Launch args / env that the TIER 1 stack REQUIRES on A100 (put in the image's serve script / submission env):
+#   --dsa-prefill-backend tilelang --dsa-decode-backend tilelang          (fa3 is Hopper-only, F57)
+#   env SGLANG_OPT_USE_TOPK_V2=0 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829
+# Tier-2 launch options under test: --enable-attn-tp-input-scattered, --cuda-graph-max-bs-decode 64,
+#   --max-mamba-cache-size 200, --chunked-prefill-size 16384 with explicit --mem-fraction-static (auto drops to 0.646),
+#   120 env SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192, --dcp-size 8 (blocked on 116).
+#
+# Every submission records: git commit, this file's uncommented list + patch sha256, image tag, command, env
+# (notes/submissions.md).
