@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Detached jobs on the GPU box (survive ssh drops). Logs: /sjtu/linhang/arena/runs/jobs/<name>.log (+ "DONE rc=N" line).
+#   scripts/gjob run  <name> '<remote shell command>'   start in tmux window <name> (refuses if already running)
+#   scripts/gjob wait <name>                            block until DONE, then print the log tail (use with run_in_background)
+#   scripts/gjob tail <name> [n]                        show log tail
+#   scripts/gjob ls                                     list job logs and their status
+set -uo pipefail
+D=/sjtu/linhang/arena/runs/jobs; G="$(dirname "$0")/gssh"
+case "${1:-}" in
+  run)  name=$2; shift 2; cmd="$*"
+        printf '%s\n' "$cmd" | timeout 60 ssh -o ConnectTimeout=20 GPU "mkdir -p $D && cat > $D/$name.cmd" || { echo "cannot upload job"; exit 1; }
+        GSSH_TIMEOUT=60 "$G" "if tmux list-windows -t arena-daemons -F '#W' | grep -qx '$name'; then echo 'job $name already running'; exit 3; fi;
+          : > $D/$name.log; tmux new-window -d -t arena-daemons -n '$name' \"bash $D/$name.cmd > $D/$name.log 2>&1; echo DONE rc=\\\$? >> $D/$name.log\"; echo started $name" ;;
+  wait) name=$2; until GSSH_TIMEOUT=60 "$G" "grep -q '^DONE rc=' $D/$name.log" 2>/dev/null; do sleep 60; done
+        GSSH_TIMEOUT=60 "$G" "tail -${3:-25} $D/$name.log" ;;
+  tail) GSSH_TIMEOUT=60 "$G" "tail -${3:-30} $D/$2.log" ;;
+  ls)   GSSH_TIMEOUT=60 "$G" "cd $D 2>/dev/null && for f in *.log; do printf '%-28s %s\n' \"\${f%.log}\" \"\$(grep -m1 '^DONE rc=' \$f || echo running)\"; done" ;;
+  *)    sed -n 2,6p "$0" ;;
+esac

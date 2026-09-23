@@ -43,6 +43,7 @@ autostart 已排：b113 探测 → b113 N6 → 120on N6 → 120cap4096 N6 → b1
 `pexec`/`ppush`（保留相对路径！dest 是目录）/`pstatus`/`podq init|submit|ls|log|pause|resume|cancel`/`bootstrap`/`autostart.sh`。
 `podq init` 推送全部 `patches/NNN-*.patch`。任务模板 `scripts/pod/jobs/dev_template.sh`、`dev_b120_template.sh`（变体用不同源码名避免误复用引擎）。
 小心：`pkill -f <模式>` 会杀掉包含该模式的 bexec 外壳，用 PID；前台 `sleep` 链式等待会被拦截，用 Monitor。
+**远端命令**：`scripts/gssh` 只重试建连，命令只执行一次（中途断线不重跑、会提示检查远端状态）；超过几分钟的任务一律用 `scripts/gjob run <名> '<命令>'`（GPU 机 tmux、日志 `/sjtu/linhang/arena/runs/jobs/<名>.log`、末行 `DONE rc=`），用 `scripts/gjob wait <名>` 后台等待。
 
 ## 5. Codex 分工
 worker W15–W21 均已结束并经 Claude 核验（见 board.md 实例表、notes/dispatch.md T41–T47）。主 Codex 会话 `01a0c731-…`（T37）未再活动。
