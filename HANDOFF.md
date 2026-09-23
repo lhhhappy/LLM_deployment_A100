@@ -32,12 +32,11 @@
 
 启动参数固定：`--dsa-prefill-backend tilelang --dsa-decode-backend tilelang`（fa3 仅 Hopper，F57），env `SGLANG_OPT_DEEPGEMM_HC_PRENORM=0`、`SGLANG_OPT_USE_TOPK_V2=0`、`SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829`。
 
-## 3. 8 卡待跑队列
-autostart 已排：b113 探测 → b113 N6 → 120on N6 → 120cap4096 N6 → b113 N10 → 120on N10 → 120cap4096 N10 → b113 N14。
-- 之后手动追加：`dev_b140_n6/n10`（140 on）、150 启动探测（加 `--warmups ax_shapes`，核对 ready 后无 "compile after serving started"）、130 A/B。
-- 每个 dev 结果：读 `summary.json`（`build/podtools/summ.sh <job>`），记 TTFT p95 四门、tpm、n_at_slo → `notes/experiments.md`；
-  跑完用 `build/podtools/dstat.sh` 看 decode ms/step，必要时 `/start_profile`（`build/podtools/prof.sh` + `profsum.py`）找下一个瓶颈。
-- 已知：110 torch 版时 decode 每请求每步 +10ms、indexer 占 ~60% GPU（F63，evidence/T43）；112/113 应大幅改善——**第一件事就是验证这一点**。
+## 3. 8 卡状态与队列（2026-09-23）
+- 服务 `lh-arena-sess-b` 在线。已完成：b113 探测、能力冒烟 12/12、真机 kernel 复核 11/11、N6 基线（intra 两门 FAIL，排队所致）、120 N6（四门全过，自估）、冷预填充探针（1 万 tok/s）。
+- 队列：013b DCP+115 探针 → 020 mHC 输入分散探针 → 021 NCCL LL128 探针 → 022 容量探针 → 023 120v2 N6 → 024 最佳组合 N10 → 025 最佳+140 N10。
+- 分析工具：`build/verify_kit/`（pod 内 `/tmp/ax/verify_kit/`）：analyze_run.py（逐请求门禁/排队/缓存）、logstat.py（日志+metrics）、coldprobe.py、component_table.py。
+- 优先级见 `research/claude/R8_next_directions.md` §8。
 
 ## 4. pod 工作方式（`scripts/pod/`，在 GPU 机上运行）
 `pexec`/`ppush`（保留相对路径！dest 是目录）/`pstatus`/`podq init|submit|ls|log|pause|resume|cancel`/`bootstrap`/`autostart.sh`。

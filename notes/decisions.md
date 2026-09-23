@@ -73,3 +73,9 @@
 - 事实：我们在 N6 就卡 intra 两门，主因是排队（p95 6.4s）；chain_start 有余量；indexer 在 ≤6 万上下文只占 4.3%（114 价值下调）；allreduce 占 11%；KV 在 N6 已 50%。
 - 排序：① 120 调度 A/B（队列中 013/014，N6 上直接看 intra 两门是否转 PASS）；② 140 双点快照 A/B（修短间隔丢缓存）+ 查长空闲丢缓存原因；
   ③ 容量（DCP 探针已排、cuda-graph bs、KV 预算）；④ 预填充：allreduce（自定义 allreduce/NCCL 协议）、prefill CP 探针、MoE；⑤ 114 仅在超长请求上有益，保留但不急。
+
+## 决策（2026-09-23）— 采纳 Fable T49 审阅
+- 120 改 v2（封顶仅在有等待时生效；chunk 16384 / cap 8192 / short 8192），v1 存 patches/drafts/。
+- 新增并优先：`--enable-attn-tp-input-scattered`（mHC 每卡 1/8 token）；容量零风险杠杆（cuda-graph max bs 64、KDA 槽 200）。
+- CP 不做主线（每轮只准入 1 请求、关闭 120、decode 头切分白名单无 Glm5Next）；DCP 仅作容量后备（需 115）。
+- lib.sh：引擎复用键加入 SGLANG_AX_*/NCCL_* 环境变量（防止只差环境变量的实验误复用引擎）。

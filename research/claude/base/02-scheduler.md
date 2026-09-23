@@ -1,5 +1,9 @@
 # 02 — Scheduler source map (base image SGLang, fe236ea6c3)
 
+> **2026-09-23 更正（8 卡实测 + Fable 审阅）**：① "冷预填充独占 GPU 伤 intra" 已被 8 卡证实为 N6 主瓶颈（intra 排队 p95 6.4s，F76），补丁 120 把它降到 0.36s（F77 起）。
+> ② 120 v1 的续算封顶在无等待时也生效 → chain_start 尾部变差；v2 只在 `waiting_queue_len>0` 时封顶，短请求阈值 4096 太小（实测丢 5–8k 状态的请求被挡）→ v2 用 chunk 16384 / cap 8192 / short 8192。
+> ③ max_running_requests=116=584/5 成立，但先满的是 KV（N6 峰值 50%），不是 KDA 槽。④ NO_TOKEN 使 `batch_is_full` 粘住（`scheduler.py:3755,3581`），N≥14 KV 吃紧时会重现排队，需配合容量措施。
+
 Source root: `build/base_exact/sglang/`. All paths are relative to `srt/`. "unverified" = not confirmed in code.
 Deployment assumed: TP8, 8×A100, `--page-size 64 --mamba-radix-cache-strategy extra_buffer --schedule-policy lpm`. No mixed chunk, no priority, no DP-attention. MTP may or may not be on.
 
