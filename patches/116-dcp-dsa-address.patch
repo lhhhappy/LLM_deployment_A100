@@ -100,18 +100,21 @@
  def materialize_full_kv_cp(
      attn_mla,
      forward_batch: ForwardBatch,
-@@ -3064,6 +3117,18 @@
+@@ -3064,6 +3117,21 @@
                  page_table_1
              ).to(torch.int32)
  
 +        if (  # [ax] 116: under DCP read the gathered full KV, never the sharded pool by virtual loc
 +            dsa_impl == "tilelang"
 +            and get_parallel().dcp_enabled
-+            and forward_batch.attn_dcp_metadata is not None
-+            and forward_batch.attn_dcp_metadata.dcp_kv_buffer is not None
 +            and not forward_batch.forward_mode.is_target_verify()
 +            and not forward_batch.forward_mode.is_draft_extend_v2()
 +        ):
++            md = forward_batch.attn_dcp_metadata
++            if md is None or md.dcp_kv_buffer is None:
++                # e.g. a graph-captured prefill that skipped prepare_context_parallel_metadata_for_dcp:
++                # the sharded pool cannot be read by virtual loc, so fail loudly instead of reading wrong rows.
++                raise RuntimeError("[ax] 116: DCP extend without attn_dcp_metadata (dcp_kv_buffer)")
 +            kv_cache, page_table_1 = _ax116_dcp_extend_rows(
 +                self, forward_batch, page_table_1
 +            )
@@ -119,7 +122,7 @@
          if dsa_impl == "tilelang":
              if q_rope is not None:
                  # Triton prefill kernel reads q_nope/q_rope directly, skipping
-@@ -3093,16 +3158,27 @@
+@@ -3093,16 +3161,27 @@
                          d_v=layer.v_head_dim,
                      )
                  q_all = concat_mla_absorb_q_general(q_nope, q_rope)
@@ -151,7 +154,7 @@
              )
          elif dsa_impl in ("flashmla_sparse", "flashmla_sparse_q8"):
              if topk_transform_method == TopkTransformMethod.RAGGED:
-@@ -3395,16 +3471,30 @@
+@@ -3395,16 +3474,30 @@
              # CUDA / MUSA paths byte-identical to pre-patch by always re-cat.
              if q_all is None or not _is_hip:
                  q_all = concat_mla_absorb_q_general(q_nope, q_rope)

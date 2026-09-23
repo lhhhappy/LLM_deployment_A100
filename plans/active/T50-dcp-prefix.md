@@ -33,10 +33,11 @@
 
 ## 进度记录
 - [x] 规则/交接/已有证据阅读，任务in-progress。
-- [x] （T50b）CPU 侧根因：底包 DSA 读路径（latent 稀疏注意力、indexer K 读写）全部按虚拟 loc 访问每卡大小的池，只有 latent 写入按 loc%W 分片 → 越界崩溃 + 未越界时读错行。110–115 未引入、是继承。证据 `evidence/T50/address_protocol.txt`。
-- [x] （T50b）补丁 `patches/116-dcp-dsa-address.patch`：extend 读 dcp_kv_buffer（虚拟 loc→行号表）、decode/verify 转本卡行+NaN 清零、indexer K 在虚拟空间复制、显存核算 ×W。全栈 000→…→115→116→140→120→130→150→160 fuzz=0（本地与开发机）。
-- [x] （T50b）开发机脚本 `scripts/analysis/devbox_dcp_check.sh`（+ dcp_check.py / dcp_compare.py），源码树已在开发机建好；gjob `t50_dcp` 等两卡空闲后自动跑。
-- [ ] 开发机结果：原栈复现（数值偏差 + 高 slot 越界）、116 后 DCP2 与非 DCP logits 对比、decode/cuda graph。
-- [ ] 116 .md（含 8 卡复验方案）、交付。
+- [x] （T50b）CPU 侧：底包 DSA 读路径与 indexer K 全按虚拟 loc 访问每卡大小的池。证据 `evidence/T50/address_protocol.txt`（rev2）。
+- [x] （T50b）开发机 r1/r2：dummy 权重下 logits 与注意力无关（所有变体逐位相同）→ 改为 well-scaled 初始化 + DSA o_proj 输入判据。
+- [x] （T50b）r3 实测纠正根因：GLM rope 维=0，latent 写入走 `set_mla_kv_buffer_kernel_norope`（`mla_buffer.py:87-114`），**没有 DCP 分片**，每卡按虚拟 loc 写全部 token。原栈 DCP = 复制 KV（低 slot 正确、无容量增益、高水位超过每卡行数时越界 → 025 崩溃）。116 v1（只换算读路径）在 ext/dec 上不通过（相对误差 1.2–1.7）。
+- [x] （T50b）116 最终版：norope 写入按 owner 规则分片 + extend 读 dcp_kv_buffer + decode/verify 转本卡行 + indexer K 虚拟空间复制 + 显存核算。全栈 fuzz=0（本地、开发机）。`patches/116-dcp-dsa-address.{patch,md}`（含 8 卡方案）。
+- [ ] r5 全矩阵（orig/fix/full × ref/dcp/dcp_hi/graph）：开发机让给 T52b；gjob `t50_dcp6` 在 `T52b/DONE` 出现后自动跑。
+- [ ] 根据 r5 回填 116.md、evidence，交付。
 ## 决策记录
 - 2026-09-23：先确认各池地址域，禁止用冷请求通过替代前缀命中正确性。
