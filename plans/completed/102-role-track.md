@@ -1,6 +1,6 @@
 # 102 — Role-boundary KDA checkpoint on the base, without splitting the prefill
 
-- 状态：active（设计中，未排 L2）　负责人：Claude　创建：2026-09-22
+- 状态：superseded（2026-09-23 被补丁 140 取代：一次预填充导出角色边界+末尾 fp32 双快照）；原状态：active（设计中，未排 L2）　负责人：Claude　创建：2026-09-22
 - 关联：dispatch T33/T34；F3、F45、F52、F53；决策 29；替代候选：101（镜像 B，45735）
 
 ## 目标

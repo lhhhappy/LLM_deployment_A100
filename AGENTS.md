@@ -9,6 +9,7 @@
 - `notes/dispatch.md`：你被派的任务（T 编号）
 
 ## 动手前按需读
+- `docs/histories/YYYY-MM/`：已完成代码变更的历史（按 refs/harness-template-cn 规范；每个完成的改动任务写/补一份）
 - `plans/active/*.md`：正在执行的计划（目标、范围、验证方式、进度）
 - `tests/TIERS.md`：**三级验证体系**（L1 2 卡自测 → L2 提测（Trisol 8 卡）→ L3 正式提交）：每一级能确认什么、晋级条件
 - `tests/TEST_PLAN.md`：**测试用例总表**（ID、环境 CPU/L2/T8、通过标准、状态）。改了代码就重跑相关用例，并回填状态；实验结果引用用例 ID
