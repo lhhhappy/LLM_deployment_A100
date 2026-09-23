@@ -23,6 +23,7 @@ import os
 from pathlib import Path
 import random
 import sys
+import time
 import traceback
 from types import ModuleType, SimpleNamespace as NS
 import unittest
@@ -133,7 +134,7 @@ def compile_nodes(path, names, ns):
 
 
 def load_source(root=CANDIDATE):
-    ns = dict(Union=Union, Enum=Enum, auto=auto, math=math, os=os, random=random,
+    ns = dict(Union=Union, Enum=Enum, auto=auto, math=math, os=os, random=random, time=time,
               lru_cache=lru_cache, contextmanager=contextmanager, Counter=Counter,
               logger=logging.getLogger('p120'), _IS_HIP=False, PREFILL_TILE_BUDGET=0,
               PREFILL_TILE_BUDGET_MODE='compact', CLIP_MAX_NEW_TOKENS=4096,
@@ -158,7 +159,7 @@ def load_source(root=CANDIDATE):
         ns[name] = type(name, (), {})
     compile_nodes(root / 'srt/managers/schedule_policy.py',
                   {'AddReqResult', 'PrefillAdder', '_role_boundary_token_ids',
-                   '_ax_sched_protect_config', 'SchedulePolicy', 'CacheAwarePolicy',
+                   '_ax_sched_protect_config', '_ax_srpt_aging', 'SchedulePolicy', 'CacheAwarePolicy',
                    'CacheAgnosticPolicy', '_ceil_div', 'estimate_prefill_extend_tile_metrics'}, ns)
     tree = ast.parse((root / 'srt/managers/scheduler.py').read_text())
     source_cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'Scheduler')

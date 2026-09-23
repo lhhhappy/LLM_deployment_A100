@@ -10,7 +10,7 @@ run=$1; N=$2; ref=${3:-}
 out=evidence/L${run%%-*}; mkdir -p "$out"
 D=/tmp/ax/runs/$run; A=/tmp/ax/codex/fetch_${run}.tgz; px() { GSSH_TIMEOUT=600 scripts/gssh "cd /sjtu/linhang/arena/repo && scripts/pod/pexec_codex '$1'" 2>/dev/null; }
 # 1. pack on the pod (pexec_codex may only write /tmp/ax/codex), report size + sha256
-meta=$(px "cd $D/N$N && r=\$(python3 -c \"import json;print(json.load(open(\\\"summary.json\\\"))[\\\"raw\\\"].split(\\\"/\\\")[-1])\") && j=\$(python3 -c \"import json;print(json.load(open(\\\"summary.json\\\"))[\\\"run\\\"].split(\\\"/\\\")[-1])\") && tar czf $A \$r \$j summary.json -C $D server.log && echo META \$(stat -c %s $A) \$(sha256sum $A | cut -c1-64)" | grep -o "META [0-9]* [0-9a-f]*")
+meta=$(px "cd $D/N$N && r=\$(python3 -c \"import json;print(json.load(open(\\\"summary.json\\\"))[\\\"raw\\\"].split(\\\"/\\\")[-1])\") && j=\$(python3 -c \"import json;print(json.load(open(\\\"summary.json\\\"))[\\\"run\\\"].split(\\\"/\\\")[-1])\") && tar czf $A \$r \$j summary.json -C $D server.log job.log && echo META \$(stat -c %s $A) \$(sha256sum $A | cut -c1-64)" | grep -o "META [0-9]* [0-9a-f]*")
 [ -n "$meta" ] || { echo "packing failed (run dir / level finished?)"; exit 2; }
 size=$(echo $meta | cut -d" " -f2); sha=$(echo $meta | cut -d" " -f3); chunk=120000; n=$(( (size + chunk - 1) / chunk ))
 # 2. fetch in chunks, 3. verify the sha256 before extracting (a truncated transfer must fail, not be patched over)
