@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Reviewer (Codex/Fable) command execution in the L2 pod — user-approved 2026-09-23 with a STRICT NO-STOP rule.
+# Allowed: read anything; write ONLY under /tmp/ax/codex/; run own CPU-only analysis scripts (CUDA hidden).
+# Forbidden (refused here, and by rule.md §4.7): service lifecycle (bohr/trisol), killing any process
+# (engine, queue worker), touching /tmp/ax/{queue,src,runs,patches,bin} for writes, podq, GPU use.
+#   scripts/pod/pexec_codex '<command>'        (upload scripts first: scripts/pod/ppush /tmp/ax/codex <files>)
+set -uo pipefail
+c="${1:-}"; [ -n "$c" ] || { sed -n 2,6p "$0"; exit 1; }
+deny='(bohr|trisol|inference|kill|pkill|killall|shutdown|reboot|halt|systemctl|podq|nvidia-smi +-r|--gpu-reset|flush_cache|start_profile|/generate|:30000|launch_server|sglang\.launch|(^|[;&| ])(rm|mv|cp|tee|dd|truncate|chmod|chown|ln)[^;&|]*/tmp/ax/(queue|src|runs|patches|bin|worker|engine)|>[^;&|]*/tmp/ax/(queue|src|runs|patches|bin|worker|engine))'
+if echo "$c" | grep -qiE "$deny"; then echo "REFUSED by pexec_codex policy (no stop / no kill / no writes outside /tmp/ax/codex / no engine requests): $c" >&2; exit 3; fi
+D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"
+PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c"

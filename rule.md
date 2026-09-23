@@ -67,7 +67,7 @@
 5. `command` 是 argv 不是 shell；A100 上 SGLang 必须 `SGLANG_OPT_USE_TOPK_V2=0`（放 `env`）。
 6. 审批：L2 自测（Trisol 8 卡）与每天 2 次正式提交由用户授权 Claude 批准，每次正式提交向用户汇报（决策 23/25/27）；其他 agent 不自行提交、不起 8 卡、不打镜像。
 
-7. **pod 只读权限（09-23 用户批准）**：Codex/Fable 可用 `scripts/pod/pread`（status/ls/tail/head/cat/grep/analyze，路径限 /tmp/ax 的 runs/queue/verify 等）查看 8 卡 pod；**禁止**直接用 bexec/pexec/podq/ppush，禁止任何启停引擎、写文件、提交任务、触碰服务生命周期的操作。
+7. **pod 访问（09-23 用户批准，严格不许停）**：除只读工具外，Codex/Fable 可经 GPU 机运行 `scripts/pod/pexec_codex '<命令>'`（仅 CPU，CUDA 被隐藏）并用 `scripts/pod/ppush /tmp/ax/codex <文件>` 上传自己的分析脚本，输出只写 `/tmp/ax/codex/`。**绝对禁止**：停/删服务（bohr/trisol）、杀任何进程（引擎、队列 worker）、向引擎发请求（flush/generate/profile）、写 /tmp/ax 的 queue/src/runs/patches/bin、用 GPU（工具会拒绝这些命令）。只读工具：Codex/Fable 可用 `scripts/pod/pread`（status/ls/tail/head/cat/grep/analyze，路径限 /tmp/ax 的 runs/queue/verify 等）查看 8 卡 pod；**禁止**直接用 bexec/pexec/podq/ppush，禁止任何启停引擎、写文件、提交任务、触碰服务生命周期的操作。
 
 ## 4.1 技术路线保密（对外可见的元数据一律中性）
 arena 队友（即竞争对手）能看到：Trisol 镜像目录里的**镜像名和 tag**，以及推理服务的**名字、描述、启动命令、环境变量**。所以：

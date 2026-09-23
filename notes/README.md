@@ -77,6 +77,7 @@
 - **F74** 真机（L2 pod，比赛镜像）复核：开发机 kernel 结论 11/11 成立
 - **F75** 8 卡 b113 实时日志（dev N6 进行中）：decode 已修好（bs6 16.4ms/步）；冷预填充 746ms/8192 块；N6 时 KV 峰值已占 50%
 - **F76** 8 卡 b113 开发集 N6 基线：卡在 intra 两门（排队所致），chain_start 有余量；冷预填充约 1 万 tok/s；真机 profile
+- **F77** 补丁 120 在 8 卡 N6 上消除了 intra 排队：四门全过（自估规则）；chain_start 尾部变差
 
 ## Decisions（最新在上）
 
@@ -188,6 +189,7 @@
 - research/codex/R14_recent_pr_watchlist.md
 - research/codex/R15_base_source_exploration.md
 - research/codex/R17_nextn_sm80.md
+- research/codex/R18_cache_loss_and_capacity.md
 - research/codex/R5_dp_memory_accounting.md
 - research/codex/R6_prior_art_cn_github.md
 - research/codex/R7_kda_internal_checkpoints.md
