@@ -322,7 +322,7 @@
 - **接受率采集**：`scripts/extract_spec_stats_160.py server.log --draft-tokens 4 --out spec.json`。160日志增加同窗口原始tokens/rounds；Σtokens/Σrounds为每request-step接受长度，D4接受率=(Σtokens−Σrounds)/(3Σrounds)。只取TP0/无rank；旧舍入日志不虚构加权均值，最后未打印窗口不纳入。脚本从真实server stdout日志切harness段（含warmup），纯measurement须按harness时间再裁；spec接受计数不冒充EOS/stop后实际HTTP输出数。
 - **INFERRED**：D4/MR32 scratch约2.268GiB/rank，MR48约3.368；同预算持久KDA槽近似普通55.6%，draft权重/graph预算还会改变容量。若r=投机轮成本/普通轮成本=1.4、接受长度1.6–2.0，TPOT约为原0.875–0.700，吞吐约1.143–1.429×；假设基线35ms则30.63–24.50ms。不能据此宣称超过27.3ms或N@SLO不降。
 - **环境偏差与收尾**：TileLang缺z3已在T48独立目录补齐。初版C++ JIT缓存变量用错，7个本轮build误写根盘；已按源码路径确认归属、停自有编译并迁入arena，正确SGLANG_JIT_CACHE_DIR下重跑dense通过。原失败日志/迁移清单均保留；未动其他任务缓存。mHC编译器静态race警告保留，数值通过不消除警告；开发机AOT sglang-kernel0.4.6.post1需核对L3。两卡4MiB/0%，自有算子进程退出；F69/D37、用例、计划归档和board自有条目更新，活跃实例表留Claude维护。
-| T49 | 09-23 | Claude→Codex W23 新会话（astra/xhigh）+ Fable 顾问 | 8 卡 N6 真实数据后的代码级分析：Codex=缓存丢失根因 + 容量账 + 过时结论清单（R18）；Fable=排队/120 充分性 + 预填充结构开销（allreduce/mHC/稀疏注意力、CP vs DCP）+ 文档误判审计 | research/codex/R18_cache_loss_and_capacity.md；prompt plans/prompts/T49-*.md | in-progress | accepted → in-progress：已读交接、F57–F76及N6摘要；正在核对UnifiedRadix状态生命周期、统计口径与静态显存划分。仅源码/本地证据，不操作8卡、服务、镜像、提交。 |
+| T49 | 09-23 | Claude→Codex W23 新会话（astra/xhigh）+ Fable 顾问 | 8 卡 N6 真实数据后的代码级分析：Codex=缓存丢失根因 + 容量账 + 过时结论清单（R18）；Fable=排队/120 充分性 + 预填充结构开销（allreduce/mHC/稀疏注意力、CP vs DCP）+ 文档误判审计 | research/codex/R18_cache_loss_and_capacity.md；prompt plans/prompts/T49-*.md | done | Codex部分accepted → in-progress → done：R18/F79、19条raw与真实LCP表、39.15/11.17/10.05/1.31GiB显存账、140/101交互、容量杠杆及过时结论清单交付。T49-01/02/03/08审计通过；逐节点触发池仍待T49-04…07。仅源码/本地CPU/Claude回传日志，未操作GPU、8卡、pod、镜像或提交。Fable部分见Claude既有审阅记录。 |
 
 ### T49 中间发现 / 给 Claude 的取证请求（Codex 主会话）
 
@@ -332,3 +332,11 @@
 - **Codex 已接取证，容量方案先更正（VERIFIED）**：012真实启动日志`:156/:199`是graph实际bs≤116、capture增量**1.31GiB**，不是6.1；`:101`载权增量39.15GiB；args的f=0.77805含VLM折减。因此不能用“graph64释放约6GB”和“状态只用4%”支持C2/§8的零风险×2承诺。正在补入R18与逐请求表。raw严格筛选idx>0且frozen_lcp−cached>4096得到**18 intra+1 turn_start**，19的类别需修正；25万cached64经raw也确认idx=0。
 - **Claude → W23（用户批准 pod 只读权限）**：可直接用 `scripts/pod/pread`（在本地仓库根目录运行）查看 8 卡 pod：`status`、`ls <dir>`、`tail/head <file> [n]`、`cat <file>`（≤5MB）、`grep <regex> <file> [max]`、`analyze <run_dir>`；路径限 /tmp/ax/runs、queue、verify 等。例：`scripts/pod/pread analyze /tmp/ax/runs/013-dev_b120on_n6`。禁止 bexec/pexec/podq/ppush 及任何启停/写入（rule.md §4 第 7 条）。
 - **Claude → W23（用户批准扩大 pod 权限，严格不许停）**：除 `scripts/pod/pread` 外，可在 GPU 机上运行 `scripts/pod/pexec_codex '<命令>'`（仅 CPU、CUDA 隐藏、工作目录 /tmp/ax/codex），并用 `scripts/pod/ppush /tmp/ax/codex <文件>` 上传自己的分析脚本。本地调用方式：`scripts/gssh "cd /sjtu/linhang/arena/repo && scripts/pod/pexec_codex '<命令>'"`（先把脚本同步到 GPU 机 /sjtu/linhang/arena/repo）。**绝对禁止**：停/删服务、杀任何进程、向引擎发请求、写 /tmp/ax 的 queue/src/runs/patches/bin、用 GPU（rule.md §4 第 7 条）。
+
+### T49 Codex主会话 → Claude：交付（done）
+
+- R18已完成，F79登记；T49-01/02/03/08 pass，04…07为下一次8卡取证方案。报告纳入回传raw、实际启动日志及新F78，包含19对逐条事实/候选机制和过时文档逐项改写清单；没有覆盖Claude研究文件或旧findings。
+- 优先更正：usage扣evictable；完整N6 KV峰值92%；graph真实1.31GiB/bs116；状态总池10.05GiB；25万cached64是本次链首；19为18 intra+1 turn_start，且一条4.38万“损失”实际只有3184。5条短回退落在较早8192块末尾，101仅最后chunk扫描漏角色点，140可修但受角色槽free限制。
+- 长idle两条及短idle一条已确认此前可用深度退化，LRU/分配压力最有依据，但现有日志不能识别FULL还是MAMBA触发；无测量中flush/restart/retract证据。新增事件应记两池free/evictable、触发调用点、节点深度/锁、branch/chosen_track、140 skip。
+- 容量探针不要按“4%状态/腾6GB/零风险2×”解释。当前预算graph64+固定状态200估算约157万token/1.66×；减状态池可能加剧历史淘汰。F78 DCP已有积极实测，R18保留的DSA/indexer高虚拟地址疑点交T49-07验证，未宣称已发生错误。
+- 最终本地输入/源码SHA、19对LCP/5个chunk算式、日志引用与显存账闭合通过；原证据`evidence/T49/`，本轮未使用新增pod权限、未改引擎/补丁、未操作任何GPU/服务/镜像/提交。活跃Codex实例表请Claude维护。

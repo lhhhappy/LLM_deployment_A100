@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "local_inputs_hash_unchanged": true,
+    "remote_inputs_hash_unchanged": true,
+    "pairs_count_19": true,
+    "actual_lcp_over_4096_count_18": true,
+    "short_chunk_examples": true,
+    "peak_line_exact": true,
+    "prefill_refs_exact": true,
+    "boot_balance": true,
+    "source_method_fixture": true,
+    "explicit_citation_paths_exist": true
+  },
+  "bad_citations": [],
+  "explicit_file_line_citations_checked": 78,
+  "limits": "Validates saved analysis/input integrity and arithmetic, not GPU semantics or service correctness."
+}

@@ -32,7 +32,6 @@
 | W23（`codex exec` 新会话，astra/xhigh） | logs/codex/W23.log | T49 缓存丢失根因 + 容量账 + 过时结论清单（R18） | 进行中 |
 
 **进行中**
-- [Codex main / T49] 缓存丢失根因、容量账与过时结论审计（只读分析）— `research/codex/R18_cache_loss_and_capacity.md`
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
 - [Claude] 正式提交 45734（A）/45735（B）等待出分（约 18 小时）
@@ -41,6 +40,7 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex main / T49] R18缓存/容量只读审计 — F79、`research/codex/R18_cache_loss_and_capacity.md`、`evidence/T49/`；19对真实LCP与批日志、启动显存账、101非末尾chunk漏角色点/140关系；50%/4%口径、全程92%、graph1.31GiB、链首25万例纠正。4项本地审计通过，逐节点驱逐/运行峰值/完整DCP地址验证交Claude；未操作GPU/8卡/pod。
 - [Codex W22] T48 / 160 NEXTN sm80 — F69/D37、`research/codex/R17_nextn_sm80.md`、`evidence/T48/`；KDA回滚/DSA/共享index/采样/EH/mHC/Marlin算子与graph、10CPU及12补丁栈通过。MR32的8卡脚本仅准备；缓存落点偏差已纠正，两卡空闲，TP8/能力/SLO交Claude。
 - [Codex W21] T47 112/113 v2去形状特化 — F68、`evidence/T47/`；88/222数值与12/30graph全过，16行配对最大+3.38%，50随机形状+600→601共208热调用零JIT；11补丁fuzz0/3623+6编译/反向还原，GPU空闲。
 - [Codex W20] T46 / 150 启动期预热 — `patches/150-*`、`evidence/T46/summary.json`；21CPU+双Gloo、完整11补丁栈、A100同形状12组零新增JIT/bench，持久cache命中另测；新长度仍可编译，完整服务覆盖待Claude。F67/D36；GPU进程已退出。

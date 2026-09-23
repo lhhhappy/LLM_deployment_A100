@@ -269,3 +269,18 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | P160-04 | L1 GPU算子 | EH norm、draft argmax、greedy/target-only采样、accept/prologue、两topk、mHC、111 MoE clip10与原生dense FP8 Marlin；数值与graph | pass（MoE clip10四形状+graph relL2≤0.00589；dense9形状及27次动态graph relL2≤0.00285；EH/mHC等误差和范围见证据README；非采样分布等价证明） |
 | P160-05 | CPU打包/源码核对 | 12补丁fuzz0、确定生成、3624源码+8工具编译、反向还原、base未改、GPU源码/测试/config SHA一致、shell语法通过 | pass（stack_receipt.json、remote_source_hashes.json、shell_syntax.log；源码4689文件一致） |
 | P160-06 | L2/T8 | 真实draft载权/TP8、三完整graph、输出与能力、accept分布、overlap/槽压力/abort/retract/flush；原dev全TTFT/TPOT/N@SLO门 | todo（仅准备dev_b160_mtp_n6.sh，MR32/D4/topk1/steps3；未执行、未入队、无镜像/提交） |
+
+## T49 — b113 N6缓存丢失与容量只读审计（Codex主会话）
+
+报告`research/codex/R18_cache_loss_and_capacity.md`，证据`evidence/T49/README.md`。01–03为CPU原方法/数据算术；08为已有8卡结果的本地重分析，非新8卡实验。04–07仅方案，交Claude安排。
+
+| ID | 环境 | 通过标准 | 状态 |
+|---|---|---|---|
+| T49-01 | CPU/实际方法 | 原`_get_mamba_token_info`对free=0但含evictable的两池给出不可淘汰率，区分resident/free | pass（0.50/0.0411；local_audit.json） |
+| T49-02 | CPU/实际方法 | 原extend tracking在相同45000终点、有/无branch38912的选择与源码相符 | pass（last_track38912/44992；local_audit.json；非GPU状态数值） |
+| T49-03 | CPU/冻结数据 | 极端五条唯一匹配cohort链首；943360 KV/584状态精确字节及ratio条件算术可核对 | pass（local_audit.json；graph通用算式后由boot_memory_audit补VLM条件） |
+| T49-04 | L2/T8待安排 | idle310s无流量、KV压力、短分支状态压力三臂；记录free/evictable/触发池，区分TTL/LRU | todo（仅R18§6方案） |
+| T49-05 | L2/T8待安排 | 101 branch覆盖end、角色落在非末尾chunk；140 off/on、跨/不跨decode网格、实际LCP/track/尾部释放对照 | todo（仅R18§4/§6方案，承接P140-08） |
+| T49-06 | L2/T8待安排 | graph64、f、ratio/固定状态槽单变量A/B；峰值账闭合、两池淘汰/140 skip/全部SLO | todo（仅R18§7/§8方案） |
+| T49-07 | L2/T8待安排 | DCP1/2/8+115完整KV/indexer地址、超旧物理容量的高虚拟slot、长前缀/分叉/flush/graph数值一致 | todo（F78启动/12题冒烟不代替本项） |
+| T49-08 | CPU/已有T8日志 | 722 raw与测量窗口绑定；19对36个真实prompt原Renderer重分词长度匹配，LCP/分类/启动账有行号与SHA | pass（remote_analysis.json、boot_memory_audit.json、previous_prefill_slices.txt；18 intra+1 turn_start；树事件未验证） |

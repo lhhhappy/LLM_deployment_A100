@@ -460,3 +460,16 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 冷预填充首字（秒，20k/60k/190k）：b113 1.98/6.37/19.29；`--enable-attn-tp-input-scattered` 2.79¹/6.01/17.52；`--dcp-size 8`+114+115 2.04/5.89/**15.58**。¹新引擎首请求含编译。
 - DCP：每卡 914,688 token 槽，调度器按 ×attn_dcp_size 计（`scheduler.py:2249,2423`、`tp_worker.py:430`）→ 逻辑约 **732 万 token**（原 94 万）；max_running_requests 113。原版 DCP 因 tilelang 64 头 256KB 共享内存失败，补丁 115 修复（F 前述）。
 - 与 Fable 预测（DCP 预填充注意力约 3× 慢）相反：实测更快 —— 64 头一次读 KV 的效率收益大于每卡多算的头。decode TPOT 与梯子表现待测（ladder_dcp）。
+## F79 — T49：b113 N6缓存/容量口径纠正与逐请求源码归因（VERIFIED；候选根因单列INFERRED）
+
+- **supersedes F75/F76的容量口径，纠正F77超长缓存例归因**：Unified统计`pool_stats_observer.py:249`从capacity同时减free和evictable，50%/4%是不可淘汰占用，不能证明两个物理池未满。原方法CPU夹具证明两池free=0仍输出0.50/0.0411（T49-01）。Claude回传012完整measurement日志后，峰值为**863296 KV token/0.92**，状态非evictable最大24；50%是中途观察，不是全程峰值。`evidence/T49/remote/012_server.log:5540`。
+- **启动账已闭合**：载权增量39.15GiB/rank；KV943360×12716B=11.17193GiB；KDA584+padding共10.05335GiB（SSM9.71191+conv0.34143）；真实decode graph捕获bs≤116、增量**1.31GiB**，不是6.1。f=0.77805含VLM折减，运行余量约17.25GiB；capture后最小free15.78GiB不是prefill峰值空余。`012_server.log:14/:95/:128/:135/:156/:199`，完整账见R18§7、`boot_memory_audit.json`。
+- **T49-03/08，真实输入核对**：25万prompt/cached64及最大五条“lost”均为实际cohort链首，没有本次同链前驱。严格idx>0、冻结LCP−cached>4096筛出**18 intra+1 turn_start**；重渲染36个prompt、长度全匹配，raw374真实LCP52400而冻结93013，“丢43797”收窄为3184；raw721实际差5053而非6536。逐项raw行号、LCP与rid在R18§4.3/`remote_analysis.json`。
+- **短回退证据与INFERRED根因**：5条命中恰落在前请求cached+k×8192较早chunk末尾，下一LCP早于后一个状态；例如raw255从23040计算到31232/39424再剩50，角色在38720，101只在最后chunk扫描，漏掉角色；raw257 LCP38781只能命中31232。源码与批日志`:2900/:2901`支持，仍缺逐节点事件。另branch优先覆盖end/105准入保护可产生回退（原方法CPU T49-02）。140在角色所在extend双点导出直接覆盖这类限制，且已经修改FULL/MAMBA/path-cap淘汰；额外角色槽只取真free，池满可跳过。
+- **长idle证据与INFERRED根因**：raw476/626的当前实际LCP均大于上次已使用深度，但cached分别77952→33600、33600→1216；raw695短idle+14.77s等待也17664→576。measurement无flush/restart/retract日志，path cap=-1；LRU/分配压力解释强，尚不能区分FULL先满或状态槽淘汰连带删KV。不得写成已确认5分钟TTL或已确认KV单池原因。
+- **容量算术，不是配置实测**：N26按请求均值约124万token/14.68GiB，按完整N6峰值线性压力约374万/44.30GiB。固定总池r0.9→0.5只增KV约1.27×；graph512→64含VLM自动预算只约+3.8%；再固定状态200约157万/1.66×，不能称零风险2×。FP8 MLA+既有index布局约1.75×；DCP+115仍须核验DSA逻辑/物理地址、indexer和高虚拟slot，不用启动成功代替正确性。
+- 报告`research/codex/R18_cache_loss_and_capacity.md`含文件:行号、修复方案、T49-04…07待验证方案和过时文档清单。本会话只读源码/回传日志、执行本地CPU夹具/重渲染；未修改引擎/补丁、操作GPU/8卡/pod、构建或提交。
+
+## F80 — 容量零风险杠杆实测：KV 94.3 万 → 156.9 万 token（+66%）
+- `--cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200`（探针 022）：KV 每卡 1,569,152 token（18.58GB，原 943,360/11.17GB），KDA 槽 200（ssm 3.34GB，原 9.71GB），max_running_requests 40；冷预填充不变（2.08/6.12/19.17s）。
+- 仍有约 16GB 可用显存（available_gpu_mem 16.08GB）→ mem-fraction 可再加。与 DCP（逻辑 ×7.8）互为替代/叠加，待梯子对比。
