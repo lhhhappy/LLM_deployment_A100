@@ -419,3 +419,7 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 外推到 45 层每卡每个 8192 块约 580ms（不含 allreduce；indexer 在 10 万上下文约 +110ms）→ 19.5 万 token 冷启动单独约 15s。
 - decode（bs=1，上下文 8k）每步 GPU 2.5ms：稠密 GEMM 32%、MoE 17%、mHC 14%、稀疏注意力 13%。
 - 含义：稀疏注意力（每卡重读同一潜在 KV）与 mHC（每卡算全量 token）是结构性 8× 冗余，按 token 切分可去掉约 1/3 预填充时间 → 支持 R8 §7 G1/G3/G4；MoE 为 F2。开发机结果，须 pod 复测。
+
+## F72 — 补丁 114（indexer 按查询行切分）逐位等价；TP2 6.5 万 token 预填充 −3.8%
+- 见 `patches/114-indexer-row-shard.md`。开发机结果，8 卡待测（TP8、真实长 prompt）。
+- 附带：开发机双卡 NCCL 在 SGLang 进程内需 `--disable-custom-all-reduce`、`NCCL_CUMEM_ENABLE=0`、降低 mem-fraction（纯 NCCL 冒烟正常）。

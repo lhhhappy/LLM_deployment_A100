@@ -14,7 +14,7 @@ for flag in 0 1; do
   SGLANG_AX_INDEXER_ROW_SHARD=$flag AX_CHECK_OUT=$T/logits_$flag.pt timeout 1500 $PY scripts/analysis/extend_check.py \
     --model-path /sjtu/linhang/arena/runs/rankprof/p8192/model --load-format dummy --tp-size 2 --page-size 64 \
     --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --mamba-radix-cache-strategy extra_buffer \
-    --batch-size 1 --input-len ${AX_IN:-16384} --output-len 1 --chunked-prefill-size ${AX_IN:-16384} --mem-fraction-static 0.7 \
+    --batch-size 1 --input-len ${AX_IN:-16384} --output-len 1 --chunked-prefill-size ${AX_IN:-16384} --mem-fraction-static ${AX_MEM:-0.7} \
     --cuda-graph-backend-decode disabled --disable-custom-all-reduce > $T/run_$flag.log 2>&1 || true
   grep "AX_CHECK\|row-shard active\|Error" $T/run_$flag.log | tail -3
 done
