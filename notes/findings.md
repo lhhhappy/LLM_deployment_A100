@@ -562,3 +562,45 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
   - **append-only（同链追加）：实际 6.85M，预期 1.56M ⇒ 多算了 5.3M，占我们全部 prefill 工作的一半**。
   - chain-head：1.01M，预期 2.24M。
 - ⇒ 一级问题：同链追加请求的缓存丢失（被驱逐，或 KDA 状态断点没落在可复用的位置）。修好后 prefill 需求约减半（10.6M → 约 5.3M），按闭环产能足够支撑 N22+。
+
+## F93 — T53：026 N18 原始账本纠正与评测脚本审阅（VERIFIED）
+
+- **supersedes F92 的“同链多算5.3M/可减半/N22+够用”及 F91 的“43个fast超标”口径**。只读取回026 N18完整722条raw（0 error；SHA256 `486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59`），按原harness的`idx_in_chain`分开本轮链首与后续请求。
+- append-only共441条：53条是本轮链首，actual=4,605,181、frozen=84,196，差4,520,985；388条是真后续，actual=2,240,591、frozen=1,473,820，净差766,771。原5,287,756差额的85.5%来自没有本轮同链前驱的链首，不能算同链缓存丢失；全档actual=10,629,513。全部411条后续相对冻结值的正差合计913,499（8.59%），**仍是代理指标，非真实LCP/可修收益**。
+- 原`in_ttft_gate`：fast n=328、>3s共10；只用phase=intra+frozen≤4096筛出43，额外33条全为本轮链首。冻结phase/edge不可替代实际gate/前驱存在性。026四TTFT门原数值不因此翻为FAIL，TPOT p95≈0.219仍FAIL。
+- CPU反例：当前`analyze_run.py`对空raw输出`harness_all_pass=true/formal_est_all_pass=true`、TPOT=0；`numcheck_cmp.py`对候选[1]相对参考[1,2,3]输出ok，对[1,9,8]输出drift但两者均wrong=0/1、rc0。证据`evidence/T53/cpu_review.json`。梯子忽略runner退出码/选择最新raw而不校验完整cohort，numcheck忽略flush JSON，116 probe打印而不强制数值/能力门；详见R19。
+- 本轮仅CPU审阅与只读取证，不改生产脚本/引擎、不提交、不操作8卡队列/服务。GPU开发机16:46:43 UTC两卡0%、4MiB；pod只读队列running/pending为空，不据队列状态声称引擎/GPU已停止。116和170v2现有开发机证据已读，未见本轮8卡复验。
+- 产出：`research/codex/R19_progress_and_cache_review.md`；原始证据`evidence/T53/026_N18_raw.jsonl`、`026_accounting.json`、`pod_status.txt`；复现脚本`evidence/T53/reproduce_review.py`。
+
+## F94 — 035：026 精确基线在 N22 已结束，旧分析器判 FAIL（只读日志）
+
+- **VERIFIED（作业日志）**：只读取得 `/tmp/ax/runs/035-s0_n22/job.log` 更新；`RUN_DEV N=22 rc=0`，测量 raw 722行/722唯一ID/error_class计数0；旧分析器 formal_est=False、harness=False，tpot_mean=0.1040。日志原样节选 `evidence/T57/035_followup/job_excerpt.log`。
+- 四道 TTFT 的旧分析器统计估算：fast p95=3.04s、17/23；overall 5.10s、20/27；turn 7.82s、0/3；chain 38.63s、18/22（分子超时数、分母允许数）。四门按其统计余量估算均通过，但直接p95阈值有失败。不是正式N@SLO成绩，完整新评分器重算尚未取回。
+- **INFERRED（由已读分析器实现推导）**：错误数0、四个formal门均真而formal_est_all_pass=false，剩余失败条件是tpot_p95>0.10；本次读取verdict.json/analysis.txt的SSH握手失败，未取得精确p95，不用均值0.104冒充p95门判据。失败日志 `verdict_fetch.log`。
+- 用户17:48:05 UTC快照仍为721测量行、一条在decode、队列0；server.log年龄0.4s、约91tok/s，说明该快照时请求在推进。旧2行raw与只读run_dev.py的preflight单链流程吻合，不能与measure相加；run_dev stdout在子进程运行时不必增长，详尽回放日志实际是N22/loadgen.log。
+- 旧诊断报actual_prefill=10.65M，026 N18为10.63M；总量接近不能证明每请求缓存损失相同。logstat统计整个服务日志（包含预热），其max KV usage/吞吐不作为已对齐的本档物理驻留/纯prefill产能证据。采集命令exit_code=0只表示读取成功；12/12仍只是冒烟。
+
+## F95 — T56：026 N18真实LCP与prefill停顿逐条归因（VERIFIED数值；INFERRED机制）
+
+- **VERIFIED；细化F93的冻结代理值**：原harness Renderer/tokenizer重渲染全部722条，token长度逐一匹配；本轮有前驱的411条真实LCP正缺口 **863,336**（冻结913,499），6条冻结高估共 **50,163**。64-token网格可复用缺口上限 **850,432**，占全档实际未命中10,629,513的 **8.00%**；168条超64容差，正缺口855,956。仅相对于本轮前驱prompt，不是全部跨链潜力、时间收益或N22承诺。
+- **VERIFIED位置/数量；b/c机制INFERRED**：互斥分类a240、b152、c16、d3。d只接收高估后已在64容差内的请求；其余3条冻结高估仍有10,364真实缺口，保留b。b中61条命中前驱最后角色点、41条更早角色点、24条更早前驱角色点、3条对应实际chunk末尾、18条继承更早命中、5条创建来源未识别；c为零命中10条及共享前缀区深回退6条，不能冒称已记录某池evict。全部411条CSV/JSON含具体深度/前驱/日志点。
+- **VERIFIED**：只有LCP仍包含前驱整个cached前缀，才可证明已用状态退化；严格满足的16条合计214,592。raw674命中180224对应前驱raw667实际第22个8k块（log3495）；raw721前驱一次15104-budget prefill，不能凭cached8192编造前驱8k块。
+- **VERIFIED**：346个唯一形状/首token时间锚点确定pod日志相对raw UTC epoch偏移 **0秒**。测量期1234批、722请求的逐批序列数/cached/new token合计和逐请求预算全部闭合。原harness fast328条中超3秒10条，排队用exec−recv、执行用first−exec精确加回TTFT。**INFERRED**：6条缓存缺口与队头阻塞并存、3条缓存重算为主、1条队头/合批阻塞为主；raw616仅8-token对齐差。
+- **VERIFIED名单/原日志；INFERRED停顿**：22条output<100且TPOT>0.10均交付完整相交prefill批次。8k/16k批的估计停顿p50约0.682/1.245秒；raw661/662分别遇约48/63批。估计基于raw准入/首token及报告间隔扣一次decode，非CUDA计时或逐token trace；报告new/throughput不能直接当GPU耗时。各请求并集合计400.214请求秒，不能当去重GPU时间。
+- 交付：`research/codex/R20_true_lcp_attribution.md`；`evidence/T56/attribute.py`、`pairs_attributed.csv`、`fast_details.md`、`decode_overlaps.md`、`manifest.json`、`validation.json`。raw SHA `486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59`；完整日志SHA `9fc7608f26f9dc44a49b45abfef34d1a8523553a6281c3994836d88bc2c43ccd`。T56-01至04全量CPU复现通过；未改生产代码/补丁/工具，未调用引擎、运行GPU或操作队列/服务。
+
+## F96 — T58：035 N22完整原始记录重算，唯一估算失败门为TPOT p95（VERIFIED）
+
+- **补全F94精确p95**：本地直接复用原harness及scripts/score_formal.py重算，不使用旧analyze_run的结论。11门10过1败；TPOT p95 **0.2961931135342048** >0.10，均值 **0.10395581354618791**；205/722条TPOT>0.10。四TTFT按题目统计余量估算过：fast3.045406（17/23）、overall5.104129（20/27）、turn7.815638（0/3）、chain38.627189（18/22）。仍是dev统计估算，不是正式N@SLO。
+- **完整性**：722唯一ID与原cohort的ID/chain/idx全匹配；measure namespace单一、无预检/预热；四类错误0、输出预算逐条满足、722服务端时间戳完整，TTFT重构差0。原TPOT由首末SSE的perf_counter计算，保存的epoch finish包含返回处理，不能精确替换；核对脚本修正此假设，未修改raw/评分规则。
+- 最后请求prompt58788、输出2803、17:48:08.192 UTC完成，TPOT0.011586；用户17:48:05快照是正常收尾。输入raw SHA256 `3f8bfa0d683b5ade8caba09d6829754693042589f607a15e7fc3fb7a21a7bd9b`，来源evidence/L035，未覆盖。
+- 复现和完整11门报告：`evidence/T58/README.md`、`score_formal.json`、`verify_integrity.py`、`integrity.json`（输入/源码SHA）。本轮只有CPU评分与只读取证；未重跑GPU、未操作引擎/队列/镜像/提交。原始文件无法补出未保存的清缓存响应或逐SSE流。
+
+## F97 — T59：035 N22超标205条的特征与prefill时间重叠
+
+- **VERIFIED（完整722条raw）**：205条TPOT>0.10；仅26条output<100，179条≥100。106条自身实际未命中≤4096，97条命中率≥90%。相对026 N18同req_id，140条cached相同、36条更多、29条更少；N18/N22均超92条，N22新增113条，N18超而N22过44条。不能将全部TPOT退化归因本请求缓存丢失，也不是仅短输出尾部问题。
+- **VERIFIED（分组）**：prompt≥65536的148条中64条超标（43.2%），更短的574条中141条（24.6%）；自身未命中≥65536为30/43（69.8%），存在负载/时间混杂，不是独立因果效应。按首token UTC分组17:42–17:44为32/36超标，17:30/17:32分别0/67、0/56；分钟组不是该分钟全部活跃请求。
+- **VERIFIED（日志事件；INFERRED机制）**：raw656命中9216/9755、补算539、TTFT0.825s，149输出的首末token时长116.510s、TPOT0.787229（N18同命中时0.080100）。其保守内部decode窗口有136次prefill报告，其中131批≥8192，合计1,195,904预算token。raw652/655命中97.74%/99.43%，decode125.983/138.067s，内部prefill139/157批。支持其他prefill挤占decode的机制；报告间隔不是GPU耗时，未宣称精确阻塞秒数或205条全量因果归因。
+- **VERIFIED（运行行为）**：035日志17:43:03等处仍有20条running且queue=0，却执行16384-token prefill；历史120v2仅waiting非空才封顶，与此一致。历史补丁另存SHA，未冒称与运行源码逐字节核验。源文件在T55清理中删除，取自git历史；没有恢复/覆盖生产补丁。
+- **方法限制**：T56的亚秒级批成员重建迁移到035在raw63失败（最近报告估计差112ms超100ms容差）；未放宽断言硬配对。本次采用331个唯一形状/epoch锚点核验UTC偏移0秒，以秒级日志完整落入decode窗并留1秒起点余量的保守事件计数。失败证据保留，不把估计当trace；17:48:16退出异常在全部请求结束之后。
+- 产物：`evidence/T59/analyze.py`、`failures_205.csv`、`all_722.csv`、`summary.json`、逐请求日志行号与输入SHA验证；报告`research/codex/R21_N22_tpot_failures.md`。仅CPU分析/只读取回完整日志，无GPU/引擎/队列/镜像/提交操作。

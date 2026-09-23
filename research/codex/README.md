@@ -30,3 +30,9 @@ v2 分工交付（2026-09-22；全部仅调研）：
 早期脚本、审计快照、两个patch和config-only fixtures已在T8中原样移到[archive/](archive/README.md)，逐文件状态与SHA256均保留；仅删除6个可再生成的`__pycache__`字节码文件。它们不是E1依赖，不混入正式`scripts/`或根`patches/`；归档脚本的旧相对路径未修订，不应直接运行。
 
 当前E1工具在共享`scripts/`：`e1_env.sh`、`setup_e1_env.sh`、`make_e1_kimi_standin.py`、`launch_e1_standin.sh`、`replay_chains.py`、`test_replay_chains.py`。E2状态和后续动作以[dispatch](../../notes/dispatch.md)与实验台账为准。
+
+- [R19 — 现状、缓存账本与脚本/补丁审阅](R19_progress_and_cache_review.md)：T53/F93；026完整raw推翻“5.3M同链浪费”归因、fast43→10；空raw/数值截短/120生成器反例与后续建议。仅CPU与只读取证，生产实现未修。
+
+- [R20 — 026 N18真实LCP与prefill停顿逐条归因](R20_true_lcp_attribution.md)：T56/F95；411条真实正差863336、64网格上限850432（8.00%）；10条fast与22条短输出逐批证据，时间偏移0秒。位置/计算VERIFIED，淘汰与停顿机制INFERRED。
+
+- [R21 — 035 N22超标205条的特点](R21_N22_tpot_failures.md)：T59/F97；完整名单与722对照、时间聚集、高命中低TTFT受影响案例、N18同ID转换、120v2空等待队列下大块行为。原始事实与prefill干扰推断分开，非逐token阻塞计时。

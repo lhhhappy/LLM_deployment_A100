@@ -1,0 +1,1 @@
+Initial check failed at exact epoch-based TPOT reconstruction assertion (1e-5 tolerance). Observed max difference 0.00020661176831437977. Source shows raw TPOT uses perf_counter first/last SSE; stored epoch finish is after call_engine returns. Removed invalid equality assumption, retained proxy delta as diagnostic. No raw, scorer or SLO threshold was changed.

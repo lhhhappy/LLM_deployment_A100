@@ -3,7 +3,10 @@
 
 No CUDA/torch import; model forwards, cache/pools and ScheduleBatch are faked.
 The decision methods, 101 split, resource accounting and LPM sort are production
-code. Run scripts/make_120.py first, then unittest discover -s tests -p this-file.
+code. Build the trees first (T57):
+  python3 scripts/patch_stack.py apply build/p120/baseline 000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin
+  python3 scripts/patch_stack.py apply build/p120/candidate <same> 120-sched-protect-chain
+then: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
 """
 from __future__ import annotations
 
@@ -290,8 +293,10 @@ class ProtectTests(unittest.TestCase):
         trace.append(step(s))
         self.assertEqual([r['mode'] for r in trace], ['prefill', 'decode', 'prefill', 'decode'])
         self.assertEqual([r[0] for r in trace[2]['reqs']], ['cold', 'short'])
-        self.assertEqual(trace[0]['reqs'][0][2], 2048)
-        self.assertEqual(trace[2]['reqs'][0][2], 4096)
+        # 120 caps a cold chunk only while other requests wait: alone it takes the full 8192 budget,
+        # once the short hit is waiting the continuation is capped to 2048 and the short joins the batch.
+        self.assertEqual(trace[0]['reqs'][0][2], 8192)
+        self.assertEqual(trace[2]['reqs'][0][2], 8192 + 2048)
         self.assertIn('short', [r[0] for r in trace[3]['reqs']])
         (EVIDENCE / 'interleave.json').write_text(json.dumps(trace, indent=2) + '\n')
 
@@ -302,10 +307,10 @@ class ProtectTests(unittest.TestCase):
         while not cold.output_ids:
             t = step(s)
             self.assertEqual(t['mode'], 'prefill')
-            self.assertLessEqual(cold.extend_range.length, 2048)
+            self.assertLessEqual(cold.extend_range.length, 8192)   # alone: uncapped, full chunk budget
             count += 1
             self.assertLess(count, 60)
-        self.assertEqual(count, math.ceil(100000 / 2048))
+        self.assertEqual(count, math.ceil(100000 / 8192))
         self.assertEqual(cold.extend_range.end, len(cold.origin_input_ids))
 
     def test_only_decode_unchanged(self):
@@ -411,7 +416,8 @@ class ProtectTests(unittest.TestCase):
     def test_config_alignment_and_minimum_progress(self):
         for cap, expected in [('1', 256), ('2100', 2048), ('99999', 8192)]:
             with patch.dict(os.environ, {'SGLANG_AX_SCHED_COLD_CAP': cap}):
-                s, _ = make_scheduler(waiting=[Req('c', 20000)])
+                # a second waiting request makes the cap apply at admission
+                s, _ = make_scheduler(waiting=[Req('c', 20000), Req('w', 20000)])
                 self.assertEqual(s._ax_sched_protect_limits(8192), (expected, 4096, 256))
                 step(s)
                 self.assertEqual(s.chunked_req.extend_range.length, expected)
@@ -427,9 +433,10 @@ class ProtectTests(unittest.TestCase):
                          ['prefill', 'decode', 'decode', 'prefill', 'decode', 'decode', 'prefill'])
 
     def test_finished_decode_batch_does_not_starve_cold(self):
-        s, _ = make_scheduler(waiting=[Req('c', 8192)], running=[Req('done', 1, output=0)])
-        modes = [step(s)['mode'] for _ in range(4)]
-        self.assertEqual(modes, ['prefill'] * 4)
+        # 20000 tokens need three 8192-budget prefill rounds; a finished decoder must not insert decode turns
+        s, _ = make_scheduler(waiting=[Req('c', 20000)], running=[Req('done', 1, output=0)])
+        modes = [step(s)['mode'] for _ in range(3)]
+        self.assertEqual(modes, ['prefill'] * 3)
 
     def test_unsupported_modes_bypass_protection(self):
         for attr, value in [('is_mixed_chunk', True), ('require_mlp_sync', True),
@@ -521,10 +528,11 @@ class ProtectTests(unittest.TestCase):
             c = Req('c', 1536, boundary=1100)
             s, _ = make_scheduler(root, chunk=c, waiting=[Req('long', 10000, cached=4096)], role=True)
             return step(s)
+        # The one-partial guard is part of 101 (T57 folded the former 105 into it), so neither tree crashes
+        # even with 120's protection switched off.
         with patch.dict(os.environ, {'SGLANG_AX_SCHED_PROTECT': '0'}):
             for root in (BASE, CANDIDATE):
-                with self.assertRaises(AssertionError):
-                    run(root)
+                run(root)
         t = run(CANDIDATE)
         self.assertEqual(t['chunk'], 'c')
         self.assertEqual(t['waiting'], ['long'])

@@ -1,0 +1,12 @@
+LEVEL N=22 status=VALID formal_est=PASS tpot_mean=0.0500 tpot_p95=0.0500 | fast_intra:3.05(17/23) overall_intra:5.10(20/27) turn_start:7.82(0/3) chain_start:38.63(18/22) | failed=[]
+  -> good exit=0
+LEVEL N=22 status=INVALID reasons=missing req_id x1 (e.g. biomaster:canon:FWyXLCJ4mffNsaYz6LvcE:llm:0)
+  -> g_trunc exit=2
+LEVEL N=22 status=INVALID reasons=duplicate req_id x1 (e.g. biomaster:canon:wI_6c6wS2_U8k-sG7QyDS:llm:0); missing req_id x1 (e.g. biomaster:canon:FWyXLCJ4mffNsaYz6LvcE:llm:0)
+  -> g_dup exit=2
+LEVEL N=22 status=VALID formal_est=FAIL tpot_mean=0.0500 tpot_p95=0.0500 | fast_intra:3.05(17/23) overall_intra:5.10(20/27) turn_start:7.82(0/3) chain_start:38.63(18/22) | failed=['tpot_p95<=0.10']
+  -> g_notpot exit=1
+LEVEL N=22 status=VALID formal_est=FAIL tpot_mean=0.0500 tpot_p95=0.0500 | fast_intra:3.05(17/23) overall_intra:5.10(20/27) turn_start:7.82(0/3) chain_start:38.63(18/22) | failed=['coverage=100%']
+  -> g_err1 exit=1
+LEVEL N=22 status=VALID formal_est=FAIL tpot_mean=0.1040 tpot_p95=0.2962 | fast_intra:3.05(17/23) overall_intra:5.10(20/27) turn_start:7.82(0/3) chain_start:38.63(18/22) | failed=['tpot_p95<=0.10']
+  -> real035 exit=1

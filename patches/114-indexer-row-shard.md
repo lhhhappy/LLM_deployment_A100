@@ -5,4 +5,4 @@
 - 验证（开发机 2×A100，TP2，SGLang 真实模型代码 + 随机权重的单卡份额缩小版，`scripts/analysis/extend_check.py`、`run_p114_check.sh`）：
   - 1.6 万 token：logits **逐位一致**，178.8 → 177.6 ms（indexer 很小）。
   - 6.5 万 token：logits **逐位一致**，733.0 → 705.0 ms（−3.8%，TP2 只省一半；推算 TP8 约 −6~7%，上下文越长越多）。
-- 叠加：000→101→105→110→111→112→113→114 fuzz=0。decode 路径未改（后续可按 batch 行切）。
+- 叠加：数字顺序，单独叠在 S0 上可打（fuzz=0）。decode 路径未改（后续可按 batch 行切）。

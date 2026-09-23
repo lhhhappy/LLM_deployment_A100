@@ -1,0 +1,15 @@
+{
+  "n": 722,
+  "followups": 411,
+  "rendered_lengths_match": 722,
+  "fast_n": 328,
+  "fast_over3": 10,
+  "short_slow_n": 22,
+  "frozen_positive_loss": 913499,
+  "true_positive_loss": 863336,
+  "aligned_loss": 850432,
+  "frozen_overestimate": 50163,
+  "overestimated_pairs": 6,
+  "loss_gt64": 168
+}
+batches 1733 offset 0 anchors 346

@@ -1,0 +1,6 @@
+{
+  "commit": "57348431bdcd4e3585766e1280da512f6c660491",
+  "path": "patches/drafts/120-sched-protect-chain-v2.patch",
+  "sha256": "ef1744b3a51c2ee87fc0ceb858a04cca078c4720ad50b16ff7498a1b0ee7eb1a",
+  "scope": "Historical v2 source, not independently verified against live pod bytes."
+}

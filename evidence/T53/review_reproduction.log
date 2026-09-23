@@ -1,0 +1,148 @@
+{
+  "cohort_edge_roles": {
+    "chain-head/head": {
+      "n": 104,
+      "prompt": 2237598,
+      "frozen_uncached": 2237598
+    },
+    "append-only/followup": {
+      "n": 388,
+      "prompt": 17749327,
+      "frozen_uncached": 1473820
+    },
+    "append-only/head": {
+      "n": 53,
+      "prompt": 5338173,
+      "frozen_uncached": 84196
+    },
+    "system-tools-changed/head": {
+      "n": 148,
+      "prompt": 7972369,
+      "frozen_uncached": 7972369
+    },
+    "compact-rebuild/head": {
+      "n": 6,
+      "prompt": 227449,
+      "frozen_uncached": 9162
+    },
+    "unexplained-break/followup": {
+      "n": 23,
+      "prompt": 891861,
+      "frozen_uncached": 198891
+    }
+  },
+  "empty_analyzer": {
+    "gates": {
+      "fast_intra": {
+        "n": 0,
+        "p95": 0.0,
+        "over": 0,
+        "allowed_over": 0,
+        "harness_pass": true,
+        "formal_est_pass": true
+      },
+      "overall_intra": {
+        "n": 0,
+        "p95": 0.0,
+        "over": 0,
+        "allowed_over": 0,
+        "harness_pass": true,
+        "formal_est_pass": true
+      },
+      "turn_start": {
+        "n": 0,
+        "p95": 0.0,
+        "over": 0,
+        "allowed_over": 0,
+        "harness_pass": true,
+        "formal_est_pass": true
+      },
+      "chain_start": {
+        "n": 0,
+        "p95": 0.0,
+        "over": 0,
+        "allowed_over": 0,
+        "harness_pass": true,
+        "formal_est_pass": true
+      }
+    },
+    "errors": 0,
+    "tpot_mean": 0.0,
+    "tpot_p95": 0,
+    "harness_all_pass": true,
+    "formal_est_all_pass": true
+  },
+  "num_comparator": {
+    "truncated": {
+      "rc": 0,
+      "stdout": "case             first_div=None  first_lp_diff=0 max_lp_diff_common=0 ok\nNUMCMP wrong=0/1\n",
+      "stderr": ""
+    },
+    "diverged_after_first": {
+      "rc": 0,
+      "stdout": "case             first_div=1     first_lp_diff=0 max_lp_diff_common=0 drift\nNUMCMP wrong=0/1\n",
+      "stderr": ""
+    }
+  }
+}
+{
+  "raw_sha256": "486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59",
+  "n": 722,
+  "errors": 0,
+  "all_actual": 10629513,
+  "by_edge_role": {
+    "append-only/head": {
+      "n": 53,
+      "prompt": 5338173,
+      "actual": 4605181,
+      "frozen": 84196,
+      "positive_excess": 4520985,
+      "net_excess": 4520985
+    },
+    "chain-head/head": {
+      "n": 104,
+      "prompt": 2237598,
+      "actual": 1005598,
+      "frozen": 2237598,
+      "positive_excess": 0,
+      "net_excess": -1232000
+    },
+    "system-tools-changed/head": {
+      "n": 148,
+      "prompt": 7972369,
+      "actual": 2462097,
+      "frozen": 7972369,
+      "positive_excess": 0,
+      "net_excess": -5510272
+    },
+    "append-only/followup": {
+      "n": 388,
+      "prompt": 17749327,
+      "actual": 2240591,
+      "frozen": 1473820,
+      "positive_excess": 824117,
+      "net_excess": 766771
+    },
+    "compact-rebuild/head": {
+      "n": 6,
+      "prompt": 227449,
+      "actual": 27961,
+      "frozen": 9162,
+      "positive_excess": 18799,
+      "net_excess": 18799
+    },
+    "unexplained-break/followup": {
+      "n": 23,
+      "prompt": 891861,
+      "actual": 288085,
+      "frozen": 198891,
+      "positive_excess": 89382,
+      "net_excess": 89194
+    }
+  },
+  "fast_correct_count": 328,
+  "fast_correct_over": 10,
+  "fast_naive_over": 43,
+  "naive_heads": 33,
+  "followup_positive_excess_all": 913499
+}

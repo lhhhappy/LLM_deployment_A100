@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "n_rows": 722,
+  "n_unique_ids": 722,
+  "cohort_id_chain_position_exact_match": true,
+  "measured_namespace_only": true,
+  "all_output_budgets_met": true,
+  "errors": 0,
+  "server_timing_coverage": 1.0,
+  "max_ttft_reconstruction_delta": 0.0,
+  "max_client_epoch_tpot_proxy_delta": 0.00020661176831437977,
+  "tpot_timing_note": "Exact first/last SSE monotonic timestamps are not saved; score the recorded tpot_s, not the epoch finish proxy.",
+  "tpot_over_0_10": 205,
+  "tpot_mean": 0.10395581354618791,
+  "tpot_p95": 0.2961931135342048,
+  "last_completed_request": {
+    "req_id": "biomaster:canon:FWyXLCJ4mffNsaYz6LvcE:llm:0",
+    "prompt_tokens": 58788,
+    "output_tokens": 2803,
+    "client_finish_at_s": 1790185688.1917636,
+    "tpot_s": 0.011585587324530716
+  },
+  "hashes": {
+    "evidence/L035/raw_dev-combined-v1_N22_1790184432.jsonl": "3f8bfa0d683b5ade8caba09d6829754693042589f607a15e7fc3fb7a21a7bd9b",
+    "evidence/L035/run_dev-combined-v1_N22_1790184432.json": "b3c58fda715c5194b0cbfecb95ccb0e7533ffe4c740370361a9118a818829069",
+    "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json": "9221a2fae6470e552dfb4ac707927f0ce3c4d8c1ef823f7ec90ca55ca7578f19",
+    "evidence/L035/summary.json": "54afd9b303d7c48568abf0015cb402dab2228d68ef50ceeb2de38b9ca7231b4e",
+    "scripts/score_formal.py": "f337997092db01e207235778387b2a7b3af40fe0c6b767cb3f3bf9b2cd139f8a",
+    "s1-dev/harness/s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+    "s1-dev/harness/s1_score.py": "8da35984ce6bc88e6f2cabff18d8e58ecb257fff2a50e03baec831665d49af16",
+    "s1-dev/harness/s1_loadgen.py": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f"
+  },
+  "scope": "Existing raw/run only. Not a new GPU run or an official arena score; does not reconstruct unrecorded cache-clear receipts."
+}

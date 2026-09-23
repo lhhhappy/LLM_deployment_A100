@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "input_sha256": {
+    "evidence/L035/raw_dev-combined-v1_N22_1790184432.jsonl": "3f8bfa0d683b5ade8caba09d6829754693042589f607a15e7fc3fb7a21a7bd9b",
+    "evidence/T53/026_N18_raw.jsonl": "486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59",
+    "evidence/T59/035_server.log": "28c3a9255b5424888d2ab99dfde62e00cce4415baff233584dd5af96b7bb0f1e"
+  },
+  "unique_matched_requests": 722,
+  "failed": 205,
+  "all_feature_partitions_close": true,
+  "same_prompt_and_output_tokens": true,
+  "utc_anchors": 331,
+  "scope": "CPU descriptive analysis of existing raw/logs, not a new run or causal A/B.",
+  "excluded_method": "T56 subsecond request-batch map failed at raw line 63; not used. mapping_failure.txt preserves the failure."
+}

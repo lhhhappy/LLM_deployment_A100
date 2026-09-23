@@ -3,32 +3,32 @@
     "length": 100000,
     "cap": 2048,
     "role": false,
-    "prefill": 49,
-    "rounds": 97,
+    "prefill": 46,
+    "rounds": 91,
     "bound": 98
   },
   {
     "length": 100000,
     "cap": 2048,
     "role": true,
-    "prefill": 50,
-    "rounds": 99,
+    "prefill": 47,
+    "rounds": 93,
     "bound": 100
   },
   {
     "length": 32769,
     "cap": 256,
     "role": true,
-    "prefill": 129,
-    "rounds": 257,
+    "prefill": 98,
+    "rounds": 195,
     "bound": 260
   },
   {
     "length": 10000,
     "cap": 4096,
     "role": true,
-    "prefill": 4,
-    "rounds": 7,
+    "prefill": 3,
+    "rounds": 5,
     "bound": 8
   }
 ]

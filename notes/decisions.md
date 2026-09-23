@@ -47,6 +47,16 @@
 - 保持 dev 原始 verdict，默认按 dev 搜索；可显式选择 dev+tpot / estimated。TTFT 估计采用单侧 95% Clopper–Pearson（L=Beta⁻¹(0.05;k,n−k+1)，k=0 时 L=0），全程标 estimated，不宣称与隐藏实现一致；符合 D0 §5 审阅边界。
 - 针对 F23，既做档前严格 flush，也用 S1_FLUSH_URL 本地 guard 验证原 runner 的预热后 flush；失败终止子进程而不修改 harness。VERIFIED：29 项 CPU 测试通过，证据 `evidence/T12/tools_validation.log`；具体接口/用法见脚本头与 experiments「Tools」。
 
+## 决策 39（2026-09-24）— 以 task.md 为唯一准绳；先修测量门，再直接测 N22；仓库只留正确文档
+- **目标**（task.md:72–74,593–614）：排名只看 `n_at_slo` → `tpot_mean`；TPM 只回报不排名（`s1-dev/README.md:50–55` 的 TPM 排名是旧口径，不用）。第一名 CalvinCao：N26、tpot_mean 0.0551。
+- **每档 11 道硬门**（task.md:519），含 tpot_p95 ≤ 0.10（无余量）；四道 TTFT 门带统计余量（task.md:565–567）。正式爬坡从 N10 起，+4/−4，单档约 4 小时（task.md:476,500–515）。
+- **开发集只做 A/B 与回归，不预测 N@SLO**（task.md:354）：本地结论只用"同一 N 上候选相对已验证基线"的比较；绝对档位用正式成绩校准（45979/45980 出分后）。
+- **能力门**：按用户决定，保留 12 题冒烟作为粗筛，不加完整能力集。
+- **测量门先修**（R19 S1–S8，Codex T53）：评分失败即失败（T54）；门与分桶只用 harness 代码；账本按回放链内位置拆分。**F92 撤回**（F93）。
+- **性能主测直接 N22**，N18 作对照；不从低档爬；每次只改一个变量（mkjob 机械检查）。
+- **仓库只留正确、现行文档**：过时或错误内容直接删除，git 保留历史（用户 09-24）。清理由 T55 审查、Claude 执行。
+- 决策人：用户 + Claude。注：`scripts/next_id.py D` 只数表格行（给出 38，与既有"决策 38"小节冲突），本条取 39。
+
 ## 决策 34（2026-09-23）— 8 卡服务被守护进程误删后的处置
 - 事实：`lh-arena-sess-a`（2102309548588015616）于 2026-09-22T19:45:59Z 被 `scripts/trisol_test_daemon.py` 以 IDLE_RELEASE 删除。代码默认 `idle_hold_seconds=10800`，
   配置文件虽已改为 1e9，但**守护进程只在启动时读配置、改后未重启**，于是在旧队列最后一项结束 3 小时后自动释放。违反"停服务须经用户同意"。当时 pod 正在跑 dev N6 基线（019），结果与 pod 内所有状态丢失（profile 摘要已存 evidence/T43）。

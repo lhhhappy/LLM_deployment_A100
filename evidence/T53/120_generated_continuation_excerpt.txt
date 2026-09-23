@@ -1,0 +1,28 @@
+    def add_chunked_req(self, req: Req):
+        if self.dllm_config is not None:
+            _rem_tokens = self._get_dllm_remain_tokens()
+        else:
+            _rem_tokens = min(self.rem_chunk_tokens, int(self.rem_total_tokens))
+            if self.is_hybrid_swa:
+                # alloc_extend needs extend_num_tokens + page_size per request,
+                # so reserve one page here to avoid OOM
+                _rem_tokens = min(
+                    _rem_tokens, int(self.rem_swa_tokens) - self.page_size
+                )
+            # The chunked_req must be added to the list; otherwise, it will cause a memory leak.
+            # Therefore, in certain cases where _rem_tokens <= 0, it should be replaced with rem_chunk_tokens.
+            if _rem_tokens <= 0:
+                if self.is_hybrid_swa:
+                    return req
+                _rem_tokens = self.rem_chunk_tokens
+
+        if self.ax_protect is not None:
+            self.ax_continuation = req
+            cap, _, grid = self.ax_protect
+            _rem_tokens = min(_rem_tokens, cap, self.rem_input_tokens)
+            # Preserve checkpoint, KV-page and DSA/deterministic alignment.
+            # Below one grid unit retain the native resource-limited progress;
+            # the no-starvation bound assumes room for at least one unit.
+            if _rem_tokens >= grid:
+                _rem_tokens = _rem_tokens // grid * grid
+

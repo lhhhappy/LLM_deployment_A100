@@ -1,0 +1,488 @@
+{
+  "config": {
+    "set": "dev-combined-v1",
+    "N": 18,
+    "model": "glm-5.3-flash",
+    "seed": 20260910,
+    "instance_id": "dev-combined-v1-1790150368-measure",
+    "cache_namespace": "dev-combined-v1-1790150368-measure",
+    "cohort_sha256": "91f5061bd1c167c6",
+    "cohort_version": "dev-combined-v1",
+    "warmup": false,
+    "prefix_warm_from_excluded": false,
+    "cohort_file": "/tmp/ax/s1/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json",
+    "pacing": "chain-total-gap-scaled-v1",
+    "chain_gap_cap_ms": 3600000,
+    "gap_rounding": "last-nonzero-remainder",
+    "workload_hash": "997e98a98033b24b",
+    "cohort_sha256_canonical": "c6645ee02c86494e",
+    "max_chains": null,
+    "config_hash": "fbcb6c72ec99221e",
+    "lane": "dev",
+    "strict_ttft_basis": false,
+    "steady_start_min": 10,
+    "steady_len_min": 60
+  },
+  "wall_s": 1270.078818321228,
+  "n_attempted": 722,
+  "n_dispatched": 722,
+  "error_counts": {},
+  "harness_error_rate": 0.0,
+  "service_error_rate": 0.0,
+  "infra_error_rate": 0.0,
+  "n_judged": 722,
+  "n_unjudgeable": 0,
+  "coverage": 1.0,
+  "budget_attainment": {
+    "unweighted": 0.628808864265928,
+    "weighted": 0.6257937653140018,
+    "authoritative_for_lane": "unweighted",
+    "is_slo_gate": false,
+    "note": "**不是硬门**（两个通道都不是）。dev 以 unweighted 为准；formal 做加权总体推断时以 weighted 为准。",
+    "tripwire": {
+      "threshold": 0.8,
+      "triggered": true,
+      "meaning": "低于绊线时本档需**解释**（通常指向固定开销偏高或冷 prefill 率偏低），但不否决。"
+    }
+  },
+  "slack_s": {
+    "p50": 0.3159238976069859,
+    "p90": 1.5535242625645225,
+    "p95": 2.7355471515655516,
+    "p99": 6.116395450047085
+  },
+  "implied_prefill_tok_s": {
+    "p50": 6581.141252339585,
+    "p90": 31877.90862992501,
+    "p95": 61437.86409526496,
+    "p99": 245473.3633489896
+  },
+  "uncached_actual_vs_expected_rel_dev": {
+    "p50": 0.012149141181399247,
+    "p90": 7.194180522565321,
+    "p95": 29.876571428571427,
+    "p99": 149.61081081081082
+  },
+  "ttft_p95_by_gate": {
+    "fast_intra(uncached_expected<=4096,<=3s)": 2.4422240257263184,
+    "overall_intra(<=5s)": 4.411845922470093,
+    "turn_start(<=15s)": 11.661762237548828,
+    "chain_start(<=30s)": 25.433237314224243
+  },
+  "ttft_gate_detail": {
+    "fast_intra(uncached_expected<=4096,<=3s)": {
+      "n": 328,
+      "p95": 2.4422240257263184,
+      "limit_s": 3.0,
+      "evaluable": true,
+      "pass": true,
+      "n_server_only": 328,
+      "p95_server_only": 2.4422240257263184,
+      "pass_server_only": true,
+      "min_n_for_p95": 20,
+      "underpowered": false,
+      "n_at_or_above_p95": 17,
+      "p95_uncached": 3144,
+      "shape_pressure_reference_tok_s": 1048.0
+    },
+    "overall_intra(<=5s)": {
+      "n": 388,
+      "p95": 4.411845922470093,
+      "limit_s": 5.0,
+      "evaluable": true,
+      "pass": true,
+      "n_server_only": 388,
+      "p95_server_only": 4.411845922470093,
+      "pass_server_only": true,
+      "min_n_for_p95": 20,
+      "underpowered": false,
+      "n_at_or_above_p95": 20,
+      "p95_uncached": 14033,
+      "shape_pressure_reference_tok_s": 2806.6
+    },
+    "turn_start(<=15s)": {
+      "n": 20,
+      "p95": 11.661762237548828,
+      "limit_s": 15.0,
+      "evaluable": true,
+      "pass": true,
+      "n_server_only": 20,
+      "p95_server_only": 11.661762237548828,
+      "pass_server_only": true,
+      "min_n_for_p95": 20,
+      "underpowered": false,
+      "n_at_or_above_p95": 1,
+      "p95_uncached": 42015,
+      "shape_pressure_reference_tok_s": 2801.0
+    },
+    "chain_start(<=30s)": {
+      "n": 314,
+      "p95": 25.433237314224243,
+      "limit_s": 30.0,
+      "evaluable": true,
+      "pass": true,
+      "n_server_only": 314,
+      "p95_server_only": 25.433237314224243,
+      "pass_server_only": true,
+      "min_n_for_p95": 20,
+      "underpowered": false,
+      "n_at_or_above_p95": 16,
+      "p95_uncached": 108278,
+      "shape_pressure_reference_tok_s": 3609.266666666667
+    }
+  },
+  "ttft_gate_warnings": [],
+  "chain_start_definition": {
+    "logical_chain_head": "idx_in_chain == 0（回放实际发送的该链第一条）",
+    "cold_session_start": "edge_type == 'chain-head'（会话首次，零缓存命中）",
+    "system_tools_changed": "edge_type == 'system-tools-changed'（system/tools 变更导致重新切链，该请求 prompt 前缀与任何已缓存内容都不同 -> 结构性零命中）",
+    "context_reset": "phase == 'context_reset'（上下文重建）",
+    "note": "chain_start(<=30s) 门是以上条件的**并集**，不等于单纯的会话冷首轮；huge-prefill 是与它们**重叠**的标记，且**仍在总体主门内**。"
+  },
+  "chain_start_strata": {
+    "chain_head_cold_session_start": {
+      "n": 104,
+      "p95_ttft_s": 5.917279243469238,
+      "p95_uncached": 34211,
+      "shape_pressure_reference_tok_s": 1140.3666666666666,
+      "n_zero_cache_hit": 104
+    },
+    "system_tools_changed": {
+      "n": 148,
+      "p95_ttft_s": 12.052886724472046,
+      "p95_uncached": 138847,
+      "shape_pressure_reference_tok_s": 4628.233333333334,
+      "n_zero_cache_hit": 148
+    },
+    "context_reset": {
+      "n": 23,
+      "p95_ttft_s": 27.19051766395569,
+      "p95_uncached": 2767,
+      "shape_pressure_reference_tok_s": 92.23333333333333,
+      "n_zero_cache_hit": 0
+    },
+    "normal_chain_start": {
+      "n": 39,
+      "p95_ttft_s": 63.378931760787964,
+      "p95_uncached": 3296,
+      "shape_pressure_reference_tok_s": 109.86666666666666,
+      "n_zero_cache_hit": 0
+    }
+  },
+  "chain_start_huge_prefill_overlap": {
+    "n": 28,
+    "p95_ttft_s": 45.55304217338562,
+    "p95_uncached": 234947,
+    "shape_pressure_reference_tok_s": 7831.566666666667,
+    "n_zero_cache_hit": 28,
+    "threshold_uncached": 65536,
+    "note": "与上面的分层**重叠**的子集；仍计入总体 chain_start 主门，不得仅作副榜。"
+  },
+  "chain_start_strata_total": {
+    "n": 314,
+    "p95_ttft_s": 25.433237314224243,
+    "p95_uncached": 108278,
+    "shape_pressure_reference_tok_s": 3609.266666666667,
+    "n_zero_cache_hit": 252
+  },
+  "ttft_basis": {
+    "n_successful": 722,
+    "n_server": 722,
+    "n_client_proxy": 0,
+    "n_unknown": 0,
+    "server_coverage": 1.0,
+    "mixed_basis": false,
+    "conflicting_gates": [],
+    "conflict": false,
+    "note": "gate 用逐请求 ttft_s（服务端优先、缺失时回退客户端首 SSE）。若两基准对同一门给出不同结论，该档判定**依赖基准**，须在报告中显式说明；默认不改判（保持与在跑结论可比），--strict-ttft-basis 时并入 ALL_PASS。"
+  },
+  "ttft_p95_by_phase": {
+    "context_reset": 27.19051766395569,
+    "intra": 12.835152387619019,
+    "session_start": 5.917279243469238,
+    "turn_start": 4.4518959522247314
+  },
+  "ttft_by_len_tier": {
+    "<32K": {
+      "n": 232,
+      "p50": 0.8509316444396973,
+      "p90": 2.0671498775482178,
+      "p95": 3.52070689201355,
+      "p99": 8.501038789749146
+    },
+    "32-64K": {
+      "n": 342,
+      "p50": 0.997795820236206,
+      "p90": 3.446359634399414,
+      "p95": 4.9210920333862305,
+      "p99": 25.23130965232849
+    },
+    "64-128K": {
+      "n": 122,
+      "p50": 2.4422240257263184,
+      "p90": 18.0795419216156,
+      "p95": 27.19051766395569,
+      "p99": 45.997750997543335
+    },
+    "128-256K": {
+      "n": 26,
+      "p50": 7.635177135467529,
+      "p90": 46.14451503753662,
+      "p95": 63.378931760787964,
+      "p99": 81.1551079750061
+    },
+    ">256K": {
+      "n": 0,
+      "p50": null,
+      "p90": null,
+      "p95": null,
+      "p99": null
+    }
+  },
+  "tpot": {
+    "p50": 0.057178000811420916,
+    "p90": 0.16189424325219862,
+    "p95": 0.21886361722652553,
+    "p99": 0.5537371197715402
+  },
+  "cache_hit_ratio": {
+    "p50": 0.9135808609584442,
+    "p90": 0.9809910998791341,
+    "p95": 0.9874976062156321,
+    "p99": 0.9949909945429618
+  },
+  "ttft_p95_by_hit_band": {
+    "high(>=90%)": {
+      "n": 396,
+      "p50": 0.5507152080535889,
+      "p90": 1.9969244003295898,
+      "p95": 2.3012945652008057,
+      "p99": 25.23130965232849
+    },
+    "low(<50%)": {
+      "n": 151,
+      "p50": 3.9437243938446045,
+      "p90": 21.149062156677246,
+      "p95": 34.51275897026062,
+      "p99": 63.378931760787964
+    },
+    "mid(50-90%)": {
+      "n": 175,
+      "p50": 1.3040728569030762,
+      "p90": 4.232491970062256,
+      "p95": 8.367807149887085,
+      "p99": 26.85388207435608
+    }
+  },
+  "budget_attainment_stratified": {
+    "hit_band|high(>=90%)": {
+      "n": 396,
+      "attainment": 0.5833333333333334
+    },
+    "hit_band|low(<50%)": {
+      "n": 151,
+      "attainment": 0.7417218543046358
+    },
+    "hit_band|mid(50-90%)": {
+      "n": 175,
+      "attainment": 0.6342857142857142
+    },
+    "phase|context_reset": {
+      "n": 23,
+      "attainment": 0.6086956521739131
+    },
+    "phase|intra": {
+      "n": 503,
+      "attainment": 0.5685884691848907
+    },
+    "phase|session_start": {
+      "n": 104,
+      "attainment": 0.8653846153846154
+    },
+    "phase|turn_start": {
+      "n": 92,
+      "attainment": 0.6956521739130435
+    },
+    "uncached_band|16-64K": {
+      "n": 96,
+      "attainment": 0.78125
+    },
+    "uncached_band|4-16K": {
+      "n": 162,
+      "attainment": 0.691358024691358
+    },
+    "uncached_band|<4K": {
+      "n": 420,
+      "attainment": 0.5738095238095238
+    },
+    "uncached_band|>=64K": {
+      "n": 44,
+      "attainment": 0.5909090909090909
+    }
+  },
+  "tpm_steady_window": {
+    "window_rule": "[t0 + 10 min, t0 + 70 min)",
+    "start_min": 10.0,
+    "len_min": 60.0,
+    "denominator_minutes": 60.0,
+    "pricing_usd_per_mtok": {
+      "cached_input": 0.03,
+      "uncached_input": 0.15,
+      "output": 0.5
+    },
+    "usd_cny": 7.1,
+    "is_monthly_value_source": true,
+    "attribution_basis": "server_t_recv_s",
+    "n_successful": 722,
+    "n_without_timestamp": 0,
+    "t0_s": 1790151020.9877849,
+    "window_start_s": 1790151620.9877849,
+    "window_end_s": 1790155220.9877849,
+    "cohort_span_min": 21.101624453067778,
+    "n_in_window": 335,
+    "n_outside_window": 387,
+    "rpm": 5.583333333333333,
+    "subwindow_request_counts": [
+      323,
+      12,
+      0,
+      0,
+      0,
+      0
+    ],
+    "validity": {
+      "ok": false,
+      "checks": {
+        "has_requests_in_window": true,
+        "all_subwindows_nonempty": false,
+        "cohort_not_drained_before_window_end": false
+      },
+      "reason": "窗口无效：all_subwindows_nonempty, cohort_not_drained_before_window_end。该次运行不得据此发布 TPM/月产值（应改窗口或扩大 cohort 供给跨度）。"
+    },
+    "tpm_cached_input": null,
+    "tpm_uncached_input": null,
+    "tpm_input": null,
+    "tpm_decode": null,
+    "tpm_device_work": null,
+    "tpm_all": null,
+    "monthly_value": null
+  },
+  "tpm_finite_cohort_average": {
+    "all": 1636072.9035278247,
+    "input": 1625888.5592072909,
+    "uncached_input_actual": 502150.55223344034,
+    "device_work": 512334.8965539741,
+    "decode": 10184.344320533737,
+    "expected_uncached_input": 565761.8642516888
+  },
+  "tpm": {
+    "all": null,
+    "input": null,
+    "uncached_input_actual": null,
+    "device_work": null,
+    "decode": null,
+    "expected_uncached_input": null,
+    "cached_input": null
+  },
+  "tpm_semantics": "steady-window：分母固定为窗口长度 60 min（W = [t0+10min, t0+70min)），**不受 cohort drain-tail 影响**；这是对外发布的 TPM 与月产值口径。窗口无效时 TPM 为 null（不退回全程平均）。 历史对照见 rep['tpm_finite_cohort_average']（诊断）。",
+  "tpm_labels": {
+    "TPM(ALL)": "all",
+    "TPM(input)": "input",
+    "TPM(uncached-input)": "uncached_input_actual",
+    "TPM(device-work)": "device_work",
+    "TPM(decode)": "decode",
+    "TPM(expected-uncached-input)": "expected_uncached_input"
+  },
+  "tpm_formulas": {
+    "TPM(ALL)": "(Σ prompt_tokens + Σ output_tokens) / wall_min",
+    "TPM(input)": "Σ prompt_tokens / wall_min",
+    "TPM(uncached-input)": "Σ max(0, prompt_tokens_i − cached_tokens_i) / wall_min",
+    "TPM(device-work)": "(Σ 实际未命中输入 token + Σ output_tokens) / wall_min",
+    "TPM(decode)": "Σ output_tokens / wall_min",
+    "TPM(expected-uncached-input)": "Σ uncached_expected_i / wall_min（按数据集标注估算）"
+  },
+  "reference_metrics": {
+    "note": "解释性能的参考指标；**不各自构成 SLO 硬门**。硬门见 rep['gates']。",
+    "not_slo_gates": true,
+    "rpm": 34.108119413612265,
+    "avg_active_occupancy": 14.658695416225175,
+    "configured_N_slots": 18,
+    "cache_hit_ratio": {
+      "p50": 0.9135808609584442,
+      "p90": 0.9809910998791341,
+      "p95": 0.9874976062156321,
+      "p99": 0.9949909945429618
+    },
+    "cache_hit_ratio_p50": 0.9135808609584442,
+    "wall_s": 1270.078818321228,
+    "wall_min": 21.1679803053538,
+    "completed_requests": 722,
+    "dispatched_requests": 722
+  },
+  "server_timing": {
+    "n_with_server_ttft": 722,
+    "n_with_breakdown": 722,
+    "n_successful": 722,
+    "coverage": 1.0,
+    "formal_required_coverage": 1.0,
+    "server_ttft_s": {
+      "p50": 1.0811538696289062,
+      "p90": 6.7108540534973145,
+      "p95": 12.331424713134766,
+      "p99": 39.17679786682129
+    },
+    "queue_s": {
+      "p50": 0.20827031135559082,
+      "p90": 1.9876410961151123,
+      "p95": 6.916498184204102,
+      "p99": 31.291147470474243
+    },
+    "exec_to_first_s": {
+      "p50": 0.7042238712310791,
+      "p90": 3.4888644218444824,
+      "p95": 6.589619159698486,
+      "p99": 15.797193765640259
+    },
+    "ttft_client_s": {
+      "p50": 1.0982861369848251,
+      "p90": 6.74251957796514,
+      "p95": 12.368020189926028,
+      "p99": 39.269958099815995
+    }
+  },
+  "gates": {
+    "coverage=100%": true,
+    "harness_data==0": true,
+    "harness_render==0": true,
+    "engine_error<1%": true,
+    "infra_error<1%": true,
+    "gated_phases_have_samples": true,
+    "fast_intra(uncached_expected<=4096,<=3s)": true,
+    "overall_intra(<=5s)": true,
+    "turn_start(<=15s)": true,
+    "chain_start(<=30s)": true
+  },
+  "gates_used": [
+    "coverage=100%",
+    "harness_data==0",
+    "harness_render==0",
+    "engine_error<1%",
+    "infra_error<1%",
+    "fast_intra(uncached_expected<=4096,<=3s)",
+    "overall_intra(<=5s)",
+    "turn_start(<=15s)",
+    "chain_start(<=30s)",
+    "gated_phases_have_samples"
+  ],
+  "measurement_contract": {
+    "server_ttft_coverage=100%": true,
+    "required_for_lane": false,
+    "strict_ttft_basis": false,
+    "auto_enabled_by_lane": false,
+    "ttft_basis_no_conflict": true
+  },
+  "SERVICE_GATES_PASS": true,
+  "ALL_PASS": true,
+  "evaluation_status": "PASS",
+  "execution_status": "COMPLETED"
+}

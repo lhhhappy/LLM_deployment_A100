@@ -1,0 +1,21 @@
+requests=0 ok=0 errors=0
+
+== gates  (dev harness = hard p95<=limit; formal-est = task.md rule: FAIL only if 95% lower bound of exceed-rate > 5%)
+  fast_intra     n=   0 p50=   nan p95=  0.00 max=   0.0 over=  0 allowed=  0 | harness PASS | formal-est PASS (margin +0)
+  overall_intra  n=   0 p50=   nan p95=  0.00 max=   0.0 over=  0 allowed=  0 | harness PASS | formal-est PASS (margin +0)
+  turn_start     n=   0 p50=   nan p95=  0.00 max=   0.0 over=  0 allowed=  0 | harness PASS | formal-est PASS (margin +0)
+  chain_start    n=   0 p50=   nan p95=  0.00 max=   0.0 over=  0 allowed=  0 | harness PASS | formal-est PASS (margin +0)
+  => harness ALL_PASS=True  formal-est ALL_PASS=True  tpot_mean=0.0000 tpot_p95=0.0000
+
+== TTFT decomposition (server timestamps)
+
+== cache efficiency (actual cached vs frozen expectation)
+  expected cached=0  actual cached=0  ratio=0.000
+  requests with actual cached < expected-1024: 0; lost tokens total=0
+
+== prefill rate vs actual uncached tokens (exec->first token)
+
+== TPOT
+  n=0 mean=0.0000 p50=nan p95=nan max=0.000
+
+== worst requests vs their gate

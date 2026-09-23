@@ -1,0 +1,52 @@
+{
+  "config": {
+    "set": "dev-combined-v1",
+    "N": 18,
+    "model": "glm-5.3-flash",
+    "seed": 20260910,
+    "instance_id": "dev-combined-v1-1790150368-preflight",
+    "cache_namespace": "dev-combined-v1-1790150368-preflight",
+    "cohort_sha256": "91f5061bd1c167c6",
+    "cohort_version": "dev-combined-v1",
+    "warmup": false,
+    "prefix_warm_from_excluded": false,
+    "cohort_file": "/tmp/ax/s1/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json",
+    "pacing": "none(smoke)",
+    "chain_gap_cap_ms": 0,
+    "gap_rounding": "last-nonzero-remainder",
+    "workload_hash": "41a177e7d1c7462a",
+    "cohort_sha256_canonical": "c6645ee02c86494e",
+    "max_chains": 1,
+    "config_hash": "d84d898a64979b61"
+  },
+  "wall_s": 56.61914253234863,
+  "n_attempted": 2,
+  "raw_file": "raw_dev-combined-v1_N18_1790150375.jsonl",
+  "dispatched": 2,
+  "pacing": "none(smoke)",
+  "chain_gap_cap_ms": 0,
+  "gap_rounding": "last-nonzero-remainder",
+  "workload_hash": "41a177e7d1c7462a",
+  "gap_compression": {
+    "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+    "rounding": "last-nonzero-remainder",
+    "chain_gap_cap_ms": 0,
+    "n_chains": 1,
+    "n_chains_compressed": 0,
+    "n_requests_in_compressed_chains": 0,
+    "original_gap_sum_ms": 28295,
+    "effective_gap_sum_ms": 28295,
+    "affected_chains": [],
+    "affected_chains_truncated": 0
+  },
+  "client_ts_keys": [
+    "client_dispatch_at_s",
+    "client_first_token_at_s",
+    "client_finish_at_s"
+  ],
+  "steady_window_hint": {
+    "start_min": 10,
+    "len_min": 60,
+    "denominator_minutes": 60
+  }
+}

@@ -24,7 +24,7 @@
    - `_ax170_align_prefill_buckets_for_attn_tp_scatter`：开 `--enable-attn-tp-input-scattered` 且 tp>1 时，把桶向上对齐到 tp_size 的倍数，做法同 `apply_deepep_adjustments`。**这只是必要条件，不能单独修复 scatter**，真正的修复见 v2。
 
 ## v2（T52b）：`--enable-attn-tp-input-scattered` 下输出错误的根因与修复
-- **现象（8 卡，coordinator 提供）**：026j（BCG + scatter）能力冒烟 0/12，输出看似流畅但错误；026k（eager + scatter）12/12；026l（BCG 无 scatter）12/12。v1 旧版保存在 `patches/drafts/170-v1.patch`、`170-v1.md`。
+- **现象（8 卡，coordinator 提供）**：026j（BCG + scatter）能力冒烟 0/12，输出看似流畅但错误；026k（eager + scatter）12/12；026l（BCG 无 scatter）12/12。v1 旧版只保留在 git 历史中。
 - **开发机复现（实测，TP2，GPU0+1，上下文敏感测试权重）**：BCG+scatter 对 eager+scatter，22 个请求中首 token 只有 10 个相同，top-5 logprob 最大差 4.22。**正好是桶大小的长度（512/1024/4096）也错**，所以根因不是 n≠B 的 padding 问题。
 - **根因（读代码确认）**：
   - `prefill_cuda_graph_runner.py::_run_forward` 的 BCG/Full 分支 capture 时直接调用 `self.layer_model.forward(...)`，绕过了外层 `Glm5NextForConditionalGeneration.forward`（glm5_next.py:1535）里的 `get_attn_tp_context().maybe_input_scattered(forward_batch)`。`attn_input_scattered` 只由各模型外层 forward 设置，默认 False（runtime_context.py:606）。

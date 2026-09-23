@@ -1,0 +1,27 @@
+SYNTAX_AND_HELPER_POLICY_OK
+CLI_HELP_OK
+INVALID_RUN_REJECTED_RC2
+PARTIAL_RAW_REPORTED_1_VALID_1_MALFORMED
+MISSING_LOGS_REPORTED
+NO_SLO_VERDICT_COMPUTED
+READ_TIME_UTC 2026-09-23T17:45:42.386960+00:00
+RUN 035-s0_n22 LEVEL N22
+
+MISSING job.log
+
+MISSING server.log
+
+MISSING exit_code
+
+MISSING N22/run_dev.log
+
+MISSING N22/analysis.txt
+
+MISSING N22/verdict.json
+
+MISSING N22/gpu_util.csv
+
+RAW_FILE_COUNT 1
+RAW_SNAPSHOT {"file": "raw_example.jsonl", "rows": 1, "unique_ids": 1, "malformed_lines": 1, "error_classes": {}}
+
+DIAGNOSTIC_ONLY: live files may change; counts and old verdicts are not a validated SLO result.

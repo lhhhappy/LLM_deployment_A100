@@ -91,6 +91,13 @@
 - **F88** 8 卡探针 026g–k（档 1）：114 有效；MTP+v3 兼容；**170 BCG 在 TP8+scatter 下输出错误**
 - **F89** 梯子 028（MTP+114+v3 cap4096 i2，eager prefill）N18：TPOT 两项都过，TTFT 仍败
 - **F90** 今晚（09-23 离线队列）结论
+- **F91** 评测复盘（Fable R14）要点，Claude 抽查核实
+- **F92** 闭环负载与真正的 prefill 浪费（Claude 核实，推翻 R13 的一条）
+- **F93** T53：026 N18 原始账本纠正与评测脚本审阅（VERIFIED）
+- **F94** 035：026 精确基线在 N22 已结束，旧分析器判 FAIL（只读日志）
+- **F95** T56：026 N18真实LCP与prefill停顿逐条归因（VERIFIED数值；INFERRED机制）
+- **F96** T58：035 N22完整原始记录重算，唯一估算失败门为TPOT p95（VERIFIED）
+- **F97** T59：035 N22超标205条的特征与prefill时间重叠
 
 ## Decisions（最新在上）
 
@@ -189,6 +196,11 @@
 - plans/prompts/T49-brief-8card-n6.md
 - plans/prompts/T49-codex-astra.md
 - plans/prompts/T50-dcp-address.md
+- plans/prompts/T54a-verdict-fail-closed.md
+- plans/prompts/T54b-diagnostics-numerics.md
+- plans/prompts/T55-repo-cleanup-review.md
+- plans/prompts/T56-true-lcp-attribution.md
+- plans/prompts/_context-0924.md
 
 ## Reports
 
@@ -196,6 +208,9 @@
 - research/archive/R5_patch_review.md
 - research/claude/R10_prefill_fixed_overhead.md
 - research/claude/R11_retro_unverified_assumptions.md
+- research/claude/R12_full_experiment_review.md
+- research/claude/R13_fable_direction_review.md
+- research/claude/R14_fable_eval_review.md
 - research/claude/R1_model_and_engines.md
 - research/claude/R2_serving_techniques.md
 - research/claude/R3_prior_art_en.md
@@ -209,6 +224,9 @@
 - research/codex/R15_base_source_exploration.md
 - research/codex/R17_nextn_sm80.md
 - research/codex/R18_cache_loss_and_capacity.md
+- research/codex/R19_progress_and_cache_review.md
+- research/codex/R20_true_lcp_attribution.md
+- research/codex/R21_N22_tpot_failures.md
 - research/codex/R5_dp_memory_accounting.md
 - research/codex/R6_prior_art_cn_github.md
 - research/codex/R7_kda_internal_checkpoints.md

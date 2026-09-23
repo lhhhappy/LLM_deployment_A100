@@ -1,0 +1,1398 @@
+{
+  "schema_version": 1,
+  "label": "estimated",
+  "note": "Dev cohort only; organizer CI implementation unknown; binomial model assumes independent trials.",
+  "dev": {
+    "config": {
+      "set": "dev-combined-v1",
+      "N": 22,
+      "model": "glm-5.3-flash",
+      "seed": 20260910,
+      "instance_id": "dev-combined-v1-1790183817-measure",
+      "cache_namespace": "dev-combined-v1-1790183817-measure",
+      "cohort_sha256": "91f5061bd1c167c6",
+      "cohort_version": "dev-combined-v1",
+      "warmup": false,
+      "prefix_warm_from_excluded": false,
+      "cohort_file": "/tmp/ax/s1/s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json",
+      "pacing": "chain-total-gap-scaled-v1",
+      "chain_gap_cap_ms": 3600000,
+      "gap_rounding": "last-nonzero-remainder",
+      "workload_hash": "997e98a98033b24b",
+      "cohort_sha256_canonical": "c6645ee02c86494e",
+      "max_chains": null,
+      "config_hash": "e5bf368b7c3120fc",
+      "lane": "dev",
+      "strict_ttft_basis": false,
+      "steady_start_min": 10,
+      "steady_len_min": 60
+    },
+    "wall_s": 1255.2985637187958,
+    "n_attempted": 722,
+    "n_dispatched": 722,
+    "error_counts": {},
+    "harness_error_rate": 0.0,
+    "service_error_rate": 0.0,
+    "infra_error_rate": 0.0,
+    "n_judged": 722,
+    "n_unjudgeable": 0,
+    "coverage": 1.0,
+    "budget_attainment": {
+      "unweighted": 0.5886426592797784,
+      "weighted": 0.6200498655654889,
+      "authoritative_for_lane": "unweighted",
+      "is_slo_gate": false,
+      "note": "**不是硬门**（两个通道都不是）。dev 以 unweighted 为准；formal 做加权总体推断时以 weighted 为准。",
+      "tripwire": {
+        "threshold": 0.8,
+        "triggered": true,
+        "meaning": "低于绊线时本档需**解释**（通常指向固定开销偏高或冷 prefill 率偏低），但不否决。"
+      }
+    },
+    "slack_s": {
+      "p50": 0.30748443412780757,
+      "p90": 1.5895109904153006,
+      "p95": 2.697178333554949,
+      "p99": 6.3246702913556785
+    },
+    "implied_prefill_tok_s": {
+      "p50": 5361.53314576275,
+      "p90": 27540.897616863545,
+      "p95": 55807.12646202909,
+      "p99": 542606.4963855422
+    },
+    "uncached_actual_vs_expected_rel_dev": {
+      "p50": 0.012149141181399247,
+      "p90": 8.009756097560976,
+      "p95": 33.759075907590756,
+      "p99": 170.6009244992296
+    },
+    "ttft_p95_by_gate": {
+      "fast_intra(uncached_expected<=4096,<=3s)": 3.045405864715576,
+      "overall_intra(<=5s)": 5.104129076004028,
+      "turn_start(<=15s)": 7.815637588500977,
+      "chain_start(<=30s)": 38.62718915939331
+    },
+    "ttft_gate_detail": {
+      "fast_intra(uncached_expected<=4096,<=3s)": {
+        "n": 328,
+        "p95": 3.045405864715576,
+        "limit_s": 3.0,
+        "evaluable": true,
+        "pass": false,
+        "n_server_only": 328,
+        "p95_server_only": 3.045405864715576,
+        "pass_server_only": false,
+        "min_n_for_p95": 20,
+        "underpowered": false,
+        "n_at_or_above_p95": 17,
+        "p95_uncached": 3144,
+        "shape_pressure_reference_tok_s": 1048.0
+      },
+      "overall_intra(<=5s)": {
+        "n": 388,
+        "p95": 5.104129076004028,
+        "limit_s": 5.0,
+        "evaluable": true,
+        "pass": false,
+        "n_server_only": 388,
+        "p95_server_only": 5.104129076004028,
+        "pass_server_only": false,
+        "min_n_for_p95": 20,
+        "underpowered": false,
+        "n_at_or_above_p95": 20,
+        "p95_uncached": 14033,
+        "shape_pressure_reference_tok_s": 2806.6
+      },
+      "turn_start(<=15s)": {
+        "n": 20,
+        "p95": 7.815637588500977,
+        "limit_s": 15.0,
+        "evaluable": true,
+        "pass": true,
+        "n_server_only": 20,
+        "p95_server_only": 7.815637588500977,
+        "pass_server_only": true,
+        "min_n_for_p95": 20,
+        "underpowered": false,
+        "n_at_or_above_p95": 1,
+        "p95_uncached": 42015,
+        "shape_pressure_reference_tok_s": 2801.0
+      },
+      "chain_start(<=30s)": {
+        "n": 314,
+        "p95": 38.62718915939331,
+        "limit_s": 30.0,
+        "evaluable": true,
+        "pass": false,
+        "n_server_only": 314,
+        "p95_server_only": 38.62718915939331,
+        "pass_server_only": false,
+        "min_n_for_p95": 20,
+        "underpowered": false,
+        "n_at_or_above_p95": 16,
+        "p95_uncached": 108278,
+        "shape_pressure_reference_tok_s": 3609.266666666667
+      }
+    },
+    "ttft_gate_warnings": [],
+    "chain_start_definition": {
+      "logical_chain_head": "idx_in_chain == 0（回放实际发送的该链第一条）",
+      "cold_session_start": "edge_type == 'chain-head'（会话首次，零缓存命中）",
+      "system_tools_changed": "edge_type == 'system-tools-changed'（system/tools 变更导致重新切链，该请求 prompt 前缀与任何已缓存内容都不同 -> 结构性零命中）",
+      "context_reset": "phase == 'context_reset'（上下文重建）",
+      "note": "chain_start(<=30s) 门是以上条件的**并集**，不等于单纯的会话冷首轮；huge-prefill 是与它们**重叠**的标记，且**仍在总体主门内**。"
+    },
+    "chain_start_strata": {
+      "chain_head_cold_session_start": {
+        "n": 104,
+        "p95_ttft_s": 4.592581272125244,
+        "p95_uncached": 34211,
+        "shape_pressure_reference_tok_s": 1140.3666666666666,
+        "n_zero_cache_hit": 104
+      },
+      "system_tools_changed": {
+        "n": 148,
+        "p95_ttft_s": 45.235090017318726,
+        "p95_uncached": 138847,
+        "shape_pressure_reference_tok_s": 4628.233333333334,
+        "n_zero_cache_hit": 148
+      },
+      "context_reset": {
+        "n": 23,
+        "p95_ttft_s": 34.16552233695984,
+        "p95_uncached": 2767,
+        "shape_pressure_reference_tok_s": 92.23333333333333,
+        "n_zero_cache_hit": 0
+      },
+      "normal_chain_start": {
+        "n": 39,
+        "p95_ttft_s": 55.62243914604187,
+        "p95_uncached": 3296,
+        "shape_pressure_reference_tok_s": 109.86666666666666,
+        "n_zero_cache_hit": 0
+      }
+    },
+    "chain_start_huge_prefill_overlap": {
+      "n": 28,
+      "p95_ttft_s": 54.3008017539978,
+      "p95_uncached": 234947,
+      "shape_pressure_reference_tok_s": 7831.566666666667,
+      "n_zero_cache_hit": 28,
+      "threshold_uncached": 65536,
+      "note": "与上面的分层**重叠**的子集；仍计入总体 chain_start 主门，不得仅作副榜。"
+    },
+    "chain_start_strata_total": {
+      "n": 314,
+      "p95_ttft_s": 38.62718915939331,
+      "p95_uncached": 108278,
+      "shape_pressure_reference_tok_s": 3609.266666666667,
+      "n_zero_cache_hit": 252
+    },
+    "ttft_basis": {
+      "n_successful": 722,
+      "n_server": 722,
+      "n_client_proxy": 0,
+      "n_unknown": 0,
+      "server_coverage": 1.0,
+      "mixed_basis": false,
+      "conflicting_gates": [],
+      "conflict": false,
+      "note": "gate 用逐请求 ttft_s（服务端优先、缺失时回退客户端首 SSE）。若两基准对同一门给出不同结论，该档判定**依赖基准**，须在报告中显式说明；默认不改判（保持与在跑结论可比），--strict-ttft-basis 时并入 ALL_PASS。"
+    },
+    "ttft_p95_by_phase": {
+      "context_reset": 34.16552233695984,
+      "intra": 15.418891906738281,
+      "session_start": 4.592581272125244,
+      "turn_start": 4.6246185302734375
+    },
+    "ttft_by_len_tier": {
+      "<32K": {
+        "n": 232,
+        "p50": 1.055511713027954,
+        "p90": 2.0641372203826904,
+        "p95": 3.247621774673462,
+        "p99": 11.85247015953064
+      },
+      "32-64K": {
+        "n": 342,
+        "p50": 1.0762596130371094,
+        "p90": 3.617194414138794,
+        "p95": 4.6246185302734375,
+        "p99": 15.418891906738281
+      },
+      "64-128K": {
+        "n": 122,
+        "p50": 3.7741734981536865,
+        "p90": 20.60734748840332,
+        "p95": 47.18308067321777,
+        "p99": 54.61723470687866
+      },
+      "128-256K": {
+        "n": 26,
+        "p50": 7.079371690750122,
+        "p90": 47.037516832351685,
+        "p95": 50.612168312072754,
+        "p99": 55.62243914604187
+      },
+      ">256K": {
+        "n": 0,
+        "p50": null,
+        "p90": null,
+        "p95": null,
+        "p99": null
+      }
+    },
+    "tpot": {
+      "p50": 0.07128494924732617,
+      "p90": 0.1987399805965583,
+      "p95": 0.2961931135342048,
+      "p99": 0.5795988345270355
+    },
+    "cache_hit_ratio": {
+      "p50": 0.9143936710355414,
+      "p90": 0.9807062756843352,
+      "p95": 0.9865197514945493,
+      "p99": 0.9946809890765678
+    },
+    "ttft_p95_by_hit_band": {
+      "high(>=90%)": {
+        "n": 401,
+        "p50": 0.6555721759796143,
+        "p90": 1.9816906452178955,
+        "p95": 2.5820634365081787,
+        "p99": 46.27148365974426
+      },
+      "low(<50%)": {
+        "n": 165,
+        "p50": 3.7144415378570557,
+        "p90": 21.0686354637146,
+        "p95": 39.008867502212524,
+        "p99": 61.102394580841064
+      },
+      "mid(50-90%)": {
+        "n": 156,
+        "p50": 1.5443387031555176,
+        "p90": 5.806814670562744,
+        "p95": 7.310909748077393,
+        "p99": 11.85247015953064
+      }
+    },
+    "budget_attainment_stratified": {
+      "hit_band|high(>=90%)": {
+        "n": 401,
+        "attainment": 0.5236907730673317
+      },
+      "hit_band|low(<50%)": {
+        "n": 165,
+        "attainment": 0.7575757575757576
+      },
+      "hit_band|mid(50-90%)": {
+        "n": 156,
+        "attainment": 0.5769230769230769
+      },
+      "phase|context_reset": {
+        "n": 23,
+        "attainment": 0.6086956521739131
+      },
+      "phase|intra": {
+        "n": 503,
+        "attainment": 0.5129224652087475
+      },
+      "phase|session_start": {
+        "n": 104,
+        "attainment": 0.8557692307692307
+      },
+      "phase|turn_start": {
+        "n": 92,
+        "attainment": 0.6956521739130435
+      },
+      "uncached_band|16-64K": {
+        "n": 97,
+        "attainment": 0.7835051546391752
+      },
+      "uncached_band|4-16K": {
+        "n": 167,
+        "attainment": 0.6347305389221557
+      },
+      "uncached_band|<4K": {
+        "n": 415,
+        "attainment": 0.5253012048192771
+      },
+      "uncached_band|>=64K": {
+        "n": 43,
+        "attainment": 0.5813953488372093
+      }
+    },
+    "tpm_steady_window": {
+      "window_rule": "[t0 + 10 min, t0 + 70 min)",
+      "start_min": 10.0,
+      "len_min": 60.0,
+      "denominator_minutes": 60.0,
+      "pricing_usd_per_mtok": {
+        "cached_input": 0.03,
+        "uncached_input": 0.15,
+        "output": 0.5
+      },
+      "usd_cny": 7.1,
+      "is_monthly_value_source": true,
+      "attribution_basis": "server_t_recv_s",
+      "n_successful": 722,
+      "n_without_timestamp": 0,
+      "t0_s": 1790184433.066631,
+      "window_start_s": 1790185033.066631,
+      "window_end_s": 1790188633.066631,
+      "cohort_span_min": 20.420377266407012,
+      "n_in_window": 310,
+      "n_outside_window": 412,
+      "rpm": 5.166666666666667,
+      "subwindow_request_counts": [
+        306,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "validity": {
+        "ok": false,
+        "checks": {
+          "has_requests_in_window": true,
+          "all_subwindows_nonempty": false,
+          "cohort_not_drained_before_window_end": false
+        },
+        "reason": "窗口无效：all_subwindows_nonempty, cohort_not_drained_before_window_end。该次运行不得据此发布 TPM/月产值（应改窗口或扩大 cohort 供给跨度）。"
+      },
+      "tpm_cached_input": null,
+      "tpm_uncached_input": null,
+      "tpm_input": null,
+      "tpm_decode": null,
+      "tpm_device_work": null,
+      "tpm_all": null,
+      "monthly_value": null
+    },
+    "tpm_finite_cohort_average": {
+      "all": 1655336.5072323047,
+      "input": 1645032.2494454714,
+      "uncached_input_actual": 508962.3763348162,
+      "device_work": 519266.6341216495,
+      "decode": 10304.257786833254,
+      "expected_uncached_input": 572423.3108904981
+    },
+    "tpm": {
+      "all": null,
+      "input": null,
+      "uncached_input_actual": null,
+      "device_work": null,
+      "decode": null,
+      "expected_uncached_input": null,
+      "cached_input": null
+    },
+    "tpm_semantics": "steady-window：分母固定为窗口长度 60 min（W = [t0+10min, t0+70min)），**不受 cohort drain-tail 影响**；这是对外发布的 TPM 与月产值口径。窗口无效时 TPM 为 null（不退回全程平均）。 历史对照见 rep['tpm_finite_cohort_average']（诊断）。",
+    "tpm_labels": {
+      "TPM(ALL)": "all",
+      "TPM(input)": "input",
+      "TPM(uncached-input)": "uncached_input_actual",
+      "TPM(device-work)": "device_work",
+      "TPM(decode)": "decode",
+      "TPM(expected-uncached-input)": "expected_uncached_input"
+    },
+    "tpm_formulas": {
+      "TPM(ALL)": "(Σ prompt_tokens + Σ output_tokens) / wall_min",
+      "TPM(input)": "Σ prompt_tokens / wall_min",
+      "TPM(uncached-input)": "Σ max(0, prompt_tokens_i − cached_tokens_i) / wall_min",
+      "TPM(device-work)": "(Σ 实际未命中输入 token + Σ output_tokens) / wall_min",
+      "TPM(decode)": "Σ output_tokens / wall_min",
+      "TPM(expected-uncached-input)": "Σ uncached_expected_i / wall_min（按数据集标注估算）"
+    },
+    "reference_metrics": {
+      "note": "解释性能的参考指标；**不各自构成 SLO 硬门**。硬门见 rep['gates']。",
+      "not_slo_gates": true,
+      "rpm": 34.509718446315595,
+      "avg_active_occupancy": 17.806537183651532,
+      "configured_N_slots": 22,
+      "cache_hit_ratio": {
+        "p50": 0.9143936710355414,
+        "p90": 0.9807062756843352,
+        "p95": 0.9865197514945493,
+        "p99": 0.9946809890765678
+      },
+      "cache_hit_ratio_p50": 0.9143936710355414,
+      "wall_s": 1255.2985637187958,
+      "wall_min": 20.921642728646596,
+      "completed_requests": 722,
+      "dispatched_requests": 722
+    },
+    "server_timing": {
+      "n_with_server_ttft": 722,
+      "n_with_breakdown": 722,
+      "n_successful": 722,
+      "coverage": 1.0,
+      "formal_required_coverage": 1.0,
+      "server_ttft_s": {
+        "p50": 1.1576907634735107,
+        "p90": 6.535972356796265,
+        "p95": 12.603238821029663,
+        "p99": 53.720924854278564
+      },
+      "queue_s": {
+        "p50": 0.24611854553222656,
+        "p90": 2.528036594390869,
+        "p95": 7.3618996143341064,
+        "p99": 47.19186615943909
+      },
+      "exec_to_first_s": {
+        "p50": 0.7569890022277832,
+        "p90": 3.4886651039123535,
+        "p95": 6.571841239929199,
+        "p99": 15.492239236831665
+      },
+      "ttft_client_s": {
+        "p50": 1.1698203883133829,
+        "p90": 6.6795019982382655,
+        "p95": 12.611013629008085,
+        "p99": 54.42970324214548
+      }
+    },
+    "gates": {
+      "coverage=100%": true,
+      "harness_data==0": true,
+      "harness_render==0": true,
+      "engine_error<1%": true,
+      "infra_error<1%": true,
+      "gated_phases_have_samples": true,
+      "fast_intra(uncached_expected<=4096,<=3s)": false,
+      "overall_intra(<=5s)": false,
+      "turn_start(<=15s)": true,
+      "chain_start(<=30s)": false
+    },
+    "gates_used": [
+      "coverage=100%",
+      "harness_data==0",
+      "harness_render==0",
+      "engine_error<1%",
+      "infra_error<1%",
+      "fast_intra(uncached_expected<=4096,<=3s)",
+      "overall_intra(<=5s)",
+      "turn_start(<=15s)",
+      "chain_start(<=30s)",
+      "gated_phases_have_samples"
+    ],
+    "measurement_contract": {
+      "server_ttft_coverage=100%": true,
+      "required_for_lane": false,
+      "strict_ttft_basis": false,
+      "auto_enabled_by_lane": false,
+      "ttft_basis_no_conflict": true
+    },
+    "SERVICE_GATES_PASS": false,
+    "ALL_PASS": false,
+    "evaluation_status": "FAIL",
+    "execution_status": "COMPLETED"
+  },
+  "tpot": {
+    "name": "tpot_p95<=0.10",
+    "limit_s_per_token": 0.1,
+    "n": 722,
+    "n_successful": 722,
+    "n_single_token_undefined": 0,
+    "n_missing_or_invalid": 0,
+    "tpot_mean": 0.10395581354618791,
+    "tpot_p95": 0.2961931135342048,
+    "passed": false,
+    "weighted": {
+      "label": "diagnostic_only",
+      "n_valid": 722,
+      "n_positive_weight": 722,
+      "sum_weight": 2871.8816,
+      "n_missing_weight": 0,
+      "mean": 0.1158240144505801,
+      "p50": 0.07487926638223291,
+      "p95": 0.32767833846018596,
+      "exceed_rate": 0.334183832648254
+    },
+    "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+    "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+  },
+  "ttft_estimated": {
+    "fast_intra(uncached_expected<=4096,<=3s)": {
+      "label": "estimated",
+      "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+      "limit_s": 3.0,
+      "n": 328,
+      "n_in_bucket": 328,
+      "n_missing_or_invalid": 0,
+      "p95": 3.045405864715576,
+      "weighted": {
+        "label": "diagnostic_only",
+        "n_valid": 328,
+        "n_positive_weight": 328,
+        "sum_weight": 1235.8858,
+        "n_missing_weight": 0,
+        "mean": 1.422895096171823,
+        "p50": 0.888653039932251,
+        "p95": 3.7622978687286377,
+        "exceed_rate": 0.056337244104592836
+      },
+      "pass_point": false,
+      "over_limit": 17,
+      "exceed_rate": 0.051829268292682924,
+      "rate_ci_lower": 0.033290067494202435,
+      "confidence": 0.95,
+      "exceed_rate_limit": 0.05,
+      "allowed_over": 23,
+      "evaluable": true,
+      "pass_estimated": true
+    },
+    "overall_intra(<=5s)": {
+      "label": "estimated",
+      "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+      "limit_s": 5.0,
+      "n": 388,
+      "n_in_bucket": 388,
+      "n_missing_or_invalid": 0,
+      "p95": 5.104129076004028,
+      "weighted": {
+        "label": "diagnostic_only",
+        "n_valid": 388,
+        "n_positive_weight": 388,
+        "sum_weight": 1466.7051999999999,
+        "n_missing_weight": 0,
+        "mean": 1.5927297914407308,
+        "p50": 0.9588718414306641,
+        "p95": 5.911942481994629,
+        "exceed_rate": 0.06697433131075012
+      },
+      "pass_point": false,
+      "over_limit": 20,
+      "exceed_rate": 0.05154639175257732,
+      "rate_ci_lower": 0.034419231192853325,
+      "confidence": 0.95,
+      "exceed_rate_limit": 0.05,
+      "allowed_over": 27,
+      "evaluable": true,
+      "pass_estimated": true
+    },
+    "turn_start(<=15s)": {
+      "label": "estimated",
+      "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+      "limit_s": 15.0,
+      "n": 20,
+      "n_in_bucket": 20,
+      "n_missing_or_invalid": 0,
+      "p95": 7.815637588500977,
+      "weighted": {
+        "label": "diagnostic_only",
+        "n_valid": 20,
+        "n_positive_weight": 20,
+        "sum_weight": 66.669,
+        "n_missing_weight": 0,
+        "mean": 1.8024028374385657,
+        "p50": 0.8863584995269775,
+        "p95": 5.031915187835693,
+        "exceed_rate": 0.0
+      },
+      "pass_point": true,
+      "over_limit": 0,
+      "exceed_rate": 0.0,
+      "rate_ci_lower": 0.0,
+      "confidence": 0.95,
+      "exceed_rate_limit": 0.05,
+      "allowed_over": 3,
+      "evaluable": true,
+      "pass_estimated": true
+    },
+    "chain_start(<=30s)": {
+      "label": "estimated",
+      "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+      "limit_s": 30.0,
+      "n": 314,
+      "n_in_bucket": 314,
+      "n_missing_or_invalid": 0,
+      "p95": 38.62718915939331,
+      "weighted": {
+        "label": "diagnostic_only",
+        "n_valid": 314,
+        "n_positive_weight": 314,
+        "sum_weight": 1338.5074,
+        "n_missing_weight": 0,
+        "mean": 6.77695482153775,
+        "p50": 1.3214337825775146,
+        "p95": 47.037516832351685,
+        "exceed_rate": 0.0755144125463931
+      },
+      "pass_point": false,
+      "over_limit": 18,
+      "exceed_rate": 0.05732484076433121,
+      "rate_ci_lower": 0.037375324263866166,
+      "confidence": 0.95,
+      "exceed_rate_limit": 0.05,
+      "allowed_over": 22,
+      "evaluable": true,
+      "pass_estimated": true
+    }
+  },
+  "sampling_weights": {
+    "from_requests": 722,
+    "from_raw": 0,
+    "missing": 0,
+    "raw_conflicts": 0,
+    "source": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1/requests.jsonl",
+    "official_formal_authority": "overall budget_attainment.weighted only; diagnostic, not a gate",
+    "weighted_gate_statistics": "diagnostic_only; never used in pass/fail or binomial CI",
+    "quantile_method": "first cumulative weight > p * total; equal weights match dev floor(p*n)"
+  },
+  "budget_attainment_by_gate": {
+    "fast_intra(uncached_expected<=4096,<=3s)": {
+      "label": "diagnostic_only",
+      "n": 328,
+      "sum_weight": 1235.8858,
+      "unweighted": 0.45121951219512196,
+      "weighted": 0.4661746255196071
+    },
+    "overall_intra(<=5s)": {
+      "label": "diagnostic_only",
+      "n": 388,
+      "sum_weight": 1466.7051999999999,
+      "unweighted": 0.4896907216494845,
+      "weighted": 0.5155436825341589
+    },
+    "turn_start(<=15s)": {
+      "label": "diagnostic_only",
+      "n": 20,
+      "sum_weight": 66.669,
+      "unweighted": 0.75,
+      "weighted": 0.6792602258920938
+    },
+    "chain_start(<=30s)": {
+      "label": "diagnostic_only",
+      "n": 314,
+      "sum_weight": 1338.5074,
+      "unweighted": 0.7006369426751592,
+      "weighted": 0.7316161270382219
+    }
+  },
+  "estimated": {
+    "label": "estimated",
+    "passed": false,
+    "evaluation_status": "estimated FAIL",
+    "gates": {
+      "coverage=100%": true,
+      "harness_data==0": true,
+      "harness_render==0": true,
+      "engine_error<1%": true,
+      "infra_error<1%": true,
+      "gated_phases_have_samples": true,
+      "fast_intra(uncached_expected<=4096,<=3s)": true,
+      "overall_intra(<=5s)": true,
+      "turn_start(<=15s)": true,
+      "chain_start(<=30s)": true,
+      "tpot_p95<=0.10": false
+    }
+  },
+  "cache_reconciliation": {
+    "formula": "uncached_actual = prompt_tokens - cached_tokens; extra = actual - frozen uncached_expected",
+    "all_successful": {
+      "weighted": {
+        "cached_tokens": {
+          "label": "diagnostic_only",
+          "n_valid": 722,
+          "n_positive_weight": 722,
+          "sum_weight": 2871.8816,
+          "n_missing_weight": 0,
+          "mean": 29201.91023362523,
+          "p50": 18240,
+          "p95": 91136,
+          "exceed_rate": null
+        },
+        "uncached_expected": {
+          "label": "diagnostic_only",
+          "n_valid": 722,
+          "n_positive_weight": 722,
+          "sum_weight": 2871.8816,
+          "n_missing_weight": 0,
+          "mean": 13863.84351450979,
+          "p50": 2602,
+          "p95": 51873,
+          "exceed_rate": null
+        },
+        "uncached_actual": {
+          "label": "diagnostic_only",
+          "n_valid": 722,
+          "n_positive_weight": 722,
+          "sum_weight": 2871.8816,
+          "n_missing_weight": 0,
+          "mean": 19024.183787729966,
+          "p50": 3418,
+          "p95": 98429,
+          "exceed_rate": null
+        }
+      },
+      "n_successful": 722,
+      "n_paired": 722,
+      "n_missing_or_invalid_pair": 0,
+      "n_missing_by_field": {
+        "prompt_tokens": 0,
+        "cached_tokens": 0,
+        "uncached_expected": 0,
+        "glm_tokens": 0
+      },
+      "cached_tokens": {
+        "n": 722,
+        "min": 0,
+        "max": 250752,
+        "mean": 32920.28808864266,
+        "p50": 32768,
+        "p90": 67904,
+        "p95": 90112,
+        "p99": 166208
+      },
+      "uncached_expected": {
+        "n": 722,
+        "min": 68,
+        "max": 256733,
+        "mean": 16587.307479224375,
+        "p50": 2867,
+        "p90": 37661,
+        "p95": 61471,
+        "p99": 138847
+      },
+      "uncached_actual": {
+        "n": 722,
+        "min": 91,
+        "max": 256733,
+        "mean": 14748.37811634349,
+        "p50": 3072,
+        "p90": 37661,
+        "p95": 76791,
+        "p99": 169326
+      },
+      "extra_uncached_tokens": {
+        "n": 722,
+        "min": -229952,
+        "max": 250834,
+        "mean": -1838.9293628808864,
+        "p50": 28,
+        "p90": 9952,
+        "p95": 55812,
+        "p99": 155417
+      },
+      "actual_to_expected_ratio": {
+        "n": 722,
+        "min": 0.01217937924454173,
+        "max": 798.7320261437909,
+        "mean": 9.172697156938412,
+        "p50": 1.0121491411813992,
+        "p90": 9.009756097560976,
+        "p95": 34.759075907590756,
+        "p99": 171.6009244992296
+      },
+      "n_zero_expected": 0,
+      "n_actual_above_expected": 462,
+      "n_actual_equal_expected": 84,
+      "n_actual_below_expected": 176,
+      "extra_uncached_histogram": {
+        "negative": 176,
+        "zero": 84,
+        "(0,64]": 235,
+        "(64,256]": 19,
+        "(256,1024]": 53,
+        "(1024,4096]": 67,
+        ">4096": 88
+      },
+      "frozen_cached_expected": {
+        "n": 722,
+        "min": 0,
+        "max": 251916,
+        "mean": 31081.358725761773,
+        "p50": 19199,
+        "p90": 77449,
+        "p95": 93013,
+        "p99": 222738
+      },
+      "cached_minus_frozen_expected": {
+        "n": 722,
+        "min": -250834,
+        "max": 229952,
+        "mean": 1838.9293628808864,
+        "p50": -28,
+        "p90": 32768,
+        "p95": 36928,
+        "p99": 125376
+      },
+      "prompt_minus_frozen_glm_tokens": {
+        "n": 722,
+        "min": 0,
+        "max": 0,
+        "mean": 0.0,
+        "p50": 0,
+        "p90": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "by_gate": {
+      "fast_intra(uncached_expected<=4096,<=3s)": {
+        "weighted": {
+          "cached_tokens": {
+            "label": "diagnostic_only",
+            "n_valid": 328,
+            "n_positive_weight": 328,
+            "sum_weight": 1235.8858,
+            "n_missing_weight": 0,
+            "mean": 42994.97256979569,
+            "p50": 33664,
+            "p95": 117184,
+            "exceed_rate": null
+          },
+          "uncached_expected": {
+            "label": "diagnostic_only",
+            "n_valid": 328,
+            "n_positive_weight": 328,
+            "sum_weight": 1235.8858,
+            "n_missing_weight": 0,
+            "mean": 1361.0430374715852,
+            "p50": 1304,
+            "p95": 3022,
+            "exceed_rate": null
+          },
+          "uncached_actual": {
+            "label": "diagnostic_only",
+            "n_valid": 328,
+            "n_positive_weight": 328,
+            "sum_weight": 1235.8858,
+            "n_missing_weight": 0,
+            "mean": 3782.6959225520677,
+            "p50": 1740,
+            "p95": 12817,
+            "exceed_rate": null
+          }
+        },
+        "n_successful": 328,
+        "n_paired": 328,
+        "n_missing_or_invalid_pair": 0,
+        "n_missing_by_field": {
+          "prompt_tokens": 0,
+          "cached_tokens": 0,
+          "uncached_expected": 0,
+          "glm_tokens": 0
+        },
+        "cached_tokens": {
+          "n": 328,
+          "min": 0,
+          "max": 250752,
+          "mean": 41345.170731707316,
+          "p50": 35456,
+          "p90": 79616,
+          "p95": 93248,
+          "p99": 223040
+        },
+        "uncached_expected": {
+          "n": 328,
+          "min": 68,
+          "max": 4052,
+          "mean": 1428.4908536585365,
+          "p50": 1316,
+          "p90": 2911,
+          "p95": 3144,
+          "p99": 3769
+        },
+        "uncached_actual": {
+          "n": 328,
+          "min": 91,
+          "max": 80803,
+          "mean": 3415.3445121951218,
+          "p50": 1755,
+          "p90": 5387,
+          "p95": 10532,
+          "p99": 46728
+        },
+        "extra_uncached_tokens": {
+          "n": 328,
+          "min": -188,
+          "max": 78972,
+          "mean": 1986.8536585365853,
+          "p50": 53,
+          "p90": 3252,
+          "p95": 9115,
+          "p99": 43861
+        },
+        "actual_to_expected_ratio": {
+          "n": 328,
+          "min": 0.9174352217830478,
+          "max": 242.17254901960786,
+          "mean": 3.5106980708909163,
+          "p50": 1.0637254901960784,
+          "p90": 4.7592592592592595,
+          "p95": 10.343453510436433,
+          "p99": 39.39736070381232
+        },
+        "n_zero_expected": 0,
+        "n_actual_above_expected": 322,
+        "n_actual_equal_expected": 2,
+        "n_actual_below_expected": 4,
+        "extra_uncached_histogram": {
+          "negative": 4,
+          "zero": 2,
+          "(0,64]": 187,
+          "(64,256]": 16,
+          "(256,1024]": 40,
+          "(1024,4096]": 52,
+          ">4096": 27
+        },
+        "frozen_cached_expected": {
+          "n": 328,
+          "min": 8802,
+          "max": 251916,
+          "mean": 43332.0243902439,
+          "p50": 36186,
+          "p90": 81124,
+          "p95": 93267,
+          "p99": 223088
+        },
+        "cached_minus_frozen_expected": {
+          "n": 328,
+          "min": -78972,
+          "max": 188,
+          "mean": -1986.8536585365853,
+          "p50": -53,
+          "p90": -8,
+          "p95": -4,
+          "p99": 6
+        },
+        "prompt_minus_frozen_glm_tokens": {
+          "n": 328,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "p50": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0
+        }
+      },
+      "overall_intra(<=5s)": {
+        "weighted": {
+          "cached_tokens": {
+            "label": "diagnostic_only",
+            "n_valid": 388,
+            "n_positive_weight": 388,
+            "sum_weight": 1466.7051999999999,
+            "n_missing_weight": 0,
+            "mean": 40779.60282243494,
+            "p50": 33664,
+            "p95": 110784,
+            "exceed_rate": null
+          },
+          "uncached_expected": {
+            "label": "diagnostic_only",
+            "n_valid": 388,
+            "n_positive_weight": 388,
+            "sum_weight": 1466.7051999999999,
+            "n_missing_weight": 0,
+            "mean": 4126.942627598239,
+            "p50": 1581,
+            "p95": 14033,
+            "exceed_rate": null
+          },
+          "uncached_actual": {
+            "label": "diagnostic_only",
+            "n_valid": 388,
+            "n_positive_weight": 388,
+            "sum_weight": 1466.7051999999999,
+            "n_missing_weight": 0,
+            "mean": 6339.418060152784,
+            "p50": 2004,
+            "p95": 28490,
+            "exceed_rate": null
+          }
+        },
+        "n_successful": 388,
+        "n_paired": 388,
+        "n_missing_or_invalid_pair": 0,
+        "n_missing_by_field": {
+          "prompt_tokens": 0,
+          "cached_tokens": 0,
+          "uncached_expected": 0,
+          "glm_tokens": 0
+        },
+        "cached_tokens": {
+          "n": 388,
+          "min": 0,
+          "max": 250752,
+          "mean": 40301.030927835054,
+          "p50": 35520,
+          "p90": 77632,
+          "p95": 91008,
+          "p99": 223040
+        },
+        "uncached_expected": {
+          "n": 388,
+          "min": 68,
+          "max": 103207,
+          "mean": 3810.8505154639174,
+          "p50": 1595,
+          "p90": 6551,
+          "p95": 14033,
+          "p99": 62836
+        },
+        "uncached_actual": {
+          "n": 388,
+          "min": 91,
+          "max": 103228,
+          "mean": 5518.365979381443,
+          "p50": 2102,
+          "p90": 11514,
+          "p95": 21234,
+          "p99": 65941
+        },
+        "extra_uncached_tokens": {
+          "n": 388,
+          "min": -57291,
+          "max": 78972,
+          "mean": 1707.5154639175257,
+          "p50": 53,
+          "p90": 3157,
+          "p95": 9115,
+          "p99": 43861
+        },
+        "actual_to_expected_ratio": {
+          "n": 388,
+          "min": 0.10351140737958878,
+          "max": 242.17254901960786,
+          "mean": 3.147990200339329,
+          "p50": 1.0441941074523398,
+          "p90": 4.359389895138227,
+          "p95": 9.038123167155426,
+          "p99": 39.39736070381232
+        },
+        "n_zero_expected": 0,
+        "n_actual_above_expected": 380,
+        "n_actual_equal_expected": 2,
+        "n_actual_below_expected": 6,
+        "extra_uncached_histogram": {
+          "negative": 6,
+          "zero": 2,
+          "(0,64]": 221,
+          "(64,256]": 18,
+          "(256,1024]": 51,
+          "(1024,4096]": 59,
+          ">4096": 31
+        },
+        "frozen_cached_expected": {
+          "n": 388,
+          "min": 8802,
+          "max": 251916,
+          "mean": 42008.54639175258,
+          "p50": 36154,
+          "p90": 78340,
+          "p95": 91194,
+          "p99": 223088
+        },
+        "cached_minus_frozen_expected": {
+          "n": 388,
+          "min": -78972,
+          "max": 57291,
+          "mean": -1707.5154639175257,
+          "p50": -53,
+          "p90": -8,
+          "p95": -5,
+          "p99": 55
+        },
+        "prompt_minus_frozen_glm_tokens": {
+          "n": 388,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "p50": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0
+        }
+      },
+      "turn_start(<=15s)": {
+        "weighted": {
+          "cached_tokens": {
+            "label": "diagnostic_only",
+            "n_valid": 20,
+            "n_positive_weight": 20,
+            "sum_weight": 66.669,
+            "n_missing_weight": 0,
+            "mean": 19929.279179228728,
+            "p50": 18240,
+            "p95": 51648,
+            "exceed_rate": null
+          },
+          "uncached_expected": {
+            "label": "diagnostic_only",
+            "n_valid": 20,
+            "n_positive_weight": 20,
+            "sum_weight": 66.669,
+            "n_missing_weight": 0,
+            "mean": 8106.620108296209,
+            "p50": 2368,
+            "p95": 37915,
+            "exceed_rate": null
+          },
+          "uncached_actual": {
+            "label": "diagnostic_only",
+            "n_valid": 20,
+            "n_positive_weight": 20,
+            "sum_weight": 66.669,
+            "n_missing_weight": 0,
+            "mean": 12326.695786647468,
+            "p50": 4576,
+            "p95": 42050,
+            "exceed_rate": null
+          }
+        },
+        "n_successful": 20,
+        "n_paired": 20,
+        "n_missing_or_invalid_pair": 0,
+        "n_missing_by_field": {
+          "prompt_tokens": 0,
+          "cached_tokens": 0,
+          "uncached_expected": 0,
+          "glm_tokens": 0
+        },
+        "cached_tokens": {
+          "n": 20,
+          "min": 0,
+          "max": 59200,
+          "mean": 20272.0,
+          "p50": 18240,
+          "p90": 51648,
+          "p95": 59200,
+          "p99": 59200
+        },
+        "uncached_expected": {
+          "n": 20,
+          "min": 640,
+          "max": 42015,
+          "mean": 9333.95,
+          "p50": 4030,
+          "p90": 37915,
+          "p95": 42015,
+          "p99": 42015
+        },
+        "uncached_actual": {
+          "n": 20,
+          "min": 675,
+          "max": 63680,
+          "mean": 14164.6,
+          "p50": 5896,
+          "p90": 42050,
+          "p95": 63680,
+          "p99": 63680
+        },
+        "extra_uncached_tokens": {
+          "n": 20,
+          "min": 7,
+          "max": 55812,
+          "mean": 4830.65,
+          "p50": 36,
+          "p90": 18276,
+          "p95": 55812,
+          "p99": 55812
+        },
+        "actual_to_expected_ratio": {
+          "n": 20,
+          "min": 1.0005908070424199,
+          "max": 20.073286052009458,
+          "mean": 2.5573132955615785,
+          "p50": 1.0191193511008112,
+          "p90": 8.093543467208947,
+          "p95": 20.073286052009458,
+          "p99": 20.073286052009458
+        },
+        "n_zero_expected": 0,
+        "n_actual_above_expected": 20,
+        "n_actual_equal_expected": 0,
+        "n_actual_below_expected": 0,
+        "extra_uncached_histogram": {
+          "negative": 0,
+          "zero": 0,
+          "(0,64]": 12,
+          "(64,256]": 1,
+          "(256,1024]": 1,
+          "(1024,4096]": 3,
+          ">4096": 3
+        },
+        "frozen_cached_expected": {
+          "n": 20,
+          "min": 14051,
+          "max": 59601,
+          "mean": 25102.65,
+          "p50": 18275,
+          "p90": 55812,
+          "p95": 59601,
+          "p99": 59601
+        },
+        "cached_minus_frozen_expected": {
+          "n": 20,
+          "min": -55812,
+          "max": -7,
+          "mean": -4830.65,
+          "p50": -36,
+          "p90": -10,
+          "p95": -7,
+          "p99": -7
+        },
+        "prompt_minus_frozen_glm_tokens": {
+          "n": 20,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "p50": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0
+        }
+      },
+      "chain_start(<=30s)": {
+        "weighted": {
+          "cached_tokens": {
+            "label": "diagnostic_only",
+            "n_valid": 314,
+            "n_positive_weight": 314,
+            "sum_weight": 1338.5074,
+            "n_missing_weight": 0,
+            "mean": 16977.200169083862,
+            "p50": 0,
+            "p95": 57344,
+            "exceed_rate": null
+          },
+          "uncached_expected": {
+            "label": "diagnostic_only",
+            "n_valid": 314,
+            "n_positive_weight": 314,
+            "sum_weight": 1338.5074,
+            "n_missing_weight": 0,
+            "mean": 24820.07094364962,
+            "p50": 15479,
+            "p95": 93175,
+            "exceed_rate": null
+          },
+          "uncached_actual": {
+            "label": "diagnostic_only",
+            "n_valid": 314,
+            "n_positive_weight": 314,
+            "sum_weight": 1338.5074,
+            "n_missing_weight": 0,
+            "mean": 33257.44591311187,
+            "p50": 14345,
+            "p95": 157628,
+            "exceed_rate": null
+          }
+        },
+        "n_successful": 314,
+        "n_paired": 314,
+        "n_missing_or_invalid_pair": 0,
+        "n_missing_by_field": {
+          "prompt_tokens": 0,
+          "cached_tokens": 0,
+          "uncached_expected": 0,
+          "glm_tokens": 0
+        },
+        "cached_tokens": {
+          "n": 314,
+          "min": 0,
+          "max": 229952,
+          "mean": 24605.757961783438,
+          "p50": 18240,
+          "p90": 49152,
+          "p95": 85312,
+          "p99": 140544
+        },
+        "uncached_expected": {
+          "n": 314,
+          "min": 153,
+          "max": 256733,
+          "mean": 32836.77388535032,
+          "p50": 18777,
+          "p90": 62072,
+          "p95": 108278,
+          "p99": 194991
+        },
+        "uncached_actual": {
+          "n": 314,
+          "min": 277,
+          "max": 256733,
+          "mean": 26190.799363057326,
+          "p50": 11090,
+          "p90": 79033,
+          "p95": 111624,
+          "p99": 222738
+        },
+        "extra_uncached_tokens": {
+          "n": 314,
+          "min": -229952,
+          "max": 250834,
+          "mean": -6645.974522292993,
+          "p50": -16384,
+          "p90": 57847,
+          "p95": 97164,
+          "p99": 210832
+        },
+        "actual_to_expected_ratio": {
+          "n": 314,
+          "min": 0.01217937924454173,
+          "max": 798.7320261437909,
+          "mean": 17.038601540339627,
+          "p50": 0.41850188993984133,
+          "p90": 33.93386952636283,
+          "p95": 80.65122615803814,
+          "p99": 419.3174603174603
+        },
+        "n_zero_expected": 0,
+        "n_actual_above_expected": 62,
+        "n_actual_equal_expected": 82,
+        "n_actual_below_expected": 170,
+        "extra_uncached_histogram": {
+          "negative": 170,
+          "zero": 82,
+          "(0,64]": 2,
+          "(64,256]": 0,
+          "(256,1024]": 1,
+          "(1024,4096]": 5,
+          ">4096": 54
+        },
+        "frozen_cached_expected": {
+          "n": 314,
+          "min": 0,
+          "max": 250834,
+          "mean": 17959.783439490446,
+          "p50": 0,
+          "p90": 73706,
+          "p95": 98875,
+          "p99": 221440
+        },
+        "cached_minus_frozen_expected": {
+          "n": 314,
+          "min": -250834,
+          "max": 229952,
+          "mean": 6645.974522292993,
+          "p50": 16384,
+          "p90": 42624,
+          "p95": 85312,
+          "p99": 140544
+        },
+        "prompt_minus_frozen_glm_tokens": {
+          "n": 314,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "p50": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0
+        }
+      }
+    }
+  },
+  "paths": {
+    "raw": "/workspace/Agentic_science_challenge/evidence/L035/raw_dev-combined-v1_N22_1790184432.jsonl",
+    "run": "/workspace/Agentic_science_challenge/evidence/L035/run_dev-combined-v1_N22_1790184432.json",
+    "dev_scorer": "/workspace/Agentic_science_challenge/s1-dev/harness/s1_score.py"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "generator_edit_policy_executed": true,
+  "generated_continuation_has_wait_or_decode_guard": false,
+  "current_patch_has_wait_or_decode_guard": true,
+  "production_patch_not_written": true
+}

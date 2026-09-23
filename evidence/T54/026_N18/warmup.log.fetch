@@ -1,0 +1,6 @@
+[cohort] dev-combined-v1：311 链 / 722 请求，sha=91f5061bd1c167c6
+[pacing] chain-total-gap-scaled-v1 | cap=3600s | 压缩 0/311 条 chain（影响 0 请求）| Σgap 0.8h → 0.8h
+           ↑ 尾部长链只压缩等待时间，**不删除任何请求**；workload_hash=997e98a98033b24b
+[warmup] N=18 mode=shape 选择 50/311 条链，覆盖 163 个请求、91 个 shape，遗漏=0（跳过 gap、不计分）
+[warmup] ★下一步：清 KV / prefix cache（保留 code cache），再用同一 N 与同一 cohort 跑正式回放。
+exit_code: 0

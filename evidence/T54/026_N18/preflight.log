@@ -1,0 +1,8 @@
+[cohort] dev-combined-v1：311 链 / 722 请求，sha=91f5061bd1c167c6
+[物化] 单遍扫描 bodies（3.4 GB，数分钟）
+  物化 1/1 分片，已得 722/722
+[smoke] max_chains=1 no_gap=True —— 结论不可用于任何容量判断
+[pacing] none(smoke) | cap=off | 压缩 0/1 条 chain（影响 0 请求）| Σgap 0.0h → 0.0h
+原始量  /tmp/ax/runs/026-ladder_best140/N18/raw_dev-combined-v1_N18_1790150375.jsonl
+运行信息 /tmp/ax/runs/026-ladder_best140/N18/run_dev-combined-v1_N18_1790150375.json
+下一步：python3 s1_score.py --raw /tmp/ax/runs/026-ladder_best140/N18/raw_dev-combined-v1_N18_1790150375.jsonl --run /tmp/ax/runs/026-ladder_best140/N18/run_dev-combined-v1_N18_1790150375.json

@@ -1,0 +1,876 @@
+{
+  "status": "INFERRED: same running count at adjacent reports with no prefill between; not a GPU timer",
+  "by_running": {
+    "1": 0.010969121954785728,
+    "2": 0.011850447354387627,
+    "3": 0.013469222825842949,
+    "4": 0.013907722262786412,
+    "5": 0.016535485151134333,
+    "6": 0.0166685187243027,
+    "7": 0.016784155756965423,
+    "9": 0.019137096380135395,
+    "12": 0.019275560195968197,
+    "13": 0.021843456123496363,
+    "14": 0.02183608497014844,
+    "15": 0.0217940810097351,
+    "16": 0.021735742530665375,
+    "17": 0.024668390526475625,
+    "18": 0.025091654237004615
+  },
+  "samples": [
+    {
+      "line": 1560,
+      "previous_line": 1559,
+      "running": 16,
+      "throughput": 735.66,
+      "step_estimate": 0.021749177609221654
+    },
+    {
+      "line": 1659,
+      "previous_line": 1658,
+      "running": 18,
+      "throughput": 712.63,
+      "step_estimate": 0.025258549317317542
+    },
+    {
+      "line": 1696,
+      "previous_line": 1695,
+      "running": 14,
+      "throughput": 639.46,
+      "step_estimate": 0.02189347261752103
+    },
+    {
+      "line": 1732,
+      "previous_line": 1731,
+      "running": 15,
+      "throughput": 674.67,
+      "step_estimate": 0.022233091733736495
+    },
+    {
+      "line": 1769,
+      "previous_line": 1768,
+      "running": 18,
+      "throughput": 717.37,
+      "step_estimate": 0.025091654237004615
+    },
+    {
+      "line": 2135,
+      "previous_line": 2134,
+      "running": 15,
+      "throughput": 690.07,
+      "step_estimate": 0.02173692523946846
+    },
+    {
+      "line": 2175,
+      "previous_line": 2174,
+      "running": 17,
+      "throughput": 694.69,
+      "step_estimate": 0.02447134693172494
+    },
+    {
+      "line": 2194,
+      "previous_line": 2193,
+      "running": 15,
+      "throughput": 694.84,
+      "step_estimate": 0.021587703644004374
+    },
+    {
+      "line": 2204,
+      "previous_line": 2203,
+      "running": 18,
+      "throughput": 722.87,
+      "step_estimate": 0.024900742872162353
+    },
+    {
+      "line": 2244,
+      "previous_line": 2243,
+      "running": 14,
+      "throughput": 642.83,
+      "step_estimate": 0.02177869732277585
+    },
+    {
+      "line": 2263,
+      "previous_line": 2262,
+      "running": 16,
+      "throughput": 736.57,
+      "step_estimate": 0.0217223074521091
+    },
+    {
+      "line": 2450,
+      "previous_line": 2449,
+      "running": 16,
+      "throughput": 713.58,
+      "step_estimate": 0.0224221530872502
+    },
+    {
+      "line": 2755,
+      "previous_line": 2754,
+      "running": 12,
+      "throughput": 622.55,
+      "step_estimate": 0.019275560195968197
+    },
+    {
+      "line": 2757,
+      "previous_line": 2756,
+      "running": 9,
+      "throughput": 466.94,
+      "step_estimate": 0.019274424979654772
+    },
+    {
+      "line": 2797,
+      "previous_line": 2796,
+      "running": 13,
+      "throughput": 590.24,
+      "step_estimate": 0.02202493900786121
+    },
+    {
+      "line": 2936,
+      "previous_line": 2935,
+      "running": 15,
+      "throughput": 686.46,
+      "step_estimate": 0.021851236780001747
+    },
+    {
+      "line": 2967,
+      "previous_line": 2966,
+      "running": 17,
+      "throughput": 683.68,
+      "step_estimate": 0.024865434121226306
+    },
+    {
+      "line": 3087,
+      "previous_line": 3086,
+      "running": 16,
+      "throughput": 738.8,
+      "step_estimate": 0.021656740660530593
+    },
+    {
+      "line": 3291,
+      "previous_line": 3290,
+      "running": 14,
+      "throughput": 646.9,
+      "step_estimate": 0.021641675684031535
+    },
+    {
+      "line": 3304,
+      "previous_line": 3303,
+      "running": 13,
+      "throughput": 600.13,
+      "step_estimate": 0.02166197323913152
+    },
+    {
+      "line": 3361,
+      "previous_line": 3360,
+      "running": 14,
+      "throughput": 628.58,
+      "step_estimate": 0.022272423557860573
+    },
+    {
+      "line": 3639,
+      "previous_line": 3638,
+      "running": 9,
+      "throughput": 473.69,
+      "step_estimate": 0.018999767780616014
+    },
+    {
+      "line": 3656,
+      "previous_line": 3655,
+      "running": 7,
+      "throughput": 417.06,
+      "step_estimate": 0.016784155756965423
+    },
+    {
+      "line": 3664,
+      "previous_line": 3663,
+      "running": 5,
+      "throughput": 302.38,
+      "step_estimate": 0.016535485151134333
+    },
+    {
+      "line": 3665,
+      "previous_line": 3664,
+      "running": 5,
+      "throughput": 301.7,
+      "step_estimate": 0.016572754391779916
+    },
+    {
+      "line": 3669,
+      "previous_line": 3668,
+      "running": 5,
+      "throughput": 302.7,
+      "step_estimate": 0.016518004625041296
+    },
+    {
+      "line": 3678,
+      "previous_line": 3677,
+      "running": 6,
+      "throughput": 359.96,
+      "step_estimate": 0.0166685187243027
+    },
+    {
+      "line": 3681,
+      "previous_line": 3680,
+      "running": 4,
+      "throughput": 296.1,
+      "step_estimate": 0.013508949679162444
+    },
+    {
+      "line": 3687,
+      "previous_line": 3686,
+      "running": 3,
+      "throughput": 222.3,
+      "step_estimate": 0.013495276653171389
+    },
+    {
+      "line": 3688,
+      "previous_line": 3687,
+      "running": 3,
+      "throughput": 222.44,
+      "step_estimate": 0.013486782952706347
+    },
+    {
+      "line": 3689,
+      "previous_line": 3688,
+      "running": 3,
+      "throughput": 222.37,
+      "step_estimate": 0.013491028466070063
+    },
+    {
+      "line": 3690,
+      "previous_line": 3689,
+      "running": 3,
+      "throughput": 222.47,
+      "step_estimate": 0.013484964264844699
+    },
+    {
+      "line": 3691,
+      "previous_line": 3690,
+      "running": 3,
+      "throughput": 222.95,
+      "step_estimate": 0.013455931823278762
+    },
+    {
+      "line": 3693,
+      "previous_line": 3692,
+      "running": 2,
+      "throughput": 168.74,
+      "step_estimate": 0.011852554225435581
+    },
+    {
+      "line": 3694,
+      "previous_line": 3693,
+      "running": 2,
+      "throughput": 169.1,
+      "step_estimate": 0.011827321111768185
+    },
+    {
+      "line": 3699,
+      "previous_line": 3698,
+      "running": 3,
+      "throughput": 223.09,
+      "step_estimate": 0.013447487561074006
+    },
+    {
+      "line": 3700,
+      "previous_line": 3699,
+      "running": 3,
+      "throughput": 222.88,
+      "step_estimate": 0.013460157932519742
+    },
+    {
+      "line": 3701,
+      "previous_line": 3700,
+      "running": 3,
+      "throughput": 222.73,
+      "step_estimate": 0.013469222825842949
+    },
+    {
+      "line": 3703,
+      "previous_line": 3701,
+      "running": 3,
+      "throughput": 222.86,
+      "step_estimate": 0.013461365879924615
+    },
+    {
+      "line": 3706,
+      "previous_line": 3705,
+      "running": 4,
+      "throughput": 287.61,
+      "step_estimate": 0.013907722262786412
+    },
+    {
+      "line": 3707,
+      "previous_line": 3706,
+      "running": 4,
+      "throughput": 287.47,
+      "step_estimate": 0.013914495425609628
+    },
+    {
+      "line": 3708,
+      "previous_line": 3707,
+      "running": 4,
+      "throughput": 287.53,
+      "step_estimate": 0.013911591833895594
+    },
+    {
+      "line": 3710,
+      "previous_line": 3709,
+      "running": 3,
+      "throughput": 222.47,
+      "step_estimate": 0.013484964264844699
+    },
+    {
+      "line": 3711,
+      "previous_line": 3710,
+      "running": 3,
+      "throughput": 222.51,
+      "step_estimate": 0.013482540110556829
+    },
+    {
+      "line": 3712,
+      "previous_line": 3711,
+      "running": 3,
+      "throughput": 223.04,
+      "step_estimate": 0.013450502152080344
+    },
+    {
+      "line": 3713,
+      "previous_line": 3712,
+      "running": 3,
+      "throughput": 222.67,
+      "step_estimate": 0.013472852202811336
+    },
+    {
+      "line": 3714,
+      "previous_line": 3713,
+      "running": 3,
+      "throughput": 223.15,
+      "step_estimate": 0.013443871835088505
+    },
+    {
+      "line": 3715,
+      "previous_line": 3714,
+      "running": 3,
+      "throughput": 222.56,
+      "step_estimate": 0.013479511143062544
+    },
+    {
+      "line": 3716,
+      "previous_line": 3715,
+      "running": 3,
+      "throughput": 222.59,
+      "step_estimate": 0.013477694415741946
+    },
+    {
+      "line": 3717,
+      "previous_line": 3716,
+      "running": 3,
+      "throughput": 222.94,
+      "step_estimate": 0.013456535390688078
+    },
+    {
+      "line": 3718,
+      "previous_line": 3717,
+      "running": 3,
+      "throughput": 223.47,
+      "step_estimate": 0.013424620754463686
+    },
+    {
+      "line": 3719,
+      "previous_line": 3718,
+      "running": 3,
+      "throughput": 222.92,
+      "step_estimate": 0.013457742687959807
+    },
+    {
+      "line": 3720,
+      "previous_line": 3719,
+      "running": 3,
+      "throughput": 222.81,
+      "step_estimate": 0.013464386697185943
+    },
+    {
+      "line": 3721,
+      "previous_line": 3720,
+      "running": 3,
+      "throughput": 222.47,
+      "step_estimate": 0.013484964264844699
+    },
+    {
+      "line": 3722,
+      "previous_line": 3721,
+      "running": 3,
+      "throughput": 222.53,
+      "step_estimate": 0.013481328360221093
+    },
+    {
+      "line": 3723,
+      "previous_line": 3722,
+      "running": 3,
+      "throughput": 222.51,
+      "step_estimate": 0.013482540110556829
+    },
+    {
+      "line": 3724,
+      "previous_line": 3723,
+      "running": 3,
+      "throughput": 222.1,
+      "step_estimate": 0.0135074290859973
+    },
+    {
+      "line": 3726,
+      "previous_line": 3725,
+      "running": 2,
+      "throughput": 168.85,
+      "step_estimate": 0.011844832691738229
+    },
+    {
+      "line": 3727,
+      "previous_line": 3726,
+      "running": 2,
+      "throughput": 168.59,
+      "step_estimate": 0.011863099827985052
+    },
+    {
+      "line": 3731,
+      "previous_line": 3730,
+      "running": 3,
+      "throughput": 223.62,
+      "step_estimate": 0.013415615776764154
+    },
+    {
+      "line": 3732,
+      "previous_line": 3731,
+      "running": 3,
+      "throughput": 223.08,
+      "step_estimate": 0.013448090371167294
+    },
+    {
+      "line": 3733,
+      "previous_line": 3732,
+      "running": 3,
+      "throughput": 223.21,
+      "step_estimate": 0.013440258052954616
+    },
+    {
+      "line": 3737,
+      "previous_line": 3736,
+      "running": 4,
+      "throughput": 298.4,
+      "step_estimate": 0.013404825737265416
+    },
+    {
+      "line": 3740,
+      "previous_line": 3739,
+      "running": 2,
+      "throughput": 168.77,
+      "step_estimate": 0.011850447354387627
+    },
+    {
+      "line": 3741,
+      "previous_line": 3740,
+      "running": 2,
+      "throughput": 168.75,
+      "step_estimate": 0.011851851851851851
+    },
+    {
+      "line": 3742,
+      "previous_line": 3741,
+      "running": 2,
+      "throughput": 168.61,
+      "step_estimate": 0.011861692663543087
+    },
+    {
+      "line": 3743,
+      "previous_line": 3742,
+      "running": 2,
+      "throughput": 168.81,
+      "step_estimate": 0.011847639357857946
+    },
+    {
+      "line": 3744,
+      "previous_line": 3743,
+      "running": 2,
+      "throughput": 168.97,
+      "step_estimate": 0.011836420666390483
+    },
+    {
+      "line": 3745,
+      "previous_line": 3744,
+      "running": 2,
+      "throughput": 168.56,
+      "step_estimate": 0.011865211200759373
+    },
+    {
+      "line": 3746,
+      "previous_line": 3745,
+      "running": 2,
+      "throughput": 168.77,
+      "step_estimate": 0.011850447354387627
+    },
+    {
+      "line": 3747,
+      "previous_line": 3746,
+      "running": 2,
+      "throughput": 168.76,
+      "step_estimate": 0.011851149561507467
+    },
+    {
+      "line": 3748,
+      "previous_line": 3747,
+      "running": 2,
+      "throughput": 168.68,
+      "step_estimate": 0.011856770215793217
+    },
+    {
+      "line": 3749,
+      "previous_line": 3748,
+      "running": 2,
+      "throughput": 168.66,
+      "step_estimate": 0.011858176212498519
+    },
+    {
+      "line": 3750,
+      "previous_line": 3749,
+      "running": 2,
+      "throughput": 168.9,
+      "step_estimate": 0.011841326228537596
+    },
+    {
+      "line": 3751,
+      "previous_line": 3750,
+      "running": 2,
+      "throughput": 169.08,
+      "step_estimate": 0.011828720132481665
+    },
+    {
+      "line": 3752,
+      "previous_line": 3751,
+      "running": 2,
+      "throughput": 168.88,
+      "step_estimate": 0.011842728564661299
+    },
+    {
+      "line": 3753,
+      "previous_line": 3752,
+      "running": 2,
+      "throughput": 168.73,
+      "step_estimate": 0.011853256682273456
+    },
+    {
+      "line": 3754,
+      "previous_line": 3753,
+      "running": 2,
+      "throughput": 168.86,
+      "step_estimate": 0.011844131232974061
+    },
+    {
+      "line": 3755,
+      "previous_line": 3754,
+      "running": 2,
+      "throughput": 168.94,
+      "step_estimate": 0.011838522552385463
+    },
+    {
+      "line": 3756,
+      "previous_line": 3755,
+      "running": 2,
+      "throughput": 168.57,
+      "step_estimate": 0.011864507326333274
+    },
+    {
+      "line": 3757,
+      "previous_line": 3756,
+      "running": 2,
+      "throughput": 169.31,
+      "step_estimate": 0.011812651349595417
+    },
+    {
+      "line": 3758,
+      "previous_line": 3757,
+      "running": 2,
+      "throughput": 168.85,
+      "step_estimate": 0.011844832691738229
+    },
+    {
+      "line": 3759,
+      "previous_line": 3758,
+      "running": 2,
+      "throughput": 168.68,
+      "step_estimate": 0.011856770215793217
+    },
+    {
+      "line": 3760,
+      "previous_line": 3759,
+      "running": 2,
+      "throughput": 168.75,
+      "step_estimate": 0.011851851851851851
+    },
+    {
+      "line": 3761,
+      "previous_line": 3760,
+      "running": 2,
+      "throughput": 168.99,
+      "step_estimate": 0.011835019823658205
+    },
+    {
+      "line": 3762,
+      "previous_line": 3761,
+      "running": 2,
+      "throughput": 168.65,
+      "step_estimate": 0.011858879335902756
+    },
+    {
+      "line": 3763,
+      "previous_line": 3762,
+      "running": 2,
+      "throughput": 168.83,
+      "step_estimate": 0.011846235858555943
+    },
+    {
+      "line": 3764,
+      "previous_line": 3763,
+      "running": 2,
+      "throughput": 168.79,
+      "step_estimate": 0.011849043189762428
+    },
+    {
+      "line": 3765,
+      "previous_line": 3764,
+      "running": 2,
+      "throughput": 168.77,
+      "step_estimate": 0.011850447354387627
+    },
+    {
+      "line": 3766,
+      "previous_line": 3765,
+      "running": 2,
+      "throughput": 169.0,
+      "step_estimate": 0.011834319526627219
+    },
+    {
+      "line": 3767,
+      "previous_line": 3766,
+      "running": 2,
+      "throughput": 168.66,
+      "step_estimate": 0.011858176212498519
+    },
+    {
+      "line": 3768,
+      "previous_line": 3767,
+      "running": 2,
+      "throughput": 168.84,
+      "step_estimate": 0.011845534233593935
+    },
+    {
+      "line": 3769,
+      "previous_line": 3768,
+      "running": 2,
+      "throughput": 168.68,
+      "step_estimate": 0.011856770215793217
+    },
+    {
+      "line": 3770,
+      "previous_line": 3769,
+      "running": 2,
+      "throughput": 168.75,
+      "step_estimate": 0.011851851851851851
+    },
+    {
+      "line": 3771,
+      "previous_line": 3770,
+      "running": 2,
+      "throughput": 168.82,
+      "step_estimate": 0.011846937566639024
+    },
+    {
+      "line": 3772,
+      "previous_line": 3771,
+      "running": 2,
+      "throughput": 168.7,
+      "step_estimate": 0.01185536455245999
+    },
+    {
+      "line": 3774,
+      "previous_line": 3773,
+      "running": 1,
+      "throughput": 91.4,
+      "step_estimate": 0.010940919037199124
+    },
+    {
+      "line": 3775,
+      "previous_line": 3774,
+      "running": 1,
+      "throughput": 91.19,
+      "step_estimate": 0.01096611470555982
+    },
+    {
+      "line": 3776,
+      "previous_line": 3775,
+      "running": 1,
+      "throughput": 91.06,
+      "step_estimate": 0.010981770261366132
+    },
+    {
+      "line": 3777,
+      "previous_line": 3776,
+      "running": 1,
+      "throughput": 91.33,
+      "step_estimate": 0.010949304719150335
+    },
+    {
+      "line": 3778,
+      "previous_line": 3777,
+      "running": 1,
+      "throughput": 91.17,
+      "step_estimate": 0.010968520346605243
+    },
+    {
+      "line": 3779,
+      "previous_line": 3778,
+      "running": 1,
+      "throughput": 91.0,
+      "step_estimate": 0.01098901098901099
+    },
+    {
+      "line": 3780,
+      "previous_line": 3779,
+      "running": 1,
+      "throughput": 91.19,
+      "step_estimate": 0.01096611470555982
+    },
+    {
+      "line": 3781,
+      "previous_line": 3780,
+      "running": 1,
+      "throughput": 91.23,
+      "step_estimate": 0.01096130658774526
+    },
+    {
+      "line": 3782,
+      "previous_line": 3781,
+      "running": 1,
+      "throughput": 91.22,
+      "step_estimate": 0.010962508221881167
+    },
+    {
+      "line": 3783,
+      "previous_line": 3782,
+      "running": 1,
+      "throughput": 91.18,
+      "step_estimate": 0.010967317394165387
+    },
+    {
+      "line": 3784,
+      "previous_line": 3783,
+      "running": 1,
+      "throughput": 91.04,
+      "step_estimate": 0.010984182776801405
+    },
+    {
+      "line": 3785,
+      "previous_line": 3784,
+      "running": 1,
+      "throughput": 91.16,
+      "step_estimate": 0.010969723562966214
+    },
+    {
+      "line": 3786,
+      "previous_line": 3785,
+      "running": 1,
+      "throughput": 91.13,
+      "step_estimate": 0.01097333479644464
+    },
+    {
+      "line": 3787,
+      "previous_line": 3786,
+      "running": 1,
+      "throughput": 91.17,
+      "step_estimate": 0.010968520346605243
+    },
+    {
+      "line": 3788,
+      "previous_line": 3787,
+      "running": 1,
+      "throughput": 91.16,
+      "step_estimate": 0.010969723562966214
+    },
+    {
+      "line": 3789,
+      "previous_line": 3788,
+      "running": 1,
+      "throughput": 91.15,
+      "step_estimate": 0.010970927043335162
+    },
+    {
+      "line": 3790,
+      "previous_line": 3789,
+      "running": 1,
+      "throughput": 91.2,
+      "step_estimate": 0.010964912280701754
+    },
+    {
+      "line": 3791,
+      "previous_line": 3790,
+      "running": 1,
+      "throughput": 91.11,
+      "step_estimate": 0.010975743606629349
+    },
+    {
+      "line": 3792,
+      "previous_line": 3791,
+      "running": 1,
+      "throughput": 91.2,
+      "step_estimate": 0.010964912280701754
+    },
+    {
+      "line": 3793,
+      "previous_line": 3792,
+      "running": 1,
+      "throughput": 91.1,
+      "step_estimate": 0.010976948408342482
+    },
+    {
+      "line": 3794,
+      "previous_line": 3793,
+      "running": 1,
+      "throughput": 91.06,
+      "step_estimate": 0.010981770261366132
+    },
+    {
+      "line": 3796,
+      "previous_line": 3794,
+      "running": 1,
+      "throughput": 91.12,
+      "step_estimate": 0.010974539069359086
+    },
+    {
+      "line": 3799,
+      "previous_line": 3798,
+      "running": 2,
+      "throughput": 168.94,
+      "step_estimate": 0.011838522552385463
+    },
+    {
+      "line": 3800,
+      "previous_line": 3799,
+      "running": 2,
+      "throughput": 169.02,
+      "step_estimate": 0.011832919181161992
+    },
+    {
+      "line": 3801,
+      "previous_line": 3800,
+      "running": 2,
+      "throughput": 168.45,
+      "step_estimate": 0.011872959335114277
+    },
+    {
+      "line": 3802,
+      "previous_line": 3801,
+      "running": 2,
+      "throughput": 168.39,
+      "step_estimate": 0.011877189856879864
+    }
+  ]
+}

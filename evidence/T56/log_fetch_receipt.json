@@ -1,0 +1,6 @@
+{
+  "source": "/tmp/ax/runs/026-ladder_best140/server.log",
+  "sha256": "9fc7608f26f9dc44a49b45abfef34d1a8523553a6281c3994836d88bc2c43ccd",
+  "bytes": 763831,
+  "transport": "ssh GPU -> scripts/pod/pexec_codex; Python read_bytes + gzip/base64; no pod writes except wrapper cwd mkdir"
+}

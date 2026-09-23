@@ -29,10 +29,10 @@
   },
   {
     "seed": 4,
-    "rounds": 5,
-    "baseline_assertion": true,
-    "baseline_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6",
-    "off_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6"
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "14765cbd12b2127e3716bd68aea938298b06d10895b6d9b6092148e5cbe805f7",
+    "off_sha256": "14765cbd12b2127e3716bd68aea938298b06d10895b6d9b6092148e5cbe805f7"
   },
   {
     "seed": 5,
@@ -155,10 +155,10 @@
   },
   {
     "seed": 22,
-    "rounds": 5,
-    "baseline_assertion": true,
-    "baseline_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6",
-    "off_sha256": "24d660f780227e25c9bae533332bf0c447a360460a5194f8d7262dee3fec94e6"
+    "rounds": 40,
+    "baseline_assertion": false,
+    "baseline_sha256": "307666c9f03b7f8847450d685b33a0c2092b4400f859851f8cbd3fe10c1393c4",
+    "off_sha256": "307666c9f03b7f8847450d685b33a0c2092b4400f859851f8cbd3fe10c1393c4"
   },
   {
     "seed": 23,

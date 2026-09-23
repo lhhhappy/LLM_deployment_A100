@@ -1,0 +1,38 @@
+{
+  "a": {
+    "n": 240,
+    "prompt_tokens": 11010176,
+    "true_lcp": 10059124,
+    "cached_tokens": 10109312,
+    "raw_positive_gap": 7346,
+    "aligned_gap": 0,
+    "frozen_overestimate": 0
+  },
+  "b": {
+    "n": 152,
+    "prompt_tokens": 6863676,
+    "true_lcp": 6188094,
+    "cached_tokens": 5824128,
+    "raw_positive_gap": 363966,
+    "aligned_gap": 358976,
+    "frozen_overestimate": 43833
+  },
+  "c": {
+    "n": 16,
+    "prompt_tokens": 680755,
+    "true_lcp": 595862,
+    "cached_tokens": 103872,
+    "raw_positive_gap": 491990,
+    "aligned_gap": 491456,
+    "frozen_overestimate": 0
+  },
+  "d": {
+    "n": 3,
+    "prompt_tokens": 86581,
+    "true_lcp": 75234,
+    "cached_tokens": 75200,
+    "raw_positive_gap": 34,
+    "aligned_gap": 0,
+    "frozen_overestimate": 6330
+  }
+}

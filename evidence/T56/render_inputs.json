@@ -1,0 +1,16 @@
+{
+  "evidence/T53/026_N18_raw.jsonl": "486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59",
+  "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json": "9221a2fae6470e552dfb4ac707927f0ce3c4d8c1ef823f7ec90ca55ca7578f19",
+  "s1-dev/data/dev-combined-v1/requests.jsonl": "00c79cb68219a95420bb73048e701719953c8931b5dc70dd6822cc4ff3d4d047",
+  "s1-dev/data/dev-combined-v1/chains.jsonl": "48d30c359099f9a6fc26cc68c5b5aabf927ba5de8d0fe4aea6463cb57c213e3f",
+  "s1-dev/data/dev-combined-v1/bodies/dev-combined-v1.jsonl.gz": "41a4b6fb88311bfac353105c351acd764138d1ebbdaa1829357dfcf1ac5bf37f",
+  "s1-dev/harness/s1_common.py": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+  "s1-dev/harness/s1_loadgen.py": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f",
+  "s1-dev/glm_tok/chat_template.jinja": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891",
+  "s1-dev/glm_tok/config.json": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+  "s1-dev/glm_tok/generation_config.json": "230c30609ecbbb9e6583bedde8e7bdda0c6eb8fe5fad0eaeb3d1b293d751cb4f",
+  "s1-dev/glm_tok/model.safetensors.index.json": "3c3f40366a53c3fd7974b4eab7881a365a98c2a4329150befebab99fe7c18b05",
+  "s1-dev/glm_tok/processor_config.json": "aae38374c94b08cc9b0547c6e64f05b951bd9735cea571c6988f5ed552bed3ed",
+  "s1-dev/glm_tok/tokenizer.json": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+  "s1-dev/glm_tok/tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc"
+}

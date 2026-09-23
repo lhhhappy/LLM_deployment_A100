@@ -1,0 +1,6 @@
+
+kex_exchange_identification: Connection closed by remote host
+Connection closed by UNKNOWN port 65535
+[gssh] connection dropped DURING the command — NOT re-run (it may have partially executed). Check remote state.
+
+FETCH_RC=255

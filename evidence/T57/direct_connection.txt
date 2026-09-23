@@ -1,0 +1,4 @@
+Probe used SSH alias GPU with ProxyCommand=none, ProxyJump=none, ConnectTimeout=12, BatchMode=yes; local HTTP(S)/ALL proxy variables removed.
+Observed: ssh connect to configured GPU host/port: Connection timed out
+DIRECT_READ_RC 255
+No pod log was returned by this direct probe.

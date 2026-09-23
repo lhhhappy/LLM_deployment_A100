@@ -1,0 +1,8 @@
+# Verbatim selected lines from read-only pread tail of /tmp/ax/runs/035-s0_n22/job.log.
+RUN_DEV N=22 rc=0
+RAW_FILES N=22 2 rows=722 uniq=722 err=0
+DIAG N=22 rows=722 actual_prefill=10.65M expected=11.98M waste=-1.33M (-12% of actual)
+DIAG N=22   gpu0 util avg 97%
+LADDER N=22 formal_est=False harness=False tpot=0.1040 | fast_i:3.04(17/23) overal:5.10(20/27) turn_s:7.82(0/3) chain_:38.63(18/22)
+prefill batches=1725  decode log lines=1126  max queue=18  max KV usage=0.98  max KDA-state usage=0.45  events={}
+LADDER first level N=22 failed -> stop (no descent; diagnose and fix)

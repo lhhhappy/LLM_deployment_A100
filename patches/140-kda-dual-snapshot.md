@@ -1,6 +1,8 @@
 # 140 — KDA 双点 fp32 快照（T45 / W19）
 
-140 叠加在 `base_exact + 000→101→105→110→111→112`，随后应用 `120→130`。
+> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/patch_stack.py`）。
+
+140 属于 S0 基线，按数字顺序叠加（000→101→106→110→111→120→140）。
 启动时 `SGLANG_AX_KDA_DUAL_SNAPSHOT=1` 开启；默认/`0` 保持原栈。未加入 RELEASE、构建脚本或任何队列。
 
 ## 设计与范围
@@ -43,8 +45,7 @@
 
 结果索引：`evidence/T45/README.md`、`summary.json`；完整数字以该收据为准。
 
-- `python3 scripts/make_140.py`：只复制只读底包，按fuzz=0生成补丁。
-- `python3 scripts/verify_140.py`：完整000→101→105→110→111→112→140→120→130实际应用、编译、确定再生成、整栈反向逐字节恢复。
+- `python3 scripts/verify_140.py`（旧栈顺序，T57 前）：完整000→101→110→111→140→120实际应用、编译、确定再生成、整栈反向逐字节恢复。
 - `python3 scripts/test_kda_snapshot_scheduler_140.py`：真实调度/准入AST，关闭32组×30轮JSON轨迹字节相同；开启8组；role prompt从2次extend变为1次。
 - 开发机CPU：`test_kda_snapshot_cache_140.py --source candidate/sglang`。真实controller/tree/components和tracking/pool/flush方法；checked CPU allocator与session服务stub。覆盖插入、重复、分叉、COW源、锁、淘汰、chunk续算、资源压力、namespace与真flush；每项结束调用原tree sanity_check。
 - 开发机GPU：`run_kda_snapshot_140.sh --baseline baseline`。随机projection/conv/gate权重，64×128真实KDA尺寸，含8×128的TP8分片；实际patched `forward_extend→dispatcher→TritonKDAKernel` 和底包conv/chunk kernel。假package初始化只绕过无关服务依赖，不替换计算；不是完整模型或服务验证。

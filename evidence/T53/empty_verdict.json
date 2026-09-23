@@ -1,0 +1,41 @@
+{
+ "gates": {
+  "fast_intra": {
+   "n": 0,
+   "p95": 0.0,
+   "over": 0,
+   "allowed_over": 0,
+   "harness_pass": true,
+   "formal_est_pass": true
+  },
+  "overall_intra": {
+   "n": 0,
+   "p95": 0.0,
+   "over": 0,
+   "allowed_over": 0,
+   "harness_pass": true,
+   "formal_est_pass": true
+  },
+  "turn_start": {
+   "n": 0,
+   "p95": 0.0,
+   "over": 0,
+   "allowed_over": 0,
+   "harness_pass": true,
+   "formal_est_pass": true
+  },
+  "chain_start": {
+   "n": 0,
+   "p95": 0.0,
+   "over": 0,
+   "allowed_over": 0,
+   "harness_pass": true,
+   "formal_est_pass": true
+  }
+ },
+ "errors": 0,
+ "tpot_mean": 0.0,
+ "tpot_p95": 0,
+ "harness_all_pass": true,
+ "formal_est_all_pass": true
+}

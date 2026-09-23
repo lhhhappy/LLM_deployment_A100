@@ -284,3 +284,45 @@ CPU：`python -B scripts/test_async_tokenize.py --real`；原样长输入性能�
 | T49-06 | L2/T8待安排 | graph64、f、ratio/固定状态槽单变量A/B；峰值账闭合、两池淘汰/140 skip/全部SLO | todo（仅R18§7/§8方案） |
 | T49-07 | L2/T8待安排 | DCP1/2/8+115完整KV/indexer地址、超旧物理容量的高虚拟slot、长前缀/分叉/flush/graph数值一致 | todo（F78启动/12题冒烟不代替本项） |
 | T49-08 | CPU/已有T8日志 | 722 raw与测量窗口绑定；19对36个真实prompt原Renderer重分词长度匹配，LCP/分类/启动账有行号与SHA | pass（remote_analysis.json、boot_memory_audit.json、previous_prefill_slices.txt；18 intra+1 turn_start；树事件未验证） |
+
+
+## T53 — 现状、缓存账本与脚本审阅（CPU，只读生产实现）
+
+| ID | 环境 | 检查 / 通过标准 | 状态 |
+|---|---|---|---|
+| T53-01 | CPU/已有T8 raw | 026完整722条唯一ID与cohort逐项一致，拆开实际链首/后续，原harness fast分桶 | pass（026_accounting.json；F93推翻F92相应归因，未测新引擎） |
+| T53-02 | CPU反例 | 空raw必须拒绝；缺桶/TPOT不得假通过 | fail（已复现、未修；empty_verdict.json为ALL_PASS=true） |
+| T53-03 | CPU反例 | 数值比较须拒绝缺失输出，不可凭首token证明完整状态/解码正确 | fail（已复现、未修；cpu_review.json；截短为ok、后续分叉为drift但wrong=0） |
+| T53-04 | CPU/源码 | 120生成器应保留当前v3等待/decode条件 | fail（已复现、未修；只在内存执行edit_policy；120_generator_review.json） |
+| T53-05 | 静态审阅 | runner/flush/116 probe失败传播、模板与日志来源一致 | fail（静态缺陷见R19 S1/S3/S5/S8，未修；未调用引擎或执行probe） |
+
+## T57 — 用户执行的只读日志采集脚本
+
+| ID | 环境 | 检查 / 通过标准 | 状态 |
+|---|---|---|---|
+| T57-01 | CPU | 语法与CLI可用；非法run拒绝；collector通过pexec_codex规则；缺日志和截断raw明确报告，不生成SLO结论 | pass（evidence/T57/validation.log；网络连通另未通过） |
+
+## T56 — 026 N18真实LCP与日志时间窗归因（CPU，只读已有T8结果）
+
+报告R20/F95；复现 `PYTHONDONTWRITEBYTECODE=1 /tmp/t42-venv/bin/python evidence/T56/attribute.py`。没有新增引擎实验。
+
+| ID | 环境 | 检查 / 通过标准 | 状态 |
+|---|---|---|---|
+| T56-01 | CPU/原Renderer | 722唯一请求/cohort位置一致，重渲染长度全匹配；411对实际前驱LCP、冻结差异、分类账闭合 | pass（真实正差863336、64网格850432；render_summary/classification_summary/pairs_attributed） |
+| T56-02 | CPU/raw/harness | 原in_ttft_gate产生fast328/超时10；22条短输出名单；recv→exec→first精确加回TTFT | pass（fast_10、short_tpot_22；TTFT加法误差0） |
+| T56-03 | CPU/已有完整日志 | 输入SHA校验；时间偏移有形状/epoch锚点；全部测量批序列数、cached/new及逐请求预算闭合 | pass（偏移0秒/346锚点/1234批/722请求；batch_mapping_validation；批成员仍为重建INFERRED） |
+| T56-04 | CPU/时间区间 | 每条短输出列全部相交批次原日志字段；并集不超过decode窗；原报告间隔和停顿估计区分，±50ms敏感性保留 | pass（22条；decode_overlaps.md/short_tpot_22.json；无逐token或CUDA trace，停顿INFERRED） |
+
+## T58 — 035 N22原始记录CPU重评分
+
+| ID | 环境 | 检查 / 通过标准 | 状态 |
+|---|---|---|---|
+| T58-01 | CPU | 原harness+score_formal复算11门并输出明确判定 | pass（score_formal.json；评分核对通过，候选N22结果FAIL） |
+| T58-02 | CPU | 全cohort ID/chain/idx、单一measure namespace、输出预算、有限指标/时间戳与输入SHA | pass（verify_integrity.py、integrity.json；不含未记录清缓存响应） |
+
+## T59 — 035 N22 TPOT超标请求特征（CPU，已有数据）
+
+| ID | 环境 | 检查 / 通过标准 | 状态 |
+|---|---|---|---|
+| T59-01 | CPU | 固定输入SHA；两档722同ID、prompt/output一致；205名单准确，分组与N18转换账闭合 | pass（evidence/T59/analyze.py、validation.json、CSV；F97/R21） |
+| T59-02 | CPU/已有日志 | UTC偏移有独立形状/epoch锚点；报告事件完整落在保守decode窗内；不将报告间隔当GPU计时 | pass（331锚点偏移0秒；failure_log_overlaps.json；亚秒映射迁移失败另保留，未用于结论） |

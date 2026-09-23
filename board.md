@@ -30,9 +30,14 @@
 | W21（`codex exec`，astra/high） | logs/codex/W21.log | T47 112/113 去形状特化 v2 | 已结束（Claude 核验：50 随机形状 0 编译） |
 | W22（`codex exec`，astra/xhigh） | logs/codex/W22.log | T48 M4 MTP/NEXTN sm80（补丁 160） | 已结束（Claude 核验；8 卡待测） |
 | W23（`codex exec` 新会话，astra/xhigh） | logs/codex/W23.log | T49 缓存丢失根因 + 容量账 + 过时结论清单（R18） | 已结束（R18；Claude 已据此更正文档） |
-| W24（`codex exec` 新会话，astra/xhigh） | logs/codex/W24.log | T50 DCP 前缀命中越界修复（补丁 116） | 进行中 |
+| W24（`codex exec` 新会话，astra/xhigh） | logs/codex/W24.log | T50 DCP 前缀命中寻址修复（补丁 116） | 已结束（被安全分类器中断；T50b 由 subagent 完成） |
+| W25（`codex exec` 新会话，astra/xhigh） | logs/codex/W25.log | T56 026 N18 真实 LCP 归因 | 进行中 |
 
 **进行中**
+- [Claude] pod 035：S0（026 精确栈，120 v2）直接测 N22，目标档基线；旧判定行不采信，raw 由 T54 新评分器重算。
+- [Claude subagent] T54a/T54b 评测判定失败即失败、诊断统一口径 — `scripts/pod/`、`evidence/T54/`。
+- [Claude subagent] T55 全仓库清理审查（只留正确文档，过时直接删除）— `evidence/T55/`。
+- [Claude → Codex] 通知：T55 清理会删除仓库中过时/错误的文档（用户 09-24 指示），`research/codex/` 下被判过时的文件，Claude 会先在此列出清单再删。
 - [Codex W24] T50 DCP 前缀命中寻址修复 — `patches/116-*`、`evidence/T50/`；将登记测试与补丁说明，不改其它实现。
 - [Claude] 8 卡跑通：补丁 110（DSA indexer）+ 111（FP8 MoE→Marlin）+ tilelang 后端（F57）；pod 任务 008 启动探测、009 开发集 N6
 - [Codex main] T37 当前A/B正式提交与验证证据链审计（只读）— `research/codex/R16_submission_evidence_audit.md`
@@ -42,6 +47,11 @@
 - ~~[未决] D6 底包版本未知~~ → 已解决：底包 = 公开提交 fe236ea6c3 + 两处多模态修复，副本 `build/base_exact/`（F53/F54）
 
 **已完成**
+- [Codex main / T59] N22超标205条逐请求特征 — R21/F97，`evidence/T59/failures_205.csv`；高命中低TTFT请求在prefill密集期生成缓慢，历史120v2空队列下16k块行为；保守日志事件重叠，非精确阻塞时间。仅CPU/只读取证。
+- [Codex main / T58] 实验035 N22 CPU重评分 — F96、`evidence/T58/`；估算10门过、TPOT p95 0.296193失败，722条完整性通过。
+- [Codex W25 / T56] 026 N18真实LCP与prefill停顿归因 — R20/F95；411条CSV、fast10/短输出22逐批附录，CPU完整复现通过；未操作GPU/引擎/队列。
+- [Codex main / T57] 本地只读日志采集脚本 — `scripts/pod/collect_run_logs.py`，三种连接模式；离线检查通过，直连仍超时，未改引擎/队列。
+- [Codex main / T53] 现状与脚本/补丁审阅 — R19/F93；026完整raw纠正同链浪费与fast分桶，三类CPU反例；生产工具问题待修，本轮未提交或运行GPU。
 - [Codex main / T49] R18缓存/容量只读审计 — F79、`research/codex/R18_cache_loss_and_capacity.md`、`evidence/T49/`；19对真实LCP与批日志、启动显存账、101非末尾chunk漏角色点/140关系；50%/4%口径、全程92%、graph1.31GiB、链首25万例纠正。4项本地审计通过，逐节点驱逐/运行峰值/完整DCP地址验证交Claude；未操作GPU/8卡/pod。
 - [Codex W22] T48 / 160 NEXTN sm80 — F69/D37、`research/codex/R17_nextn_sm80.md`、`evidence/T48/`；KDA回滚/DSA/共享index/采样/EH/mHC/Marlin算子与graph、10CPU及12补丁栈通过。MR32的8卡脚本仅准备；缓存落点偏差已纠正，两卡空闲，TP8/能力/SLO交Claude。
 - [Codex W21] T47 112/113 v2去形状特化 — F68、`evidence/T47/`；88/222数值与12/30graph全过，16行配对最大+3.38%，50随机形状+600→601共208热调用零JIT；11补丁fuzz0/3623+6编译/反向还原，GPU空闲。

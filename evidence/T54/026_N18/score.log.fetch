@@ -1,0 +1,48 @@
+{
+  "execution_status": "COMPLETED",
+  "evaluation_status": "PASS",
+  "ALL_PASS": true,
+  "gates": {
+    "coverage=100%": true,
+    "harness_data==0": true,
+    "harness_render==0": true,
+    "engine_error<1%": true,
+    "infra_error<1%": true,
+    "gated_phases_have_samples": true,
+    "fast_intra(uncached_expected<=4096,<=3s)": true,
+    "overall_intra(<=5s)": true,
+    "turn_start(<=15s)": true,
+    "chain_start(<=30s)": true
+  },
+  "measurement_contract": {
+    "server_ttft_coverage=100%": true,
+    "required_for_lane": false,
+    "strict_ttft_basis": false,
+    "auto_enabled_by_lane": false,
+    "ttft_basis_no_conflict": true
+  },
+  "coverage": 1.0,
+  "reference_metrics": {
+    "note": "解释性能的参考指标；**不各自构成 SLO 硬门**。硬门见 rep['gates']。",
+    "not_slo_gates": true,
+    "rpm": 34.108119413612265,
+    "avg_active_occupancy": 14.658695416225175,
+    "configured_N_slots": 18,
+    "cache_hit_ratio": {
+      "p50": 0.9135808609584442,
+      "p90": 0.9809910998791341,
+      "p95": 0.9874976062156321,
+      "p99": 0.9949909945429618
+    },
+    "cache_hit_ratio_p50": 0.9135808609584442,
+    "wall_s": 1270.078818321228,
+    "wall_min": 21.1679803053538,
+    "completed_requests": 722,
+    "dispatched_requests": 722
+  }
+}
+
+判定：PASS
+报告 /tmp/ax/runs/026-ladder_best140/N18/report_dev-combined-v1_N18_1790151020.json
+      /tmp/ax/runs/026-ladder_best140/N18/report_dev-combined-v1_N18_1790151020.md
+exit_code: 0

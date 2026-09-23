@@ -1,0 +1,13 @@
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/old_s0: 10 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/old_a: 15 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/old_dcp: 11 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/t_000: 1 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/t_101: 3 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/t_pre110: 4 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/t_post113: 8 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/t_pre115: 9 patches
+OK /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/s0_v3: 10 patches
+wrote /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/new/101-role-boundary-split.patch: 150 lines, 1 files changed
+wrote /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/new/110-sm80-dsa-indexer.patch: 544 lines, 8 files changed
+wrote /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/new/115-dcp-sm80.patch: 304 lines, 5 files changed
+wrote /tmp/claude-0/-workspace-Agentic-science-challenge/8c1aa0c0-070c-4bdb-8020-4588869e076f/scratchpad/t57/new/121-sched-cap-while-decoding.patch: 26 lines, 1 files changed

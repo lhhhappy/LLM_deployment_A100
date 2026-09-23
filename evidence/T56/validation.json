@@ -1,0 +1,64 @@
+{
+  "tests": {
+    "T56-01": {
+      "status": "pass",
+      "requests": 722,
+      "followup_pairs": 411,
+      "prompt_lengths_match": 722,
+      "cohort_positions_match": 722,
+      "raw_sha256": "486f041027abde2a1702e0c19190ce11e7001eb0cc4055d3773aff8c95bfdb59",
+      "true_positive_gap": 863336,
+      "aligned_gap": 850432
+    },
+    "T56-02": {
+      "status": "pass",
+      "fast_n": 328,
+      "fast_over3": 10,
+      "short_slow": 22,
+      "ttft_additivity_max_error": 0.0
+    },
+    "T56-03": {
+      "status": "pass",
+      "log_sha256": "9fc7608f26f9dc44a49b45abfef34d1a8523553a6281c3994836d88bc2c43ccd",
+      "timezone_offset_s": 0,
+      "shape_anchors": 346,
+      "mapped_batches": 1234,
+      "all_batch_counts_and_token_sums_match": true
+    },
+    "T56-04": {
+      "status": "pass",
+      "decode_windows": 22,
+      "overlap_counts": [
+        43,
+        38,
+        7,
+        14,
+        20,
+        11,
+        19,
+        31,
+        14,
+        11,
+        8,
+        15,
+        18,
+        17,
+        9,
+        9,
+        48,
+        63,
+        17,
+        24,
+        17,
+        17
+      ],
+      "all_pause_unions_within_window": true,
+      "causal_claims_labelled_inferred": true
+    }
+  },
+  "limitations": [
+    "No per-token timestamps, CUDA events, snapshot-slot or radix-eviction events.",
+    "Batch membership validated against all count/token constraints but is reconstructed, not request-ID logging.",
+    "Pause values are inferred wall spans; 50-ms sensitivity is not a confidence interval."
+  ]
+}
