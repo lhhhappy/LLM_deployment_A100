@@ -1,0 +1,73 @@
+{
+  "set": "dev-combined-v1",
+  "n": 6,
+  "wall_s": 1806,
+  "base_url": "http://127.0.0.1:30000",
+  "raw": "/tmp/ax/runs/012-dev_b113_n6/dev/raw_dev-combined-v1_N6_1790139354.jsonl",
+  "run": "/tmp/ax/runs/012-dev_b113_n6/dev/run_dev-combined-v1_N6_1790139354.json",
+  "report": "/tmp/ax/runs/012-dev_b113_n6/dev/report_dev-combined-v1_N6_1790139354.json",
+  "score_rc": 0,
+  "evaluation_status": "FAIL",
+  "ttft_p95_by_gate": {
+    "fast_intra(uncached_expected<=4096,<=3s)": 7.5077760219573975,
+    "overall_intra(<=5s)": 7.518910646438599,
+    "turn_start(<=15s)": 4.013016700744629,
+    "chain_start(<=30s)": 19.86030101776123
+  },
+  "ALL_PASS": false,
+  "tpm": {
+    "all": null,
+    "input": null,
+    "uncached_input_actual": null,
+    "device_work": null,
+    "decode": null,
+    "expected_uncached_input": null,
+    "cached_input": null
+  }
+}
+
+requests=722 ok=722 errors=0
+
+== gates
+  fast_intra     n= 328 p50=  0.56 p95=  7.51 max=  17.7 over= 55 allowed_over= 23 -> FAIL (margin -32)
+  overall_intra  n= 388 p50=  0.64 p95=  7.52 max=  17.7 over= 44 allowed_over= 27 -> FAIL (margin -17)
+  turn_start     n=  20 p50=  0.66 p95=  4.01 max=   4.0 over=  0 allowed_over=  3 -> PASS (margin +3)
+  chain_start    n= 314 p50=  1.01 p95= 19.86 max=  73.5 over=  5 allowed_over= 22 -> PASS (margin +17)
+
+== TTFT decomposition (server timestamps)
+  fast_intra     queue p50=  0.14 p95=  6.41 | exec->first p50=  0.38 p95=  1.15
+  overall_intra  queue p50=  0.14 p95=  6.31 | exec->first p50=  0.44 p95=  2.75
+  turn_start     queue p50=  0.10 p95=  3.36 | exec->first p50=  0.59 p95=  3.90
+  chain_start    queue p50=  0.10 p95=  6.83 | exec->first p50=  0.73 p95= 10.25
+
+== cache efficiency (actual cached vs frozen expectation)
+  expected cached=22,440,741  actual cached=24,847,744  ratio=1.107
+  requests with actual cached < expected-1024: 113; lost tokens total=4,923,405
+    lost= 250770 prompt= 252115 cached=64 exp_uncached=1281 phase=intra edge=append-only ttft=27.47
+    lost= 250336 prompt= 251916 cached=384 exp_uncached=1196 phase=intra edge=append-only ttft=52.94
+    lost= 214144 prompt= 222738 cached=7296 exp_uncached=1298 phase=intra edge=append-only ttft=73.46
+    lost= 210832 prompt= 229576 cached=18240 exp_uncached=504 phase=context_reset edge=append-only ttft=23.78
+    lost= 193234 prompt= 203233 cached=8704 exp_uncached=1295 phase=intra edge=append-only ttft=19.86
+
+== prefill rate vs actual uncached tokens (exec->first token)
+  uncached [     0,     1024) n= 173 exec->first p50=  0.31s p95=  0.95s  eff tok/s p50=    1639
+  uncached [  1024,     4096) n= 283 exec->first p50=  0.38s p95=  1.04s  eff tok/s p50=    5121
+  uncached [  4096,    16384) n= 138 exec->first p50=  0.82s p95=  2.03s  eff tok/s p50=    9132
+  uncached [ 16384,    65536) n=  88 exec->first p50=  3.46s p95=  6.01s  eff tok/s p50=   10014
+  uncached [ 65536,1000000000) n=  40 exec->first p50=  9.13s p95= 27.08s  eff tok/s p50=   10468
+
+== TPOT
+  n=722 mean=0.0304 p50=0.0175 p95=0.0732 max=1.422
+
+== worst requests vs their gate
+  ttft=  17.7/   3s queue=  14.8 prompt=  18472 cached=    576 exp_unc=    534 phase=intra idx=4 edge=append-only
+  ttft=  12.9/   3s queue=   8.3 prompt=  95880 cached=  49216 exp_unc=   2867 phase=intra idx=1 edge=append-only
+  ttft=  11.3/   3s queue=  10.1 prompt=  83900 cached=  79296 exp_unc=   4579 phase=intra idx=2 edge=append-only
+  ttft=  11.2/   3s queue=   4.3 prompt=  80803 cached=   1216 exp_unc=   1831 phase=intra idx=5 edge=append-only
+  ttft=  10.9/   3s queue=   9.9 prompt=  93238 cached=  88448 exp_unc=   2044 phase=intra idx=3 edge=append-only
+  ttft=  10.7/   3s queue=  10.1 prompt=  41299 cached=  40256 exp_unc=   1022 phase=intra idx=2 edge=append-only
+  ttft=  10.6/   3s queue=  10.0 prompt=  42882 cached=  40640 exp_unc=   2234 phase=intra idx=3 edge=append-only
+  ttft=  10.3/   3s queue=   9.2 prompt= 253884 cached= 251904 exp_unc=   1968 phase=intra idx=1 edge=append-only
+  ttft=  10.0/   3s queue=   0.3 prompt= 117308 cached=  14080 exp_unc= 103207 phase=intra idx=1 edge=append-only
+  ttft=   9.9/   3s queue=   8.5 prompt=  45229 cached=  35648 exp_unc=   4625 phase=intra idx=2 edge=append-only
+exit_code: 0

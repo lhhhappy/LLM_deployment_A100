@@ -68,3 +68,8 @@
 
 - 补记（09-23，lh-arena-sess-b 准入后）：发现旧守护进程被 tmux `arena-daemons:l2` 里的 `scripts/run_forever.sh` 自动拉起、已空转 8 小时（配置已指向新服务名，但事件日志对新服务 0 条记录）。已杀掉守护进程与 run_forever、关闭 l2 窗口，并把 `trisol_test_daemon.py`、`run_forever.sh`、其测试移到 `scripts/archive/retired/`（本地与 GPU 机）。
   核验：无任何进程调用 bohr/trisol 或旧守护进程；在用代码（scripts/pod、gjob、gssh）中 inference delete/stop 调用 0 处；`submit_daemon.py` 不碰推理服务、队列为空。
+
+## 决策（2026-09-23，N6 基线后）— 按真实瓶颈重排
+- 事实：我们在 N6 就卡 intra 两门，主因是排队（p95 6.4s）；chain_start 有余量；indexer 在 ≤6 万上下文只占 4.3%（114 价值下调）；allreduce 占 11%；KV 在 N6 已 50%。
+- 排序：① 120 调度 A/B（队列中 013/014，N6 上直接看 intra 两门是否转 PASS）；② 140 双点快照 A/B（修短间隔丢缓存）+ 查长空闲丢缓存原因；
+  ③ 容量（DCP 探针已排、cuda-graph bs、KV 预算）；④ 预填充：allreduce（自定义 allreduce/NCCL 协议）、prefill CP 探针、MoE；⑤ 114 仅在超长请求上有益，保留但不急。

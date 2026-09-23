@@ -440,3 +440,11 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 冷预填充续块（cached=0，n=291）：约 11k tok/s ≈ 746ms/8192 块（成本表估算 580ms + allreduce 等，吻合）→ 19 万 token 冷启动预填充约 18s。
 - 池占用：KV 峰值 0.50（N6！整机约 94 万 token）、KDA 状态 0.04。→ 推断约 N14 起 KV 满、开始驱逐；**容量（DCP/cuda-graph bs/FP8 KV）优先级上调**。
 - 注意：日志 "input throughput" 以日志间隔计，首块含等待/decode 时间，不可直接用；/metrics cache_hit_rate=0 疑似统一缓存未更新 → 以 harness 逐请求 cached_tokens 为准。
+
+## F76 — 8 卡 b113 开发集 N6 基线：卡在 intra 两门（排队所致），chain_start 有余量；冷预填充约 1 万 tok/s；真机 profile
+- 结果（`evidence/N6_b113/analysis.txt`，`scripts/pod/verify/analyze_run.py`，允许超标数按 95% 下界规则自算）：722/722 成功；
+  fast_intra p95 7.51s（超标 55 / 允许约 23，FAIL）、overall_intra p95 7.52s（44/27，FAIL）、turn_start 4.01s（PASS）、chain_start 19.86s（5/22，PASS）。TPOT 均值 0.0304，p95 0.073。
+- **intra 超标主因是排队**：intra 排队 p95 6.4s，exec→首 token p95 1.0–2.8s；最差 10 个请求排队 8–15s、未命中仅数百到数千 token → 冷预填充连续占用 GPU（补丁 120 的目标）。
+- 缓存：总实际命中 2485 万 ≥ 冻结期望 2244 万（×1.107，跨会话共享带来额外命中），但 19 个 intra 请求相对同链前一请求丢失 >4096 token：
+  (a) 长空闲（244–300s）后几乎全丢（原因待查，当时 KV 峰值仅 50%）；(b) 短间隔丢 5–8k（KDA 状态停在上一轮角色边界而非末尾 → 补丁 140 的目标）。
+- 冷预填充单请求（012b）：2 万 1.98s、6 万 6.37s、19 万 19.3s（≈1 万 tok/s）。8 卡真实 profile（6 万请求 3 块，≈645ms/块）：MoE 31.8%、稀疏注意力 17.0%、稠密 GEMM 13.2%、mHC 11.8%、**allreduce 11.1%**、逐元素 6.1%、indexer 4.3%、KDA 4.1%（与单卡成本表吻合）。
