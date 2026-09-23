@@ -476,3 +476,7 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 
 > 更正（09-23，Codex R18 核验）：① F75/F76 的 "KV 峰值 50%、KDA 4%" 是**扣除可淘汰缓存后的占用**（`pool_stats_observer.py:249,271`），不是物理驻留；完整 N6 测量期 KV 不可淘汰峰值 **863,296 token / 92%**。② 012 的 decode CUDA graph 实际增量 **1.31GiB**（非 6.1GB）；容量探针的 +66% 主要来自 KDA 池 10.05→3.46GiB。
 > ③ "25 万 prompt cached=64" 等最大损失例均为**本次 cohort 链首**（无同链前驱），不是运行中丢缓存；"19 个 intra" 实为 18 intra + 1 turn_start，其中 5 条短回退符合"101 只在最后 chunk 拆角色点"机制，140 可覆盖（但压力下额外角色槽可能被跳过）。详见 research/codex/R18_cache_loss_and_capacity.md。
+
+## F81 — chunked_prefill 16384 使自动 mem_fraction_static 从 0.7885 降到 0.646 → KV 从 157 万掉到 63 万，运行时 27GB 闲置
+- 024（120v2 + 输入分散 + 扩容 + chunk 16384）：max_total_num_tokens 633,536（7.5GB），available_gpu_mem 27.22GB；对照 022（chunk 8192）1,569,152 / 16.08GB。
+- 对策：025/026 显式 `--mem-fraction-static 0.75`（估计 KV ≈ 130 万、激活余量约 20GB）。024 保持原样作参照。

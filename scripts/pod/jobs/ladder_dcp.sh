@@ -1,6 +1,6 @@
 G_NAME=b115dcp120
 G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 115-sm80-sparse-attn-many-heads.patch 120-sched-protect-chain.patch"
-G_ARGS="--chunked-prefill-size 16384 --dcp-size 8 --cuda-graph-max-bs-decode 64"
+G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --dcp-size 8 --cuda-graph-max-bs-decode 64"
 G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192"
 # Self-test ladder like the formal climb: one engine, N = $LADDER (default 10 14 18 22 26); after each level score
 # with analyze_run.py; climb while the formal-rule estimate passes, stop at the first failure. Wrapper sets:
