@@ -46,4 +46,4 @@ autostart 已排：b113 探测 → b113 N6 → 120on N6 → 120cap4096 N6 → b1
 
 ## 5. Codex 分工
 worker W15–W21 均已结束并经 Claude 核验（见 board.md 实例表、notes/dispatch.md T41–T47）。主 Codex 会话 `01a0c731-…`（T37）未再活动。
-下一批候选任务：prefill 融合 topk / 输出降精度（113 仍写全 fp32 logits）；MTP（M4）；A100 MoE Marlin 调优；按 8 卡 profile 定。
+下一批方向见 `research/claude/R8_next_directions.md`（P0：能力门自测 + 8 卡基线/profile；P1：冷预填充吞吐 INT8 W8A8、EDF；P2：容量 cuda-graph bs、状态池、驱逐、FP8 KV、DP2）。
