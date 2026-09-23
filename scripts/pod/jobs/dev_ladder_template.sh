@@ -30,13 +30,17 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   local N=$1
   local out=$RUN_DIR/N$N; mkdir -p $out; local extra=""; [ $first = 1 ] || extra="--skip-warmup"; first=0
   python3 $AX/verify_kit/metrics_sampler.py $out/metrics.jsonl 10 & local msp=$!
+  nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used --format=csv,noheader -l 5 > $out/gpu_util.csv 2>/dev/null & local gsp=$!
   ( cd $S1 && S1_HARNESS_DIR=$S1/harness python3 run_dev.py --base-url http://127.0.0.1:$PORT --set dev-combined-v1 \
       --root $S1/data/dev-combined-v1 --cohort $S1/harness/g0a/samples_v3/cohort_dev-combined-v1.json \
       --tok-dir /mnt/models --out $out --n $N $extra ) > $out/run_dev.log 2>&1
-  kill $msp 2>/dev/null
+  kill $msp $gsp 2>/dev/null
   curl -sf http://127.0.0.1:$PORT/v1/models >/dev/null || { echo "LADDER N=$N ENGINE_DEAD"; return 3; }
   local raw=$(ls -t $out/raw_*.jsonl 2>/dev/null | head -1); [ -n "$raw" ] || { echo "LADDER N=$N NO_RAW"; tail -5 $out/run_dev.log; return 4; }
   python3 $AX/verify_kit/analyze_run.py $S1/harness $raw $out/verdict.json > $out/analysis.txt 2>&1
+  { python3 $AX/verify_kit/ttft_decomp.py $raw; python3 $AX/verify_kit/prefill_waste.py $raw; python3 $AX/verify_kit/cachecmp.py $raw; \
+    awk -F", " '{u[$2]+=$3; n[$2]++} END {for (g in u) printf "  gpu%s util avg %.0f%%\n", g, u[g]/n[g]}' $out/gpu_util.csv; } > $out/diag.txt 2>&1
+  grep -E "over-limit|waste=|gpu0 util" $out/diag.txt | sed "s/^/DIAG N=$N /" | cut -c1-200
   local v=$(python3 -c "import json;d=json.load(open('$out/verdict.json'));g=d['gates'];print('formal_est=%s harness=%s tpot=%.4f | '%(d['formal_est_all_pass'],d['harness_all_pass'],d['tpot_mean'])+' '.join('%s:%.2f(%d/%d)'%(k[:6],v['p95'],v['over'],v['allowed_over']) for k,v in g.items()))")
   echo "LADDER N=$N $v"
   python3 $AX/verify_kit/logstat.py $RUN_DIR/server.log 2>/dev/null | sed -n 2p
