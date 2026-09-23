@@ -29,7 +29,9 @@ start_engine() {  # start_engine <extra launch args...>; waits until ready (mode
 
 ensure_engine() {  # ensure_engine <src name> <launch args...>: reuse the running engine if code+args unchanged
   local name=$1; shift
-  local sig="$name $(cat $AX/src/$name/PATCHES_SIG 2>/dev/null) | $* | ${SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS:-}"
+  # env is part of the reuse key (engines differing only by SGLANG_AX_*/NCCL_* must not be reused)
+  local envkey; envkey=$(env | grep -E '^(SGLANG_AX_|SGLANG_ARENA_|NCCL_|SGLANG_MAMBA|SGLANG_OPT_)' | sort | tr '\n' ' ')
+  local sig="$name $(cat $AX/src/$name/PATCHES_SIG 2>/dev/null) | $* | $envkey"
   if [ -f $AX/engine.sig ] && [ "$(cat $AX/engine.sig)" = "$sig" ] && curl -sf http://127.0.0.1:$PORT/v1/models >/dev/null 2>&1; then
     echo "ENGINE_REUSED: $sig"; return 0
   fi
