@@ -490,3 +490,10 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - 025（DCP8 + 114 + 115 + 120v2，mem 0.75，逻辑 KV 818,112×8）：N10 测量约 2.5 分钟时，一次 extend（新 576、命中 77,312）后全 rank "an illegal memory access"；KV 仅用 8%。
 - 冷启动探针未覆盖前缀命中路径。INFERRED：DCP 下每卡只存 1/8 KV，112/113/114 indexer（及稀疏注意力的索引）按全量 KV 寻址 → 越界（Codex R18 已提示"DSA 地址协议须核验"）。
 - 处置：DCP 暂退出梯子；派 Codex 做 DCP 下 indexer/稀疏注意力地址协议的定位与修复（开发机 DCP2 复现）。
+
+## F84 — 106 生效（KV 三次打满不崩）；N10 四道 TTFT 门两口径全过，但 tpot_p95 0.13 > 0.10 → 120 v3
+- 025b（120v2 + 输入分散 + 扩容 + chunk16384 + **106**，KV 63 万）N10：722/722 成功；KV 占用 3 次到 1.00，无 "Prefill out of memory"、无调度器异常。
+- 门（`evidence/L025b/N10_analysis.txt`）：fast_intra 2.11s（7/23）、overall_intra 3.13s（12/27）、turn_start 3.49s、chain_start 26.38s（12/22）—— harness 与正式估算均 PASS；**tpot_p95 0.1315 > 0.10（FAIL）**，tpot_mean 0.0472。缓存损失 468 万 → 46 万 token。
+- TPOT 对照：b113 N6 p95 0.073；120v1 N6 p95 0.104（已碰线）。原因：预填充与 decode 交替时，出字请求每 token 要等一整轮预填充；v2 无等待时不封顶（16384/轮 ≈1.2–1.5s）放大了它。
+- 对策：120 v3（有请求在 decode 时也封顶，cap 2048）+ `--prefill-decode-interval 3`（每轮预填充后连跑 3 步 decode）→ 梯子 027。026（v2+140）跑完 N18 后停止，不再下探。
+- 意义：随 N 上升 **TPOT 门与 TTFT 门同为约束**；tpot_mean 也是同档名次依据（第一名 0.0273）。

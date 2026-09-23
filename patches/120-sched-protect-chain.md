@@ -89,3 +89,9 @@ python3 scripts/check_records.py
 5. 最后单独验证 NEXTN（若要采用）和默认 overlap；CPU 通过不代替这两项。
 
 模板在 pod 内由队列注入 `AX`、`RUN_DIR`、`N`，并设置 `AX_P120_VARIANT=off|on|cap4096`。本轮未调用 pod/Trisol/bohr，没有 8 卡、镜像或提交动作；外部服务名字、command、env 仍遵守中性命名规则。
+
+
+## 版本记录（Claude，2026-09-23）
+- v1（W15）：续算与新冷请求始终封顶 cap（2048）；8 卡 N6：intra 排队 6.4→0.36s，但 chain_start 尾部变差、tpot_p95 0.104。存 patches/drafts/120-sched-protect-chain-v1.patch。
+- v2：仅在有等待请求时封顶（Fable 建议），chunk 16384 / cap 8192 / short 8192；8 卡 N10：TTFT 四门全过，但 tpot_p95 0.1315 超门。存 drafts/…-v2.patch。
+- v3（当前）：有等待**或有请求在 decode** 时封顶，只有完全空闲才用大块；配合 `--prefill-decode-interval 3`、cap 2048 → 梯子 027。

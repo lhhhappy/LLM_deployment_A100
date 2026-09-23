@@ -1,0 +1,46 @@
+requests=722 ok=722 errors=0
+
+== gates  (dev harness = hard p95<=limit; formal-est = task.md rule: FAIL only if 95% lower bound of exceed-rate > 5%)
+  fast_intra     n= 328 p50=  0.59 p95=  2.11 max= 139.4 over=  7 allowed= 23 | harness PASS | formal-est PASS (margin +16)
+  overall_intra  n= 388 p50=  0.70 p95=  3.13 max= 139.4 over= 12 allowed= 27 | harness PASS | formal-est PASS (margin +15)
+  turn_start     n=  20 p50=  0.95 p95=  3.49 max=   3.5 over=  0 allowed=  3 | harness PASS | formal-est PASS (margin +3)
+  chain_start    n= 314 p50=  1.23 p95= 26.38 max=  60.2 over= 12 allowed= 22 | harness PASS | formal-est PASS (margin +10)
+  => harness ALL_PASS=False  formal-est ALL_PASS=False  tpot_mean=0.0472 tpot_p95=0.1315
+
+== TTFT decomposition (server timestamps)
+  fast_intra     queue p50=  0.16 p95=  1.19 | exec->first p50=  0.40 p95=  1.25
+  overall_intra  queue p50=  0.16 p95=  1.31 | exec->first p50=  0.44 p95=  1.68
+  turn_start     queue p50=  0.12 p95=  1.25 | exec->first p50=  0.73 p95=  3.37
+  chain_start    queue p50=  0.12 p95= 18.59 | exec->first p50=  0.85 p95=  9.30
+
+== cache efficiency (actual cached vs frozen expectation)
+  expected cached=22,440,741  actual cached=24,431,744  ratio=1.089
+  requests with actual cached < expected-1024: 76; lost tokens total=455,687
+    lost=  78972 prompt=  80803 cached=0 exp_uncached=1831 phase=intra edge=append-only ttft=139.41
+    lost=  44961 prompt=  80607 cached=33600 exp_uncached=2046 phase=intra edge=append-only ttft=4.04
+    lost=  43797 prompt=  95880 cached=49216 exp_uncached=2867 phase=intra edge=append-only ttft=11.42
+    lost=  16646 prompt=  18202 cached=1216 exp_uncached=340 phase=intra edge=append-only ttft=14.83
+    lost=  15741 prompt=  40098 cached=23040 exp_uncached=1317 phase=intra edge=append-only ttft=1.82
+
+== prefill rate vs actual uncached tokens (exec->first token)
+  uncached [     0,     1024) n= 160 exec->first p50=  0.34s p95=  0.89s  eff tok/s p50=    1549
+  uncached [  1024,     4096) n= 275 exec->first p50=  0.40s p95=  1.08s  eff tok/s p50=    4889
+  uncached [  4096,    16384) n= 152 exec->first p50=  0.75s p95=  1.28s  eff tok/s p50=   10717
+  uncached [ 16384,    65536) n=  92 exec->first p50=  2.79s p95=  5.60s  eff tok/s p50=   11465
+  uncached [ 65536,1000000000) n=  43 exec->first p50=  7.88s p95= 24.27s  eff tok/s p50=   11795
+
+== TPOT
+  n=722 mean=0.0472 p50=0.0297 p95=0.1315 max=0.673
+
+== worst requests vs their gate
+  ttft= 139.4/   3s queue= 131.6 prompt=  80803 cached=      0 exp_unc=   1831 phase=intra idx=5 edge=append-only
+  ttft=  27.2/   3s queue=  24.3 prompt=  71691 cached=  36608 exp_unc=  35138 phase=intra idx=2 edge=append-only
+  ttft=  15.7/   3s queue=   7.1 prompt= 117308 cached=  14080 exp_unc= 103207 phase=intra idx=1 edge=append-only
+  ttft=  14.8/   3s queue=  13.3 prompt=  18202 cached=   1216 exp_unc=    340 phase=intra idx=3 edge=append-only
+  ttft=  12.5/   3s queue=  11.5 prompt=  25361 cached=  16576 exp_unc=   6673 phase=intra idx=4 edge=append-only
+  ttft=  11.4/   3s queue=   7.4 prompt=  95880 cached=  49216 exp_unc=   2867 phase=intra idx=1 edge=append-only
+  ttft=   9.7/   3s queue=   8.9 prompt=  46231 cached=  37568 exp_unc=   8653 phase=intra idx=2 edge=append-only
+  ttft=   9.2/   3s queue=   6.2 prompt=  72473 cached=  36160 exp_unc=  36279 phase=intra idx=2 edge=append-only
+  ttft=   6.8/   3s queue=   3.9 prompt=  72598 cached=  36288 exp_unc=  36279 phase=intra idx=2 edge=append-only
+  ttft=   6.5/   3s queue=   0.2 prompt= 113097 cached=  50240 exp_unc=  62836 phase=intra idx=2 edge=append-only
+exit_code: 0

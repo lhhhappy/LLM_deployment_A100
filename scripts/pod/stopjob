@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# (runs on the GPU box, Claude only) Stop one pod queue job without touching service/engine/worker.
+D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"; cd "$D/../.."
+"$D/ppush" /tmp/ax/bin scripts/pod/stopjob_inpod.sh >/dev/null && bexec "bash /tmp/ax/bin/scripts/pod/stopjob_inpod.sh $1"
