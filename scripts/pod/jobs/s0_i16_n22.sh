@@ -1,14 +1,10 @@
-# 037 S0+interval16@N22: exactly job 035 (S0 = 026 stack, 120 v2 draft) plus ONE change: --prefill-decode-interval 16.
-# Why: 035 (S0@N22, re-scored with score_formal.py) passes 10/11 gates; only tpot_p95=0.296 fails. During heavy prefill S0
-# gives ~1 decode step per 16k chunk (~1.3 s) -> TPOT ~1 s/token for streams in those windows. Hypothesis: 16 decode
-# steps after every prefill batch bound the per-stream stall (TPOT ~(1.3+16*0.025)/16 ~ 0.1) at a cost of ~20-25% prefill
-# time. Decisive readout: tpot_p95 vs the TTFT over-limit counts (035 margins: fast 6, overall 7, chain 4).
-# Verdict: LEVEL line from level_verdict.py (complete data + harness scorer + task.md rules).
+# S0 with 16 decode rounds after each prefill batch at N22.
 G_NAME=s0v2
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch"
+G_PATCHES="000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 120-sched-protect-chain.patch 140-kda-dual-snapshot.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200 --prefill-decode-interval 16"
 G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1"
 LADDER_UP="22"
+
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
 #   G_NAME, G_PATCHES, G_ARGS, G_ENV (same as dev_generic_template.sh), optional LADDER.

@@ -4,7 +4,7 @@
 #   scripts/pod/qpush <queue_name>=<scripts/pod/jobs/file.sh> ...     e.g. 026g-cc_a_v3_114.sh=scripts/pod/jobs/cc_a_v3_114.sh
 set -euo pipefail; cd "$(dirname "$0")/../.."
 bash scripts/pod/verify/make_kit.sh >/dev/null
-tar cf - build/verify_kit patches scripts/pod | timeout 120 ssh GPU 'tar xf - -C /sjtu/linhang/arena/repo'
+tar cf - build/verify_kit patches scripts/pod | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
 files=""; mvs=""
 for a in "$@"; do n=${a%%=*}; f=${a#*=}; [ -f "$f" ] && bash -n "$f" || { echo "bad job $f"; exit 2; }
   files="$files $f"; mvs="$mvs mv tmpj/$f $n;"; done

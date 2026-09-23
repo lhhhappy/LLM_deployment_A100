@@ -1,13 +1,10 @@
-# 037b S1+interval16@N22: job 036 (S1 = S0 + 114, the best so far) with ONE change: --prefill-decode-interval 16.
-# Why: at N22 the only failing gate is tpot_p95 (036: 0.253) while 036 has wide TTFT margins (fast 7/23, overall 15/27,
-# chain 17/22). 16 decode steps after each prefill batch keep streams near 0.1 s/token during heavy prefill at a cost of
-# ~20% of heavy-prefill time. This is the most likely dev-N22 pass candidate. Compare with 036.
-# Verdict: LEVEL line from level_verdict.py (complete data + harness scorer + task.md rules).
+# S1 (S0 + 114) with 16 decode rounds after each prefill batch at N22.
 G_NAME=s0v2_114
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch"
+G_PATCHES="000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 140-kda-dual-snapshot.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200 --prefill-decode-interval 16"
 G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1"
 LADDER_UP="22"
+
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
 #   G_NAME, G_PATCHES, G_ARGS, G_ENV (same as dev_generic_template.sh), optional LADDER.

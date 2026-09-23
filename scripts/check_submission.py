@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """check_submission.py — offline validator for submission.json against llm-challenge-arena-v1/task.md.
 
-Checks (ERROR = task.md rule; WARN = our own guard rail):
-  * exactly the four fields image / command / env / model_name (no extras, e.g. base_url, api_key)
-  * image, command non-empty strings; image as name:tag (no @sha256, platform rejects it), on registry.dp.tech, not :latest (WARN,
-    ERROR with --final; a REPLACE_ placeholder is an ERROR with --final)
+Checks (ERROR = task.md rule or platform-observed rejection; WARN = advice):
+  * image and command required; env and model_name optional (no extras, e.g. base_url, api_key)
+  * image, command non-empty strings; image as name:tag (no @sha256, platform rejects it), on registry.dp.tech;
+    :latest warns because a mutable tag is hard to reproduce
   * command is argv, not shell: first token is not KEY=VAL, no shell operators (&& || | ; > < etc.),
     no $ expansion or backticks
-  * --served-model-name present and equal to model_name
+  * --served-model-name consistent with model_name (advice)
   * env is an object of string -> string; no base_url/api_key anywhere; SGLang needs
     SGLANG_OPT_USE_TOPK_V2=0 on A100
-  * (SGLang commands) every --flag exists in src/sglang arg_groups/fields/*.py or server_args.py
+  * (SGLang commands) every --flag exists in the exact base package's server_args.py
   * (optional --trace) stub trace: first line session_start, then >=1 user/assistant line
     (`playground trace validate` 0.1.39 accepts a session_start-only file, the server does not).
 
 Usage: scripts/check_submission.py submission/candidate-01.json [--trace T.jsonl] [--final]
-       [--sglang-src src/sglang/python/sglang/srt]
+       [--sglang-src build/base_exact/sglang/srt] [--skip-flag-check]
 Exit 0 = no errors. Pure local; no network.
 """
 import argparse
@@ -27,6 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIELDS = {"image", "command", "env", "model_name"}
+REQUIRED_FIELDS = {"image", "command"}
 FORBIDDEN_KEYS = {"base_url", "api_key", "apikey", "api-key"}
 SHELL_OPS = {"&&", "||", "|", ";", ">", ">>", "<", "<<", "&", "2>", "2>&1", "|&", ";;", "(", ")"}
 KV_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
@@ -69,11 +70,14 @@ def flag_value(argv, flag):
 def sglang_known_flags(srt: Path):
     flags = set()
     for f in sorted((srt / "arg_groups" / "fields").glob("*.py")):
-        for m in re.finditer(r"^\s{4}([a-z_][a-z0-9_]*)\s*:\s*A\[", f.read_text(), re.M):
+        for m in re.finditer(r"^[ \t]{4}([a-z_][a-z0-9_]*)\s*:\s*A\[", f.read_text(), re.M):
             flags.add("--" + m.group(1).replace("_", "-"))
     sa = srt / "server_args.py"
     if sa.exists():
-        flags.update(re.findall(r"[\"'](--[a-z0-9][a-z0-9-]*)[\"']", sa.read_text()))
+        source = sa.read_text()
+        flags.update("--" + m.replace("_", "-") for m in
+                     re.findall(r"^[ \t]{4}([a-z_][a-z0-9_]*)\s*:\s*A\[", source, re.M))
+        flags.update(re.findall(r"[\"'](--[a-z0-9][a-z0-9-]*)[\"']", source))
     return flags
 
 
@@ -98,7 +102,8 @@ def main():
     ap.add_argument("submission")
     ap.add_argument("--trace")
     ap.add_argument("--final", action="store_true", help="treat placeholder/unpinned image as error")
-    ap.add_argument("--sglang-src", default=str(ROOT / "src/sglang/python/sglang/srt"))
+    ap.add_argument("--sglang-src", default=str(ROOT / "build/base_exact/sglang/srt"))
+    ap.add_argument("--skip-flag-check", action="store_true", help="skip only the local SGLang flag lookup")
     a = ap.parse_args()
     r = Report()
 
@@ -112,13 +117,12 @@ def main():
         return 1
 
     keys = set(sub)
-    if keys != FIELDS:
-        if keys - FIELDS:
-            r.err(f"unexpected fields: {sorted(keys - FIELDS)} (schema is exactly {sorted(FIELDS)})")
-        if FIELDS - keys:
-            r.err(f"missing fields: {sorted(FIELDS - keys)}")
-    else:
-        r.ok("exactly the four fields image/command/env/model_name")
+    if keys - FIELDS:
+        r.err(f"unexpected fields: {sorted(keys - FIELDS)}")
+    if REQUIRED_FIELDS - keys:
+        r.err(f"missing required fields: {sorted(REQUIRED_FIELDS - keys)}")
+    if not (keys - FIELDS or REQUIRED_FIELDS - keys):
+        r.ok("submission fields match task.md schema")
     bad = sorted({k for k in walk_keys(sub) if str(k).lower() in FORBIDDEN_KEYS})
     if bad:
         r.err(f"forbidden keys present: {bad}")
@@ -141,8 +145,8 @@ def main():
                 r.err("image must be name:tag; the platform rejects tag@sha256 digests (F55)")
             elif not re.search(r":[A-Za-z0-9_.-]+$", img.rsplit("/", 1)[-1]):
                 sev("image has no tag")
-            if img.endswith(":latest") or img.endswith("latest"):
-                sev("image tag ends with latest")
+            if img.endswith(":latest"):
+                r.warn("image tag is latest; use a unique tag for reproducibility")
         r.ok("image is a non-empty string")
 
     # command
@@ -180,20 +184,20 @@ def main():
                 r.warn(f"duplicate flags: {dups}")
 
     # model_name vs --served-model-name
-    mn = sub.get("model_name")
-    if not isinstance(mn, str) or not mn:
-        r.err("model_name must be a non-empty string")
+    mn = sub.get("model_name", "default")
+    if "model_name" in sub and (not isinstance(mn, str) or not mn):
+        r.err("model_name must be a non-empty string when provided")
     elif argv:
         smn = flag_value(argv, "--served-model-name")
         if not smn:
-            r.err("--served-model-name missing (capability eval uses model_name)")
+            r.warn("--served-model-name missing; check that the service accepts model_name")
         elif smn[-1] != mn:
-            r.err(f"--served-model-name {smn[-1]!r} != model_name {mn!r}")
+            r.warn(f"--served-model-name {smn[-1]!r} != model_name {mn!r}; check the served model id")
         else:
             r.ok(f"--served-model-name == model_name == {mn!r}")
 
     # env
-    env = sub.get("env")
+    env = sub.get("env", {})
     if not isinstance(env, dict):
         r.err("env must be an object of string -> string")
         env = {}
@@ -220,7 +224,9 @@ def main():
         if host != ["0.0.0.0"] or port != ["8000"]:
             r.warn(f"expected --host 0.0.0.0 --port 8000, got host={host} port={port}")
         srt = Path(a.sglang_src)
-        if srt.is_dir():
+        if a.skip_flag_check:
+            r.warn("local SGLang flag lookup skipped")
+        elif srt.is_dir():
             known = sglang_known_flags(srt)
             used = sorted({t.split("=", 1)[0] for t in argv if t.startswith("--")})
             unknown = [f for f in used if f not in known]

@@ -6,6 +6,7 @@ s1-dev/
 cache/
 logs/
 build/base_exact/
+build/scratch/
 build/l3_*/
 build/p111/a/
 build/p111/b/

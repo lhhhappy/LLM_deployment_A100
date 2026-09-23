@@ -15,7 +15,9 @@ ZIP="build/submit_${DAY}_${ARM}.zip"
 TRACE=submission/stub-trace.jsonl
 set -a; . ~/.config/playground/credentials.env; set +a
 
-python3 scripts/check_submission.py --final "$OUT/submission.json" >/dev/null || [ "${SKIP_FLAG_CHECK:-0}" = 1 ]  # checker cannot parse the annotated-field base args (0923); flags verified by pod runs
+CHECK_ARGS=(--final --trace "$TRACE")
+[ "${SKIP_FLAG_CHECK:-0}" = 1 ] && CHECK_ARGS+=(--skip-flag-check)
+python3 scripts/check_submission.py "${CHECK_ARGS[@]}" "$OUT/submission.json"
 [ -f "$ZIP" ] || playground submit --challenge-id "$CH" --outputs "$OUT" --trace "$TRACE" --dry-run --bundle-out "$ZIP" >/dev/null
 MANIFEST=$(mktemp -d)
 unzip -o -q "$ZIP" arm_manifest.json -d "$MANIFEST"

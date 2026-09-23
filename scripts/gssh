@@ -3,13 +3,20 @@
 #   - only the connection is retried (idempotent probe `true`), up to 6 times;
 #   - the real command runs EXACTLY ONCE. If the connection drops mid-command (ssh rc 255), it is NOT re-run:
 #     it may have partially executed — inspect the remote state before doing anything else.
-# Long jobs (> a few minutes): use scripts/gjob (detached tmux on the GPU box), not gssh.
+# Long jobs (> a few minutes): use scripts/gjob (detached tmux on the GPU box).
+run_for() {
+  local seconds=$1; shift
+  if command -v timeout >/dev/null 2>&1; then timeout "$seconds" "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then gtimeout "$seconds" "$@"
+  else perl -e 'my $seconds = shift; alarm($seconds); exec @ARGV or die "exec: $!"' "$seconds" "$@"
+  fi
+}
 for i in 1 2 3 4 5 6; do
-  timeout 40 ssh -o ConnectTimeout=20 -o BatchMode=yes GPU true 2>/dev/null && break
+  run_for 40 ssh -n -o ConnectTimeout=20 -o BatchMode=yes GPU true 2>/dev/null && break
   echo "[gssh] connect probe failed ($i/6), retrying" >&2; sleep 6
   [ $i -eq 6 ] && { echo "[gssh] cannot connect to GPU" >&2; exit 255; }
 done
-timeout "${GSSH_TIMEOUT:-600}" ssh -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=8 GPU "$@"
+run_for "${GSSH_TIMEOUT:-600}" ssh -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=8 GPU "$@"
 rc=$?
 [ $rc -eq 255 ] && echo "[gssh] connection dropped DURING the command — NOT re-run (it may have partially executed). Check remote state." >&2
 exit $rc

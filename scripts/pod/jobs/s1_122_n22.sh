@@ -64,4 +64,3 @@ for N in $UP; do
   else echo "LADDER stop at N=$N (formal-est FAIL); highest pass = previous level"; fi
   break
 done
-
