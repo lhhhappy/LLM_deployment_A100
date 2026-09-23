@@ -37,6 +37,9 @@
 - 镜像名线索（INFERRED，无作者关联）：marlin 82 个（主流 sm80 量化路径）；`actquant`/int8 W8A8 3 个（MoE 激活量化）；`fp8kv` 1 个；
   调度名 edf/srpt/sjf/slack/aged-fifo 18 个（至少两队自研 SLO 调度）；dp2-affinity/balanced 8 个；rowchunk-kda-cpu/hicache/kpool 12 个；graphsafe/nextn 10 个。
 
+- **09-23 下午排行榜快照（用户提供）**：LewyM 22 / 0.02728（09/21，未变）；Jinbo hu 22 / 0.03561（09/23 04:27 新交，原 0.0370）；Mingjun Xu 22 / 0.03753（09/23 07:41 新交，原 0.0509）；
+  N18：微信用户LkYc 0.02419、张正明 0.02583、王俊杰 0.02653。TPM 157–179 万。**仍无人过 N=26**；前三名在 N22 上压 TPOT。
+
 ## 4. 方向（按对"冲 N=26"的价值排序）
 
 ### P0 必做核验（不做就可能白费）
