@@ -542,3 +542,14 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 - T52b：170 v2 修好 BCG+scatter。根因（纠正 Claude 的"补齐错位"推断）：BCG 捕获时直接调 layer_model.forward，绕过了外层 forward 里的 `maybe_input_scattered()`，所以捕获用的是非 scatter 布局；回放时外层按 scatter 走，embedding 跳过了 all-reduce ⇒ 每卡把部分和喂进 graph。TP2 22/22 与 eager 一致（evidence/T52b）。8 卡待复测。
 - T50b：116 VERDICT PASS（开发机 TP2+DCP2，包括高地址、graph、全栈）。**纠正 F78**：底包在 GLM 的 norope 路径上，latent 写入没分片，"逻辑 KV ×7.8"并不存在；025 崩溃是分配器高水位超过每卡行数后越界。8 卡待复测。
 - B1（MTP+114，chunk 16384，mem 0.74）：能启动，但 KV 只有 821,504，低于 PRECHECK 的 900k ⇒ 方案 B 用 chunk 8192（B2）。
+
+## F91 — 评测复盘（Fable R14）要点，Claude 抽查核实
+- **034（= 正式提交 B 的配置：MTP+114，chunk 8192，不限块）N18 大幅失败**：fast 13.16（91/23）、overall 17.20（75/27）、turn 10.47 过、chain 35.52（19/22）、tpot 0.0612；冒烟 12/12，KV 1.04M。B 是在自测之前提交的 ⇒ 线上预期低于 N18。
+- **026 的 fast_intra 失败几乎全是缓存丢失（Claude 核实）**：超过 3 秒的 43 个快速请求里，97.7% 实际没命中缓存，未命中 token 中位数 80,607（本应 ≤4096）。034 相反，是纯排队。⇒ 两种失败要分开治：缓存保留 vs prefill 产能。
+- Fable 实测（未逐条复核）：
+  - N18 下同链、间隔 <5s 的相邻请求对里，24–31% 丢了超过 1k token 的缓存，140 只减少约两成；
+  - 驻留 KV 需求 p90 为 1.2–1.3M，而池子只有 1.04–1.32M，7–28% 的时间超出（N22/26 会撞上容量墙）；
+  - tpot_mean 的 58–73% 来自 prefill 造成的停顿，tpot_p95 由输出不到 60 token 的请求决定，实际上是单次停顿上限约 0.5s；
+  - 每档开头 harness 同时发起 N 个链首（s1_loadgen.py:586-596），造成 7–13 个 chain_start 超标；所有官方 N18 通过者的 chain p95 都约 45s，靠统计余量过门；
+  - 前端不是瓶颈（客户端与服务端 TTFT 差 p95 0.12s）。
+- 方法：dev N18 ≠ 正式 N18，偏差方向不一；从没做过重复测量，噪声水平未知；前 6 分钟截断回放在 4 个 N18 运行上的排序与完整 20 分钟一致（n=4，有希望但未证实）。详见 research/claude/R14_fable_eval_review.md。
