@@ -27,6 +27,7 @@ Dev N22 (035, scored with the harness scorer): 10 of 11 gates pass; tpot_p95 0.2
 | 115-dcp-sm80 | decode context parallel on A100: 64-head sparse kernel + DSA address fix | candidate | `--dcp-size N` (off) | no (dev box TP2+DCP2 only) |
 | 120-sched-protect-chain | decode turn after each prefill; continuation capped while others wait; short hits share the batch | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP` (2048), `_SHORT_TOKENS` (4096) | yes |
 | 121-sched-cap-while-decoding | also cap continuations while any request is decoding | candidate | — (patch applied = on) | only inside multi-change runs 027/028 |
+| 122-adaptive-decode-rounds | after each prefill batch, decode rounds proportional to its estimated time while requests decode | candidate | `SGLANG_AX_TPOT_TARGET` (off) | pending (S1+122 at N22) |
 | 130-async-tokenize | tokenizer off the HTTP event loop; routing key plumbed | candidate | `SGLANG_AX_ASYNC_TOKENIZE` (1) | no single-change run |
 | 140-kda-dual-snapshot | fp32 KDA states at the role boundary and prompt end from one prefill | yes | `SGLANG_AX_KDA_DUAL_SNAPSHOT` (0) | yes |
 | 150-startup-warmup | representative-shape warmup at startup | candidate | `--warmups ax_shapes` (off) | no single-change run |

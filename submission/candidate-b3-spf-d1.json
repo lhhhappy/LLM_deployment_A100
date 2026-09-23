@@ -1,9 +1,0 @@
-{
-  "image": "REPLACE_WITH_BUILT_IMAGE@sha256:...",
-  "command": "python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 8000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy shortest-prefill-first",
-  "env": {
-    "SGLANG_OPT_USE_TOPK_V2": "0",
-    "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS": "154827,154829"
-  },
-  "model_name": "default"
-}

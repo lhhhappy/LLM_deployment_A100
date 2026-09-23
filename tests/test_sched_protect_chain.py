@@ -58,6 +58,13 @@ class Batch:
     def init_new(cls, reqs, *args, chunked_req=None):
         return cls(reqs, chunked_req=chunked_req)
 
+    @property
+    def extend_num_tokens(self):
+        # mirrors ScheduleBatch.extend_num_tokens: new tokens computed by this extend batch
+        if not self.forward_mode.is_extend():
+            return None
+        return sum(r.extend_range.length for r in self.reqs if getattr(r, 'extend_range', None))
+
     def is_empty(self):
         return not self.reqs
 
@@ -158,10 +165,14 @@ def load_source(root=CANDIDATE):
     names = {'get_next_batch_to_run', 'get_new_batch_prefill', '_get_new_batch_prefill_raw',
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_limits', '_ax_should_decode',
-             'get_num_allocatable_reqs'}
+             'get_num_allocatable_reqs', '_ax_decode_rounds_owed'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
-    mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
+    # module-level helpers some patches add (skipped when the tree does not define them)
+    helpers = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in {'_ax_tpot_params'}]
+    ns.setdefault('math', math)
+    ns.setdefault('os', os)
+    mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), *helpers, cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
     runtime = ModuleType('sglang.srt.runtime_context')
