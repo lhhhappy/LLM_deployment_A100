@@ -1,10 +1,10 @@
-# 037d S1+122+123@N22: job 037c with ONE change: patch 123 (shortest remaining prefill first, aging 2000 tokens/s).
-# Why: 60 of 87 chain_start overs in 037 were small/medium heads queued ~54 s behind one large cold request. Old patch names.
-G_NAME=s1_122_123
-G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch 122-adaptive-decode-rounds.patch 123-srpt-admission.patch"
+# 042 S1 repeat@N22: identical to job 036 (S1 = S0 + 114). Why: run-to-run noise at N22 has never been measured; every
+# single-change comparison (e.g. fast 7 vs 17 overs) needs it. Old patch file names (pod not yet on the consolidated stack).
+G_NAME=s0v2_114
+G_PATCHES="000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch"
 G_ARGS="--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200"
-G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_TPOT_TARGET=0.17 SGLANG_AX_SRPT_AGING=2000"
-LADDER_UP="22 26"   # climb to N26 only if N22 passes
+G_ENV="SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1"
+LADDER_UP="22"
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
 #   G_NAME, G_PATCHES, G_ARGS, G_ENV (same as dev_generic_template.sh), optional LADDER.
