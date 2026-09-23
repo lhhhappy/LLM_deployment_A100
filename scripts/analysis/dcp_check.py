@@ -8,7 +8,7 @@
 # Random dummy weights make the logits almost independent of attention (09-23: stock DCP2 matched non-DCP bit-exactly),
 # so the SENSITIVE oracle is "attn": the input of each DSA layer's o_proj (this rank's heads, after the DCP LSE combine),
 # captured by a forward pre-hook in eager passes (rows subsampled for the cold prefill). AX_ATTN_BOOST (default 1) scales
-# the DSA o_proj weights identically in both arms so attention also drives the logits (incl. CUDA-graph decode).
+# the DSA o_proj outputs identically in both arms so attention also drives the logits (incl. CUDA-graph decode).
 # Compare a DCP run against a non-DCP run of the same stack with dcp_compare.py.
 # Usage: python dcp_check.py <one_batch CLI args ...> (--batch-size/--input-len are ignored except for arg parsing)
 import os
@@ -60,9 +60,10 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     boost = float(os.environ.get("AX_ATTN_BOOST", "1"))
     for name, m in mr.model.named_modules():
         if isinstance(m, DeepseekV2AttentionMLA):
-            if boost != 1:
-                with torch.no_grad():
-                    m.o_proj.weight.mul_(boost)
+            if boost != 1:  # o_proj is quantized (int-packed): scale its OUTPUT (hook is captured into graphs too)
+                def post(mod, args, out, _b=boost):
+                    return (out[0] * _b, *out[1:]) if isinstance(out, tuple) else out * _b
+                m.o_proj.register_forward_hook(post)
             def pre(mod, args, _n=name):
                 if torch.cuda.is_current_stream_capturing():
                     return

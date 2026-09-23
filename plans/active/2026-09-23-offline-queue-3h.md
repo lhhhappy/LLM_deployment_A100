@@ -1,0 +1,16 @@
+# 离线 3–4 小时 8 卡队列（用户在机场，2026-09-23 约 11:40 起）
+全部在 pod 队列中自动执行（worker 在 pod 内，不依赖本地网络）。每个梯子先过正确性闸门，只测 N18→22→26，失败即停。
+
+| 顺序 | 任务 | 问题 | 判据 |
+|---|---|---|---|
+| 028 | 梯子 MTP+114+v3（cap4096 i2），eager prefill | MTP 在全量负载下 TPOT 是否达标？TTFT 是否守住？ | 两种口径 + tpot_mean/p95 |
+| 029a | 数值指纹：eager+scatter（参考） | – | – |
+| 029b | 数值指纹：BCG+scatter vs 029a | 170 错误是否只出现在需补齐的长度？ | 各长度 WRONG/ok |
+| 029c | 数值指纹：BCG 无 scatter vs 029a | 不带 scatter 是否数值干净？ | wrong=0 |
+| 029d | 数值指纹：eager 无 scatter vs 029a（噪声对照） | 拓扑不同带来的噪声幅度 | – |
+| 030 | 梯子 BCG+114+v3（cap2048 i3），无 scatter，NUMREF=029d | 027 同样的调度，去掉固定开销后 TTFT 是否恢复，同时保持 tpot_p95≈0.11？ | 对照 027 |
+| 031 | 梯子 BCG+114+v3（cap4096 i2），无 scatter | 块大小的另一端 | 对照 030 |
+| 032 | 梯子 BCG+114+MTP（cap4096 i2） | 叠加后是否冲 N22 | 冒烟闸门保护 MTP+BCG 未验证的风险 |
+
+开发机：T52b（修 BCG+scatter，TP2 复现）→ T50b（DCP 116）。
+回来后先读：各梯子 `LADDER` 行、`N*/metrics.jsonl`、029 的 NUMCMP 表。
