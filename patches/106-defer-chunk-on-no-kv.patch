@@ -1,0 +1,15 @@
+--- a/python/sglang/srt/managers/schedule_policy.py
++++ b/python/sglang/srt/managers/schedule_policy.py
+@@ -1046,7 +1046,11 @@
+             # The chunked_req must be added to the list; otherwise, it will cause a memory leak.
+             # Therefore, in certain cases where _rem_tokens <= 0, it should be replaced with rem_chunk_tokens.
+             if _rem_tokens <= 0:
+-                if self.is_hybrid_swa:
++                # [ax] 106: with no KV headroom, forcing a full chunk makes alloc_for_extend raise
++                # "Prefill out of memory" and kills the engine (seen at N10 on 8xA100). Defer the
++                # continuation one round instead (same as the SWA path): decode runs, finishing or
++                # retracted requests free KV, and the chunked request resumes next round.
++                if self.is_hybrid_swa or os.environ.get("SGLANG_AX_DEFER_CHUNK_ON_NO_KV", "1") == "1":
+                     return req
+                 _rem_tokens = self.rem_chunk_tokens
+ 

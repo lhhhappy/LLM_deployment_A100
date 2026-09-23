@@ -480,3 +480,8 @@ SGLang #31170（open）是单实例内部DP rank的routing_key亲和路由，不
 ## F81 — chunked_prefill 16384 使自动 mem_fraction_static 从 0.7885 降到 0.646 → KV 从 157 万掉到 63 万，运行时 27GB 闲置
 - 024（120v2 + 输入分散 + 扩容 + chunk 16384）：max_total_num_tokens 633,536（7.5GB），available_gpu_mem 27.22GB；对照 022（chunk 8192）1,569,152 / 16.08GB。
 - 对策：025/026 显式 `--mem-fraction-static 0.75`（估计 KV ≈ 130 万、激活余量约 20GB）。024 保持原样作参照。
+
+## F82 — 梯子 024 在 N10 引擎崩溃："Prefill out of memory"（底包续算强制整块分配）→ 补丁 106
+- 024（KV 63 万）N10 warmup 中冷请求 16384 分块续算，KV 0.96→1.00 后 `allocation.py:217` 抛错，全 rank 退出（LADDER N=10 ENGINE_DEAD）。
+- 根因：`add_chunked_req` 在 rem_total_tokens≤0 时强制 rem_chunk_tokens（SWA 分支则跳过本轮）。120 v2 无等待时不封顶加速了 KV 耗尽，但原版同样有此隐患。
+- 修复：补丁 106（本轮跳过续算）。回归：025b（024 同配置 + 106），026 带 106。**正式评测中引擎崩溃 = 该档失败，此项优先级最高。**
