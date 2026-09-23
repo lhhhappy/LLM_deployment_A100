@@ -65,3 +65,6 @@
   4. F3 EDF + 注定超时降级（合规，追平前排）。
   5. F1 仅角色边界快照（不做网格，避免吃容量）。
   6. G4 mHC、F2 MoE kernel 最后。
+
+- 补记（09-23，lh-arena-sess-b 准入后）：发现旧守护进程被 tmux `arena-daemons:l2` 里的 `scripts/run_forever.sh` 自动拉起、已空转 8 小时（配置已指向新服务名，但事件日志对新服务 0 条记录）。已杀掉守护进程与 run_forever、关闭 l2 窗口，并把 `trisol_test_daemon.py`、`run_forever.sh`、其测试移到 `scripts/archive/retired/`（本地与 GPU 机）。
+  核验：无任何进程调用 bohr/trisol 或旧守护进程；在用代码（scripts/pod、gjob、gssh）中 inference delete/stop 调用 0 处；`submit_daemon.py` 不碰推理服务、队列为空。

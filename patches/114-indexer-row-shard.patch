@@ -1,6 +1,6 @@
 --- a/python/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py
 +++ b/python/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py
-@@ -56,6 +56,24 @@
+@@ -56,6 +56,31 @@
      from sglang.srt.mem_cache.memory_pool import DSATokenToKVPool
  
  
@@ -20,12 +20,19 @@
 +    if tp <= 1 or n_rows < int(os.environ.get("SGLANG_AX_INDEXER_ROW_SHARD_MIN_ROWS", "1024")):
 +        return None
 +    per = (n_rows + tp - 1) // tp
++    global _AX_114_LOGGED
++    if not _AX_114_LOGGED:
++        _AX_114_LOGGED = True
++        logger.info(f"[ax] 114 indexer row-shard active: rows={n_rows} tp={tp} per_rank={per}")
 +    return group, tp, group.rank_in_group, per
++
++
++_AX_114_LOGGED = False
 +
  class IndexerKPool(MultiPlatformOp):
      def __init__(
          self,
-@@ -985,6 +1003,12 @@
+@@ -985,6 +1010,12 @@
              n_real <= total_q
          ), f"plan has more real rows ({n_real}) than q_fp8 ({total_q})"
  
@@ -38,7 +45,7 @@
          if total_k_rows > 0:
              k_u8 = plan.ragged_k_u8
              k_scale = plan.ragged_k_scale
-@@ -1000,15 +1024,15 @@
+@@ -1000,15 +1031,15 @@
              )
              k_fp8 = k_u8.view(torch.float8_e4m3fn)
              logits = deep_gemm.fp8_mqa_logits(
@@ -59,7 +66,7 @@
  
          topk_method = metadata.topk_transform_method
          attn_metadata = metadata.attn_metadata
-@@ -1030,16 +1054,45 @@
+@@ -1030,16 +1061,45 @@
                  if topk_offsets_all is not None and row_select is not None:
                      topk_offsets_all = topk_offsets_all.index_select(0, row_select)
  
