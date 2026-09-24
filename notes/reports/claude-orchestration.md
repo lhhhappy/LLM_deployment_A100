@@ -19,7 +19,7 @@
    - 连续 decode 满 `MAX_DECODE` 后强制放行一整块（日志 `guard=` 计数）。
 7. **rank 一致性：** collective 进入条件与决策输入在各 rank 相同，时钟取 max。8 卡开销未测。
 8. **MTP 计数：** 按 `output_ids`，结果处理时 extend。计数滞后使余量偏小。
-9. **占用：** 我没有 pod 或开发机任务，也没有本地后台进程。待同步项只有 122 补丁本身。
+9. **占用：** 我没有 pod 或开发机任务。
 10. **队列（主会话管理）：**
     - 047（正式 A，dev N22）已结束：VALID FAIL。TPOT .0620/.0870 通过，turn 2/3 通过；fast 33/23、overall 55/27、chain 73/22 失败（pod 报告）。
     - 048（A+122 冻结版）运行中；049、050 排队。
@@ -132,4 +132,3 @@ cd tests && python3 -m unittest test_tpot_paced_prefill test_sched_protect_chain
 ### 相关文档
 - 补丁说明：[122 .md](../../patches/122-tpot-paced-prefill.md)
 - 分析：[claude-进展](../claude-进展-2026-09-24.md)
-- `notes/knowledge.md` 的"闭环负载"一节已收紧，本地未提交，按规则不提交共享文件，由主会话决定。

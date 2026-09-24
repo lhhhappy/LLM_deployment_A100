@@ -35,6 +35,14 @@ def epoch(s):
     return dt.datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc).timestamp()
 
 
+def pair_ok(p, r, rows):
+    """The T56 pair must describe this request and its predecessor as replayed in this raw."""
+    if p.get("prompt") != r["prompt_tokens"] or p.get("chain_id") != r["chain_id"] or p.get("idx") != r["idx_in_chain"]:
+        return False
+    prev = [x for x in rows if x["chain_id"] == r["chain_id"] and x["idx_in_chain"] == r["idx_in_chain"] - 1]
+    return len(prev) == 1 and prev[0]["prompt_tokens"] == p.get("previous_prompt")
+
+
 def main():
     root = Path(__file__).resolve().parents[2]
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -67,7 +75,7 @@ def main():
     times = [b[0] for b in batches]
 
     import bisect
-    out = []
+    out, rejected = [], 0
     for r in rows:
         if not in_ttft_gate(r, "overall_intra"):
             continue
@@ -80,6 +88,8 @@ def main():
         run = r["t_first_token_s"] - r["t_exec_start_s"]
         new = r["prompt_tokens"] - r["cached_tokens"]
         p = pairs.get(r["req_id"])
+        if p is not None and not pair_ok(p, r, rows):
+            p, rejected = None, rejected + 1  # the T56 pair does not describe this replay: gap unknown
         gap = None if p is None else max(0, p["true_lcp"] // 64 * 64 - r["cached_tokens"])
         ideal = None if p is None else r["prompt_tokens"] - p["true_lcp"] // 64 * 64  # new tokens at full reuse
         lo = bisect.bisect_left(times, int(r["t_recv_s"]))
@@ -119,6 +129,7 @@ def main():
         print(f"  {lab:32s} {n:3d} | wait p50 {med('wait'):6.2f}s run p50 {med('run'):5.2f}s | new p50 {med('new'):6d} "
               f"| window batches p50 {med('win_batches')}, with partial p50 {med('win_partial')}")
     print("  (labels are descriptive; log lines have 1 s resolution; wait includes decode rounds and scheduling)")
+    print(f"  true-LCP pairs rejected (prompt/predecessor mismatch with this raw): {rejected}")
     left = a.chunk - a.cap
     cls = [o for o in out if o["cached"] > 0 and left < o["new"] <= a.short]
     if cls and left > 0:
