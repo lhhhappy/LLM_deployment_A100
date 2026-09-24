@@ -5,7 +5,7 @@ prepare_src() {   # prepare_src <commit> -> $AX/src/<commit>: pod base + $AX/eng
   local commit=$1; local dst=$AX/src/$commit
   [ -n "$commit" ] && [ -f "$AX/engine/$commit.diff" ] || { echo "ENGINE_DIFF_MISSING $commit"; return 1; }
   if [ "$(cat $dst/COMMIT 2>/dev/null)" != "$commit" ]; then
-    rm -rf $dst; mkdir -p $dst && cp -a $BASE_PKG $dst/sglang
+    rm -rf "$dst"; mkdir -p "$dst" && cp -a "$BASE_PKG" "$dst/sglang" || { echo "ENGINE_COPY_FAIL $commit"; rm -rf "$dst"; return 1; }
     patch -p3 -d $dst/sglang --fuzz=0 --no-backup-if-mismatch -s < $AX/engine/$commit.diff || { echo "ENGINE_APPLY_FAIL $commit"; rm -rf $dst; return 1; }
     echo "$commit" > $dst/COMMIT
   fi

@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# Run LOCALLY. Sync repo (patches, scripts/pod, verify kit) to the GPU box, push kit + all numbered patches into the
-# pod, and enqueue job files under explicit names (sorted order = run order).
+# Run LOCALLY. Sync repo (scripts/pod, verify kit) to the GPU box, export each job's engine commit
+# (G_COMMIT, scripts/engine/export.sh) and push that diff + the kit into the pod, then enqueue the job files
+# under explicit names (sorted order = run order).
 #   scripts/pod/qpush <queue_name>=<scripts/pod/jobs/file.sh> ...     e.g. 026g-cc_a_v3_114.sh=scripts/pod/jobs/cc_a_v3_114.sh
 set -euo pipefail; cd "$(dirname "$0")/../.."
 bash scripts/pod/verify/make_kit.sh >/dev/null
-tar cf - build/verify_kit patches scripts/pod | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
-files=""; mvs=""
+files=""; mvs=""; diffs=""
 for a in "$@"; do n=${a%%=*}; f=${a#*=}; [ -f "$f" ] && bash -n "$f" || { echo "bad job $f"; exit 2; }
-  files="$files $f"; mvs="$mvs mv tmpj/$f $n;"; done
+  c=$(sed -n 's/^G_COMMIT=\([0-9a-f]\{40\}\)$/\1/p' "$f"); [ -n "$c" ] || { echo "job $f: needs G_COMMIT=<40-hex commit>"; exit 2; }
+  grep -q '^G_EXPECT=' "$f" || { echo "job $f: needs G_EXPECT"; exit 2; }
+  [ "$(scripts/engine/export.sh "$c")" = "$c" ] || exit 2
+  files="$files $f"; mvs="$mvs mv tmpj/$f $n;"; diffs="$diffs engine/$c.diff"; done
+tar cf - build/verify_kit build/engine scripts/pod scripts/engine | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
 GSSH_TIMEOUT=500 scripts/gssh "cd /sjtu/linhang/arena/repo && (cd build && ../scripts/pod/ppush /tmp/ax verify_kit >/dev/null) \
- && scripts/pod/ppush /tmp/ax \$(ls patches/[0-9][0-9][0-9]-*.patch) >/dev/null \
+ && (cd build && ../scripts/pod/ppush /tmp/ax $diffs >/dev/null) \
  && scripts/pod/ppush /tmp/ax/queue/pending/tmpj $files >/dev/null && source scripts/pod/common.sh \
  && bexec 'cd /tmp/ax/queue/pending && $mvs rm -rf tmpj; echo PENDING: \$(ls | tr \"\\n\" \" \"); echo RUN: \$(ls ../running)'"
