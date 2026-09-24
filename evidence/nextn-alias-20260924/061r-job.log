@@ -1,0 +1,6 @@
+DATA_READY full chains=311 requests=5601 N30 admission_seconds=4200 drain=true
+ENGINE_COMMIT c92acd57a61eb6f9eed3222cc048877eef7963d9
+ENGINE_READY after 160s
+ENGINE_STARTED: c92acd57a61eb6f9eed3222cc048877eef7963d9 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0.085 SGLANG_AX_SCHED_COLD_CAP=4096 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 
+MECHANISMS MISMATCH spec expected=NEXTN got=EAGLE
+exit_code: 0

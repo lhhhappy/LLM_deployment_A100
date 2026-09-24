@@ -9,13 +9,13 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 061r-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | 已确认running，正在启动新源码引擎；执行层 Codex 跟踪 |
-| 063r-official_a_122_180_full_n30_70m | 同 061r，仅加新版 180 的三个 HiCache 参数 | 已确认pending，排061r后；不要求前一项SLO通过 |
+| 061s-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | 修正启动配置检查后重新部署；执行层 Codex 跟踪 |
+| 063s-official_a_122_180_full_n30_70m | 同 061s，仅加新版 180 的三个 HiCache 参数 | 修正启动配置检查后重新部署，排061s后；不要求前一项SLO通过 |
 
 两项固定同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，源码含正式 A 全部13项改动。
 171/172/123/DCP关闭；122以 `SGLANG_AX_PACE_TPOT=0.085` 开启。
 新版180为主机层保留120/122；启动日志须与任务的 `G_EXPECT` 一致。
-063r只加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；暂不加NUMA绑定。
+063s只加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；暂不加NUMA绑定。
 
 ## 测量与比较
 
@@ -28,6 +28,8 @@
 - 每25分钟只读监控，运行中完成记录的窗口标open；不因部分样本超过门限自动停止。
 
 ## 已撤下的旧任务
+
+- 061r：引擎正常就绪，但任务把NEXTN别名错误地与内部EAGLE名称比较，测量前误判退出；现修正G_EXPECT为spec=EAGLE。063r有同一检查，已停，无测量raw。证据见 [修复记录](../evidence/nextn-alias-20260924/README.md)。
 
 - 060旧180中断：旧开关会同时关闭调度保护，部分记录仅诊断。
 - 060z原样A中断：用户收窄测试范围，无测量raw。

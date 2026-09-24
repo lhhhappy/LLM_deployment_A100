@@ -1,0 +1,22 @@
+{
+  "failed_job": "061r-official_a_122_full_n30_70m",
+  "job_log": "/tmp/ax/runs/061r-official_a_122_full_n30_70m/job.log",
+  "exact_error": "MECHANISMS MISMATCH spec expected=NEXTN got=EAGLE",
+  "engine_ready_seconds": 160,
+  "tp0_effective": {
+    "120": "on",
+    "122": "on",
+    "180": "off:no_hierarchical_cache",
+    "spec": "EAGLE",
+    "dcp": 1
+  },
+  "source": "engine/sglang/srt/arg_groups/speculative_hook.py:_resolve_speculative_algorithm_alias",
+  "cause": "job G_EXPECT used the CLI alias instead of the resolved internal name",
+  "fix": "G_EXPECT spec=EAGLE; retain CLI NEXTN and all engine/data arguments",
+  "same_check_in_063r": "job stopped before measurement; no performance result",
+  "replacements": [
+    "061s-official_a_122_full_n30_70m",
+    "063s-official_a_122_180_full_n30_70m"
+  ],
+  "cpu_tests": 5
+}

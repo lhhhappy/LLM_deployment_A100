@@ -1,7 +1,12 @@
 import importlib.util
+import ast
 import json
+import os
 from pathlib import Path
+import re
+import subprocess
 import tempfile
+from typing import Optional
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,6 +58,36 @@ class DeployRuntime(unittest.TestCase):
         (self.ax/'runs/new').mkdir(parents=True)
         with self.assertRaises(AssertionError): q.publish(self.stage, self.ax)
         self.assertEqual((self.ax/'bin/scripts/pod/lib.sh').read_text(),'old runtime')
+
+
+class EffectiveMechanisms(unittest.TestCase):
+    def test_nextn_alias_and_both_jobs_against_observed_log(self):
+        source = ROOT/'engine/sglang/srt/arg_groups/speculative_hook.py'
+        node = next(n for n in ast.parse(source.read_text()).body
+                    if isinstance(n, ast.FunctionDef) and n.name == '_resolve_speculative_algorithm_alias')
+        namespace = {'Optional': Optional}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), str(source), 'exec'), namespace)
+        self.assertEqual(namespace[node.name]('NEXTN', None), 'EAGLE')
+        # Observed on TP0 in 061r at 13:15:33: NEXTN was resolved to EAGLE.
+        line = ('[ax] mechanisms: 101=off:role_ids_unset 120=on 122=on '
+                '123=off:SGLANG_AX_SRPT_AGING_unset 140=off 180=off:no_hierarchical_cache '
+                '| spec=EAGLE dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 '
+                'SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 '
+                'SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0')
+        template = (ROOT/'scripts/pod/jobs/dev_ladder_template.sh').read_text()
+        check = template[template.index('[ -n "${G_EXPECT:-}" ]'):template.index('\ngrep -h "KV Cache')]
+        with tempfile.TemporaryDirectory() as d:
+            for suffix, host in [('', False), ('_180', True)]:
+                job = (ROOT/f'scripts/pod/jobs/official_a_122{suffix}_full_n30_70m.sh').read_text()
+                expected = re.search(r'^G_EXPECT="([^"]+)"', job, re.M)[1]
+                self.assertIn('--speculative-algorithm NEXTN', job)
+                observed = line.replace('180=off:no_hierarchical_cache', '180=on') if host else line
+                for log, rc in [(observed, 0), (observed.replace('122=on', '122=off:test'), 2),
+                                (observed.replace('spec=EAGLE', 'spec=-'), 2)]:
+                    Path(d, 'server.log').write_text(log+'\n')
+                    result = subprocess.run(['bash', '-c', check], text=True, capture_output=True,
+                                            env={**os.environ, 'RUN_DIR':d, 'G_EXPECT':expected})
+                    self.assertEqual(result.returncode, rc, result.stdout+result.stderr)
 
 
 if __name__ == '__main__': unittest.main()
