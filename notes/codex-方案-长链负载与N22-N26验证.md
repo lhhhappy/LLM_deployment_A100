@@ -2,7 +2,7 @@
 
 本页保留96链/1718请求冻结候选的实现与验收事实，不是下一版生成规范。**现行规范统一见[longchain.md](../scripts/longchain/longchain.md)**：s1-dev为素材库，允许将A session的query/完整片段改写后续接到B；不要求恢复原故事，按事件计划构造长短链、工具续跑、等待和重建。Phoenix只提供行为结构。task.md的固定轨迹回放兼容这种离线组合；review聚焦负载和依赖，不逐条审文学/问答正确性。
 
-交接入口及全部相关文档地址见 [长链数据 handoff](codex-handoff-长链数据设计与文档索引.md)，当前状态以 [数据状态页](reports/codex-data.md) 为准。旧候选曾生成并[冻结留档](../evidence/longchain-audit/frozen-candidate/README.md)，最新完整CPU校验为1718/1718、0错误；冻结时结构/哈希复查通过，主会话安排的独立验收已确认[ACCEPTED_DIAGNOSTIC_CPU_ARCHIVE](../evidence/longchain-audit/independent-freeze-acceptance.json)，本候选分析工作收尾；成品副本随后已按用户要求删除。**它不满足代表性长压测的质量要求，仅是诊断候选，不能替代原开发集或按当前数据安排代表性N22/N26评测。**本会话不操作 GPU 队列、不正式提交。执行层与编排线按 [coordination.md](coordination.md) 并行，原 [执行层 handoff](codex-handoff-执行层并行任务.md) 作为任务背景。
+交接入口及全部相关文档地址见 [长链数据 handoff](codex-handoff-长链数据设计与文档索引.md)，当前状态以 [数据状态页](reports/codex-data.md) 为准。旧候选曾生成并[冻结留档](../evidence/longchain-audit/frozen-candidate/README.md)，最新完整CPU校验为1718/1718、0错误；冻结时结构/哈希复查通过，主会话安排的独立验收已确认[ACCEPTED_DIAGNOSTIC_CPU_ARCHIVE](../evidence/longchain-audit/independent-freeze-acceptance.json)，本候选分析工作收尾；成品副本随后已按用户要求删除。**它不满足代表性长压测的质量要求，仅是诊断候选，不能替代原开发集或按当前数据安排代表性N22/N26评测。**本会话不操作 GPU 队列、不正式提交。执行层与编排线按 [collaboration.md](collaboration.md) 并行，原 [执行层 handoff](codex-handoff-执行层并行任务.md) 作为任务背景。
 
 ## 用户确认的交付标准
 

@@ -1,6 +1,6 @@
 # 实验队列
 
-本页记录决策，实时状态以 `scripts/pod/pread status` 为准。按用户最新安排，执行层主 Codex 统一管理 8 卡队列、集成、独立复核和提交准备；Claude 负责编排，数据 Codex 负责生成。会话、消息入口及汇报位置见 [coordination.md](coordination.md)。
+本页记录决策，实时状态以 `scripts/pod/pread status` 为准。参与者平等合作，谁入队谁在这里写一行并盯到结果；分工、登记、消息入口见 [collaboration.md](collaboration.md)。
 
 ## 当前安排（2026-09-24）
 

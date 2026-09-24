@@ -36,7 +36,7 @@
 | [longchain.py](../scripts/longchain/longchain.py)、[checker](../scripts/longchain/longchain_check.py) | 当前事件构建与独立检查代码；v2不使用旧polish后处理 |
 | [可选回放防护](../scripts/longchain/longchain_replay.py) | 全量离线验收后调用原runner；只换root/set/cohort，防止缺正文假PASS与陈旧正文cache |
 | [素材盘点脚本](../scripts/longchain/longchain_material_inventory.py) | 复算素材供应，不生成轨迹 |
-| [协调](coordination.md)、[队列](queue.md) | 本会话只做数据/CPU工作，不操作8卡队列 |
+| [协调](collaboration.md)、[队列](queue.md) | 本会话只做数据/CPU工作，不操作8卡队列 |
 
 ## 证据与数据
 

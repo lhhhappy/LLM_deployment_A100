@@ -1,6 +1,28 @@
 # Claude 编排报告
 
-会话 `91cd0b57-498a-4428-b192-9ba6fe4f2404`。按 [coordination.md](../coordination.md) 汇报。
+会话 `91cd0b57-498a-4428-b192-9ba6fe4f2404`。按 [collaboration.md](../collaboration.md) 汇报。
+
+## 里程碑（2026-09-24 夜）：补丁 180（HiCache）交付 8 卡调试
+
+- **做了什么**：[180](../../patches/180-hicache-glm-dsa.md) 移植了上游 #40913→#40915 的主机池声明，把 KV、DSA 索引键、KDA 状态和 MTP 草稿池都搬到主机；另外只取了 #38212 中树与检查点的部分：开启 HiCache 后，树只在 256 token 分组边界分裂，KDA 检查点只在精确位置发布。原始 PR 差异存放在 `refs/`。
+- **Claude 复核**：
+  - 在正式 A 全栈加 180 上，52 项 CPU 测试全部通过；不加 180 时 30 项失败、1 项报错，说明这组测试能区分对错。
+  - HiCache 关闭时，逐处对照 `schedule_batch`、`mamba_component` 和 `_prepare_for_caching_req`，行为与底包等价。
+  - 与 140 兼容：140 自身要求网格对齐，HiCache 开启时 140 自带的守卫会拒绝启动。
+  - 没有自造环境变量。
+- **8 卡草案**：`scripts/pod/jobs/drafts/offA_180_hicache_lite_n14.sh`。它与 058 完全相同，只多了 180 和三个参数 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`，已发给主 Codex 调试。pod 主机内存实测 2 TB。
+- **未验证**：
+  - GPU 上主机恢复后的数值（开发机脚本 `scripts/tests/hicache180/gpu/hc180_numeric.py` 还没跑）；
+  - 与 170、115 的组合；
+  - 恢复时延与对 decode 的干扰。
+  - 恢复计时、回退原因埋点和传输优先级，留给补丁 181。
+
+## 里程碑（2026-09-24 晚）：方向页与驻留账本
+
+- 用户认可的下一阶段框架写在 [notes/roadmap.md](../roadmap.md)（唯一方向页）：四条线（驻留 / prefill 成本 / 时间分配 / 工具）加平台层；阶段 0 先用正式 A 原样在长链集 N14、N18 定紧门。
+- 驻留账本 `scripts/analysis/residency_ledger.py`（CPU 闭环模拟，模型估计）。Codex 复核指出三处缺陷（回放顺序未对齐 cohort、越池比例未按时间加权、装不下仍继续推进），已全部修正并核对（311/311 链与 cohort 一致）。修正后在开发集上仍复现不了 047（prefill 多算 74%），因此撤回"N14–N18 是驻留瓶颈区间"的说法；账本先由长链集 N14 的真实运行校准，之后才用于选档。结果 `evidence/longchain-design-20260924/residency_ledger_v2.json`。
+- 草案（未入队，用户要求先讨论）：`scripts/pod/jobs/drafts/offA_longchain_n14.sh`、`offA_longchain_n18.sh`，只换回放集，补丁/参数/env 与 047 一致；pod 需先同步 `data/s1-dev-longchain`。
+- 补丁整理建议（未执行）：120–124 合并、171/172 归档、160 的 101/140 守卫改显式开关。
 
 ## 状态摘要（2026-09-24；047 已结束，048 运行中）
 
