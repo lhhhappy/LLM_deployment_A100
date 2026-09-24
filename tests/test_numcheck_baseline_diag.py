@@ -9,6 +9,7 @@ import runpy
 import sys
 import tempfile
 import unittest
+from urllib.parse import urlsplit
 from unittest import mock
 
 
@@ -23,10 +24,11 @@ class BaselineDiagnosticTest(unittest.TestCase):
             out = Path(directory) / "diag"
 
             def urlopen(req, timeout):
-                path = req.full_url.rsplit("/", 1)[-1]
+                path = urlsplit(req.full_url).path.rsplit("/", 1)[-1]
                 body = json.loads(req.data)
                 calls.append((path, body))
                 if path == "flush_cache":
+                    self.assertEqual(urlsplit(req.full_url).query, "timeout=30")
                     if fail == "flush":
                         raise OSError("flush failed")
                     return io.BytesIO(b"{}")

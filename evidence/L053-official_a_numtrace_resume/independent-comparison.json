@@ -1,0 +1,486 @@
+{
+  "status": "COMPLETE_TP8_TRACE",
+  "comparisons": [
+    {
+      "rank": 0,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 0,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 0,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 0,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 1,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 1,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 1,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 1,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 2,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 2,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 2,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 2,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 3,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 3,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 3,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 3,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 4,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 4,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 4,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 4,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 5,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 5,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 5,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 5,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 6,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 6,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 6,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 6,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 7,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 3,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 7,
+      "tokens": 37,
+      "reference_forward": 2,
+      "candidate_forward": 4,
+      "input_sha256": "7a4b67e4ce07f12268b0b090185f1de356423fe65695117b05e3f65dc14f1a63",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 4,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 203,
+      "stages": 273
+    },
+    {
+      "rank": 7,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 6,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    },
+    {
+      "rank": 7,
+      "tokens": 256,
+      "reference_forward": 5,
+      "candidate_forward": 7,
+      "input_sha256": "69bbdb0937958c81aa298565971012bc8191a9fe824f0d8c135562d4a9212b0b",
+      "parameter_samples_equal": true,
+      "first_different_stage": {
+        "layer": 3,
+        "stage": "mlp_output"
+      },
+      "different_moe_stages": [],
+      "differing_stages": 208,
+      "stages": 273
+    }
+  ],
+  "scope": "Synchronous diagnostic; first unequal stage is a location, not a kernel cause. Parameters were sampled, not fully hashed; no performance/quality verdict."
+}

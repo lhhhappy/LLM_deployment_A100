@@ -43,8 +43,9 @@ def request(path, body, timeout):
 
 
 def flush():
-    # A failed flush invalidates the cold-request comparison immediately.
-    request("/flush_cache", {}, 60)
+    # /v1/models becomes available before startup warmup has fully drained.
+    # Let the server wait for true idleness; a refusal after this still fails.
+    return request("/flush_cache?timeout=30", {}, 60).decode()
 
 
 class InvalidResponse(RuntimeError):
@@ -112,7 +113,7 @@ def run(out_dir, mode):
         for name, prompt, count, repeats in cases(mode):
             prompt_hash = hashlib.sha256(json.dumps(prompt, sort_keys=True).encode()).hexdigest()
             for repeat in range(1, repeats + 1):
-                flush()
+                flush_receipt = flush()
                 try:
                     body, response = generate(prompt, count)
                 except InvalidResponse as exc:
@@ -122,7 +123,8 @@ def run(out_dir, mode):
                     }, indent=2) + "\n")
                     raise
                 record = {"case": name, "repeat": repeat, "max_new_tokens": count,
-                          "prompt_sha256": prompt_hash, "request": body, "response": response}
+                          "prompt_sha256": prompt_hash, "flush_receipt": flush_receipt,
+                          "request": body, "response": response}
                 handle.write(json.dumps(record, allow_nan=False) + "\n")
                 handle.flush()
                 records.append(record)

@@ -1,0 +1,7 @@
+{
+  "status": "INVALID_TRACE",
+  "reason": "helper rejected input_ids=None from general_mm_embed_routine before reading forward_batch.input_ids",
+  "candidate_patches_loaded": false,
+  "requests_complete": 12,
+  "layer_trace_records": 0
+}

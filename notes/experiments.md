@@ -128,3 +128,27 @@
 结论：目标prefill边界已存在可测重复漂移，不能仅归因后续MTP verify或logprob拼接；仍未隔离哪个模块造成。下一项052按同输入逐层记录输入输出，定位首个差异，诊断同步可能改变执行时序，不能据此测速度。原数值门未放宽、候选未推进为通过。
 
 [汇总](../evidence/L051-official_a_baseline_diag/summary.json)、[完整响应](../evidence/L051-official_a_baseline_diag/responses.jsonl)。051 new→done通知已由常驻watcher主动送达，主会话随即取回并分析。
+
+## 052：逐层探针未命中，诊断INVALID（2026-09-24，Codex）
+
+12个单token请求完成，但8rank均未生成tensor trace，仅有ARMED。主会话沿真实调用链查明：`general_mm_embed_routine`对纯文本也先算embedding，再以`input_ids=None`调用`Glm5NextModel`；helper的input_ids判空导致全跳过。此前只验证了插桩锚点/张量边界，缺少外层真实调用契约验证；主会话验收遗漏负责，052无逐层定位结论。
+
+已亲自修helper：内部参数为None时读取`forward_batch.input_ids`并核对embedding行数；052r在真实pod torch上先回归该入口，跑后强制核8rank、每个冷37/256三次、层覆盖及stage覆盖。记录为空必失败，不再因请求完成就标trace完成。后续171/172及关联修复由主会话亲自实现，subagent停止代码改动。
+
+[无效诊断收据](../evidence/L052-official_a_numtrace/trace-status.json)、[请求摘要](../evidence/L052-official_a_numtrace/summary.json)。
+
+
+## 053：正式 A 重复差异首先出现在 MoE（主会话独立复核）
+
+052r 已完成一条 cold37 后，第二次 flush 与启动预热重叠而 HTTP400；052s 发现已有记录后保护退出，均不能算算子故障。053 把已核明的8rank首条记录归档，复用同一引擎，flush显式等空闲后完成12个单token请求。cold37/256各3次、8rank、45层全部阶段完整；每次相同输入与参数采样收据一致。
+
+32项跨重复比较中，cold37首/第二次在layer3/mlp_output首次不同、首/第三次在layer4/mlp_output首次不同；cold256两组均在layer3/mlp_output首次不同。所有rank一致，之前阶段逐位一致。该阶段包含MoE本地计算和TP归约，尚不能指认具体kernel、111适配错误或正常浮点误差。完整原始8rank记录以压缩包分块取回并核sha256，本地独立复算与pod一致；直接pread大文件会在传输层截断，未采信截断记录。
+
+证据：[独立复算](../evidence/L053-official_a_numtrace_resume/independent-comparison.json)、[传输校验](../evidence/L053-official_a_numtrace_resume/trace-transfer.json)。054由主会话亲自加首MoE内部收据：完整本地专家权重、路由、有效排序区、GEMM1/激活/GEMM2/本地归约；同步诊断不测性能。首次完整权重快照会临时多占一个权重张量的显存，不进入正式部署。
+
+
+## 054：首个 MoE 内部收据与收益边界
+
+12请求诊断完成，8rank的cold37/256各三次收据完整。首MoE全量w1/w2与两组scale、输入、router_logits、topk_ids/weights均在重复间相同；32组比较中30组先在有效sorted_ids区不同，其余2组本地阶段全部相同、到TP归约后的mlp_output才变化（其他rank本地已变化）。cold256的16组均随后出现GEMM1、激活、GEMM2及local_output差异。证据：[pod汇总](../evidence/L054-official_a_moe_numtrace/comparison.json)。尚缺固定排序反事实、误差量化与原始dump独立复核，不能由此认定权重损坏、路由错选或171/172错误。
+
+用户要求先确认对并发的回报。排序稳定化列为正确性诊断，不能称加速或承诺N22/N26。171只证实局部投影省时；172完整单卡MoE省3–5%，没有整模型收益。后续按整段prefill/decode成本及瓶颈TTFT筛选主要投入，避免为逐位一致增加未经评估的生产开销。

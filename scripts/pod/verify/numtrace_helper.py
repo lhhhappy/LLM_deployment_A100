@@ -84,7 +84,7 @@ def begin(model, input_ids, positions, forward_batch, embedding):
     global _active, _sequence
     _active = None
     directory = os.environ.get("SGLANG_AX_NUMTRACE_DIR")
-    if not directory or input_ids is None or input_ids.numel() not in (37, 256):
+    if not directory:
         return
     # The job creates ARMED only after the engine is ready. This excludes
     # startup warmup and graph-capture calibration even if their M is 37/256.
@@ -94,6 +94,19 @@ def begin(model, input_ids, positions, forward_batch, embedding):
         return
     if torch.cuda.is_current_stream_capturing():
         return
+    # general_mm_embed_routine always embeds first (also for text-only input)
+    # and invokes Glm5NextModel(input_ids=None, input_embeds=...). The original
+    # batch still owns the exact token IDs used to form that embedding.
+    id_source = "model_argument"
+    if input_ids is None:
+        input_ids = forward_batch.input_ids
+        id_source = "forward_batch"
+    if input_ids is None:
+        raise RuntimeError("armed target EXTEND has no token IDs")
+    if input_ids.numel() not in (37, 256):
+        return
+    if embedding.shape[0] != input_ids.numel():
+        raise RuntimeError("numtrace token IDs and embedding row count differ")
     _sequence += 1
     rank = _rank()
     out_dir = Path(directory)
@@ -104,6 +117,7 @@ def begin(model, input_ids, positions, forward_batch, embedding):
                "observed_layers": set()}
     _write({"kind": "begin", "rank": rank, "forward": _sequence,
             "tokens": _active["tokens"], "mode": forward_batch.forward_mode.name,
+            "input_id_source": id_source,
             "expected_layers": _active["expected_layers"],
             "input_ids": _fingerprint(input_ids), "positions": _fingerprint(positions),
             "parameters": _parameter_digest(model)})
@@ -113,6 +127,8 @@ def begin(model, input_ids, positions, forward_batch, embedding):
 def capture(layer, stage, tensor):
     if _active is None:
         return
+    if stage == "mlp_input":
+        _active["mlp_layer"] = layer
     record = {"kind": "stage", "rank": _active["rank"],
               "forward": _active["forward"], "tokens": _active["tokens"],
               "layer": layer, "stage": stage, "tensor": _fingerprint(tensor)}
@@ -120,9 +136,29 @@ def capture(layer, stage, tensor):
         _active["observed_layers"].add(layer)
     _write(record)
     dump_layer = os.environ.get("SGLANG_AX_NUMTRACE_DUMP_LAYER")
-    if dump_layer is not None and str(layer) == dump_layer and tensor is not None:
+    # Full expert weights are hashed above; do not write multi-GB duplicates.
+    weight_stage = stage in {"moe_w1", "moe_w2", "moe_w1_scale", "moe_w2_scale"}
+    if dump_layer is not None and str(layer) == dump_layer and tensor is not None and not weight_stage:
         name = f"rank-{_active['rank']}-forward-{_active['forward']}-layer-{layer}-{stage}.pt"
         torch.save(tensor.detach().contiguous().clone().cpu(), _active["path"].parent / name)
+
+
+def capture_moe(stage, tensor):
+    # First MoE layer only. Weight fingerprints here cover the complete local
+    # expert tensors; the model-level parameter receipt remains a sample.
+    if _active is not None and _active.get("mlp_layer") == 3:
+        capture(3, "moe_" + stage, tensor)
+
+
+def capture_alignment(sorted_ids, expert_ids, padded_count, block_size):
+    if _active is None or _active.get("mlp_layer") != 3:
+        return
+    count = int(padded_count.item())
+    if count < 0 or count > sorted_ids.numel() or count % block_size:
+        raise RuntimeError("invalid MoE alignment extent")
+    capture_moe("sorted_ids", sorted_ids[:count])
+    capture_moe("expert_ids", expert_ids[:count // block_size])
+    capture_moe("padded_count", padded_count)
 
 
 def finish(hidden_states, residual):

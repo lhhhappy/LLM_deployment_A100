@@ -9,7 +9,9 @@ cp build/p110/sm80_deep_gemm.py $K/oracle110_sm80_deep_gemm.py     # 110 torch s
 cp scripts/pod/verify/numcheck.py scripts/pod/verify/numcheck_cmp.py \
    scripts/pod/verify/numcheck_baseline_diag.py \
    scripts/pod/verify/install_numtrace.py scripts/pod/verify/numtrace_helper.py \
+   scripts/pod/verify/install_moe_numtrace.py \
    scripts/pod/verify/cap_smoke_body.sh scripts/pod/verify/metrics_sampler.py scripts/pod/verify/prof_ledger.py $K/
+cp scripts/analysis/compare_numtrace.py $K/
 cp scripts/pod/verify/level_verdict.py scripts/score_formal.py $K/   # verdict path (T54): must exist, no silent skip
 if command -v sha256sum >/dev/null 2>&1; then sha256sum $K/* > $K/SHA256SUMS
 else shasum -a 256 $K/* > $K/SHA256SUMS; fi
