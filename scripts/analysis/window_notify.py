@@ -21,6 +21,22 @@ def event_key(state, health, now):
     return compact_status(state, health, now)[1]
 
 
+def source_sample(state, data, error, now):
+    """Debounce transport only; diagnostic and engine health events remain immediate."""
+    if error is None:
+        state.update(source_health='up', source_failures=0)
+        state.pop('source_error', None)
+        return data['state'], data['health']
+    state.update(source_health='retrying', source_failures=state.get('source_failures', 0)+1,
+                 source_error=str(error)[:300])
+    if state['source_failures'] < 3: return None
+    # A stable event key prevents varying SSH error strings from generating new
+    # model turns throughout one outage. Exact latest error stays in state.json.
+    return (dict(health='retrying', heartbeat=now,
+                 error='GPU watcher cache unavailable after 3+ consecutive reads; inspect bridge state.json'),
+            dict(alerts=['notification bridge cannot read GPU watcher']))
+
+
 def message(job, key, state, health, now):
     view, _ = compact_status(state, health, now)
     brief = state.get('last_report', '暂无诊断快照')
@@ -78,18 +94,20 @@ def main():
             deliver()
             try:
                 data = json.loads(run_bounded([str(ROOT/'scripts/gssh'), command], 80, cwd=ROOT))
-                s, h = data['state'], data['health']
+                sample = source_sample(state, data, None, time.time())
             except Exception as exc:
-                s = dict(health='retrying', heartbeat=time.time(), error=str(exc)[:300])
-                h = dict(alerts=['notification bridge cannot read GPU watcher'])
-            key = event_key(s, h, time.time())
-            terminal = s.get('job_state') in TERMINAL and s.get('health') == 'up'
-            if 'seen_key' not in state:
-                state['seen_key'] = key  # Existing diagnostic is the baseline.
-            elif key != state['seen_key']:
-                state['pending'] = dict(key=key, text=message(args.job, key, s, h, time.time()))
-                deliver()
-            state.update(health='up', next_report_at=s.get('next_report_at'))
+                sample = source_sample(state, None, exc, time.time())
+            if sample is not None:
+                s, h = sample
+                key = event_key(s, h, time.time())
+                terminal = s.get('job_state') in TERMINAL and s.get('health') == 'up'
+                if 'seen_key' not in state and s.get('health') == 'up':
+                    state['seen_key'] = key  # Existing diagnostic is the baseline.
+                elif key != state.get('seen_key'):
+                    state['pending'] = dict(key=key, text=message(args.job, key, s, h, time.time()))
+                    deliver()
+                if s.get('next_report_at'): state['next_report_at'] = s['next_report_at']
+            state.update(health='up')
             state.pop('error', None)
         except Exception as exc:
             error = str(exc)[:300]

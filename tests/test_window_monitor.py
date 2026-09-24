@@ -100,6 +100,20 @@ class Windows(unittest.TestCase):
         self.assertLessEqual(len(text), 1600)
         self.assertIn('完成=420', text)
 
+    def test_bridge_debounces_transport_and_keeps_real_alerts_immediate(self):
+        state = {}
+        self.assertIsNone(bridge.source_sample(state, None, 'SSH closed', 100))
+        self.assertIsNone(bridge.source_sample(state, None, 'SSH timeout', 160))
+        s, h = bridge.source_sample(state, None, 'SSH closed', 220)
+        key = bridge.event_key(s, h, 220)
+        s, h = bridge.source_sample(state, None, 'another SSH error', 280)
+        self.assertEqual(bridge.event_key(s, h, 280), key)
+        good = dict(state=dict(health='up', heartbeat=300), health=dict(alerts=['server error']))
+        s, h = bridge.source_sample(state, good, None, 300)
+        self.assertEqual(h['alerts'], ['server error'])
+        self.assertEqual(state['source_failures'], 0)
+        self.assertIsNone(bridge.source_sample(state, None, 'transient', 360))
+
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
         p.write_text('{"req_id":"a"}\n{"req_id":')
