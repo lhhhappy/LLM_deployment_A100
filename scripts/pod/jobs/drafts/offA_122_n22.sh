@@ -1,16 +1,16 @@
-# DRAFT — not queued. Queue owner (main Codex) reviews, syncs patches/122-tpot-paced-prefill.patch to the pod, and queues.
-# Question: official A + 122 only (TPOT-paced prefill budget), dev N14; compare gate by gate with 044r (official A as is).
-# Single change vs 044r: patch 122 inserted after 121 + env SGLANG_AX_PACE_TPOT=0.085; launch args identical
+# DRAFT (048) — not queued. Queue owner (main Codex) reviews, syncs patches/122-tpot-paced-prefill.patch, and queues.
+# Question: official A + 122 only (TPOT-paced prefill budget) at dev N22; compare gate by gate with 047 (official A as is, N22).
+# Single change vs 047: patch 122 inserted after 121 + env SGLANG_AX_PACE_TPOT=0.085; launch args identical
 # (the explicit --prefill-decode-interval 2 stays in the command and is ignored while 122 is on, as its .md states).
-# Expected sha256 of 122: 644cef8c4bc11942b7550e67e0476d1036562403b84f8c618de037d4e64f98ce
-# Evidence to collect beyond the verdict: server-log lines "[ax-pace] on:" (effective values) and the 30 s
-# "[ax-pace] decisions/forced_decode/mean_budget" lines; prefill batch sizes vs 044r.
-# Refuted if: no TTFT gate improves vs 044r, or tpot_p95 > 0.10, or mean_budget does not rise above 4096.
+# Frozen 122 sha256: cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b
+# Evidence beyond the verdict: "[ax-pace] on:" (effective values); 30 s "[ax-pace] ... guard=... mean_budget=..." lines;
+# prefill batch sizes, KV usage and running/queue counts vs 047. 122 is a measurable candidate, not a TPOT guarantee.
+# Refuted if: no TTFT gate improves vs 047, or tpot_p95 > 0.10, or mean_budget does not rise above 4096.
 G_NAME=off_a_122
 G_PATCHES="000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 122-tpot-paced-prefill.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch 150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch"
 G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2"
 G_ENV="SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=4096 SGLANG_AX_PACE_TPOT=0.085"
-LADDER_UP="14"
+LADDER_UP="22"
 
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:

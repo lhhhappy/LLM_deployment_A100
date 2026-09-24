@@ -12,10 +12,11 @@
 不同点：我们的门是每请求平均 TPOT，所以按每个请求实测的进度记账，而不是按单步 TBT。
 
 - 每个正在 decode 的请求：`slack = t0 + τ·(已出 token − 锚定时 token) − now + 允许欠账`。t0 是它第一次出现在运行批中的时刻；首 token 尚未处理的按刚出首 token 计。
-- 规则：让所有请求保持 `slack ≥ 0`，最终 TPOT ≤ τ + 欠账/(n−1)。欠账默认 0.5 s，且不超过 (0.10−τ)·(n−1)。
+- 目标：让所有请求保持 `slack ≥ 0`；欠账默认 0.5 s，且不超过 (0.10−τ)·(n−1)。**这是调度目标，不是 TPOT 保证。** 以下情况会破坏它：成本模型低估；锚点晚于真实首 token（晚多少不受 τ 裕量约束）；连续 decode 达到 `MAX_DECODE` 后强制放行一整块（日志 `guard=` 计数）。TPOT 门只按实测判定。
 - 每轮：预测成本 `C0 + c·(C1 + C2·上下文)` 放得进最小 slack 的整块（或剩余全部工作）就 prefill，否则 decode 一轮。连续 decode 最多 32 轮。
 - 块内预算扣掉等待中完整缓存命中短请求所需的 token，余下给续算/冷请求。这取代 121 固定的 COLD_CAP。
 - 开启时取代固定 interval 与 120 的单轮 decode。
+- overlap 调度下，第 k+1 步在第 k 步 prefill 仍在 GPU 上时就已决策：以上一个受控 prefill 的预测结束时刻作为决策时间，避免同一份余量被连续两块重复使用。
 - 8 个 TP rank 用一次 CPU all_reduce(MAX) 对齐时钟，保证决策一致。只在"有未完成的 decoder 且有 prefill 待做"时调用，这个条件在各 rank 上相同。
 
 ## 开关
@@ -35,22 +36,27 @@
 每 30 s 打一行 `[ax-pace] decisions/forced_decode/mean_budget`，用来核对实际行为。
 
 ## 证据
-**CPU（真实调度代码）：** `tests/test_tpot_paced_prefill.py` 11 个用例，加 `test_sched_protect_chain.py` 27 个，共 38 个全部通过。测试从源码树中抽出真实的 `get_next_batch_to_run`、`_get_new_batch_prefill_raw`、`PrefillAdder` 执行，模型、池与 batch 是假的。
+**CPU（真实调度代码）：** `tests/test_tpot_paced_prefill.py` 12 个用例，加 `test_sched_protect_chain.py` 27 个，共 39 个全部通过。测试从源码树中抽出真实的 `get_next_batch_to_run`、`_get_new_batch_prefill_raw`、`PrefillAdder` 执行，模型、池与 batch 是假的。
 - 关闭时与正式 A 逐步 trace 相同；
 - rank 时钟取 max 且只在需要时调用；
 - 新到请求 `full_untruncated_fill_ids` 为空时按 `seqlen` 计；
 - overlap 下首 token 未处理的 decoder 仍计账；
-- 上限放行整块。
+- 上限放行整块；
+- overlap 下在飞 prefill 计入。
 
 **仿真（同一真实调度代码 + 假时钟与假成本模型）：** 仅说明机制按设计工作，不是性能预测。
 - MTP 接受长度 3.3、约 7.7k token/s、5 个种子：冷请求首 token p95 降约 30–45%，TPOT p95 约 0.08；
 - 成本低估 25% 时 TPOT 仍在门内；
 - 无 MTP 时首 token 变差（TPOT 本无余量，机制优先守 TPOT）。
 
-**8 卡：** 未测。草案 `scripts/pod/jobs/drafts/offA_122_n14.sh`（正式 A + 122，dev N14，对照 044r）。
+**8 卡：** 未测。草案 048 `scripts/pod/jobs/drafts/offA_122_n22.sh`（正式 A + 122，dev N22，对照 047）。
 
 ## 已知限制
-- 锚点在第一次看到该请求时建立，最多比真实首 token 晚一步。
+- 锚点时序：在第一次看到该请求的决策时建立，时间取 max(同步时钟, 在飞受控 prefill 的预测结束)。
+  - overlap 且产生它的 prefill 受控时，锚点 ≈ 预测结束；预测偏晚多少，锚点就晚多少。
+  - 该 prefill 不受控（当时无 decoder）时，锚点取决策时刻，早于首 token，属保守方向。
+  - 非 overlap 时，锚点晚于首 token 的时间是结果处理与调度耗时。
+  - 这些偏差都没有上界保证。
 - 成本模型不含 batch 内多请求差异；C0、C2 是推断值，需 A 配置 TP8 实测曲线替换。
 - 每个需要决策的调度步多一次 TP CPU 组 all_reduce，开销未在 8 卡实测。
 - 会抬高 tpot_mean（仿真中 0.06→0.08 量级）；只有 N 提升时才有排名意义。

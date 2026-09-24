@@ -221,6 +221,19 @@ class PacedPrefill(unittest.TestCase):
             t = step(s)
             self.assertEqual((t['mode'], new_tokens(t)), ('prefill', 8192))
 
+    def test_in_flight_prefill_is_charged_under_overlap(self):
+        # overlap: step k+1 is decided before step k's prefill finishes (clock not advanced between decisions)
+        clock = Clock()
+        with patch.dict(os.environ, PACE):
+            dec = Req('dec', 1, output=300)
+            dec.output_ids = [1]
+            s, _ = build(CAND, clock, waiting=[Req('cold', 60000)], running=[dec])
+            dec._ax_pace_anchor = (clock.t + 0.6, 1)  # slack 0.6 + 0.5 deficit = 1.1 s: one 8192 chunk (0.57 s)
+            t1 = step(s)
+            self.assertEqual((t1['mode'], new_tokens(t1)), ('prefill', 8192))
+            t2 = step(s)  # same wall time: the first chunk is still predicted to run for 0.57 s
+            self.assertEqual(t2['mode'], 'decode')
+
     def test_ranks_agree_on_one_clock(self):
         clock = Clock()
         calls = []

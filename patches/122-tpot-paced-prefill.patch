@@ -1,6 +1,6 @@
 --- a/python/sglang/srt/managers/scheduler.py
 +++ b/python/sglang/srt/managers/scheduler.py
-@@ -1311,6 +1311,143 @@
+@@ -1311,6 +1311,153 @@
              and any(not req.finished() for req in running_batch.reqs)
          )
  
@@ -35,7 +35,9 @@
 +            self._ax_pace_cfg = cfg
 +            self._ax_pace_forced = 0
 +            self._ax_pace_tokens = None
-+            self._ax_pace_stats = [0, 0, 0, 0.0]  # decisions, forced decode, capped prefill, sum budget
++            self._ax_pace_decided_t = None  # agreed time of this step's pace decision (None: not taken)
++            self._ax_pace_busy_until = None  # predicted end of the last paced prefill batch
++            self._ax_pace_stats = [0, 0, 0, 0.0, 0]  # decisions, forced decode, capped prefill, sum budget, guard
 +            self._ax_pace_log_ts = 0.0
 +        return cfg
 +
@@ -54,9 +56,9 @@
 +        # Pace slack of a decoding request: t0 + tau * (tokens since t0) - now, anchored at the first step
 +        # that sees it in the running batch (the agreed clock, so every rank anchors identically). A request
 +        # whose first token is not yet processed (overlap lag) counts as having just produced it, so a
-+        # prefill chunk cannot be scheduled against it unseen; the anchor is at most one step late, which
-+        # the tau < gate margin covers. Keeping slack >= -deficit_r at every step bounds its final TPOT by
-+        # tau + deficit_r / (n - 1); deficit_r <= (gate - tau) * (n - 1) keeps that under the gate.
++        # prefill chunk cannot be scheduled against it unseen. Aim: keep slack >= -deficit_r, with
++        # deficit_r <= (gate - tau) * (n - 1). Not a TPOT guarantee: cost-model error, anchor lateness and
++        # the max_decode guard can all break it; the gate is judged by measurement only.
 +        worst = None
 +        for req in running_batch.reqs:
 +            if req.finished():
@@ -77,6 +79,7 @@
 +        """Decode now, or prefill with a token budget whose predicted cost fits every decoder's slack."""
 +        cfg = self._ax_pace()
 +        self._ax_pace_tokens = None
++        self._ax_pace_decided_t = None
 +        if running_batch.is_prefill_only or running_batch.is_empty():
 +            return False
 +        if self.chunked_req is None and not self.waiting_queue:
@@ -84,7 +87,11 @@
 +        if all(req.finished() for req in running_batch.reqs):
 +            self._ax_pace_forced = 0
 +            return False
++        # Overlap scheduling decides step k+1 while step k's batch is still on the GPU: charge a paced
++        # prefill still in flight by deciding at its predicted end (deterministic on every rank).
 +        now = self._ax_pace_now()
++        if self._ax_pace_busy_until is not None:
++            now = max(now, self._ax_pace_busy_until)
 +        slack = self._ax_pace_slack(running_batch, now, cfg)
 +        if slack is None:
 +            self._ax_pace_forced = 0
@@ -109,9 +116,12 @@
 +            stats[1] += 1
 +            decode = True
 +        else:
-+            # after max_decode rounds the guard admits one full chunk so prefill always progresses
++            # After max_decode rounds the guard admits one full chunk so prefill always progresses. This is
++            # where the TPOT bound stops holding (also when the cost model underestimates): counted in the log.
++            stats[4] += tokens < need
 +            self._ax_pace_forced = 0
 +            self._ax_pace_tokens = max(tokens, need)
++            self._ax_pace_decided_t = (now, ctx)
 +            stats[2] += tokens < self.chunked_prefill_size
 +            stats[3] += min(tokens, self.chunked_prefill_size)
 +            decode = False
@@ -119,7 +129,7 @@
 +            self._ax_pace_log_ts = now
 +            n_prefill = max(stats[0] - stats[1], 1)
 +            logger.info(
-+                f"[ax-pace] decisions={stats[0]} forced_decode={stats[1]} budgeted_prefill={stats[2]} "
++                f"[ax-pace] decisions={stats[0]} forced_decode={stats[1]} budgeted_prefill={stats[2]} guard={stats[4]} "
 +                f"mean_budget={stats[3] / n_prefill:.0f} last_slack={slack:.3f}s ctx={ctx}"
 +            )
 +        return decode
@@ -144,7 +154,7 @@
      def _should_defer_prefill(self) -> bool:
          if self._prefill_decode_interval_remaining == 0:
              return False
-@@ -3511,7 +3648,11 @@
+@@ -3511,7 +3658,11 @@
  
          if self.dllm_config is not None:
              new_batch = self.get_new_batch_dllm(running_batch)
@@ -157,7 +167,21 @@
              new_batch = None
          else:
              prefill_plan = self.get_new_batch_prefill(running_batch)
-@@ -3695,6 +3836,10 @@
+@@ -3556,6 +3707,13 @@
+             )
+         ret = converted
+         self._arm_prefill_decode_interval(ret)
++        if self._ax_pace() is not None and ret is not None and ret.forward_mode.is_extend():
++            # predicted end of this prefill, from the agreed decision time; None if it was not paced (no
++            # decoders then: requests it completes are anchored at the next decision, i.e. early)
++            cfg, decided = self._ax_pace_cfg, self._ax_pace_decided_t
++            self._ax_pace_busy_until = None if decided is None else (
++                decided[0] + cfg["c0"] + (ret.extend_num_tokens or 0) * (cfg["c1"] + cfg["c2"] * decided[1])
++            )
+         if self._ax_sched_protect_enabled() and self.prefill_decode_interval == 0:
+             self._ax_decode_due = ret is not None and ret.forward_mode.is_extend()
+ 
+@@ -3695,6 +3853,10 @@
          else:
              prefill_tile_block_m = 64  # Fallback for non-Triton backends
  
@@ -168,7 +192,7 @@
          adder = PrefillAdder(
              self.page_size,
              self.tree_cache,
-@@ -3712,7 +3857,7 @@
+@@ -3712,7 +3874,7 @@
              dllm_config=self.dllm_config,
              waiting_queue_len=len(self.waiting_queue),
              prefill_tile_block_m=prefill_tile_block_m,
