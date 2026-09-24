@@ -58,11 +58,13 @@ class ShortWarmupTest(unittest.TestCase):
 
     def test_census_failures_cannot_be_called_warm(self):
         _, plan = short.plan_for(self.chains, self.rows, self.shape_key)
-        rows = [dict(req_id=rid, output_tokens=10, error=None, error_class=None)
-                for c in plan['pairs'] for rid in c['req_ids']]
+        rows = [dict(req_id=rid, output_tokens=budget, error=None, error_class=None)
+                for c in plan['pairs'] for rid, budget in zip(c['req_ids'], c['output_budgets'])]
         short.validate_records(plan, rows)
         for bad in (rows[:-1], rows+[rows[0]], [dict(r, error='failed') for r in rows],
-                    [dict(r, output_tokens=0) for r in rows]):
+                    [dict(r, output_tokens=0) for r in rows],
+                    [dict(r, output_tokens=1) for r in rows],
+                    [dict(r, output_tokens=True) for r in rows]):
             with self.assertRaises(ValueError): short.validate_records(plan, bad)
 
     def test_only_warmup_command_is_replaced_and_flush_precedes_measurement(self):

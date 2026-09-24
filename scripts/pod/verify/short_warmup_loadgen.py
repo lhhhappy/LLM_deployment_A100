@@ -65,9 +65,13 @@ def validate_records(plan, records):
         raise ValueError('representative warmup request census mismatch')
     if any(r.get('error') or r.get('error_class') for r in records):
         raise ValueError('representative warmup contains failed requests')
-    if any(not isinstance(r.get('output_tokens'), (int, float)) or r['output_tokens'] <= 0
+    budgets = {rid: budget for pair in plan['pairs']
+               for rid, budget in zip(pair['req_ids'], pair['output_budgets'], strict=True)}
+    # Original call_engine sets ignore_eos=True. An early successful EOF must
+    # not count as exercising the unchanged output budget (especially MTP).
+    if any(type(r.get('output_tokens')) is not int or r['output_tokens'] != budgets[r['req_id']]
            for r in records):
-        raise ValueError('representative warmup produced no output tokens')
+        raise ValueError('representative warmup output count differs from original budget')
 
 
 def main(argv=None):
