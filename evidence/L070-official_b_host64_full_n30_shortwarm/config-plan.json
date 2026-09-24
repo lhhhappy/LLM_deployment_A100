@@ -1,0 +1,27 @@
+{
+  "baseline": "069-official_b_pace_off_host64_full_n30_shortwarm",
+  "candidate": "070-official_b_host64_full_n30_shortwarm",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "environment_changes": {
+    "SGLANG_AX_PACE_TPOT": [
+      "0",
+      "0.085"
+    ]
+  },
+  "expected_mechanism_changes": {
+    "122": [
+      "off",
+      "on"
+    ]
+  },
+  "engine_args_identical": true,
+  "rest_of_job_identical_except_comments": true,
+  "base_job_sha256": "dc4ce4e655b9edbb0393d23979dc0c110e91b210374f71b834953a6c4b4eba8a",
+  "candidate_job_sha256": "d038f3f12189e945e9381e1a54e64c7fd120ad434ab7935233f1bae8efd30df8",
+  "same_host_gb_per_rank": 64,
+  "same_mem_fraction_static": 0.87,
+  "same_n": 30,
+  "same_warmup": "rep16-v1",
+  "hypothesis": "with reduced recomputation after host64, paced prefill may reduce cold-chain wait/execution; TP8 net benefit unknown",
+  "scope": "122 whole mechanism: changes token budget and scheduling relative to fixed interval/cold cap; not just constant tau"
+}

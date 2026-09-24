@@ -6,7 +6,7 @@
 
 更新运行库前先等待当前任务结束（或按用户要求用 `stopjob` 停指定任务），通过GPU机的 `scripts/pod/podq pause` 暂停取任务。`qpush` 只向空闲且暂停的队列部署，返回远程 `gjob` 名称；用 `scripts/gjob tail <名称>` 确认 `RUNTIME_DEPLOYED` 和 `DONE rc=0` 后，再通过GPU机的 `podq resume` 恢复。SSH断连先查状态，不重复提交。传输只含指定源码差分，不含源码缓存树。禁止覆盖已有结果目录。
 
-当前067跑完整N30，不设70分钟截止；短预热与真实flush保留。首次15分钟、随后每30分钟作诊断，完整结束后判11门。见[任务入口](jobs/README.md)与[评估协议](../../notes/evaluation.md)。旧timed工具只供历史取证，不是当前任务入口。
+当前迭代跑完整N30，不设70分钟截止；短预热与真实flush保留。首次15分钟、随后每30分钟作诊断，完整结束后判11门。见[任务入口](jobs/README.md)与[评估协议](../../notes/evaluation.md)。旧timed工具只供历史取证，不是当前任务入口。
 
 单档使用 `verify_kit/run_dev_checked.py --runner $S1/run_dev.py -- ...` 执行原主办方 runner，仅替换 flush hook：清缓存失败在测量前停止，成功信息写入 `flush_evidence.json`。`level_verdict.py` 按 summary 定位测量 raw/run，核对 N、完整 cohort、runner 状态和本次清缓存日志，再调用原 harness 与 `score_formal.py` 判分。退出码 0=有效且估计通过，1=有效但估计失败，2=无效。主统计口径保持 CP；Wilson/Wald 仅作边界诊断，不能拿来挑通过算法。
 

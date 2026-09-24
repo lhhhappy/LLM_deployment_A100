@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/review_eval_shortwarm",
+  "scope": "read-only independent complete 068 vs 069, raw and terminal archive, next 070 design",
+  "verdict": "no blocking findings",
+  "verified": [
+    "both 5601 unique requests / 311 chains; frozen metadata, budgets, flush and complete scoring agree",
+    "069 full raw matches independent terminal archive byte for byte",
+    "omitted data-root reproduced 4879 extra ids against old dev set; corrected reanalysis valid",
+    "VALID FAIL only chain 31/29; other 10 gates pass",
+    "uncached 30.810M to 19.132M; TPOT mean/p95 .03426/.07250 to .02882/.05590",
+    "chain bad:20 queue>=80%,2 exec-to-first>30s; all dispatched before38.38min"
+  ],
+  "next": "070 host64 constant, only enable existing fixed122 tau .085",
+  "boundaries": [
+    "122 entire mechanism including budget/interval/cold cap, not tau alone",
+    "queue evidence does not identify host guard as cause",
+    "all-run TPOT includes drain; first40min p95 .07311",
+    "a two-case gate crossing would not establish robust performance gain"
+  ]
+}

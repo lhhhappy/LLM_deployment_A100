@@ -4,6 +4,41 @@
 
 ## 当前开发集对照
 
+### 069：host容量32→64GB/rank，全量长链N30（2026-09-24，Codex，独立复核通过）
+
+相对068只扩HiCache host预算，122仍off；源码759a6eb、mem0.87、MTP、冻结311链/5601请求N30一致。
+运行工具2837b3c，29个运行文件与068逐字节相同。KV/indexer与KDA host一起扩，8卡预算256→512GB；
+实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB/rank。
+启动180秒，rep16-v1预热112.832秒，同计划/原预算，20:06:39 UTC真flush。
+完整5601条每条恰好一次、原prompt/输出预算/gap一致、零错误、TTFT全部服务端打点；测量6455.19秒（107.59分钟）。
+原harness及题面补充门复算 **VALID FAIL：10/11通过，仅chain失败**，CP/Wilson/Wald整档结论一致。
+
+| 门 | 样本 | 068→069 p95秒 | 超标 / CP允许 | 069结果 |
+|---|---:|---:|---:|---|
+| fast_intra | 4765 | 8.3800→2.7039 | 222 / 263 | PASS |
+| overall_intra | 5010 | 9.6509→3.6268 | 195 / 276 | PASS |
+| turn_start | 159 | 20.8841→13.6406 | 7 / 13 | PASS |
+| chain_start | 432 | 100.3816→40.3355 | 31 / 29 | FAIL |
+| TPOT p95 | 5601 | .072501→.055902 | 2条>.10 | PASS |
+
+TPOT均值.034262→.028824；固定[10,70)分钟稳态窗3444条，有效，TPM(all) 2,733,104.87→3,666,963.70，decode 29,532.55→41,081.13。
+全量未命中prompt 30,809,642→19,131,690 token；测量内部prefill批9707→7293、new tokens约30.98M→19.31M，单序列且pending批5168→2545。
+后一计数是日志形态，不证明每一批都由某个拒绝分支产生。host FULL占用中位99.903%，89.11%样本≥98%；仍不含KDA host，不能凭此认定具体淘汰。
+
+同ID四桶修复/新增：fast367/128、overall327/112、turn12/6、chain24/5；唯一TTFT坏例589→311。
+31个chain坏例为30个cohort链首+1个非链首context_reset，均在前38.377分钟发送；20条queue_time≥80%TTFT，2条exec→first本身>30秒。
+其中lc302:0017两轮cached45,824相同却TTFT .369→82.872秒；最终cached不能揭示等待时状态层级，未证实120/180 host拒绝分支是该案例原因。
+82.135分钟起剩链<30，低延迟尾段不当满载产能；前40分钟TPOT p95约.07311，也应跟踪前段解码压力。
+一次完整对照支持保留host64继续研究，未测重跑噪声，不预测正式N30。
+
+070保持069全部条件，只重新开启修复122（τ=.085），检验较低重算量下的预算/节奏取舍；不承诺能修两条就稳定过门。
+CPU真实调度器47项通过（当前759的HiCache/122，历史机制基准保留），独立参与者复核原始数据后支持设计，无阻断理由。
+全量比较311个固定坏例与新增坏例、四门点估计/统计余量、TPOT、前段时间账，不删保护、不改预热集。
+
+取证误漏`--data-root`曾用旧dev集产生INVALID（extra4879）；保留原报错，正确冻结集重新判分，原raw/run未改。
+后续显式使用`fetch_level.sh <run> 30 --data-root data/s1-dev-longchain`。
+证据：[最终审计](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/final-audit.json)、[完整判分](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/level_verdict.json)、[5601条对照](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.csv)、[摘要](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.txt)、[311条坏例](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/ttft-cases.csv)、[独立复核](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/independent-review.json)。
+
 ### 068：关闭122，全量长链N30（2026-09-24，Codex，独立复核通过）
 
 相对067唯一引擎变化为PACE .085→0，同源码759a6eb、mem0.87、新版180、MTP与32GB/rank HiCache。

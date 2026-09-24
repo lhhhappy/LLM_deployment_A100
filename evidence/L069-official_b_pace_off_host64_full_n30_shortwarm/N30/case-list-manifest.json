@@ -1,0 +1,23 @@
+{
+  "scope": "complete VALID N30 candidate 069; paired baseline for paced-prefill test 070",
+  "rows": 5601,
+  "unique_bad_requests": 311,
+  "gate_overs": {
+    "fast_intra": 222,
+    "overall_intra": 195,
+    "turn_start": 7,
+    "chain_start": 31
+  },
+  "raw_sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b",
+  "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "cohort_sha256": "60799f7856cd5c08685ac11f0d6e452fa4de05dd3518d13c22b2030c09e75ed6",
+  "requests_sha256": "060fecce235ee4c1437230ad9e88a879eecf2b239c33af91dc3e0bc091c453e9",
+  "original_output_budgets_match": true,
+  "output_tokens_match": true,
+  "timestamps_monotonic": true,
+  "errors": 0,
+  "final_watcher_raw_identical": true,
+  "check105_raw_is_unchanged_prefix": true,
+  "bucket_membership_overlaps": "fast_intra included in overall_intra",
+  "comparison": "same frozen workload, same N and warmup; pair all 5601 requests"
+}

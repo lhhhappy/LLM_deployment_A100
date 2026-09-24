@@ -9,7 +9,8 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 测量收尾；105分钟5585条/0错，剩3链16请求；chain仍31/全量允许29；等待终态，若未结束下一22:21:57 UTC |
+| 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 已准备，47项CPU回归与独立复核通过；待部署 |
+| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
 | 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
 | 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
@@ -31,6 +32,11 @@
 CPU源码尺寸函数及cgroup余量检查通过，独立review无阻断理由；收据见[budget-probe](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)。
 启动实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on符合G_EXPECT。
 判据：完整11门、589个固定坏例及新增坏例、cached/重算量、等待/执行与TPOT。高host占用是干预线索，未证明某请求遭淘汰。
+
+070固定引擎759a6eb，只将`SGLANG_AX_PACE_TPOT=0→0.085`与`G_EXPECT 122=on`对应调整。
+host64、mem0.87、MTP、原数据/rep16/N30不变；这是122整体机制对照，不是只改变τ常数。
+069工作量降低后，检验更大prefill预算能否减少chain等待且守住TPOT；31条chain中20条queue≥80%，但尚未识别具体阻塞原因。
+完整比较311个固定TTFT坏例和新增坏例，单轮临界跨门不认定稳定收益。设计收据见[070配置](../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。
 
 ## 测量与比较
 

@@ -7,9 +7,9 @@
 ## 现在做什么
 
 当前由Codex单人持续迭代SGLang，vLLM暂缓。主线为 **正式A + 显存比例0.87 + 新版180 + 修复122**，
-对应正式46174/0924d；本地067全量有效FAIL，四类TTFT未过、TPOT通过。068关闭122后完整有效FAIL，三类TTFT失败，未见整体优势；069已启动只扩host缓存32→64GB/rank的对照。064已停止，065/066已撤销。
+对应正式46174/0924d；本地067全量有效FAIL，四类TTFT未过、TPOT通过。068关闭122后完整有效FAIL，三类TTFT失败，未见整体优势；069只扩host缓存至64GB/rank后10/11门通过，仅chain失败。070准备在host64上单独重开122。064已停止，065/066已撤销。
 统一采用固定16请求短预热、真清缓存、全量311链/5601请求N30回放；每分钟观察健康、首次15分钟、随后每30分钟保存窗口，
-30分钟重点检查严重bug，全量完成后判11道硬门。067/068已冻结616/589个唯一TTFT坏例并完成同ID对照；069继续以完整结果验证容量收益。
+30分钟重点检查严重bug，全量完成后判11道硬门。067/068/069已冻结616/589/311个唯一TTFT坏例；070继续完整同ID对照，检验剩余chain等待与TPOT取舍。
 
 当前安排只看[队列](notes/queue.md)；比较规则只看[评估协议](notes/evaluation.md)；
 持续过程见[Codex迭代日志](notes/iterations/codex.md)，长篇说明见[组合与预热](notes/reports/sglang-shortwarm-mainline-0924.md)。
@@ -30,7 +30,7 @@
 | 查看 8 卡队列和日志 | `scripts/pod/pread status`；队列说明见 [scripts/pod/README.md](scripts/pod/README.md) |
 | 准备下一项 8 卡实验 | 先看 [任务队列](notes/queue.md) 与 pod 实时状态，由当前负责人按 [pod 工具说明](scripts/pod/README.md)安排。037b–042 的[原始 job 快照](evidence/jobs-0924/)仅供追溯，不能当新实验重复推送；本地工具同步需协调 |
 | 判定单档 | `level_verdict.py` 核对 N、完整 cohort、runner 与本次清缓存证据，再调用原 harness 和题面补充门；CP 为估计口径，其他区间仅诊断。修复及验证见[审计](notes/fable-审计-2026-09-24.md)，本地改动待负责人同步 pod |
-| 取回并复核单档 | `scripts/analysis/fetch_level.sh <完整run目录名> <N>`；输出在 `evidence/L<完整run目录名>/N<N>/`，按 summary 选文件，返回 0=有效通过、1=有效失败、2=无效/工具失败 |
+| 取回并复核单档 | `scripts/analysis/fetch_level.sh <完整run目录名> <N> --data-root data/s1-dev-longchain`（当前长链集）；输出在 `evidence/L<完整run目录名>/N<N>/`，按 summary 选文件，返回 0=有效通过、1=有效失败、2=无效/工具失败 |
 | 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
 | 修改引擎 | 在 `engine/sglang/` 里改，按机制提交（`engine NNN:`）；见 [engine/README.md](engine/README.md) |
 | 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)，官方结果用 `scripts/official_status.sh <attempt_id>` 查；只在明确安排正式提交时使用 |

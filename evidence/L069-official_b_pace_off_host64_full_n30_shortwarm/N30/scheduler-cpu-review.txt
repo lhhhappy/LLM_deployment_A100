@@ -1,0 +1,12 @@
+SOURCE 759a6ebb8e31723519ad5daf438e26e24b32501a CURRENT HiCache + pace; historic mechanism baselines retained
+...............................................
+----------------------------------------------------------------------
+Ran 47 tests in 5.136s
+
+OK
+
+  [sim, cost x1.25] A + 122: tpot max 0.093, over 0.10: 0/250
+
+  [sim, fake cost model] requests=250
+  official A : tpot max 0.066 p95 0.063 | ttft p95 6.92s max 18.93s
+  A + 122    : tpot max 0.088 p95 0.080 | ttft p95 5.06s max 13.04s

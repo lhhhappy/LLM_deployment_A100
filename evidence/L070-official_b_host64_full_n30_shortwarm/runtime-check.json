@@ -1,0 +1,7 @@
+{
+  "baseline_bundle": "build/queue/queue-20260924T195929-4936",
+  "candidate_plan": "build/scratch/queue070-plan",
+  "identical_runtime_files": 29,
+  "different_files": [],
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a"
+}

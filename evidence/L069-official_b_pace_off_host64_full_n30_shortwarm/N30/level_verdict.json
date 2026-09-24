@@ -1,0 +1,161 @@
+{
+ "status": "VALID",
+ "n": 30,
+ "passed": false,
+ "failed_gates": [
+  "chain_start(<=30s)"
+ ],
+ "tpot_mean": 0.028824435259178417,
+ "tpot_p95": 0.055902278097016166,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 4765,
+   "p95": 2.7038826942443848,
+   "over_limit": 222,
+   "allowed_over": 263,
+   "rate_ci_lower": 0.041669860120915836,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.041669860120915836,
+      "allowed_over": 263,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.04181980434426199,
+      "allowed_over": 262,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0415676698908906,
+      "allowed_over": 264,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "overall_intra": {
+   "n": 5010,
+   "p95": 3.6267874240875244,
+   "over_limit": 195,
+   "allowed_over": 276,
+   "rate_ci_lower": 0.034528140671844954,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.034528140671844954,
+      "allowed_over": 276,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.03467079440591926,
+      "allowed_over": 275,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.034427606689711475,
+      "allowed_over": 277,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "turn_start": {
+   "n": 159,
+   "p95": 13.640632629394531,
+   "over_limit": 7,
+   "allowed_over": 13,
+   "rate_ci_lower": 0.020841899853618256,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.020841899853618256,
+      "allowed_over": 13,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.02404313120490291,
+      "allowed_over": 12,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.017264154382264058,
+      "allowed_over": 13,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "chain_start": {
+   "n": 432,
+   "p95": 40.33553600311279,
+   "over_limit": 31,
+   "allowed_over": 29,
+   "rate_ci_lower": 0.05242088791480337,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.05242088791480337,
+      "allowed_over": 29,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.05388986686236816,
+      "allowed_over": 29,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.05133460706448319,
+      "allowed_over": 30,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  }
+ },
+ "rows": 5601,
+ "raw": "raw_s1-dev-longchain_N30_1790280416.jsonl",
+ "run": "run_s1-dev-longchain_N30_1790280416.json",
+ "wall_s": 6455.189443349838,
+ "harness_point_all_pass": false,
+ "flush": {
+  "verified": true,
+  "mode": "checked_runner_receipt_and_server_log",
+  "server_log": "/workspace/Agentic_science_challenge/evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/server.log",
+  "window_start_s": 1790280399.0127895,
+  "window_end_s": 1790280399.0853796,
+  "matched_server_flush_s": 1790280399.0,
+  "server_log_clock": "UTC, second precision"
+ },
+ "interval_sensitivity": {
+  "diagnostic_only": true,
+  "primary_method": "clopper_pearson",
+  "organizer_method_unknown": true,
+  "sensitive_ttft_gates": [],
+  "all_gates_pass_by_method": {
+   "clopper_pearson": false,
+   "wilson": false,
+   "wald": false
+  }
+ }
+}
