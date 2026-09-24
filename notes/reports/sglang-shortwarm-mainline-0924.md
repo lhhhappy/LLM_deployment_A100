@@ -67,3 +67,26 @@ fast坏例64条的recv→exec中位7.56秒、exec→first中位1.62秒、实际�
 服务区间日志1107个prefill块，中位8192，仅2个≤64；未见此前持续碎块形态。
 继续完整回放，下次16:00:50 UTC检查趋势；不把已完成请求统计当整档判定。
 原始快照、日志区间、badcase工具结果及CSV见[evidence/check15](../../evidence/L067-official_b_full_n30_shortwarm/check15/)。
+
+## 45分钟检查点：性能问题与可复现线索
+
+1761条完成且唯一、0错误；累计TTFT p95（fast/overall/turn/chain）16.26/17.02/30.11/157.37秒，
+TPOT均值/p95 .04479/.07603。第30分钟后已完成622条，fast超标133/529、p95 18.17秒；不能只归咎开场。
+这些fast坏例recv→exec中位5.73秒，exec→first 1.39秒；81条实际未命中>8192，44条≤4096。
+15→45分钟服务日志1856个prefill块，中位8064，仅5个≤64，未见旧122持续碎块形态。
+
+**本地预判**：按原分桶与当前CP估计法，全5601 cohort的fast共4765，最多允许263条超标，当前已302；
+chain共432，允许29，当前已43。因此本轮后续全部达标也无法PASS；仍需完整数据才能给VALID终态。
+独立复算核对全集归属、桶归属、唯一性及CP允许数通过。这不是官方结论，不触发自动停测。
+继续运行收集不同压力阶段的归因证据。
+
+**待定位问题C067-cache-gap**：选第30分钟后已完成fast坏例中最慢8条（实际dispatch在38.21–43.22分钟）。
+用冻结正文和同哈希tokenizer重渲染实际前驱及当前prompt，16份长度均等于raw；前驱已完成、namespace相同。
+页对齐prompt LCP减cached的正差额为10,944–171,904，中位31,360 token。
+例：lc_20260924_139:0002输入77,721，前驱公共前缀77,382，cached=0，TTFT288.65秒，其中recv→exec280.75秒。
+这验证了输入确有公共前缀，不能证明可恢复的混合状态曾保存，也不能区分淘汰/检查点缺失/装回失败。
+样本有意选最慢请求，不能外推缺口比例或可修收益。独立review核对筛选、差值及边界通过，未独立重渲染。
+下一步沿这8个ID核查状态保存、host备份、装回与准入；现有日志不能回答的部分留作下一轮定向观测。
+
+复现：`.venv-longchain/bin/python scripts/analysis/replay_lcp.py evidence/L067-official_b_full_n30_shortwarm/check45/raw.jsonl --data-root data/s1-dev-longchain --tok-dir s1-dev/glm_tok --since-min 30 --limit 8 --out /tmp/067-lcp.json`。
+证据：[check45](../../evidence/L067-official_b_full_n30_shortwarm/check45/)，包含raw、窗口、服务区间日志、lcp结果、全量桶余量与N30实参审计。
