@@ -1,0 +1,41 @@
+[2026-09-24 10:59:52 TP7] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP7] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP4] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP2] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP3] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP4] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP2] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP3] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP5] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP6] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 12.27 GB
+[2026-09-24 10:59:52 TP5] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 10:59:52 TP6] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1036288, KV size: 1.12 GB
+[2026-09-24 11:00:11 TP0] max_total_num_tokens=1036288, chunked_prefill_size=8192, max_prefill_tokens=16384, max_running_requests=32, context_len=1048576, available_gpu_mem=14.08 GB
+[2026-09-24 11:00:11 TP6] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP6] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP3] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP5] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP3] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP5] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP4] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP4] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP7] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP7] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP0] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP0] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP1] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP2] HiCache size split: 19.34 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 17.13 GB.
+[2026-09-24 11:00:11 TP1] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:11 TP2] Allocating kv hierarchical KV host pool: 1394368 tokens, 17.13 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 11:00:31 TP4] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP5] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP1] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP2] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP3] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP7] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 11:00:31 TP6] Allocating 12.67 GB host memory for hierarchical Mamba cache (layout=page_first).
+exit_code: 0

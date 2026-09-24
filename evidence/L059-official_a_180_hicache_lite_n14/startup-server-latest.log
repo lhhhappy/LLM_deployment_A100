@@ -1,0 +1,46 @@
+  return func(*args, **kwargs)
+/opt/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/opt/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/opt/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+[2026-09-24 11:00:59 TP0] Prefill batch, #new-seq: 1, #new-token: 8192, #cached-token: 0, full token usage: 0.01, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 6951, cuda graph: False, input throughput (token/s): 1405.27
+[2026-09-24 11:01:05] INFO:     127.0.0.1:43612 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-24 11:01:06 TP0] Prefill batch, #new-seq: 1, #new-token: 6976, #cached-token: 0, full token usage: 0.01, mamba usage: 0.02, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1100.59
+[2026-09-24 11:01:06 TP0] Decode batch, #running-req: 1, #full token: 15296, full token usage: 0.01, mamba num: 4, mamba usage: 0.01, spec tokens: 128, spec rounds: 40, accept len: 3.20, accept rate: 0.73, cuda graph: True, gen throughput (token/s): 5.73, #queue-req: 0
+[2026-09-24 11:01:07 TP0] Decode batch, #running-req: 1, #full token: 15360, full token usage: 0.01, mamba num: 1, mamba usage: 0.00, spec tokens: 124, spec rounds: 40, accept len: 3.10, accept rate: 0.70, cuda graph: True, gen throughput (token/s): 194.44, #queue-req: 0
+[2026-09-24 11:01:07] INFO:     127.0.0.1:43616 - "POST /generate HTTP/1.1" 200 OK
+/opt/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+[2026-09-24 11:01:07] INFO:     127.0.0.1:43622 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-24 11:01:07 TP0] Prefill batch, #new-seq: 1, #new-token: 6848, #cached-token: 8192, full token usage: 0.01, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 3645.32
+[2026-09-24 11:01:08 TP0] Decode batch, #running-req: 1, #full token: 15168, full token usage: 0.01, mamba num: 4, mamba usage: 0.01, spec tokens: 119, spec rounds: 40, accept len: 2.98, accept rate: 0.66, cuda graph: True, gen throughput (token/s): 96.24, #queue-req: 0
+[2026-09-24 11:01:09 TP0] Decode batch, #running-req: 1, #full token: 15232, full token usage: 0.01, mamba num: 4, mamba usage: 0.01, spec tokens: 119, spec rounds: 40, accept len: 2.98, accept rate: 0.66, cuda graph: True, gen throughput (token/s): 188.08, #queue-req: 0
+[2026-09-24 11:01:09 TP0] Decode batch, #running-req: 1, #full token: 15360, full token usage: 0.01, mamba num: 4, mamba usage: 0.01, spec tokens: 106, spec rounds: 40, accept len: 2.65, accept rate: 0.55, cuda graph: True, gen throughput (token/s): 166.88, #queue-req: 0
+[2026-09-24 11:01:10 TP0] Decode batch, #running-req: 1, #full token: 15488, full token usage: 0.01, mamba num: 4, mamba usage: 0.01, spec tokens: 107, spec rounds: 40, accept len: 2.67, accept rate: 0.56, cuda graph: True, gen throughput (token/s): 168.22, #queue-req: 0
+[2026-09-24 11:01:11 TP0] Decode batch, #running-req: 1, #full token: 15616, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 128, spec rounds: 40, accept len: 3.20, accept rate: 0.73, cuda graph: True, gen throughput (token/s): 200.61, #queue-req: 0
+[2026-09-24 11:01:11 TP0] Decode batch, #running-req: 1, #full token: 15680, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 102, spec rounds: 40, accept len: 2.55, accept rate: 0.52, cuda graph: True, gen throughput (token/s): 161.05, #queue-req: 0
+[2026-09-24 11:01:12 TP0] Decode batch, #running-req: 1, #full token: 15808, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 114, spec rounds: 40, accept len: 2.85, accept rate: 0.62, cuda graph: True, gen throughput (token/s): 179.77, #queue-req: 0
+[2026-09-24 11:01:13 TP0] Decode batch, #running-req: 1, #full token: 15936, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 121, spec rounds: 40, accept len: 3.02, accept rate: 0.68, cuda graph: True, gen throughput (token/s): 192.04, #queue-req: 0
+[2026-09-24 11:01:13 TP0] Decode batch, #running-req: 1, #full token: 16064, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 112, spec rounds: 40, accept len: 2.80, accept rate: 0.60, cuda graph: True, gen throughput (token/s): 176.95, #queue-req: 0
+[2026-09-24 11:01:14] INFO:     127.0.0.1:39612 - "POST /generate HTTP/1.1" 200 OK
+[2026-09-24 11:01:14 TP0] Prefill batch, #new-seq: 1, #new-token: 1408, #cached-token: 14592, full token usage: 0.02, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 215.77
+[2026-09-24 11:01:14 TP0] Decode batch, #running-req: 1, #full token: 16000, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 103, spec rounds: 40, accept len: 2.58, accept rate: 0.53, cuda graph: True, gen throughput (token/s): 118.95, #queue-req: 0
+[2026-09-24 11:01:15 TP0] Decode batch, #running-req: 1, #full token: 16128, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 121, spec rounds: 40, accept len: 3.02, accept rate: 0.68, cuda graph: True, gen throughput (token/s): 191.16, #queue-req: 0
+[2026-09-24 11:01:15] INFO:     127.0.0.1:39618 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-24 11:01:15 TP0] Decode batch, #running-req: 1, #full token: 16256, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 124, spec rounds: 40, accept len: 3.10, accept rate: 0.70, cuda graph: True, gen throughput (token/s): 196.12, #queue-req: 0
+[2026-09-24 11:01:16 TP0] Decode batch, #running-req: 1, #full token: 16384, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 85, spec rounds: 40, accept len: 2.12, accept rate: 0.38, cuda graph: True, gen throughput (token/s): 134.04, #queue-req: 0
+[2026-09-24 11:01:16] INFO:     127.0.0.1:39626 - "POST /generate HTTP/1.1" 200 OK
+[2026-09-24 11:01:16 TP0] Prefill batch, #new-seq: 1, #new-token: 2240, #cached-token: 14848, full token usage: 0.02, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 989.76
+[2026-09-24 11:01:17 TP0] Decode batch, #running-req: 1, #full token: 17216, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 121, spec rounds: 40, accept len: 3.02, accept rate: 0.68, cuda graph: True, gen throughput (token/s): 132.05, #queue-req: 0
+[2026-09-24 11:01:17] INFO:     127.0.0.1:39638 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-24 11:01:17 TP0] Decode batch, #running-req: 1, #full token: 17344, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 119, spec rounds: 40, accept len: 2.98, accept rate: 0.66, cuda graph: True, gen throughput (token/s): 187.45, #queue-req: 0
+[2026-09-24 11:01:18 TP0] Decode batch, #running-req: 1, #full token: 17472, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 104, spec rounds: 40, accept len: 2.60, accept rate: 0.53, cuda graph: True, gen throughput (token/s): 164.17, #queue-req: 0
+[2026-09-24 11:01:19 TP0] Decode batch, #running-req: 1, #full token: 17536, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 105, spec rounds: 40, accept len: 2.62, accept rate: 0.54, cuda graph: True, gen throughput (token/s): 165.16, #queue-req: 0
+[2026-09-24 11:01:19 TP0] Decode batch, #running-req: 1, #full token: 17664, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 103, spec rounds: 40, accept len: 2.58, accept rate: 0.53, cuda graph: True, gen throughput (token/s): 161.80, #queue-req: 0
+[2026-09-24 11:01:20 TP0] Decode batch, #running-req: 1, #full token: 17792, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 111, spec rounds: 40, accept len: 2.77, accept rate: 0.59, cuda graph: True, gen throughput (token/s): 175.56, #queue-req: 0
+[2026-09-24 11:01:21] INFO:     127.0.0.1:39654 - "POST /generate HTTP/1.1" 200 OK
+[2026-09-24 11:01:21 TP0] Prefill batch, #new-seq: 1, #new-token: 896, #cached-token: 15872, full token usage: 0.02, mamba usage: 0.01, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 195.42
+[2026-09-24 11:01:21 TP0] Decode batch, #running-req: 1, #full token: 16768, full token usage: 0.02, mamba num: 4, mamba usage: 0.01, spec tokens: 109, spec rounds: 40, accept len: 2.73, accept rate: 0.57, cuda graph: True, gen throughput (token/s): 129.32, #queue-req: 0
+exit_code: 0

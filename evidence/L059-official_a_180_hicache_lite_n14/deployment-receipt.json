@@ -1,0 +1,47 @@
+{
+  "job": "059-official_a_180_hicache_lite_n14.sh",
+  "status": "PUBLISHING",
+  "created_utc": "2026-09-24T10:56:14.388633+00:00",
+  "baseline": "058-official_a_longchain_lite_n14",
+  "job_sha256": "21563cdb8e339065a929f48da7ddacd23ce011046bf6918bf32666191fcb18be",
+  "patch_hashes": {
+    "000-interface-compliance.patch": "e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6",
+    "101-role-boundary-split.patch": "0f6ee401c8bafd6d3c62f18a33545e1a777140eb9df53774029b60ae0a3694e0",
+    "106-defer-chunk-on-no-kv.patch": "a2c9f92d8a0abc96eaec515e6afa216a8ffa98037431748c1e0f846b66a03174",
+    "110-sm80-dsa-indexer.patch": "6a592ffc62b655c91672d2c31d76d2ecf9bbc3526a6f86f95ff28907522c5360",
+    "111-sm80-fp8-moe-marlin.patch": "67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a",
+    "114-indexer-row-shard.patch": "70c078d01b17c3d1051e18f31253dd0beab0f58b642599978d4630fcd7352a9c",
+    "120-sched-protect-chain.patch": "ef1744b3a51c2ee87fc0ceb858a04cca078c4720ad50b16ff7498a1b0ee7eb1a",
+    "121-sched-cap-while-decoding.patch": "dee943778854ba4d19c804fcee9070338e9f6eb51529b30d658b13e8c0f5faa0",
+    "130-async-tokenize.patch": "d48bf2a2d8a4c4daf68981aefdbc1646cf2d36b986ebf610f41e377a60ba2380",
+    "140-kda-dual-snapshot.patch": "1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35",
+    "150-startup-warmup.patch": "3d53476f8d94262e55241bb2295e3b9b96fb0ffc243469aaef9541d4169f20af",
+    "160-nextn-sm80.patch": "3547ff7d6d583b5ca19e0474a9ed0bd3fff3a355d5298868ee9f83ee96000a40",
+    "170-glm-bcg-prefill.patch": "48eeac6b956102d4394ace56e6fbbed343082b060b9aefd9548f73cc644320d5",
+    "180-hicache-glm-dsa.patch": "3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848"
+  },
+  "runtime_tool_hashes": {
+    "/tmp/ax/verify_kit/level_verdict.py": "1e61a387557c087417d24f9981627789c6988e0a7a516e75f8a98d2bd362c6e3",
+    "/tmp/ax/verify_kit/run_dev_checked.py": "8ac02956bece026b4f463548df3ead42b6e9b57774764c72015cc6b3ca0c36d6",
+    "/tmp/ax/verify_kit/score_formal.py": "ecbcd6c81d6921939a74d5f7919ccfaee8fa837d6310afb5c3cfa5753c81384f",
+    "/tmp/ax/verify_kit/metrics_sampler.py": "cc81cfcb4f9a90505127f64f64a05c08f09f81ba8f283ba61e87352960c55057",
+    "/tmp/ax/s1/s1-dev/run_dev.py": "4e5fdbd479b22ba05173ddeb71b30c108b4bca0fb57993eb0ab91746275b783f",
+    "/tmp/ax/bin/scripts/pod/lib.sh": "f915d3851d9dc92d6501d6033c71d8e9adf85e7fc4ab62db675928727577f109",
+    "/tmp/ax/bin/scripts/pod/jobs/dev_ladder_template.sh": "bb173d61a37e8cb8ad3338a37cacbefce4ceb82fba810bde9cabf465ac72652e"
+  },
+  "added_args": [
+    "--enable-hierarchical-cache",
+    "--hicache-size",
+    "32",
+    "--hicache-write-policy",
+    "write_through"
+  ],
+  "n": 14,
+  "dataset": "s1-dev-longchain-lite",
+  "chains": 64,
+  "requests": 1123,
+  "manifest_sha256": "b8f8b668189d9a6ded593ff88462cda37285d8e7a68f7654cea9ab1624f9b999",
+  "numa_binding_added": false,
+  "gpu_numeric_status": "NOT_YET_VALIDATED; user authorized debugging/performance replay",
+  "queued_utc": "2026-09-24T10:57:29.094495+00:00"
+}

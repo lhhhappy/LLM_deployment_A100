@@ -1,0 +1,27 @@
+{
+  "status": "RUNNING_ENGINE_SERVING_PRE_MEASUREMENT",
+  "checked_utc": "2026-09-24T11:02:50.955059+00:00",
+  "patches_verified": 14,
+  "data_artifacts_verified": 8,
+  "runtime_tools_unchanged_vs_058": 7,
+  "patch_stack_signature": "32989fc8418538ae",
+  "measurement_started": false,
+  "job_sha256": "21563cdb8e339065a929f48da7ddacd23ce011046bf6918bf32666191fcb18be",
+  "added_args": [
+    "--enable-hierarchical-cache",
+    "--hicache-size",
+    "32",
+    "--hicache-write-policy",
+    "write_through"
+  ],
+  "gpu_kv_tokens": 1036288,
+  "host_kv_tokens_per_rank": 1394368,
+  "host_kv_and_indexer_gb_per_rank": 19.34,
+  "host_mamba_gb_per_rank": 12.67,
+  "host_mamba_slot_count": null,
+  "evidence": [
+    "startup-job.log",
+    "startup-server-latest.log",
+    "startup-pools.log"
+  ]
+}

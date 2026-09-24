@@ -1,0 +1,45 @@
+EXPERIMENT formal_A_plus_180_hicache_lite_N14 chains=64 requests=1123 baseline=058 no_profiler
+DATA_SHA a48f5490f984632149b49a2c2565cf8bea030985c6917938d2fc1cd86e1b4571 bodies/s1-dev-longchain-lite.jsonl.gz
+DATA_SHA 8f54f08bdd6c2cc81cedc66f1461a87c941d70f130bb7c4f411aadbe919f9bdb chains.jsonl
+DATA_SHA cfaaa05d8acda995059eb897e5455921bc4055f9179544c512fb5347486a5482 cohort.json
+DATA_SHA 1b97ec81571ef40e6e25667cc826283d431824551483e1706eeb73dc26a62380 event-plans.jsonl
+DATA_SHA 5009e7a4f362dda6eb70a4309e11a04db29efe70f0acc8348e5bec7435603165 provenance.jsonl
+DATA_SHA f92caac90cc004e68eef0d8f8d7466104a50a5fea1e128162eef0cd9d6cacd35 requests.jsonl
+DATA_SHA 37710ea9ef8436ee2f0317ce479cee4ca7ec3218e085b9c2da19955bb70a6ff7 samples/s1-dev-longchain-lite.jsonl
+DATA_SHA de80367d4a15efe25f91c81fdbe9475552e31c01275e080913b510610ca432a7 subset-selection.json
+DATA_READY s1-dev-longchain-lite 64 1123 f5ef90c6218b260f
+               total        used        free      shared  buff/cache   available
+Mem:            2014          89        1401           0         536        1924
+	[4mGPU0	GPU1	GPU2	GPU3	GPU4	GPU5	GPU6	GPU7	NIC0	NIC1	NIC2	NIC3	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	NV12	NV12	NV12	NV12	NV12	NV12	NV12	PXB	NODE	SYS	SYS	0-31,64-95	0		N/A
+GPU1	NV12	 X 	NV12	NV12	NV12	NV12	NV12	NV12	PXB	NODE	SYS	SYS	0-31,64-95	0		N/A
+GPU2	NV12	NV12	 X 	NV12	NV12	NV12	NV12	NV12	NODE	PXB	SYS	SYS	0-31,64-95	0		N/A
+GPU3	NV12	NV12	NV12	 X 	NV12	NV12	NV12	NV12	NODE	PXB	SYS	SYS	0-31,64-95	0		N/A
+GPU4	NV12	NV12	NV12	NV12	 X 	NV12	NV12	NV12	SYS	SYS	PXB	NODE	32-63,96-127	1		N/A
+GPU5	NV12	NV12	NV12	NV12	NV12	 X 	NV12	NV12	SYS	SYS	PXB	NODE	32-63,96-127	1		N/A
+GPU6	NV12	NV12	NV12	NV12	NV12	NV12	 X 	NV12	SYS	SYS	NODE	PXB	32-63,96-127	1		N/A
+GPU7	NV12	NV12	NV12	NV12	NV12	NV12	NV12	 X 	SYS	SYS	NODE	PXB	32-63,96-127	1		N/A
+NIC0	PXB	PXB	NODE	NODE	SYS	SYS	SYS	SYS	 X 	NODE	SYS	SYS				
+1e61a387557c087417d24f9981627789c6988e0a7a516e75f8a98d2bd362c6e3  /tmp/ax/verify_kit/level_verdict.py
+8ac02956bece026b4f463548df3ead42b6e9b57774764c72015cc6b3ca0c36d6  /tmp/ax/verify_kit/run_dev_checked.py
+ecbcd6c81d6921939a74d5f7919ccfaee8fa837d6310afb5c3cfa5753c81384f  /tmp/ax/verify_kit/score_formal.py
+cc81cfcb4f9a90505127f64f64a05c08f09f81ba8f283ba61e87352960c55057  /tmp/ax/verify_kit/metrics_sampler.py
+4e5fdbd479b22ba05173ddeb71b30c108b4bca0fb57993eb0ab91746275b783f  /tmp/ax/s1/s1-dev/run_dev.py
+f915d3851d9dc92d6501d6033c71d8e9adf85e7fc4ab62db675928727577f109  /tmp/ax/bin/scripts/pod/lib.sh
+bb173d61a37e8cb8ad3338a37cacbefce4ceb82fba810bde9cabf465ac72652e  /tmp/ax/bin/scripts/pod/jobs/dev_ladder_template.sh
+000-interface-compliance.patch: OK
+101-role-boundary-split.patch: OK
+106-defer-chunk-on-no-kv.patch: OK
+110-sm80-dsa-indexer.patch: OK
+111-sm80-fp8-moe-marlin.patch: OK
+114-indexer-row-shard.patch: OK
+120-sched-protect-chain.patch: OK
+121-sched-cap-while-decoding.patch: OK
+130-async-tokenize.patch: OK
+140-kda-dual-snapshot.patch: OK
+150-startup-warmup.patch: OK
+160-nextn-sm80.patch: OK
+170-glm-bcg-prefill.patch: OK
+180-hicache-glm-dsa.patch: OK
+src off_a_180_hicache_lite_n14: 000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch 150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch 180-hicache-glm-dsa.patch sig=32989fc8418538ae
+exit_code: 0
