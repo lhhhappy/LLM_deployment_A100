@@ -1,0 +1,20 @@
+START_UTC=2026-09-24T11:40:21Z
+3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848  src/patches/180-hicache-glm-dsa.patch
+25243bdbcc4dfe053962d0c65cfa0a35786b5950167106fa3f48084e0949d25b  src/scripts/tests/hicache180/test_180_glm_host_pools.py
+4db1b1d4ea5b466d8919b377572df7ffb1b4f2f643b09133b5c0a31512007005  src/scripts/tests/hicache180/test_180_tree_hicache_e2e.py
+0, GPU-14c26f76-e5a4-9d1f-5d33-9ff397af4933, 4 MiB, 0 %
+1, GPU-0fd597b1-c02f-3a31-8fa7-8ecb15791ca8, 4 MiB, 0 %
+torch 2.13.0+cu130 cuda True device NVIDIA A100-SXM4-80GB
+test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact)
+Backup one 256-token group + one KDA slot through the real controller, ... ok
+test_fork_inside_group_does_not_overwrite_sibling (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_fork_inside_group_does_not_overwrite_sibling)
+Hazard (b). Branch A = X[0:128] + Y, branch B = X[0:128] + Z; a state ... ok
+test_flush_with_write_through_in_flight (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_flush_with_write_through_in_flight)
+/flush_cache while a write-through D2H is still unacknowledged (on ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.791s
+
+OK
+END_UTC=2026-09-24T11:40:37Z
+SSH_AND_TEST_RC=0

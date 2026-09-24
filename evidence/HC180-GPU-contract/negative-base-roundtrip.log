@@ -1,0 +1,38 @@
+test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact)
+Backup one 256-token group + one KDA slot through the real controller, ... <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+<frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+
+  test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact) (with_draft=False)
+Backup one 256-token group + one KDA slot through the real controller, ... FAIL
+  test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact) (with_draft=True)
+Backup one 256-token group + one KDA slot through the real controller, ... FAIL
+
+======================================================================
+FAIL: test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact) (with_draft=False)
+Backup one 256-token group + one KDA slot through the real controller,
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/hc180/src/scripts/tests/hicache180/test_180_glm_host_pools.py", line 147, in test_round_trip_restores_every_component_byte_exact
+    self._round_trip(with_draft)
+  File "/sjtu/linhang/arena/runs/hc180/src/scripts/tests/hicache180/test_180_glm_host_pools.py", line 227, in _round_trip
+    self.assertTrue(
+AssertionError: False is not true : DSA indexer rows layer 0 (target) not restored
+
+======================================================================
+FAIL: test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact) (with_draft=True)
+Backup one 256-token group + one KDA slot through the real controller,
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/hc180/src/scripts/tests/hicache180/test_180_glm_host_pools.py", line 147, in test_round_trip_restores_every_component_byte_exact
+    self._round_trip(with_draft)
+  File "/sjtu/linhang/arena/runs/hc180/src/scripts/tests/hicache180/test_180_glm_host_pools.py", line 227, in _round_trip
+    self.assertTrue(
+AssertionError: False is not true : DSA indexer rows layer 0 (target) not restored
+
+----------------------------------------------------------------------
+Ran 1 test in 4.500s
+
+FAILED (failures=2)
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

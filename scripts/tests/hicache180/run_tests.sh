@@ -6,7 +6,7 @@
 # Build trees on the CPU with scripts/patch_stack.py, e.g.
 #   python3 scripts/patch_stack.py apply /tmp/t180 000-interface-compliance.patch ... 180-hicache-glm-dsa.patch
 # PYTHON needs torch and the sglang import deps.
-set -u
+set -uo pipefail
 TREE=$(readlink -f "$1"); shift
 PY=${1:-python3}; [ $# -gt 0 ] && shift
 HERE=$(dirname "$(readlink -f "$0")")

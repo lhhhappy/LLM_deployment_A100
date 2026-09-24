@@ -1,0 +1,216 @@
+/sjtu/linhang/arena/runs/hc180/t180/sglang/launch_server.py:63: UserWarning: 'python -m sglang.launch_server' is still supported, but 'sglang serve' is the recommended entrypoint.
+  Example: sglang serve --model-path <model> [options]
+  warnings.warn(
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[2026-09-24 11:23:36] Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.
+[2026-09-24 11:23:36] Use dsa attention backend for DeepSeek with DSA.
+[2026-09-24 11:23:36] Setting page size to 64 for DeepSeek DSA.
+[2026-09-24 11:23:36] Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+[2026-09-24 11:23:36] DSA with TP mode is active, dp_size=1, tp_size=2, attn_tp_size=2, attention weights will be sharded across 2 ranks.
+[2026-09-24 11:23:36] Set DSA backends for bfloat16 KV Cache: prefill=tilelang, decode=tilelang.
+[2026-09-24 11:23:37] Compiled-kernel caches now live under SGLANG_CACHE_DIR (/root/.cache/sglang). These older directories are no longer used by sglang, but may still be used by other frameworks on this machine, so they were left alone: /root/.triton, /root/.cache/flashinfer. Remove them yourself if nothing else needs them.
+[2026-09-24 11:23:38] server_args={'model_path': 'model8', 'tokenizer_path': 'model8', 'tokenizer_mode': 'auto', 'tokenizer_backend': 'huggingface', 'tokenizer_worker_num': 1, 'detokenizer_worker_num': 1, 'skip_tokenizer_init': False, 'load_format': 'dummy', 'model_loader_extra_config': '{}', 'trust_remote_code': False, 'context_length': None, 'is_embedding': False, 'enable_multimodal': None, 'revision': None, 'model_impl': 'auto', 'model_config_parser': 'auto', 'json_model_override_args': '{}', 'dtype': 'auto', 'quantization': None, 'quantization_param_path': None, 'kv_cache_dtype': 'bfloat16', 'enable_fp32_lm_head': False, 'modelopt_quant': None, 'modelopt_checkpoint_restore_path': None, 'modelopt_checkpoint_save_path': None, 'modelopt_export_path': None, 'quantize_and_serve': False, 'rl_quant_profile': None, 'enable_tf32_matmul': False, 'mem_fraction_static': 0.8312499999999999, 'max_running_requests': 4, 'max_queued_requests': None, 'max_total_tokens': 16384, 'chunked_prefill_size': 4096, 'prefill_decode_interval': 0, 'enable_dynamic_chunking': False, 'max_prefill_tokens': 16384, 'prefill_max_requests': None, 'schedule_policy': 'fcfs', 'enable_priority_scheduling': False, 'disable_priority_preemption': False, 'default_priority_value': None, 'abort_on_priority_when_disabled': False, 'schedule_low_priority_values_first': False, 'priority_scheduling_preemption_threshold': 10, 'retraction_policy': 'length', 'schedule_conservativeness': 1.0, 'page_size': 64, 'c128_page_size': 16, 'swa_full_tokens_ratio': 0.8, 'disable_hybrid_swa_memory': False, 'radix_eviction_policy': 'lru', 'prefill_only_disable_kv_cache': False, 'disable_radix_cache': False, 'enable_page_major_kv_layout': False, 'enable_unified_memory': False, 'disable_chunked_prefix_cache': False, 'disable_overlap_schedule': False, 'num_continuous_decode_steps': 1, 'scheduler_recv_interval': 1, 'enable_mixed_chunk': False, 'nccl_port': None, 'dist_timeout': None, 'dist_init_addr': None, 'gated_launch_port': None, 'nnodes': 1, 'node_rank': 0, 'tp_size': 2, 'dcp_size': 1, 'pp_size': 1, 'pp_max_micro_batch_size': None, 'pp_async_batch_depth': 0, 'dp_size': 1, 'load_balance_method': 'round_robin', 'attn_cp_size': 1, 'moe_dp_size': 1, 'dwdp_size': 1, 'dcp_comm_backend': 'ag_rs', 'dcp_replicate_q_proj': None, 'enable_prefill_cp': False, 'cp_strategy': None, 'enable_dsa_cache_layer_split': False, 'enable_dsa_prefill_context_parallel': False, 'dsa_prefill_cp_mode': 'round-robin-split', 'enable_prefill_context_parallel': False, 'prefill_cp_mode': 'in-seq-split', 'enable_cp_decode_attn_tp': False, 'enable_dp_attention': False, 'enable_dp_attention_local_control_broadcast': False, 'enable_dp_lm_head': False, 'enable_tp_lm_head_all_to_all': False, 'enable_attn_tp_input_scattered': False, 'enable_shared_experts_attn_tp': False, 'enable_dense_mlp_attn_tp': False, 'enable_layernorm_sp': False, 'disable_attn_tp_gather': False, 'enable_p2p_check': False, 'device': 'cuda', 'base_gpu_id': 0, 'gpu_id_step': 1, 'random_seed': 644969506, 'mlx_enable_sampling': False, 'watchdog_timeout': 300, 'soft_watchdog_timeout': None, 'sleep_on_idle': False, 'use_ray': False, 'custom_sigquit_handler': None, 'numa_node': None, 'gc_threshold': None, 'host': '127.0.0.1', 'port': 31800, 'fastapi_root_path': '', 'smg_grpc_mode': False, 'grpc_mode': False, 'grpc_port': None, 'grpc_worker_threads': 4, 'sidecar': None, 'sidecar_args': None, 'skip_server_warmup': False, 'warmups': None, 'enable_http2': False, 'http2_max_concurrent_streams': 200, 'http2_initial_connection_window_size': 1048576, 'ssl_keyfile': None, 'ssl_certfile': None, 'ssl_ca_certs': None, 'ssl_keyfile_password': None, 'enable_ssl_refresh': False, 'api_key': None, 'admin_api_key': None, 'served_model_name': 'model8', 'weight_version': 'default', 'chat_template': None, 'hf_chat_template_name': None, 'completion_template': None, 'file_storage_path': 'sglang_storage', 'enable_cache_report': True, 'reasoning_parser': None, 'default_chat_template_kwargs': None, 'strip_thinking_cache': False, 'enable_strict_thinking': False, 'tool_call_parser': None, 'tool_server': None, 'sampling_defaults': 'model', 'asr_max_buffer_seconds': 60, 'asr_max_concurrent_sessions': 32, 'preferred_sampling_params': None, 'allow_auto_truncate': False, 'stream_interval': 1, 'batch_notify_size': 16, 'stream_response_default_include_usage': False, 'incremental_streaming_output': False, 'enable_streaming_session': False, 'enable_session_radix_cache': False, 'log_level': 'info', 'log_level_http': None, 'log_requests': False, 'log_requests_level': 2, 'log_requests_format': 'text', 'log_requests_target': None, 'uvicorn_access_log_exclude_prefixes': [], 'crash_dump_folder': None, 'show_time_cost': False, 'enable_metrics': False, 'smg_http_sidecar_port': None, 'enable_mfu_metrics': False, 'enable_metrics_for_all_schedulers': False, 'load_snapshot_publish_interval': 15, 'tokenizer_metrics_custom_labels_header': 'x-custom-labels', 'tokenizer_metrics_allowed_custom_labels': None, 'extra_metric_labels': None, 'bucket_time_to_first_token': None, 'bucket_inter_token_latency': None, 'bucket_e2e_request_latency': None, 'prompt_tokens_buckets': None, 'generation_tokens_buckets': None, 'gc_warning_threshold_secs': 0.0, 'decode_log_interval': 40, 'enable_request_time_stats_logging': False, 'kv_events_config': None, 'load_publish_endpoint': None, 'enable_forward_pass_metrics': False, 'forward_pass_metrics_worker_id': '', 'forward_pass_metrics_ipc_name': None, 'enable_trace': False, 'trace_modules': 'request', 'otlp_traces_endpoint': 'localhost:4317', 'export_metrics_to_file': False, 'export_metrics_to_file_dir': None, 'stat_loggers': None, 'constrained_json_whitespace_pattern': None, 'constrained_json_disable_any_whitespace': False, 'attention_backend': 'dsa', 'decode_attention_backend': None, 'enable_lean_attention': None, 'prefill_attention_backend': None, 'sampling_backend': 'flashinfer', 'grammar_backend': 'xgrammar', 'radix_cache_backend': None, 'mm_attention_backend': None, 'fp8_gemm_runner_backend': 'auto', 'fp4_gemm_runner_backend': 'auto', 'bf16_gemm_backend': 'auto', 'dsa_prefill_backend': 'tilelang', 'dsv4_prefill_backend': 'auto', 'dsa_decode_backend': 'tilelang', 'dsa_paged_mqa_logits_backend': 'auto', 'dsa_topk_backend': 'sgl-kernel', 'disable_flashinfer_autotune': False, 'flashinfer_autotune_skip_ops': None, 'mamba_backend': 'triton', 'cuda_graph_config': {'decode': {'backend': 'full', 'max_bs': 4, 'bs': [1, 2, 4], 'tc_compiler': 'eager', 'full_prefill_max_req': None, 'full_prefill_prefix_chunk_tokens': None}, 'prefill': {'backend': 'disabled', 'max_bs': 2048, 'bs': [4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048], 'tc_compiler': 'eager', 'full_prefill_max_req': None, 'full_prefill_prefix_chunk_tokens': None}}, 'cuda_graph_backend_decode': None, 'cuda_graph_backend_prefill': None, 'cuda_graph_max_bs_decode': 4, 'cuda_graph_max_bs_prefill': None, 'cuda_graph_bs_decode': None, 'cuda_graph_bs_prefill': None, 'cuda_graph_tc_compiler': None, 'disable_prefill_cuda_graph': False, 'disable_decode_cuda_graph': False, 'disable_cuda_graph': False, 'disable_cuda_graph_padding': False, 'enable_profile_cuda_graph': False, 'enable_cudagraph_gc': False, 'debug_cuda_graph': False, 'enable_layerwise_nvtx_marker': False, 'enable_nccl_nvls': False, 'enable_symm_mem': False, 'triton_attention_reduce_in_fp32': False, 'triton_attention_num_kv_splits': 8, 'triton_attention_split_tile_size': None, 'flashinfer_mla_disable_ragged': False, 'enable_fused_qk_norm_rope': False, 'enable_precise_embedding_interpolation': False, 'enable_fused_moe_sum_all_reduce': False, 'enable_deepseek_v4_fp4_indexer': False, 'disable_custom_all_reduce': False, 'enable_mscclpp': False, 'enable_torch_symm_mem': False, 'enable_scattered_sconv': False, 'pre_warm_nccl': False, 'enable_quant_communications': False, 'enable_flashinfer_allreduce_fusion': False, 'enforce_disable_flashinfer_allreduce_fusion': False, 'flashinfer_allreduce_fusion_backend': None, 'enable_aiter_allreduce_fusion': False, 'enable_torch_compile': False, 'enable_torch_compile_debug_mode': False, 'torch_compile_max_bs': 32, 'speculative_algorithm': None, 'speculative_draft_model_path': None, 'speculative_draft_model_revision': None, 'speculative_draft_load_format': None, 'speculative_num_steps': None, 'speculative_eagle_topk': None, 'speculative_num_draft_tokens': None, 'speculative_dflash_block_size': None, 'speculative_dspark_block_size': None, 'speculative_dspark_sps_table_path': None, 'speculative_dspark_confidence_sts_path': None, 'speculative_dspark_align_verify_tokens_to_graph_tier': False, 'speculative_accept_threshold_single': 1.0, 'speculative_accept_threshold_acc': 1.0, 'speculative_use_rejection_sampling': False, 'speculative_token_map': None, 'speculative_attention_mode': 'prefill', 'speculative_draft_attention_backend': None, 'speculative_dsa_topk_backend': 'sgl-kernel', 'speculative_draft_kv_cache_dtype': None, 'speculative_draft_window_size': None, 'speculative_moe_runner_backend': 'auto', 'speculative_moe_a2a_backend': None, 'speculative_draft_model_quantization': None, '_speculative_draft_quantization_explicitly_set': False, 'speculative_skip_dp_mlp_sync': False, 'enable_multi_layer_eagle': False, 'speculative_adaptive': False, 'speculative_adaptive_config': None, 'decoupled_spec_bind_endpoint': None, 'decoupled_spec_connect_endpoints': None, 'decoupled_spec_rank': None, 'decoupled_spec_role': 'null', 'spec_trace_dir': None, 'speculative_ngram_min_bfs_breadth': 1, 'speculative_ngram_max_bfs_breadth': 10, 'speculative_ngram_match_type': 'BFS', 'speculative_ngram_max_trie_depth': 18, 'speculative_ngram_capacity': 10000000, 'speculative_ngram_external_corpus_path': None, 'speculative_ngram_external_sam_budget': 0, 'speculative_ngram_external_corpus_max_tokens': 10000000, 'ep_size': 1, 'moe_a2a_backend': 'none', 'enable_w4a4_mxfp4_megamoe': False, 'deepep_v2_mode': 'direct', 'moe_runner_backend': 'auto', 'flashinfer_mxfp4_moe_precision': 'default', 'deepep_mode': 'auto', 'fuseep_mode': 2, 'deepep_dispatcher_output_dtype': 'auto', 'ep_num_redundant_experts': 0, 'ep_dispatch_algorithm': None, 'init_expert_location': 'trivial', 'enable_eplb': False, 'eplb_algorithm': 'auto', 'eplb_rebalance_num_iterations': 1000, 'eplb_rebalance_layers_per_chunk': None, 'eplb_min_rebalancing_utilization_threshold': 1.0, 'expert_distribution_recorder_mode': None, 'expert_distribution_recorder_buffer_size': 1000, 'expert_balancedness_report_mode': 'off', 'deepep_config': None, 'moe_dense_tp_size': None, 'elastic_ep_backend': None, 'enable_elastic_expert_backup': False, 'mooncake_ib_device': None, 'enable_waterfill': False, 'ep_join_mode': None, 'ep_join_rank_offset': 0, 'elastic_ep_initial_size': None, 'max_ep_size': None, 'elastic_ep_scale_timeout': 600, 'elastic_ep_rejoin': False, 'disable_flashinfer_cutlass_moe_fp4_allgather': False, 'disable_shared_experts_fusion': False, 'enforce_shared_experts_fusion': False, 'max_mamba_cache_size': 48, 'mamba_ssm_dtype': None, 'mamba_max_states_per_path': -1, 'enable_mamba_cache_stochastic_rounding': False, 'mamba_cache_philox_rounds': 0, 'mamba_full_memory_ratio': 0.9, 'mamba_radix_cache_strategy': 'extra_buffer', 'uses_mamba_radix_cache': True, 'mamba_track_interval': 256, 'enable_int8_mamba_checkpoint': False, 'int8_mamba_ckpt_size': None, 'linear_attn_backend': 'triton', 'linear_attn_decode_backend': None, 'linear_attn_prefill_backend': None, 'linear_attn_verify_backend': None, 'enable_linear_replayssm': False, 'linear_replayssm_cache_len': 16, 'enable_linear_replayssm_spec': False, 'enable_hierarchical_cache': True, 'hicache_host_memory_mode': 'cache', 'hicache_ratio': 2.0, 'hicache_size': 4, 'hicache_write_policy': 'write_through', 'hicache_io_backend': 'kernel', 'hicache_mem_layout': 'page_first', 'hicache_storage_backend': None, 'hicache_storage_prefetch_policy': 'timeout', 'hicache_storage_backend_extra_config': None, 'hicache_storage_prefetch_retry_poll_interval': 0, 'hicache_storage_prefetch_retry_max_attempts': 4, 'enable_hisparse': False, 'hisparse_config': None, 'enable_broadcast_mm_inputs_process': False, 'enable_prefix_mm_cache': False, 'mm_enable_dp_encoder': False, 'mm_process_config': {}, 'mm_processor_worker_num': 0, 'mm_io_worker_num': 0, 'allowed_media_domains': [], 'media_url_max_file_size_mb': 64, 'mm_preprocess_cache_size_mb': None, 'trust_mm_content_hashes': False, 'limit_mm_data_per_request': None, 'enable_mm_global_cache': False, 'image_processor_backend': 'auto', 'mm_global_cache_backend': 'mooncake', 'disable_fast_image_processor': False, 'mm_feature_transport': 'cpu', 'keep_mm_feature_on_device': False, 'enable_lora': None, 'enable_lora_overlap_loading': None, 'max_lora_rank': None, 'lora_target_modules': None, 'lora_paths': None, 'max_loaded_loras': None, 'max_loras_per_batch': 8, 'lora_eviction_policy': 'lru', 'lora_backend': 'csgmv', 'max_lora_chunk_size': 16, 'experts_shared_outer_loras': None, 'lora_use_virtual_experts': False, 'lora_strict_loading': False, 'lora_drain_wait_threshold': 0.0, 'enable_two_batch_overlap': False, 'enable_single_batch_overlap': False, 'tbo_token_distribution_threshold': 0.48, 'cpu_offload_gb': 0, 'offload_group_size': -1, 'offload_num_in_group': 1, 'offload_prefetch_step': 1, 'offload_mode': 'cpu', 'enable_lmcache': False, 'lmcache_config_file': None, 'enable_flexkv': False, 'flexkv_config_file': None, 'kt_weight_path': None, 'kt_method': 'AMXINT4', 'kt_cpuinfer': None, 'kt_threadpool_count': 2, 'kt_num_gpu_experts': None, 'kt_max_deferred_experts_per_token': None, 'dllm_algorithm': None, 'dllm_algorithm_config': None, 'dllm_fdfo': True, 'disaggregation_mode': 'null', 'disaggregation_transfer_backend': 'mooncake', 'disaggregation_bootstrap_port': 8998, 'disaggregation_ib_device': None, 'disaggregation_decode_enable_radix_cache': False, 'disaggregation_decode_enable_offload_kvcache': False, 'disaggregation_decode_retraction_backup': None, 'num_reserved_decode_tokens': 512, 'disaggregation_decode_extra_slots': None, 'disaggregation_decode_polling_interval': 1, 'optimistic_prefill_attempts': 0, 'encoder_only': False, 'language_only': False, 'language_model_only': False, 'encoder_transfer_backend': 'zmq_to_scheduler', 'encoder_urls': [], 'encoder_bootstrap_port': 8997, 'encoder_register_urls': [], 'enable_adaptive_dispatch_to_encoder': False, 'enable_pdmux': False, 'pdmux_config_path': None, 'sm_group_num': 8, 'startup_weight_load_mode': 'serial', 'custom_weight_loader': [], 'weight_loader_disable_mmap': False, 'weight_loader_prefetch_checkpoints': False, 'weight_loader_prefetch_num_threads': 4, 'weight_loader_drop_cache_after_load': False, 'remote_instance_weight_loader_seed_instance_ip': None, 'remote_instance_weight_loader_seed_instance_service_port': None, 'remote_instance_weight_loader_send_weights_group_ports': None, 'remote_instance_weight_loader_backend': 'nccl', 'remote_instance_weight_loader_start_seed_via_transfer_engine': False, 'engine_info_bootstrap_port': 6789, 'modelexpress_config': None, 'download_dir': None, 'model_checksum': None, 'delete_ckpt_after_loading': False, 'decrypted_config_file': None, 'decrypted_draft_config_file': None, 'checkpoint_engine_wait_weights_before_ready': False, 'enable_prefill_delayer': False, 'prefill_delayer_max_delay_passes': 30, 'prefill_delayer_token_usage_low_watermark': None, 'prefill_delayer_forward_passes_buckets': None, 'prefill_delayer_wait_seconds_buckets': None, 'prefill_delayer_queue_min_ratio': None, 'prefill_delayer_max_delay_ms': None, 'min_free_slots_delay': None, 'enable_deterministic_inference': False, 'rl_on_policy_target': None, 'kv_canary': 'none', 'kv_canary_real_data': 'none', 'kv_canary_sweep_interval': 0, 'enable_dynamic_batch_tokenizer': False, 'dynamic_batch_tokenizer_batch_size': 32, 'dynamic_batch_tokenizer_batch_timeout': 0.002, 'enable_tokenizer_batch_encode': False, 'disable_tokenizer_batch_decode': False, 'debug_tensor_dump_output_folder': None, 'debug_tensor_dump_layers': None, 'debug_tensor_dump_input_file': None, 'enable_memory_saver': False, 'enable_weights_cpu_backup': False, 'enable_draft_weights_cpu_backup': False, 'enable_custom_logit_processor': False, 'enable_return_hidden_states': False, 'return_hidden_states_mode': None, 'enable_return_routed_experts': False, 'enable_return_indexer_topk': False, 'disable_outlines_disk_cache': False, 'enable_mis': False, 'weight_cache_mode': 'off', 'weight_cache_socket': None, 'weight_cache_timeout': 1800, 'forward_hooks': None, 'msprobe_dump_config': None}
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[2026-09-24 11:23:50 TP0] Processor tokenizer for model8 is TokenizersBackend, reloading via get_tokenizer
+[2026-09-24 11:23:57 TP0] Ignore import error when loading sglang.srt.multimodal.processors.clip: cannot import name 'ModelRunner' from partially initialized module 'sglang.srt.model_executor.model_runner' (most likely due to a circular import) (/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner.py)
+[2026-09-24 11:23:58 TP0] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[2026-09-24 11:23:58 TP0] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:23:58 TP0] torchcodec is not installed; audio inputs will fail at request time
+[2026-09-24 11:23:58 TP0] torchaudio is not installed; audio inputs will fail at request time
+[2026-09-24 11:23:58 TP0] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-24 11:23:59 TP0] Init torch distributed begin.
+[2026-09-24 11:24:00 TP1] Processor tokenizer for model8 is TokenizersBackend, reloading via get_tokenizer
+[2026-09-24 11:24:07 TP1] Ignore import error when loading sglang.srt.multimodal.processors.clip: cannot import name 'ModelRunner' from partially initialized module 'sglang.srt.model_executor.model_runner' (most likely due to a circular import) (/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner.py)
+[2026-09-24 11:24:08 TP1] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-24 11:24:08] Ignore import error when loading sglang.srt.multimodal.processors.clip: cannot import name 'ModelRunner' from partially initialized module 'sglang.srt.model_executor.model_runner' (most likely due to a circular import) (/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner.py)
+[2026-09-24 11:24:08 TP1] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:24:08 TP1] torchcodec is not installed; audio inputs will fail at request time
+[2026-09-24 11:24:08 TP1] torchaudio is not installed; audio inputs will fail at request time
+[2026-09-24 11:24:08 TP1] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-24 11:24:08] Ignore import error when loading sglang.srt.multimodal.processors.inkling: No module named 'quack'
+[2026-09-24 11:24:08] Ignore import error when loading sglang.srt.multimodal.processors.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:24:08] torchcodec is not installed; audio inputs will fail at request time
+[2026-09-24 11:24:08] torchaudio is not installed; audio inputs will fail at request time
+[2026-09-24 11:24:08] Ignore import error when loading sglang.srt.multimodal.processors.mimo_v2: No module named 'torchcodec'
+[2026-09-24 11:24:08 TP1] Init torch distributed begin.
+[2026-09-24 11:24:08 TP0] sglang is using nccl==2.29.7
+[2026-09-24 11:24:10] Processor tokenizer for model8 is TokenizersBackend, reloading via get_tokenizer
+[2026-09-24 11:24:17] Ignore import error when loading sglang.srt.models.bailing_moe_linear: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:17] Ignore import error when loading sglang.srt.models.bailing_moe_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:17] Ignore import error when loading sglang.srt.models.bailing_moe_v3: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:18] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-24 11:24:18] Ignore import error when loading sglang.srt.models.longcat_flash: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:18] Ignore import error when loading sglang.srt.models.longcat_flash_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:18] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:24:19] Multimodal processor concurrency enabled with 2 isolated worker threads (auto).
+[2026-09-24 11:24:19] Using default HuggingFace chat template with detected content format: openai
+[2026-09-24 11:24:19] Auto-detected template features: reasoning_parser=deepseek-r1, tool_call_parser=glm45
+[2026-09-24 11:24:20 TP0] All Reduce config: symmetric_memory = 20.01 MB, local_buffer = 2.00 MB, multicast = False, pull = True
+[2026-09-24 11:24:29 TP0] Init torch distributed ends. elapsed=30.34 s, mem usage=0.78 GB
+[2026-09-24 11:24:29 TP1] Init torch distributed ends. elapsed=21.05 s, mem usage=0.78 GB
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.bailing_moe_linear: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.bailing_moe_linear: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.bailing_moe_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.bailing_moe_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.bailing_moe_v3: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.bailing_moe_v3: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.longcat_flash: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.longcat_flash: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.longcat_flash_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.longcat_flash_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+[2026-09-24 11:24:29 TP0] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:24:29 TP1] Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+[2026-09-24 11:24:29 TP0] Load weight begin. avail mem=77.95 GB
+[2026-09-24 11:24:29 TP1] Load weight begin. avail mem=77.95 GB
+[2026-09-24 11:24:29 TP0] Detected fp8 checkpoint.
+[2026-09-24 11:24:29 TP0] Shared experts fusion optimization enabled.
+[2026-09-24 11:24:29 TP0] FlashInfer TRTLLM MoE deferred finalize is disabled (moe_runner_backend=auto, quant_method=Fp8MoEMethod).
+[2026-09-24 11:24:29 TP1] FlashInfer TRTLLM MoE deferred finalize is disabled (moe_runner_backend=auto, quant_method=Fp8MoEMethod).
+[2026-09-24 11:24:30 TP0] Multimodal attention backend not set. Use triton_attn.
+[2026-09-24 11:24:30 TP0] Using triton_attn as multimodal attention backend.
+[2026-09-24 11:24:30 TP1] Multimodal attention backend not set. Use triton_attn.
+[2026-09-24 11:24:30 TP1] Using triton_attn as multimodal attention backend.
+[2026-09-24 11:24:30 TP0] Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+[2026-09-24 11:24:30 TP1] Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+[2026-09-24 11:24:38 TP0] Load weight end. elapsed=8.49 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=72.81 GB, mem usage=5.13 GB.
+[2026-09-24 11:24:38 TP1] Load weight end. elapsed=8.49 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=72.81 GB, mem usage=5.13 GB.
+[2026-09-24 11:24:40 TP0] Processor tokenizer for model8 is TokenizersBackend, reloading via get_tokenizer
+[2026-09-24 11:24:40 TP1] Processor tokenizer for model8 is TokenizersBackend, reloading via get_tokenizer
+[2026-09-24 11:24:49 TP0] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-24 11:24:49 TP1] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-24 11:24:49 TP0] Mamba Cache is allocated. max_mamba_cache_size: 48, conv_state size: 0.02GB, ssm_state size: 0.57GB 
+[2026-09-24 11:24:49 TP1] Mamba Cache is allocated. max_mamba_cache_size: 48, conv_state size: 0.02GB, ssm_state size: 0.57GB 
+[2026-09-24 11:24:49 TP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 16384, KV size: 0.04 GB
+[2026-09-24 11:24:49 TP0] Memory pool end. avail mem=72.11 GB
+[2026-09-24 11:24:49 TP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 16384, KV size: 0.04 GB
+[2026-09-24 11:24:49 TP1] Memory pool end. avail mem=72.11 GB
+[2026-09-24 11:24:50 TP0] Linear attention kernel backend: decode=triton, prefill=triton, verify=triton
+[2026-09-24 11:24:50 TP0] KDA kernel dispatcher: decode=TritonKDAKernel, verify=TritonKDAKernel, extend=TritonKDAKernel packed_decode=True
+[2026-09-24 11:24:50 TP0] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-24 11:24:50 TP1] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-24 11:24:50 TP0] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, bs=[1, 2, 4], avail mem=72.10 GB
+[2026-09-24 11:24:50 TP1] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, bs=[1, 2, 4], avail mem=72.10 GB
+  0%|          | 0/3 [00:00<?, ?it/s]Capturing batches (bs=4 avail_mem=72.10 GB):   0%|          | 0/3 [00:00<?, ?it/s]Capturing batches (bs=4 avail_mem=72.10 GB):   0%|          | 0/3 [00:09<?, ?it/s]
+[2026-09-24 11:25:00 TP0] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 71, in _load_tilelang
+    new_tilelang = importlib.import_module("tilelang")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'tilelang'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 489, in __init__
+    self.capture()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1075, in capture
+    self._capture_one_stream()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1144, in _capture_one_stream
+    self.capture_one_shape(
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1262, in capture_one_shape
+    self.backend.capture_one(
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner_backend/full_cuda_graph_backend.py", line 110, in capture_one
+    forward_fn()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1223, in run_once
+    out = forward(
+          ^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/models/glm5_next.py", line 1536, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/models/glm5_next.py", line 1156, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/models/glm5_next.py", line 843, in forward
+    hidden_states, residual = self.layer_communicator.prepare_attn(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/layers/communicator_mhc.py", line 476, in prepare_attn
+    hidden_states, residual = self.mhc.attn_split(
+                              ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/layers/communicator_mhc.py", line 88, in attn_split
+    hidden_states, self.h_res, self.h_post, norm_fused = self.hc_attn_pre(
+                                                         ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/models/glm5_next.py", line 794, in hc_attn_pre
+    return self._hc_pre(
+           ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/models/glm5_next.py", line 778, in _hc_pre
+    return _hc_pre_fn(
+           ^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 1883, in hc_pre
+    post_mix, comb_mix, layer_input, norm_fused = _mhc_pre_dispatch(
+                                                  ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 1827, in _mhc_pre_dispatch
+    post_mix, comb_mix, layer_input = mhc_pre(
+                                      ^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 1042, in mhc_pre
+    kernel_0, _ = mhc_pre_gemm_sqrsum_splitk_kernel(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 595, in mhc_pre_gemm_sqrsum_splitk_kernel
+    _load_tilelang()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/kernels/ops/layernorm/mhc.py", line 74, in _load_tilelang
+    raise RuntimeError(
+RuntimeError: tilelang is not installed; this kernel cannot run on the current platform
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/scheduler.py", line 5690, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/scheduler.py", line 557, in __init__
+    self.init_model_worker()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/scheduler.py", line 1065, in init_model_worker
+    self.init_all_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/scheduler.py", line 1048, in init_all_cuda_graphs
+    self.tp_worker.init_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/managers/tp_worker.py", line 443, in init_cuda_graphs
+    self.model_runner.init_cuda_graphs(
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner.py", line 1062, in init_cuda_graphs
+    capture = capture_cuda_graphs(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner_components/cuda_graph_setup.py", line 249, in capture_cuda_graphs
+    decode = capture_decode_graph(model_runner=model_runner)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/model_runner_components/cuda_graph_setup.py", line 568, in capture_decode_graph
+    runner = graph_runners[model_runner.device](model_runner)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/hc180/t180/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 491, in __init__
+    raise Exception(
+Exception: Capture cuda graph failed: tilelang is not installed; this kernel cannot run on the current platform
+Possible solutions:
+1. set --mem-fraction-static to a smaller value (e.g., 0.8 or 0.7)
+2. set --cuda-graph-max-bs-decode to a smaller value (e.g., 16)
+3. disable decode CUDA graph by --cuda-graph-backend-decode=disabled. (Not recommended. Huge performance loss)
+Open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose 
+
+
+[2026-09-24 11:25:00] Received sigquit from a child process. It usually means the child failed.
+[2026-09-24 11:25:00] kill_process_tree called: parent_pid=1682735, include_parent=True, pid=1682735

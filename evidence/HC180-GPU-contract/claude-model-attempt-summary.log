@@ -1,0 +1,13 @@
+=== t180 mtp=off 11:23:26
+rc=1
+server exited rc=-9; see work_t180_off/server_31800.log
+=== t180 mtp=on 11:25:00
+rc=1
+server exited rc=-9; see work_t180_on/server_31800.log
+=== tbase mtp=off 11:25:58
+rc=1
+server exited rc=-9; see work_tbase_off/server_31800.log
+=== tbase mtp=on 11:26:56
+rc=1
+server exited rc=-9; see work_tbase_on/server_31800.log
+DONE rc=0
