@@ -4,8 +4,9 @@
   python3 scripts/engine/tree.py <ref> [OUT]      export engine/sglang at <ref> to OUT/sglang
   python3 scripts/engine/tree.py --mechanism 120  print the commit that introduced mechanism 120
 
-<ref> is any git ref (official-A-0923a, HEAD, a commit) or `mech:NNN` / `before:NNN` for the commit that
-introduced mechanism NNN (subject "engine NNN: ...") or its parent. Without OUT the tree is cached under
+<ref> is any git ref (official-A-0923a, HEAD, a commit), `mech:NNN` for the latest commit of mechanism NNN
+(subject "engine NNN: ..."; a mechanism may have follow-up commits), or `before:NNN` for the parent of its
+first commit. Without OUT the tree is cached under
 build/engine/trees/<commit>/ and reused. Library use (tests): tree_dir(ref) -> Path to .../sglang.
 """
 from __future__ import annotations
@@ -25,18 +26,23 @@ def git(*args: str) -> str:
     return subprocess.run(["git", "-C", str(REPO), *args], check=True, capture_output=True, text=True).stdout.strip()
 
 
-def mechanism_commit(num: str) -> str:
+def mechanism_commits(num: str) -> list[str]:
+    """Commits of mechanism NNN, newest first."""
     hits = git("log", "--format=%H", "--grep", f"^engine {num}:", "engine-base..HEAD").splitlines()
-    if len(hits) != 1:
-        raise SystemExit(f"mechanism {num}: expected one commit, found {len(hits)}")
-    return hits[0]
+    if not hits:
+        raise SystemExit(f"mechanism {num}: no commit")
+    return hits
+
+
+def mechanism_commit(num: str) -> str:
+    return mechanism_commits(num)[0]
 
 
 def resolve(ref: str) -> str:
     if ref.startswith("mech:"):
         return mechanism_commit(ref[5:])
     if ref.startswith("before:"):
-        return git("rev-parse", mechanism_commit(ref[7:]) + "^")
+        return git("rev-parse", mechanism_commits(ref[7:])[-1] + "^")
     return git("rev-parse", "--verify", ref + "^{commit}")
 
 

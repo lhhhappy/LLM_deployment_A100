@@ -273,6 +273,7 @@ def sparse_attention_fwd_kernel_v1(
     threads=256,
     return_lse=False,
     max_heads_per_block=64,  # [ax] 115: 32 on sm80 when a rank holds all 64 heads (DCP) -> fits 164KB smem
+    stage_output=True,  # [ax] 115: False drops O_shared (written, never read) to fit sm80 smem; default = base kernel
 ):
     assert (
         dim == tilelang.math.next_power_of_2(dim) or dim % 64 == 0
@@ -341,7 +342,8 @@ def sparse_attention_fwd_kernel_v1(
             KV_shared = T.alloc_shared([BI, D], dtype)
             if has_tail:
                 K_tail_shared = T.alloc_shared([BI, D_tail], dtype)
-            # [ax] 115: O_shared removed (written, never read) -> frees H_per_block*D*2 bytes of smem
+            if stage_output:
+                O_shared = T.alloc_shared([H_per_block, D], dtype)
             mask = T.alloc_fragment([BI], "bool")
 
             acc_o = T.alloc_fragment([H_per_block, D], accum_dtype)
@@ -431,6 +433,8 @@ def sparse_attention_fwd_kernel_v1(
             if return_lse:
                 T.copy(sumexp, LSE[b_i, s_i, H0:H1])
 
+            if stage_output:
+                T.copy(acc_o, O_shared)
             T.copy(acc_o, Output[b_i, s_i, H0:H1, :])
 
     return main
@@ -1423,6 +1427,7 @@ def tilelang_sparse_fwd(
                 max_heads_per_block=64,
                 block_I=64,
                 num_stages=1,
+                stage_output=False,
             )
         else:
             kernel = kernel_factory(
