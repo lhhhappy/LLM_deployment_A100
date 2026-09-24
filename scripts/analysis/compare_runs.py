@@ -96,7 +96,10 @@ def pair_ok(p, r, by):
             or p.get("idx") != r["idx_in_chain"]:
         return False
     prev = [x for x in by.values() if x["chain_id"] == r["chain_id"] and x["idx_in_chain"] == r["idx_in_chain"] - 1]
-    return len(prev) == 1 and prev[0]["prompt_tokens"] == p.get("previous_prompt")
+    if len(prev) != 1 or prev[0]["prompt_tokens"] != p.get("previous_prompt"):
+        return False
+    lcp = p.get("true_lcp")
+    return type(lcp) is int and 0 <= lcp <= min(r["prompt_tokens"], prev[0]["prompt_tokens"])
 
 
 def pct(xs, q):

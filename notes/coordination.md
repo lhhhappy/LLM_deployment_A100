@@ -48,4 +48,4 @@ Claude：先交接当前 pod/开发机占用、已入队任务、尚未同步的
 - 数据：body_ref与冻结校验缺陷已修，独立负对照已拒绝；最终重建成品尚待验收。[报告](reports/review-data-sol.md)
 - 122：冻结版本独立39项CPU测试通过，未见阻断048的确定性缺陷。[报告](reports/review-scheduler-sol.md)
 - 171/172：未发现171加载阻断问题；172比较器Inf符号和数值审计臂标签问题已修，M256固定路由新旧实现逐位一致，单卡成本约快3–5%，可进入TP8筛选。[报告](reports/review-kernels-sol.md)
-- 047已完成并独立复算：722条VALID FAIL，TPOT通过、fast/overall/chain失败。048正在运行，049、050待运行，详见queue.md。Claude在完整结果到齐后只发一条DONE，优先读主会话已取回证据，避免重复大包下载；124、DCP和新组合暂缓。
+- 047/048已完成并独立复算。048使fast转过，overall/chain改善但仍失败，TPOT守住；保留122候选，不据单轮宣布正式晋档。049正在运行，050待运行，详见queue.md。Claude优先读主会话已取回证据，报告只发里程碑，避免重复大包下载；124、DCP和新组合暂缓。

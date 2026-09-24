@@ -9,11 +9,13 @@
 | 044r / 045r | 正式 A@dev N14 / B@dev N10 校准 | 完成；各722条，主会话重新调用评分器复算一致，均有效FAIL；见 experiments.md 与 evidence/coordination-20260924/calibration-recheck.json |
 | 046r | S1@N22 混合 profile | 已自然结束进入done；两段TP0/TP4共4份trace已复算；仅诊断，不作判档/性能对照 |
 | 047-official_a_n22 | 正式 A 原样、原开发集 N22，不开 profiler | 完成且独立复算一致：722条VALID FAIL；TPOT .0620/.0870通过，fast33/23、overall55/27、chain73/22失败；13补丁/参数/env一致，冒烟12/12、KV池1,036,288。完整证据evidence/L047-official_a_n22/N22/ |
-| 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 正在运行；冻结SHA cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b；独立审查39项CPU测试通过；主要看能否改善047的TTFT失败并守住TPOT，核实际块长/guard/TP同步/KV压力 |
-| 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 已入队；非整齐长度、64k前缀尝试、MTP/decode图、融合路径日志与容量；不是逐层状态验收、能力门或SLO成绩 |
+| 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 完成且独立复算一致：722条VALID FAIL；fast33→10/23转通过，overall55→28/27、chain73→62/22仍失败；TPOT .0617/.0840通过。保留122为有希望候选，尚无正式N收益结论；不插队继续扫参数 |
+| 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 正在运行，基线引擎已就绪；非整齐长度、64k前缀尝试、MTP/decode图、融合路径日志与容量；不是逐层状态验收、能力门或SLO成绩 |
 | 050-official_a_172_num | 正式A与A+172各两次真实TP8输出/logprob初筛 | 已入队；正式A+172 fuzz0应用与独立脚本审查通过；数值对照后另录单请求trace，核对8个rank实际融合kernel；不是延迟/SLO对照 |
 
 新任务使用修正的 checked runner、flush证据和评分kit；047打印工具及原数据哈希，每个job打印patch哈希。049使用通用numcheck，flush耗尽、并发请求失败、输出截断都会失败；其logprob阈值仅粗筛，原始差异必须复核。
+
+047/048同请求对照工具已独立验收10项CPU回归：完整cohort/负载一致、原始精度判门、排除warmup与边界秒。T56 LCP仅核元数据/物理上界，来源未验证，仍只作诊断。[对照记录](../evidence/L048-official_a_122_n22/N22/compare_vs_047.txt)、[工具复核](reports/review-compare-sol.md)。
 
 ## 新数据与算子线
 

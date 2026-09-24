@@ -1,0 +1,27 @@
+{
+  "set": "dev-combined-v1",
+  "n": 22,
+  "wall_s": 1132,
+  "base_url": "http://127.0.0.1:30000",
+  "raw": "/tmp/ax/runs/048-official_a_122_n22/N22/raw_dev-combined-v1_N22_1790225665.jsonl",
+  "run": "/tmp/ax/runs/048-official_a_122_n22/N22/run_dev-combined-v1_N22_1790225665.json",
+  "report": "/tmp/ax/runs/048-official_a_122_n22/N22/report_dev-combined-v1_N22_1790225665.json",
+  "score_rc": 0,
+  "evaluation_status": "FAIL",
+  "ttft_p95_by_gate": {
+    "fast_intra(uncached_expected<=4096,<=3s)": 2.078369379043579,
+    "overall_intra(<=5s)": 7.7786595821380615,
+    "turn_start(<=15s)": 30.5393226146698,
+    "chain_start(<=30s)": 76.6303083896637
+  },
+  "ALL_PASS": false,
+  "tpm": {
+    "all": null,
+    "input": null,
+    "uncached_input_actual": null,
+    "device_work": null,
+    "decode": null,
+    "expected_uncached_input": null,
+    "cached_input": null
+  }
+}

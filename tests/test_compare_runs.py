@@ -125,6 +125,17 @@ class CompareRuns(unittest.TestCase):
         rc, out = run(b, c, "--pairs", str(pf))
         self.assertIn("metadata-checked 410, rejected 1", out)
 
+    def test_impossible_lcp_is_rejected(self):
+        pairs = json.loads((ROOT / "evidence/T56/pairs_rendered.json").read_text())
+        pf = self.tmp / "pairs.json"
+        for value in (-1, 10**9):
+            with self.subTest(true_lcp=value):
+                pairs[0]["true_lcp"] = value
+                pf.write_text(json.dumps(pairs))
+                rc, out = run(SRC, SRC, "--pairs", str(pf))
+                self.assertEqual(rc, 0, out)
+                self.assertIn("metadata-checked 410, rejected 1", out)
+
 
 if __name__ == "__main__":
     unittest.main()

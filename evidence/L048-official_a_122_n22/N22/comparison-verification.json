@@ -1,0 +1,29 @@
+{
+  "baseline": "047-official_a_n22",
+  "candidate": "048-official_a_122_n22",
+  "baseline_patch_count": 13,
+  "candidate_patch_count": 14,
+  "only_added_patch": {
+    "122-tpot-paced-prefill.patch": "cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b"
+  },
+  "args_equal": true,
+  "only_added_env": {
+    "SGLANG_AX_PACE_TPOT": "0.085"
+  },
+  "kv_tokens_equal": 1036288,
+  "independent_score_matches_pod": true,
+  "compare_tool_tests": 10,
+  "compare_tool_sha256": "707422df864f81dbc62f1cab1656636324942a5f08555390ad8778f4a658afa4",
+  "candidate_files": {
+    "job.log": "77adca570b2b62c1b44be31c4f6a517bda98f8096885769f768684377dbbc505",
+    "level_verdict.json": "5cc435dc3d86b4ebdf9e11b2323908199d95b3b4a33ba5599167d62d698810f3",
+    "compare_vs_047.txt": "baa69f5e2fe223031ea3ce926c522ac8da09f2a312dfd47cd9ec1c0055389ad6",
+    "compare_vs_047.csv": "45f1d272eea891ef92466e940a01d658406c32513d022bbc456497eb840efa24"
+  },
+  "limits": [
+    "single A/B run; no same-configuration N22 variance estimate",
+    "T56 LCP metadata checked; no content-source binding",
+    "seconds at measurement boundaries excluded from batch stats",
+    "not an official N22 pass or concurrency prediction"
+  ]
+}
