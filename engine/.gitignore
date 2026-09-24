@@ -1,0 +1,3 @@
+# Undo the repository-wide src/ and cache/ rules for the engine source; keep bytecode ignored.
+!src/
+!cache/
