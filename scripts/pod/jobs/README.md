@@ -1,14 +1,9 @@
 # 当前可运行任务
 
-按用户新决定逐项比较三个配置，122全部关闭：
+当前主线只有`official_b_full_n30_shortwarm.sh`（队列067）：正式A + mem0.87 + 新版180 + 修复122，
+引擎759a6eb，固定rep16-v1短预热，真flush后全量N30回放5601请求，不设70分钟截止。
 
-- `official_a_full_n30_70m.sh`：正式 A 参数基准（064）。
-- `official_a_mem087_full_n30_70m.sh`：仅加 `--mem-fraction-static 0.87`（065）。
-- `official_a_180_mem087_full_n30_70m.sh`：在065上仅加新版180的三个HiCache参数（066）。
-
-三项固定源码提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，全量311链/5601请求、N30、70分钟准入后排空。
-启动、预热及排空不计入70分钟准入时长，正式测量前真实flush。
-队列实时安排见 [queue.md](../../../notes/queue.md)。
-061s在预热中发现122短命中预留导致64-token续块，已停；063s撤下。修复后的122另行验证。
-旧任务原文留在git和 `evidence/source-workflow-20260924/retired-jobs.tgz`；不能重新入队旧补丁任务。
-新任务必须声明 `G_COMMIT`、`G_EXPECT`；默认走完整回放，设置 `G_MEASURE_SECONDS` 才走定时诊断。
+其余official_a_*_70m入口保留用于历史配置追溯，当前未排队，不自动重跑。
+队列事实见[queue](../../../notes/queue.md)，统一规则见[evaluation](../../../notes/evaluation.md)。
+所有新job声明固定G_COMMIT和G_EXPECT；原预热默认不变，日常诊断显式设G_WARMUP_PROFILE=rep16-v1。
+当前rep16-v1入口用于单档完整回放，不与G_MEASURE_SECONDS叠加。

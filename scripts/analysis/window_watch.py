@@ -32,7 +32,7 @@ TERMINAL = {'done', 'failed', 'cancelled'}
 CHUNK = 90000
 
 SNAPSHOT_CODE = r'''
-import gzip, hashlib, json, pathlib, sys, time
+import gzip, hashlib, json, pathlib, re, sys, time
 job, want_data = sys.argv[1], sys.argv[2] == '1'
 root = pathlib.Path('/tmp/ax/runs') / job
 states = [s for s in ('pending','running','done','failed','cancelled')
@@ -40,6 +40,44 @@ states = [s for s in ('pending','running','done','failed','cancelled')
 if len(states) > 1: raise ValueError('ambiguous queue state; retry')
 state = states[0] if states else 'unknown'
 m = dict(job_state=state, observed_at=time.time(), data=False)
+def tail(path, size=65536):
+    if not path.is_file(): return ''
+    with path.open('rb') as f:
+        f.seek(max(0, path.stat().st_size-size)); return f.read().decode(errors='replace')
+levels = sorted(root.glob('N[0-9]*'), key=lambda p:p.stat().st_mtime)
+h = dict(phase='startup', recent_error_lines=[], observation='file snapshots only')
+server = root/'server.log'
+if server.is_file():
+    t = tail(server)
+    h['server_log_age_s'] = round(time.time()-server.stat().st_mtime, 1)
+    h['recent_error_lines'] = [line[-400:] for line in t.splitlines()
+        if re.search(r'Traceback|CUDA out of memory|OutOfMemoryError|AssertionError|ERROR|Watchdog', line)][-8:]
+    batches = [line for line in t.splitlines() if 'Prefill batch' in line or 'Decode batch' in line]
+    if batches: h['latest_batch'] = batches[-1][-1000:]
+if levels:
+    level = levels[-1]
+    h['level'] = level.name
+    h['phase'] = 'preflight'
+    if (level/'warmup.log').is_file():
+        h['phase'] = 'warmup'
+        h['warmup_tail'] = tail(level/'warmup.log', 1800).splitlines()[-3:]
+    if (level/'flush_evidence.json').is_file():
+        f = json.loads((level/'flush_evidence.json').read_text())
+        h['runner_elapsed_s'] = round(time.time()-f['runner_started_s'], 1)
+        if f.get('flush_success') is True:
+            h['phase'] = 'measurement'
+            h['since_flush_s'] = round(time.time()-f['flush_finished_s'], 1)
+    gpu = level/'gpu_util.csv'
+    if gpu.is_file(): h['gpu_latest'] = tail(gpu, 4096).splitlines()[-8:]
+    if (level/'rundev_exit_code').is_file(): h['phase'] = 'scoring_or_finished'
+    checkpoints = sorted(level.glob('checkpoint_*.json'), key=lambda p:p.stat().st_mtime)
+    if checkpoints:
+        c = json.loads(checkpoints[-1].read_text())
+        h['completed_at_checkpoint'] = c.get('n_done')
+        h['checkpoint_age_s'] = round(time.time()-c['at_s'], 1)
+        raw = level/pathlib.Path(c['raw_file']).name
+        if raw.is_file(): h['raw_age_s'] = round(time.time()-raw.stat().st_mtime, 1)
+m['health'] = h
 def done():
     print('WINDOW_META '+json.dumps(m)); sys.exit(0)
 if state in ('unknown','pending') or (state == 'running' and not want_data): done()
@@ -132,6 +170,18 @@ def is_drained(meta, rows):
             and 'timed_score' in meta)
 
 
+def health_alerts(meta):
+    h = meta.get('health', {})
+    alerts = []
+    if h.get('recent_error_lines'): alerts.append('recent server error; inspect preserved lines')
+    if meta['job_state'] == 'running' and h.get('phase') == 'measurement':
+        if h.get('raw_age_s', h.get('since_flush_s', 0)) > 300:
+            alerts.append('no completed record for >300s; check long requests/gaps/engine')
+        if h.get('server_log_age_s', 0) > 300:
+            alerts.append('server log unchanged for >300s; not proof of engine failure')
+    return alerts
+
+
 def render(meta, rows, out, job, width):
     complete = is_complete(meta, rows)
     drained = is_drained(meta, rows)
@@ -190,6 +240,18 @@ def main(argv=None):
             meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, int(due)), 'WINDOW_META '))
             terminal = meta['job_state'] in TERMINAL
             state.update(health='up', job_state=meta['job_state'])
+            alerts = health_alerts(meta)
+            health = dict(observed_at=meta['observed_at'], job_state=meta['job_state'],
+                          **meta.get('health', {}), alerts=alerts)
+            atomic_json(out/'health.json', health)
+            with (out/'health_history.jsonl').open('a') as f:
+                f.write(json.dumps(health, ensure_ascii=False)+'\n')
+            if alerts != state.get('alerts', []):
+                print(args.job+': HEALTH '+json.dumps(alerts), flush=True)
+            if alerts:
+                with (out/'alerts.jsonl').open('a') as f:
+                    f.write(json.dumps(health, ensure_ascii=False)+'\n')
+            state['alerts'] = alerts
             if meta['data']:
                 rows = download(meta, out)
                 line = render(meta, rows, out, args.job, args.window_min)

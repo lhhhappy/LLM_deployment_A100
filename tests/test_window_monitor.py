@@ -34,6 +34,14 @@ class Windows(unittest.TestCase):
         for width in [0, -1, float('nan'), float('inf')]:
             with self.assertRaises(ValueError): gates.windows_for(self.rows(), width, True, None)
 
+    def test_health_alerts_distinguish_warmup_from_no_measurement_progress(self):
+        meta = dict(job_state='running', health=dict(phase='warmup', server_log_age_s=600))
+        self.assertEqual(watch.health_alerts(meta), [])
+        meta['health'].update(phase='measurement', raw_age_s=301)
+        self.assertEqual(len(watch.health_alerts(meta)), 2)
+        meta['health'].update(raw_age_s=1, server_log_age_s=1, recent_error_lines=['CUDA out of memory'])
+        self.assertEqual(len(watch.health_alerts(meta)), 1)
+
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
         p.write_text('{"req_id":"a"}\n{"req_id":')
