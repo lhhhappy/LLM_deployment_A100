@@ -12,15 +12,17 @@
 - TPOT均值/p95：067 .033498/.067469 → 068 .034262/.072501；固定稳态TPM 2.788M→2.733M，关闭122未见整体优势。
 - 唯一TTFT坏例616→589；fast修复282新增251、overall修复251新增260。完整[对照](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.txt)、[589坏例](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/ttft-cases.csv)、[哈希](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/case-list-manifest.json)；详见[experiments](../experiments.md)。
 - FULL host占用中位99.903%，744样本中97.45%≥98%；只覆盖FULL，不含KDA host。evicted_tokens_total是device淘汰，dropped=0不排除host churn。
-- lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束至执行326.57→301.78秒。真LCP不证明有效混合检查点存在；保存/淘汰/恢复原因未知。
-- 下一069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
+- lc139:0002在067/068均cached=0；069为75,520，TTFT265.63→8.143秒，距真LCP仍差1,792 token。缺口显著缩小，但有效状态保存/淘汰/恢复的具体事件仍未知。
+- 当前069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
 - 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。工具2837b3c已部署并恢复队列，启动180秒、rep16预热112.832秒，20:06:39 UTC真flush后已进入全量测量。
-- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，首15分钟已复核；下一45分钟诊断20:51:57 UTC。
+- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，45分钟已复核；下一75分钟诊断21:21:57 UTC。
 - 启动实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on符合G_EXPECT。[启动收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json)。
-- 069首15分钟快照625条，唯一、0错误、原预算/gap/时间戳核对通过；较晚健康675条不混入快照。四桶p95=10.560/13.795/15.277/192.192秒，TPOT均值/p95=.043517/.084881。
-- 与068相同625条相比，四桶超标90→69、95→61、8→3、33→23；未命中7.895M→5.291M token。仅已完成子集、有选择/时序偏差，不判整档或因果收益。
-- fast修复61、新增40；剩余69坏例中58条实际未命中≤4096，57条queue_time占TTFT≥80%。lc002:0007仅1696新token，TTFT92.38s，其中scheduler queue91.32s；等待原因仍未知。
-- 20:23:44补充样本FULL host占用99.894%、无retraction，不能单独证明容量瓶颈；[15分钟证据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/audit.json)、[慢例与服务区间](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/slow-fast-cases.json)。继续全量，下一步结合坏例追准入/恢复/池预算。
+- 069第46分钟快照2338条，唯一、0错误、原预算/gap/时间戳核对通过，前625条未变；独立复核通过。四桶p95=7.680/8.560/19.142/83.207秒，TPOT均值/p95=.035214/.070973。
+- 与068相同2338条相比，四桶超标430→212、377→179、13→7、49→31；未命中22.334M→12.055M token，TPOT均值.046581→.035214。仍是已完成子集，有选择/时序偏差。
+- chain累计31超标已超过冻结全量432样本CP允许29；若最终数据有效，此本地门已无法通过。继续完整回放，不预测官方、不提前停止；其他桶不能由子集直接判全量。
+- fast修复340新增122；212坏例中197条实际未命中≤4096、188条queue_time占TTFT≥80%（交集176）。剩余161链，尚非最后排空。
+- 新坏例lc302:0017两轮cached45,824不变，TTFT.369→82.872秒，其中scheduler queue82.573秒；lc117:0032同cached71,168，.419→55.005秒。
+- 源码120在partial存在时提前拒绝needs_host_load_back请求，180保留此规则；当前源码5项CPU HiCache调度测试通过，确认host候选会被暂缓；但最终cached不证明案例等待时层级或实际skip原因，仍需定向证据。[45分钟审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/audit.json)、[持续坏例](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/persistent-cases.json)、[新坏例与源码线索](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/slow-fast-cases.json)。
 - 同ID跟踪缓存量、等待/执行、prefill批与全部11门；容量无收益再补定向事件trace。缓存命中改善也不能忽略新坏例/TPOT回退。
 - 068在99.02分钟后剩链<30，最后排空段不代表满N30；不拿尾窗好看抵消全量失败。
 
@@ -39,7 +41,7 @@
 | 假设 | 需要什么证据 | 下一步 |
 | --- | --- | --- |
 | 缓存能减少工作量（当前优先） | 全程FULL host高占用与重复缺口；尚不能归因淘汰 | 069先做容量干预，无收益再定向trace |
-| 准入/批形成拖慢TTFT | 同请求recv→exec与actual prefill块；冷续块/短命中同批情况 | 复现调度反例，先CPU验证 |
+| 准入/批形成拖慢TTFT | 多数已完成fast坏例主要在queue；120在partial时拒绝host恢复候选 | CPU核验120/180交互，再用skip/restore事件辨因；不热改069 |
 | 执行单位成本偏高 | 长链exec→first分解；同形状块成本、MoE与通信时间 | 测成本曲线，评估A内实现 |
 | 122节奏过保守 | 解码余量与冷请求等待同步变化；forced-decode/实际块 | 校准成本模型，仍守TPOT尾部 |
 | 测量或监控干扰 | 请求唯一性、原输出预算、flush、采样器寿命 | 先修工具；不把测量问题算引擎收益 |

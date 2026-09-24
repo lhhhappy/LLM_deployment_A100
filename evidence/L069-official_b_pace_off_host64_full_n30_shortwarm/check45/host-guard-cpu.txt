@@ -1,0 +1,11 @@
+SOURCE_COMMIT 759a6ebb8e31723519ad5daf438e26e24b32501a; CPU fake requests/pools, actual scheduler and PrefillAdder methods
+test_blocker_names_the_reason (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_device_hit_decisions_identical_with_and_without_host_tier (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_host_hit_does_not_join_active_chunk (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_host_tier_keeps_protection_storage_bypasses (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_mechanism_report_official_a_env (test_sched_protect_chain.HiCacheTierTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.143s
+
+OK

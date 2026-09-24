@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "req_id": "scimaster:canon:lc_20260924_302:llm:0017",
+      "candidate": {
+        "prompt_tokens": 46276,
+        "cached_tokens": 45824,
+        "ttft_s": 82.87232160568237,
+        "queue_time_s": 82.57317686080933,
+        "t_recv_s": 1790282329.6519625,
+        "t_admit_s": 1790282329.741865,
+        "t_exec_start_s": 1790282412.3438249,
+        "t_first_token_s": 1790282412.5242841
+      },
+      "baseline": {
+        "cached_tokens": 45824,
+        "ttft_s": 0.36892151832580566,
+        "queue_time_s": 0.0028891563415527344,
+        "t_recv_s": 1790273868.7688355,
+        "t_admit_s": 1790273868.8655484,
+        "t_exec_start_s": 1790273868.9173424,
+        "t_first_token_s": 1790273869.137757
+      },
+      "actual_uncached_tokens": 452
+    },
+    {
+      "req_id": "biomaster:canon:lc_20260924_117:llm:0032",
+      "candidate": {
+        "prompt_tokens": 71748,
+        "cached_tokens": 71168,
+        "ttft_s": 55.0045428276062,
+        "queue_time_s": 54.55333137512207,
+        "t_recv_s": 1790282365.439127,
+        "t_admit_s": 1790282365.5715058,
+        "t_exec_start_s": 1790282420.2425656,
+        "t_first_token_s": 1790282420.4436698
+      },
+      "baseline": {
+        "cached_tokens": 71168,
+        "ttft_s": 0.4186263084411621,
+        "queue_time_s": 0.06070280075073242,
+        "t_recv_s": 1790273980.5582669,
+        "t_admit_s": 1790273980.6936998,
+        "t_exec_start_s": 1790273980.7743397,
+        "t_first_token_s": 1790273980.9768932
+      },
+      "actual_uncached_tokens": 580
+    }
+  ],
+  "lc302_service_window": {
+    "scope": "Whole-second batch lines strictly inside lc302 recv-to-exec; no batch request IDs",
+    "prefill_batches": 141,
+    "new_tokens": 553856,
+    "median_new_tokens": 4096,
+    "single_sequence_with_pending": 126,
+    "with_pending": 141,
+    "queue_max": 13,
+    "running_min_max": [
+      13,
+      23
+    ],
+    "decode_log_lines": 13
+  },
+  "source_hypothesis": {
+    "location": "engine/sglang/srt/managers/schedule_policy.py:_ax_short_hit, add_one_req",
+    "observed_code": "While a partial exists, 120 accepts only short device-prefix hits and returns OTHER before host load for needs_host_load_back requests. 180 retains this guard.",
+    "not_proven": "Final cached_tokens does not reveal residence/eligibility while waiting; device pool/slot pressure and queue ordering remain alternatives. Need CPU counterexample and runtime skip/restore evidence before assigning these cases to this guard."
+  },
+  "timing_semantics": "t_admit_s is API dispatch finish; queue_time_s is first forward minus scheduler wait-queue entry"
+}

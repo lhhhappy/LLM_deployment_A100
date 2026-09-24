@@ -1,0 +1,110 @@
+{
+  "scope": "Previously verified true-prompt LCP for eight biased 067 slow cases, same frozen data; does not prove valid checkpoint existed. Candidate outstanding cases are unknown.",
+  "source_lcp_file": "evidence/L067-official_b_full_n30_shortwarm/check45/lcp.json",
+  "pairs": [
+    {
+      "req_id": "biomaster:canon:lc_20260924_139:llm:0002",
+      "known_lcp_aligned": 77312,
+      "candidate_completed": true,
+      "base_cached": 0,
+      "base_ttft": 265.62984585762024,
+      "candidate_cached": 75520,
+      "candidate_ttft": 8.14272665977478,
+      "candidate_wait": 7.759857892990112,
+      "candidate_exec_to_first": 0.38286876678466797,
+      "candidate_queue_time": 7.603792667388916,
+      "candidate_lcp_gap": 1792
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_244:llm:0005",
+      "known_lcp_aligned": 17664,
+      "candidate_completed": true,
+      "base_cached": 17664,
+      "base_ttft": 1.0476539134979248,
+      "candidate_cached": 17664,
+      "candidate_ttft": 0.42761731147766113,
+      "candidate_wait": 0.10535955429077148,
+      "candidate_exec_to_first": 0.32225775718688965,
+      "candidate_queue_time": 0.058003902435302734,
+      "candidate_lcp_gap": 0
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_271:llm:0015",
+      "known_lcp_aligned": 35072,
+      "candidate_completed": true,
+      "base_cached": 4096,
+      "base_ttft": 87.75573539733887,
+      "candidate_cached": 34560,
+      "candidate_ttft": 2.8636345863342285,
+      "candidate_wait": 2.6080148220062256,
+      "candidate_exec_to_first": 0.25561976432800293,
+      "candidate_queue_time": 2.488020896911621,
+      "candidate_lcp_gap": 512
+    },
+    {
+      "req_id": "biomaster:canon:lc_20260924_188:llm:0004",
+      "known_lcp_aligned": 46336,
+      "candidate_completed": true,
+      "base_cached": 46336,
+      "base_ttft": 18.05463933944702,
+      "candidate_cached": 46336,
+      "candidate_ttft": 1.8545401096343994,
+      "candidate_wait": 1.6105914115905762,
+      "candidate_exec_to_first": 0.24394869804382324,
+      "candidate_queue_time": 1.5039212703704834,
+      "candidate_lcp_gap": 0
+    },
+    {
+      "req_id": "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:7",
+      "known_lcp_aligned": 38400,
+      "candidate_completed": true,
+      "base_cached": 38400,
+      "base_ttft": 0.7682759761810303,
+      "candidate_cached": 38400,
+      "candidate_ttft": 3.0426673889160156,
+      "candidate_wait": 2.211542844772339,
+      "candidate_exec_to_first": 0.8311245441436768,
+      "candidate_queue_time": 2.0804905891418457,
+      "candidate_lcp_gap": 0
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_241:llm:0017",
+      "known_lcp_aligned": 122624,
+      "candidate_completed": true,
+      "base_cached": 79104,
+      "base_ttft": 15.324909687042236,
+      "candidate_cached": 122624,
+      "candidate_ttft": 4.079316139221191,
+      "candidate_wait": 3.7558071613311768,
+      "candidate_exec_to_first": 0.32350897789001465,
+      "candidate_queue_time": 3.503723621368408,
+      "candidate_lcp_gap": 0
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_271:llm:0016",
+      "known_lcp_aligned": 35840,
+      "candidate_completed": true,
+      "base_cached": 4096,
+      "base_ttft": 44.90169906616211,
+      "candidate_cached": 35072,
+      "candidate_ttft": 16.27202796936035,
+      "candidate_wait": 15.984423875808716,
+      "candidate_exec_to_first": 0.28760409355163574,
+      "candidate_queue_time": 15.876741886138916,
+      "candidate_lcp_gap": 768
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_294:llm:0005",
+      "known_lcp_aligned": 182272,
+      "candidate_completed": true,
+      "base_cached": 182272,
+      "base_ttft": 0.7713589668273926,
+      "candidate_cached": 182272,
+      "candidate_ttft": 0.954348087310791,
+      "candidate_wait": 0.672511100769043,
+      "candidate_exec_to_first": 0.28183698654174805,
+      "candidate_queue_time": 0.3477048873901367,
+      "candidate_lcp_gap": 0
+    }
+  ]
+}

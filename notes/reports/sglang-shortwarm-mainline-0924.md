@@ -253,3 +253,28 @@ lc284:0006两轮cached同为16,640，TTFT135.987→39.130秒；lc239:0009两轮c
 
 较晚20:23:44的两个metrics样本：FULL host 2,900,736/2,903,808（99.894%），FULL device不可淘汰占用.9323，KDA .2201，无retraction；device usage不是物理驻留率，host gauge不覆盖KDA。高占用和write_through dropped=0都不证明host是否淘汰了某请求。
 未发现需要中止的故障，保留原任务继续全量，下一45分钟检查20:51:57 UTC。证据：[check15](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/)，含625条原快照/同ID CSV、审计、慢例、服务区间和分层metrics。
+
+
+## 069第45分钟检查（快照约46分钟）
+
+2338条唯一且无错误，原预算/prompt/gap与068同ID一致、服务端时间戳单调，前15分钟625条逐行未变；窗口复算和独立参与者复核通过。
+四桶p95 fast/overall/turn/chain=7.6802/8.5603/19.1424/83.2074秒；超标/本子集允许212/108、179/115、7/10、31/18。TPOT均值/p95=.035214/.070973，2条>.10。
+068相同2338请求超标430/377/13/49、TPOT=.046581/.080681；fast修复340新增122，overall299/101，turn12/6，chain23/5。
+相同请求cached128.321M→138.600M、实际未命中22.334M→12.055M；557条命中增加、222条减少、1559条相同。已完成150链、剩161链，尚非最终排空。
+
+chain当前31次超标是最终计数的下界；冻结全量此桶432条，CP最多允许29，因此若完整数据最终有效，该本地门已无法通过。独立复核确认此界限；这不构成官方预测，不据此中止任务。
+其余全量允许fast263/overall276/turn13，现有计数未超过这些上限；窗口仍open，有未完成选择偏差，不能由此判它们最后会过，也不把同ID子集改善当全量收益。
+
+原8条LCP线索已全完成：lc139:0002从068 cached0/TTFT265.630变为069 cached75,520/TTFT8.143秒，真实对齐LCP77,312，剩余差1,792；等待7.760秒、执行至首token.383秒。
+lc271:0015 cached4,096→34,560、TTFT87.756→2.864；lc271:0016 cached4,096→35,072、TTFT44.902→16.272。差额缩小支持继续查缓存收益，但这些都是偏置坏例，不推算总体可修空间。
+新回退lc302:0017两轮cached45,824一致，TTFT.369→82.872秒，queue_time82.573秒；lc117:0032 cached71,168一致，TTFT.419→55.005秒。
+212条fast坏例中197条实际未命中≤4096、188条queue_time占TTFT≥80%，交集176；只能定位主要耗时在等待，不能直接归因规则或排除先前恢复/资源竞争。
+lc302等待区间内141个prefill批，553,856新token、中位4096，126个单序列且pending，queue最高13，running13–23；服务持续工作，但无逐请求skip/恢复事件，不能指定哪一批阻塞它。
+
+源码线索：schedule_policy._ax_short_hit要求不需host load-back，add_one_req在continuation/new_chunked_req已登记时、恢复路径之前返回OTHER；180仍保留120该规则。独立源码复核确认。
+最终cached相同不证明排队时数据在host，也不证明案例实际走了此拒绝分支。下一步是CPU复现这一组合条件，并在必要时补skip/restore证据，避免简单删保护导致缓存/显存契约错误。
+较晚20:54:02两个metrics样本FULL host占用99.947%、无retraction；FULL device不可淘汰占用.8848、KDA .2129，仍不当物理驻留或整窗压力证明。
+继续069全量，下一75分钟检查21:21:57 UTC。证据：[check45](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/)，包含原始快照、2338条对照CSV、全量计数下界、持续坏例与服务区间。
+
+CPU补充：对引擎759a6eb运行现有HiCacheTierTests，5项通过（含device短命中可合批、host候选不合入active chunk且不调用init_load_back）。
+使用真实调度/PrefillAdder方法与假请求/池，仅验证机制条件，不能证明lc302实际命中分支；未修改运行中的引擎或评测。收据[host-guard-cpu.txt](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/host-guard-cpu.txt)。

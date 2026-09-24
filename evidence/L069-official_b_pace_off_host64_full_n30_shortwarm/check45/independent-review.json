@@ -1,0 +1,6 @@
+{
+  "reviewer": "review_eval_shortwarm",
+  "scope": "read-only local raw and source verification",
+  "findings": "No material factual errors; 2338 rows unique, metadata/budgets/timings match, previous625 unchanged, paired CSV agrees. Whole chain CP count lower-bound failure confirmed conditional on complete valid data. Fast-bad short-miss/queue-heavy intersection176. Host-guard code confirmed, case attribution remains unproven.",
+  "performance_boundary": "Completed candidate subset; selection/timing bias; no whole-run or official prediction"
+}
