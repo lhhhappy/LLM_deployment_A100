@@ -12,7 +12,7 @@
 
 **2. 本地三个任务**：全量 N30、70 分钟后排空，同一引擎提交 `c92acd5`，按顺序跑：
 - a. 正式 A 原样，参数同 `submission/official-0923-A.json`；`G_EXPECT="120=on 122=off 180=off"`。
-- b. a 加 `--mem-fraction-static 0.87`。依据（执行层复核后更正）：061s 前 21 分钟 8 卡采样的最大值为 70,446/81,920 MiB，但这段仍在预热，不能据此说约 11.2 GiB 从未用到，4 小时一档里可能出现更高峰值；0.87 同时扩大 KDA 状态池，KV 增量粗估约 36 万 token（推算），实际池大小以启动日志实测为准。
+- b. a 加 `--mem-fraction-static 0.87`。依据（执行层复核后更正）：061s 前 21 分钟 8 卡采样的最大值为 70,446/81,920 MiB，但这段仍在预热，不能据此说约 11.2 GiB 从未用到，4 小时一档里可能出现更高峰值；0.87 时 `kv_cache_configurator._handle_max_mamba_cache` 按比例 0.9 同时扩大 KDA 槽，MTP 中间池还受 max_running=32 约束，三者须联合计算，不给 KV 增量的预估，以 065 启动日志的实测池大小为准；0.87 只是实验值，不承诺长时间不 OOM。
 - c. b 加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；`G_EXPECT` 中 `180=on`。
 
 **3. 今天两个正式提交**，用户授权，用于校准本地尺子，不为刷分：
