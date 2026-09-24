@@ -1,0 +1,5 @@
+{
+  "patches/171-kda-bf16-proj-fusion.patch": "807856b5a5743528dec927ecd506ded1b926524842824268da85732217135f72",
+  "tests/test_kda_fusion_171.py": "97c22355c1185c1d113cb8a6272644c514c0f8053c0dae516c8ee0bcb9e85825",
+  "tests/gpu/test_kda_fusion_171.py": "2debc9ed42385fee874b00df216edf361e603a4d55c3f41266374e34bd4f69fe"
+}

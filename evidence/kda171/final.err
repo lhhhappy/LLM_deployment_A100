@@ -1,0 +1,10 @@
+Breakable CUDA graph is incompatible with KDA hybrid linear attention; disabling prefill CUDA graph.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=8, attn_tp_size=8, attention weights will be sharded across 8 ranks.
+Setting KV cache dtype to bfloat16 for DeepSeek DSA on SM8 device.
+Set DSA backends for bfloat16 KV Cache: prefill=flashmla_sparse, decode=fa3.
+USDT:2026-09-24 03:42:08 1563711:1563711 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-24 03:42:08 1563711:1563711 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-24 03:42:08 1563711:1563711 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-24 03:42:08 1563711:1563711 SyncActivityProfilerHandler.cpp:59] profiler_stop
