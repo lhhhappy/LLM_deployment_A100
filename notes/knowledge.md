@@ -4,7 +4,7 @@
 
 ## 赛题与测量
 
-- 正式排名依次比较 `n_at_slo` 与 `tpot_mean`；TPM 不排名。能力 AIME26/GPQA Diamond 都须严格高于 90 分。正式爬坡从 N=10 开始，过了 +4、没过 −4；题面规定的 11 门均须通过。四道 TTFT 门按题面统计余量判，`tpot_p95 ≤0.10 s/token` 无余量。[task.md](../llm-challenge-arena-v1/task.md)
+- 正式排名（主办方确认，2026-09-24）逐级比较：`n_at_slo` 越大越好（一档都过不了排最后）→ TPOT（`tpot_mean`）越小越好 → TPM 越大越好 → 先提交者靠前。能力 AIME26/GPQA Diamond 都须严格高于 90 分。正式爬坡从 N=10 开始，过了 +4、没过 −4；题面规定的 11 门均须通过。四道 TTFT 门按题面统计余量判，`tpot_p95 ≤0.10 s/token` 无余量。[task.md](../llm-challenge-arena-v1/task.md)
 - 开发集是链前缀抽样，722 请求、311 条在本轮出现的链；链首占比远高于正式集。它只适合我们自己配置之间的 A/B 与回归，不推出正式 N@SLO。不能使用截链、去间隔等改变负载的参数。见 [R19](../research/codex/R19_progress_and_cache_review.md) 与 task.md 开发集约束。
 - 判分先检查本轮 cohort 中每个请求恰好出现一次、runner 成功和指标完整，再调用 harness 的 `s1_score.evaluate`（`scripts/score_formal.py`）并核对题面的 TPOT p95 门。空 raw、缺请求、缺指标或 runner 失败是 **INVALID**，不是 PASS。`run_dev.py` 对 flush 的公开检查只看 HTTP 成功，不能据此证明缓存真清；另核对真实清除行为。[R19 §2](../research/codex/R19_progress_and_cache_review.md)、[level_verdict.py](../scripts/pod/verify/level_verdict.py)
 - `meta_info` 的时间戳、prompt/cached/completion token 计数必须如实；thinking、输出预算、历史和 tools 保持原样；`/flush_cache` 必须清掉前缀 KV。性能改善不能以牺牲这些条件取得。见 task.md「质量前提」「约束」。
@@ -45,6 +45,6 @@
 - `blocking.py` 已更新为窗口诊断：排队位置不能直接归因调度，prefill 生命周期重合不等于 GPU 独占。042/037d 的旧成本估计分别在 218/123 条请求超过整个执行窗口；新版保留有符号残差、缺失 LCP 标未知，按真实 cohort 验证。累计重合秒数是 request-seconds；86.9%/98.9% 是 TPOT 超标请求的生成窗口重合中位数，不能称真实停顿占比。[工具复核与用法](codex-分析-阻塞归因与执行路线.md)
 - 执行层研究不限于 SGLang：题面 vLLM sm80 backport 已有主办方接口验证，是首个替代引擎对照候选；不是已证明分数更高。KDA BF16 投影融合、170 v2、MoE 结构/大块路径按数值和真实成本筛选。[更新后的 R9](../research/claude/R9_upstream_since_base.md)
 
-## 正式最终评测的规模（用户提供，2026-09-24）
-- 回放 341 条会话链、5150 个请求（平均每链约 15.1 个请求；开发集为 311 链 / 722 请求，每链约 2.3 个），按档搜索最大 N，整轮约 8–10 小时。按此估算，链首约占 6.6%（开发集为 43%）。
-- `llm-challenge-arena-v1/challenge.json` 的摘要写"8–10 小时起步，搜索多档更长"，排名为 N@SLO → TPM(decode) → chain_start p95；task.md 写的是 N@SLO → tpot_mean。两处不一致，以 task.md 为准，已标记待确认。
+## 正式最终评测的规模（主办方确认，2026-09-24）
+- 回放 341 条会话链、5150 个请求（平均每链约 15.1 个请求；开发集为 311 链 / 722 请求，每链约 2.3 个），按档搜索最大 N，整轮约 8–10 小时。由此估算，链首约占 6.6%，开发集为 43%。
+- 排名顺序见上文「赛题与测量」。task.md 与 `challenge.json` 摘要里的旧排名写法（TPM 不排名；或 TPM(decode) → chain_start p95）以主办方这次确认为准。
