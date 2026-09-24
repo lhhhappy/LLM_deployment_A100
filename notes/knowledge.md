@@ -35,10 +35,12 @@
 - 来源：`s1-dev/` 是主办方公开开发集与 harness（task.md「公开开发集」：同一套 harness 与评分口径），本仓库不做版本管理，只读。我们用原 `run_dev.py` 回放（preflight→warmup→flush→测量），节拍为默认 chain-total-gap-scaled-v1、cap 3600 s（0 条链被压缩），未使用 `--max-chains/--no-gap/--include-all`。`--tok-dir` 用 `/mnt/models`，但 722 条的 prompt_tokens 与数据集 glm_tokens 全部一致；TTFT 全部来自服务端打点；输出长度全部等于 max_output_i（ignore_eos）。判定用 harness 的 s1_score 加 task.md 的统计余量与 tpot_p95 门（harness 自带 summary 只按点估计判，另行报告）。
 - 结构差异（主办方设计，不是脚本错误）：开发集链前缀抽样，311 链/722 请求、平均 2.3 请求/链，chain_start 314 条（43%）；loadgen 每个槽取一整条链顺序回放，链短则槽不断开新链，冷链首持续涌入；042 实际 prefill 中链首占 76%。正式用整链集，单档约 4 小时；开发集 N22 一档约 20 分钟，harness 的稳态 TPM 窗口 [10,70) min 不成立，本地 TPM 为空。
 - 已撤回（Codex 复核）：「开发集 p95 高 3–6 倍」没有同配置同档校准，不成立；「tpm_all 相当」混用了全程平均与稳态窗口，不成立。可说的只是：正式通过档 TPOT 余量大，开发集同类配置在更高档位 TPOT 失败。
-- 校准：044 用正式 A 原配置跑开发集 N14、045 用正式 B 原配置跑 N10，逐门对照官方通过档，得到开发集对这两种配置的偏差；在此之前，开发集只用于 A/B 相对比较。
+- 校准：044r 用正式 A 原样（镜像 0923a 的 13 个补丁，含 121；与镜像源码树逐文件一致）跑开发集 N14，045r 用正式 B 原样跑 N10，逐门对照官方通过档。最初的 044/045 漏掉 121，已作废删除。在校准结果出来前，开发集只用于 A/B 相对比较。
 - 正式提交内容对其他选手不可见（`scoringDetails`："部署赛提交内容仅作者与主办方可见"）。
 
 ## 产能与profile复核（Codex）
 
 - 122的1.175s/16k是成本公式，不是所有上下文下的直测；由全程未命中token/墙钟及此公式得出的prefill占时、MFU只作条件估算，不按N线性外推。当前S1已启用mHC token scatter及reduce-scatter路径，不能照旧profile重复计入尚未实现的收益。TP4仅专家71.12GiB/rank，保留当前KDA池的4+4 PD方案不满足显存账。[分析§10](codex-分析-2026-09-24.md#10-对prefill效率是根的逐项复核与可改代码)
 - 通用`prof_ledger.py`曾把一个decode的多stream标记算成44步，产生负outside时间；现按External id合并，4个CPU用例和4份历史trace回归通过。kernel名字分类只是启发式，no-kernel gap不能直接当host开销。[分析§12](codex-分析-2026-09-24.md#12-新复现的profile账本bug及修复)
+- `blocking.py` 已更新为窗口诊断：排队位置不能直接归因调度，prefill 生命周期重合不等于 GPU 独占。042/037d 的旧成本估计分别在 218/123 条请求超过整个执行窗口；新版保留有符号残差、缺失 LCP 标未知，按真实 cohort 验证。累计重合秒数是 request-seconds；86.9%/98.9% 是 TPOT 超标请求的生成窗口重合中位数，不能称真实停顿占比。[工具复核与用法](codex-分析-阻塞归因与执行路线.md)
+- 执行层研究不限于 SGLang：题面 vLLM sm80 backport 已有主办方接口验证，是首个替代引擎对照候选；不是已证明分数更高。KDA BF16 投影融合、170 v2、MoE 结构/大块路径按数值和真实成本筛选。[更新后的 R9](../research/claude/R9_upstream_since_base.md)
