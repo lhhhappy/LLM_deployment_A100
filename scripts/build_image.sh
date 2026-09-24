@@ -54,8 +54,8 @@ bad="$(grep -E '^(\+\+\+|---) ' "$STAGE/engine.diff" | awk '{print $2}' | grep -
 [ -z "$bad" ] || die "diff has paths outside engine/sglang: $bad"
 B64="$(gzip -9nc "$STAGE/engine.diff" | base64 -w0)"
 
-mkdir -p build/image
-DF=build/image/Dockerfile
+mkdir -p build/scratch/image
+DF=build/scratch/image/Dockerfile   # generated; build/image/ keeps records of built images
 {
   echo "# generated"
   echo "FROM $FROM_IMAGE"

@@ -1,3 +1,4 @@
+# Now in git: this image's engine source = tag official-A-0923a (= image-lh-img-0923a), file-identical (migration 2026-09-24).
 # Image 0923a (official attempts 45979/45980). Built with the pre-consolidation patch files (old names, in this order):
 #   000-interface-compliance 101-d1v12-on-base 105-role-split-single-partial 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer
 #   111-sm80-fp8-moe-marlin 112-sm80-indexer-kernels 113-sm80-prefill-indexer 114-indexer-row-shard 140-kda-dual-snapshot
