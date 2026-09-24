@@ -171,7 +171,7 @@ def load_source(root=CANDIDATE):
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
-             '_ax_pace_should_decode', '_ax_pace_limits'}
+             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)

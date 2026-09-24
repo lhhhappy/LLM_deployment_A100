@@ -1,0 +1,50 @@
+--- a/python/sglang/srt/managers/scheduler.py
++++ b/python/sglang/srt/managers/scheduler.py
+@@ -1311,6 +1311,27 @@
+             and any(not req.finished() for req in running_batch.reqs)
+         )
+ 
++    def _ax_short_reserve_limits(self, ax_protect):
++        """[ax] 124: size the partial's share by what waiting short hits need, instead of a fixed COLD_CAP.
++
++        With 120/121 a continuation takes COLD_CAP and short full hits get the rest of the chunk
++        (8192 - 4096 in official A), so a waiting hit with more new tokens than that leftover waits for the
++        whole cold prefill. Here the continuation / cold first chunk is capped at min(COLD_CAP, chunk minus the
++        paged new tokens of the waiting complete short hits), at least one grid unit; prefixes are the ones
++        calc_priority matched this round. With no such hit waiting the cap is COLD_CAP, as before. Off unless
++        SGLANG_AX_SHORT_RESERVE=1. The batch token budget is unchanged.
++        """
++        cap, short, grid = ax_protect
++        budget = min(self.chunked_prefill_size, self.max_prefill_tokens) // grid * grid
++        reserve = 0
++        for req in self.waiting_queue:
++            new = req.seqlen - len(req.prefix_indices)
++            if len(req.prefix_indices) > 0 and not req.needs_host_load_back() and 0 < new <= short:
++                reserve += -(-new // self.page_size) * self.page_size
++                if reserve >= budget:
++                    break
++        return max(grid, min(cap, (budget - reserve) // grid * grid)), short, grid
++
+     def _should_defer_prefill(self) -> bool:
+         if self._prefill_decode_interval_remaining == 0:
+             return False
+@@ -3695,6 +3716,10 @@
+         else:
+             prefill_tile_block_m = 64  # Fallback for non-Triton backends
+ 
++        ax_protect = self._ax_sched_protect_limits(chunked_prefill_size)
++        if ax_protect is not None and os.environ.get("SGLANG_AX_SHORT_RESERVE", "0") == "1":
++            ax_protect = self._ax_short_reserve_limits(ax_protect)
++
+         adder = PrefillAdder(
+             self.page_size,
+             self.tree_cache,
+@@ -3712,7 +3737,7 @@
+             dllm_config=self.dllm_config,
+             waiting_queue_len=len(self.waiting_queue),
+             prefill_tile_block_m=prefill_tile_block_m,
+-            ax_protect=self._ax_sched_protect_limits(chunked_prefill_size),
++            ax_protect=ax_protect,
+         )
+ 
+         if self.chunked_req is not None:
