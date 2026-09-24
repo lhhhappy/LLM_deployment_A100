@@ -1,0 +1,79 @@
+import base64
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts/analysis'))
+import window_gates as gates
+import window_watch as watch
+
+
+class Windows(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def rows(self):
+        # Slow unfinished requests are deliberately absent from completed raw.
+        return [dict(req_id=str(i), client_dispatch_at_s=t, client_finish_at_s=t+1,
+                     wall_s=1, phase='chain_start', output_tokens=10, ttft_s=1, tpot_s=.01)
+                for i, t in enumerate([100, 3700])]
+
+    def test_old_window_cannot_close_from_completed_max_wall(self):
+        run = gates.windows_for(self.rows(), 25, True, gates.score_formal.load_harness())
+        self.assertTrue(all(w['open'] for w in run['windows']))
+        self.assertIn('unfinished requests absent', gates.summary(run, 'live'))
+
+    def test_invalid_window_width(self):
+        for width in [0, -1, float('nan'), float('inf')]:
+            with self.assertRaises(ValueError): gates.windows_for(self.rows(), width, True, None)
+
+    def test_only_live_unterminated_last_fragment_ignored(self):
+        p=self.out/'raw'
+        p.write_text('{"req_id":"a"}\n{"req_id":')
+        self.assertEqual(len(gates.load_raw(p, allow_partial=True)), 1)
+        with self.assertRaises(ValueError): gates.load_raw(p)
+        p.write_text('{"req_id":"a"}\nbad\n')
+        with self.assertRaises(ValueError): gates.load_raw(p, allow_partial=True)
+
+    def test_duplicate_request_rejected(self):
+        p=self.out/'raw'; p.write_text('{"req_id":"a"}\n'*2)
+        with self.assertRaises(ValueError): gates.load_raw(p)
+
+    def meta(self):
+        return dict(job_state='failed', raw='raw_x.jsonl', n=30, score={},
+                    verdict=dict(status='VALID', rows=2, raw='raw_x.jsonl'),
+                    summary=dict(raw='/tmp/ax/runs/x/N30/raw_x.jsonl', n=30))
+
+    def test_failed_is_complete_only_with_matching_receipt(self):
+        m=self.meta()
+        self.assertTrue(watch.is_complete(m, self.rows()))
+        for key, value in [('rows', 3), ('raw', 'other.jsonl'), ('status', 'INVALID')]:
+            m=self.meta(); m['verdict'][key]=value
+            self.assertFalse(watch.is_complete(m, self.rows()))
+        m=self.meta(); m['job_state']='running'
+        self.assertFalse(watch.is_complete(m, self.rows()))
+        m=self.meta(); m['summary']['n']=14
+        self.assertFalse(watch.is_complete(m, self.rows()))
+
+    def test_hashed_chunk_download_and_truncation(self):
+        data=('\n'.join(json.dumps(r) for r in self.rows())+'\n').encode()
+        z=gzip.compress(data)
+        m=dict(size=len(z), sha256=hashlib.sha256(z).hexdigest(), archive='snapshot.gz')
+        def call(_code, _path, start, length):
+            return 'WINDOW_DATA '+base64.b64encode(z[start:start+length]).decode()+'\nexit_code: 0\n'
+        self.assertEqual(watch.download(m, self.out, call), self.rows())
+        with self.assertRaises(ValueError):
+            watch.download(m, self.out, lambda *a:'WINDOW_DATA '+base64.b64encode(z[:-2]).decode())
+        m['sha256']='0'*64
+        with self.assertRaises(ValueError): watch.download(m, self.out, call)
+        self.assertEqual((self.out/'raw.jsonl').read_bytes(), data)
+
+
+if __name__ == '__main__': unittest.main()

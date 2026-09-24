@@ -17,10 +17,10 @@ equals score_formal.json (same n, over, p95, tpot mean/p95), which calibrates th
 
 Windows are NOT verdicts: only the complete-data harness score is a verdict. The replay is
 closed-loop, so a window inherits the backlog of earlier windows. With --live (a run still in
-progress) a request appears only after it finishes, so windows that may still receive late
-finishers are marked "open": any window ending after the earliest dispatch among requests
-that could still be running is unknown; we mark every window that ends later than
-(latest finish seen - longest wall seen) as open.
+progress) a request appears only after it finishes. Raw rows do not list all outstanding
+dispatches, so every live window remains "open". The longest completed wall time cannot
+bound a request that has not finished. These are completed-request statistics, not a
+latency estimate for all requests sent during the window.
 Standard library only; the HTML chart is inline SVG.
 """
 
@@ -41,19 +41,28 @@ GATE_SHORT = {"fast_intra": "fast", "overall_intra": "overall",
               "turn_start": "turn", "chain_start": "chain"}
 
 
-def load_raw(path: Path) -> list[dict]:
+def load_raw(path: Path, allow_partial: bool = False) -> list[dict]:
     rows = []
+    seen = set()
     with path.open(encoding="utf-8") as f:
         for line in f:
-            line = line.strip()
-            if not line:
+            terminated = line.endswith("\n")
+            if not line.strip():
                 continue
             try:
-                rows.append(json.loads(line))
+                row = json.loads(line)
             except json.JSONDecodeError:
-                # A live file can end in a partially written line; anything else is an error.
-                if f.read().strip():
-                    raise
+                if allow_partial and not terminated and not f.read():
+                    break
+                raise
+            if not isinstance(row, dict):
+                raise ValueError("raw rows must be objects")
+            rid = row.get("req_id")
+            if rid is not None:
+                if rid in seen:
+                    raise ValueError(f"duplicate raw req_id: {rid}")
+                seen.add(rid)
+            rows.append(row)
     return rows
 
 
@@ -86,27 +95,24 @@ def stats(records: list[dict], scorer) -> dict:
 
 
 def windows_for(rows: list[dict], window_min: float, live: bool, scorer) -> dict:
+    if not finite(window_min) or window_min <= 0:
+        raise ValueError("window_min must be finite and positive")
     disp = [r["client_dispatch_at_s"] for r in rows if finite(r.get("client_dispatch_at_s"))]
     if len(disp) != len(rows):
         raise ValueError("every raw row needs client_dispatch_at_s")
     t0 = min(disp)
     width = window_min * 60
     n_win = int((max(disp) - t0) // width) + 1
-    open_after = None
-    if live:
-        fin = [r["client_finish_at_s"] for r in rows if finite(r.get("client_finish_at_s"))]
-        walls = [r["wall_s"] for r in rows if finite(r.get("wall_s"))]
-        if fin and walls:
-            open_after = max(fin) - max(walls) - t0
     out = []
     for i in range(n_win):
         lo, hi = t0 + i * width, t0 + (i + 1) * width
         sel = [r for r in rows if lo <= r["client_dispatch_at_s"] < hi]
         cum = [r for r in rows if r["client_dispatch_at_s"] < hi]
-        is_open = bool(live and open_after is not None and (i + 1) * width > open_after)
+        is_open = live  # No complete census of outstanding dispatches is available.
         out.append({"index": i, "start_min": i * window_min, "end_min": (i + 1) * window_min,
                     "open": is_open, "window": stats(sel, scorer), "cumulative": stats(cum, scorer)})
     return {"t0": t0, "window_min": window_min, "live": live, "n_rows": len(rows),
+            "closure_basis": "unknown_outstanding_dispatches" if live else "caller_declared_complete",
             "span_min": (max(disp) - t0) / 60, "windows": out, "whole": stats(rows, scorer)}
 
 
@@ -121,19 +127,23 @@ def check_score(whole: dict, score_path: Path) -> list[str]:
             if r[a] != w[b]:
                 bad.append(f"{short}.{b}: score={r[a]} window_tool={w[b]}")
     for a, b in (("n", "n"), ("tpot_mean", "mean"), ("tpot_p95", "p95")):
-        if not math.isclose(ref["tpot"][a], whole["tpot"][b], rel_tol=1e-12, abs_tol=0):
+        rv, wv = ref["tpot"][a], whole["tpot"][b]
+        equal = rv is None and wv is None or (
+            finite(rv) and finite(wv) and math.isclose(rv, wv, rel_tol=1e-12, abs_tol=0))
+        if not equal:
             bad.append(f"tpot.{b}: score={ref['tpot'][a]} window_tool={whole['tpot'][b]}")
     return bad
 
 
 def summary(run: dict, label: str) -> str:
-    """One line: whole-run over/allowed per gate, TPOT, and the latest closed window."""
+    """One line of observed completed requests; live windows remain incomplete."""
     def gates(st):
         return " ".join(f"{k} {v['over']}/{v['allowed'] if v['allowed'] is not None else '-'}"
                         for k, v in st["gates"].items())
     w = run["whole"]
     t = w["tpot"]
-    line = (f"{label}: {run['n_rows']} req, {run['span_min']:.0f} min | whole {gates(w)} | "
+    scope = "observed/incomplete" if run["live"] else "whole"
+    line = (f"{label}: {run['n_rows']} req, {run['span_min']:.0f} min | {scope} {gates(w)} | "
             f"tpot {t['mean']:.4f}/{t['p95']:.4f}" if t["n"] else f"{label}: {run['n_rows']} req")
     closed = [x for x in run["windows"] if not x["open"]]
     if closed:
@@ -141,7 +151,9 @@ def summary(run: dict, label: str) -> str:
         g = x["window"]["gates"]
         p95 = " ".join(f"{k} {v['p95']:.1f}" for k, v in g.items() if v["p95"] is not None)
         line += (f" | last closed {x['start_min']:.0f}-{x['end_min']:.0f}m: {x['window']['n']} req, "
-                 f"p95 {p95}, over {sum(v['over'] for v in g.values())}")
+                 f"p95 {p95}")
+    elif run["live"]:
+        line += " | all windows open; unfinished requests absent"
     return line
 
 
@@ -255,7 +267,8 @@ pre{{overflow-x:auto;font-size:11px;color:var(--fg)}} p{{color:var(--mut)}}
 <h1>Gate curves, {window_min:g}-minute windows</h1>
 <p>{legend}</p>
 <p>Diagnostic only: windows are not verdicts; the complete-data harness score is. Each request sits in the window
-of its dispatch time; the closed-loop replay carries backlog from earlier windows. {'; '.join(opens)}</p>
+of its dispatch time; the closed-loop replay carries backlog from earlier windows. Live curves contain only
+completed requests and can omit the slowest unfinished requests. {'; '.join(opens)}</p>
 <div class="g">{''.join(panels)}</div>{tables}</body></html>"""
 
 
@@ -275,7 +288,7 @@ def main(argv=None) -> int:
     labels = a.label + [p.parent.parent.name or p.name for p in a.raw[len(a.label):]]
     runs = []
     for path, lab in zip(a.raw, labels):
-        rows = load_raw(path)
+        rows = load_raw(path, allow_partial=a.live)
         if not rows:
             print(f"{path}: no rows", file=sys.stderr)
             return 2

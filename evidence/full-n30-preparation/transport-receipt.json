@@ -1,0 +1,21 @@
+{
+  "body": "bodies/s1-dev-longchain.jsonl.gz",
+  "filename": "s1-dev-longchain.jsonl",
+  "mtime": 0,
+  "compresslevel": 1,
+  "sha256": "c005ddf85ffd956c5056b53922f3876c3df745d0155fb593247114194d726f03",
+  "size": 524381018,
+  "raw_bytes": 1545491137,
+  "xz_bytes": 6786092,
+  "archive_bytes": 8526417,
+  "archive_sha256": "265e327857d3d44930a55ee09578273379cae2f438ca0e9c4b56c5db9459e8b6",
+  "artifact_hashes": {
+    "requests.jsonl": "060fecce235ee4c1437230ad9e88a879eecf2b239c33af91dc3e0bc091c453e9",
+    "chains.jsonl": "9c5d43503bccb4565e407a6216f46b415849b36e995023688d1d05e8c076048f",
+    "provenance.jsonl": "ecb11091809e718f7fa1429a90b0e61e0842947057fb8b31b6b68fafb6290dd8",
+    "bodies/s1-dev-longchain.jsonl.gz": "c005ddf85ffd956c5056b53922f3876c3df745d0155fb593247114194d726f03",
+    "cohort.json": "60799f7856cd5c08685ac11f0d6e452fa4de05dd3518d13c22b2030c09e75ed6",
+    "event-plans.jsonl": "45429dbde4cee79e23394d845e9f2f16522d1edfa0eb42357b9ce7c0f8ddb5c1",
+    "samples/s1-dev-longchain.jsonl": "027fda5e34743a0db9e419bd2ec4e03292c33df5c9b4701bc554b0d5eb04d2eb"
+  }
+}
