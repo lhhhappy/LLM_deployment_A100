@@ -82,13 +82,14 @@ chain共432，允许29，当前已43。因此本轮后续全部达标也无法PA
 
 **待定位问题C067-cache-gap**：选第30分钟后已完成fast坏例中最慢8条（实际dispatch在38.21–43.22分钟）。
 用冻结正文和同哈希tokenizer重渲染实际前驱及当前prompt，16份长度均等于raw；前驱已完成、namespace相同。
-页对齐prompt LCP减cached的正差额为10,944–171,904，中位31,360 token。
+按当前180的256-token树边界，prompt LCP减cached的正差额为10,752–171,776，中位31,360 token。
+75分钟检查时纠正了原工具默认64-token物理页口径；重渲染复算通过，现须显式提供alignment，调查方向不变。
 例：lc_20260924_139:0002输入77,721，前驱公共前缀77,382，cached=0，TTFT288.65秒，其中recv→exec280.75秒。
 这验证了输入确有公共前缀，不能证明可恢复的混合状态曾保存，也不能区分淘汰/检查点缺失/装回失败。
 样本有意选最慢请求，不能外推缺口比例或可修收益。独立review核对筛选、差值及边界通过，未独立重渲染。
 下一步沿这8个ID核查状态保存、host备份、装回与准入；现有日志不能回答的部分留作下一轮定向观测。
 
-复现：`.venv-longchain/bin/python scripts/analysis/replay_lcp.py evidence/L067-official_b_full_n30_shortwarm/check45/raw.jsonl --data-root data/s1-dev-longchain --tok-dir s1-dev/glm_tok --since-min 30 --limit 8 --out /tmp/067-lcp.json`。
+复现：`.venv-longchain/bin/python scripts/analysis/replay_lcp.py evidence/L067-official_b_full_n30_shortwarm/check45/raw.jsonl --data-root data/s1-dev-longchain --tok-dir s1-dev/glm_tok --since-min 30 --limit 8 --alignment 256 --out /tmp/067-lcp.json`。
 证据：[check45](../../evidence/L067-official_b_full_n30_shortwarm/check45/)，包含raw、窗口、服务区间日志、lcp结果、全量桶余量与N30实参审计。
 
 ## 下一轮怎样核对改进
@@ -101,3 +102,16 @@ case-list-manifest.json绑定raw与冻结数据manifest哈希。四桶超标数�
 
 用户提供的线上榜单快照：N@SLO30，TPOT均值.046204，逻辑TPM1,557,557.2、decode TPM19,434。
 作为正式目标参照；当前本地未过门的局部样本不与其直接排名，TPM等完整固定稳态评分后再讨论。
+
+## 75分钟检查点：后段压力变化
+
+3210条完成且唯一，前45分钟raw原样保留；0错误、0输出预算差异、0服务端时间戳逆序。
+累计四桶p95 13.68/14.94/28.05/129.32秒，TPOT .0417/.0732；四桶累计超标均已超过全量CP允许数。
+第60分钟后已完成834条的四桶p95为2.09/2.72/2.75/12.32秒，TPOT .0325/.0555，仍为open样本。
+与30–60分钟相比，已完成请求平均未命中从9404降到4419 token、逻辑cache比率85.9%→92.8%；
+不能当因果证明，尤其后段尚有在途慢请求。75分钟已完整完成215/311条链，还有96条，未进入少于30条链的最终排空。
+配置未变化；继续按实际工作量、状态复用与等待分解压力差异，不归功于未实施的优化或预热。
+
+观测缺口：原metrics_sampler过滤掉了已有的HiCache占用、备份、搬回、丢弃和分层命中计数。
+已补充下一轮采集名单，8类样例解析校验通过；各pool保留标签，不把KV token与KDA槽相加。
+本轮采样器不热改，缺失指标仍视为未知。证据见[check75](../../evidence/L067-official_b_full_n30_shortwarm/check75/)。

@@ -23,9 +23,12 @@ def main():
     ap.add_argument('--tok-dir', required=True, type=Path)
     ap.add_argument('--since-min', type=float, default=0)
     ap.add_argument('--limit', type=int, default=8)
+    ap.add_argument('--alignment', type=int, required=True,
+                    help='effective cache-tree token alignment (067 HiCache: 256; physical page: 64)')
     ap.add_argument('--out', required=True, type=Path)
     args = ap.parse_args()
     if args.limit < 1: ap.error('limit must be positive')
+    if args.alignment < 1: ap.error('alignment must be positive')
     rows = [json.loads(s) for s in args.raw.read_text().splitlines() if s.strip()]
     by_pos = {(r['chain_id'], r['idx_in_chain']): r for r in rows}
     if len(by_pos) != len(rows): raise ValueError('duplicate replay position')
@@ -61,13 +64,14 @@ def main():
         lcp = next((i for i, (x, y) in enumerate(zip(a, b)) if x != y), min(len(a), len(b)))
         results.append(dict(req_id=r['req_id'], predecessor=prev['req_id'],
             prompt_tokens=len(b), cached_tokens=r['cached_tokens'], true_prompt_lcp=lcp,
-            lcp_aligned=lcp//64*64, positive_lcp_minus_cached=max(0, lcp//64*64-r['cached_tokens']),
+            lcp_aligned=lcp//args.alignment*args.alignment,
+            positive_lcp_minus_cached=max(0, lcp//args.alignment*args.alignment-r['cached_tokens']),
             actual_uncached=len(b)-r['cached_tokens'], frozen_uncached=r['uncached_expected'],
             ttft_s=r['ttft_s'], recv_to_exec_s=r['t_exec_start_s']-r['t_recv_s'],
             exec_to_first_s=r['t_first_token_s']-r['t_exec_start_s'],
             predecessor_gap_s=r['client_dispatch_at_s']-prev['client_finish_at_s']))
     report = dict(raw_sha256=hashlib.sha256(args.raw.read_bytes()).hexdigest(),
-        tokenizer_hashes=hashes, since_min=args.since_min,
+        tokenizer_hashes=hashes, since_min=args.since_min, alignment_tokens=args.alignment,
         selection='slowest completed fast-intra requests; biased diagnostic sample', results=results)
     args.out.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(dict(pairs=len(results), rendered_lengths_match=True,

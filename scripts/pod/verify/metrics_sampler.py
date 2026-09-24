@@ -8,13 +8,23 @@ KEEP = re.compile(r"^sglang:(num_running_reqs|num_queue_reqs|token_usage|gen_thr
                   r"full_token_usage|kv_available_tokens|kv_evictable_tokens|kv_used_tokens|"
                   r"mamba_available_tokens|mamba_evictable_tokens|mamba_used_tokens|evicted_tokens_total|"
                   r"eviction_duration_seconds_count|eviction_duration_seconds_sum|"
+                  r"hicache_host_used_tokens|hicache_host_total_tokens|prefill_effective_tokens_total|"
+                  r"load_back_tokens_total|load_back_bytes_total|"
+                  r"load_back_duration_seconds_count|load_back_duration_seconds_sum|"
+                  r"hicache_backup_tokens_total|hicache_backup_bytes_total|hicache_dropped_tokens_total|"
+                  r"hicache_backup_duration_seconds_count|hicache_backup_duration_seconds_sum|"
                   r"prompt_tokens_total|generation_tokens_total|num_requests_total)(\{[^}]*\})? ([0-9.eE+-]+)", re.M)
 with open(out, "a") as f:
     while True:
         try:
             txt = urllib.request.urlopen(url, timeout=5).read().decode(); row = {"t": round(time.time(), 1)}
             samples = KEEP.findall(txt)
-            for k, labels, v in samples: row[k] = round(row.get(k, 0) + float(v), 4) if k.endswith("_total") else float(v)
+            for k, labels, v in samples:
+                # New tier/pool counters stay labeled: KDA slots and KV tokens
+                # must not be added into one flat "token" number.
+                if k in {"prefill_effective_tokens_total", "load_back_tokens_total",
+                         "hicache_backup_tokens_total", "hicache_dropped_tokens_total"}: continue
+                row[k] = round(row.get(k, 0) + float(v), 4) if k.endswith("_total") else float(v)
             # Preserve labels for per-pool analysis; legacy flat fields remain compatible.
             # Missing metrics stay absent, never interpreted as zero evictions.
             row["samples"] = [{"name": k, "labels": labels, "value": float(v)} for k, labels, v in samples]
