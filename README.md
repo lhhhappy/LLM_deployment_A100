@@ -6,7 +6,7 @@
 
 ## 现在做什么
 
-截至 2026-09-24 已复核的 8 卡完整开发集 N22 结果：S0（035）只挂解码门，`tpot_p95=0.296`；S0+114 的 S1（036）改善 TTFT 与均值 TPOT，`tpot_p95=0.253` 仍失败；S0+固定 16 轮 decode（037）把 `tpot_p95` 降到 0.0775，却使 overall、turn、chain 三道 TTFT 门失败。当前要找同时保住 prefill 与 decode 的调度点。后续作业状态看 [任务队列](notes/queue.md)和 pod 实时状态，完整结果见 [实验记录](notes/experiments.md)。补丁与 S0/S1 的精确定义见 [patches/README.md](patches/README.md)；当前 7 个 S0 补丁已按 [等价性记录](evidence/T57/equivalence.log)验证与 026/035 源码树一致。
+截至 2026-09-24 00:47 UTC已复核：037b–042这批队列已结束，完整dev N22尚无全过配置。S1+122/123（037d）把chain超标降到23/22，仍以TPOT p95=0.147失败；状态槽400使同链缓存缺口约减半，但TPOT仍失败；DCP8在冒烟时出现33/40行张量形状错误，没有完整档。S1原样重跑fast超标7→15，单次小差异需谨慎解释。详见 [codex-分析](notes/codex-分析-2026-09-24.md)和[实验记录](notes/experiments.md)。下一步问题看[任务队列](notes/queue.md)，实时状态以pod为准。补丁与S0/S1精确定义见[patches/README.md](patches/README.md)；当前7个S0补丁与026/035源码等价性见[记录](evidence/T57/equivalence.log)。
 
 每轮按这个循环：从 [任务队列](notes/queue.md) 取一个明确的问题 → 复制现行 job，优先只改一个变量 → 入队跑完整开发集 → 用原 harness 评分器和题面规则核对完整性及 11 门 → 看原始记录解释瓶颈 → 更新补丁和 [实验记录](notes/experiments.md) → 再跑。多变量组合只评价组合，后续再拆分归因。失败或数据不完整就记失败或 INVALID。12 题能力测试只用于冒烟，不能证明能力门通过。
 
@@ -21,7 +21,7 @@
 | 判定单档 | job 的 `LEVEL` 行由 `scripts/pod/verify/level_verdict.py` 生成：先查 cohort、runner 与原始记录，再调用 `scripts/score_formal.py`（harness 评分器）并补上题面 TPOT 门 |
 | 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
 | 修改引擎 | 补丁照只读的 `build/base_exact/` 写；一个机制保留一个可用版本，说明写在同名 `.md`；不要照旧的 v0.5.20 源码写 |
-| 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)；只在明确安排正式提交时使用 |
+| 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)，官方结果用 `scripts/official_status.sh <attempt_id>` 查；只在明确安排正式提交时使用 |
 
 GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/linhang/arena/` 下工作**；仓库镜像位于 `/sjtu/linhang/arena/repo`。8 卡 Trisol 服务与正在运行的队列任务不能停、删或杀进程。整理者对 pod 只使用 `scripts/pod/pread` 只读查看，或 `scripts/pod/pexec_codex` 在 `/tmp/ax/codex` 做 CPU 分析；不要改队列、运行目录或向引擎发请求。实验入队和提交由当前负责运行的协作者协调，避免碰撞。
 
