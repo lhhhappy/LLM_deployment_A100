@@ -290,7 +290,7 @@ CPU补充：对引擎759a6eb运行现有HiCacheTierTests，5项通过（含devic
 
 chain仍31，超过全量CP允许29的下界结论不变。31条现存坏例均在前38.377分钟发出，20条queue_time≥80% TTFT；执行至首token中位8.658秒，2条超过30秒。
 两条分别是251,916-token链首（exec→first31.484s、等待99.614s）和252,115-token链首（exec→first31.694s、等待3.162s）。执行段含分块/解码调度，不是纯kernel时间；也不能把队列时间扣掉就宣称另一调度可通过。
-31条有效桶成员是25个cohort链首+6个非链首context_reset；raw phase中出现intra/turn_start正常，原harness优先按idx=0归chain_start。
+31条有效桶成员是30个cohort链首+1个非链首context_reset；raw phase中出现intra/turn_start正常，原harness优先按idx=0归chain_start。
 剩余222个fast坏例205条实际未命中≤4096、195条queue_time占比≥80%，前段短请求等待与长链prefill时间仍值得分别分析。
 较晚21:24:01两个metrics样本FULL host占用99.894%、无retraction，FULL device不可淘汰占用.8076、KDA .1842；只作点状观察。
 继续全量，下一105分钟检查21:51:57 UTC。证据：[check75](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/)，含4084条同ID CSV、31条chain原始字段与分解、冻结快照和metrics。
