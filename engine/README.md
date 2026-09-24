@@ -35,7 +35,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP8 33/40 row mismatch unfixed |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
-| 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |
+| 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | Fixed version: official 46174 host32 N18 PASS; 46173 off N14 PASS. Full local N30 067/068 both FAIL; host64+122 recovery experiment 071 pending |
 | 123 | SRPT admission with aging | no | `SGLANG_AX_SRPT_AGING` (off) | no single-change run |
 | 130 | tokenizer off the HTTP loop | yes (off by env) | `SGLANG_AX_ASYNC_TOKENIZE` | — |
 | 140 | fp32 KDA states at role boundary and prompt end | yes (off: 160 under MTP) | `SGLANG_AX_KDA_DUAL_SNAPSHOT` (0) | yes (without MTP) |
@@ -44,7 +44,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 170 | breakable prefill CUDA graph | yes (not enabled) | `--cuda-graph-backend-prefill breakable` | v2 TP8 recheck pending |
 | 171 | KDA BF16 projection fusion | no | `SGLANG_AX_KDA_FUSE_PROJ` (0) | 056 dev N22: mixed result, smaller KV/state pools; no confirmed net gain |
 | 172 | Marlin MoE clamped-SwiGLU fusion | no | `SGLANG_AX_MOE_FUSE_SWIGLU` (0) | 057 dev N22: TPOT mean −1.6%, mixed TTFT; one run |
-| 180 | HiCache host tier for GLM DSA; keeps 120/122 on with the host tier | no | `--enable-hierarchical-cache --hicache-size N` (off) | 059/060 used the old version (120 silently off); 063s full N30 with 122 queued; GPU restore correctness still unverified |
+| 180 | HiCache host tier for GLM DSA; keeps 120/122 on with the host tier | no | `--enable-hierarchical-cache --hicache-size N` (off) | 067–069 completed TP8 full N30; 069 host64 passes 10/11 gates. Official host32 candidates pass capability, N14/N18. Dedicated GPU restore numerical validation remains separate |
 
 124 (short-hit reserve) was not migrated: it conflicts with 122/123, and 122 has its own short-hit reserve. Its patch remains in
 git history (the `patches/` directory was removed after the migration).
