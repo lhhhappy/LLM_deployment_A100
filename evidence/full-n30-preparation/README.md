@@ -4,7 +4,7 @@
 
 冻结 gzip 为 524,381,018 字节；传输时将正文无损转成 xz，在目的地重建原 gzip（包括文件名、mtime、level1、
 TextIOWrapper 关闭时的 flush），验证全部冻结文件后才发布。传输包 8,526,417 字节。
-本地重建已逐字节哈希校验；远端状态以 `sync_on_gpu.sh` 的 DATA_TRANSFER_VERIFIED 回执为准。
+本地与远端重建均通过冻结文件核验，311链/5601请求已发布到Pod；见 [同步回执](sync-receipt.txt)。全量测量尚未入队。
 
 ## 计时方案
 

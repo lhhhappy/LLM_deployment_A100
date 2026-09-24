@@ -1,0 +1,6 @@
+GPU_ARCHIVE_VERIFIED 265e327857d3d44930a55ee09578273379cae2f438ca0e9c4b56c5db9459e8b6
+PUSH_OK 105 chunks
+exit_code: 0
+DATA_TRANSFER_VERIFIED manifest=19a7e5a6 artifacts=8 chains=311 requests=5601
+exit_code: 0
+DONE rc=0
