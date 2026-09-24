@@ -110,6 +110,7 @@ class MarlinMoeQuantInfo(MoeQuantInfo):
     w2_global_scale: Optional[torch.Tensor] = None
     w13_bias: Optional[torch.Tensor] = None
     w2_bias: Optional[torch.Tensor] = None
+    fp8_weights: bool = False  # [ax] 111: fp8 e4m3 weights (W8A16 on sm80)
 
 
 @register_fused_func("none", "marlin")
@@ -205,6 +206,7 @@ def fused_experts_none_to_marlin(
         gemm1_alpha=runner_config.gemm1_alpha,
         activation=runner_config.activation,
         is_gated=runner_config.is_gated,
+        fp8_weights=quant_info.fp8_weights,
     ).to(hidden_states.dtype)
 
     return StandardCombineInput(

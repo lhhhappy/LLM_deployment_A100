@@ -1094,6 +1094,16 @@ class Fp8MoEMethod(FusedMoEMethodBase):
         self.is_fp4_expert = self.quant_config.is_fp4_experts
         self.dequant_fp4_to_fp8 = self.quant_config.dequant_fp4_to_fp8
         self.with_bias = False
+        # [ax] 111: sm80 has no fp8 tensor cores (Triton rejects fp8e4nv), so block-fp8
+        # experts run weight-only through the Marlin MoE kernel (fp8 e4m3 weights, bf16 acts).
+        self.ax_sm80_marlin = (
+            _is_cuda
+            and can_auto_enable_marlin_fp8()
+            and self.block_quant
+            and not self.is_fp4_expert
+            and not self.use_mxfp8
+            and get_bool_env_var("SGLANG_AX_SM80_FP8_MOE_MARLIN", "true")
+        )
         # The MxFP4 wrapper methods borrow this instance for weight loading;
         # they never call create_moe_runner, so moe_runner_config is unset.
         self._owns_moe_runner = False
@@ -2050,6 +2060,20 @@ class Fp8MoEMethod(FusedMoEMethodBase):
             align_mxfp8_moe_weights_for_flashinfer_trtllm(layer)
 
     def process_weights_after_loading(self, layer: Module) -> None:
+        if self.ax_sm80_marlin:  # [ax] 111
+            from sglang.srt.layers.quantization.marlin_utils_fp8 import (
+                prepare_moe_fp8_layer_for_marlin,
+            )
+
+            if not hasattr(layer, "orig_dtype"):
+                layer.orig_dtype = torch.bfloat16
+            layer.weight_block_size = self.weight_block_size
+            prepare_moe_fp8_layer_for_marlin(layer, size_k_first=False)
+            torch.cuda.empty_cache()
+            return
+        self._ax_process_weights_after_loading_base(layer)
+
+    def _ax_process_weights_after_loading_base(self, layer: Module) -> None:
         if _is_hip and _use_hip_int4:
             self.process_weights_hip_int4(layer)
 
@@ -2369,6 +2393,11 @@ class Fp8MoEMethod(FusedMoEMethodBase):
         self.moe_runner_config = moe_runner_config
         moe_runner_backend = get_moe_runner_backend()
 
+        if self.ax_sm80_marlin:  # [ax] 111
+            self.runner = MoeRunner(MoeRunnerBackend.MARLIN, moe_runner_config)
+            self._owns_moe_runner = True
+            return
+
         if moe_runner_backend.is_auto():
             if self.is_deepgemm_moe_runner_backend_enabled():
                 moe_runner_backend = MoeRunnerBackend.DEEP_GEMM
@@ -2427,6 +2456,21 @@ class Fp8MoEMethod(FusedMoEMethodBase):
 
         x = dispatch_output.hidden_states
         moe_runner_config = self.moe_runner_config
+
+        if self.ax_sm80_marlin:  # [ax] 111
+            from sglang.srt.layers.moe.moe_runner.marlin import MarlinMoeQuantInfo
+
+            quant_info = MarlinMoeQuantInfo(
+                w13_qweight=layer.w13_weight,
+                w2_qweight=layer.w2_weight,
+                w13_scales=layer.w13_weight_scale,
+                w2_scales=layer.w2_weight_scale,
+                w13_g_idx_sort_indices=None,
+                w2_g_idx_sort_indices=None,
+                weight_bits=8,
+                fp8_weights=True,
+            )
+            return self.runner.run(dispatch_output, quant_info)
 
         if use_intel_amx_backend(layer):
             from sglang.srt.layers.moe.topk import apply_topk_weights_cpu

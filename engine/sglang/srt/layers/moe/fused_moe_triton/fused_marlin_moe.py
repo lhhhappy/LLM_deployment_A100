@@ -162,6 +162,7 @@ def fused_marlin_moe(
     gemm1_alpha: Optional[float] = None,
     activation: str = "silu",
     is_gated: bool = True,
+    fp8_weights: bool = False,  # [ax] 111: fp8 e4m3 weights (W8A16, sm80)
 ) -> torch.Tensor:
     """
     This function computes a Mixture of Experts (MoE) layer using two sets of
@@ -280,6 +281,10 @@ def fused_marlin_moe(
     scalar_type2 = get_scalar_type(
         num_bits, w2_zeros is not None, w2_scale, w2_global_scale
     )
+    if fp8_weights:
+        from sgl_kernel.scalar_type import scalar_types
+
+        scalar_type1 = scalar_type2 = scalar_types.float8_e4m3fn
 
     intermediate_cache2 = torch.empty(
         (M * topk_ids.shape[1], N),

@@ -204,7 +204,7 @@ def prepare_moe_fp8_layer_for_marlin(
         "performance for compute-heavy workloads."
     )
 
-    e = layer.num_experts
+    e = layer.w13_weight.shape[0]  # [ax] 111: local experts incl. fused shared ones
     k = layer.hidden_size
     n = layer.intermediate_size_per_partition
     weight_block_size = getattr(layer, "weight_block_size", None)
