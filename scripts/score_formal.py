@@ -23,7 +23,9 @@ TPOT uses raw tpot_s (client first/last SSE timing divided by output_tokens-1),
 unweighted per-request mean and dev's p95 convention. No statistical allowance
 is applied to the 0.10 s/token gate. Missing/invalid multi-token TPOT blocks the
 estimate; single-token outputs have undefined TPOT and are counted separately.
-Coverage, errors and empty buckets retain their dev gates in the estimate.
+The file entrypoint also checks the full dev request index (each req_id once,
+with its chain position) before reporting PASS or FAIL. Partial raw files are
+invalid input; use score_records() directly for diagnostic subsets.
 Cache diagnostics retain frozen uncached_expected bucket membership.
 
 Official weighting (s1-dev/harness/s1_score.py evaluate): ONLY the overall
@@ -50,6 +52,7 @@ These are dev estimates, never an official capacity or verdict.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from functools import lru_cache
 import importlib.util
 import json
@@ -383,7 +386,22 @@ def score_files(raw: Path, run: Path, harness: Path = DEFAULT_HARNESS,
                 if any(isinstance(v, float) and not math.isfinite(v) for v in record.values()):
                     raise ValueError(f"raw line {line_number} has non-finite values")
                 records.append(record)
-    report = score_records(records, read_json(run), load_harness(harness), requests)
+    scorer = load_harness(harness)
+    if requests is not None:
+        common = sys.modules["s1_common"]
+        expected_index, _, _ = common.load_index(str(requests.parent))
+        expected = {rid: row["_idx_in_chain"] for rid, row in expected_index.items()}
+        counts = Counter(row.get("req_id") for row in records)
+        duplicate = sum(n - 1 for n in counts.values() if n > 1)
+        missing = len(set(expected) - set(counts))
+        unknown = len(set(counts) - set(expected))
+        wrong_index = sum(row.get("idx_in_chain") != expected[row["req_id"]]
+                          for row in records if row.get("req_id") in expected)
+        if duplicate or missing or unknown or wrong_index:
+            raise ValueError("raw does not match full dev request index: "
+                             f"duplicate={duplicate}, missing={missing}, unknown={unknown}, "
+                             f"wrong_idx_in_chain={wrong_index}")
+    report = score_records(records, read_json(run), scorer, requests)
     report["paths"] = {"raw": str(raw.resolve()), "run": str(run.resolve()),
                        "dev_scorer": str(harness.resolve() / "s1_score.py")}
     return report
