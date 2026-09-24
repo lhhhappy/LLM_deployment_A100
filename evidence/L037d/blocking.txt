@@ -1,8 +1,7 @@
-== raw_dev-combined-v1_N22_1790194938.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate); model exceeds the measured exec window for 123 rows -> their exec time is not split
-   blocker seconds = victims' waiting seconds that overlap the blocker's prefill window, summed over victims; NOT GPU seconds, and the blocker's window also contains decode rounds
--- fast_intra: 13 over | primary cause queue(arrangement) 9, cache gap(work) 3, unattributed(model>exec) 1 | TTFT seconds: queue 68%, own_cost_est 7%, cache_gap_s 19%, interleave 6%
+== raw_dev-combined-v1_N22_1790194938.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate)
+-- fast_intra: 13 over | primary cause queue(arrangement) 9, cache gap(work) 4 | TTFT seconds: queue 68%, own_cost_est 7%, cache_gap_s 19%, interleave 6%
    their queue time was spent behind: head:>=64k 49%, head:8k-64k 19%, followup:<8k 12%, followup:8k-64k 10%, head:<8k 7%, followup:>=64k 4%
--- overall_intra: 21 over | primary cause queue(arrangement) 14, own work(cost) 4, cache gap(work) 2, unattributed(model>exec) 1 | TTFT seconds: queue 68%, own_cost_est 19%, cache_gap_s 7%, interleave 6%
+-- overall_intra: 21 over | primary cause queue(arrangement) 14, own work(cost) 4, cache gap(work) 3 | TTFT seconds: queue 68%, own_cost_est 19%, cache_gap_s 7%, interleave 6%
    their queue time was spent behind: head:>=64k 55%, head:8k-64k 21%, followup:<8k 11%, followup:8k-64k 7%, head:<8k 4%, followup:>=64k 2%
 -- turn_start: 0 over
 -- chain_start: 23 over | primary cause queue(arrangement) 22, own work(cost) 1 | TTFT seconds: queue 80%, own_cost_est 16%, cache_gap_s 0%, interleave 4%
@@ -20,4 +19,3 @@
      214.7s  head:>=64k       uncached  169326 prefill 14.7s  master:canon:qciFldST32QKFYjmIIyWU:llm:1
      201.4s  head:>=64k       uncached  144191 prefill 12.7s  master:canon:7R_gC0sdkKuFwausVMIg2:llm:1
      198.4s  head:>=64k       uncached  194725 prefill 16.7s  master:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1
-wrote 722 rows to evidence/L037d/blocking.csv
