@@ -35,4 +35,4 @@
 
 代码/graph缓存不清。TP8的混合缓存池由引擎实际reset负责；不能仅凭单条请求cached_tokens=0证明每一种DP/HiCache/L3配置都清理正确。当前配置没有启用这些替代存储层，早期多worker失败归并有CPU反例检查，未宣称完成所有多worker故障注入。
 
-生成内容允许变化。用户已取消主会话自设的token/logprob重复一致性门；接口计数、清缓存、请求完整性和赛题评分继续检查。056仅加171已完成：722/722接口计数与服务端TTFT检查通过，flush收据HTTP200/JSON success=true，性能门VALID FAIL；[完整复核](../../evidence/L056-official_a_171_n22/N22/comparison-verification.json)。057仅加172运行中，均原开发集N22。
+生成内容允许变化。用户已取消主会话自设的token/logprob重复一致性门；接口计数、清缓存、请求完整性和赛题评分继续检查。056仅加171、057仅加172均已完成原开发集N22：各722/722接口计数与服务端TTFT检查通过、0请求错误，flush收据HTTP200/JSON success=true，均为TTFT性能门VALID FAIL。[056完整复核](../../evidence/L056-official_a_171_n22/N22/comparison-verification.json)、[057完整复核](../../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。

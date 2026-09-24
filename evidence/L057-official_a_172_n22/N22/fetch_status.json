@@ -1,0 +1,26 @@
+{
+  "size": 252267,
+  "sha256": "ded0c692f658938912644b3f8dc918f3a3ec16bac01cca7318603d6b8412110c",
+  "source": "pod",
+  "run": "057-official_a_172_n22",
+  "n": 22,
+  "raw": "raw_dev-combined-v1_N22_1790235836.jsonl",
+  "files": [
+    "flush_evidence.json",
+    "gpu_util.csv",
+    "job.log",
+    "loadgen.log",
+    "metrics.jsonl",
+    "raw_dev-combined-v1_N22_1790235836.jsonl",
+    "run_dev-combined-v1_N22_1790235836.json",
+    "run_dev.log",
+    "rundev_exit_code",
+    "score.log",
+    "server.log",
+    "summary.json",
+    "verdict_exit_code"
+  ],
+  "data_root": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+  "harness_dir": "/workspace/Agentic_science_challenge/s1-dev/harness",
+  "exit_code": 1
+}

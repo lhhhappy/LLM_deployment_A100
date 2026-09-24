@@ -1,0 +1,163 @@
+{
+ "status": "VALID",
+ "n": 22,
+ "passed": false,
+ "failed_gates": [
+  "fast_intra(uncached_expected<=4096,<=3s)",
+  "overall_intra(<=5s)",
+  "chain_start(<=30s)"
+ ],
+ "tpot_mean": 0.06099838282979893,
+ "tpot_p95": 0.0850039376323489,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 328,
+   "p95": 7.867355585098267,
+   "over_limit": 33,
+   "allowed_over": 23,
+   "rate_ci_lower": 0.07454911540707065,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.07454911540707065,
+      "allowed_over": 23,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.07647347115463858,
+      "allowed_over": 22,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.0732895186778558,
+      "allowed_over": 24,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "overall_intra": {
+   "n": 388,
+   "p95": 12.147491931915283,
+   "over_limit": 53,
+   "allowed_over": 27,
+   "rate_ci_lower": 0.10877204282945985,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.10877204282945985,
+      "allowed_over": 27,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.11042587880863716,
+      "allowed_over": 26,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.10792052277884173,
+      "allowed_over": 27,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "turn_start": {
+   "n": 20,
+   "p95": 36.82867383956909,
+   "over_limit": 2,
+   "allowed_over": 3,
+   "rate_ci_lower": 0.01806520308541864,
+   "pass_estimated": true,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.01806520308541864,
+      "allowed_over": 3,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.033663223561904744,
+      "allowed_over": 2,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 3,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "chain_start": {
+   "n": 314,
+   "p95": 81.20907092094421,
+   "over_limit": 62,
+   "allowed_over": 22,
+   "rate_ci_lower": 0.161155154234285,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.161155154234285,
+      "allowed_over": 22,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.16315309940175823,
+      "allowed_over": 22,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.16050099926196007,
+      "allowed_over": 23,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  }
+ },
+ "rows": 722,
+ "raw": "raw_dev-combined-v1_N22_1790235836.jsonl",
+ "run": "run_dev-combined-v1_N22_1790235836.json",
+ "wall_s": 1147.6099400520325,
+ "harness_point_all_pass": false,
+ "flush": {
+  "verified": true,
+  "mode": "checked_runner_receipt_and_server_log",
+  "server_log": "/workspace/Agentic_science_challenge/evidence/L057-official_a_172_n22/N22/server.log",
+  "window_start_s": 1790235830.6448133,
+  "window_end_s": 1790235830.714455,
+  "matched_server_flush_s": 1790235830.0,
+  "server_log_clock": "UTC, second precision"
+ },
+ "interval_sensitivity": {
+  "diagnostic_only": true,
+  "primary_method": "clopper_pearson",
+  "organizer_method_unknown": true,
+  "sensitive_ttft_gates": [],
+  "all_gates_pass_by_method": {
+   "clopper_pearson": false,
+   "wilson": false,
+   "wald": false
+  }
+ }
+}

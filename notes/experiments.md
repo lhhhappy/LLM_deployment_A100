@@ -173,3 +173,26 @@ raw跨度1171.7→1157.2s，单次少约1.2%，没有同配置重跑噪声估计
 显存实际变化：KV 1,036,288→1,024,960（−1.09%），Mamba状态槽321→318。该差异在CUDA graph捕获前的分池阶段已存在；目标权重加载阶段记录用量39.15→39.18GB、draft阶段.85→1.02GB。这些是进程阶段显存差，不等于持久参数字节差；现日志不能区分存储分配粒度、加载暂存/工作区或其他分配，更不能证明池缩小造成了本次TTFT变化。单层参数相等的开发机证据不能替代服务显存账。
 
 结论：171局部省时尚未兑现为明确整档净收益，暂不加入部署组合；057按既定顺序独立测172。开发集结果不预测正式N22/N26。证据：[完整复算](../evidence/L056-official_a_171_n22/N22/level_verdict.json)、[同请求对照](../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)、[逐请求CSV](../evidence/L056-official_a_171_n22/N22/compare_vs_047.csv)、[配置/接口/显存复核](../evidence/L056-official_a_171_n22/N22/comparison-verification.json)。
+
+## 057：正式 A + 172，dev N22（2026-09-24，Codex 独立复核）
+
+问题：单卡MoE激活融合的收益是否兑现到完整TP8服务？正式A只增加172及融合开关，不加171或122；13个基准补丁哈希一致，有效启动参数除自动random_seed外一致。047有额外本地能力冒烟，057跳过；两者均用原harness preflight→warmup→flush→完整测量，不设重复输出一致性门。
+
+常驻watcher通知failed后，主会话即时读取status/job.log并取回完整证据：722条唯一请求、0请求错误，prompt冻结计数/输出预算/服务端TTFT全部722/722。flush HTTP200、JSON success=true，服务日志时间吻合。252,267字节压缩归档SHA256=`ded0c692f658938912644b3f8dc918f3a3ec16bac01cca7318603d6b8412110c`；本地主会话调用原harness及补充门独立判分，与pod完全一致。VALID FAIL是三道TTFT门失败，无引擎崩溃或一致性门阻断。
+
+| 指标 | 047基准 → 057候选 | 057判定 |
+|---|---|---|
+| fast TTFT p95 / 超标 | 5.2276→7.8674s；33→33/23 | FAIL |
+| overall TTFT p95 / 超标 | 10.8031→12.1475s；55→53/27 | FAIL |
+| turn TTFT p95 / 超标 | 39.3831→36.8287s；2→2/3 | PASS（统计余量） |
+| chain TTFT p95 / 超标 | 93.0873→81.2091s；73→62/22 | FAIL |
+| TPOT mean / p95 | .061976/.087032→.060998/.085004s | PASS |
+| 单请求TPOT>.10 | 8→0/722 | 诊断计数 |
+
+其余硬门通过，三种统计区间对整档结论一致。KV 1,036,288、Mamba状态槽321保持基准容量，未出现171那轮的池缩小。缓存总量24,514,624→24,512,960，71条请求缓存变化≥1024token；不能用总量相近排除逐请求缓存影响。测量窗内prefill批2301→2286、partial单跑1815→1786，累计新token均约9.92M；排除窗口外日志及不完整边界秒。
+
+同请求fast改善10/新增10，overall改善17/新增15，chain改善15/新增4。fast执行段p50 .57→.55s，等待p95 4.32→6.32s；chain超时62条中55条首执行前已经等超过30秒，超时子集等待中位53.04s、执行段中位3.95s。以上按原始精度重新计算；执行段包含batch/chunk效应、等待不是纯调度计时，尚未隔离因果。T56 LCP只作未核源诊断。
+
+raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只有一次，没有同配置N22重跑噪声估计，fast/overall p95还变差，因此不能认定稳定整档净收益。正式TPM窗口不足，保持null。补丁哈希、融合flag、基线路径已核，本轮没有kernel trace或新的正式能力评测，不将其写成kernel级测速或质量通过。
+
+决策：172保留候选、暂不合入或自动叠加171；下一步须对准整段prefill成本及长请求等待积压。057结束后pread确认running/pending均为空，服务未停止或释放。证据：[完整判分](../evidence/L057-official_a_172_n22/N22/level_verdict.json)、[同请求对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、[逐请求CSV](../evidence/L057-official_a_172_n22/N22/compare_vs_047.csv)、[配置/接口/容量复核](../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。

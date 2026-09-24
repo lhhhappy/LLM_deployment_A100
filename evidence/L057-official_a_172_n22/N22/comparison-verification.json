@@ -1,0 +1,168 @@
+{
+  "baseline": "L047-official_a_n22",
+  "candidate": "L057-official_a_172_n22",
+  "baseline_patch_count": 13,
+  "candidate_patch_count": 14,
+  "only_added_patch": {
+    "172-moe-clamped-swiglu.patch": "2752e70a32a732294b6025bd13ad6226c269c885c25fb96800885da5b669d606"
+  },
+  "server_config_differences": {
+    "random_seed": [
+      503622811,
+      340535551
+    ]
+  },
+  "request_metadata_equal": [
+    "prompt_tokens",
+    "glm_tokens",
+    "uncached_expected",
+    "max_output_i",
+    "phase",
+    "chain_id",
+    "idx_in_chain",
+    "edge_type",
+    "replay_gap_ms",
+    "effective_replay_gap_ms"
+  ],
+  "candidate_interface": {
+    "rows": 722,
+    "unique_ids": 722,
+    "errors": 0,
+    "server_ttft": 722,
+    "prompt_tokens_exact": 722,
+    "output_tokens_exact": 722
+  },
+  "candidate_flush_receipt": {
+    "schema_version": 1,
+    "runner_started_s": 1790235328.5499833,
+    "n": 22,
+    "flush_success": true,
+    "runner_rc": 0,
+    "flush_started_s": 1790235830.6448133,
+    "flush_http_status": 200,
+    "flush_response": {
+      "success": true,
+      "message": "Cache flushed."
+    },
+    "flush_finished_s": 1790235830.714455,
+    "runner_finished_s": 1790236984.939689,
+    "raw": "raw_dev-combined-v1_N22_1790235836.jsonl",
+    "run": "run_dev-combined-v1_N22_1790235836.json"
+  },
+  "independent_score_matches_pod": true,
+  "summary": {
+    "baseline": {
+      "kv_tokens": [
+        1036288
+      ],
+      "mamba_slots": [
+        321
+      ],
+      "wall_s": 1171.6701109409332,
+      "tpot_mean": 0.061975909487134634,
+      "tpot_p95": 0.08703226930832952,
+      "request_tpot_over_010": 8,
+      "cached_tokens": 24514624,
+      "fast_intra": {
+        "n": 328,
+        "p95": 5.227582931518555,
+        "over_limit": 33,
+        "allowed_over": 23,
+        "over_wait_alone": 25,
+        "over_wait_median_s": 4.318772315979004,
+        "over_execution_median_s": 0.6925647258758545
+      },
+      "overall_intra": {
+        "n": 388,
+        "p95": 10.803122997283936,
+        "over_limit": 55,
+        "allowed_over": 27,
+        "over_wait_alone": 40,
+        "over_wait_median_s": 7.889467477798462,
+        "over_execution_median_s": 1.4229228496551514
+      },
+      "turn_start": {
+        "n": 20,
+        "p95": 39.38310527801514,
+        "over_limit": 2,
+        "allowed_over": 3,
+        "over_wait_alone": 2,
+        "over_wait_median_s": 28.925052881240845,
+        "over_execution_median_s": 5.022549867630005
+      },
+      "chain_start": {
+        "n": 314,
+        "p95": 93.08727669715881,
+        "over_limit": 73,
+        "allowed_over": 22,
+        "over_wait_alone": 63,
+        "over_wait_median_s": 47.96056532859802,
+        "over_execution_median_s": 3.5202488899230957
+      }
+    },
+    "candidate": {
+      "kv_tokens": [
+        1036288
+      ],
+      "mamba_slots": [
+        321
+      ],
+      "wall_s": 1147.6099400520325,
+      "tpot_mean": 0.06099838282979893,
+      "tpot_p95": 0.0850039376323489,
+      "request_tpot_over_010": 0,
+      "cached_tokens": 24512960,
+      "fast_intra": {
+        "n": 328,
+        "p95": 7.867355585098267,
+        "over_limit": 33,
+        "allowed_over": 23,
+        "over_wait_alone": 28,
+        "over_wait_median_s": 6.321996688842773,
+        "over_execution_median_s": 0.6944077014923096
+      },
+      "overall_intra": {
+        "n": 388,
+        "p95": 12.147491931915283,
+        "over_limit": 53,
+        "allowed_over": 27,
+        "over_wait_alone": 42,
+        "over_wait_median_s": 8.141870021820068,
+        "over_execution_median_s": 1.3872158527374268
+      },
+      "turn_start": {
+        "n": 20,
+        "p95": 36.82867383956909,
+        "over_limit": 2,
+        "allowed_over": 3,
+        "over_wait_alone": 1,
+        "over_wait_median_s": 20.61775493621826,
+        "over_execution_median_s": 6.123851537704468
+      },
+      "chain_start": {
+        "n": 314,
+        "p95": 81.20907092094421,
+        "over_limit": 62,
+        "allowed_over": 22,
+        "over_wait_alone": 55,
+        "over_wait_median_s": 53.03630590438843,
+        "over_execution_median_s": 3.949436664581299
+      }
+    }
+  },
+  "limits": [
+    "One run per configuration; no matched baseline repeat to estimate variance.",
+    "047 had local ability smoke before harness, 057 skipped local smoke; both flushed after original harness warmup.",
+    "Patch hash/flag/backend confirmed; no kernel-level runtime trace in this performance run.",
+    "Execution spans include batching/chunking; wait is not a pure scheduler timer.",
+    "No output equality requirement; no new formal quality or concurrency result.",
+    "Logical TPM window not covered; keep null."
+  ],
+  "files": {
+    "job.log": "d38c421718eb618bf0a41d1285496a133dddccc46dc0fc4702cc0c8dccd6436d",
+    "server.log": "4a774e0cae1e74126f541a5ea09d4d96cf6e3c80ddecb6c38ad6443c4cae2ee6",
+    "level_verdict.json": "bc4d5f527996c78e1098a78bf486b2e2a9d60a295128e7d21efdabbd6e50257d",
+    "compare_vs_047.txt": "86d74ad294cbc13f2ad02719f2d61e198786ccf2b42f5e176f0670a1a6dcbdfb",
+    "compare_vs_047.csv": "78ac9f73d59b3646b29157012adf1c5d4e90d093ecdf3868129ad19b0a503e60"
+  }
+}

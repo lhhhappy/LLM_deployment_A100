@@ -1,0 +1,22 @@
+== N22 vs evidence/L057-official_a_172_n22/N22: 722 requests each, same ids
+  base: VALID passed=False tpot 0.0620/0.0870 | fast_intra:33/23(p95 5.23) overall_intra:55/27(p95 10.80) turn_start:2/3(p95 39.38) chain_start:73/22(p95 93.09)
+  cand: VALID passed=False tpot 0.0610/0.0850 | fast_intra:33/23(p95 7.87) overall_intra:53/27(p95 12.15) turn_start:2/3(p95 36.83) chain_start:62/22(p95 81.21)
+  fast_intra (> 3 s, per-request limit): base 33 cand 33 | fixed 10 {'cache more': 3, 'wait': 6, 'cache less': 1} | new 10 {'cache less': 1, 'wait': 9}
+      wait: p50 0.39 -> 0.36 | p95 4.32 -> 6.32
+      run: p50 0.57 -> 0.55 | p95 0.72 -> 0.71
+  overall_intra (> 5 s, per-request limit): base 55 cand 53 | fixed 17 {'cache more': 4, 'wait': 13} | new 15 {'cache less': 1, 'wait': 14}
+      wait: p50 0.43 -> 0.40 | p95 9.23 -> 9.58
+      run: p50 0.59 -> 0.58 | p95 2.08 -> 2.36
+  turn_start (> 15 s, per-request limit): base 2 cand 2 | fixed 1 {'wait': 1} | new 1 {'cache less': 1}
+      wait: p50 0.89 -> 0.58 | p95 36.72 -> 29.13
+      run: p50 0.70 -> 0.69 | p95 7.39 -> 7.69
+  chain_start (> 30 s, per-request limit): base 73 cand 62 | fixed 15 {'wait': 10, 'cache more': 3, 'cache less': 2} | new 4 {'cache less': 1, 'wait': 2, 'cache more': 1}
+      wait: p50 1.64 -> 2.40 | p95 85.47 -> 80.26
+      run: p50 0.71 -> 0.69 | p95 13.02 -> 12.91
+  LCP gap (T56 pairs, unverified source, diagnostic only): metadata-checked 411, rejected 0, no pair (unknown) 311 of 722; workload identity ('c6645ee02c86494e', '997e98a98033b24b')
+  prefill lines excluded: before/after the window base 919 cand 909, in boundary seconds base 1 cand 1
+  tpot per request > 0.10: 8 -> 0
+  cached tokens total: 24.51M -> 24.51M; requests with |delta cached| >= 1024: 71
+  base prefill batches 2301 {'<=8k': 388, '<=4k': 1805, '<=2k': 108} | tokens 9.92M | partial alone 1815
+  cand prefill batches 2286 {'<=8k': 407, '<=4k': 1788, '<=2k': 91} | tokens 9.92M | partial alone 1786
+wrote 722 rows to evidence/L057-official_a_172_n22/N22/compare_vs_047.csv

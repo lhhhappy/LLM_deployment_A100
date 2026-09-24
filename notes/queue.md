@@ -22,9 +22,9 @@
 
 | 055-official_a_combo_cost | 正式配置与171+172组合短测速 | 按用户最新顺序要求主动停止，队列记failed为stopjob终止，不是候选错误；不作完整组合结论 |
 | 056-official_a_171_n22 | 现有正式配置只加171，完整原开发集N22 | 完成并独立复算：722条VALID FAIL，fast35/23、overall57/27、turn1/3、chain64/22，TPOT .0628/.0869通过；无引擎错误，非一致性门退出。34层实际融合；KV 1,024,960、状态槽318，少于047的1,036,288/321。单次收益混合，尚无净收益结论 |
-| 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 已启动并回放中；KV 1,036,288与047一致；同样直接测量，不叠加171或122，结束后独立取回重判 |
+| 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 完成并独立复算：722条VALID FAIL、0请求错误；fast33/23、overall53/27、turn2/3、chain62/22，TPOT .0610/.0850通过。KV 1,036,288、状态槽321与047一致。均值略降但fast/overall TTFT p95上升，未证明稳定净收益 |
 
-049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。常驻watcher继续跟踪056/057。
+049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。056/057均已完成；057结束后pread确认无running/pending job，服务未停止或释放，常驻watcher继续监控。
 
 新任务使用修正的 checked runner、flush证据和评分kit；047打印工具及原数据哈希，每个job打印patch哈希。049使用通用numcheck，flush耗尽、并发请求失败、输出截断都会失败；其logprob阈值仅粗筛，原始差异必须复核。
 
@@ -34,7 +34,7 @@
 
 - **长链数据**：96链/1,718请求诊断候选已冻结并独立验收；36文件hash全过、35项大小匹配、1,718条全量渲染收据与成品零失配，原harness自检通过。cohort=`cd106a80519548d4`；[冻结入口](../evidence/longchain-audit/frozen-candidate/README.md)、[独立验收](../evidence/longchain-audit/independent-freeze-acceptance.json)。后续工作量、长gap/reset和语义关联缺口仍成立，不作代表集、不入队。下一版方案已确认：s1-dev跨session借query/片段适配续接，Phoenix千session观测供行为结构，按[统一设计](../scripts/analysis/longchain.md)实现并验收；旧dev保留独立回归，算子队列不等新数据。见 [交接入口](codex-handoff-长链数据设计与文档索引.md)与[独立复核](reports/review-data-sol.md)。
 - **171 KDA投影融合**：开发机加载/状态/MTP/graph与成本证据已交付；056首次完整TP8性能回放已独立复核，未证明净收益，暂不加入部署组合。fast执行段p50 .57→.55s，但首执行前等待p95 4.32→9.78s；不能用执行段代替孤立kernel测速。缓存池差异在graph捕获前已出现，加载后空闲显存不同，具体分配来源及对TTFT的影响未隔离。见[056对照](../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)。
-- **172 MoE clamped SwiGLU**：单卡随机权重完整Marlin路径墙钟减少3.1–4.9%；BF16激活与graph检查通过。独立审查发现并修复探针两臂写同一实现的问题；补测M256原版自身也有数值波动，固定路由后原版重复/候选均逐位一致。057直接完整TP8回放中；050未加载172，不作错误证据。尚无整模型或并发档收益结论。见patch说明与research/codex/R23。
+- **172 MoE clamped SwiGLU**：单卡随机权重完整Marlin路径墙钟减少3.1–4.9%；BF16激活与graph检查通过。057完整TP8回放已独立复核，TPOT均值少约1.6%、chain超时73→62，但fast超时不变、fast/overall p95变差，不能认定稳定整体提升；保留候选，暂不合入或自动叠加171。缓存池未缩小；62条chain超时中55条在首执行前已超过30秒。下一步算子投入须对准整段prefill成本与等待积压，不能只优化均值。见[057对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、research/codex/R23。
 - **170 prefill graph**：现有v2 TP2证据仍不能代替TP8；待171独立验证后决定下一项，不与171/122一起改。
 
 ## 暂缓的候选

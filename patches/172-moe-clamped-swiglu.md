@@ -25,4 +25,6 @@
 
 测速时审计 wrapper 已恢复，不受上述审计标签错误影响。没有新增持久缓冲；该探针的整MoE额外allocated峰值在4k/8k/16k分别少40/80/160MiB，不能当成服务KV池扩容。原始记录、历史脚本与复算见 [evidence/moe172](../evidence/moe172/summary.json)，完整边界见 [R23](../research/codex/R23_moe_swiglu_fusion.md)。
 
-当前8卡实验：[official_a_172_n22.sh](../scripts/pod/jobs/official_a_172_n22.sh)。按用户2026-09-24最新要求，在171独立实验之后直接跑完整原开发集N22，只加172，以047作对照。取消生成输出逐字一致性前置，清缓存、完整性及赛题评分门保留。050未加载172，不能算172错误；单卡MoE省时不能直接推出N22/N26。
+8卡实验057已完成并独立复算：[official_a_172_n22.sh](../scripts/pod/jobs/official_a_172_n22.sh)，正式A只加172，原开发集N22，以047作对照。722条完整、0请求错误、严格flush成功，整档VALID FAIL。fast超时33→33、overall55→53、turn2→2、chain73→62；TPOT均值.061976→.060998、p95 .087032→.085004，单请求TPOT>.10为8→0。fast/overall TTFT p95分别5.23→7.87s、10.80→12.15s，不能只按超时条数或均值称全面改善。KV 1,036,288、状态槽321与基准一致。单次对照没有噪声估计，保留为待复验候选，尚无稳定整档净收益或正式并发晋档结论。[完整对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、[配置/接口/容量复核](../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。
+
+生成输出逐字一致性前置已按用户要求取消，清缓存、完整性及赛题评分门保留。050未加载172，不能算172错误；057未加171或122，单卡MoE省时不能直接推出N22/N26。
