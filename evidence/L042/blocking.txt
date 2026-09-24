@@ -1,7 +1,8 @@
-== raw_dev-combined-v1_N22_1790203410.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate)
--- fast_intra: 15 over | primary cause queue(arrangement) 11, cache gap(work) 3, own work(cost) 1 | TTFT seconds: queue 77%, own_cost_est 6%, cache_gap_s 16%, interleave 2%
+== raw_dev-combined-v1_N22_1790203410.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate); model exceeds the measured exec window for 218 rows -> their exec time is not split
+   blocker seconds = victims' waiting seconds that overlap the blocker's prefill window, summed over victims; NOT GPU seconds, and the blocker's window also contains decode rounds
+-- fast_intra: 15 over | primary cause queue(arrangement) 11, unattributed(model>exec) 2, own work(cost) 1, cache gap(work) 1 | TTFT seconds: queue 77%, own_cost_est 6%, cache_gap_s 16%, interleave 2%
    their queue time was spent behind: head:>=64k 75%, followup:8k-64k 9%, followup:<8k 8%, head:8k-64k 6%, head:<8k 2%
--- overall_intra: 18 over | primary cause queue(arrangement) 13, own work(cost) 3, cache gap(work) 2 | TTFT seconds: queue 73%, own_cost_est 16%, cache_gap_s 10%, interleave 1%
+-- overall_intra: 18 over | primary cause queue(arrangement) 13, own work(cost) 2, unattributed(model>exec) 2, cache gap(work) 1 | TTFT seconds: queue 73%, own_cost_est 16%, cache_gap_s 10%, interleave 1%
    their queue time was spent behind: head:>=64k 68%, followup:8k-64k 12%, followup:<8k 8%, head:8k-64k 8%, followup:>=64k 2%, head:<8k 2%
 -- turn_start: 0 over
 -- chain_start: 17 over | primary cause queue(arrangement) 17 | TTFT seconds: queue 85%, own_cost_est 13%, cache_gap_s 0%, interleave 1%
@@ -19,3 +20,4 @@
      306.7s  head:>=64k       uncached  222738 prefill 17.0s  master:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1
      306.1s  head:>=64k       uncached  243724 prefill 18.4s  master:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1
      242.4s  head:>=64k       uncached  177518 prefill 12.8s  master:canon:qciFldST32QKFYjmIIyWU:llm:1
+wrote 722 rows to evidence/L042/blocking.csv

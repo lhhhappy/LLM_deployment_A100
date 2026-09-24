@@ -107,17 +107,19 @@ def main():
         ttft = r["t_first_token_s"] - r["t_recv_s"]
         queue = r["t_exec_start_s"] - r["t_recv_s"]
         execs = r["t_first_token_s"] - r["t_exec_start_s"]
-        own = min(own_cost(r["uncached"]), execs)
+        own_est = own_cost(r["uncached"])
+        model_ok = own_est <= execs          # else the cost model does not fit this request: do not attribute exec
+        own = own_est if model_ok else execs
         gap_tok = max(0, (lcp[r["req_id"]] // 64) * 64 - r["cached_tokens"]) if r["req_id"] in lcp else None
         gap_s = min(own, gap_tok * PER_TOK_S) if gap_tok else 0.0
-        inter = max(0.0, execs - own)
+        inter = execs - own if model_ok else 0.0
         qu, qshare = attribute((r["t_recv_s"], r["t_exec_start_s"]), act, i)
         du, dshare = attribute((r["client_first_token_at_s"], r["client_finish_at_s"]), act, i)
         ttft_over = [g for g in r["gates"] if ttft > LIMIT[g]]
         tpot_over = r.get("tpot_s") is not None and r["tpot_s"] > 0.10
         parts = {"queue(arrangement)": queue, "own work(cost)": own - gap_s, "cache gap(work)": gap_s,
-                 "interleave(arrangement)": inter}
-        top = max(parts, key=parts.get)
+                 "exec beyond own estimate": inter}
+        top = max(parts, key=parts.get) if model_ok else ("queue(arrangement)" if queue > execs else "unattributed(model>exec)")
         qk = collections.defaultdict(float)
         for j, s in qshare.items():
             qk[kind(rows[j])] += s
@@ -133,13 +135,16 @@ def main():
         out.append({"req_id": r["req_id"], "idx": r["idx_in_chain"], "gates": "|".join(r["gates"]),
                     "ttft_over": "|".join(ttft_over), "tpot_over": int(tpot_over), "ttft": round(ttft, 3),
                     "queue": round(queue, 3), "own_cost_est": round(own - gap_s, 3), "cache_gap_s": round(gap_s, 3),
-                    "cache_gap_tok": gap_tok, "interleave": round(inter, 3), "primary": top,
+                    "cache_gap_tok": gap_tok, "interleave": round(inter, 3), "model_ok": int(model_ok), "own_est_s": round(own_est, 3), "primary": top,
                     "uncached": r["uncached"], "out": r["output_tokens"], "tpot": r.get("tpot_s"),
                     "queue_blocked_union": round(qu, 2),
                     "queue_blockers": ";".join(f"{k}={v:.1f}" for k, v in sorted(qk.items(), key=lambda x: -x[1])),
                     "decode_prefill_union": round(du, 2),
                     "decode_blockers": ";".join(f"{k}={v:.1f}" for k, v in sorted(dk.items(), key=lambda x: -x[1]))})
-    print(f"== {a.raw.name}: 722 rows complete; cost model {FIXED_S}s/forward + {PER_TOK_S*1e6:.0f}us/token (estimate)")
+    print(f"== {a.raw.name}: 722 rows complete; cost model {FIXED_S}s/forward + {PER_TOK_S*1e6:.0f}us/token (estimate); "
+          f"model exceeds the measured exec window for {sum(1 for o in out if not o['model_ok'])} rows -> their exec time is not split")
+    print("   blocker seconds = victims' waiting seconds that overlap the blocker's prefill window, summed over victims; "
+          "NOT GPU seconds, and the blocker's window also contains decode rounds")
     for g in GATES:
         v = [o for o in out if g in o["ttft_over"].split("|")]
         if not v:
