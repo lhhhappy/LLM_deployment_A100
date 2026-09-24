@@ -48,6 +48,10 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   python3 $AX/verify_kit/metrics_sampler.py $out/metrics.jsonl 10 & local msp=$!
   nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used --format=csv,noheader -l 5 > $out/gpu_util.csv 2>/dev/null & local gsp=$!
   local runner=("$AX/verify_kit/run_dev_checked.py")
+  if [ "${G_WARMUP_PROFILE:-original}" != original ]; then
+    [ -z "${G_MEASURE_SECONDS:-}" ] || { echo 'short warmup requires the full replay runner'; return 2; }
+    runner+=(--warmup-profile "$G_WARMUP_PROFILE")
+  fi
   if [ -n "${G_MEASURE_SECONDS:-}" ]; then
     runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS")
     echo "TIMED_DIAGNOSTIC N=$N admission_seconds=$G_MEASURE_SECONDS drain_all_admitted=true"

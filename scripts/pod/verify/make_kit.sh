@@ -14,6 +14,7 @@ cp scripts/pod/verify/numcheck.py scripts/pod/verify/numcheck_cmp.py \
    scripts/pod/verify/cap_smoke_body.sh scripts/pod/verify/metrics_sampler.py scripts/pod/verify/prof_ledger.py $K/
 cp scripts/analysis/compare_numtrace.py $K/
 cp scripts/pod/verify/level_verdict.py scripts/pod/verify/run_dev_checked.py scripts/score_formal.py $K/   # required verdict/flush path
+cp scripts/pod/verify/short_warmup_loadgen.py $K/
 cp scripts/pod/verify/timed_run.py scripts/pod/verify/timed_loadgen.py scripts/pod/verify/timed_score.py $K/
 if command -v sha256sum >/dev/null 2>&1; then sha256sum $K/* > $K/SHA256SUMS
 else shasum -a 256 $K/* > $K/SHA256SUMS; fi
