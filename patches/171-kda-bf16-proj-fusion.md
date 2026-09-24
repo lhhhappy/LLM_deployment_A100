@@ -33,6 +33,8 @@ GPU 算子入口：[test_kda_fusion_171.py](../tests/gpu/test_kda_fusion_171.py)
 
 **这不是实际 TP8 通信或真实权重模型验证。** 投影没有历史依赖，成本记录中 P、服务 batch、KV/KDA 容量均为 null；不能把它当 `T(c,P,B)` 服务成本。完整模型成本应扩展通用 [extend_check.py](../scripts/analysis/extend_check.py)，使用真实缓存历史。
 
+2026-09-24 新增了显式启用时的 `[ax-kda171]` 每层加载路径日志（head rank0），用于真实 TP8 核对是否实际融合。新补丁 SHA `08eee808be8632776721c90769162a3a30622b8e73fd806565a0c94cdb10026e`；下述 `evidence/kda171` 来自 eefc2ab 的旧哈希版本，两者计算/加载逻辑相同，仅日志不同，不能混写哈希。
+
 开发机 A100 实测已通过：8 个模拟 rank 的加载/投影、非整齐行、冷 prefill→decode→后续 prefill、MTP 非融合 verify 及接受 1–4 token 的 SSM/conv 提交、11 种形状的投影 graph 重放、FP16 dtype 覆盖。逐位相等并非通用要求；完整误差、边界与原始记录见 [R22](../research/codex/R22_kda_projection_fusion.md) 和 [final.jsonl](../evidence/kda171/final.jsonl)。
 
 单层投影调用实测 6 linear → 1 linear + 1 bmm。非 profile 的重复计时：256 行 eager 墙钟中位数约 141→87µs；4096 行约 588→477µs；16384 行约 2082→1872µs。1024 行 eager 两组存在明显 host 波动，不使用混合中位数宣称 2×；同形状投影 graph 约 160→119µs。这里的 graph 是算子图，不是 170 的模型 BCG。
@@ -44,3 +46,5 @@ GPU 算子入口：[test_kda_fusion_171.py](../tests/gpu/test_kda_fusion_171.py)
 由 8 卡负责人安排正式 A 原路径的 flag=0/1 对照，其他参数固定。先同配置重复建立误差参照；覆盖 33/37/63/65、图桶/补齐、chunk 续算、长前缀命中、多请求与 MTP verify/accept。保存逐层输出、SSM/conv、实际融合与 graph 路径、KV/KDA 容量及峰值显存。
 
 数值通过后，同负载测 256/1024/4096/8192/16384 的模型成本，随后完整回放检查四道 TTFT、TPOT 及全部其余硬门。只改善算子或某一门不记为并发档晋级。170 的 prefill BCG 先独立验证，再测组合；正式提交由用户安排。
+
+真实 TP8 初筛 job：[official_a_171_num.sh](../scripts/pod/jobs/official_a_171_num.sh)。A 与 A+171 各两次输出/logprob指纹、非整齐长度、64k前缀尝试、MTP/decode graph及启动容量。这个 HTTP 初筛不读取逐层状态；`numcheck_cmp` 的0.5 logprob线是粗拒绝阈值，原始差异须独立审阅，不自动认定数值等价或能力门通过。

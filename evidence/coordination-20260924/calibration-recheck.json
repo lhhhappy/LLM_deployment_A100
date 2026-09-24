@@ -1,0 +1,31 @@
+[
+  {
+    "run": "044r-cal_offA_n14",
+    "exit_code": 1,
+    "matches_saved_verdict": true,
+    "status": "VALID",
+    "passed": false,
+    "failed_gates": [
+      "overall_intra(<=5s)",
+      "chain_start(<=30s)"
+    ],
+    "rows": 722,
+    "tpot_mean": 0.04257679184719075,
+    "tpot_p95": 0.0783407044762822
+  },
+  {
+    "run": "045r-cal_offB_n10",
+    "exit_code": 1,
+    "matches_saved_verdict": true,
+    "status": "VALID",
+    "passed": false,
+    "failed_gates": [
+      "fast_intra(uncached_expected<=4096,<=3s)",
+      "overall_intra(<=5s)",
+      "tpot_p95<=0.10"
+    ],
+    "rows": 722,
+    "tpot_mean": 0.03450019495480403,
+    "tpot_p95": 0.1182292680080026
+  }
+]

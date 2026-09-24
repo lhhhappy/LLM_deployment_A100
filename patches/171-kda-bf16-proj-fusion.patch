@@ -89,3 +89,17 @@
              )
          else:
              self.qkv_proj = QKVParallelLinear(
+@@ -455,6 +485,13 @@
+                 tp_size=head_shard_size,
+             )
+ 
++        if get_bool_env_var("SGLANG_AX_KDA_FUSE_PROJ", "false") and head_shard_rank == 0:
++            logger.info(
++                "[ax-kda171] layer=%s fused=%s head_tp=%s model_tp=%s dtype=%s",
++                layer_idx, self.do_fuse_qkvbfg, head_shard_size, self.tp_size,
++                self.fused_qkvbfg_a_proj.weight.dtype if self.do_fuse_qkvbfg else None,
++            )
++
+         self.dt_bias = nn.Parameter(
+             torch.empty(divide(projection_size, head_shard_size), dtype=torch.float32)
+         )

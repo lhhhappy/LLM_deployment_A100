@@ -1,0 +1,32 @@
+{
+  "files": {
+    "scripts/pod/jobs/official_a_n22.sh": "bee4ce6186aa8af100d7fade2216448024e2c48010234a40093818554439646d",
+    "scripts/pod/jobs/dev_ladder_template.sh": "3f8a00ead9cd6015fbf83b5164bb5af8ebb7fd6e567ee5d1b92bd56145302b46",
+    "scripts/pod/lib.sh": "f915d3851d9dc92d6501d6033c71d8e9adf85e7fc4ab62db675928727577f109",
+    "scripts/pod/verify/level_verdict.py": "1e61a387557c087417d24f9981627789c6988e0a7a516e75f8a98d2bd362c6e3",
+    "scripts/pod/verify/run_dev_checked.py": "17d024785235081ce3eb16e2906eff052787fa0f4686c0d7c714a32477e1d3f7",
+    "scripts/pod/verify/prof_ledger.py": "f567f85d410770b6360210237ef9d90b7642121e0d0bd0ae7042b7604285fd53",
+    "scripts/score_formal.py": "ecbcd6c81d6921939a74d5f7919ccfaee8fa837d6310afb5c3cfa5753c81384f",
+    "submission/official-0923-A.json": "b57129e1c1b298daf03baea2a974672b1580253e55564f01825e708dbd873af1"
+  },
+  "cpu_tests": {
+    "test_eval_tools.py": 14,
+    "test_prof_ledger.py": 4,
+    "test_kda_fusion_171.py": 3,
+    "test_tpot_paced_prefill.py": 12,
+    "test_numcheck_probe.py": 4,
+    "122_related_total": 39
+  },
+  "calibration_recheck": "calibration-recheck.json",
+  "profile": "046r-ledger.json",
+  "note": "047 has no 122; 048 uses frozen 122. 049 is a numerical screen, not state/quality/SLO acceptance.",
+  "snapshot": "047 preparation; follow-up review updated after 048/049 enqueue",
+  "frozen_122_sha256": "cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b",
+  "followup_files": {
+    "scripts/pod/jobs/official_a_122_n22.sh": "0f90a69c79a2b548f6eedbe0d5c7856f2aca27e7c2a745a98a7f3cc7b11255c5",
+    "scripts/pod/jobs/official_a_171_num.sh": "3d034aaf16b869894555fe0dcec8c2b1e9fb25a009467d90b198e40b0c96282b",
+    "scripts/pod/verify/numcheck.py": "48616102b7b9e74e15f575330ec8c268eca490dab829e3083ac508e07900c12b",
+    "tests/test_numcheck_probe.py": "9134dfd282a501dd1081febc85a733aefdaee3db39ddcf869610cf8a650dbe80",
+    "patches/171-kda-bf16-proj-fusion.patch": "08eee808be8632776721c90769162a3a30622b8e73fd806565a0c94cdb10026e"
+  }
+}

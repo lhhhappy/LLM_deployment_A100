@@ -10,14 +10,16 @@
 
 ## 分工
 
+按用户 2026-09-24 最新安排：执行层主 Codex 统一管理 8 卡队列、复核实验并准备提交；Claude 继续做编排，另一个 Codex 做长链数据。会话、汇报路径和当前安排见 [coordination](notes/coordination.md)。用户随后授权主 Codex 自主统筹后续推进与提交时机；质量、完整性和证据要求仍须满足。
+
 两边都深入源码，也都改核心代码；区别在于各自回答的问题。
 
-| | Codex：执行层 | Claude：负载与服务层，兼统筹 |
+| | Codex：执行层，兼统筹 | Claude：负载与服务层 |
 |---|---|---|
 | 核心问题 | 同样的计算为什么这么贵，怎样变便宜 | 这批请求为什么过不了门，整个服务怎样更好 |
 | 研究与代码 | 模型前向、MoE 大块路径、prefill CUDA graph（170）、kernel、通信、张量布局、KV/KDA 状态契约 | 请求到达与 batch 形成、准入与排序、块预算、缓存复用与淘汰、状态池（`scheduler.py`、`schedule_policy.py`、`mem_cache/`）；本地与正式的校准；实验与评分工具 |
 | 交付 | 正确的补丁，外加同条件下省多少时间、多占多少显存的实测 | 调度与缓存补丁；完整对照结果、失败请求归因；局部加速能否兑现为整档收益的判断 |
-| 8 卡 | 准备补丁、数值检查、针对性探针 | 统一排队、采集证据、完整验证 |
+| 8 卡 | 统一排队、数值探针、采集证据、独立复核和完整验证 | 准备编排候选与实验草案，向主 Codex 交付证据 |
 
 接口：Codex 提供实测单块成本曲线（块长 × 上下文 × batch），调度侧直接使用；Claude 提供真实请求的失败归因，执行侧据此判断是调度缺口还是执行粒度问题；任何新缓冲先报显存，按 KV/状态池损失算账。跨两层的改动先约定接口和负责人。每方的结论进入决策前，由对方对照原始数据复核。
 
@@ -38,6 +40,6 @@
 - 补丁照只读的 `build/base_exact/` 写，每个机制只保留一个版本和同名 `.md`；每次运行打印所用补丁哈希；里程碑即提交。
 - `llm-challenge-arena-v1/`、`s1-dev/`、`build/base_exact/`、`refs/` 只读。只保留正确的现行文档，过时内容直接删除（git 留历史）。
 - 改共享文件（`notes/knowledge.md`、`queue.md`、`experiments.md`）前先读最新内容，只提交自己的改动；各自的长篇分析放在自己的文件里。
-- 8 卡服务不可停、删、释放。停单个测试 job 用 GPU 机上的 `scripts/pod/stopjob <job.sh>`。审阅只用 `scripts/pod/pread`；CPU 分析用 `scripts/pod/pexec_codex`，只写 `/tmp/ax/codex`。入队由 Claude 统一安排，正式提交时机由用户决定；官方结果用 `scripts/official_status.sh <attempt_id>` 查。
+- 8 卡服务不可停、删、释放。停单个测试 job 用 GPU 机上的 `scripts/pod/stopjob <job.sh>`。审阅只用 `scripts/pod/pread`；CPU 分析用 `scripts/pod/pexec_codex`，只写 `/tmp/ax/codex`。入队与提交时机由执行层主 Codex 按用户本轮授权统筹；官方结果用 `scripts/official_status.sh <attempt_id>` 查。
 - GPU 开发机只在 `/sjtu/linhang/arena/` 下工作；不探测评测平台或其他选手。
 - 不关 thinking、不压输出、不截历史、不删 tools；时间戳和 token 计数如实；`/flush_cache` 真清。对外可见的镜像、服务和启动元数据保持中性。
