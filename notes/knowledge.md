@@ -37,3 +37,8 @@
 - 已撤回（Codex 复核）：「开发集 p95 高 3–6 倍」没有同配置同档校准，不成立；「tpm_all 相当」混用了全程平均与稳态窗口，不成立。可说的只是：正式通过档 TPOT 余量大，开发集同类配置在更高档位 TPOT 失败。
 - 校准：044 用正式 A 原配置跑开发集 N14、045 用正式 B 原配置跑 N10，逐门对照官方通过档，得到开发集对这两种配置的偏差；在此之前，开发集只用于 A/B 相对比较。
 - 正式提交内容对其他选手不可见（`scoringDetails`："部署赛提交内容仅作者与主办方可见"）。
+
+## 产能与profile复核（Codex）
+
+- 122的1.175s/16k是成本公式，不是所有上下文下的直测；由全程未命中token/墙钟及此公式得出的prefill占时、MFU只作条件估算，不按N线性外推。当前S1已启用mHC token scatter及reduce-scatter路径，不能照旧profile重复计入尚未实现的收益。TP4仅专家71.12GiB/rank，保留当前KDA池的4+4 PD方案不满足显存账。[分析§10](codex-分析-2026-09-24.md#10-对prefill效率是根的逐项复核与可改代码)
+- 通用`prof_ledger.py`曾把一个decode的多stream标记算成44步，产生负outside时间；现按External id合并，4个CPU用例和4份历史trace回归通过。kernel名字分类只是启发式，no-kernel gap不能直接当host开销。[分析§12](codex-分析-2026-09-24.md#12-新复现的profile账本bug及修复)
