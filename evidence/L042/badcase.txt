@@ -1,0 +1,28 @@
+== raw_dev-combined-v1_N22_1790203410.jsonl: 722 requests, wall 1166 s, 1266 prefill batches logged in the window
+prefill batches >=8192 new tokens: 870; of these with requests decoding and an EMPTY queue: 216 (25%)
+prefill new tokens in window: 10.69M
+
+== TPOT: 175/722 requests > 0.10 s/token (24.2%); mean 0.0915, p95 0.2323
+  output tokens [0,100): 24/80 over (30%)
+  output tokens [100,300): 126/506 over (25%)
+  output tokens [300,1000): 20/104 over (19%)
+  output tokens [1000,inf): 5/32 over (16%)
+  prompt tokens [0,16384): 21/76 over (28%)
+  prompt tokens [16384,65536): 98/498 over (20%)
+  prompt tokens [65536,131072): 47/122 over (39%)
+  prompt tokens [131072,inf): 9/26 over (35%)
+  worst minutes (first token, UTC): 22:44 27/38, 22:50 22/28, 22:45 18/42, 22:47 16/37, 22:57 16/35
+  during their decode: prefill batches p50 39, big chunks p50 28, prefill tokens p50 355k
+   0.692 s/tok out=34 prompt=252115 decode 22.8 s: 36 prefill batches (34 >=8192) | ref tpot 0.616
+   0.584 s/tok out=31 prompt=72344 decode 17.5 s: 26 prefill batches (23 >=8192) | ref tpot 0.503
+   0.516 s/tok out=193 prompt=26374 decode 99.0 s: 147 prefill batches (140 >=8192) | ref tpot 0.431
+   0.500 s/tok out=169 prompt=28448 decode 84.0 s: 123 prefill batches (118 >=8192) | ref tpot 0.408
+   0.486 s/tok out=113 prompt=34112 decode 54.5 s: 88 prefill batches (78 >=8192) | ref tpot 0.238
+
+== TTFT gate overs (harness buckets)
+  fast_intra: 15/328 over | queue p50 2.5s exec p50 0.9s | lost cache (>4096 over frozen) 12
+  overall_intra: 18/388 over | queue p50 4.8s exec p50 2.3s | lost cache (>4096 over frozen) 10
+  turn_start: 0/20 over
+  chain_start: 17/314 over | queue p50 36.1s exec p50 3.8s | lost cache (>4096 over frozen) 9
+
+wrote 225 rows to evidence/L042/badcases.csv

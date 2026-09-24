@@ -1,0 +1,1 @@
+LEVEL N=22 status=VALID formal_est=FAIL tpot_mean=0.0810 tpot_p95=0.1466 | fast_intra:2.65(13/23) overall_intra:5.26(21/27) turn_start:14.18(0/3) chain_start:34.13(23/22) | failed=['chain_start(<=30s)', 'tpot_p95<=0.10']

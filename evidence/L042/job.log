@@ -1,0 +1,21 @@
+src s0v2_114: 000-interface-compliance.patch 101-d1v12-on-base.patch 105-role-split-single-partial.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 112-sm80-indexer-kernels.patch 113-sm80-prefill-indexer.patch 114-indexer-row-shard.patch 140-kda-dual-snapshot.patch drafts/120-sched-protect-chain-v2.patch sig=c60f145bd16b320c
+ENGINE_READY after 140s
+ENGINE_STARTED: s0v2_114 c60f145bd16b320c | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 
+[2026-09-23 22:31:42 TP4] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1316416, KV size: 15.59 GB
+[2026-09-23 22:31:52 TP0] max_total_num_tokens=1316416, chunked_prefill_size=16384, max_prefill_tokens=16384, max_running_requests=40, context_len=1048576, available_gpu_mem=19.09 GB
+PATCH_SHA e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6  000-interface-compliance.patch
+PATCH_SHA 93dbc0e01f60ef52f8997a1e5cd5ef7984640ae09725db39cc530581960da376  101-d1v12-on-base.patch
+PATCH_SHA d01ff50dc00b50344094e4f3b7cbce27cbb0ac433938681eb6b30738cc110212  105-role-split-single-partial.patch
+PATCH_SHA a2c9f92d8a0abc96eaec515e6afa216a8ffa98037431748c1e0f846b66a03174  106-defer-chunk-on-no-kv.patch
+PATCH_SHA e0ed2d96703c6eaea84387508f7e17217cad7fd5db8f9f85250ef51241f1ec5e  110-sm80-dsa-indexer.patch
+PATCH_SHA 67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a  111-sm80-fp8-moe-marlin.patch
+PATCH_SHA 342a4cc9ad8cf8a9eda2c0f0df83aa2a2e8e5bc18495961c43d18f5f6cf63735  112-sm80-indexer-kernels.patch
+PATCH_SHA 1f4d3a7b458bb77192e626013826d30c1e4f4b51279a78fbd66a1e446990ec17  113-sm80-prefill-indexer.patch
+PATCH_SHA 70c078d01b17c3d1051e18f31253dd0beab0f58b642599978d4630fcd7352a9c  114-indexer-row-shard.patch
+PATCH_SHA 1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35  140-kda-dual-snapshot.patch
+PATCH_SHA ef1744b3a51c2ee87fc0ceb858a04cca078c4720ad50b16ff7498a1b0ee7eb1a  drafts/120-sched-protect-chain-v2.patch
+PRECHECK (info only) kv_tokens=1316416 patches=000-interface-compliance.patch,101-d1v12-on-base.patch,105-role-split-single-partial.patch,106-defer-chunk-on-no-kv.patch,110-sm80-dsa-indexer.patch,111-sm80-fp8-moe-marlin.patch,112-sm80-indexer-kernels.patch,113-sm80-prefill-indexer.patch,114-indexer-row-shard.patch,140-kda-dual-snapshot.patch,drafts/120-sched-protect-chain-v2.patch args=[--chunked-prefill-size 16384 --mem-fraction-static 0.75 --enable-attn-tp-input-scattered --cuda-graph-max-bs-decode 64 --max-mamba-cache-size 200] env=[SGLANG_AX_SCHED_COLD_CAP=8192 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_KDA_DUAL_SNAPSHOT=1 SGLANG_AX_INDEXER_ROW_SHARD=1]
+CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=2587
+LEVEL N=22 status=VALID formal_est=FAIL tpot_mean=0.0915 tpot_p95=0.2323 | fast_intra:2.36(15/23) overall_intra:4.28(18/27) turn_start:6.39(0/3) chain_start:31.00(17/22) | failed=['tpot_p95<=0.10']
+INFO N=22   gpu3 util avg 96%
+LADDER first level N=22 failed -> stop (no descent; diagnose and fix)
