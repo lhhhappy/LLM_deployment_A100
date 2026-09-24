@@ -1,11 +1,21 @@
 # Dev self-test on one engine: run the levels in LADDER_UP (e.g. "22" or "22 26"); each level is scored by
 # verify_kit/level_verdict.py (complete data + harness scorer + task.md rules); stop at the first failure. Wrapper sets:
-#   G_COMMIT (engine commit id, exported by scripts/engine/export.sh), G_ARGS, G_ENV, optional LADDER.
+#   G_COMMIT (engine commit id, exported by scripts/engine/export.sh), G_ARGS, G_ENV, G_EXPECT, optional LADDER.
+#   G_EXPECT lists the effective mechanism states the job relies on, e.g. "120=on 122=off 180=on"; the engine's
+#   "[ax] mechanisms:" line must match every entry ("off" also matches "off:<reason>") or the job measures nothing.
 source $AX/bin/scripts/pod/lib.sh
 prepare_src "$G_COMMIT" || exit 1
 export SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0
 [ -n "${G_ENV:-}" ] && export $G_ENV
 ensure_engine "$G_COMMIT" --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang $G_ARGS || exit 1
+[ -n "${G_EXPECT:-}" ] || { echo "MECHANISMS INVALID: set G_EXPECT"; exit 2; }
+mech=$(grep -h "\[ax\] mechanisms:" "$RUN_DIR/server.log" | tail -1); mech=" ${mech#*mechanisms: }"
+[ "$mech" != " " ] || { echo "MECHANISMS INVALID: engine printed no [ax] mechanisms line"; exit 2; }
+for want in $G_EXPECT; do
+  k=${want%%=*}; v=${want#*=}; got=$(grep -o " $k=[^ ]*" <<<"$mech" | head -1 | cut -d= -f2)
+  case "$got" in "$v"|"$v":*) ;; *) echo "MECHANISMS MISMATCH $k expected=$v got=${got:-missing}"; exit 2 ;; esac
+done
+echo "MECHANISMS OK expected=[$G_EXPECT] engine=[${mech# }]"
 grep -h "KV Cache is allocated\|max_total_num_tokens" $AX/engine_current.log | tail -2 | cut -c1-200
 # Print the effective setup (informational; accuracy of the verdict does not depend on it).
 kv=$(grep -oh "max_total_num_tokens=[0-9]*" $AX/engine_current.log | tail -1 | cut -d= -f2)

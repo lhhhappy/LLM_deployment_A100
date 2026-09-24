@@ -171,7 +171,8 @@ def load_source(root=CANDIDATE):
     source_cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'Scheduler')
     names = {'get_next_batch_to_run', 'get_new_batch_prefill', '_get_new_batch_prefill_raw',
              '_arm_prefill_decode_interval', '_should_defer_prefill',
-             '_ax_sched_protect_enabled', '_ax_sched_protect_limits', '_ax_should_decode',
+             '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
+             '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
              '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
@@ -613,8 +614,8 @@ class ProtectTests(unittest.TestCase):
             self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
 
-# HEAD carries 180 on top of official A and the other default-off candidates.
-TREE_180 = tree_dir('mech:180')
+# HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.
+TREE_180 = tree_dir('HEAD')
 
 
 class HiCacheTierTests(unittest.TestCase):
@@ -660,6 +661,43 @@ class HiCacheTierTests(unittest.TestCase):
         self.assertEqual([r[0] for r in t['reqs']], ['cold', 'fits'])
         self.assertEqual(t['waiting'], ['host'])
         s.tree_cache.init_load_back.assert_not_called()
+
+    def test_blocker_names_the_reason(self):
+        s, _ = make_scheduler(TREE_180)
+        self.assertIsNone(s._ax_sched_protect_blocker())
+        s.enable_hierarchical_cache = True
+        self.assertIsNone(s._ax_sched_protect_blocker())
+        s.enable_hicache_storage = True
+        self.assertEqual(s._ax_sched_protect_blocker(), 'hicache_storage')
+        s.enable_hicache_storage = False
+        s.is_mixed_chunk = True
+        self.assertEqual(s._ax_sched_protect_blocker(), 'mixed_chunk')
+
+    def test_mechanism_report_official_a_env(self):
+        s, ns = make_scheduler(TREE_180)
+        s.schedule_policy = 'lpm'
+        policy = ModuleType('sglang.srt.managers.schedule_policy')
+        policy._role_boundary_token_ids = ns['_role_boundary_token_ids']
+        policy._ax_srpt_aging = ns['_ax_srpt_aging']
+        mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy})
+        mods.start()
+        self.addCleanup(mods.stop)
+        ns['get_spec'] = lambda: NS(speculative_algorithm='NEXTN')
+        ns['get_parallel'] = lambda: NS(dcp_size=1)
+        env = {'SGLANG_AX_KDA_DUAL_SNAPSHOT': '0', 'SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS': ''}
+        with patch.dict(os.environ, env):
+            for k in ('SGLANG_AX_PACE_TPOT', 'SGLANG_AX_SRPT_AGING'):
+                os.environ.pop(k, None)
+            rep = s._ax_mechanism_report()
+        head = rep.split(' | ')[0].split()
+        self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
+                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache'])
+        s.enable_hierarchical_cache = True
+        with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
+            rep = s._ax_mechanism_report()
+        self.assertIn('120=on 122=on', rep)
+        self.assertIn('180=on', rep)
+        self.assertIn('spec=NEXTN dcp=1', rep)
 
 if __name__ == '__main__':
     unittest.main()
