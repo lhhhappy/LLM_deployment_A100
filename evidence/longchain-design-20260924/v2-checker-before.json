@@ -1,0 +1,79 @@
+{
+  "versions": {
+    "transformers": "5.12.1",
+    "tokenizers": "0.22.2",
+    "jinja2": "3.1.6"
+  },
+  "checker_sha256": "09cbd7bf8129f5f88a3bd75a16c7a989451de4c49d8791c9be46daff7c5a89c3",
+  "fixtures": [
+    {
+      "case": "baseline",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        662
+      ]
+    },
+    {
+      "case": "prefix_unclosed_call",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        1814
+      ]
+    },
+    {
+      "case": "initial_task_removed",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        606
+      ]
+    },
+    {
+      "case": "unaccounted_summary_text",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        812
+      ]
+    },
+    {
+      "case": "summary_unpaired_call",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        662
+      ]
+    },
+    {
+      "case": "duplicate_excerpt",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        662
+      ]
+    },
+    {
+      "case": "nonobject_excerpt",
+      "status": "CRASH",
+      "exception": "AttributeError(\"'NoneType' object has no attribute 'get'\")",
+      "prompt_tokens": [
+        2941,
+        662
+      ]
+    }
+  ]
+}

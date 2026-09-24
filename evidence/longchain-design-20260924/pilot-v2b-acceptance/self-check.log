@@ -1,0 +1,6 @@
+[cohort] longchain-events-pilot：24 链 / 455 请求，sha=e115ff81e03f03cb
+[物化] 单遍扫描 bodies（3.4 GB，数分钟）
+  物化 1/1 分片，已得 455/455
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+自检结果：失配=0 ；共=455
+SELF_CHECK: PASS

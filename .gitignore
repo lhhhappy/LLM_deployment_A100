@@ -17,3 +17,6 @@ __pycache__/
 *.pyc
 *.env
 credentials*
+.venv-longchain/
+data/longchain-*/
+data/s1-dev-longchain/

@@ -1,6 +1,6 @@
 # 正式提交
 
-这里只记提交物、官方状态与可查的出处。官方结果自己查：`scripts/official_status.sh <attempt_id>`（Playground CLI；stress 只含最高通过档）。开发集结果放 [experiments.md](experiments.md)。正式成绩需由 Playground/主办方返回，不能由开发集推断。下表前四项状态已用 [本地公开快照](../data/all_att_2026-09-23.json)中的 attempt changelog 核对；后两项截至 2026-09-24 的本地记录仍须刷新官方状态。
+这里只记提交物、官方状态与可查的出处。官方结果自己查：`scripts/official_status.sh <attempt_id>`（Playground CLI；stress 只含最高通过档）。开发集结果放 [experiments.md](experiments.md)。正式成绩需由 Playground/主办方返回，不能由开发集推断。下表前四项状态已用 [本地公开快照](../evidence/official/all_att_2026-09-23.json)中的 attempt changelog 核对；后两项于2026-09-24由Codex只读重新查询：[45979](../evidence/cost-audit-20260924/official-45979.json)、[45980](../evidence/cost-audit-20260924/official-45980.json)，均completed、能力门通过，最高通过档分别N14/N10。
 
 | Attempt | 日期 | 配置 / 镜像 | 已核实的官方状态 |
 |---|---|---|---|

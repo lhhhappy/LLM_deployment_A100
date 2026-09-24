@@ -1,0 +1,95 @@
+{
+  "versions": {
+    "transformers": "5.12.1",
+    "tokenizers": "0.22.2",
+    "jinja2": "3.1.6"
+  },
+  "checker_sha256": "f9b719d35f246763bb33f0089f02dbd8695f42925a4cfd235aa478cd39f62bb3",
+  "fixtures": [
+    {
+      "case": "baseline",
+      "status": "VALID",
+      "errors": [],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        636
+      ]
+    },
+    {
+      "case": "prefix_unclosed_call",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: rebuild does not preserve the original opening task prefix",
+        "p:canon:1: rebuild removal range splits a tool call/result group",
+        "p:canon:1: introduced tool block has 1 calls but 0 results",
+        "p:canon:1: introduced tool call/result ID sets differ"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        1788
+      ]
+    },
+    {
+      "case": "initial_task_removed",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: rebuild does not preserve the original opening task prefix"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        580
+      ]
+    },
+    {
+      "case": "unaccounted_summary_text",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: rebuild summary text does not exactly match ordered extracts"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        786
+      ]
+    },
+    {
+      "case": "summary_unpaired_call",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: invalid rebuild summary message"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        636
+      ]
+    },
+    {
+      "case": "duplicate_excerpt",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: summary excerpt indices must be strictly increasing"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        636
+      ]
+    },
+    {
+      "case": "nonobject_excerpt",
+      "status": "INVALID",
+      "errors": [
+        "p:canon:1: summary excerpt must be an object"
+      ],
+      "rendered_prompts": 2,
+      "prompt_tokens": [
+        2941,
+        636
+      ]
+    }
+  ]
+}

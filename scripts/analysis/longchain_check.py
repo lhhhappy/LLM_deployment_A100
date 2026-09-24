@@ -100,7 +100,8 @@ def _new_message_suffix(previous, current):
     if i == len(before):
         return i
     if (i == len(before) - 1 and isinstance(before[i], dict) and before[i].get("role") == "user"
-            and "system-reminder" in str(before[i].get("content", ""))):
+            and "system-reminder" in str(before[i].get("content", ""))
+            and not str(before[i].get("content", "")).startswith("历史上下文摘录（中间记录已归档）：\n")):
         return i
     return None
 
@@ -169,6 +170,103 @@ def _actual_append_edge(before_body, after_body):
         return False
     return any(isinstance(m, dict) and m.get("role") == "assistant"
                for m in after_body.get("messages", [])[start:])
+
+
+def _rebuild_errors(before, after, row, provenance, rid):
+    """Independently verify the compiler's explicit replace-middle operation."""
+    errors = []
+    if not isinstance(before, dict) or not before or row.get("phase") != "context_reset":
+        return [f"{rid}: rebuild requires a predecessor and context_reset phase"]
+    if not isinstance(after, dict):
+        return [f"{rid}: rebuild body must be an object"]
+    receipt = provenance.get("rebuild")
+    if not isinstance(receipt, dict) or receipt.get("method") != "receiving_history_extractive_summary_v1":
+        return [f"{rid}: missing/unknown rebuild receipt"]
+    old, new = before.get("messages", []), after.get("messages", [])
+    if (not isinstance(old, list) or not isinstance(new, list)
+            or any(not isinstance(m, dict) for m in old + new)):
+        return [f"{rid}: rebuild messages must be lists of objects"]
+    left, right = receipt.get("prefix_end"), receipt.get("tail_start")
+    if not _is_int(left) or not _is_int(right) or not 0 <= left < right <= len(old):
+        return [f"{rid}: invalid rebuild removal range"]
+    # Method v1 preserves the opening task messages preceding the first
+    # assistant. This is a semantic contract, not a freely chosen cut point.
+    opening_end = next((i for i, m in enumerate(old) if m.get("role") == "assistant"), 0)
+    if opening_end == 0 and old and old[0].get("role") == "user":
+        opening_end = 1
+    if left != opening_end:
+        errors.append(f"{rid}: rebuild does not preserve the original opening task prefix")
+    boundaries, i = {0}, 0
+    while i < len(old):
+        j = i + 1
+        if old[i].get("tool_calls"):
+            while j < len(old) and old[j].get("role") == "tool":
+                j += 1
+        boundaries.add(j)
+        i = j
+    if left not in boundaries or right not in boundaries:
+        errors.append(f"{rid}: rebuild removal range splits a tool call/result group")
+    removed, tail = old[left:right], old[right:]
+    if (not _is_int(receipt.get("removed_messages")) or receipt["removed_messages"] != len(removed)
+            or receipt.get("removed_sha256") != _canonical_digest(removed)):
+        errors.append(f"{rid}: rebuild removed-history receipt mismatch")
+    if receipt.get("retained_tail_sha256") != _canonical_digest(tail):
+        errors.append(f"{rid}: rebuild retained tail mismatch")
+    summary = receipt.get("summary_message")
+    summary_valid = (isinstance(summary, dict) and set(summary) == {"role", "content"}
+                     and summary.get("role") == "user" and isinstance(summary.get("content"), str))
+    if not summary_valid:
+        errors.append(f"{rid}: invalid rebuild summary message")
+    if new != old[:left] + [summary] + tail or new == old or _new_message_suffix(old, new) is not None:
+        errors.append(f"{rid}: body does not implement declared history replacement")
+    excerpts = receipt.get("summary_excerpts")
+    if not isinstance(excerpts, list) or not 1 <= len(excerpts) <= 8:
+        errors.append(f"{rid}: rebuild summary requires 1 to 8 extracts")
+    else:
+        last_index, texts, extracts_valid = -1, [], True
+        for ex in excerpts:
+            if not isinstance(ex, dict):
+                errors.append(f"{rid}: summary excerpt must be an object")
+                extracts_valid = False
+                continue
+            index, text = ex.get("removed_index"), ex.get("text")
+            if (not _is_int(index) or not 0 <= index < len(removed)
+                    or not isinstance(text, str) or not 1 <= len(text) <= 240):
+                errors.append(f"{rid}: invalid summary excerpt index/text")
+                extracts_valid = False
+                continue
+            if index <= last_index:
+                errors.append(f"{rid}: summary excerpt indices must be strictly increasing")
+                extracts_valid = False
+            last_index = index
+            texts.append(text)
+            source = removed[index].get("content")
+            if not isinstance(source, str) or not source:
+                source = json.dumps(removed[index], ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            if not source.startswith(text):
+                errors.append(f"{rid}: summary excerpt is not from removed receiving history")
+                extracts_valid = False
+        if summary_valid and extracts_valid:
+            expected_text = "历史上下文摘录（中间记录已归档）：\n" + "\n".join(texts) + "\n继续当前任务。"
+            if summary["content"] != expected_text:
+                errors.append(f"{rid}: rebuild summary text does not exactly match ordered extracts")
+    # Both retained sides must keep complete tool groups. They are old history,
+    # so do not impose newly introduced ID uniqueness across separate groups.
+    for retained in (old[:left], tail):
+        i = 0
+        while i < len(retained):
+            j = i + 1
+            calls = retained[i].get("tool_calls")
+            if calls:
+                while j < len(retained) and retained[j].get("role") == "tool":
+                    j += 1
+            if calls is not None and not isinstance(calls, list):
+                errors.append(f"{rid}: retained tool_calls must be a list")
+            else:
+                block_errors, _ = _new_tool_block_errors(retained[i:j], 0, rid)
+                errors.extend(block_errors)
+            i = j
+    return errors
 
 
 def _chain_summary_errors(chain_meta, grouped, req_rows, bodies):
@@ -610,7 +708,9 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                     errors.append(f"{rid}: synthetic continuation changes system/tools without an implemented event")
                 start = _new_message_suffix((prev_body or {}).get("messages", []),
                                             bodies[rid].get("messages", []))
-                if start is None:
+                if p.get("event_kind") == "context_reset":
+                    errors.extend(_rebuild_errors(prev_body, bodies[rid], row, p, rid))
+                elif start is None:
                     errors.append(f"{rid}: synthetic body is not an append/reminder-replacement of predecessor")
                 else:
                     new_messages = bodies[rid].get("messages", [])[start:]
@@ -665,6 +765,8 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                                 errors.append(f"{rid}: {p['kind']} {key} must be an integer")
                             elif value != actual:
                                 errors.append(f"{rid}: {p['kind']} {key}={value} rendered={actual}")
+                    if is_synthetic and p.get("event_kind") == "context_reset" and prev_tokens is not None and n >= len(prev_tokens):
+                        errors.append(f"{rid}: context rebuild did not reduce rendered prompt tokens")
                     if rec.get("lcp_tokens") is not None:
                         token_lcps.append(rec["lcp_tokens"])
                     prev_tokens = ids_tok

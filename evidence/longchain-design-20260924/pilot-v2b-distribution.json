@@ -1,0 +1,3127 @@
+{
+  "diagnostic_only": true,
+  "source": {
+    "root": "/Users/lhappy/workbench/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+    "manifest_sha256": "2e707a72b9abebae4c98c2170dc3d193a2f3d0fe2480924bb1e898b1acb4a63d",
+    "requests": 722,
+    "chains": 311,
+    "sessions": 136,
+    "kinds": {},
+    "four_gates": {
+      "fast_intra": 328,
+      "overall_intra": 388,
+      "turn_start": 20,
+      "chain_start": 314
+    },
+    "chain_length": {
+      "n": 311,
+      "sum": 722,
+      "mean": 2.3215434083601285,
+      "min": 1,
+      "p50": 1,
+      "p95": 6,
+      "p99": 7,
+      "max": 13
+    },
+    "chain_length_bands": {
+      "1-4": {
+        "chains": 261,
+        "requests": 431
+      },
+      "5-8": {
+        "chains": 48,
+        "requests": 267
+      },
+      "9-15": {
+        "chains": 2,
+        "requests": 24
+      },
+      "16-30": {
+        "chains": 0,
+        "requests": 0
+      },
+      "31-99": {
+        "chains": 0,
+        "requests": 0
+      },
+      "100+": {
+        "chains": 0,
+        "requests": 0
+      }
+    },
+    "source_summary_chain_length": {
+      "n": 311,
+      "sum": 5601,
+      "mean": 18.009646302250804,
+      "min": 1,
+      "p50": 8,
+      "p95": 82,
+      "p99": 138,
+      "max": 240
+    },
+    "phase": {
+      "session_start": 104,
+      "intra": 503,
+      "context_reset": 23,
+      "turn_start": 92
+    },
+    "prompt_tokens": {
+      "n": 722,
+      "sum": 34416777,
+      "mean": 47668.66620498615,
+      "min": 8364,
+      "p50": 36576,
+      "p95": 114376,
+      "p99": 224581,
+      "max": 256733
+    },
+    "frozen_uncached_tokens": {
+      "n": 722,
+      "sum": 11976036,
+      "mean": 16587.307479224375,
+      "min": 68,
+      "p50": 2867,
+      "p95": 61471,
+      "p99": 138847,
+      "max": 256733
+    },
+    "rendered_added_tokens_from_provenance": {
+      "n": 0
+    },
+    "output_budget": {
+      "n": 722,
+      "sum": 215582,
+      "mean": 298.590027700831,
+      "min": 12,
+      "p50": 198,
+      "p95": 915,
+      "p99": 2453,
+      "max": 5644
+    },
+    "gap_ms": {
+      "n": 722,
+      "sum": 3027842,
+      "mean": 4193.686980609418,
+      "min": 0,
+      "p50": 1547,
+      "p95": 16291,
+      "p99": 33210,
+      "max": 300782
+    },
+    "effective_gap_ms": {
+      "n": 722,
+      "sum": 3027842,
+      "mean": 4193.686980609418,
+      "min": 0,
+      "p50": 1547,
+      "p95": 16291,
+      "p99": 33210,
+      "max": 300782
+    },
+    "gap_cap": {
+      "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+      "rounding": "last-nonzero-remainder",
+      "chain_gap_cap_ms": 3600000,
+      "n_chains": 311,
+      "n_chains_compressed": 0,
+      "n_requests_in_compressed_chains": 0,
+      "original_gap_sum_ms": 3027842,
+      "effective_gap_sum_ms": 3027842,
+      "affected_chains": [],
+      "affected_chains_truncated": 0
+    },
+    "estimated_gap_rows": 42,
+    "synthetic_gap_origins": {},
+    "source_plan_actual": {
+      "source_all": {
+        "session_start": 104,
+        "intra": 5125,
+        "turn_start": 231,
+        "context_reset": 141
+      },
+      "actual_all": {
+        "session_start": 104,
+        "intra": 503,
+        "context_reset": 23,
+        "turn_start": 92
+      },
+      "planned_synthetic": {},
+      "actual_synthetic": {},
+      "displaced_planned": {},
+      "context_pressure_events": 0,
+      "replaced_behavior_references": 0
+    },
+    "repetition": {
+      "complete_prompt_excluding_req_id": {
+        "duplicate_groups": 1,
+        "cross_session_groups": 1,
+        "cross_session_occurrences": 2,
+        "cross_session_redundant_occurrences": 1,
+        "cross_chain_groups": 1,
+        "largest_cross_session_groups": [
+          {
+            "sha256": "28a8e8bf3235aa31eb5e1c6ca27fbb775727dbbf408355dbda13130332ac435a",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 66584
+          }
+        ]
+      },
+      "introduced_blocks_exact": {
+        "duplicate_groups": 8,
+        "cross_session_groups": 8,
+        "cross_session_occurrences": 27,
+        "cross_session_redundant_occurrences": 19,
+        "cross_chain_groups": 8,
+        "largest_cross_session_groups": [
+          {
+            "sha256": "d2cba27c02f04fd91311a70ba296f5c9825a21803d01c0ec035f13ccd0609d8e",
+            "occurrences": 8,
+            "sessions": 8,
+            "chains": 8,
+            "chars": 52
+          },
+          {
+            "sha256": "cc0391749eb70a3d486634816a145e8c9c8239d5b9c685c692dad05bae2ed72a",
+            "occurrences": 4,
+            "sessions": 3,
+            "chains": 4,
+            "chars": 9386
+          },
+          {
+            "sha256": "2db16cea680d63b9a2a97cec591505fc97094a64b9a7f4cf01e11a7dc5884950",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 26732
+          },
+          {
+            "sha256": "01823d8b8c629d21046b7cf1afa1990c7a556e5f230cb892e26d27c11366ef07",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 53
+          },
+          {
+            "sha256": "ec5142356dc2fb314f081f45b88c8ecbedac21eb1cdb85c2028b5ad9da8ab831",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 46
+          },
+          {
+            "sha256": "6d509e4d44a04105ea2bb4ea454f09d65bf5149c9630119b74ec8b146bb7210d",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 703
+          },
+          {
+            "sha256": "46e84d104774b5636e77bf2148025f6a70a37d3e8bfa80bf3a0243e6bfb3fec4",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 55
+          },
+          {
+            "sha256": "b0044cd13538e71a05584f63263f6e41c51c56b9741ba4de3ee2cb9633ab9186",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 50
+          }
+        ]
+      },
+      "introduced_blocks_call_ids_normalized": {
+        "duplicate_groups": 9,
+        "cross_session_groups": 8,
+        "cross_session_occurrences": 27,
+        "cross_session_redundant_occurrences": 19,
+        "cross_chain_groups": 8,
+        "largest_cross_session_groups": [
+          {
+            "sha256": "d2cba27c02f04fd91311a70ba296f5c9825a21803d01c0ec035f13ccd0609d8e",
+            "occurrences": 8,
+            "sessions": 8,
+            "chains": 8,
+            "chars": 52
+          },
+          {
+            "sha256": "cc0391749eb70a3d486634816a145e8c9c8239d5b9c685c692dad05bae2ed72a",
+            "occurrences": 4,
+            "sessions": 3,
+            "chains": 4,
+            "chars": 9386
+          },
+          {
+            "sha256": "2db16cea680d63b9a2a97cec591505fc97094a64b9a7f4cf01e11a7dc5884950",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 26732
+          },
+          {
+            "sha256": "01823d8b8c629d21046b7cf1afa1990c7a556e5f230cb892e26d27c11366ef07",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 53
+          },
+          {
+            "sha256": "ec5142356dc2fb314f081f45b88c8ecbedac21eb1cdb85c2028b5ad9da8ab831",
+            "occurrences": 3,
+            "sessions": 3,
+            "chains": 3,
+            "chars": 46
+          },
+          {
+            "sha256": "cc1d383e0fe920c49dcb64d5b5dd9fe47780219ccf1dd7a5a71e3ab0c93d4d1c",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 703
+          },
+          {
+            "sha256": "46e84d104774b5636e77bf2148025f6a70a37d3e8bfa80bf3a0243e6bfb3fec4",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 55
+          },
+          {
+            "sha256": "b0044cd13538e71a05584f63263f6e41c51c56b9741ba4de3ee2cb9633ab9186",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 50
+          }
+        ]
+      },
+      "introduced_block_occurrences": 394,
+      "initial_history_blocks_excluded_from_introductions": 6930,
+      "source_material_uses": []
+    }
+  },
+  "generated": {
+    "root": "/Users/lhappy/workbench/Agentic_science_challenge/data/s1-dev-longchain",
+    "manifest_sha256": "ef546a95768d6837b8528a8a475c698d6301d00a91cd235f31e8057cd49c60de",
+    "requests": 455,
+    "chains": 24,
+    "sessions": 24,
+    "kinds": {
+      "original": 70,
+      "synthetic": 385
+    },
+    "four_gates": {
+      "fast_intra": 390,
+      "overall_intra": 413,
+      "turn_start": 12,
+      "chain_start": 30
+    },
+    "chain_length": {
+      "n": 24,
+      "sum": 455,
+      "mean": 18.958333333333332,
+      "min": 1,
+      "p50": 8,
+      "p95": 89,
+      "p99": 125,
+      "max": 125
+    },
+    "chain_length_bands": {
+      "1-4": {
+        "chains": 9,
+        "requests": 22
+      },
+      "5-8": {
+        "chains": 4,
+        "requests": 29
+      },
+      "9-15": {
+        "chains": 5,
+        "requests": 60
+      },
+      "16-30": {
+        "chains": 2,
+        "requests": 56
+      },
+      "31-99": {
+        "chains": 3,
+        "requests": 163
+      },
+      "100+": {
+        "chains": 1,
+        "requests": 125
+      }
+    },
+    "source_summary_chain_length": {
+      "n": 24,
+      "sum": 455,
+      "mean": 18.958333333333332,
+      "min": 1,
+      "p50": 8,
+      "p95": 89,
+      "p99": 125,
+      "max": 125
+    },
+    "phase": {
+      "session_start": 7,
+      "intra": 422,
+      "turn_start": 18,
+      "context_reset": 8
+    },
+    "prompt_tokens": {
+      "n": 455,
+      "sum": 35667259,
+      "mean": 78389.58021978023,
+      "min": 14357,
+      "p50": 72237,
+      "p95": 142038,
+      "p99": 223343,
+      "max": 225596
+    },
+    "frozen_uncached_tokens": {
+      "n": 455,
+      "sum": 1510066,
+      "mean": 3318.8263736263734,
+      "min": 76,
+      "p50": 773,
+      "p95": 9636,
+      "p99": 36078,
+      "max": 167007
+    },
+    "rendered_added_tokens_from_provenance": {
+      "n": 455,
+      "sum": 2141360,
+      "mean": 4706.285714285715,
+      "min": 76,
+      "p50": 781,
+      "p95": 18582,
+      "p99": 121825,
+      "max": 222738
+    },
+    "output_budget": {
+      "n": 455,
+      "sum": 322838,
+      "mean": 709.5340659340659,
+      "min": 62,
+      "p50": 525,
+      "p95": 2310,
+      "p99": 4257,
+      "max": 7317
+    },
+    "gap_ms": {
+      "n": 455,
+      "sum": 3037866,
+      "mean": 6676.628571428571,
+      "min": 0,
+      "p50": 3075,
+      "p95": 26833,
+      "p99": 70378,
+      "max": 300000
+    },
+    "effective_gap_ms": {
+      "n": 455,
+      "sum": 3037866,
+      "mean": 6676.628571428571,
+      "min": 0,
+      "p50": 3075,
+      "p95": 26833,
+      "p99": 70378,
+      "max": 300000
+    },
+    "gap_cap": {
+      "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+      "rounding": "last-nonzero-remainder",
+      "chain_gap_cap_ms": 3600000,
+      "n_chains": 24,
+      "n_chains_compressed": 0,
+      "n_requests_in_compressed_chains": 0,
+      "original_gap_sum_ms": 3037866,
+      "effective_gap_sum_ms": 3037866,
+      "affected_chains": [],
+      "affected_chains_truncated": 0
+    },
+    "estimated_gap_rows": 387,
+    "synthetic_gap_origins": {
+      "estimated_capped_phoenix_end_to_start_proxy": 385
+    },
+    "source_plan_actual": {
+      "source_all": {
+        "session_start": 7,
+        "intra": 422,
+        "turn_start": 18,
+        "context_reset": 8
+      },
+      "actual_all": {
+        "session_start": 7,
+        "intra": 422,
+        "turn_start": 18,
+        "context_reset": 8
+      },
+      "planned_synthetic": {
+        "turn_start": 10,
+        "intra": 370,
+        "context_reset": 5
+      },
+      "actual_synthetic": {
+        "turn_start": 10,
+        "intra": 370,
+        "context_reset": 5
+      },
+      "displaced_planned": {},
+      "context_pressure_events": 0,
+      "replaced_behavior_references": 3
+    },
+    "repetition": {
+      "complete_prompt_excluding_req_id": {
+        "duplicate_groups": 0,
+        "cross_session_groups": 0,
+        "cross_session_occurrences": 0,
+        "cross_session_redundant_occurrences": 0,
+        "cross_chain_groups": 0,
+        "largest_cross_session_groups": []
+      },
+      "introduced_blocks_exact": {
+        "duplicate_groups": 1,
+        "cross_session_groups": 1,
+        "cross_session_occurrences": 2,
+        "cross_session_redundant_occurrences": 1,
+        "cross_chain_groups": 1,
+        "largest_cross_session_groups": [
+          {
+            "sha256": "2db16cea680d63b9a2a97cec591505fc97094a64b9a7f4cf01e11a7dc5884950",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 26732
+          }
+        ]
+      },
+      "introduced_blocks_call_ids_normalized": {
+        "duplicate_groups": 7,
+        "cross_session_groups": 4,
+        "cross_session_occurrences": 8,
+        "cross_session_redundant_occurrences": 4,
+        "cross_chain_groups": 4,
+        "largest_cross_session_groups": [
+          {
+            "sha256": "2db16cea680d63b9a2a97cec591505fc97094a64b9a7f4cf01e11a7dc5884950",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 26732
+          },
+          {
+            "sha256": "3b36d87a4504d17d6ecddd99f50edabe485d6d7f5d7bbb3b721ae0da4f869e83",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 14986
+          },
+          {
+            "sha256": "1ad7c8001030ca09792ce2504444711f99a8677c479432adf9f673d1afc8ea97",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 1666
+          },
+          {
+            "sha256": "3c55aafcca9e5ffb54b65eaf3f0a2fd04a57552672ce8a4655fb3ecc00f9aeb5",
+            "occurrences": 2,
+            "sessions": 2,
+            "chains": 2,
+            "chars": 876
+          }
+        ]
+      },
+      "introduced_block_occurrences": 464,
+      "initial_history_blocks_excluded_from_introductions": 738,
+      "source_material_uses": [
+        {
+          "material": "donor_block:8d946eaa0f776a13193734374003660fc656a0ccf9b0734b182d6b1eeaaf0248",
+          "events": 2,
+          "sessions": 2,
+          "role": "donor_block"
+        },
+        {
+          "material": "answer_material:0fd4d13ee1bbba2ad0a3ddd0f20f7e0fc3c612c779f9e23d7460e681c98ca8dd",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:258b9167e12c56b2b7606463f25e90f3c8dcfeaaf891ddfd5326587f004d4bc0",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:25eb522d5a8af4d23e2ab42107dc28616cc0ec9315fcb7b4ce6f5b3a4cae3066",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:403c2798574b75072befd680ea78698fdab82d13606cf1207d1049ef3fe01105",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:73c54f4d7df99f5f042228c05f68b208a7344e8f8e8b85b6202d00e97c5e6c0f",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:78f3b65f34293293da1e9f3c4bdba2cf7e80588f3afa43e0e38f90ec7907f316",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:880389d375d22d89c04cda2396594f6725a6368848749c2a699d647a011c2bab",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:bb006d3bc76106b5c35a9ece223b3d8e29b97828608a36ea005dd79852d5930d",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:bd47fb07ccf4a0d6533b2d4a32c4a0237c4fd7399a0830081fcb32c4e10c8f0a",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "answer_material:c9dbb9bb09c6ea1139c1f859d8ddb59be44f14a8ce23b29713eaf89ebe328055",
+          "events": 1,
+          "sessions": 1,
+          "role": "answer_material"
+        },
+        {
+          "material": "donor_block:0085a3269ff79fd5f263528ed42cc8a8a337b3a74de9bb74080d3353ad1d7908",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:013569c7cedbc0383995bf0b3405dc1674f14fa3ef0e8cba343f35881fec9023",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:014622dfcfa7123d0d183c74f996d25eaaa9c2740307035b973e5dcb940a9be6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0225b3ef8fdd2bc5f879dbef4d086db434b24c22c6c2bc9d6c078f412fc81757",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:028fb66b7b43777d068cf7b9ec4b5487a667359f65305c31cb037f926996144f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:03b85509d6188bb1fec878b82263aae3628898c570e168fb73ff96383a9b050a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0455d84bbed16e97256742afbc229f674c0fa1e53c990a927cfe8ce74b0ad2ff",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:066d37c303fd522311413dbdebc5c3d3b069f70a50286865d1e354ce847770a0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:067172f96038b71f57d12641b72441045916a6229eb5c954e195371d3f252018",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:06a48d298503f77f937f335799c14d29baff804b98b37a3336922e1e7523d422",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:06d090029e2ef5d48fce25538a52e5e44b8d7ec3c04bd5757a4f4f56582c8db4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:077450f2db1261564de711b341cfe0b7965a7543f1e94da03808ae9b2911e11c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:07b8088e1f625a736287cd37950ff89cd96255ec286c892c73a8b8cd31c48e5b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:07d618d7de1aee28207860de48830244ef8daf5a6051f099f22825b04bf17a30",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0903849d8a7398aa7651cb73b9e36dd0f587f4e9d91accb9f718f857eab78ac9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:09438f2c5b710036190c087b51e3f7f836c608b4cdf91a753619ede0bb7faa1c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0988a5e1da7e9e939a2181f80dd3fa2087cce39e54e83f05d991d975986532e3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:09e2392c64b3f1a34ff4ca17453ce036828ecee4ec7453f987b760d968226a3a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0a47a03f4a7553fe0f469f366d6fad5f1f69d2f9d972102c7107fce1e158d5a6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0ad305de254e3aaf9f5cbb9446b9e8baf4a0f4589b37de643b246100f17f8379",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0c1ce0fa9d69d707547326900736cc2f382a5ffed4d0a42d3c767667b8f40b5e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0c47b7d2de1e618e24bf788947a5300818a071df0d3258156210ff309f80b3d0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0c4ab62073fc77d2569a69e1583bb50c36ca2c2d9341301fe1a50b55cd3fc1b2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0db70dd930483c75c5b898f0c5e24c384b81926edd61181ce4bd010ba33b63db",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0e0a9f895d2df7f9953a0f0b4c5370779126e6711d40338b769813dbcdc74a6c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0eb4982cc22d0125dfb7850fd73957b1a510d2cf476eb74a4929e159f9153715",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:0eda508ce3d3404514558db2af129abcf08e821d70d5ea4cd4b56dde055b3bd1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1015e3352bc8261b3af141e9804ae1f51d44f68b4c8a5cf714dc4e027bb2caef",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:10220d3e7b968b8302a4e5e17a755fbcd29b4768ffa15d018a6f736dac482c33",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:104f8be98e70e0f21cfda15ba8ab8cc0445b594df37c69b476c683d1118b37f0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:109d2aac04163dd94772b1eb1bb44c25e0f41f65d6e163201d14492e7048489e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:11a17ce7cff85b5a21b69f175cd3e3b1e8256253c76403a42092d63113498089",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:124f8a17c8482b516332fdb1bcb08eacd9540ffe7fd0dff22dfb41b3becd7c06",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:13285267209f6c8883dc254779074c0f42666ea5b6f6bf9f64c1311b7e9f409e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:153c9960b6bf51c288eb4bec99233aea924873b9e4a4f5c6cfe72560906f6f69",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:156faf1a4ba830f31785bc539781926427bcbb1ed24eb81d4515be5243d662b5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:157ba0e91f239d0d68a5f8bd6e6e120a5bf16d6e3f1ba20a8124ef7b64357a1a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:15998131c0612663d0dfe984620e3c3b7c4f2ac167ad752ca407511ae4569da5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:161b9f2b37f383339e15d4b6543aba19c02bd11239c0f2c25ba80d8351dc2309",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:161e07582e0785557578bb5712cd3e54a6575cd0199bce1c6f0ccdf0501325e5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1621a12a53d411c19d43ebe99929f0413d527507ba02e333f8d40bd128ba6519",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:168f325d7877bae94f9a526fcfd1daa6c5f2e14ed797acaf1132eed8ebd39e80",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:16b3cff29be6e8a4423e900aac7c5e5976a6e53bb7b8a347e7aeb9ac9d2e4491",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:16bb0011fde3f2abab907909eb268b86f57c73d49f8a6d6e38b23577668eb244",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:16d4a98b87aa3fe3d156114d0a71773d03a3a49150bab5584db1c47731b4a85f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:16e92f53f60b98e8a2f068406d509178ff1c10ad514044d70fdf61af2f35101c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:17d095f7f27e6702c941d754197847044793ed2790143ea4bd1c078a74d2f073",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:17f260483d1ffe0bf4d5bd2af63c3658fb709023d5c8f44a8c3da913c67b16fc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:18a68300771b320e06e7acc2097959a398e299c576ed23b781c2706fd8ce671e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:18cff4a2e31df262f036f822b0395c9d655a32360b097c73c5c59c49a41268c1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:190d4bcd4ee216aa5a80b7d4f1151fad13649017b7a7c5ee010fc2c94d88763c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:194aca8c3d679f02c20f8a1a6fa3a4214900c466395ff5d753ff6245a6bd3d3a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1ac2a27befcb07f4b40226eae5910d2862268c0bc5afadb8fa1c849670d5eb83",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1b94a4bf79db7cf4eaeeea85c5a150a67567e747b4a2bc38798c07e10c4a38a2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1ba374174fd6276e34d9588d09b1c8c36359882de6c79712d0305b0d436776a3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1ba7781b378e9da1e33d6def7df2abe9506c2ef625682dc7f7e34bd628f8f7c9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1bd811746b648a63c96a7904d02f385dc832360cacc3ee031774e49cabe8087f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1bd82194a6e86f55d2364cca635a76b2b73139b5a1d6f25a862c59c80acd5099",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1c8c758ccae2c29c111c7046a96d147fefb990b792a69cee97efbe62570cfbe5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1e4fab4b8813da7f98165a8abb8fe3e690ec00b622dccc7b1917b53f622db371",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1ea771bf9d1653f4c182912e1bfc98013a7ccc460135309a2cc76bdbec38e19d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1ebfe6a3cb57ea30e2df770bc0823853369bfdae18feed57db6708c2538847d2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1f39a0f34d43742bc8a1c4ca506620104c0445eeee152a3b33510e1d7f141d61",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:1f3d876a7ea42c152c95e35c64fff9577a2eb4de1a4a0362c328a7964d6d7146",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:201ac3d2cfc912358ce445545a5f012ba9524043f85fef90252fb9b5e0214f5c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:20ad030f6ef807580ec7284237c9b46d2f785226f930af40731260c254750cc5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:22da61cd03e11273618107db4ea357df3121178ab1541b33c2de8aea81f86beb",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:22f38497988469cc215110ece1645173a4e051d7ffd447f396df20deb38260f6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:238b354183f525c09f96aa1b41cc164189e0a5efc754069c8d2f55572adb27ed",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:23bf5a5e2c2a38985301344ffb879a5ab33f1af5ebcab1b1f8d99e59f547dc9d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:244ba27dee9d45e946a341a9efa244e0c1cf6a2b91d4892dcb3c98d53cd88012",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:246ef93c5e290815184c40645b205e7801123da0ff5b47ce862616a72fb6dafe",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:2539fc5a73cb4cc4506345c1cb2e891ac0fe2b41462e206dd228fe22bc9f6337",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:259021437007afd5a16f766d0119237fd5618a30b77589bd1977518228abd4f9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:26209c2945877a0bb84c33a10a5589947770b24ac2cdc28d5ebcbeb50784659c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:266a44dbc34bd850cae108c6bacbe560d1363020dab69d2ceda6d4215aeab7ce",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:27120566b7e572e41e5b5818e2eb0ba7a8cbf209ad31678dbf37b44d25c4771a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:281f214b1b3234fa48348c3d5d61eebd3bdec9d06490f1a4db3a139ab8b37fcc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:28305850cdfed88e092c612607093eff5102c026031cc91283a02412b70af5f1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:28ae79265552c6f7d944f6bf4507a8327591eadec2361af654718b93769bea19",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:28d08c9448c9932125a5f67a3ad4d29445b725592c621d2544728181a63510a3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:298dd5ccd2d44e4b82d24867a8fdda543502cdadec2342514ed548e3c47717f1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:2cfdd50ab4d562f07ce6d9b35ebb892a6406dc7ab9b10a93054fe7669debeb35",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:2dd1fcb7b3427845d67a2004746eef7ed9213a916becc0cde98c34006c496cb1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:300934643f58bc1727cec26d8a651f211706b85b6e5eb0614cd8c67d08a9f4ed",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:323a9106da007a077eaad833429728f7d3a4ada5bb7a3599f28465e6cadffb2b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:32829fc415590decf19077210e65607569cb6f2bedc994e769794fb174203c62",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:32c390ba317ac1b9d9e312471ae1594b98d7032073b9b22af6ee6b391f588473",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:331eee2cbe81ced2041e244e1baa8ecb09df0226649512c8aa7b49ff35c86ee2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:36ce347464c02a491179e353a2f1b56e7e47c8f51cf532f6c42ee093802c320f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:36fa6801bab98526b3a6cca81cb0da484db74a4474cb63e2816a5f0e9956d0fe",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:37c26375187749205f687d639e3e84ae6838f020902ffcb39c0a131fdaa5217f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:38890f28f67718dd6915945bbbb0196400e5067d027a13405a23758327c17be1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:389b013f6a02e1189a34f462ad32703787e1707a1f8c62b32d3af6a9e4749217",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:39698d61cc855ebc4f77102b6a68622b485cad6259e1298343a168127d40bf95",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:39c3537808477739c0706eb930b55f3ae7d7bc2ea37f87511a1015ca64b5fe32",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:39fe8018ce39d25a8be08da70387d135818f0d52ac339270ce5ee8cdd6db1e8e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3b50f0c7531afffd4e035ce6ef9702c672d86ecf886af9b08efacb43220532d8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3b564bfca6ab4ab56cb1f2900609dcc3a92826576566b374997aa1f6dd75bad9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3be30504f757889ccdcbbf21ff5200b722be56beb4aea44af07d082bbb5014b8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3bf403c172536b5e1cb03ea8eb882f17b127871b3d89ea10dfaa6639f3028a35",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3cb0484af8a5ebf9d9a76c40f4850278ed56a25c463c0653d960a476a9dfa50a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3cc90139008c3733b82a6062584adac9e11be056e8f26fd86cc16df02755baca",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3cce352700b14e7445e6b6a98fa8a7e9ddcdc9c41081a0befcd46d64b4820a2f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3cd10c66bc3a106ddd08579eb2d79717f4252856fb1ba41114e7fe41e83c2ee3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3d2650447caaae279fcf9824f6cc337771df6c427da588b9c5728b3119f00739",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3e48e37c7a1f85380cf4e3f0528e5b2c5fef441a9a882adae26cd8a3c3148c69",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3e9bb145ee2051a9a4151e88920f119048dac67c174e3905856a0d6dfb1ee8ef",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3ef98064706ec804913bfd4d4cec514607a7aa342a2d3ae4406b371f3ffc61d9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3f8e56556b0b3883dff9db2dc5391c4c5c08e9034f3931555ecf5915e685fee4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:3fdd50fb6e1c78f940e9c4dd0bc47a682935f0100c429af43a74c8ccb7f0d56b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:409741eef92d8c320af8e83aab8c47423c2a64953f024c3a4e73bb531e3d6b55",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4125dc61ddd649f64cdc64d79ac1d6c5bcda82af1cdec609ac49b7a1bfc675eb",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:420721afd62a98c4433a2db6a270bbd7033c3e270c95f65444a40e9edf627416",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:459250c68dca3cc5fdf0a297451a98cbbdfb4f684f015939f47194f30cdb6c62",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4696f7420b3d9d72607bcbe3e62e97cb100e44b4f3e52e5dfff0c24f98fb8976",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:46b669eed1148d638cd0e75891740b6a10604439873929639725f0632e1eab1f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:475342372b050191e23cf3bc8719eacb7494dcb6735a7311d1f7d2a8cdd8fb94",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:47886bacbaaa15ece0c6bbad4a26d334a9d4d790f57b2247f8b2c266d99b7d7d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4814c1240254d3bf9338472532de07ce32eb91fc2aec3cc991513fb7cf71b3d0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4a1e7a3d5bb8a3c7cc16e62bd09de7581e35777eb6adcb4fca675ae1e55221f7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4bb073d4cb0cb450e24cd4e8437bf6488e5ddda6559a95ee90a4a63697a4a157",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4dad7c95861cfa3d91ea6e6eda7aedec7216cbcd16ab203b65bd7961e16b6bff",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4e6c69866dcbdc076d1bdcd2cb044c88f025e968f3736d64f8631f9fa8384d6c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4e93bdd2d6fb7ad0d0f4b1d12c1f7995540bbb62d6ff0990deb6a296d47ab1d5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4e9e69e40b7398495114fc44a6b98faeea89689ebfbf58f7209eedece53da3dc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:4ea1f4bf4733c5e93c93530f42917081782b1548fccbec2e101748c2a407d5aa",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:50131eac5d8e2edafb1809db6590eaa327a8e81f9de461caed85e380c3b12641",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5088f03f3629d598aaf8b1405fa29b032151b8392760f4aac95edf361e83490d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:50a46900d6ce67230be91ab0e6314574d5e7f2a47441a847d24c701245b96456",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:53b8a1c00fa9c84fa3685240c569a1fd2e2bd5879577ecb29352dcb6665c6946",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:541e8cae6f1a72a54129b3f6238cf17ffb85a4e57cc09b20844e4a1d307e3b58",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:552d5f6e8aba52ca69d6d4661617efb7ff88fb16ab227f107e96e1e46b0412b8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5562a35a8657c62ed569e551499be630c4d80f4ebd79c92932996d2d9f79d8b7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:55ea5c01430e059eda66b1fc06d73d599fcfe1fda4f2efe26e48fd4d957a177c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5628788cd88490c7e4eddf2c9d697adb23bbcef19ffbc3ccbeaf5b22c70c7d20",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:570f0d1512bd243607d24395959065649700ca4dee6d100776c794eb419dbe68",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:57ca3c115b83bc1c609c6a79a080898a69a10831e5a3df701c1961fc97faf5dc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:58adc71cc7c617e5e6821c3e5f7a9643168be0c85568f9d27321e4c85e536dba",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:58ec4d5bce833197e4c74c0dd875879020110a17c98a54c3603548b33531be01",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:59a83044b62972e56368f0ff6d6da30c4dcd0066226a7f60f1407427f4234427",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:59e5454c8d99339b4de32838949e5e419584881e57b6f13d375e782fca89fa73",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5af53140b00deee67d7285a04be1a687cbfb68e98ae0f7a0f8d9b793c000c5dc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5b16db9aa61783e4b08ffa47f0c0a3f389c929f691fec3992e89357eb1c8766e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5b41912808f2dfe4d16612ff801d2b6050214e21e3a66f9077c7d1fe2568037b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5b48be9b64fbb1808f6f3b9e516aa16e48fe88fd714dd5bb71c830785f53d1ac",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5c27e233f61fd7c87e4db1e2a58226be2a275bf8be69762f81bca8088be3b4bf",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5ca2d378907fd4e058212e591b55f311bae1b538c95c19efa08cc09bdd1e036e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5cde7f45a06b2797c54d994fde0a1eddf79046eb20ec8e605785e29c311b28b8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:5d2eec15d333952dc8a4a6ff7e334f7f8c576a52bf9c61c468e38b64450282dc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6089e26b4ff8edd2f743ea535f5e294431ade8f13e69628ebe4666ef76c20320",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:60ffe12249e8499cefae0252ab299925ba10d56f749c4b3dcc80b57bb834a61f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:624db9a36656ed828cd41fa8fe8641ba69dd11ebea395541e9e550dc99a5150a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:626ff51e5e8d08a420747cedfcf5a2218d32b2f76b42a50bde3f602dd7c053f5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:62eb58a0f821c6f31ea16368e2458c391009be2ee73c93a4223547b66a8b5473",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:634e3c344e3f3082f5cf7d6a659dcb51bc213e1c1db187e3ac048f9eceef3b75",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:63b598dcde239d2804e30e792beb708bd12174d4e0ec091c541f38fae7935877",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:63f55949a51d7f52e77196b7327d98f4cf5d807ef7d36d3721460c5c1d12bc21",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:644be78a79b28ec0a601df453bc5787188ae5dad54046d4294ab57b2e6476efc",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:64a7714a81ad4b9ba4bfc376b209e0b983e865bc5430c772716ed4388f4cf75e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6543b860b749afc0160a2e4188c07868623abc85a4ac402db954158d21c7093c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:65718a03e39ca3cd0cc2c64898b0252fbbb2d4e342168302fa8b5e825d560901",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:65abd4b54f503d284d4a2243bdd5a94f3ccd707a2b792cac33f0b6c07eda2340",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:66386fdcce89f86047d1d2d675fb42bfd8ac0ff42c2026273f213968329723ee",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:66fb563f74b6eca0ee62ddde06378664326c738793ace224e778bf4db68ead03",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:67d018160ee8f0ec387655411f18b81b60a08aebe5b11268132527b1a3734436",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:688ab11babe63e02e69c06ed58e9d3525ab9e85ecef3632f4396aed5574ec622",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6916b8393dd3bc41a4c72de4bb9e54eea8c25d75872293c44b45e31886d5b1b2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6ac14ffbcabf13ad7530f2735b6ef615a76aa01749900cbacdf995331f259303",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6b664ec2442c950071a162c3d4eb04a2bf9771bdbb293d2c78f70f268818f1d0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6b7cb656b549c4ca3dc78621d4a87c404dfc2e9431038c67a23a3e81b66e2596",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:6bfbb9a50f452b44db5f3757144ef66bb62c5b76e99a576df910ed2a609732d5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:700bdc56c16e20aff1066bd26a41c61c2aa69a85d5dd307ce9c7f4cc84770108",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:740ad0435d130303576da97a4701816c1117dcc21fdf75b6342652262f694299",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:74b51e4809bc41a4b70ae11bc563eabc9671df8e88044279f03862774a59222c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:74dd500cbba081aa19ed6bde8761b1cec64ab9ddc3c0e33182c84dccd1567e1b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:755eb792687e6fc056ea1a22c3d0eb58694f03633fc40921640411792b4156b8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:75f57a478d3117dcf1025269a53abfaa07931a950831b05ec4d93434299bd98b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7719ca55d40a7dc447cd58b6f5cb7ade79cc57584f1e215b9faa36757987c1bb",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:780e2d47615b8852df849070a453affc2f5487cbf5e176ab1be4dab4c0ae244f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:78bc8504ffc084474b9264f592d4301b74696c0785c844e2b377324a524b29b4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:794ff9977ee0de6de12b1bc7d2cc6cc596ac828d79450c9401f3e02cfdf79e3a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7b776e700c66853ea077dcceab4a35c74667d3acedc05b6702f5f68c1a78f789",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7c514c0083227e7cd32f0b4f89466fd0d9cf9932ce900f9c14a56bb188d64f8d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7c687263a68c7894b4bfef8c1147b34931ed37afa35d0940577767b24bf37688",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7c692f70ff322fa2a0d83ccef85ba55adc213edea58b0c3434c08c9cba439f4f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7c8fdc3f6cb3947508f7b4e2a4f3e1ee34d2d676bc243c77142a068cff3cba0b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7c980548176804b6487a97003f5b5cc42e708e19235f5ebed06f6d137d631eef",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7d6dd1e045e61dbafd240fc75af67d60ba27cf157954035801eeafad332cefe0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7de9a471a2d78229a80fcf417843d05e985cec379206bdd88bd1d2825e10fea3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7e83c75c3cdd4e9dc637cdfa94dd71294b65990bddd1eea2df6c94557da168b7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7f4779dc8a1b014762274a0edf0b9e785e6c6fe69173bea65ef0686634a3186b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7f683d9c96890352a667776666c4a75685af3ffffd0fd990862923f182b6abe4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:7fa24352db2b80d2c8596a2d9deb0c79d925f78a52200926f4366a94ea328f4c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8017f36f28e5ecb53cd19d0d81e4b7de63e5e6da4e63af28b257ad0d5af9dc6d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8085e343514498bc6d8bbdc490e78c534968c547b49303e7c04da375033b4ff7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:80933983c2250d5a23e41cf44ab21621416cf004a012e9748a11c410165c30d1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:809814ab21a5afe1db3861226e6735a0e928725f76712069270593d2ded8e80f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:80d6824e076a02f82f28abdfa48932e76538d794c5855769049b113d2905513d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8236bdb19b7aa7c4abe27670d0fc7f2fb0491acc83d9ff6f3da550335b76814d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8305c89990b05ef3d38fc7114083b3a95fd7ce89dce5d5914b3c33f6cf60de1c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:83491da88c07ce818cd065deb92c35d3697418e564fb60918db7baded64be2d1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:841526d202ec919d014f5c41bb9438dccaa4de25190da660b78e488c18513d55",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:84a52f39e8367b23308b13e9983f6cceef3333eb56303396aa28b7dd3caa227c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:864d1c5a269b9400a91bb4b34f7657d3c5b7560af48ec89abcd08926231bdb3f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8664dde6b0965e4a1e4fedaa21cfc9cf565a3d32a3a28886dd456fe233130074",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:86f9afb77ec8ee8cb25da0198e90cfd162a6ebc1029160f84e8026c60f9e1462",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:87ee564fc6933b05b75f0e79c6c35cea190e57aff524cbaca1b157f9e82ab3d0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8805c1d53a772974e88fab786b8c732e53106a9bf3ec503737d110b66e8cce83",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:885049d3af50561e8202851670f42d2d9ca1a8358341498be39c855d94198058",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:88a80b754fe1c760b6e3e8a92b59a27b1fd46c373f3e89213a9ac1ad537ae026",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8927820d7a724d4dfc673d5e88265578bbbe87a1b78f18fb2aba71cdb61cb897",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:89b3774e90e0b484250cb674896a51b6b70564ec28e3f432542dd004f08442cf",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8b1011f1c7f13f10ae1b49b1b410789a187d2b018516815dbf5a9b9fd7bb4a34",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8b3d80376cfa89a554e941f6cfa38e8702498076ea686df8f1098d8ff96ca899",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8bf8495f90d139a562537115615b018ea49fc66b24ef503c8e8a868d6b370520",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8c540c7aae8324b6b202269854af0f99cca66bea1041c6c50d7a48e90b0f281b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8ca2bbda5b1b4ea9797cfc3aaded31f5720f6ebe2058181933d7710e14400737",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8d0566dc8deccf004f2b567c0122962c16046562a8e8d5edbd9ef414ff44f01a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8d66423819585a25d1298ecc71de15676631946d9a5c48201425e54a3bbfd1f7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8d803188f9374cf0e72259c03b8f404c4909263756a6019f9c42e4ac4677718b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8d86df5a5b56b4d9510260bd9b910ea4396ffe2f1a150e2e47bc265a78bde318",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8ec7f96d446f3f7f22574757f1ef085049dd76b32c88664e1d960ee08748be45",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8f1833fe17e0d776cf4c95a3838ddd7332b5fc95f399c0849a41846e7f1b4f70",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8f468ba00cfa6668dd1dfcc95f114d00b5ca5eb7bdcbee323dc7012685c80f69",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:8ff3d58511bdced518d3887c44274fc9884205dc077db896fe1e7fe2b940fe6c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:90ee85428247fc2191a961024087235b45be8808c7cbcea2bf330d11eedd9b3f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:91747af43b4ecdb3b10e3fa9d80f481321b47de22a698b16760aa663922542f1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:943bd925310a60a29bb9a261f9c6de86037c96261db142ddfb715db2ca68a5c8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9504d4ee8e90a7f8877370cb5b2e3bd0b882c94044143391f90d0ec42b99c31d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9509954de43df4c4efae77070d3f59023c5cc9bd0c4a9cc1cbbd37f09086ba99",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:977c19f75c3565ff4eaf355f0b41a05a0af52860f476707e6c0e5c670a5c0e8a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:97ccf21a3182ed45867ce2cd86a614d27971497932e6e4da3a6be803dac7a745",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:98042dd6e14b1529439ddb4289e2b2ee4532af6659108f933006e1387775d76f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:984717aa0e5875f01fbde7eb05b46ecf19a0e390a8de1e58097719b0d84cb487",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9850eb6f65961f04a5dd2adfd31ea895be0f3a11a5f6642e41289e30b509873e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9871c69342ba2df21dcc2937ef00baa58ffcf8d6cac14b292e43bf23a4e24c68",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9afd46c093d9e5907c4aa426db6255957e874e138dd50afec601b4d029dcd794",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9cd96fc3c7973a55fecfc887e95137d5a1ec4372b1206687a3dfebe7b71916ac",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9d693a6687ab93b9774f3ac4c2bc97dca7a97e16b0ab39a1e21e080eb61e67e2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9f53f3b3e63f625a0f9570cf904f1f9261dc7a32a3b6dd8793e2d34e463c9bda",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:9fc6aacb42bd47f17f9512000f20e2cdf2d6b432d21d6cff869851443933f255",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a07f441ee6f4eb0b0f918e614e2d5917a1127d16942630f748c55ad6969e6cd0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a0a33b6886366613369b08ec21ef11fe21bad24378dee696348b11fe28591016",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a0d6fa45fc5cd2849b964519fcd2b335d594dd514a71fa1241ca25d8a68b8620",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a204c1b33c928d625e55142b84eda2a133dc6afc802c24f50ef5dbce844409b1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a2ec7b3f5caabd9ae211ddef412df241e35615f3040d1b73a3b234e14648d627",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a36d382a068ca1f7f7ab98d66139b13fb1d9f8b1b7eb10386995cb78f80c9e33",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a60b3a404289190a4fc3dd7cca3e5af9c79befd355f29cc692ad023aaac4f74a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:a8f16f52c0b120e76294d0dd3794525ca3abcfe574e50edf0ee3cab5bb142e00",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:aa0d733b2c8b6d19c001033983d7b05dd73e4ef76bac7aa22d3fd84b46c97a35",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:aaefa80e79152198bbcf6873a2856edfc254102df1d2274587a046b9d4c4c5c7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ab751b88de76fc1d70c8a443221f7bddee698aa0ff6adfce22449eedaa21953b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:abc9c20fe739eac590fd0829754325cf5d210ec50435b2c24baead671df66895",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ae8beb363e0ac2439e281b24ac3a3090b635b1114f06b7ee4f156ea59a9b6ca7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:aeb99dd2c580745ad86946824541854eb75b29e4a95646b9d223173ebc56bc3c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:af17ac1e0762ed53aa1a54e51ade3889b7c5865aca240c8e0e011a93ba7f46c5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:af250d29274e66826daf997411843d0deb9dd0f8da3dcd92c74c7b0f7cbb9bd5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b09c29e0900ce03d6962254a51666aefde906fb8996d07cf36ae2a7eaee6bc4f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b1a9d6c3131d0c0b633877911d65b92aa0dd8f354a550458a14b3715d2300f52",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b2c403625862d98c04dcc0f61ee81d990e1f37e0cdb9fdd61bcb91a28d45ee8d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b2efeee2a90c8941faa353c45f5c6f3b1a8443d4f99b01cfab61761f0af27c11",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b362b0041a7f38dea7a5fc923349466666478d7a91105eabb443b887c30c4e43",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b4ed05a349ac0d805bebe0a508d4ca5ffa38a1a67757b8e06fa0c423b7db979b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b59e66177536406b44ecedb393b8ecd9f530e70debf423ca5ff8cdad16a59f8b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b8149f1ff56fdf0fc81835bbab9182acf9e0e334014cde81f3e1887bc35b84ae",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b81a6370edbe3cb7647b82d2cffb053e47bd1e1ed25e7c7177d77ae4bb564bb2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b9127e82ae3860aac8c4bc0d7711df7dc6c7c54e86d05bbd6447622e5536cb0a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b9293c4d5e8791dc99739e612098160be57065c8109e44d971f701a8ecd6665f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:b94246d555eb1d5cfd353fff33eff1949d6abbd5601f2d961eb2f6ee4598316d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:bb0f2bbf679cf47eb32b199967f1db8d22e4f0dad8fe5d8a056c9b37651d8b6c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:bb84f207ec507dba8966de1c0d774bf7af3e47ec50370160c1a1232a771a6d92",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:bb8cc63e7e3e3700235aeff6c6a8f9a1b1d3ec715ac224f06cd80c80d5cd33c8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c3ece0fc01676ef0a6619ee2f716c4c2ba9966cd8b7bab206c12570a3f0e35f4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c437a598dabde90bd9557e379a7f5783add053c4fb8b1a89c1b007fb81c01914",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c551742ab7c8e93d8d9eb6bf17618a51c15fe13746859b41f7c282f158e87e0a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c7f3601e11accf68dc28e9dd0234b76dfab4bd3e7d1a63b2f82da4c430164b61",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c83515b54fee00716c736d1820547c8494563c4c626ccc1a849f15fd59bb9e6b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c8a11f69759e42e70cf22dd971edb93c44931ebe551d2ca5f834515124dda96c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c8eac378f3593757baddfffba2b842a1b8a1e1180bbd1464d95f1a2abd1499be",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c94f00c8b7c98f8ba7f3c131f9f589521fa74c5d7e9dca0989904e1e20b39730",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:c9eb42d1d4d1d0afa28b87a04909de709b10f94d885ab21ce7d34aaa4e44f18f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ca42bc561fbf326250dcea279bc82202763f6c30f54e1d9bcf881d000a235c56",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:cba703b9afd867fffbf55fadc8f262bcef0f68943f275c609118e31e2ab0208e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:cccc3e8f0cbfc2ad836799da504de6b1585512e9a132a71c6e16a9a2690083f3",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ccf078a6103b55e8bf7e939194565f9cccab5f8e709d31b3d30f9e947c538747",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:cd8921387a77d94d6ea3b566033c93933bddc37815a8842c23266bd128aa58b7",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:cec2346ab1698bcbcb91c928b93dc8dfc25057acc4db5127456e72f547a99773",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:cf680b07456249fd979c70e37d6d0762685d635a76c6a659cacd5e59abf92d43",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d0a2ae1b31f57cad44c338e3e9e02a517c9ead8d4da03029bf8f715b54ad10ca",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d10580e0f0b4d7c34806cb82af2ee24a65bb4b65180d2dc4c8f76547be2f32c5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d1b16e58246cb0b3069f7d878d78d1c327f856109b9aacc79057b4e8c67fa76e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d1c055f1510bbdff6321adec0a618db736d4acca0af85dd1cb977beaf7ab4d32",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d1e72d0e60fee6ad37741964b8630c2637634a5a2afeb202fb29fcd824e12438",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d259dd69dc25f72ed01bd1284297906b5ac733cc347efe97c95f4f44d9f0faab",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d3e3bc6d502481cb52664d4bf370714ea55039060fab62e0498390a72673c2c6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d4025ce897981ed60e2f977105eeca4c5e41bcd501532ed7e19c6c936da77ed2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d5136ab739f9397f01e7a6bd4c366cfb1dd46966782cc09cdd733d4b0b3624cb",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d54af5b634ee436ebc7f1fd00181750e8703f51f3b0f56ca08b73a3fcb187388",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d5fbfd211c7c03f77c20781b33fc04d74fecdba6e4255a0ecdc08482b16a61c8",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d6175a19504a2ba6c2c120da7068df1b6556b4365c3a082a5a8be5d4e973b917",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d6423ecd1420e5c406d83de3b1de6b93c544f4573f5757bd06beb23665294847",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d6498f631e03945b447d803f874fd91f843703db35c84a39d06b0aac3d3ad51e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d706cbae360c1d9858fbf545547b06096ba2d06b4de5ca33753f5b357e37b727",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d7908041318309898dc2769fffd28480ba22808366494ecd828bad6246fdd2a1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d82a97c17e2c6229b3b636b10356f2a9121cb04162a48fd1618206848bc0c502",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d8764c1b8ed71b0f9f23ff2a6fe4b2a97ef1011d463d3243b31afa45c50b674e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d9408e6d33688cc524cc4d551dc434d212b527f629c4089d40b76bcdb93f8428",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:d9ae214e51e06dbb2f9dc4ba8d64d90924d5253accdf845408c0c8d68280e89c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:db91db56f183245f33a3c270d789ced2f33ba8e0b5143ab8f3ac97a542a3bf63",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:dbad1eb7f83c8e1cefe442dc0eb6bfefde7f281c75f9b5b2da04be8b2f482945",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:dc2b52b36c84f397a3da8777c7a6fd19b5980fbc90caf16ff528c6b93d406375",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:dd9daa759c6ab75d02e2189a4e61ff089b8e3b7b0169fda5f93baa9385b01c0b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:df3da6d1e7093d830f4a98585f4456af96e366b577b25e8123c19ac700d7660d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:df42ff5cec90301e0b18a470f05a2cc3c4ab2356dcf3b9614a4a88cea0ac0602",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:dfcd12e63df2a8fadc5c8187962d3ae35b3b158c922fe56302252eb3f90a9bb6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e0e02a2ee107ea9298b1645581b5c234df344e784821310474dd05fa4976e260",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e13bfac97f27e18db9d28cccb8c7c85b8e47272a5fd284dfad47183c83fa5de4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e17644afe84a4dc6aff09c21961af7b824242e57fdaf4ed85713f6572a19d1d6",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e18c71b99aa850af28c1e76de72bba638697dbdf7ca58d27fa47b0281e08c417",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e27bbedf8c1709f7a5aa28128431b64c302aabd0f61c77f413832ccf830ba658",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e285c2a67962ed6329ae3d3e4deef1400d223a04b71517ff86b852aa33068532",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e36dcecef929b74de8f0ff3ff91c8902a3d6358bf05cd65314fac63cff414976",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e38b7413a4e4876996e7e816122348e250b275843799cf63706c4a59be11c50d",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e3fd41160209487bf029cba4ae14ee57be44dd5e053d717d556f934bb826b2a5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e40132f512aac7d25a6d7e0539baf786d52b9edd01ff06b96596516356e06c3e",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e42429130839395b98efc948f420f7ccb9b5580e0932bdde6f02504541b55efa",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e4c4697ca101a4e110e5ee6b6adb243f785099ea213e4327ab795d060119bbec",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e58e330c9a08d2f55dd4cf84db41a3125c1bf2a12a608435119e145dce2aed55",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e8296621648a43809339a394246f298e5ddcf4bd37bc6b03b8de326f2bde3336",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e85e1e982ef4be60a91a10a18b6def86d3b6a29b48d8d3678880d64e732661a1",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e9078e0e22c04b3eb4e6876b502f8e795241d3f2061a131e82a1183118a4c696",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:e9ebd0bb0eac0bc5aff50ef503903727e86e3c15263f4002542a64238155f263",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ea7c521ad6a4d6270b5233fc0537675c191f6d93c67f679f354472195c17c083",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:eab4b770930375af18332309c2254b6b9304565e07ebd64f850aefb975e07ff2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:eaf3454dd30d7506079ba91c353f8158b7e6a05393b1e69209f00687052c1121",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:eb6340bad90149165842057b8c137b0bcedce23a7687b8fee0f224e14165b986",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:eb8215fa5acdd69d8ae7ee3936e9a2554849e3d8b0eae1d99ce0aa8325a3ec0b",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ebbe3ec777ada346981ad6433b9c16c69c7b478d4ff06fc2d2ba8f9f8e9da2b2",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ebc82c03de3ca22868387c09319dd0dab8848ae957b2be204e9329420e3c4099",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ec40586885a834d074fe6b9dc11172c63d85f5f288be1bcbd9524b0c05b343b4",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ee7b33e71201cc8f43d424d0089c4f2616bd28604e119c95334a4ad61fd3dbba",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:efff008418fa73615f3a88522f06e88e59efc8988c0f876ee72ee19e8e07e4e9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f19321b6b83ab243ffcbefc46377b89da1d34ebfdc58e49d740d5d53e3cf033f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f23d4fbddc948a997a08850b3a534912996f945582194c3172bdc06cab676a81",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f2949c4bd942096475574a6e3c89e91617d6c59f2998220223c79b8af448937f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f3af4d52a4085fcee3d7fc811c2dc82fc3790a8a20e7c4cbdd6e399f00f6b10a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f3bd6281a6f36307d4107f1cff5a54cb26613eed9eae42215f52d9c5f1a41b8f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f42a204ff1127433be1d6918d87f2bf5a0e67a751698be5f8e67caedc5c68887",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f44367d6307e052bc948c0600f8a0f2062b0e4231328f010bd8bd2de88f8ab57",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f503fe29652b92ff42c3bede278eec0ae90fbcd017927cbe1e4367417dae1b31",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f564ad0e4aaf3a7dab4427d0d7753f98278bc17582d216d9ea88608eb5864260",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f6047185eec412e9e8409a74106e962590ef029f00281a49bcf460fbfa9a3eff",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f69ce9cdec2985707adb08a4a4b176720495107261770ab506e6c4e00a9ece03",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f73f4a51b0a31b54b5dc84c525b34b5baf8136ee2ad23c3fbb9553ade502691c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f75d85cb13a1a355611fb09405b79cca5854fc3f88bb74762971513a77ca3319",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f8d82d97718666d19d38b26f5b22bf5d29ead448bb4adfb34d4a9ad6476373c9",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f8e08eb9ce93feba48c2a3ac0f9babd4b91b25d3628dd782ea0dd138f5fac284",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:f90dd76b14dfce8347ea0b990e93c8520aa8d5eb31c290d53e3361e49037086f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fa9e1e40a5de9c3900864db43ccf6116469cece0e35bd1bbe9298b2e6dc9d2c5",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:faa24732df27a1b365990743c1257ff39bacc55edfde24ed76ce6e8bc5467387",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fab9e4fb58585d5d99010fc8b51ca2ad7739339eca951603660f1b4dc8a6ab49",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fb09c985fb4a773fbef0655a71d247c59b93421f7d132747d94bb1c2abbfce3c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fc1b89683e6d2a2e51535506fae79966e545546f78eeac9268f35d2c1960488c",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fc40a2d447c68bc64e2f071e6bb647ce912914340c3cbb3c8773c7bfac398e8f",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fcdeadd7f5a0c9dc9fedfb011f850866356f7074f1fe977316cbe0091971fd0a",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:fde8f74005464732bf539dbeddf2b1d9fef81a2dce6703aab0ea09d925c96580",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "donor_block:ff4912039d9a400a7daa727512a410f818d9cb0d161b15fb38561a46eb5d21d0",
+          "events": 1,
+          "sessions": 1,
+          "role": "donor_block"
+        },
+        {
+          "material": "query_material:0c05c6b754f20127aef3f36c320718cfc731791494fba30bc4a325a17f2e6444",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:0f8ff0a72b91b08488de6fcb48dd9ac2b68ff9fcf8f1aba7dbe4d73e57059352",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:112847b898af7fe38b67c52d52833144ead441d970d897085125db13411a4c74",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:208fcd99e4ac86b4a8972ea36a99cfcedc9d90e0529eaa201c6141abaf5e53d9",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:247a7fd38b716abe31f76a4226920c07f80df96c8a22a57a612509f618b40924",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:31fba5e0c4fb789ddfabd6aa4298116ceb90d078ce834082263bf3bccf5e64dd",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:34c2738ef3eaae75d5cd8e9b121ca07f296643103201bf126523aab44234ed37",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:388af7bff6093d7307a0a10fc7b0825e6ff776a474b637fb9444bd068fd574ee",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:453621a94d874b8b8e8bb93a1562a47f04c2b6849967bb25ff1a27d9112f0757",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        },
+        {
+          "material": "query_material:4578508450e0a90217265fd7a6c5e5877591b3fa1102750f457b271d46cc55c1",
+          "events": 1,
+          "sessions": 1,
+          "role": "query_material"
+        }
+      ]
+    }
+  },
+  "head_prefix": {
+    "pairs": 276,
+    "generated_lcp": {
+      "n": 276,
+      "sum": 523229,
+      "mean": 1895.7572463768115,
+      "min": 50,
+      "p50": 58,
+      "p95": 15913,
+      "p99": 33840,
+      "max": 121031
+    },
+    "source_lcp": {
+      "n": 276,
+      "sum": 523229,
+      "mean": 1895.7572463768115,
+      "min": 50,
+      "p50": 58,
+      "p95": 15913,
+      "p99": 33840,
+      "max": 121031
+    },
+    "generated_beyond_system_tools": {
+      "n": 276,
+      "sum": 87197,
+      "mean": 315.9311594202899,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 1,
+      "max": 87192
+    },
+    "source_beyond_system_tools": {
+      "n": 276,
+      "sum": 87197,
+      "mean": 315.9311594202899,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 1,
+      "max": 87192
+    },
+    "pairs_with_added_shared_history": 0,
+    "pairs_from_same_source_session": 8,
+    "largest_added_shared_history": [
+      {
+        "chain_a": "biomaster:canon:tdcLB4UAP2gbfwt3tyH6l:34",
+        "chain_b": "biomaster:canon:tdcLB4UAP2gbfwt3tyH6l:46",
+        "generated_lcp": 121031,
+        "source_lcp": 121031,
+        "generated_beyond_system_tools": 87192,
+        "source_beyond_system_tools": 87192,
+        "added_shared_history_tokens": 0,
+        "same_source_session": true
+      },
+      {
+        "chain_a": "biomaster:canon:5f5b5fc16f0e43f5b26c6:33",
+        "chain_b": "biomaster:canon:5f5b5fc16f0e43f5b26c6:5",
+        "generated_lcp": 34120,
+        "source_lcp": 34120,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": true
+      },
+      {
+        "chain_a": "biomaster:canon:b4fd826f8b534be684537:0",
+        "chain_b": "biomaster:canon:tdcLB4UAP2gbfwt3tyH6l:34",
+        "generated_lcp": 33840,
+        "source_lcp": 33840,
+        "generated_beyond_system_tools": 1,
+        "source_beyond_system_tools": 1,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:b4fd826f8b534be684537:0",
+        "chain_b": "biomaster:canon:tdcLB4UAP2gbfwt3tyH6l:46",
+        "generated_lcp": 33840,
+        "source_lcp": 33840,
+        "generated_beyond_system_tools": 1,
+        "source_beyond_system_tools": 1,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:3c848ec83da94d9b916a4:38",
+        "chain_b": "biomaster:canon:4HsN0fpakHkbM99Ze9Tas:1",
+        "generated_lcp": 18897,
+        "source_lcp": 18897,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:-6wE5LvA9TMlv6zs7Ueq3:0",
+        "chain_b": "biomaster:canon:44213ca6-5696-4d87-87e5-bb7e56c6af6a:0",
+        "generated_lcp": 18256,
+        "source_lcp": 18256,
+        "generated_beyond_system_tools": 1,
+        "source_beyond_system_tools": 1,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:-6wE5LvA9TMlv6zs7Ueq3:0",
+        "chain_b": "biomaster:canon:Q5X6tzK9EK7duAccJ6855:0",
+        "generated_lcp": 18256,
+        "source_lcp": 18256,
+        "generated_beyond_system_tools": 1,
+        "source_beyond_system_tools": 1,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:44213ca6-5696-4d87-87e5-bb7e56c6af6a:0",
+        "chain_b": "biomaster:canon:Q5X6tzK9EK7duAccJ6855:0",
+        "generated_lcp": 18256,
+        "source_lcp": 18256,
+        "generated_beyond_system_tools": 1,
+        "source_beyond_system_tools": 1,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "scimaster:canon:b5619a12-1ee9-4f07-ac48-c878f9b48d21:3",
+        "chain_b": "scimaster:canon:cff4f308-c6d1-478f-ab08-1b74ecc784bd:1",
+        "generated_lcp": 17080,
+        "source_lcp": 17080,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:-6wE5LvA9TMlv6zs7Ueq3:0",
+        "chain_b": "biomaster:canon:7d9cd396-2035-47f8-9b74-d3d0d674063f:2",
+        "generated_lcp": 16788,
+        "source_lcp": 16788,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:44213ca6-5696-4d87-87e5-bb7e56c6af6a:0",
+        "chain_b": "biomaster:canon:7d9cd396-2035-47f8-9b74-d3d0d674063f:2",
+        "generated_lcp": 16788,
+        "source_lcp": 16788,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:7d9cd396-2035-47f8-9b74-d3d0d674063f:2",
+        "chain_b": "biomaster:canon:Q5X6tzK9EK7duAccJ6855:0",
+        "generated_lcp": 16788,
+        "source_lcp": 16788,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:5f5b5fc16f0e43f5b26c6:104",
+        "chain_b": "biomaster:canon:5f5b5fc16f0e43f5b26c6:33",
+        "generated_lcp": 15913,
+        "source_lcp": 15913,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": true
+      },
+      {
+        "chain_a": "biomaster:canon:5f5b5fc16f0e43f5b26c6:104",
+        "chain_b": "biomaster:canon:5f5b5fc16f0e43f5b26c6:5",
+        "generated_lcp": 15913,
+        "source_lcp": 15913,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": true
+      },
+      {
+        "chain_a": "biomaster:canon:5f5b5fc16f0e43f5b26c6:186",
+        "chain_b": "biomaster:canon:d178f942-a0bc-4976-bc06-004b5ed5c3f2:3",
+        "generated_lcp": 8009,
+        "source_lcp": 8009,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "scimaster:canon:9zTV_OcISgnd-3yodfsVD:0",
+        "chain_b": "scimaster:canon:qC-a0syl9AozTV-86COCC:2",
+        "generated_lcp": 7312,
+        "source_lcp": 7312,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "scimaster:canon:54be7dfe-f727-44f5-b38e-0cdeb1c1a882:0",
+        "chain_b": "scimaster:canon:9zTV_OcISgnd-3yodfsVD:0",
+        "generated_lcp": 6743,
+        "source_lcp": 6743,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "scimaster:canon:54be7dfe-f727-44f5-b38e-0cdeb1c1a882:0",
+        "chain_b": "scimaster:canon:qC-a0syl9AozTV-86COCC:2",
+        "generated_lcp": 6743,
+        "source_lcp": 6743,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:-6wE5LvA9TMlv6zs7Ueq3:0",
+        "chain_b": "biomaster:canon:38fdeb8b-dcfe-4cb3-ba69-0d8cb1e5fff2:0",
+        "generated_lcp": 5265,
+        "source_lcp": 5265,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      },
+      {
+        "chain_a": "biomaster:canon:38fdeb8b-dcfe-4cb3-ba69-0d8cb1e5fff2:0",
+        "chain_b": "biomaster:canon:44213ca6-5696-4d87-87e5-bb7e56c6af6a:0",
+        "generated_lcp": 5265,
+        "source_lcp": 5265,
+        "generated_beyond_system_tools": 0,
+        "source_beyond_system_tools": 0,
+        "added_shared_history_tokens": 0,
+        "same_source_session": false
+      }
+    ]
+  },
+  "token_head_comparison_skipped": false
+}

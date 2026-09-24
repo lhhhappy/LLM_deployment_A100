@@ -1,0 +1,49 @@
+[
+  {
+    "old": "data/longchain-pilot-v1",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-source-v1",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-source",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-screen-incomplete",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-events-pilot-v2",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-events-v2",
+    "action": "deleted incomplete or superseded build; manifest retained"
+  },
+  {
+    "old": "data/longchain-screen",
+    "new": "cache/longchain-legacy/longchain-screen",
+    "action": "archived byte-identical"
+  },
+  {
+    "old": "data/longchain-reviewed-raw",
+    "new": "cache/longchain-legacy/longchain-reviewed-raw",
+    "action": "archived byte-identical"
+  },
+  {
+    "old": "data/longchain-materials",
+    "new": "evidence/longchain-design-20260924/materials"
+  },
+  {
+    "old": "data/all_att_2026-09-23.json",
+    "new": "evidence/official/all_att_2026-09-23.json"
+  },
+  {
+    "old": "data/longchain-events-pilot-v2b",
+    "new": "data/s1-dev-longchain",
+    "action": "current accepted 24-chain pilot"
+  }
+]
