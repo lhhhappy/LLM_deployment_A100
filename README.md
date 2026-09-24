@@ -20,7 +20,7 @@
 | 准备下一项 8 卡实验 | 先看 [任务队列](notes/queue.md) 和已入队[原始 job 快照](evidence/jobs-0924/)。当前旧名队列（037b–042）冻结，**不要用本地 job 重新 `qpush`**；这批任务全部开跑、GPU 镜像同步后，再按 [pod 工具说明](scripts/pod/README.md)入队新实验 |
 | 判定单档 | job 的 `LEVEL` 行由 `scripts/pod/verify/level_verdict.py` 生成：先查 cohort、runner 与原始记录，再调用 `scripts/score_formal.py`（harness 评分器）并补上题面 TPOT 门 |
 | 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
-| 修改引擎 | 补丁照只读的 `build/base_exact/` 写；一个机制保留一个可用版本，说明写在同名 `.md`；不要照旧的 v0.5.20 源码写 |
+| 修改引擎 | 在 `engine/sglang/` 里改，按机制提交（`engine NNN:`）；见 [engine/README.md](engine/README.md) |
 | 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)，官方结果用 `scripts/official_status.sh <attempt_id>` 查；只在明确安排正式提交时使用 |
 
 GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/linhang/arena/` 下工作**；仓库镜像位于 `/sjtu/linhang/arena/repo`。8 卡 Trisol 服务与正在运行的队列任务不能停、删或杀进程。整理者对 pod 只使用 `scripts/pod/pread` 只读查看，或 `scripts/pod/pexec_codex` 在 `/tmp/ax/codex` 做 CPU 分析；不要改队列、运行目录或向引擎发请求。实验入队和提交由当前负责运行的协作者协调，避免碰撞。
@@ -31,7 +31,7 @@ GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/lin
 |---|---|
 | `llm-challenge-arena-v1/`、`s1-dev/` | 赛题原文、公开开发集与 harness；只读 |
 | `build/base_exact/`、`refs/sglang-fe236ea6c3/` | 底包副本与上游参考；只读 |
-| `patches/` | 引擎补丁、精确基线、机制开关 |
+| `engine/` | 引擎源码（git 管理）、机制说明与开关；`patches/` 仅保留到 061/062 结束后删除 |
 | `scripts/pod/` | 8 卡队列、job 模板、判定与只读访问 |
 | `research/` | 源码地图、仍有效的分析；入口见 `research/README.md` |
 | `notes/queue.md` | 下一步问题与实验顺序；一条任务只写问题、判据、状态 |

@@ -34,7 +34,7 @@
 ## 规则
 
 - 判分只用原 harness（`scripts/score_formal.py`，加 task.md 统计余量与 tpot_p95 门），数据须完整（每条请求恰好一次），缺数据即 INVALID。差异小于同配置重跑的噪声不算结果。
-- 补丁照只读的 `build/base_exact/` 写，每个机制只保留一个版本和同名 `.md`；每次运行打印所用补丁哈希；里程碑即提交。
+- 引擎只在 `engine/sglang/` 里改（git 管理，底包为 `engine-base`，正式 A 为 `official-A-0923a`）：每个机制一个或一组 `engine NNN:` 提交，说明在 `engine/docs/`，修正并入所属机制，不另开编号；默认关闭路径等于底包，不许悄悄绕开。每次运行记录引擎提交号，任务写明 `G_EXPECT` 并与启动时的 `[ax] mechanisms:` 行核对。详见 [engine/README.md](engine/README.md)。
 - `llm-challenge-arena-v1/`、`s1-dev/`、`build/base_exact/`、`refs/` 只读。只保留正确的现行文档，过时内容直接删除（git 留历史）。
 - 改共享文件（`notes/knowledge.md`、`queue.md`、`experiments.md`）前先读最新内容，只提交自己的改动；各自的长篇分析放在自己的文件里。
 - 8 卡服务不可停、删、释放。停单个测试 job 用 GPU 机上的 `scripts/pod/stopjob <job.sh>`。审阅只用 `scripts/pod/pread`；CPU 分析用 `scripts/pod/pexec_codex`，只写 `/tmp/ax/codex`。入队规则见 collaboration.md，正式提交由参与者一起判断、用户定；官方结果用 `scripts/official_status.sh <attempt_id>` 查。
