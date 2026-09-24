@@ -1,0 +1,162 @@
+{
+ "status": "VALID",
+ "n": 14,
+ "passed": false,
+ "failed_gates": [
+  "overall_intra(<=5s)",
+  "chain_start(<=30s)"
+ ],
+ "tpot_mean": 0.04257679184719075,
+ "tpot_p95": 0.0783407044762822,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 328,
+   "p95": 3.9800872802734375,
+   "over_limit": 22,
+   "allowed_over": 23,
+   "rate_ci_lower": 0.04584090161986072,
+   "pass_estimated": true,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.04584090161986072,
+      "allowed_over": 23,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.047713618860177026,
+      "allowed_over": 22,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.04435420560663622,
+      "allowed_over": 24,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "overall_intra": {
+   "n": 388,
+   "p95": 9.459831476211548,
+   "over_limit": 39,
+   "allowed_over": 27,
+   "rate_ci_lower": 0.07645989870874789,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.07645989870874789,
+      "allowed_over": 27,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.07810770491031428,
+      "allowed_over": 26,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.07540673745876669,
+      "allowed_over": 27,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "turn_start": {
+   "n": 20,
+   "p95": 13.322988271713257,
+   "over_limit": 0,
+   "allowed_over": 3,
+   "rate_ci_lower": 0.0,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 3,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 2,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 3,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "chain_start": {
+   "n": 314,
+   "p95": 64.45531964302063,
+   "over_limit": 32,
+   "allowed_over": 22,
+   "rate_ci_lower": 0.07513935889273907,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.07513935889273907,
+      "allowed_over": 22,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.07714349831790838,
+      "allowed_over": 22,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.07382855043415515,
+      "allowed_over": 23,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  }
+ },
+ "rows": 722,
+ "raw": "raw_dev-combined-v1_N14_1790217294.jsonl",
+ "run": "run_dev-combined-v1_N14_1790217294.json",
+ "wall_s": 1225.9052011966705,
+ "harness_point_all_pass": false,
+ "flush": {
+  "verified": true,
+  "mode": "legacy_run_log_and_bounded_server_log",
+  "server_log": "/workspace/Agentic_science_challenge/evidence/L044r-cal_offA_n14/N14/server.log",
+  "window_start_s": 1790216772.0,
+  "window_end_s": 1790217294.5508146,
+  "matched_server_flush_s": 1790217288.0,
+  "server_log_clock": "UTC, second precision"
+ },
+ "interval_sensitivity": {
+  "diagnostic_only": true,
+  "primary_method": "clopper_pearson",
+  "organizer_method_unknown": true,
+  "sensitive_ttft_gates": [],
+  "all_gates_pass_by_method": {
+   "clopper_pearson": false,
+   "wilson": false,
+   "wald": false
+  }
+ }
+}

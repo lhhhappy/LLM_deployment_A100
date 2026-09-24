@@ -1,0 +1,21 @@
+{
+  "size": 236524,
+  "sha256": "6a518945f7ad877f71bebd82baa0e9594ef115016ee87614b361652f4a28b11a",
+  "source": "pod",
+  "run": "045r-cal_offB_n10",
+  "n": 10,
+  "raw": "raw_dev-combined-v1_N10_1790219279.jsonl",
+  "files": [
+    "gpu_util.csv",
+    "job.log",
+    "loadgen.log",
+    "metrics.jsonl",
+    "raw_dev-combined-v1_N10_1790219279.jsonl",
+    "run_dev-combined-v1_N10_1790219279.json",
+    "run_dev.log",
+    "score.log",
+    "server.log",
+    "summary.json"
+  ],
+  "exit_code": 1
+}

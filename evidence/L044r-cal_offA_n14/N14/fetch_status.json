@@ -1,0 +1,21 @@
+{
+  "size": 255573,
+  "sha256": "42acfec2ae6067e033713b5d668eba6f78fda4e770ffebd78059ae2212cfd108",
+  "source": "pod",
+  "run": "044r-cal_offA_n14",
+  "n": 14,
+  "raw": "raw_dev-combined-v1_N14_1790217294.jsonl",
+  "files": [
+    "gpu_util.csv",
+    "job.log",
+    "loadgen.log",
+    "metrics.jsonl",
+    "raw_dev-combined-v1_N14_1790217294.jsonl",
+    "run_dev-combined-v1_N14_1790217294.json",
+    "run_dev.log",
+    "score.log",
+    "server.log",
+    "summary.json"
+  ],
+  "exit_code": 1
+}

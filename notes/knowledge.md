@@ -5,7 +5,7 @@
 ## 赛题与测量
 
 - 正式排名（主办方确认，2026-09-24）逐级比较：`n_at_slo` 越大越好（一档都过不了排最后）→ TPOT（`tpot_mean`）越小越好 → TPM 越大越好 → 先提交者靠前。能力 AIME26/GPQA Diamond 都须严格高于 90 分。正式爬坡从 N=10 开始，过了 +4、没过 −4；题面规定的 11 门均须通过。四道 TTFT 门按题面统计余量判，`tpot_p95 ≤0.10 s/token` 无余量。[task.md](../llm-challenge-arena-v1/task.md)
-- 开发集是链前缀抽样，722 请求、311 条在本轮出现的链；链首占比远高于正式集。它只适合我们自己配置之间的 A/B 与回归，不推出正式 N@SLO。不能使用截链、去间隔等改变负载的参数。见 [R19](../research/codex/R19_progress_and_cache_review.md) 与 task.md 开发集约束。
+- 开发集是链前缀抽样，722 请求、311 条在本轮出现的链；链首占比远高于正式集。它只适合我们自己配置之间的 A/B 与回归，不推出正式 N@SLO。报告原开发集时不能使用截链、去间隔等改变负载的参数。另建独立、冻结的合成长链集用于机制研究，须注明来源与偏差，不冒充原开发集或正式成绩。见 [R19](../research/codex/R19_progress_and_cache_review.md)、[长链方案](codex-方案-长链负载与N22-N26验证.md)。
 - 判分先检查本轮 cohort 中每个请求恰好出现一次、runner 成功和指标完整，再调用 harness 的 `s1_score.evaluate`（`scripts/score_formal.py`）并核对题面的 TPOT p95 门。空 raw、缺请求、缺指标或 runner 失败是 **INVALID**，不是 PASS。原 `run_dev.py` 忽略 flush 失败返回值。现新增 checked runner 在失败时阻断测量；level_verdict 核对本次 receipt、调用时间窗及真实服务日志，缺证据标 INVALID。CP 主评分不变，Wilson/Wald 仅诊断方法敏感性；本地修复待负责人同步 pod。[修复与历史影响](fable-审计-2026-09-24.md)。[R19 §2](../research/codex/R19_progress_and_cache_review.md)、[level_verdict.py](../scripts/pod/verify/level_verdict.py)
 - `meta_info` 的时间戳、prompt/cached/completion token 计数必须如实；thinking、输出预算、历史和 tools 保持原样；`/flush_cache` 必须清掉前缀 KV。性能改善不能以牺牲这些条件取得。见 task.md「质量前提」「约束」。
 
@@ -34,8 +34,8 @@
 ## 开发集与正式压测的关系（2026-09-24，已核对口径）
 - 来源：`s1-dev/` 是主办方公开开发集与 harness（task.md「公开开发集」：同一套 harness 与评分口径），本仓库不做版本管理，只读。我们用原 `run_dev.py` 回放（preflight→warmup→flush→测量），节拍为默认 chain-total-gap-scaled-v1、cap 3600 s（0 条链被压缩），未使用 `--max-chains/--no-gap/--include-all`。`--tok-dir` 用 `/mnt/models`，但 722 条的 prompt_tokens 与数据集 glm_tokens 全部一致；TTFT 全部来自服务端打点；输出长度全部等于 max_output_i（ignore_eos）。判定用 harness 的 s1_score 加 task.md 的统计余量与 tpot_p95 门（harness 自带 summary 只按点估计判，另行报告）。
 - 结构差异（主办方设计，不是脚本错误）：开发集链前缀抽样，311 链/722 请求、平均 2.3 请求/链，chain_start 314 条（43%）；loadgen 每个槽取一整条链顺序回放，链短则槽不断开新链，冷链首持续涌入；042 实际 prefill 中链首占 76%。正式用整链集，单档约 4 小时；开发集 N22 一档约 20 分钟，harness 的稳态 TPM 窗口 [10,70) min 不成立，本地 TPM 为空。
-- 已撤回（Codex 复核）：「开发集 p95 高 3–6 倍」没有同配置同档校准，不成立；「tpm_all 相当」混用了全程平均与稳态窗口，不成立。可说的只是：正式通过档 TPOT 余量大，开发集同类配置在更高档位 TPOT 失败。
-- 校准：044r 用正式 A 原样（镜像 0923a 的 13 个补丁，含 121；与镜像源码树逐文件一致）跑开发集 N14，045r 用正式 B 原样跑 N10，逐门对照官方通过档。最初的 044/045 漏掉 121，已作废删除。在校准结果出来前，开发集只用于 A/B 相对比较。
+- 已撤回（Codex 复核）：旧「开发集 p95 高 3–6 倍」混用了配置和档位；「tpm_all 相当」混用了全程平均与稳态窗口。新的044r/045r提供同配置同档比较，但不能倒推旧论证正确，也不能推出所有N的换算系数。
+- 校准更新：044r正式A原样（13补丁含121）在dev N14为overall/chain失败、TPOT=.0426/.0783；045r B@N10为fast/overall/TPOT失败、TPOT=.0345/.1182。两套正式同档已通过；pod结果见[实验记录校准节](experiments.md#正式ab原样校准044r045r2026-09-24claude)，本轮完整raw待本地独立复核。TPOT p95差距分别约2.2倍和5.7倍，不能统一除以二。开发集通过不作为研究N22/N26的前置；原044/045缺121已作废。[设计](codex-方案-长链负载与N22-N26验证.md)
 - 正式提交内容对其他选手不可见（`scoringDetails`："部署赛提交内容仅作者与主办方可见"）。
 
 ## 产能与profile复核（Codex）
@@ -59,4 +59,6 @@
 ## 公开榜单（用户转贴，2026-09-24 约 07:20）
 - 我们（正式 A，45979）：N14，tpot_mean 0.017435（全榜最小），tpm_all 1,757,558（接近全榜最大），tpm_decode 20,547，排第 17。
 - 前列：N26 两名 tpot 0.040 / 0.055（第三名 0.043）、tpm 1.46–1.61M；N22 四名 tpot 0.027–0.052；N18 九名 tpot 0.024–0.048。
-- 推断：tpm 约 1.76M/min 封顶，接近固定回放速率的需求量；tpm 更低的提交，TPOT 都更高，说明没有完全跟上回放速率，但仍守住了 TTFT 门。我们的 decode 速度余量大，缺的是 N，应优先改 TTFT 与缓存驻留；TPOT 只需守住不明显退步。
+- 可以确认的比较：按用户转贴，我们 A 在已通过的 N14 上 TPOT 均值低、逻辑 TPM 高，但有效 N 落后；跨 N、跨配置的 TPOT 不能用来证明我们在 N22/N26 仍有相同余量，也不是纯 decode kernel 速度的直接比较。以上榜单全貌本轮未独立拉取。
+- 待验证假设：约 1.76M/min 是转贴中观察到的高值，尚未证明是吞吐上限或固定请求速率。逻辑 TPM 包含缓存输入；较低 TPM 与较高 TPOT 同时出现，不能单凭相关性判定没跟上正式回放，更不能排除缓存、prefill 成本或测量窗口内请求构成的差异。
+- 决策：优先提高通过全部硬门的 N。TTFT、缓存驻留和 prefill 成本是重点研究方向，但正式更高失败档的主因尚未确认。允许 TPOT 均值变慢来换取更高有效 N，前提是该档 tpot_p95≤0.10 s/token 且其他硬门全部通过；不能要求均值保持 N14 的 0.017435，也不能用均值代替 p95 门。相同有效 N 下再按已确认的同档排名规则优化。
