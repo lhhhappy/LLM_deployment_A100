@@ -67,6 +67,20 @@ if levels:
         if f.get('flush_success') is True:
             h['phase'] = 'measurement'
             h['since_flush_s'] = round(time.time()-f['flush_finished_s'], 1)
+            # Before the first 25-completion checkpoint, establish measurement
+            # identity from a complete row dispatched after this successful flush.
+            # Never use a preflight raw or infer that no checkpoint means no progress.
+            candidates = []
+            for raw in level.glob('raw_*.jsonl'):
+                if raw.stat().st_mtime < f['flush_finished_s']: continue
+                with raw.open() as handle: line = handle.readline()
+                if not line.endswith('\n'): continue
+                try: first = json.loads(line)
+                except ValueError: continue
+                if first.get('client_dispatch_at_s', 0) >= f['flush_finished_s']:
+                    candidates.append(raw)
+            if len(candidates) == 1:
+                h['raw_age_s'] = round(time.time()-candidates[0].stat().st_mtime, 1)
     gpu = level/'gpu_util.csv'
     if gpu.is_file(): h['gpu_latest'] = tail(gpu, 4096).splitlines()[-8:]
     if (level/'rundev_exit_code').is_file(): h['phase'] = 'scoring_or_finished'

@@ -9,7 +9,7 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 已部署、队列已恢复，当前启动中（以pread日志为准） |
+| 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | running；短预热101.7s完成，15:15:31 UTC真flush成功，进入N30测量 |
 | 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
 | 065 / 066 | 仅mem0.87 / 再加新版180 | 已从pending撤销，不再阻挡组合验证 |
 

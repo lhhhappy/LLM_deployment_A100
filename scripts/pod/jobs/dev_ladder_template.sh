@@ -50,6 +50,9 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   local runner=("$AX/verify_kit/run_dev_checked.py")
   if [ "${G_WARMUP_PROFILE:-original}" != original ]; then
     [ -z "${G_MEASURE_SECONDS:-}" ] || { echo 'short warmup requires the full replay runner'; return 2; }
+    # Each short-warmup level currently requires its own verified receipt.
+    # Original warmup still supports the existing cross-N reuse path.
+    extra=""
     runner+=(--warmup-profile "$G_WARMUP_PROFILE")
   fi
   if [ -n "${G_MEASURE_SECONDS:-}" ]; then

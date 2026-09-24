@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import subprocess
+import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +43,22 @@ class Windows(unittest.TestCase):
         self.assertEqual(len(watch.health_alerts(meta)), 2)
         meta['health'].update(raw_age_s=1, server_log_age_s=1, recent_error_lines=['CUDA out of memory'])
         self.assertEqual(len(watch.health_alerts(meta)), 1)
+
+    def test_progress_before_first_checkpoint_is_not_reported_as_stall(self):
+        root = self.out/'runs/job'; level = root/'N30'; level.mkdir(parents=True)
+        running = self.out/'queue/running'; running.mkdir(parents=True)
+        (running/'job.sh').touch()
+        now = time.time()
+        (level/'flush_evidence.json').write_text(json.dumps(dict(
+            runner_started_s=now-400, flush_success=True, flush_finished_s=now-310)))
+        # Preflight is excluded by its dispatch timestamp even if its mtime is new.
+        (level/'raw_preflight.jsonl').write_text(json.dumps(dict(client_dispatch_at_s=now-350))+'\n')
+        (level/'raw_measure.jsonl').write_text(json.dumps(dict(client_dispatch_at_s=now-10))+'\n')
+        code = watch.SNAPSHOT_CODE.replace('/tmp/ax', str(self.out))
+        output = subprocess.check_output([sys.executable, '-c', code, 'job', '0'], text=True)
+        meta = json.loads(watch.marked(output, 'WINDOW_META '))
+        self.assertLess(meta['health']['raw_age_s'], 10)
+        self.assertEqual(watch.health_alerts(meta), [])
 
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
