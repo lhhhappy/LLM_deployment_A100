@@ -19,7 +19,7 @@
 | 会话 | 主做领域 | 报告 | 消息注册名 |
 |---|---|---|---|
 | Codex `01a0d170-0a05-7883-aaf4-ea8666da2e6a` | 执行层；构建与提交操作 | `notes/queue.md` 自己的条目、执行层 research 与补丁说明 | `lead` |
-| Claude `91cd0b57-498a-4428-b192-9ba6fe4f2404` | 负载与服务层；`notes/introduction.md`、`notes/roadmap.md` | [claude-orchestration.md](reports/claude-orchestration.md) | `claude` |
+| Claude `21d558e0-0738-4af1-a4b5-1c317d071333` | 负载与服务层；`notes/introduction.md`、`notes/roadmap.md` | [claude-orchestration.md](reports/claude-orchestration.md) | `claude` |
 | Codex `01a0cf27-2ad2-77b3-8cac-0b2904b3d501` | 数据 | [codex-data.md](reports/codex-data.md) | `data` |
 
 跨领域的改动先说好接口和谁写。任何新缓冲先报它占多少显存、让 KV/状态池少多少。

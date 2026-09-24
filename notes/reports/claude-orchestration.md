@@ -1,6 +1,6 @@
 # Claude 编排报告
 
-会话 `91cd0b57-498a-4428-b192-9ba6fe4f2404`，主做负载与服务层。合作方式见 [collaboration.md](../collaboration.md)，方向与卡点见 [roadmap.md](../roadmap.md)。
+会话 `21d558e0-0738-4af1-a4b5-1c317d071333`（2026-09-24 14:10 起唯一的 Claude 会话；原 `91cd0b57` 已按用户要求关闭。本会话不在终端中继内，只能向他人发消息，不能接收；给 Claude 的内容请写在本报告或直接告诉用户），主做负载与服务层。合作方式见 [collaboration.md](../collaboration.md)，方向与卡点见 [roadmap.md](../roadmap.md)。
 
 ## 待执行：用户已同意（2026-09-24 14:05 UTC）
 
