@@ -10,7 +10,7 @@
 - 请求取消只取消调用方的等待，不停止 Rust 编码。`shield` 保留底层 future，实际完成（含异常）后才释放槽位并消费废弃异常；排队取消不会提交 executor 工作。executor 至多有一个任务，避免取消风暴累积 native 编码队列。正常关闭调用 `shutdown(wait=False, cancel_futures=True)`，已运行任务允许结束。
 - HTTP `/generate`：保留 body 中非 `None` 的 `routing_key`（包括显式空串）；否则取非空 `X-S1-Routing-Key`，再取非空 `X-S1-Session-ID`；没有提示则仍为 `None`。HTTP 框架的 Headers 查找不区分大小写；不 strip 或解释值。该接线独立于 `SGLANG_ENABLE_REQUEST_HEADER_OVERRIDES`。
 - Session-ID 只作为 routing fallback；不写 native `session_id/session_params`、cache_salt 或 priority。修复 `GenerateReqInput.__getitem__` 原来遗漏 routing_key 的复制，使 batch 子请求保留同一键（也覆盖显式 body 键）。不修改 scheduler；沿已有 TokenizedGenerateReqInput → Req 字段透传。
-- 开关只回退分词；完整撤销（含路由接线）在同一副本执行 `patch -R -p3 --fuzz=0 < engine/docs/130-async-tokenize.md`。
+- 开关只回退分词；完整撤销（含路由接线）：`git revert` 该机制的 `engine 130:` 提交。
 
 ## 正确性与边界
 

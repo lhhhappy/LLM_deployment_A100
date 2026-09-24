@@ -34,7 +34,7 @@ GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/lin
 |---|---|
 | `llm-challenge-arena-v1/`、`s1-dev/` | 赛题原文、公开开发集与 harness；只读 |
 | `build/base_exact/`、`refs/sglang-fe236ea6c3/` | 底包副本与上游参考；只读 |
-| `engine/` | 引擎源码（git 管理）、机制说明与开关；旧补丁文件仅供迁移追溯，当前任务不再读取 |
+| `engine/` | 引擎源码（git 管理）、机制说明与开关；旧补丁文件已删除，需要时从 git 历史取 |
 | `scripts/pod/` | 8 卡队列、job 模板、判定与只读访问 |
 | `research/` | 源码地图、仍有效的分析；入口见 `research/README.md` |
 | `notes/queue.md` | 下一步问题与实验顺序；一条任务只写问题、判据、状态 |

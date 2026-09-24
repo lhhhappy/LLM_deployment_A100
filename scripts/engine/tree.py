@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Engine source trees from git (replaces scripts/patch_stack.py).
+"""Engine source trees from git.
 
   python3 scripts/engine/tree.py <ref> [OUT]      export engine/sglang at <ref> to OUT/sglang
   python3 scripts/engine/tree.py --mechanism 120  print the commit that introduced mechanism 120

@@ -46,8 +46,8 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 172 | Marlin MoE clamped-SwiGLU fusion | no | `SGLANG_AX_MOE_FUSE_SWIGLU` (0) | 057: wall −1–2 %, gates unchanged |
 | 180 | HiCache host tier correct for GLM DSA; keeps 120/122 on with the host tier | no | `--enable-hierarchical-cache --hicache-size N` (off) | 059/060 ran the previous version (120 silently off); 062 lite N30 queued |
 
-124 (short-hit reserve) was not migrated: it conflicts with 122/123, and 122 has its own short-hit reserve. It remains in
-git history under `patches/`.
+124 (short-hit reserve) was not migrated: it conflicts with 122/123, and 122 has its own short-hit reserve. Its patch remains in
+git history (the `patches/` directory was removed after the migration).
 
 ## Default-off audit (2026-09-24, by reading `git diff official-A-0923a HEAD`)
 - 122, 123, 171, 172: identical when off.

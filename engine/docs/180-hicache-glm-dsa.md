@@ -189,10 +189,7 @@ CPU 上跑真实代码：真实设备池、主机池、组装策略、`HybridCac
 ## 10. 复现
 
 ```bash
-python3 scripts/engine/tree.py apply /tmp/t180 000-interface-compliance.patch 101-role-boundary-split.patch \
-  106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch \
-  120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch \
-  150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch 180-hicache-glm-dsa.patch
+python3 scripts/engine/tree.py mech:180 /tmp/t180      # official A + candidates up to the latest 180 commit
 scripts/tests/hicache180/run_tests.sh /tmp/t180 <python with torch>
 ```
 上游原始 diff：`refs/pr40913.diff`、`pr40914.diff`、`pr40915.diff`、`pr38212.diff`（本补丁使用）；`pr40134.diff`（未采用，§2）；`pr38474.diff`（KL 测试设计，参考）。

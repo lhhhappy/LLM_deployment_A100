@@ -1,12 +1,12 @@
 # 160 — GLM NEXTN sm80兼容配置与可加权spec统计（T48/W22）
 
-> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/engine/tree.py`）。
+> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。现在是 `engine/` 里的 `engine 160:` 提交（`python3 scripts/engine/tree.py mech:160` 取源码树）。
 
 完整路径/行号/不兼容清单、缓存交互、INFERRED性能与容量模型、L2闸门：[`R17_nextn_sm80.md`](../../research/codex/R17_nextn_sm80.md)。原始证据：[`evidence/T48/`](../../evidence/T48/README.md)。
 
 ## 应用与实现
 
-按数字顺序叠加，单独叠在 S0 上可打；补丁文件即唯一版本（生成器已在 T57 删除）。
+以 `engine 160:` 提交为唯一版本（生成器已在 T57 删除）。
 
 新文件`srt/arg_groups/ax_mtp_sm80.py`，在EAGLE参数auto_params解析之后调用。仅GLM target、sm80、NEXTN别名EAGLE触发：
 

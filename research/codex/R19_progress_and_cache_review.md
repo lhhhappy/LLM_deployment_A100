@@ -66,7 +66,7 @@ CPU 反例：参考 `[1,2,3]`，候选 `[1]` → `ok; wrong=0/1`；候选 `[1,9,
 
 ### S6 — 严重：120 补丁和生成器不一致，重生成会带回旧逻辑
 
-`make_120.py:58–61/:86–90` 无条件把 cold 限到 cap；当前 `120-sched-protect-chain.patch` 则是 v3：只有存在等待或 decode 才限块。生成器 main 最后直接覆盖原补丁。
+`make_120.py:58–61/:86–90` 无条件把 cold 限到 cap；当前 120（`engine 120:` 提交）则是 v3：只有存在等待或 decode 才限块。生成器 main 最后直接覆盖原补丁。
 
 本轮只在内存调用生成器 `edit_policy`，确认生成结果没有当前 wait/decode 条件，未运行生成器 main、未覆盖生产补丁。证据 `120_generator_review.json`。原 T41 的测试/确定生成收据不能自动替当前 v3 背书。
 

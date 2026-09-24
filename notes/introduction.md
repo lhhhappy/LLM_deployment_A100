@@ -117,7 +117,7 @@
 
 ## 6. 补丁清单
 
-详见 [engine/README.md](../engine/README.md) 及各补丁同名 `.md`。每个机制只保留一个补丁，按数字顺序叠在底包上。下表把四种状态分开列：在镜像里、启动时生效、真实负载走到了、有 8 卡单变量证据。
+详见 [engine/README.md](../engine/README.md) 与 `engine/docs/` 下各机制说明。引擎源码在 `engine/sglang/`（git 管理），每个机制是一个或一组 `engine NNN:` 提交；正式 A 为标签 `official-A-0923a`。下表把四种状态分开列：在镜像里、启动时生效、真实负载走到了、有 8 卡单变量证据。
 
 | 补丁 | 作用 | 正式 A 中生效？ | 8 卡证据 |
 |---|---|---|---|
@@ -254,7 +254,7 @@
 | `data/s1-dev-longchain/` | 长链合成集 |
 | `build/base_exact/` | 底包源码（只读） |
 | `refs/sglang-fe236ea6c3/` | 上游 SGLang 参考，含官方文档 |
-| `patches/` | 补丁及说明 |
+| `engine/` | 引擎源码（git 管理）与机制说明 |
 | `research/` | 源码地图与分析，入口 `research/README.md` |
 | `notes/roadmap.md` | 方向页 |
 | `notes/experiments.md` | 实验记录 |
