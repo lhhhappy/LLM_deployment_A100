@@ -189,7 +189,7 @@ CPU 上跑真实代码：真实设备池、主机池、组装策略、`HybridCac
 ## 10. 复现
 
 ```bash
-python3 scripts/engine/tree.py mech:180 /tmp/t180      # official A + candidates up to the latest 180 commit
-scripts/tests/hicache180/run_tests.sh /tmp/t180 <python with torch>
+python3 scripts/engine/tree.py HEAD /tmp/t180      # fresh output directory; prints the exact exported commit
+scripts/tests/hicache180/run_tests.sh /tmp/t180 python3  # Python environment must have torch and SGLang dependencies
 ```
 上游原始 diff：`refs/pr40913.diff`、`pr40914.diff`、`pr40915.diff`、`pr38212.diff`（本补丁使用）；`pr40134.diff`（未采用，§2）；`pr38474.diff`（KL 测试设计，参考）。

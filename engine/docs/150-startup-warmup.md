@@ -3,7 +3,7 @@
 > T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。现在是 `engine/` 里的 `engine 150:` 提交（`python3 scripts/engine/tree.py mech:150` 取源码树）。
 
 内部启动参数增加 `--warmups ax_shapes` 即启用；不加时不发送请求。
-未加入 RELEASE、构建脚本、L2 队列或提交配置。公开 command 仍用中性的 `/opt/ax/serve <profile>`，参数写内部 profile。
+正式 A 包含此源码，但未启用 `ax_shapes`；原 harness 的 preflight、warmup 与测量前flush是另一套回放流程。
 
 **结论范围：启动前预热代表性分支；不能保证任意服务形状零 JIT。**
 112/113 的长度是 constexpr；有限请求集不能穷尽动态调度、上下文长度、stride 和量化/MoE路由组合。

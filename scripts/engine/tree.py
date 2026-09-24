@@ -2,7 +2,7 @@
 """Engine source trees from git.
 
   python3 scripts/engine/tree.py <ref> [OUT]      export engine/sglang at <ref> to OUT/sglang
-  python3 scripts/engine/tree.py --mechanism 120  print the commit that introduced mechanism 120
+  python3 scripts/engine/tree.py --mechanism 120  print the latest commit for mechanism 120
 
 <ref> is any git ref (official-A-0923a, HEAD, a commit), `mech:NNN` for the latest commit of mechanism NNN
 (subject "engine NNN: ..."; a mechanism may have follow-up commits), or `before:NNN` for the parent of its

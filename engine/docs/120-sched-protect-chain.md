@@ -19,7 +19,8 @@ Model computation, token counts, timestamps, flush and outputs are untouched.
 ## Switches (read once at engine start)
 `SGLANG_AX_SCHED_PROTECT` (1; 0 = base behaviour), `SGLANG_AX_SCHED_COLD_CAP` (2048; S0 uses 8192),
 `SGLANG_AX_SCHED_SHORT_TOKENS` (4096; S0 uses 8192). Supported with plain TP, LPM, page 64, chunked prefill, no mixed chunk,
-no HiCache, no DP attention; other modes bypass the protection.
+no DP attention. The current 180 changes the cache-tier restriction: the host tier preserves protection, while L3 storage
+bypasses it. Short-hit sharing excludes requests still waiting for host restore; other unsupported modes bypass protection.
 
 ## Evidence
 - CPU: `tests/test_sched_protect_chain.py` runs the real scheduler and `PrefillAdder` code on fakes (trees come from git via
