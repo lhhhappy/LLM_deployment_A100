@@ -1,0 +1,23 @@
+{
+ "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0924c",
+ "command": "python3 -m sglang.launch_server --model-path /mnt/models --host 0.0.0.0 --port 8000 --tp-size 8 --served-model-name default --enable-metrics --incremental-streaming-output --page-size 64 --mamba-radix-cache-strategy extra_buffer --reasoning-parser glm45 --tool-call-parser glm47 --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --mem-fraction-static 0.87",
+ "env": {
+  "SGLANG_OPT_USE_TOPK_V2": "0",
+  "SGLANG_OPT_DEEPGEMM_HC_PRENORM": "0",
+  "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS": "154827,154829",
+  "SGLANG_AX_KDA_DUAL_SNAPSHOT": "0",
+  "SGLANG_AX_SCHED_PROTECT": "1",
+  "SGLANG_AX_SCHED_SHORT_TOKENS": "8192",
+  "SGLANG_AX_ASYNC_TOKENIZE": "0",
+  "SGLANG_MAMBA_SSM_DTYPE": "float32",
+  "SGLANG_OPT_FUSED_KDA_VERIFY": "0",
+  "SGLANG_AX_INDEXER_ROW_SHARD": "1",
+  "SGLANG_AX_SCHED_COLD_CAP": "4096",
+  "SGLANG_AX_PACE_TPOT": "0",
+  "SGLANG_AX_KDA_FUSE_PROJ": "0",
+  "SGLANG_AX_MOE_FUSE_SWIGLU": "0",
+  "SGLANG_AX_SM80_INDEXER": "1",
+  "SGLANG_AX_SM80_FP8_MOE_MARLIN": "1"
+ },
+ "model_name": "default"
+}
