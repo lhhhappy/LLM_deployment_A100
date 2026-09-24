@@ -11,6 +11,7 @@ TPOT stays under the gate; with the patch off the trace is identical to the offi
 import math
 import os
 import random
+import sys
 import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import patch
@@ -18,7 +19,8 @@ from unittest.mock import patch
 from test_sched_protect_chain import ROOT, Req, make_scheduler, step, tree_dir
 
 BASE = tree_dir('official-A-0923a')
-CAND = tree_dir('mech:122')
+# Test the working source, including fixes not yet committed to the mechanism.
+CAND = ROOT / 'engine/sglang'
 # official A launch: chunk 8192 (default), interval 2, COLD_CAP 4096, SHORT_TOKENS 8192
 A_ENV = {'SGLANG_AX_SCHED_PROTECT': '1', 'SGLANG_AX_SCHED_COLD_CAP': '4096', 'SGLANG_AX_SCHED_SHORT_TOKENS': '8192'}
 PACE = {'SGLANG_AX_PACE_TPOT': '0.085'}
@@ -139,6 +141,60 @@ class PacedPrefill(unittest.TestCase):
             t = step(s)
             self.assertEqual(sorted(r[0] for r in t['reqs']), ['cold', 'hit'])
             self.assertEqual(dict((r[0], r[2] - r[1]) for r in t['reqs'])['cold'], 7168)  # 8192 - paged(1000)
+
+    def test_refused_hit_stops_shrinking_the_continuation(self):
+        # One request slot, held by the continuation: the reserved hit is refused. The first round still reserves for
+        # it; from the next round the continuation gets the full budget again, and the hit runs once the slot frees.
+        with patch.dict(os.environ, PACE):
+            clock = Clock()
+            cold, hit = Req('cold', 30000), Req('hit', 4096, cached=60000)
+            s, _ = build(CAND, clock, chunk=cold, waiting=[hit], slots=1)
+            sizes = []
+            for _ in range(40):
+                t = step(s)
+                if t['mode'] == 'prefill':
+                    sizes.append(dict((r, b - a) for r, a, b in t['reqs']))
+                advance(clock, t)
+                if hit.output_ids:
+                    break
+            self.assertEqual(sizes[0], {'cold': 8192 - 4096})
+            self.assertEqual(sizes[1], {'cold': 8192})
+            self.assertTrue(hit.output_ids)
+
+    def test_full_budget_hit_does_not_force_tiny_continuation_forever(self):
+        for grid in (64, 256):
+            for hit_work in (8192, 8192 - grid + 1):
+                with self.subTest(grid=grid, hit_work=hit_work), patch.dict(os.environ, PACE):
+                    clock = Clock()
+                    cold = Req('cold', 30000)
+                    hit = Req('hit', hit_work, cached=60000)
+                    s, ns = build(CAND, clock, chunk=cold, waiting=[hit])
+                    ns['mamba_checkpoint_grid'] = lambda p: grid
+                    sys.modules['sglang.srt.runtime_context'].mamba_checkpoint_grid = lambda p: grid
+                    t = step(s)
+                    self.assertEqual(t['reqs'], [('cold', 0, 8192)])
+                    # Bounded completion, using real admission and continuation
+                    # logic; no free-generation equality requirement.
+                    for _ in range(80):
+                        advance(clock, t)
+                        t = step(s)
+                        if hit.output_ids:
+                            break
+                    self.assertTrue(hit.output_ids, t)
+
+    def test_reserve_keeps_exact_fit_and_skips_impossible_hit(self):
+        for grid in (64, 256):
+            with self.subTest(grid=grid), patch.dict(os.environ, PACE):
+                clock = Clock()
+                s, ns = build(CAND, clock, chunk=Req('cold', 30000), waiting=[
+                    Req('too_big', 8192, cached=70000),
+                    Req('fits', 8192 - grid, cached=60000)])
+                ns['mamba_checkpoint_grid'] = lambda p: grid
+                sys.modules['sglang.srt.runtime_context'].mamba_checkpoint_grid = lambda p: grid
+                t = step(s)
+                self.assertEqual([(r, b-a) for r, a, b in t['reqs']],
+                                 [('cold', grid), ('fits', 8192 - grid)])
+                self.assertEqual(t['waiting'], ['too_big'])
 
     def test_budget_fits_a_fresh_decoders_allowed_deficit(self):
         clock = Clock()

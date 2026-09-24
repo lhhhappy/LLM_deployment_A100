@@ -1498,13 +1498,30 @@ class Scheduler(
         budget = min(chunk_size, self.max_prefill_tokens)
         if self._ax_pace_tokens is not None:
             budget = min(budget, max(grid, self._ax_pace_tokens // grid * grid))
+        # A hit reserved in the previous round beside the same continuation that is still waiting was refused for a
+        # reason other than budget (request slots, KV, mamba slots, a partial-prefill rule). Stop reserving for it until
+        # this continuation ends, so one refused hit cannot shrink the continuation round after round; it can still be
+        # admitted whenever the batch has room. Same inputs on every TP rank, so the decision stays rank-consistent.
+        cont = self.chunked_req.rid if self.chunked_req is not None else None
+        last_cont, last_reserved, blocked = getattr(self, "_ax_reserve_state", (None, frozenset(), frozenset()))
+        waiting = {req.rid for req in self.waiting_queue}
+        blocked = (blocked | last_reserved) & waiting if cont == last_cont else frozenset()
         reserve = 0
+        reserved = []
         for req in self.waiting_queue:
+            if req.rid in blocked:
+                continue
             new = req.seqlen - len(req.prefix_indices)  # prefix matched by calc_priority this round
             if len(req.prefix_indices) > 0 and not req.needs_host_load_back() and 0 < new <= short:
-                reserve += -(-new // self.page_size) * self.page_size
-                if reserve >= budget:
-                    break
+                needed = -(-new // self.page_size) * self.page_size
+                # The continuation consumes at least one grid unit. Reserve
+                # only complete hits that fit beside it; otherwise an 8192-hit
+                # with an 8192 budget forces endless 64-token continuation
+                # chunks while the hit itself can never join those batches.
+                if needed <= budget - grid - reserve:
+                    reserve += needed
+                    reserved.append(req.rid)
+        self._ax_reserve_state = (cont, frozenset(reserved), blocked)
         cap = max(grid, (budget - reserve) // grid * grid)
         return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
 
