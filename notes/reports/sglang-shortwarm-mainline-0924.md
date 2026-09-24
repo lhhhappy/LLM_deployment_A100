@@ -230,3 +230,9 @@ lc139:0002前驱结束到发送约45.82秒，但到执行实际326.57→301.78�
 执行真实源码的拆分/sidecar尺寸函数并核对新旧job只有该参数不同；[CPU收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)不是实际大内存分配或速度测量。
 启动核对device KV1,397,760与KDA418不变、两类host容量增加；完整比较同ID坏例、缓存/重算、等待/执行、TPOT及11门。
 独立复核支持此设计，无阻断理由；若容量干预不能缓解重复缺口，再补节点发布/备份、两级淘汰、匹配、恢复/回退定向trace。
+
+
+069启动核验：启动180秒；device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on与G_EXPECT相符。
+rep16原16条请求全部成功，原prompt长度和输出预算严格匹配；预热112.832秒，同068计划哈希f1c67a4e…eed2c96。
+20:06:39 UTC真flush有HTTP成功及服务日志双收据；首测量dispatch20:06:57.676，首诊断20:21:57，此后每30分钟。
+20:09:04健康快照完成56条、无告警；这不是性能窗口。证据见[入口审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/measurement-start-audit.json)。

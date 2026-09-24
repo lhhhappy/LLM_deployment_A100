@@ -22,8 +22,8 @@
     "host_kv_tokens": 8,
     "host_mamba_gb": 8
   },
-  "phase_at_review": "warmup",
-  "warmup_receipt_pending": true,
-  "measurement_flush_pending": true,
+  "phase_at_review": "measurement",
+  "warmup_receipt_pending": false,
+  "measurement_flush_pending": false,
   "startup_error_lines": []
 }

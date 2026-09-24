@@ -1,0 +1,22 @@
+{
+  "status": "MEASUREMENT_START_VERIFIED",
+  "n": 30,
+  "warmup_requests": 16,
+  "warmup_elapsed_s": 112.83195519447327,
+  "plan_sha256": "f1c67a4e1d17d2bff64371999008a5b40728b9b51faeedbac84674ea91ed2c96",
+  "same_plan_and_pairs_as_068": true,
+  "original_prompt_lengths_and_output_budgets_match": true,
+  "warmup_errors": 0,
+  "flush_finished_s": 1790280399.0853796,
+  "flush_finished_utc": "2026-09-24T20:06:39.085380+00:00",
+  "flush_http_success": true,
+  "server_flush_log_lines": [
+    "[2026-09-24 20:06:39 TP0] Cache flushed successfully!"
+  ],
+  "first_observed_dispatch_s": 1790280417.675915,
+  "first_observed_dispatch_utc": "2026-09-24T20:06:57.675915+00:00",
+  "next_report_utc": "2026-09-24T20:21:57.675915+00:00",
+  "health_snapshot_completed": 56,
+  "health_snapshot_observed_utc": "2026-09-24T20:09:04.114608+00:00",
+  "scope": "Startup and warmup correctness only; no SLO or performance conclusion"
+}
