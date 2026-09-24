@@ -44,3 +44,7 @@
 - 通用`prof_ledger.py`曾把一个decode的多stream标记算成44步，产生负outside时间；现按External id合并，4个CPU用例和4份历史trace回归通过。kernel名字分类只是启发式，no-kernel gap不能直接当host开销。[分析§12](codex-分析-2026-09-24.md#12-新复现的profile账本bug及修复)
 - `blocking.py` 已更新为窗口诊断：排队位置不能直接归因调度，prefill 生命周期重合不等于 GPU 独占。042/037d 的旧成本估计分别在 218/123 条请求超过整个执行窗口；新版保留有符号残差、缺失 LCP 标未知，按真实 cohort 验证。累计重合秒数是 request-seconds；86.9%/98.9% 是 TPOT 超标请求的生成窗口重合中位数，不能称真实停顿占比。[工具复核与用法](codex-分析-阻塞归因与执行路线.md)
 - 执行层研究不限于 SGLang：题面 vLLM sm80 backport 已有主办方接口验证，是首个替代引擎对照候选；不是已证明分数更高。KDA BF16 投影融合、170 v2、MoE 结构/大块路径按数值和真实成本筛选。[更新后的 R9](../research/claude/R9_upstream_since_base.md)
+
+## 正式最终评测的规模（用户提供，2026-09-24）
+- 回放 341 条会话链、5150 个请求（平均每链约 15.1 个请求；开发集为 311 链 / 722 请求，每链约 2.3 个），按档搜索最大 N，整轮约 8–10 小时。按此估算，链首约占 6.6%（开发集为 43%）。
+- `llm-challenge-arena-v1/challenge.json` 的摘要写"8–10 小时起步，搜索多档更长"，排名为 N@SLO → TPM(decode) → chain_start p95；task.md 写的是 N@SLO → tpot_mean。两处不一致，以 task.md 为准，已标记待确认。
