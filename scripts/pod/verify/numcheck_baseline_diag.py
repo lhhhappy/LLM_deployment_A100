@@ -45,7 +45,14 @@ def request(path, body, timeout):
 def flush():
     # /v1/models becomes available before startup warmup has fully drained.
     # Let the server wait for true idleness; a refusal after this still fails.
-    return request("/flush_cache?timeout=30", {}, 60).decode()
+    raw = request("/flush_cache?timeout=30", {}, 60).decode()
+    try:
+        payload = json.loads(raw)
+    except ValueError as exc:
+        raise RuntimeError("flush returned invalid JSON") from exc
+    if not isinstance(payload, dict) or payload.get("success") is not True:
+        raise RuntimeError("flush lacks success=true acknowledgement")
+    return raw
 
 
 class InvalidResponse(RuntimeError):

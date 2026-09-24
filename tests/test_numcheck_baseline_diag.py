@@ -31,7 +31,7 @@ class BaselineDiagnosticTest(unittest.TestCase):
                     self.assertEqual(urlsplit(req.full_url).query, "timeout=30")
                     if fail == "flush":
                         raise OSError("flush failed")
-                    return io.BytesIO(b"{}")
+                    return io.BytesIO(b"{}" if fail == "flush_ack" else b'{"success":true}')
                 if fail == "request":
                     raise OSError("generate failed")
                 n = body["sampling_params"]["max_new_tokens"]
@@ -88,6 +88,12 @@ class BaselineDiagnosticTest(unittest.TestCase):
         self.assertIsNone(summary)
         self.assertIsNone(failure)
         self.assertNotIn("DIAGNOSTIC_COMPLETE", stdout)
+
+    def test_missing_flush_ack_stops_before_generate(self):
+        calls, _, summary, records, _ = self.execute("flush_ack")
+        self.assertEqual([path for path, _ in calls], ["flush_cache"])
+        self.assertEqual(records, [])
+        self.assertIsNone(summary)
 
     def test_short_response_stops_without_summary(self):
         _, stdout, summary, records, failure = self.execute("short")

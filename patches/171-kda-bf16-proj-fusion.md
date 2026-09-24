@@ -43,8 +43,8 @@ GPU 算子入口：[test_kda_fusion_171.py](../tests/gpu/test_kda_fusion_171.py)
 
 ## 下一步真实模型验收
 
-由 8 卡负责人安排正式 A 原路径的 flag=0/1 对照，其他参数固定。先同配置重复建立误差参照；覆盖 33/37/63/65、图桶/补齐、chunk 续算、长前缀命中、多请求与 MTP verify/accept。保存逐层输出、SSM/conv、实际融合与 graph 路径、KV/KDA 容量及峰值显存。
+由 8 卡负责人安排正式 A 原路径的 flag=0/1 对照，其他参数固定。不设置生成token/logprob重复一致性门；覆盖 33/37/63/65、图桶/补齐、chunk 续算、长前缀命中、多请求与 MTP verify/accept。保存逐层输出、SSM/conv、实际融合与 graph 路径、KV/KDA 容量及峰值显存。
 
 数值通过后，同负载测 256/1024/4096/8192/16384 的模型成本，随后完整回放检查四道 TTFT、TPOT 及全部其余硬门。只改善算子或某一门不记为并发档晋级。170 的 prefill BCG 先独立验证，再测组合；正式提交由用户安排。
 
-真实 TP8 初筛 job：[official_a_171_num.sh](../scripts/pod/jobs/official_a_171_num.sh)。A 与 A+171 各两次输出/logprob指纹、非整齐长度、64k前缀尝试、MTP/decode graph及启动容量。这个 HTTP 初筛不读取逐层状态；`numcheck_cmp` 的0.5 logprob线是粗拒绝阈值，原始差异须独立审阅，不自动认定数值等价或能力门通过。
+当前8卡实验：[official_a_171_n22.sh](../scripts/pod/jobs/official_a_171_n22.sh)。按用户2026-09-24最新要求直接跑完整原开发集N22，以047现有正式配置为对照；清缓存、请求完整性和赛题评分门保留，取消生成输出逐字一致性前置。049曾因主会话自设的重复一致性门退出，未加载171，不能算171错误。

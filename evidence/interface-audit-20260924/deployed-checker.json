@@ -1,0 +1,9 @@
+{
+  "source": "scripts/pod/verify/run_dev_checked.py",
+  "sha256": "8ac02956bece026b4f463548df3ead42b6e9b57774764c72015cc6b3ca0c36d6",
+  "jobs": [
+    "056-official_a_171_n22.sh",
+    "057-official_a_172_n22.sh"
+  ],
+  "scope": "Frozen evidence snapshot; source remains scripts/pod/verify/run_dev_checked.py"
+}

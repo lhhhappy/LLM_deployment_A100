@@ -17,10 +17,6 @@ if [ "${SMOKE_GATE:-1}" = 1 ]; then
   c=$(grep -o "correct=[0-9]*" $RUN_DIR/smoke.log | cut -d= -f2)
   [ -n "$c" ] && [ "$c" -ge "${SMOKE_MIN:-6}" ] || { echo "GATE FAIL: capability smoke ${c:-?}/12"; exit 6; }
 fi
-if [ -n "${NUMREF:-}" ]; then   # numeric fingerprint vs a reference engine run (numcheck.json)
-  python3 $AX/verify_kit/numcheck.py $RUN_DIR/num >/dev/null && python3 $AX/verify_kit/numcheck_cmp.py $NUMREF $RUN_DIR/num/numcheck.json | tee $RUN_DIR/numcmp.txt | tail -1
-  grep -q "NUMCMP wrong=0/" $RUN_DIR/numcmp.txt || { echo "GATE FAIL: numerics differ from reference"; exit 7; }
-fi
 S1=$AX/s1/s1-dev; first=1
 # Start high (target is N22/26): climb LADDER_UP; stop at the first failure. No descending by default (user 09-23:
 # a failed N18 means diagnose + fix, lower levels carry no decision value). LADDER_DOWN only if explicitly set; old note:

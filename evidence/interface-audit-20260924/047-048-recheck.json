@@ -1,0 +1,32 @@
+{
+  "L047-official_a_n22": {
+    "rows": 722,
+    "unique_req_ids": 722,
+    "errors": 0,
+    "prompt_count_matches": 722,
+    "output_count_matches": 722,
+    "ttft_sources": {
+      "server": 722
+    },
+    "cached_positive": 698,
+    "coverage": 1.0,
+    "n_judged": 722,
+    "n_unjudgeable": 0,
+    "service_error_rate": 0.0
+  },
+  "L048-official_a_122_n22": {
+    "rows": 722,
+    "unique_req_ids": 722,
+    "errors": 0,
+    "prompt_count_matches": 722,
+    "output_count_matches": 722,
+    "ttft_sources": {
+      "server": 722
+    },
+    "cached_positive": 696,
+    "coverage": 1.0,
+    "n_judged": 722,
+    "n_unjudgeable": 0,
+    "service_error_rate": 0.0
+  }
+}
