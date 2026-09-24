@@ -56,6 +56,35 @@ if TYPE_CHECKING:
     from sglang.srt.mem_cache.memory_pool import DSATokenToKVPool
 
 
+
+def _ax_indexer_row_shard(n_rows: int):
+    """[ax] 114: split the replicated O(L^2) indexer logits + top-k over TP ranks by query rows.
+    Every rank holds identical q/k/metadata (ReplicatedLinear indexer), rows are independent, so the
+    gathered result is bit-identical. Returns (group, tp, rank, rows_per_rank) or None (stock path)."""
+    import os
+
+    if os.environ.get("SGLANG_AX_INDEXER_ROW_SHARD", "1") == "0":
+        return None
+    from sglang.srt.distributed.parallel_state import get_tp_group
+
+    group = get_tp_group()
+    tp = group.world_size
+    if tp <= 1 or n_rows < int(os.environ.get("SGLANG_AX_INDEXER_ROW_SHARD_MIN_ROWS", "1024")):
+        return None
+    per = (n_rows + tp - 1) // tp
+    global _AX_114_LOGGED
+    if not _AX_114_LOGGED:
+        _AX_114_LOGGED = True
+        import logging
+
+        logging.getLogger(__name__).info(
+            f"[ax] 114 indexer row-shard active: rows={n_rows} tp={tp} per_rank={per}"
+        )
+    return group, tp, group.rank_in_group, per
+
+
+_AX_114_LOGGED = False
+
 class IndexerKPool(MultiPlatformOp):
     def __init__(
         self,
@@ -985,6 +1014,12 @@ class IndexerKPool(MultiPlatformOp):
             n_real <= total_q
         ), f"plan has more real rows ({n_real}) than q_fp8 ({total_q})"
 
+        # [ax] 114: this rank's slice of query rows [r0, r1) when row-sharding is on.
+        ax_shard = None if self.dsa_enable_prefill_cp else _ax_indexer_row_shard(n_real)
+        r0, r1 = 0, n_real
+        if ax_shard is not None:
+            r0 = min(ax_shard[2] * ax_shard[3], n_real)
+            r1 = min(r0 + ax_shard[3], n_real)
         if total_k_rows > 0:
             k_u8 = plan.ragged_k_u8
             k_scale = plan.ragged_k_scale
@@ -1000,15 +1035,15 @@ class IndexerKPool(MultiPlatformOp):
             )
             k_fp8 = k_u8.view(torch.float8_e4m3fn)
             logits = deep_gemm.fp8_mqa_logits(
-                q_fp8[:n_real].contiguous(),
+                q_fp8[r0:r1].contiguous(),
                 (k_fp8.contiguous(), k_scale.contiguous()),
-                weights[:n_real].contiguous(),
-                ks_per_q,
-                ke_per_q,
+                weights[r0:r1].contiguous(),
+                ks_per_q[r0:r1],
+                ke_per_q[r0:r1],
                 clean_logits=True,
             )
         else:
-            logits = torch.empty((n_real, 0), dtype=torch.float32, device=device)
+            logits = torch.empty((r1 - r0, 0), dtype=torch.float32, device=device)
 
         topk_method = metadata.topk_transform_method
         attn_metadata = metadata.attn_metadata
@@ -1030,16 +1065,45 @@ class IndexerKPool(MultiPlatformOp):
                 if topk_offsets_all is not None and row_select is not None:
                     topk_offsets_all = topk_offsets_all.index_select(0, row_select)
 
-        return self._topk_from_kpool_logits(
+        if ax_shard is None:
+            return self._topk_from_kpool_logits(
+                logits,
+                pool_lens,
+                seq_lens=seq_lens_expanded,
+                page_table=page_table_all,
+                topk_offsets=topk_offsets_all,
+                row_starts=ks_per_q,
+                out_rows=total_q,
+                page_table_row_index=page_table_row_index_all,
+            )
+        # [ax] 114: top-k for this rank's rows only, then all-gather (rows are independent).
+        group, tp, _, per = ax_shard
+        sl = lambda t: None if t is None else t[r0:r1]
+        local = self._topk_from_kpool_logits(
             logits,
-            pool_lens,
-            seq_lens=seq_lens_expanded,
-            page_table=page_table_all,
-            topk_offsets=topk_offsets_all,
-            row_starts=ks_per_q,
-            out_rows=total_q,
-            page_table_row_index=page_table_row_index_all,
+            pool_lens[r0:r1],
+            seq_lens=seq_lens_expanded[r0:r1],
+            page_table=(
+                page_table_all
+                if page_table_row_index_all is not None
+                else sl(page_table_all)
+            ),
+            topk_offsets=sl(topk_offsets_all),
+            row_starts=ks_per_q[r0:r1],
+            out_rows=per,
+            page_table_row_index=sl(page_table_row_index_all),
         )
+        gathered = torch.empty(
+            (tp * per, local.shape[1]), dtype=local.dtype, device=local.device
+        )
+        group.all_gather_into_tensor(gathered, local.contiguous())
+        if total_q == n_real:
+            return gathered[:n_real]
+        out = torch.full(
+            (total_q, local.shape[1]), -1, dtype=local.dtype, device=local.device
+        )
+        out[:n_real] = gathered[:n_real]
+        return out
 
     def _get_topk_ragged_with_cp(
         self,
