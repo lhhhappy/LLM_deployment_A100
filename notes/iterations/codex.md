@@ -15,9 +15,12 @@
 - lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束至执行326.57→301.78秒。真LCP不证明有效混合检查点存在；保存/淘汰/恢复原因未知。
 - 下一069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
 - 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。工具2837b3c已部署并恢复队列，启动180秒、rep16预热112.832秒，20:06:39 UTC真flush后已进入全量测量。
-- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，首次诊断20:21:57 UTC。
+- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，首15分钟已复核；下一45分钟诊断20:51:57 UTC。
 - 启动实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on符合G_EXPECT。[启动收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json)。
-- [测量入口审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/measurement-start-audit.json)：20:09:04健康快照56条、无告警；尚无诊断窗口，不判断性能收益。
+- 069首15分钟快照625条，唯一、0错误、原预算/gap/时间戳核对通过；较晚健康675条不混入快照。四桶p95=10.560/13.795/15.277/192.192秒，TPOT均值/p95=.043517/.084881。
+- 与068相同625条相比，四桶超标90→69、95→61、8→3、33→23；未命中7.895M→5.291M token。仅已完成子集、有选择/时序偏差，不判整档或因果收益。
+- fast修复61、新增40；剩余69坏例中58条实际未命中≤4096，57条queue_time占TTFT≥80%。lc002:0007仅1696新token，TTFT92.38s，其中scheduler queue91.32s；等待原因仍未知。
+- 20:23:44补充样本FULL host占用99.894%、无retraction，不能单独证明容量瓶颈；[15分钟证据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/audit.json)、[慢例与服务区间](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/slow-fast-cases.json)。继续全量，下一步结合坏例追准入/恢复/池预算。
 - 同ID跟踪缓存量、等待/执行、prefill批与全部11门；容量无收益再补定向事件trace。缓存命中改善也不能忽略新坏例/TPOT回退。
 - 068在99.02分钟后剩链<30，最后排空段不代表满N30；不拿尾窗好看抵消全量失败。
 

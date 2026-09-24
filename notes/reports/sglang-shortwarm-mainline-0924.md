@@ -236,3 +236,20 @@ lc139:0002前驱结束到发送约45.82秒，但到执行实际326.57→301.78�
 rep16原16条请求全部成功，原prompt长度和输出预算严格匹配；预热112.832秒，同068计划哈希f1c67a4e…eed2c96。
 20:06:39 UTC真flush有HTTP成功及服务日志双收据；首测量dispatch20:06:57.676，首诊断20:21:57，此后每30分钟。
 20:09:04健康快照完成56条、无告警；这不是性能窗口。证据见[入口审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/measurement-start-audit.json)。
+
+
+## 069首15分钟检查
+
+冻结快照625条，稍后健康快照675条，两者不混用。625条唯一且无错误，原prompt长度/输出预算、与068同ID的冻结元数据及gap一致，时间戳单调且TTFT全部来自服务端；窗口统计复算一致。
+四桶p95 fast/overall/turn/chain=10.5598/13.7951/15.2771/192.1919秒，超标/本子集CP允许69/30、61/32、3/5、23/9。TPOT均值/p95=.043517/.084881，1条>.10。
+068同625请求的超标为90/95/8/33，p95=19.5586/21.4286/34.4109/229.0993；TPOT=.052853/.086032。
+配对fast修复61、新增40；overall61/27，turn7/2，chain11/1。相同请求cached总量32.750M→35.354M，未命中7.895M→5.291M；138条缓存增加、55条减少、432条相同。
+这是按069已完成请求选出的子集，存在选择与到达时序偏差；只算积极的早期信号，不能宣称整档通过或容量的稳定因果收益。
+
+剩余69条fast坏例中58条实际未命中≤4096，57条上报queue_time占TTFT≥80%；40条新增坏例中35条实际未命中≤4096，30条queue_time占比≥80%。
+最慢lc002:0007：cached29,696→70,400，实际未命中1,696，TTFT166.786→92.380秒；069 recv→exec91.839秒、exec→first.541秒，上报scheduler queue91.324秒。
+当前源码queue_time=forward_entry_time−wait_queue_entry_time；raw的t_admit实际为api_server_dispatch_finish，不能当作scheduler准入。其90多秒等待区间，服务日志有164个prefill批、665,152新token、中位块4096，仍在持续工作；日志无请求ID/skip reason，不指定是哪一批或哪项规则阻挡它。
+lc284:0006两轮cached同为16,640，TTFT135.987→39.130秒；lc239:0009两轮cached同为33,792，却5.222→30.829秒。保存这些同缓存、等待变化的例子用于后续准入/恢复/容量分析，不能把等待一概归为调度bug。
+
+较晚20:23:44的两个metrics样本：FULL host 2,900,736/2,903,808（99.894%），FULL device不可淘汰占用.9323，KDA .2201，无retraction；device usage不是物理驻留率，host gauge不覆盖KDA。高占用和write_through dropped=0都不证明host是否淘汰了某请求。
+未发现需要中止的故障，保留原任务继续全量，下一45分钟检查20:51:57 UTC。证据：[check15](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check15/)，含625条原快照/同ID CSV、审计、慢例、服务区间和分层metrics。

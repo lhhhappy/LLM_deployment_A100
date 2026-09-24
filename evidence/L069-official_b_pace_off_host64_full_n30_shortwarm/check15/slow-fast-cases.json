@@ -1,0 +1,107 @@
+{
+  "selection": "three slowest completed fast-intra; biased; no cache-loss cause inferred",
+  "cases": [
+    {
+      "req_id": "biomaster:canon:lc_20260924_002:llm:0007",
+      "candidate": {
+        "prompt_tokens": 72096,
+        "cached_tokens": 70400,
+        "ttft_s": 92.37997126579285,
+        "queue_time_s": 91.32387590408325,
+        "t_recv_s": 1790280638.9693196,
+        "t_admit_s": 1790280639.1061175,
+        "t_exec_start_s": 1790280730.8084002,
+        "t_first_token_s": 1790280731.3492908
+      },
+      "baseline": {
+        "cached_tokens": 29696,
+        "ttft_s": 166.78601813316345,
+        "queue_time_s": 161.5528335571289,
+        "t_recv_s": 1790271774.8313706,
+        "t_admit_s": 1790271774.9800398,
+        "t_exec_start_s": 1790271936.5707428,
+        "t_first_token_s": 1790271941.6173887
+      },
+      "recv_to_admit_s": 0.13679790496826172,
+      "admit_to_exec_s": 91.70228266716003,
+      "actual_uncached_tokens": 1696,
+      "predecessor": "biomaster:canon:lc_20260924_002:llm:0006",
+      "predecessor_finish_to_dispatch_s": 2.8403191566467285
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_284:llm:0006",
+      "candidate": {
+        "prompt_tokens": 17103,
+        "cached_tokens": 16640,
+        "ttft_s": 39.13024926185608,
+        "queue_time_s": 38.57104516029358,
+        "t_recv_s": 1790280705.276368,
+        "t_admit_s": 1790280705.313824,
+        "t_exec_start_s": 1790280743.9482124,
+        "t_first_token_s": 1790280744.4066172
+      },
+      "baseline": {
+        "cached_tokens": 16640,
+        "ttft_s": 135.98650455474854,
+        "queue_time_s": 135.29094576835632,
+        "t_recv_s": 1790271863.9638317,
+        "t_admit_s": 1790271864.0022311,
+        "t_exec_start_s": 1790271999.3127735,
+        "t_first_token_s": 1790271999.9503362
+      },
+      "recv_to_admit_s": 0.03745603561401367,
+      "admit_to_exec_s": 38.63438844680786,
+      "actual_uncached_tokens": 463,
+      "predecessor": "scimaster:canon:lc_20260924_284:llm:0005",
+      "predecessor_finish_to_dispatch_s": 3.000077724456787
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_239:llm:0009",
+      "candidate": {
+        "prompt_tokens": 36916,
+        "cached_tokens": 33792,
+        "ttft_s": 30.829131603240967,
+        "queue_time_s": 29.89259386062622,
+        "t_recv_s": 1790280848.8724744,
+        "t_admit_s": 1790280848.9509826,
+        "t_exec_start_s": 1790280879.0084484,
+        "t_first_token_s": 1790280879.701606
+      },
+      "baseline": {
+        "cached_tokens": 33792,
+        "ttft_s": 5.221923828125,
+        "queue_time_s": 4.461883544921875,
+        "t_recv_s": 1790272070.556984,
+        "t_admit_s": 1790272070.6281185,
+        "t_exec_start_s": 1790272075.130326,
+        "t_first_token_s": 1790272075.7789078
+      },
+      "recv_to_admit_s": 0.07850813865661621,
+      "admit_to_exec_s": 30.05746579170227,
+      "actual_uncached_tokens": 3124,
+      "predecessor": "scimaster:canon:lc_20260924_239:llm:0008",
+      "predecessor_finish_to_dispatch_s": 31.88261651992798
+    }
+  ],
+  "slowest_case_service_window": {
+    "scope": "Whole-second log lines strictly inside lc002:0007 recv-to-first-exec interval; batch membership not traced",
+    "recv_to_exec_s": 91.8390805721283,
+    "reported_scheduler_queue_time_s": 91.32387590408325,
+    "prefill_batches": 164,
+    "prefill_new_tokens": 665152,
+    "prefill_new_token_median": 4096.0,
+    "batches_with_pending": 164,
+    "reported_queue_max": 9,
+    "reported_running_min_max": [
+      13,
+      19
+    ],
+    "decode_log_lines": 13,
+    "causal_limit": "Concurrent service work is observed, but logs lack request IDs and skip reasons; no claim about which batch blocked this request",
+    "reported_single_sequence_with_pending": 145
+  },
+  "timing_semantics": {
+    "t_admit_s": "api_server_dispatch_finish_ts; not scheduler admission",
+    "queue_time_s": "forward_entry_time - wait_queue_entry_time in current source; identifies queue residence but not the reason for waiting"
+  }
+}
