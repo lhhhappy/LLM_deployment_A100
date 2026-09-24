@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "runner_started_s": 1790240823.5964293,
+  "n": 14,
+  "flush_success": true,
+  "runner_rc": 0,
+  "flush_started_s": 1790242648.8580244,
+  "flush_http_status": 200,
+  "flush_response": {
+    "success": true,
+    "message": "Cache flushed."
+  },
+  "flush_finished_s": 1790242648.9102876,
+  "runner_finished_s": 1790245482.0558188,
+  "raw": "raw_s1-dev-longchain-lite_N14_1790242656.jsonl",
+  "run": "run_s1-dev-longchain-lite_N14_1790242656.json"
+}

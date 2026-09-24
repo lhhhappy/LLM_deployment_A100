@@ -1,0 +1,161 @@
+{
+ "status": "VALID",
+ "n": 14,
+ "passed": false,
+ "failed_gates": [
+  "chain_start(<=30s)"
+ ],
+ "tpot_mean": 0.01585206207902452,
+ "tpot_p95": 0.04424828217237545,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 958,
+   "p95": 0.9439234733581543,
+   "over_limit": 8,
+   "allowed_over": 59,
+   "rate_ci_lower": 0.0041619168254435155,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.0041619168254435155,
+      "allowed_over": 59,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.0047115665411296154,
+      "allowed_over": 58,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0035147362885740293,
+      "allowed_over": 60,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "overall_intra": {
+   "n": 1008,
+   "p95": 1.2347650527954102,
+   "over_limit": 13,
+   "allowed_over": 62,
+   "rate_ci_lower": 0.007644940374823215,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.007644940374823215,
+      "allowed_over": 62,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.008219248936003358,
+      "allowed_over": 61,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0070513521775586495,
+      "allowed_over": 63,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "turn_start": {
+   "n": 29,
+   "p95": 9.310136556625366,
+   "over_limit": 0,
+   "allowed_over": 4,
+   "rate_ci_lower": 0.0,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 4,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 3,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 4,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "chain_start": {
+   "n": 86,
+   "p95": 54.592594623565674,
+   "over_limit": 12,
+   "allowed_over": 8,
+   "rate_ci_lower": 0.08253110498427871,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.08253110498427871,
+      "allowed_over": 8,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.08902399221658293,
+      "allowed_over": 7,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.078075802597768,
+      "allowed_over": 8,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  }
+ },
+ "rows": 1123,
+ "raw": "raw_s1-dev-longchain-lite_N14_1790242656.jsonl",
+ "run": "run_s1-dev-longchain-lite_N14_1790242656.json",
+ "wall_s": 2824.7875504493713,
+ "harness_point_all_pass": false,
+ "flush": {
+  "verified": true,
+  "mode": "checked_runner_receipt_and_server_log",
+  "server_log": "/workspace/Agentic_science_challenge/evidence/L058-official_a_longchain_lite_n14/N14/server.log",
+  "window_start_s": 1790242648.8580244,
+  "window_end_s": 1790242648.9102876,
+  "matched_server_flush_s": 1790242648.0,
+  "server_log_clock": "UTC, second precision"
+ },
+ "interval_sensitivity": {
+  "diagnostic_only": true,
+  "primary_method": "clopper_pearson",
+  "organizer_method_unknown": true,
+  "sensitive_ttft_gates": [],
+  "all_gates_pass_by_method": {
+   "clopper_pearson": false,
+   "wilson": false,
+   "wald": false
+  }
+ }
+}

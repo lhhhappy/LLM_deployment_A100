@@ -196,3 +196,21 @@ raw跨度1171.7→1157.2s，单次少约1.2%，没有同配置重跑噪声估计
 raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只有一次，没有同配置N22重跑噪声估计，fast/overall p95还变差，因此不能认定稳定整档净收益。正式TPM窗口不足，保持null。补丁哈希、融合flag、基线路径已核，本轮没有kernel trace或新的正式能力评测，不将其写成kernel级测速或质量通过。
 
 决策：172保留候选、暂不合入或自动叠加171；下一步须对准整段prefill成本及长请求等待积压。057结束后pread确认running/pending均为空，服务未停止或释放。证据：[完整判分](../evidence/L057-official_a_172_n22/N22/level_verdict.json)、[同请求对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、[逐请求CSV](../evidence/L057-official_a_172_n22/N22/compare_vs_047.csv)、[配置/接口/容量复核](../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。
+
+## 058：正式 A 原样，longchain-lite N14（2026-09-24，Codex 独立复核）
+
+64条完整链、1123请求，13补丁逐项SHA256核对（含121），MTP保留，参数/env原样。原harness预热31链/905请求后，09:37:28 UTC flush成功；测量09:37:36–10:24:41，共47.08分钟。1123条唯一请求，0错误，prompt冻结计数/输出预算/服务端TTFT均1123/1123；取回归档SHA256=`2886a70ae7b9132431a6b02725419765ff0efea645f7e248092542b3102bf840`，本地原harness及补充门复算与pod一致。
+
+| 指标 | 044r 原dev N14 | 058 lite N14 | 正式A线上N14 |
+|---|---|---|---|
+| fast TTFT p95 / 超时 / 允许 | 3.9801s；22/23 | .9439s；8/59 | 1.5191s，PASS |
+| overall | 9.4598s；39/27 | 1.2348s；13/62 | 3.8729s，PASS |
+| turn | 13.3230s；0/3 | 9.3101s；0/4 | 6.3931s，PASS |
+| chain | 64.4553s；32/22 | 54.5926s；12/8 | 30.2343s，PASS |
+| TPOT mean / p95 | .042577/.078341 | .015852/.044248 | .017435/.036381 |
+
+058是VALID FAIL，仅chain门失败，非引擎崩溃或一致性门阻断。12条chain坏例全部是选中链的首请求、全部来源original，接收时间集中在开场约40秒；11条首执行前已等超过30秒，接收→执行常规中位39.19秒，执行→首token中位4.33秒。首40秒15条chain请求共新算750,344 token，12失败；之后71条全部通过。开场约5秒时尚有1,002,240 KV token槽与301 Mamba槽空闲，可观测淘汰计数在首约95秒没有增加。证据支持初波冷prefill积压，不能把这12条归因缓存容量淘汰；两段计时也不等于纯调度/纯GPU。
+
+负载变化明显：按token加权cache hit为71.50%→93.35%；实际新算prompt 9.808M→5.234M，输出.216M→.799M，chain门占比43.49%→7.66%。lite前20分钟762请求TPOT均值/p95为.020318/.060085；后27分钟大幅退载，全程时间平均存活链7.43、在途请求4.55，测量窗GPU利用率约76.6%（原dev94.2%）。全程均值接近线上不代表持续压力一致：lite的fast/overall更容易、turn/chain更难，线上未返回逐请求数据。两本地运行均缺完整固定稳态TPM窗口，保持null；线上TPM(all)=1,757,558.42、decode=20,546.92。
+
+主会话完成原始复算，GPT-6 Sol medium独立复核12条坏例，结论一致。用户已取消同配置自动重跑；058无第二轮GPU回放。下一项优先补全量311链持续负载证据，当前尚未入队。[完整三方分析](../evidence/L058-official_a_longchain_lite_n14/three-way-review.md)、[结构化指标与复现脚本](../evidence/L058-official_a_longchain_lite_n14/three-way-metrics.json)、[完整评分](../evidence/L058-official_a_longchain_lite_n14/N14/level_verdict.json)。
