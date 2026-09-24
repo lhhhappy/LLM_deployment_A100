@@ -1,0 +1,28 @@
+{
+  "service_id": "2102486579267252224",
+  "revision": 2,
+  "revision_id": "2103249397960679424",
+  "runtime_other_identical": true,
+  "resource_limits_and_gpu_count_identical": true,
+  "gpu_product_id_identical": true,
+  "gpu_display_name_changed": [
+    "A100-SXM4-80GB",
+    "NVIDIA A100-SXM4-80GB"
+  ],
+  "model_identity_identical": true,
+  "only_requested_change_env_added": [
+    {
+      "name": "AX_WORKSPACE_ROOT",
+      "value": "/dev/shm/arena-runtime"
+    }
+  ],
+  "service_update_exit_code": 0,
+  "observed_status": {
+    "status": "deploying",
+    "actual_replicas": 0,
+    "desired_replicas": 1,
+    "stage": "launching",
+    "reason": "ReadinessPending"
+  },
+  "pending_actual_pod_validation": true
+}

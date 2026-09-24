@@ -1,6 +1,6 @@
 # SGLang 组合验证与短预热（2026-09-24）
 
-当前069已完成5601条，VALID FAIL，10/11门通过，仅chain31/29失败；070启动时Pod被平台驱逐，无测量，准备恢复。
+当前069已完成5601条，VALID FAIL，10/11门通过，仅chain31/29失败；070启动时Pod被平台驱逐，无测量；原service revision2部署中，071尚未入队。
 最新判断与行动见[迭代索引](../iterations/codex.md)，完整067/068/069对照见[实验记录](../experiments.md)。
 下文保留最初组合定义、统一短预热协议和各检查点原始判断，用于追溯。
 原始正式组合对应已上传attempt46174/镜像0924d/引擎759a6ebb8e31723519ad5daf438e26e24b32501a。
@@ -328,3 +328,5 @@ chain仍31，超过全量CP允许29的下界结论不变。31条现存坏例均�
 恢复设计保留原service ID及8卡，以env-only修订启用AX_WORKSPACE_ROOT=/dev/shm/arena-runtime；bootstrap先核tmpfs/cgroup余量，拒绝非空原目录覆盖，再维持/tmp/ax兼容路径。
 JIT缓存暂留原可执行盘；/dev/shm noexec与各缓存变量覆盖须实查，不能笼统迁移.so。基础材料约632MB，旧诊断大文件多少未知；共享内存与host64同计cgroup，不宣称彻底消除容量风险。
 恢复后用新run071，原数据/预算/引擎条件沿用070，但新Pod冷编译缓存构成与069比较的限制。工作目录CPU8项通过；独立设计review无阻断。
+
+恢复更新于22:25:07 UTC接受，revision2=2103249397960679424，同service ID；镜像/模型/8卡与资源限额一致，仅新增工作目录env（GPU显示名被平台规范化）。当前ReadinessPending。后续恢复现场步骤集中见[交接](pod-storage-recovery-0924.md)，watch070仍负责新Pod可exec时唤醒。

@@ -1,0 +1,11 @@
+{
+  "retry_of": "070-official_b_host64_full_n30_shortwarm",
+  "job_source": "scripts/pod/jobs/official_b_host64_full_n30_shortwarm.sh",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "parameters": "exact070 host64/122on/mem.87/MTP/N30",
+  "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "warmup": "rep16-v1; all original outputs, trueflush",
+  "status": "not queued; wait new Pod, verify actual workspace + resource + dataset hashes first",
+  "comparison_scope": "infrastructure rebuilt, RAMworkspace and cold compiler caches; no isolated122 causal claim vs069",
+  "readiness_wakeup": "existing watch070 + window_notify bridge: failed Pod reads becoming successful change monitor state and notify current Codex"
+}

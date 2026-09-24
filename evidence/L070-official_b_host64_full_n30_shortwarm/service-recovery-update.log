@@ -1,0 +1,24 @@
+RECOVERY_PRECHECK actual=0 desired=1
+Idempotency-Key: 95e0791e-3196-4c87-ac43-219b7f587087
+{
+  "gpu_product_id": "2099127850496946176",
+  "gpu_display_name": null,
+  "gpu_product_deleted": false,
+  "id": "2102486579267252224",
+  "name": "lh-arena-sess-b",
+  "description": "",
+  "status": "initializing",
+  "active_revision": {
+    "gpu_product_id": "2099127850496946176",
+    "gpu_display_name": null,
+    "gpu_product_deleted": false,
+    "id": "2103249397960679424",
+    "revision": 2,
+    "created_at": "2026-09-24T22:25:07.733Z",
+    "status": "initializing",
+    "status_message": "Queued for deploy"
+  },
+  "has_canary": false,
+  "visibility": "team",
+  "shared_team_ids": []
+}

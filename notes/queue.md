@@ -9,7 +9,8 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC Pod临时存储超20Gi被驱逐；实际副本0，准备原service修订恢复 |
+| 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录，编译缓存冷启动 | 计划已备，未入队；等待revision2 Pod就绪并完成bootstrap/容量核验 |
+| 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC Pod临时存储超20Gi被驱逐；实际副本0，原service已更新revision2，deploying/ReadinessPending |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
 | 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
@@ -35,7 +36,7 @@ CPU源码尺寸函数及cgroup余量检查通过，独立review无阻断理由�
 
 070部署queue-20260924T220817-20847已核RUNTIME_DEPLOYED与DONE rc=0，队列已恢复；29运行文件与069一致。
 070启动时Pod被平台驱逐（ephemeral_exhausted），不是SLO FAIL；监控显示的running/startup是旧缓存。
-恢复准备：保留service2102486579267252224，以env-only修订声明RAM工作目录；bootstrap在任何上传前验证并链接/tmp/ax。JIT暂留原路径，新Pod冷编译缓存是对照混杂，恢复后用新run071并明确记录。
+恢复更新已接受：同service2102486579267252224，revision2=2103249397960679424；仅新增AX_WORKSPACE_ROOT，资源限额/8卡/模型镜像不变（GPU显示名由平台补NVIDIA前缀）。bootstrap在任何上传前验证并链接/tmp/ax。JIT暂留原路径，新Pod冷编译缓存是对照混杂，恢复后用新run071并明确记录。
 070固定引擎759a6eb，只将`SGLANG_AX_PACE_TPOT=0→0.085`与`G_EXPECT 122=on`对应调整。
 host64、mem0.87、MTP、原数据/rep16/N30不变；这是122整体机制对照，不是只改变τ常数。
 069工作量降低后，检验更大prefill预算能否减少chain等待且守住TPOT；31条chain中20条queue≥80%，但尚未识别具体阻塞原因。
