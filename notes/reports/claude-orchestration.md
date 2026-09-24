@@ -1,51 +1,23 @@
 # Claude 编排报告
 
-会话 `91cd0b57-498a-4428-b192-9ba6fe4f2404`。按 [collaboration.md](../collaboration.md) 汇报。
+会话 `91cd0b57-498a-4428-b192-9ba6fe4f2404`，主做负载与服务层。合作方式见 [collaboration.md](../collaboration.md)，方向与卡点见 [roadmap.md](../roadmap.md)。
 
-## 里程碑（2026-09-24 夜）：补丁 180（HiCache）交付 8 卡调试
+## 现状摘要（2026-09-24 夜）
 
-- **做了什么**：[180](../../patches/180-hicache-glm-dsa.md) 移植了上游 #40913→#40915 的主机池声明，把 KV、DSA 索引键、KDA 状态和 MTP 草稿池都搬到主机；另外只取了 #38212 中树与检查点的部分：开启 HiCache 后，树只在 256 token 分组边界分裂，KDA 检查点只在精确位置发布。原始 PR 差异存放在 `refs/`。
-- **Claude 复核**：
-  - 在正式 A 全栈加 180 上，52 项 CPU 测试全部通过；不加 180 时 30 项失败、1 项报错，说明这组测试能区分对错。
-  - HiCache 关闭时，逐处对照 `schedule_batch`、`mamba_component` 和 `_prepare_for_caching_req`，行为与底包等价。
-  - 与 140 兼容：140 自身要求网格对齐，HiCache 开启时 140 自带的守卫会拒绝启动。
-  - 没有自造环境变量。
-- **8 卡草案**：`scripts/pod/jobs/drafts/offA_180_hicache_lite_n14.sh`。它与 058 完全相同，只多了 180 和三个参数 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`，已发给主 Codex 调试。pod 主机内存实测 2 TB。
-- **未验证**：
-  - GPU 上主机恢复后的数值（开发机脚本 `scripts/tests/hicache180/gpu/hc180_numeric.py` 还没跑）；
-  - 与 170、115 的组合；
-  - 恢复时延与对 decode 的干扰。
-  - 恢复计时、回退原因埋点和传输优先级，留给补丁 181。
-
-## 里程碑（2026-09-24 晚）：方向页与驻留账本
-
-- 用户认可的下一阶段框架写在 [notes/roadmap.md](../roadmap.md)（唯一方向页）：四条线（驻留 / prefill 成本 / 时间分配 / 工具）加平台层；阶段 0 先用正式 A 原样在长链集 N14、N18 定紧门。
-- 驻留账本 `scripts/analysis/residency_ledger.py`（CPU 闭环模拟，模型估计）。Codex 复核指出三处缺陷（回放顺序未对齐 cohort、越池比例未按时间加权、装不下仍继续推进），已全部修正并核对（311/311 链与 cohort 一致）。修正后在开发集上仍复现不了 047（prefill 多算 74%），因此撤回"N14–N18 是驻留瓶颈区间"的说法；账本先由长链集 N14 的真实运行校准，之后才用于选档。结果 `evidence/longchain-design-20260924/residency_ledger_v2.json`。
-- 草案（未入队，用户要求先讨论）：`scripts/pod/jobs/drafts/offA_longchain_n14.sh`、`offA_longchain_n18.sh`，只换回放集，补丁/参数/env 与 047 一致；pod 需先同步 `data/s1-dev-longchain`。
-- 补丁整理建议（未执行）：120–124 合并、171/172 归档、160 的 101/140 守卫改显式开关。
-
-## 状态摘要（2026-09-24；047 已结束，048 运行中）
-
-1. **122 已冻结：** `patches/122-tpot-paced-prefill.patch`，sha256 `cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b`。
-2. **048 草案：** `scripts/pod/jobs/drafts/offA_122_n22.sh`。正式 A + 122 + `SGLANG_AX_PACE_TPOT=0.085`，dev N22，对照 047；启动参数不变。
-3. **CPU 测试：** 122 共 12 个，120 原有 27 个，合计 39 个通过；它们调用真实调度方法，模型、池和 batch 是假的。
-4. **定位：** 只作为可测候选，不写理论守门保证。TPOT 门只按实测判定。
-5. **复核发现并修复：**
-   - overlap 下两块 prefill 连续决策会重复使用同一份余量，现在把在飞 prefill 计入；
-   - 新到请求的 fill ids 为空；
-   - 首 token 未处理的 decoder 被漏计；
-   - 强制放行只放 256 的碎块。
-6. **保证失效条件（已写入 .md 和代码注释）：**
-   - 成本模型低估；
-   - 锚点晚于真实首 token（晚多少没有上界，也不由 τ 裕量覆盖）；
-   - 连续 decode 满 `MAX_DECODE` 后强制放行一整块（日志 `guard=` 计数）。
-7. **rank 一致性：** collective 进入条件与决策输入在各 rank 相同，时钟取 max。8 卡开销未测。
-8. **MTP 计数：** 按 `output_ids`，结果处理时 extend。计数滞后使余量偏小。
-9. **占用：** 我没有 pod 或开发机任务。
-10. **队列（主会话管理）：**
-    - 047（正式 A，dev N22）已结束：VALID FAIL。TPOT .0620/.0870 通过，turn 2/3 通过；fast 33/23、overall 55/27、chain 73/22 失败（pod 报告）。
-    - 048（A+122 冻结版）运行中；049、050 排队。
-    - 待定：048 若与 047 的差异接近重跑波动，是否补一次 A 重跑。
+- **测试口径**：按用户要求，以后只在 lite 长链集 N30（加压 N34）上比较方案，选 N30 上最好的。
+- **补丁 180（HiCache）**：
+  - 内容：移植上游 #40913→#40915 的主机池声明（KV、DSA 索引键、KDA 状态、MTP 草稿池），以及 #38212 的树与检查点部分。
+  - 冻结版 sha256 `3b63d9c8…`，见 [180](../../patches/180-hicache-glm-dsa.md)。
+  - 测试：52 项测试在 CPU 和开发机真实 CUDA 拷贝上通过；不加 180 时同一组测试失败，说明测试能区分对错。
+  - 8 卡：059（lite N14）运行中，已完成 700/1123，无报错；060（lite N30）排队。
+  - 未验证：主机恢复后模型输出的数值、恢复耗时、恢复对 decode 的干扰。
+- **补丁 122（按 TPOT 余量给 prefill 预算）**：048 在旧开发集 N22 上让 fast 门转为通过，overall、chain 仍失败。061（A+122，lite N30）排队。
+- **N30 基线**：`scripts/pod/jobs/official_a_longchain_lite_n30.sh`（058 原样，只改 N），已请执行层入队。
+- **下一步（Claude）**：
+  - 059/060/基线/061 出结果后，按请求类型、等待还是重算做 N30 失败归因；
+  - 写补丁 181：恢复计时与回退原因埋点、恢复/备份优先级；
+  - 准备 NUMA 单变量。
+- **暂停**：124（短命中留位）已冻结在候选；驻留账本在真实长链运行校准前不用于决策。
 
 ## 048 对照（A+122 冻结版 vs 047 A 原样，均 dev N22；单变量）2026-09-24
 
@@ -182,4 +154,4 @@ cd tests && python3 -m unittest test_tpot_paced_prefill test_sched_protect_chain
 
 ### 相关文档
 - 补丁说明：[122 .md](../../patches/122-tpot-paced-prefill.md)
-- 分析：[claude-进展](../claude-进展-2026-09-24.md)
+- 分析：[roadmap](../roadmap.md)、[introduction](../introduction.md)

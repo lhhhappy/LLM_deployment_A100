@@ -49,7 +49,7 @@
 - 成本低估 25% 时 TPOT 仍在门内；
 - 无 MTP 时首 token 变差（TPOT 本无余量，机制优先守 TPOT）。
 
-**8 卡：** 未测。草案 048 `scripts/pod/jobs/drafts/offA_122_n22.sh`（正式 A + 122，dev N22，对照 047）。
+**8 卡：** 048（正式 A + 122，旧开发集 N22，对照 047）fast 33→10/23 转过，overall 55→28/27、chain 73→62/22 仍挂，TPOT 守住；061（lite N30）排队，job `scripts/pod/jobs/official_a_122_lite_n30.sh`。
 
 ## 已知限制
 - 锚点时序：在第一次看到该请求的决策时建立，时间取 max(同步时钟, 在飞受控 prefill 的预测结束)。

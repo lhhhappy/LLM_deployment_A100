@@ -35,7 +35,7 @@
 - 来源：`s1-dev/` 是主办方公开开发集与 harness（task.md「公开开发集」：同一套 harness 与评分口径），本仓库不做版本管理，只读。我们用原 `run_dev.py` 回放（preflight→warmup→flush→测量），节拍为默认 chain-total-gap-scaled-v1、cap 3600 s（0 条链被压缩），未使用 `--max-chains/--no-gap/--include-all`。`--tok-dir` 用 `/mnt/models`，但 722 条的 prompt_tokens 与数据集 glm_tokens 全部一致；TTFT 全部来自服务端打点；输出长度全部等于 max_output_i（ignore_eos）。判定用 harness 的 s1_score 加 task.md 的统计余量与 tpot_p95 门（harness 自带 summary 只按点估计判，另行报告）。
 - 结构差异（主办方设计，不是脚本错误）：开发集链前缀抽样，311 链/722 请求、平均 2.3 请求/链，chain_start 314 条（43%）；loadgen 每个槽取一整条链顺序回放，链短则槽不断开新链，冷链首持续涌入；042 实际 prefill 中链首占 76%。正式用整链集，单档约 4 小时；开发集 N22 一档约 20 分钟，harness 的稳态 TPM 窗口 [10,70) min 不成立，本地 TPM 为空。
 - 已撤回（Codex 复核）：旧「开发集 p95 高 3–6 倍」混用了配置和档位；「tpm_all 相当」混用了全程平均与稳态窗口。新的044r/045r提供同配置同档比较，但不能倒推旧论证正确，也不能推出所有N的换算系数。
-- 校准更新：044r正式A原样（13补丁含121）在dev N14为overall/chain失败、TPOT=.0426/.0783；045r B@N10为fast/overall/TPOT失败、TPOT=.0345/.1182。两套正式同档已通过；pod结果见[实验记录校准节](experiments.md#正式ab原样校准044r045r2026-09-24claude)，本轮完整raw待本地独立复核。TPOT p95差距分别约2.2倍和5.7倍，不能统一除以二。开发集通过不作为研究N22/N26的前置；原044/045缺121已作废。[设计](codex-方案-长链负载与N22-N26验证.md)
+- 校准更新：044r正式A原样（13补丁含121）在dev N14为overall/chain失败、TPOT=.0426/.0783；045r B@N10为fast/overall/TPOT失败、TPOT=.0345/.1182。两套正式同档已通过；pod结果见[实验记录校准节](experiments.md#正式ab原样校准044r045r2026-09-24claude)，本轮完整raw待本地独立复核。TPOT p95差距分别约2.2倍和5.7倍，不能统一除以二。开发集通过不作为研究N22/N26的前置；原044/045缺121已作废。[现行生成设计](../scripts/longchain/longchain.md)
 - 正式提交内容对其他选手不可见（`scoringDetails`："部署赛提交内容仅作者与主办方可见"）。
 
 ## 产能与profile复核（Codex）

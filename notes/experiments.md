@@ -28,7 +28,7 @@
 | 041 | S1+DCP8 | 冒烟阶段引擎异常，未进入完整N22 | `dcp/comm.py:293`目标[33,1,512]、输入[40,1,512]；疑似TP8/scatter补齐契约不一致，未修复，不能评价性能；[服务日志](../evidence/queue-review-20260924/041-server-tail.log) |
 | 042 N22 | S1原样重复036 | TPOT .0915/.2323，175超标；fast15/23、overall18/27、turn0/3、chain17/22；仅TPOT失败 | 同配置fast7→15、p95 .2532→.2323；一次重跑证明有波动，尚非稳定噪声估计；[L042](../evidence/L042/) |
 
-真实同链LCP复核使用T56既有渲染结果，并核对同一req_id、前驱与prompt长度；只代表本轮前驱prompt的缺口，不是全部缓存潜力或已证明可恢复的时间。[缓存账本](../evidence/queue-review-20260924/cache_lcp_comparison.json)。旧[09-24运行记录](runs-0924.md)为当时交接快照，最新结论以本表与codex分析为准。
+真实同链LCP复核使用T56既有渲染结果，并核对同一req_id、前驱与prompt长度；只代表本轮前驱prompt的缺口，不是全部缓存潜力或已证明可恢复的时间。[缓存账本](../evidence/queue-review-20260924/cache_lcp_comparison.json)。旧为当时交接快照，最新结论以本表与codex分析为准。
 
 ## 正式A/B原样校准：044r/045r（2026-09-24，Claude）
 

@@ -30,7 +30,6 @@
 | [四类TTFT与造数依据](codex-四类请求与造数建议.md) | 原dev/048、Phoenix及冻结候选缺口 |
 | [来源约束](codex-长链来源约束.md) | 可见正文与不可恢复字段；不作为禁止合成的规则 |
 | [对话素材审查](codex-长链对话审查.md)、[旧实现审查](codex-长链数据审查.md) | 可复用观察与结构风险；当前设计以上述唯一入口为准 |
-| [旧候选实现/验收/命令](codex-方案-长链负载与N22-N26验证.md) | 96链/1718请求的历史实现事实 |
 | [旧独立验收](reports/review-data-sol.md)、[机器收据](../evidence/longchain-audit/independent-freeze-acceptance.json) | 不代表新版通过 |
 | [负载策略](fable-合成负载-2026-09-24.md) | 与部署实验的关系 |
 | [longchain.py](../scripts/longchain/longchain.py)、[checker](../scripts/longchain/longchain_check.py) | 当前事件构建与独立检查代码；v2不使用旧polish后处理 |
