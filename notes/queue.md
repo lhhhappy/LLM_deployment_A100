@@ -4,32 +4,28 @@
 
 ## 当前安排（2026-09-24，用户最新决定）
 
-按已准备的三项对照方案（来源：[执行说明](reports/claude-orchestration.md)，80abc38），
-带122缺陷的061s已停、063s已撤。旧双会话和错误消息投递已排除，当前Claude已按用户要求恢复队列，pread独立确认064运行、065/066排队。**尚未正式提交**。准备的实验为**全量长链集、N30、70分钟准入后排空**的三个逐项对照。
+当前Codex单人持续迭代SGLang，vLLM暂缓。围绕工作量、单位成本、调度改善做闭环；
+统一规则见[evaluation.md](evaluation.md)，过程见[Codex迭代日志](iterations/codex.md)。
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 064-official_a_full_n30_70m | 正式 A 参数与 MTP；120 on、122 off、180 off | running，14:11 UTC开跑；执行层 Codex 跟踪 |
-| 065-official_a_mem087_full_n30_70m | 同064，仅加 `--mem-fraction-static 0.87` | pending，排064后 |
-| 066-official_a_180_mem087_full_n30_70m | 同065，仅加新版180的三个HiCache参数 | pending，排065后 |
+| 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 已部署、队列已恢复，当前启动中（以pread日志为准） |
+| 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
+| 065 / 066 | 仅mem0.87 / 再加新版180 | 已从pending撤销，不再阻挡组合验证 |
 
-三项同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，含正式 A 全部13项改动。
-171/172/123/DCP关闭；显式 `SGLANG_AX_PACE_TPOT=0` 关闭122。
-066加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；不加NUMA绑定。
-122的修复由Claude接续复核/提交；不混入此次冻结源码。
-
-两个拟议正式校准候选为065与066，提交JSON和38749字节Dockerfile已准备并通过离线检查。按报告所载用户安排推进；每项本地启动、机制检查及真正测量的前20分钟无错误后再提交。
-本地结果不能替代正式能力门或宣布晋档。正式上传进度单独记 [submissions.md](submissions.md)。
+067引擎固定759a6ebb8e31723519ad5daf438e26e24b32501a，运行工具296caaa；
+120/122/180 on，171/172/123/DCP off。配置对应已上传正式46174/0924d，**不重复提交官方attempt**。
+正式46173/46174的上传与成绩只看[submissions.md](submissions.md)及official_status，不从本地推断。
 
 ## 测量与比较
 
-- 数据：`data/s1-dev-longchain/`，311链、5601请求；已同步Pod。保留原链顺序、正文、输出预算和gap。
-- 计时从测量第一条请求发出开始，4200秒关闭准入，已发请求全部排空。启动、preflight、warmup不计入70分钟。
-- 每项独立输出目录，预热后真实 `POST /flush_cache`，必须2xx且 `success=true`；不加重复生成一致性门。
-- 发送台账与完成记录逐条闭合；缺失请求为INVALID。70分钟可能只走到全量集的一部分，明确标为定时诊断，不冒充完整5601请求VALID。
-- 比较完成量、排空时间、TTFT四桶、TPOT均值/p95、错误率、缓存/恢复与等待。报告共同请求的配对差异，注明两轮到达的请求集合可能不同。
-- 原评分统计保留；10–70分钟的客户端准入吞吐另列诊断口径，不冒充原评分器稳态TPM。
-- 每25分钟只读监控，运行中完成记录的窗口标open；不因部分样本超过门限自动停止。
+- 全量`data/s1-dev-longchain/`：311链/5601请求、N30，原顺序、正文、输出预算和gap；不设70分钟截止。
+- preflight一条链 → rep16-v1固定16完整请求短预热 → 真flush → 全量测量 → 原评分器11门。
+- 预热计划、错误、实际耗时和flush收据留证；当前rep16-v1不保证全部形状覆盖，不与原预热结果冒充单变量。
+- 每分钟健康观察，每30分钟窗口快照；30分钟重点检查严重bug。运行中窗口open，不宣称整档通过。
+- 全量5601请求每个恰好一次、runner/flush/指标完整才判VALID PASS/FAIL；否则INVALID。
+- 证据明确的严重bug先保存并报告，再用stopjob停单个job，修复后新run ID重跑；8卡服务不可停删释放。
+- TPM保留原固定稳态窗口。记录等待/执行、prefill块长、缓存重算、MTP和内存压力，不将高GPU利用率等同效率。
 
 ## 已撤下的旧任务
 
