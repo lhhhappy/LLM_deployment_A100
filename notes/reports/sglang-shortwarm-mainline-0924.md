@@ -198,3 +198,18 @@ fast/overall/chain已越全量CP允许数263/276/29；turn恰为全量允许13�
 
 终态工具准备发现一个兼容性问题：compare_runs把原harness可选的cohort_sha256_canonical当作必填；067该字段null，但cohort_sha256和workload_hash存在。
 原s1_loadgen以cohort_sha256、pacing及各链gap总量计算workload_hash。正式全量对照前要补有证据的身份路径并验证拒绝错配；不修改原始run元数据，也不把这当引擎或评分失败。
+
+## 068第105分钟检查与终态工具准备
+
+快照实际约106分钟、4938条唯一且无错误，前75分钟3114条原样保留；原预算/prompt/gap与067同ID一致、服务端时间戳单调，窗口复算一致。
+四桶fast/overall/turn/chain p95为10.2303/11.1220/20.8841/100.3816秒，超标461/410/13/50。TPOT均值/p95 .037254/.074024，4条>.10。
+fast/overall/chain已超过全量允许；turn最终允许13，目前不能预判这桶必败。所有窗口仍open。
+同ID的067子集超标492/401/14/55，TPOT .036370/.069165；fast修复282新增251、overall修复251新增260、turn修复7新增6、chain修复19新增14。
+293/311链已完整结束，余18；第99.017分钟起余链少于30。90分钟后完成样本四桶p95 1.06/1.17/1.07/7.92秒，含排空影响，不能作为满N30的净收益。
+无停滞或需中止的故障证据，继续跑完。原快照、audit和4938条对照CSV见[check105](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/check105/)。
+
+compare_runs已修复canonical可选字段兼容：每档仍需VALID、完整且唯一的cohort；主hash和workload_hash必填，主hash按原freeze_cohort序列化从显式cohort名单重算。
+canonical仅在run和cohort都缺失/None时允许省略；非空字符串必须一致。新增逐请求replay_gap_ms/effective_replay_gap_ms核对，防止每链gap总和相同而请求节拍变化。
+新增--no-pairs用于当前长链完整对照，避免默认使用旧T56和64-token对齐的LCP账本。名单/节拍身份检查不代表正文hash验证，也不替代独立档位评分。
+18项CPU回归和另一参与者独立复核通过，包括真实067的5601条自比较全桶fixed/new=0、缺hash/假canonical/名单重排/同链gap交换拒绝。
+这是本地分析工具修复；原run元数据、评分器、当前Pod均不修改。自比较输出已保存check105/comparison-tool-selfcheck.txt。

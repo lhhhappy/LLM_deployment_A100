@@ -86,6 +86,55 @@ class CompareRuns(unittest.TestCase):
         rc, out = run(SRC, c)
         self.assertIn("workload identity differs", out)
 
+    def test_optional_canonical_does_not_allow_missing_primary_identity(self):
+        c = self.copy("c")
+        r = json.loads((c / self.run_name).read_text())
+        r["config"].pop("cohort_sha256")
+        (c / self.run_name).write_text(json.dumps(r))
+        rc, out = run(SRC, c)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("lacks the workload identity", out)
+
+    def test_canonical_must_match_supplied_cohort_including_absence(self):
+        c = self.copy("c")
+        for canonical in (None, "different"):
+            with self.subTest(canonical=canonical):
+                r = json.loads((c / self.run_name).read_text())
+                r["config"]["cohort_sha256_canonical"] = canonical
+                (c / self.run_name).write_text(json.dumps(r))
+                rc, out = run(SRC, c)
+                self.assertNotEqual(rc, 0)
+                self.assertIn("cohort identity differs from supplied cohort", out)
+
+    def test_same_ids_do_not_override_supplied_cohort_identity(self):
+        cohort = json.loads((ROOT / "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json").read_text())
+        cohort["cohort_sha256"] = "different"
+        path = self.tmp / "cohort.json"
+        path.write_text(json.dumps(cohort))
+        rc, out = run(SRC, SRC, "--cohort", str(path))
+        self.assertNotEqual(rc, 0)
+        self.assertIn("cohort identity differs from supplied cohort", out)
+
+    def test_no_pairs_leaves_lcp_unknown(self):
+        rc, out = run(SRC, SRC, "--no-pairs")
+        self.assertEqual(rc, 0, out)
+        self.assertIn("metadata-checked 0, rejected 0, no pair (unknown) 722 of 722", out)
+
+    def test_real_longchain_without_canonical_self_compare(self):
+        src = ROOT / "evidence/L067-official_b_full_n30_shortwarm/N30"
+        if not (src / "level_verdict.json").exists():
+            self.skipTest("requires the complete 067 evidence")
+        cfg = json.loads(next(src.glob("run_*.json")).read_text())["config"]
+        self.assertIsNone(cfg.get("cohort_sha256_canonical"))
+        rc, out = run(src, src, "--cohort", str(ROOT / "data/s1-dev-longchain/cohort.json"), "--no-pairs")
+        self.assertEqual(rc, 0, out)
+        self.assertIn("5601 requests each, same ids", out)
+        self.assertIn("metadata-checked 0, rejected 0, no pair (unknown) 5601 of 5601", out)
+        for gate in ("fast_intra", "overall_intra", "turn_start", "chain_start"):
+            line = next(l for l in out.splitlines() if l.strip().startswith(gate + " ("))
+            self.assertIn("fixed 0 {}", line)
+            self.assertIn("new 0 {}", line)
+
     def test_request_metadata_must_match(self):
         c = self.copy("c")
         rows = self.rows(c)
@@ -93,6 +142,43 @@ class CompareRuns(unittest.TestCase):
         self.write(c, rows)
         rc, out = run(SRC, c)
         self.assertIn("differ in replay metadata", out)
+
+    def test_same_total_gap_cannot_hide_per_request_gap_change(self):
+        c = self.copy("c")
+        rows = self.rows(c)
+        i, j = next((i, j) for i, r in enumerate(rows) for j, s in enumerate(rows[:i])
+                    if r["chain_id"] == s["chain_id"] and r["effective_replay_gap_ms"] != s["effective_replay_gap_ms"])
+        for key in ("replay_gap_ms", "effective_replay_gap_ms"):
+            rows[i][key], rows[j][key] = rows[j][key], rows[i][key]
+        self.write(c, rows)
+        rc, out = run(SRC, c)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("differ in replay metadata", out)
+
+    def test_reordered_cohort_cannot_keep_old_declared_hash(self):
+        cohort = json.loads((ROOT / "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json").read_text())
+        cohort["chains"].reverse()
+        path = self.tmp / "cohort.json"
+        path.write_text(json.dumps(cohort))
+        rc, out = run(SRC, SRC, "--cohort", str(path))
+        self.assertNotEqual(rc, 0)
+        self.assertIn("cohort identity differs from supplied cohort contents", out)
+
+    def test_empty_or_wrong_type_canonical_is_not_absence(self):
+        b, c = self.copy("b"), self.copy("c")
+        cohort = json.loads((ROOT / "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json").read_text())
+        path = self.tmp / "cohort.json"
+        for value in ("", 0, False, []):
+            with self.subTest(value=value):
+                cohort["cohort_sha256_canonical"] = value
+                path.write_text(json.dumps(cohort))
+                for d in (b, c):
+                    r = json.loads((d / self.run_name).read_text())
+                    r["config"]["cohort_sha256_canonical"] = value
+                    (d / self.run_name).write_text(json.dumps(r))
+                rc, out = run(b, c, "--cohort", str(path))
+                self.assertNotEqual(rc, 0)
+                self.assertIn("malformed canonical cohort identity", out)
 
     def test_gate_is_judged_at_raw_precision(self):
         c = self.copy("c")

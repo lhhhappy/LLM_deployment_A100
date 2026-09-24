@@ -2,7 +2,7 @@
 """Same-request comparison of two complete dev levels (CPU only). Base first, candidate second.
 
   compare_runs.py BASE_DIR CAND_DIR [--pairs evidence/T56/pairs_rendered.json] [--harness-dir s1-dev/harness]
-                  [--csv OUT.csv]
+                  [--csv OUT.csv] [--no-pairs]
 
 Each DIR is an evidence level directory (raw_*.jsonl, server.log, level_verdict.json). Fails closed: each level's
 verdict must be VALID and its raw must hold exactly the frozen cohort's request ids (each once, no errors, server
@@ -16,7 +16,12 @@ admission) and requests whose own execution changed (chunking). Engine-side: pre
 partial-only batches, prefill tokens and "[ax-pace]" lines, all restricted to the measurement window
 [first recv, last first token] of the raw (warmup/preflight excluded). Log seconds are whole: lines in the two
 boundary seconds are dropped and counted separately. Both runs must carry the same frozen workload identity
-(run config cohort_sha256_canonical / workload_hash) and identical per-request metadata; N may differ. Descriptive, not causal: wait is
+(run config cohort_sha256 / optional cohort_sha256_canonical / workload_hash) and identical per-request metadata;
+cohort hashes must also match the supplied --cohort. The organizer harness permits canonical to be absent;
+both the run and supplied cohort must agree on its absence. Use --no-pairs for workloads without a matching
+LCP ledger rather than importing the default legacy T56 pairs. These hashes identify the roster and replay
+metadata, not rendered prompt contents; independent complete-level verdicts are still required.
+N may differ. Descriptive, not causal: wait is
 not a pure queue timer and log lines have 1 s resolution.
 """
 import argparse
@@ -24,6 +29,7 @@ import collections
 import csv
 import datetime as dt
 import glob
+import hashlib
 import json
 import re
 import sys
@@ -39,7 +45,20 @@ def epoch(s):
     return dt.datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc).timestamp()
 
 
-def load(d, cohort_ids):
+def workload_identity(cfg, cohort):
+    primary, workload = cfg.get("cohort_sha256"), cfg.get("workload_hash")
+    if not all(isinstance(v, str) and v for v in (cfg.get("set"), primary, workload)):
+        sys.exit("INVALID: run config lacks the workload identity")
+    canonical = cfg.get("cohort_sha256_canonical")
+    if any(v is not None and (not isinstance(v, str) or not v)
+           for v in (canonical, cohort.get("cohort_sha256_canonical"))):
+        sys.exit("INVALID: malformed canonical cohort identity")
+    if primary != cohort.get("cohort_sha256") or canonical != cohort.get("cohort_sha256_canonical"):
+        sys.exit("INVALID: cohort identity differs from supplied cohort")
+    return cfg.get("set"), primary, canonical, workload
+
+
+def load(d, cohort_ids, cohort):
     raws = glob.glob(str(d / "raw_*.jsonl"))
     if len(raws) != 1:
         sys.exit(f"INVALID: {d} needs exactly one raw_*.jsonl, found {len(raws)}")
@@ -63,9 +82,7 @@ def load(d, cohort_ids):
     if len(runs) != 1:
         sys.exit(f"INVALID: {d} needs exactly one run_*.json, found {len(runs)}")
     cfg = json.loads(Path(runs[0]).read_text())["config"]
-    ident = (cfg.get("cohort_sha256_canonical"), cfg.get("workload_hash"))
-    if None in ident:
-        sys.exit(f"INVALID: {d} run config lacks the workload identity")
+    ident = workload_identity(cfg, cohort)
     t_lo, t_hi = min(r["t_recv_s"] for r in by.values()), max(r["t_first_token_s"] for r in by.values())
     # a log line stamped ts covers [ts, ts+1): interior only if that whole second lies inside [t_lo, t_hi]
     batches, pace, outside, edge = [], [], 0, 0
@@ -112,7 +129,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("base", type=Path)
     ap.add_argument("cand", type=Path)
-    ap.add_argument("--pairs", type=Path, default=root / "evidence/T56/pairs_rendered.json")
+    pair_args = ap.add_mutually_exclusive_group()
+    pair_args.add_argument("--pairs", type=Path, default=root / "evidence/T56/pairs_rendered.json")
+    pair_args.add_argument("--no-pairs", action="store_true", help="leave LCP unknown; do not read the legacy ledger")
     ap.add_argument("--harness-dir", type=Path, default=root / "s1-dev/harness")
     ap.add_argument("--cohort", type=Path, default=root / "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json")
     ap.add_argument("--csv", type=Path)
@@ -121,18 +140,24 @@ def main():
     from s1_common import in_ttft_gate  # noqa: E402
 
     cohort = json.loads(a.cohort.read_text())
-    cohort_ids = {rid for ch in cohort["chains"] for rid in ch["req_ids"]}
-    if len(cohort_ids) != cohort["n_requests"]:
+    cohort_list = [rid for ch in cohort["chains"] for rid in ch["req_ids"]]
+    cohort_ids = set(cohort_list)
+    if len(cohort_ids) != len(cohort_list) or len(cohort_ids) != cohort["n_requests"]:
         sys.exit("INVALID: cohort file is inconsistent")
-    B, vb, bb, _, ob_out, ib = load(a.base, cohort_ids)
-    C, vc, bc, pace, oc_out, ic = load(a.cand, cohort_ids)
+    # Match the organizer's freeze_cohort serialization, including chain order.
+    cohort_hash = hashlib.sha256(json.dumps(cohort["chains"], ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:16]
+    if cohort_hash != cohort.get("cohort_sha256"):
+        sys.exit("INVALID: cohort identity differs from supplied cohort contents")
+    B, vb, bb, _, ob_out, ib = load(a.base, cohort_ids, cohort)
+    C, vc, bc, pace, oc_out, ic = load(a.cand, cohort_ids, cohort)
     if ib != ic:
         sys.exit(f"INVALID: workload identity differs: {ib} vs {ic}")
-    meta = ("prompt_tokens", "uncached_expected", "max_output_i", "phase", "chain_id", "idx_in_chain", "edge_type")
+    meta = ("prompt_tokens", "uncached_expected", "max_output_i", "phase", "chain_id", "idx_in_chain", "edge_type",
+            "replay_gap_ms", "effective_replay_gap_ms")
     diff = [rid for rid in B if any(B[rid].get(k) != C[rid].get(k) for k in meta)]
     if diff:
         sys.exit(f"INVALID: {len(diff)} requests differ in replay metadata, e.g. {diff[0]}")
-    pairs = {p["req_id"]: p for p in json.loads(a.pairs.read_text())}
+    pairs = {} if a.no_pairs else {p["req_id"]: p for p in json.loads(a.pairs.read_text())}
     bad_pairs = 0
 
     print(f"== {a.base.name if a.base.name.startswith('N') else a.base} vs {a.cand}: {len(B)} requests each, same ids")
