@@ -163,6 +163,59 @@ def _should_return_dsa_dcp_lse(*, forward_mode: ForwardMode, dcp_enabled: bool) 
     return dcp_enabled and (forward_mode.is_decode() or forward_mode.is_target_verify())
 
 
+# [ax] 116: DCP address protocol for the DSA latent pool. req_to_token / page_table_1 / topk hold
+# VIRTUAL locs in [0, (size + page) * W); the latent write (set_mla_kv_buffer) keeps only
+# loc % W == rank at local row loc // W. The stock DSA backend read the local pool with virtual locs
+# (wrong rows, and out of bounds once a virtual loc >= local rows -> illegal memory access).
+def _ax116_dcp_local_indices(page_table_1: torch.Tensor) -> torch.Tensor:
+    """[ax] 116 decode: keep this rank's locs as local rows, mask the rest (-1). Graph-safe."""
+    parallel = get_parallel()
+    w, r = parallel.attn_dcp_size, parallel.attn_dcp_rank
+    own = (page_table_1 >= 0) & (page_table_1 % w == r)
+    return torch.where(own, page_table_1 // w, -1).to(torch.int32)
+
+
+def _ax116_dcp_extend_rows(backend, forward_batch, page_table_1: torch.Tensor):
+    """[ax] 116 extend: read the DCP-gathered dcp_kv_buffer (every rank holds the full prefix +
+    new KV there, filled by all_gather_kv_cache_for_mla_extend) instead of the sharded pool.
+    Maps virtual locs -> buffer rows through a per-rank int32 table, rebuilt once per batch."""
+    md = forward_batch.attn_dcp_metadata
+    table = getattr(forward_batch, "_ax116_row_table", None)
+    if table is None:
+        w = get_parallel().attn_dcp_size
+        cap = (backend.token_to_kv_pool.size + backend.token_to_kv_pool.page_size) * w
+        table = getattr(backend, "_ax116_loc2row", None)
+        if table is None or table.shape[0] != cap + 1:
+            table = torch.full((cap + 1,), -1, dtype=torch.int32, device=page_table_1.device)
+            backend._ax116_loc2row = table
+        dev = table.device
+        pre = forward_batch.extend_prefix_lens.to(device=dev, dtype=torch.int64)
+        ext = forward_batch.extend_seq_lens.to(device=dev, dtype=torch.int64)
+        seq = forward_batch.seq_lens.to(device=dev, dtype=torch.int64)
+        max_len = int(forward_batch.seq_lens_cpu.max().item())
+        pos = torch.arange(max_len, device=dev, dtype=torch.int64).view(1, -1)
+        # dcp_kv_buffer layout (dcp/planner.py): [req prefixes in position order][req extends].
+        cu_pre = (torch.cumsum(pre, 0) - pre).view(-1, 1)
+        cu_ext = (torch.cumsum(ext, 0) - ext).view(-1, 1)
+        rows = torch.where(
+            pos < pre.view(-1, 1),
+            cu_pre + pos,
+            int(md.dcp_extend_prefix_lens_sum) + cu_ext + pos - pre.view(-1, 1),
+        )
+        locs = backend.req_to_token_pool.req_to_token[
+            forward_batch.req_pool_indices, :max_len
+        ].to(torch.int64)
+        valid = (pos < seq.view(-1, 1)) & (locs >= 0) & (locs < cap)
+        idx = torch.where(valid, locs, cap)  # invalid -> trash slot
+        table.index_put_((idx.reshape(-1),), rows.reshape(-1).to(torch.int32))
+        table[cap] = -1
+        forward_batch._ax116_row_table = table
+    cap = table.shape[0] - 1
+    safe = page_table_1.clamp(min=0, max=cap).to(torch.int64)
+    rows = torch.where(page_table_1 >= 0, table[safe], -1).to(torch.int32)
+    return md.dcp_kv_buffer, rows
+
+
 def materialize_full_kv_cp(
     attn_mla,
     forward_batch: ForwardBatch,
@@ -3064,6 +3117,21 @@ class DeepseekSparseAttnBackend(
                 page_table_1
             ).to(torch.int32)
 
+        if (  # [ax] 116: under DCP read the gathered full KV, never the sharded pool by virtual loc
+            dsa_impl == "tilelang"
+            and get_parallel().dcp_enabled
+            and not forward_batch.forward_mode.is_target_verify()
+            and not forward_batch.forward_mode.is_draft_extend_v2()
+        ):
+            md = forward_batch.attn_dcp_metadata
+            if md is None or md.dcp_kv_buffer is None:
+                # e.g. a graph-captured prefill that skipped prepare_context_parallel_metadata_for_dcp:
+                # the sharded pool cannot be read by virtual loc, so fail loudly instead of reading wrong rows.
+                raise RuntimeError("[ax] 116: DCP extend without attn_dcp_metadata (dcp_kv_buffer)")
+            kv_cache, page_table_1 = _ax116_dcp_extend_rows(
+                self, forward_batch, page_table_1
+            )
+
         if dsa_impl == "tilelang":
             if q_rope is not None:
                 # Triton prefill kernel reads q_nope/q_rope directly, skipping
@@ -3093,16 +3161,27 @@ class DeepseekSparseAttnBackend(
                         d_v=layer.v_head_dim,
                     )
                 q_all = concat_mla_absorb_q_general(q_nope, q_rope)
+            if _should_return_dsa_dcp_lse(
+                forward_mode=forward_batch.forward_mode,
+                dcp_enabled=get_parallel().dcp_enabled,
+            ):
+                # [ax] 116: target-verify under DCP is a partial (LSE) pass like decode.
+                out, lse = self._forward_tilelang(
+                    q_all=q_all,
+                    kv_cache=kv_cache,
+                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    sm_scale=layer.scaling,
+                    v_head_dim=layer.v_head_dim,
+                    return_lse=True,
+                )
+                return torch.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0), lse
             return self._forward_tilelang(
                 q_all=q_all,
                 kv_cache=kv_cache,
                 page_table_1=page_table_1,
                 sm_scale=layer.scaling,
                 v_head_dim=layer.v_head_dim,
-                return_lse=_should_return_dsa_dcp_lse(
-                    forward_mode=forward_batch.forward_mode,
-                    dcp_enabled=get_parallel().dcp_enabled,
-                ),
+                return_lse=False,
             )
         elif dsa_impl in ("flashmla_sparse", "flashmla_sparse_q8"):
             if topk_transform_method == TopkTransformMethod.RAGGED:
@@ -3395,16 +3474,30 @@ class DeepseekSparseAttnBackend(
             # CUDA / MUSA paths byte-identical to pre-patch by always re-cat.
             if q_all is None or not _is_hip:
                 q_all = concat_mla_absorb_q_general(q_nope, q_rope)
+            ax116_lse = _should_return_dsa_dcp_lse(
+                forward_mode=forward_batch.forward_mode,
+                dcp_enabled=get_parallel().dcp_enabled,
+            )
+            if ax116_lse:
+                # [ax] 116: partial attention over this rank's shard (local rows); the LSE
+                # combine in forward_mla merges ranks. A row with no local key gives 0/0 -> NaN,
+                # which would survive the 0-weight combine, so zero it (its LSE is -inf/NaN).
+                out, lse = self._forward_tilelang(
+                    q_all=q_all,
+                    kv_cache=kv_cache,
+                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    sm_scale=layer.scaling,
+                    v_head_dim=layer.v_head_dim,
+                    return_lse=True,
+                )
+                return torch.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0), lse
             return self._forward_tilelang(
                 q_all=q_all,
                 kv_cache=kv_cache,
                 page_table_1=page_table_1,
                 sm_scale=layer.scaling,
                 v_head_dim=layer.v_head_dim,
-                return_lse=_should_return_dsa_dcp_lse(
-                    forward_mode=forward_batch.forward_mode,
-                    dcp_enabled=get_parallel().dcp_enabled,
-                ),
+                return_lse=ax116_lse,
             )
         elif dsa_impl == "fa3":
             return self._forward_fa3(

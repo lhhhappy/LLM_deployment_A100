@@ -1526,6 +1526,13 @@ class KVCacheConfigurator:
             pool_kwargs["layer_shard_size"] = dsa_cp_layer_shard_size
         else:
             PoolCls = DSATokenToKVPool
+        if get_parallel().dcp_enabled and not self.is_draft_worker:
+            # [ax] 116: the indexer K cache stays REPLICATED under DCP (every rank computes index K
+            # for all tokens and the top-k needs all of them), addressed by VIRTUAL loc; size it to
+            # the virtual loc space [0, (size + page) * W) instead of the per-rank latent size.
+            pool_kwargs["index_buf_size"] = (
+                max_total_num_tokens + get_schedule().page_size
+            ) * get_parallel().attn_dcp_size
         if _should_elide_dsa_index_k(is_draft_worker=self.is_draft_worker):
             pool_kwargs["skip_topk_layers"] = [
                 dsa_layer_skips_topk(self.model_config.hf_config, layer_id)

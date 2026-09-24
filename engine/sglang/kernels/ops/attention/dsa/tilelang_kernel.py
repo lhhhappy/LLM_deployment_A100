@@ -272,6 +272,7 @@ def sparse_attention_fwd_kernel_v1(
     num_stages=2,
     threads=256,
     return_lse=False,
+    max_heads_per_block=64,  # [ax] 115: 32 on sm80 when a rank holds all 64 heads (DCP) -> fits 164KB smem
 ):
     assert (
         dim == tilelang.math.next_power_of_2(dim) or dim % 64 == 0
@@ -312,13 +313,14 @@ def sparse_attention_fwd_kernel_v1(
     D = dim
     D_tail = tail_dim
 
-    if head_kv > 64:
-        assert head_kv % 64 == 0, "head_kv should be a multiple of 64"
-        REPLICATE_H = head_kv // 64
+    HB = max_heads_per_block
+    if head_kv > HB:
+        assert head_kv % HB == 0, f"head_kv should be a multiple of {HB}"
+        REPLICATE_H = head_kv // HB
     else:
         REPLICATE_H = 1
 
-    H_per_block = padded_H if REPLICATE_H == 1 else 64
+    H_per_block = padded_H if REPLICATE_H == 1 else HB
 
     @T.prim_func
     def main(
@@ -339,7 +341,7 @@ def sparse_attention_fwd_kernel_v1(
             KV_shared = T.alloc_shared([BI, D], dtype)
             if has_tail:
                 K_tail_shared = T.alloc_shared([BI, D_tail], dtype)
-            O_shared = T.alloc_shared([H_per_block, D], dtype)
+            # [ax] 115: O_shared removed (written, never read) -> frees H_per_block*D*2 bytes of smem
             mask = T.alloc_fragment([BI], "bool")
 
             acc_o = T.alloc_fragment([H_per_block, D], accum_dtype)
@@ -360,7 +362,7 @@ def sparse_attention_fwd_kernel_v1(
             q_i = s_i
             max_kv_i = q_i
 
-            H0 = g_i * padded_H + (0 if REPLICATE_H == 1 else (bx % REPLICATE_H) * 64)
+            H0 = g_i * padded_H + (0 if REPLICATE_H == 1 else (bx % REPLICATE_H) * HB)
             H1 = H0 + H_per_block
 
             T.copy(Q[b_i, s_i, H0:H1, :D], Q_shared)
@@ -429,7 +431,6 @@ def sparse_attention_fwd_kernel_v1(
             if return_lse:
                 T.copy(sumexp, LSE[b_i, s_i, H0:H1])
 
-            T.copy(acc_o, O_shared)
             T.copy(acc_o, Output[b_i, s_i, H0:H1, :])
 
     return main
@@ -1406,9 +1407,27 @@ def tilelang_sparse_fwd(
             if tail_dim == 0
             else sparse_attention_fwd_kernel_v2
         )
-        kernel = kernel_factory(
-            num_heads, d_v, tail_dim, topk, sm_scale=sm_scale, return_lse=return_lse
+        sm80_many_heads = (
+            tail_dim == 0
+            and num_heads >= 64
+            and torch.cuda.get_device_capability(q.device)[0] < 9
         )
+        if sm80_many_heads:  # [ax] 115: A100 smem (164KB): single-stage pipeline (swept: fastest that compiles)
+            kernel = sparse_attention_fwd_kernel_v1(
+                num_heads,
+                d_v,
+                tail_dim,
+                topk,
+                sm_scale=sm_scale,
+                return_lse=return_lse,
+                max_heads_per_block=64,
+                block_I=64,
+                num_stages=1,
+            )
+        else:
+            kernel = kernel_factory(
+                num_heads, d_v, tail_dim, topk, sm_scale=sm_scale, return_lse=return_lse
+            )
         # Caller-allocated LSE (in-place kernel arg): written only by kernels
         # traced with return_lse=True, but the prim_func signature always has it.
         lse = torch.empty(

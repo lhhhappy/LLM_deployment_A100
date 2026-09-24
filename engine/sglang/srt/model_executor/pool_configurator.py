@@ -457,6 +457,9 @@ class DefaultPoolConfigurator(MemoryPoolConfigurator):
                 kvc, _get_dsa_cache_layer_ids(kvc, num_layers)
             )
 
+        if not allocate_all_layers and not kvc.is_draft_worker:
+            # [ax] 116: target indexer K is replicated over the DCP virtual loc space (W x rows).
+            indexer_ratio *= kvc.ps.attn_dcp_size
         return int(
             indexer_size_per_token * num_indexer_layers * element_size * indexer_ratio
         )
