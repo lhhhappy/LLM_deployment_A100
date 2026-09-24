@@ -8,8 +8,8 @@
 | 45735 | 09-22 | B，`lh-img:0922f` | 同上 |
 | 45766 | 09-22 | A，`lh-img:0922e`（修正镜像名格式） | Trisol service failed；未进入题目评分、不计额度 |
 | 45767 | 09-22 | B，`lh-img:0922f`（修正镜像名格式） | 同上 |
-| 45979 | 09-23 15:18 UTC | A，`lh-img:0923a`；MTP+114+v3、cap4096/interval2 | 已提交；需查询官方终态与能力/压测分数 |
-| 45980 | 09-23 15:18 UTC | B，同镜像；MTP+114、chunk8192、无 interval | 已提交；需查询官方终态与能力/压测分数 |
+| 45979 | 09-23 15:18 UTC | A，`lh-img:0923a`；MTP+114+v3、cap4096/interval2 | QUALIFIED，`n_at_slo`=**14**（用户转述 Playground，09-24）；失败档的门与 tpot_mean 待查 |
+| 45980 | 09-23 15:18 UTC | B，同镜像；MTP+114、chunk8192、无 interval | QUALIFIED，`n_at_slo`=**10**（用户转述 Playground，09-24）；失败档的门与 tpot_mean 待查 |
 
 0923a 的补丁清单在 [build/image/0923a.patches.txt](../build/image/0923a.patches.txt)；A/B 的本地提交 JSON 分别在 [official-0923-A.json](../submission/official-0923-A.json) 和 [official-0923-B.json](../submission/official-0923-B.json)。最终以上传的 Playground attempt 为准。A/B 不能直接与开发集 028/034 视为同一运行：需核对镜像中未启用的 150/170 是否改变默认代码路径。[审查依据](../evidence/T55/B1-notes.md)
 
