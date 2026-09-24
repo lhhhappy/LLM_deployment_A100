@@ -1,0 +1,13 @@
+{
+  "source": "source-check.json",
+  "cpu_tests": {
+    "scheduler": 32,
+    "pace": 12,
+    "pace_on_selected_commit": 12,
+    "timed_replay": 4,
+    "queue_publication": 4,
+    "evaluation_tools": 14
+  },
+  "not_gpu_correctness_or_speed_proof": true,
+  "legacy_reuse_test_updated_to_commit_signature": true
+}

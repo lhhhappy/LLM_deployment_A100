@@ -3,6 +3,7 @@ BASE_PKG=/sgl-workspace/sglang/python/sglang
 PORT=${PORT:-30000}
 prepare_src() {   # prepare_src <commit> -> $AX/src/<commit>: pod base + $AX/engine/<commit>.diff (scripts/engine/export.sh)
   local commit=$1; local dst=$AX/src/$commit
+  [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || { echo "ENGINE_COMMIT_INVALID $commit"; return 1; }
   [ -n "$commit" ] && [ -f "$AX/engine/$commit.diff" ] || { echo "ENGINE_DIFF_MISSING $commit"; return 1; }
   if [ "$(cat $dst/COMMIT 2>/dev/null)" != "$commit" ]; then
     rm -rf "$dst"; mkdir -p "$dst" && cp -a "$BASE_PKG" "$dst/sglang" || { echo "ENGINE_COPY_FAIL $commit"; rm -rf "$dst"; return 1; }

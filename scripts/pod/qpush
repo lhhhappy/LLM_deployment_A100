@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-# Run LOCALLY. Sync repo (scripts/pod, verify kit) to the GPU box, export each job's engine commit
-# (G_COMMIT, scripts/engine/export.sh) and push that diff + the kit into the pod, then enqueue the job files
-# under explicit names (sorted order = run order).
-#   scripts/pod/qpush <queue_name>=<scripts/pod/jobs/file.sh> ...     e.g. 026g-cc_a_v3_114.sh=scripts/pod/jobs/cc_a_v3_114.sh
-set -euo pipefail; cd "$(dirname "$0")/../.."
+# Local: deploy selected commits + current runtime and queue the jobs.
+# Requires an idle, paused queue. Leaves it paused; inspect then podq resume.
+# Transfer/publish runs detached on the GPU box so SSH loss does not interrupt it.
+set -euo pipefail
+cd "$(dirname "$0")/../.."
+[ "$#" -gt 0 ] || { echo 'qpush queue-name.sh=scripts/pod/jobs/file.sh ...'; exit 2; }
 bash scripts/pod/verify/make_kit.sh >/dev/null
-files=""; mvs=""; diffs=""
-for a in "$@"; do n=${a%%=*}; f=${a#*=}; [ -f "$f" ] && bash -n "$f" || { echo "bad job $f"; exit 2; }
-  c=$(sed -n 's/^G_COMMIT=\([0-9a-f]\{40\}\)$/\1/p' "$f"); [ -n "$c" ] || { echo "job $f: needs G_COMMIT=<40-hex commit>"; exit 2; }
-  grep -q '^G_EXPECT=' "$f" || { echo "job $f: needs G_EXPECT"; exit 2; }
-  [ "$(scripts/engine/export.sh "$c")" = "$c" ] || exit 2
-  files="$files $f"; mvs="$mvs mv tmpj/$f $n;"; diffs="$diffs engine/$c.diff"; done
-tar cf - build/verify_kit build/engine scripts/pod scripts/engine | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
-GSSH_TIMEOUT=500 scripts/gssh "cd /sjtu/linhang/arena/repo && (cd build && ../scripts/pod/ppush /tmp/ax verify_kit >/dev/null) \
- && (cd build && ../scripts/pod/ppush /tmp/ax $diffs >/dev/null) \
- && scripts/pod/ppush /tmp/ax/queue/pending/tmpj $files >/dev/null && source scripts/pod/common.sh \
- && bexec 'cd /tmp/ax/queue/pending && $mvs rm -rf tmpj; echo PENDING: \$(ls | tr \"\\n\" \" \"); echo RUN: \$(ls ../running)'"
+id="queue-$(date -u +%Y%m%dT%H%M%S)-$$"
+bundle="build/queue/$id"
+python3 -B scripts/pod/queue_bundle.py build "$bundle" "$@"
+cat > "$bundle/deploy.sh" <<DEPLOY
+set -euo pipefail
+cd /sjtu/linhang/arena/repo
+scripts/pod/ppush /tmp/ax/staging/$id $bundle
+source scripts/pod/common.sh
+bexec 'python3 /tmp/ax/staging/$id/$bundle/queue_bundle.py publish /tmp/ax/staging/$id/$bundle'
+DEPLOY
+tar cf - "$bundle" scripts/pod | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
+scripts/gjob run "$id" "cd /sjtu/linhang/arena/repo && bash $bundle/deploy.sh"
+echo "DEPLOYMENT_JOB=$id (check gjob tail; resume only after RUNTIME_DEPLOYED)"

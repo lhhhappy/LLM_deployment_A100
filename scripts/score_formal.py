@@ -16,6 +16,8 @@ lower bound L = Beta_quantile(.05, k, n-k+1), L=0 for k=0. Numerically invert
 P[Binomial(n,L) >= k] = .05 by bisection, using log-space binomial sums.
 Fail the estimated TTFT check only if L > .05; equality at the time limit is
 not an exceedance. The organizer has not specified its interval implementation.
+Wilson/Wald comparisons are diagnostic only; they never replace the CP result
+or waive any other gate. Use level_verdict.py to verify runner/flush evidence.
 Method reference: https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/binom.test.html
 Within-chain dependence and this dev cohort also limit population inference.
 
@@ -57,6 +59,7 @@ from functools import lru_cache
 import importlib.util
 import json
 import math
+from statistics import NormalDist
 import sys
 from pathlib import Path
 
@@ -150,6 +153,46 @@ def allowed_over(n: int) -> int | None:
 
 def finite_number(value) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def alternative_lower(k: int, n: int, method: str) -> float | None:
+    """One-sided 95% Wilson/Wald diagnostics; neither replaces our exact estimate."""
+    if isinstance(n, bool) or isinstance(k, bool) or not isinstance(n, int) or not isinstance(k, int) or not 0 <= k <= n:
+        raise ValueError("invalid binomial counts")
+    if method not in ("wilson", "wald"):
+        raise ValueError("unknown diagnostic interval")
+    if n == 0:
+        return None
+    p, z = k / n, NormalDist().inv_cdf(.95)
+    if method == "wald":
+        return max(0.0, p - z * math.sqrt(p * (1 - p) / n))
+    return max(0.0, (p + z*z/(2*n) - z * math.sqrt(p*(1-p)/n + z*z/(4*n*n))) / (1 + z*z/n))
+
+
+@lru_cache(maxsize=256)
+def alternative_allowed(n: int, method: str) -> int | None:
+    alternative_lower(0, n, method)
+    if n == 0:
+        return None
+    lo, hi = 0, n + 1
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if alternative_lower(mid, n, method) <= .05:
+            lo = mid
+        else:
+            hi = mid
+    return lo
+
+
+def interval_sensitivity(k: int, n: int, evaluable=True) -> dict:
+    methods = {"clopper_pearson": {"rate_ci_lower": binomial_lower(k, n), "allowed_over": allowed_over(n)}}
+    for method in ("wilson", "wald"):
+        methods[method] = {"rate_ci_lower": alternative_lower(k, n, method),
+                           "allowed_over": alternative_allowed(n, method)}
+    for values in methods.values():
+        values["pass_estimated"] = bool(evaluable and n > 0 and values["rate_ci_lower"] <= .05)
+    return {"diagnostic_only": True, "organizer_method_unknown": True, "methods": methods,
+            "method_sensitive": bool(evaluable and n > 0 and len({v["pass_estimated"] for v in methods.values()}) > 1)}
 
 
 def distribution(values: list, scorer) -> dict:
@@ -290,6 +333,7 @@ def score_records(records: list[dict], run: dict, scorer=None, request_file=None
             "rate_ci_lower": lower, "confidence": .95, "exceed_rate_limit": .05,
             "allowed_over": allowed_over(n), "evaluable": evaluable,
             "pass_estimated": passed,
+            "interval_sensitivity": interval_sensitivity(over, n, evaluable),
         }
     eligible = [r for r in ok if finite_number(r.get("output_tokens")) and r["output_tokens"] > 1]
     undefined = [r for r in ok if r.get("output_tokens") == 1]
@@ -313,6 +357,14 @@ def score_records(records: list[dict], run: dict, scorer=None, request_file=None
         "schema_version": 1, "label": "estimated",
         "note": "Dev cohort only; organizer CI implementation unknown; binomial model assumes independent trials.",
         "dev": dev, "tpot": tpot, "ttft_estimated": ttft,
+        "interval_sensitivity": {
+            "diagnostic_only": True, "primary_method": "clopper_pearson", "organizer_method_unknown": True,
+            "sensitive_ttft_gates": [name for name, detail in ttft.items() if detail["interval_sensitivity"]["method_sensitive"]],
+            "all_gates_pass_by_method": {
+                method: all(value for name, value in gates.items() if name not in ttft) and
+                        all(detail["interval_sensitivity"]["methods"][method]["pass_estimated"] for detail in ttft.values())
+                for method in ("clopper_pearson", "wilson", "wald")},
+        },
         "sampling_weights": {**weight_sources,
             "source": str(request_file) if request_file is not None else "raw records",
             "official_formal_authority": "overall budget_attainment.weighted only; diagnostic, not a gate",

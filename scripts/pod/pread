@@ -9,7 +9,7 @@
 #   scripts/pod/pread grep <regex> <file> [max]    matching lines (default max 200)
 #   scripts/pod/pread analyze <run_dir>            show existing level verdicts and server-log tail (read-only)
 set -uo pipefail
-ROOTS="^/tmp/ax/(runs|queue|verify|verify_kit|src/[^/]+/(PATCHES|PATCHES_SIG))(/|$)|^/tmp/ax/(worker\.out|engine_current\.log|engine\.sig)$"
+ROOTS="^/tmp/ax/(runs|queue|verify|verify_kit|src/[^/]+/(COMMIT|PATCHES|PATCHES_SIG))(/|$)|^/tmp/ax/(worker\.out|engine_current\.log|engine\.sig|runtime-deployment\.json)$"
 G="$(cd "$(dirname "$0")/../.." && pwd)/scripts/gssh"
 ok_path() { case "$1" in *..*|*\;*|*\|*|*\&*|*\$*|*\`*|*\'*|*\"*|*\ *) return 1;; esac; [[ "$1" =~ $ROOTS ]]; }
 q() { printf '%q' "$1"; }

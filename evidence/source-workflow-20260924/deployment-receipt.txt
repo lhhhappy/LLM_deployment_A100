@@ -1,0 +1,8 @@
+PUSH_OK 2 chunks
+QUEUED 061r-official_a_122_full_n30_70m.sh engine_commit=c92acd57a61eb6f9eed3222cc048877eef7963d9
+QUEUED 063r-official_a_122_180_full_n30_70m.sh engine_commit=c92acd57a61eb6f9eed3222cc048877eef7963d9
+RUNTIME_DEPLOYED engine_commit_v1; queue remains paused for review
+DONE rc=0
+RESUMED commit workflow; full311/5601 N30 70min+drain; next061r then063r
+061r job.log: DATA_READY full chains=311 requests=5601 N30 admission_seconds=4200 drain=true
+061r job.log: ENGINE_COMMIT c92acd57a61eb6f9eed3222cc048877eef7963d9

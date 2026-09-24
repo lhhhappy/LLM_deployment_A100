@@ -1,92 +1,47 @@
 # 实验队列
 
-本页记录决策，实时状态以 `scripts/pod/pread status` 为准。参与者平等合作，谁入队谁在这里写一行并盯到结果；分工、登记、消息入口见 [collaboration.md](collaboration.md)。
+实时状态以 `scripts/pod/pread status` 为准。谁入队谁跟到结果；协作见 [collaboration.md](collaboration.md)。
 
-## 当前安排（2026-09-24）
+## 当前安排（2026-09-24，用户最新决定）
 
-| Job | 对照 / 问题 | 状态与判据 |
+今天只比较以下两项，使用**新源码流程、全量长链集、N30、70分钟准入后排空**。
+不再跑 lite、额外 A 基准或单独 180。正式提交候选是这两项，晋档只能由平台确认。
+
+| Job | 配置 | 状态 |
 |---|---|---|
-| 044r / 045r | 正式 A@dev N14 / B@dev N10 校准 | 完成；各722条，主会话重新调用评分器复算一致，均有效FAIL；见 experiments.md 与 evidence/coordination-20260924/calibration-recheck.json |
-| 046r | S1@N22 混合 profile | 已自然结束进入done；两段TP0/TP4共4份trace已复算；仅诊断，不作判档/性能对照 |
-| 047-official_a_n22 | 正式 A 原样、原开发集 N22，不开 profiler | 完成且独立复算一致：722条VALID FAIL；TPOT .0620/.0870通过，fast33/23、overall55/27、chain73/22失败；13补丁/参数/env一致，冒烟12/12、KV池1,036,288。完整证据evidence/L047-official_a_n22/N22/ |
-| 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 完成且独立复算一致：722条VALID FAIL；fast33→10/23转通过，overall55→28/27、chain73→62/22仍失败；TPOT .0617/.0840通过。保留122为有希望候选，尚无正式N收益结论；不插队继续扫参数 |
-| 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 已退出：原版两次重复13/16未过一致性门，REFERENCE_UNSTABLE；171候选未加载，暂无TP8结论 |
-| 050-official_a_172_num | 正式A与A+172各两次真实TP8输出/logprob初筛 | 已退出：原版两次重复15/16未过一致性门，REFERENCE_UNSTABLE；172候选及路径trace均未运行 |
+| 061r-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | 已确认running，正在启动新源码引擎；执行层 Codex 跟踪 |
+| 063r-official_a_122_180_full_n30_70m | 同 061r，仅加新版 180 的三个 HiCache 参数 | 已确认pending，排061r后；不要求前一项SLO通过 |
 
-| 051-official_a_baseline_diag | 正式A固定输入、逐次flush后首token/长续写重复 | 已完成16/16；逐次flush的单token cold37仍首token分叉，cold256同token logprob漂移.263；052准备逐层定位，不加载算子候选 |
-| 052-official_a_numtrace | 正式A目标prefill逐层张量指纹 | 请求12/12完成，但trace为空，诊断INVALID：多模态入口先embed后传input_ids=None，被helper跳过；主会话已修 |
-| 052r-official_a_numtrace | 修复输入ID来源后的同配置逐层定位 | 入口CPU回归通过，模型启动；已完成一条cold37，下一次flush撞上最后启动预热，HTTP400退出；8rank记录保留 |
-| 052s-official_a_numtrace | 复用052r引擎继续逐层定位 | 因发现已有8rank记录，保护退出；主会话核明来自052r已完成的一条cold37 |
-| 053-official_a_numtrace_resume | 归档首条记录后复用同引擎完成干净重复 | 已完成；8rank完整45层，cold37/256各3次；首次差异在MoE层3（部分cold37比较层4），此前阶段一致；1.18MB压缩原始记录sha256一致，本地独立复算一致 |
-| 054-official_a_moe_numtrace | 正式A首MoE内部路径：全权重、路由、排序、GEMM与归约 | 已完成；完整权重/输入/路由相同，排序首先变化，cold256随后8rank均GEMM1及本地输出变化；误差量化与排序覆盖检查已完成；按用户要求停止重复一致性排查，不作性能或算子故障结论 |
+两项固定同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，源码含正式 A 全部13项改动。
+171/172/123/DCP关闭；122以 `SGLANG_AX_PACE_TPOT=0.085` 开启。
+新版180为主机层保留120/122；启动日志须与任务的 `G_EXPECT` 一致。
+063r只加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；暂不加NUMA绑定。
 
-| 055-official_a_combo_cost | 正式配置与171+172组合短测速 | 按用户最新顺序要求主动停止，队列记failed为stopjob终止，不是候选错误；不作完整组合结论 |
-| 056-official_a_171_n22 | 现有正式配置只加171，完整原开发集N22 | 完成并独立复算：722条VALID FAIL，fast35/23、overall57/27、turn1/3、chain64/22，TPOT .0628/.0869通过；无引擎错误，非一致性门退出。34层实际融合；KV 1,024,960、状态槽318，少于047的1,036,288/321。单次收益混合，尚无净收益结论 |
-| 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 完成并独立复算：722条VALID FAIL、0请求错误；fast33/23、overall53/27、turn2/3、chain62/22，TPOT .0610/.0850通过。KV 1,036,288、状态槽321与047一致。均值略降但fast/overall TTFT p95上升，未证明稳定净收益 |
-| 058-official_a_longchain_lite_n14 | 正式 A 原样，64条完整链／1123请求的 lite 集，固定 N14 | 完成并独立复算：1123条VALID、0请求错误、flush有效；仅chain 12/8失败，fast8/59、overall13/62、turn0/4通过，TPOT .01585/.04425通过。12条chain坏例全在开场约40秒内，11条首执行前已等30秒；后期并发下降，不能据全程均值认定等价线上。完整三方对照见 evidence/L058-official_a_longchain_lite_n14/three-way-review.md |
-| 059-official_a_180_hicache_lite_n14 | 058原样加旧180（3b63d9c8），同lite N14；后来确认保护总开关随HiCache关闭 | 已完成并独立复算1123条VALID FAIL：fast26/59、overall23/62、turn0/4过，chain11/8失败，TPOT .01476/.02750；非崩溃。旧180隐含关闭120/121，因此不能当作保留A调度保护的HiCache效果。证据 evidence/L059-official_a_180_hicache_lite_n14/N14/ |
-| 060-official_a_180_hicache_lite_n30 | 复用059旧180引擎，同lite N30；旧版同时关闭调度保护 | 已按用户要求通过stopjob中断，734条部分记录仅诊断，不是完整FAIL成绩。保持服务存续；新版测试另列062。证据 evidence/L060-official_a_180_hicache_lite_n30/window/ |
-| 060z-official_a_longchain_lite_n30 | 058原样13补丁、同lite，只将N14改为N30 | 已确认running，060停止后接续；原样A基准，排061之前。Claude提供脚本，本会话核验并入队/跟踪；同样冻结8数据产物和7工具，首次预热后严格flush。为180与122各自提供同负载N30基准；入队后只将待运行编号060b调整为060z，并按worker实际sort确认在060与061之间，脚本/补丁未变；不以本地全部门通过为选候选前提。证据 evidence/L060b-official_a_longchain_lite_n30/ |
-| 061-official_a_122_lite_n30 | 正式A原13补丁+冻结122，048参数/env，改用同一lite N30 | 已确认pending，排060z后，执行层Codex入队并跟踪。14补丁/8数据产物/7工具哈希逐项核验；新引擎首次预热后严格flush，无生成重复门、无前档SLO通过前置。主要对照060z；旧060已中断，不拿部分记录替代完整对照；058为N14，不能冒充A原样N30对照。证据 evidence/L061-official_a_122_lite_n30/ |
+## 测量与比较
 
-| 062-official_a_180_sched_lite_n30 | 正式A原13补丁+新180（8312cbf7），同lite N30；主机层保留120/121保护 | 已确认pending，排061后；14补丁与原7工具/冻结数据逐项核验，旧180仅在060已停后更新。3项缓存层开关+12项显式开启host的pace CPU测试通过；新引擎首次预热和测量前真实flush。与060z比较，尚无性能结果。证据 evidence/L062-official_a_180_sched_lite_n30/ |
+- 数据：`data/s1-dev-longchain/`，311链、5601请求；已同步Pod。保留原链顺序、正文、输出预算和gap。
+- 计时从测量第一条请求发出开始，4200秒关闭准入，已发请求全部排空。启动、preflight、warmup不计入70分钟。
+- 每项独立输出目录，预热后真实 `POST /flush_cache`，必须2xx且 `success=true`；不加重复生成一致性门。
+- 发送台账与完成记录逐条闭合；缺失请求为INVALID。70分钟可能只走到全量集的一部分，明确标为定时诊断，不冒充完整5601请求VALID。
+- 比较完成量、排空时间、TTFT四桶、TPOT均值/p95、错误率、缓存/恢复与等待。报告共同请求的配对差异，注明两轮到达的请求集合可能不同。
+- 原评分统计保留；10–70分钟的客户端准入吞吐另列诊断口径，不冒充原评分器稳态TPM。
+- 每25分钟只读监控，运行中完成记录的窗口标open；不因部分样本超过门限自动停止。
 
-049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。056/057均已完成；057结束后pread确认无running/pending job，服务未停止或释放，常驻watcher继续监控。
+## 已撤下的旧任务
 
-新任务使用修正的 checked runner、flush证据和评分kit；047打印工具及原数据哈希，每个job打印patch哈希。049使用通用numcheck，flush耗尽、并发请求失败、输出截断都会失败；其logprob阈值仅粗筛，原始差异必须复核。
+- 060旧180中断：旧开关会同时关闭调度保护，部分记录仅诊断。
+- 060z原样A中断：用户收窄测试范围，无测量raw。
+- 061旧流程lite中断：用户要求全面迁移，无测量raw。
+- 062单独新版180取消；063旧流程组合lite取消，均无测量成绩。
+- 28个过时job/重复草案已从可执行入口移除。含未提交内容的原文保存在 [清理快照](../evidence/source-workflow-20260924/retired-jobs.json)，原始实验数据保留。
 
-047/048同请求对照工具已独立验收10项CPU回归：完整cohort/负载一致、原始精度判门、排除warmup与边界秒。T56 LCP仅核元数据/物理上界，来源未验证，仍只作诊断。[对照记录](../evidence/L048-official_a_122_n22/N22/compare_vs_047.txt)、[工具复核](reports/review-compare-sol.md)。
+## 已成立的参考与边界
 
-## 新数据与算子线
+- 047/048原dev N22：122使fast超标33→10，overall55→28、chain73→62；仅一次对照，不外推正式N。
+- 058原样A lite N14：1123条VALID，chain12/8失败，TPOT .01585/.04425；冷开场与后段排空影响明显。
+- 059旧180 lite N14：1123条VALID，chain11/8，fast8→26；隐含关闭调度保护，不能当作新版180单变量结果。
+- 171/172仅测过原dev N22，未证明稳定整体净收益；今天不额外叠加。
+- 源码迁移应用检查：从底包按提交差分生成的4692文件与git源码完全一致；CPU测试不替代TP8验证。
 
-- **长链数据**：新版311链/5601请求已生成并完成CPU验收，独立真实GLM检查VALID、原harness自检PASS，均5601/5601、0错误。唯一成品为`data/s1-dev-longchain/`，见[data入口](../data/README.md)与[数据状态](reports/codex-data.md)。新增139次追问/118次重建；链长中位8、最大240，保持长尾。旧副本、失败产物和cache已清除。生成新增算量仍明显低于源摘要，gap分解为估计，仍是诊断集，不替代dev、不预测正式N。尚无GPU成绩，未做N槽闭环驻留模拟；本会话未改8卡实际队列。
-- **171 KDA投影融合**：开发机加载/状态/MTP/graph与成本证据已交付；056首次完整TP8性能回放已独立复核，未证明净收益，暂不加入部署组合。fast执行段p50 .57→.55s，但首执行前等待p95 4.32→9.78s；不能用执行段代替孤立kernel测速。缓存池差异在graph捕获前已出现，加载后空闲显存不同，具体分配来源及对TTFT的影响未隔离。见[056对照](../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)。
-- **172 MoE clamped SwiGLU**：单卡随机权重完整Marlin路径墙钟减少3.1–4.9%；BF16激活与graph检查通过。057完整TP8回放已独立复核，TPOT均值少约1.6%、chain超时73→62，但fast超时不变、fast/overall p95变差，不能认定稳定整体提升；保留候选，暂不合入或自动叠加171。缓存池未缩小；62条chain超时中55条在首执行前已超过30秒。下一步算子投入须对准整段prefill成本与等待积压，不能只优化均值。见[057对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、research/codex/R23。
-- **170 prefill graph**：现有v2 TP2证据仍不能代替TP8；待171独立验证后决定下一项，不与171/122一起改。
-
-## 暂缓的候选
-
-| 方向 | 当前决定 |
-|---|---|
-| 124短命中留位 | Claude已准备和CPU测试，暂不入队；其样本同时有真实缓存缺口，先看047/048后再决定块预算还是复用修复值得下一档 |
-| DCP 33/40补齐故障 | 独立故障支线，尚未修复；不是执行层或高N回放的前置 |
-| 400状态槽 / KV容量改动 | 旧040有命中改善，兑现为SLO收益仍待同基线对照；不与本轮122同时改变 |
-| 替代引擎 / EP / 大块BF16专家副本 | 暂不占用8卡；优先完成现有候选正确性和新数据验收 |
-
-## 实验选择规则
-
-1. 直接研究N22/N26，不以本地N14或开发集PASS为前提。有效FAIL逐门分析；INVALID、数值错误先排查。
-2. 原开发集用于同配置比较和回归，不能预测正式N；新数据是来源可追溯的合成集，仍有gap、重建、工具语义等偏差。
-3. 优先单机制对照；多变量组合只评价组合，局部收益不能相加。用户已取消同配置自动整档重跑；小差异如实保留不确定性。
-4. 所有硬门完整报告；profile扰动窗口不判档；12题只作能力冒烟。
-5. 8卡只做必要确认与完整服务对照；开发机做算子迭代。不得停止/删除/释放Trisol服务；只通过既有队列切换实验引擎。正式发布须满足质量与证据要求。
-
-历史037b–042 job快照见 evidence/jobs-0924/，不是待重推任务。最初缺121的044/045已作废，校准只认044r/045r。旧122固定decode轮数与本轮TPOT进度预算是不同版本，不能套用旧公式解释新实验。
-
-## 用户最新要求：直接分别测171、172
-
-先056测171，再057测172；不再以重复生成token/logprob相同为前置，不再排固定排序诊断，暂不测组合。清缓存必须2xx且JSON success为true；preflight/warmup之后、正式测量之前再清，失败终止该档。代码缓存与CUDA graph保留。以实际TTFT、TPOT、TPM和全部赛题硬门判断效果，生成文本允许变化；局部算子速度不能当成正式并发晋档。
-
-## 用户后续安排：正式 A 的长链 lite N14
-
-全量311链的任务尚未入队，按用户调整先058跑`data/s1-dev-longchain-lite/`。该子集为64条完整链／1123请求，manifest SHA256 `b8f8b668189d9a6ded593ff88462cda37285d8e7a68f7654cea9ab1624f9b999`，cohort顺序ID `f5ef90c6218b260f`；本次已核artifact哈希与完整roster，不重复整套CPU渲染自检。回放root/set/cohort及评分requests都指向lite，使用新输出目录；不追加原开发集、N18或其他候选。正式A等价13补丁为`000 101 106 110 111 114 120 121 130 140 150 160 170`，含MTP；Pod启动前再次逐项核对冻结补丁哈希。原harness的preflight/warmup/flush继续保留，无重复输出一致性门。指标采集增加KV/Mamba池的free/evictable/used以及实际暴露的淘汰计数，并保存标签；缺失指标不视为零。
-
-用户随后明确取消同配置自动整档重跑测噪声，不安排058重复档。复用同一已完成预热的引擎时使用`--skip-warmup`，每档测量前清KV继续保留；引擎变化后的首次预热另按实际需要处理。058只执行一次GPU测量，后续三方复算均为已有记录的CPU分析。全量311链的持续负载校准仍待安排，不能将其视为lite的同负载重复档。
-
-## 用户最新安排：059，058加HiCache
-
-用户在咨询材料整理期间明确要求先提交计算任务。059沿用058的完整基线、MTP、冻结lite数据、预热/真实flush和评分工具，只增加`180-hicache-glm-dsa.patch`及`--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`。`--hicache-size`按每卡计；`--numa-node 0 0 0 0 1 1 1 1`留待后续独立实验。没有恢复生成逐字一致性门，也没有追加自动复测。
-
-180 SHA256为`3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848`。Claude的最终CUDA测试日志52/52通过；独立复核另跑3项真实CUDA搬运/分叉/flush槽复用均通过，负对照失败。52项并非全都执行设备搬运；真实模型与TP8恢复的数值、恢复延迟及decode干扰仍无完整验证，见 evidence/HC180-GPU-contract/README.md。059按用户授权直接调试和回放，不把局部检查或SLO结果当完整数值证明。远端发布回执`QUEUED ... patches=14 tools_unchanged=7 data=058 N14`、`DONE rc=0`已保存。
-
-## 当前提交目标：122、180、122+180 三选二
-
-用户明确今天从正式A+122、A+180、A+122+180中选两套正式提交，目标N@SLO至少22、争取26。本地固定lite N30比较，需要加压再测N34，不要求先过全部线上门。先完成180、A基准和122各自的lite N30，再决定组合是否值得测试和占提交名额；不将本地N30换算为正式晋档。后续代码复核、队列与提交准备由本会话自己完成，不再向Claude或subagent派新任务。
-
-171/172只测过原dev N22，尚未在新长链/lite上测过。因此旧结果既不能证明新负载无效，也不能证明足以晋档；仍保留候选。今日用户明确的三选二池是122/180/组合，不因旧dev结果把两个算子永久归档。
-
-CPU集成已核：A+122和A+122+180均按冻结顺序零fuzz应用、语法通过，真实调度方法的12项CPU测试各通过；不代表组合GPU验证。代码确认122的短命中预留排除KV/SWA/KDA任一仍需主机恢复的请求，搬回时间未进入成本模型。纯64→256对齐的额外复用损失最多192token，不能预先认定对预算可忽略。详见 evidence/candidate-selection-20260924/README.md。
-
-## 062后的准备与工具
-
-窗口监控已修复：运行中的已完成raw不能证明早期窗口完整，故保持open；分块下载核验长度与摘要；pending/断连继续等待。058真实数据完整校准、10项监控/定时回放CPU回归通过。70分钟全量诊断工具已准备：停止新发送后排空、发送台账闭合，不冒充全量VALID；原稳态TPM的t_last边界保持原判定。全量311链/5601请求已同步到Pod并逐项验证8个冻结产物，任务尚未入队，本轮优先完成新版180 lite比较。说明 evidence/full-n30-preparation/README.md。
+完整历史结果见 [experiments.md](experiments.md)，当前机制与未决边界见 [knowledge.md](knowledge.md)。
+部署、清理与检查证据见 [source-workflow-20260924](../evidence/source-workflow-20260924/README.md)。

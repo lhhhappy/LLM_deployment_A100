@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Rebuild the pod workspace on a fresh L2 service (run on the GPU box from the repo root):
-# worker + lib + all numbered patches (podq init), dev set + harness, verification kit. Idempotent.
+# Prepare the original harness and kit. Then qpush deploys the commit runtime and
+# jobs; podq init starts the worker. A fresh workspace starts paused.
 set -euo pipefail
 D=$(cd "$(dirname "$0")" && pwd); source "$D/common.sh"; cd "$D/../.."
 bexec "nvidia-smi --query-gpu=index,name,memory.used --format=csv,noheader | head -8; ls /mnt/models | head -3"
-"$D/podq" init
+bexec "mkdir -p $POD_AX/queue/{pending,running,done,failed,cancelled} $POD_AX/runs && touch $POD_AX/queue/PAUSE"
 S1SRC=s1-dev; [ -d $S1SRC/data ] || S1SRC=../s1-dev
 ( cd "$(dirname $S1SRC)" && PPUSH_PAR=12 "$D/ppush" $POD_AX/s1 "$(basename $S1SRC)/run_dev.py" "$(basename $S1SRC)/harness" "$(basename $S1SRC)/data" )
 bash scripts/pod/verify/make_kit.sh >/dev/null && ( cd build && "$D/ppush" $POD_AX verify_kit )
-bexec "ls $POD_AX/s1/s1-dev $POD_AX/patches; ls $POD_AX/queue"
+bexec "ls $POD_AX/s1/s1-dev; ls $POD_AX/queue"
+echo 'Next: local qpush, inspect deployment, then GPU podq init and podq resume.'

@@ -12,6 +12,7 @@ ensure_engine "$G_COMMIT" --schedule-policy lpm --dsa-prefill-backend tilelang -
 mech=$(grep -h "\[ax\] mechanisms:" "$RUN_DIR/server.log" | tail -1); mech=" ${mech#*mechanisms: }"
 [ "$mech" != " " ] || { echo "MECHANISMS INVALID: engine printed no [ax] mechanisms line"; exit 2; }
 for want in $G_EXPECT; do
+  [[ "$want" =~ ^[A-Za-z0-9_]+=[A-Za-z0-9_.-]+$ ]] || { echo "MECHANISMS INVALID expectation=$want"; exit 2; }
   k=${want%%=*}; v=${want#*=}; got=$(grep -o " $k=[^ ]*" <<<"$mech" | head -1 | cut -d= -f2)
   case "$got" in "$v"|"$v":*) ;; *) echo "MECHANISMS MISMATCH $k expected=$v got=${got:-missing}"; exit 2 ;; esac
 done
@@ -46,13 +47,24 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   local out=$RUN_DIR/N$N; mkdir -p $out; local extra=""; [ $first = 1 ] || extra="--skip-warmup"; first=0
   python3 $AX/verify_kit/metrics_sampler.py $out/metrics.jsonl 10 & local msp=$!
   nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used --format=csv,noheader -l 5 > $out/gpu_util.csv 2>/dev/null & local gsp=$!
-  ( cd $S1 && S1_HARNESS_DIR=$S1/harness python3 -B "$AX/verify_kit/run_dev_checked.py" --runner "$S1/run_dev.py" -- --base-url http://127.0.0.1:$PORT --set "$DATA_SET" \
+  local runner=("$AX/verify_kit/run_dev_checked.py")
+  if [ -n "${G_MEASURE_SECONDS:-}" ]; then
+    runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS")
+    echo "TIMED_DIAGNOSTIC N=$N admission_seconds=$G_MEASURE_SECONDS drain_all_admitted=true"
+  fi
+  ( cd $S1 && S1_HARNESS_DIR=$S1/harness python3 -B "${runner[@]}" --runner "$S1/run_dev.py" -- --base-url http://127.0.0.1:$PORT --set "$DATA_SET" \
       --root "$DATA_ROOT" --cohort "$COHORT" \
       --tok-dir /mnt/models --out $out --n $N $extra ) > $out/run_dev.log 2>&1
   local rdrc=$?
   printf "%s\n" "$rdrc" > "$out/rundev_exit_code"
   kill $msp $gsp 2>/dev/null
   curl -sf http://127.0.0.1:$PORT/v1/models >/dev/null || { echo "LEVEL N=$N status=ENGINE_DEAD"; return 3; }
+  if [ -n "${G_MEASURE_SECONDS:-}" ]; then
+    python3 "$AX/verify_kit/timed_score.py" "$out" --harness-dir "$S1/harness" --data-root "$DATA_ROOT"
+    local trc=$?
+    printf "%s\n" "$trc" > "$out/verdict_exit_code"
+    return "$trc"  # 0 = drained diagnostic; never a complete-cohort PASS.
+  fi
   # Verdict (T54): complete data (every dev request exactly once) scored by scripts/score_formal.py = harness s1_score
   # + task.md statistical allowance + tpot_p95 gate. Exit 0 pass / 1 fail / 2 INVALID measurement.
   python3 $AX/verify_kit/level_verdict.py $out $N --harness-dir $S1/harness --data-root "$DATA_ROOT" --rundev-rc $rdrc
