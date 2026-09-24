@@ -1,0 +1,29 @@
+{
+  "status": "STARTUP_CONFIG_VERIFIED",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "engine_ready_seconds": 180,
+  "observed_unique_capacities": {
+    "device_mamba_slots": [
+      "418"
+    ],
+    "device_kv_tokens": [
+      "1397760"
+    ],
+    "host_kv_tokens": [
+      "2903808"
+    ],
+    "host_mamba_gb": [
+      "23.73"
+    ]
+  },
+  "rank_line_counts": {
+    "device_mamba_slots": 8,
+    "device_kv_tokens": 1,
+    "host_kv_tokens": 8,
+    "host_mamba_gb": 8
+  },
+  "phase_at_review": "warmup",
+  "warmup_receipt_pending": true,
+  "measurement_flush_pending": true,
+  "startup_error_lines": []
+}

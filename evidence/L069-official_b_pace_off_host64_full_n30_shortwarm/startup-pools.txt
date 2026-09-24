@@ -1,0 +1,35 @@
+[2026-09-24 20:03:13 TP1] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP5] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP4] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP6] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP0] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP7] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP3] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:13 TP2] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-24 20:03:30 TP0] max_total_num_tokens=1397760, chunked_prefill_size=8192, max_prefill_tokens=16384, max_running_requests=32, context_len=1048576, available_gpu_mem=7.73 GB
+[2026-09-24 20:03:30 TP6] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP5] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP4] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP7] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP0] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP2] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP3] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP1] HiCache size split: 40.28 GB for KV + declared sidecars (12288 + 1584 B/token); KV host pool gets 35.68 GB.
+[2026-09-24 20:03:30 TP4] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP5] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP6] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP7] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP0] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP2] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP1] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:30 TP3] Allocating kv hierarchical KV host pool: 2903808 tokens, 35.68 GB host memory, packed MTP KV layers: target_layers=11, draft_layers=1, total_layers=12.
+[2026-09-24 20:03:46 TP0] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP4] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP1] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP3] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP2] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP6] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP5] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:46 TP7] Allocating 23.73 GB host memory for hierarchical Mamba cache (layout=page_first).
+[2026-09-24 20:03:59 TP0] [ax] mechanisms: 101=off:role_ids_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 140=off 180=on | spec=EAGLE dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0
+exit_code: 0

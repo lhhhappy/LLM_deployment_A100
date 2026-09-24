@@ -4,7 +4,7 @@
 当前单人优化SGLang，优先完整N30和四类TTFT；vLLM暂缓。允许偶尔独立代码审查。
 用户提供线上榜单参照：N@SLO30、TPOT均值.046204、TPM1,557,557.2、decode TPM19,434；本地未过门样本不可直接排名。
 
-## 当前轮：068已归档；069启动host容量对照（2026-09-24）
+## 当前轮：068已归档；069短预热中（2026-09-24）
 
 - 067/068同引擎759a6eb、mem0.87、新版180、MTP、311链/5601请求N30；068只关122。两轮每条恰好一次，0错误、原预算/gap一致、真flush，独立review通过。
 - 067 VALID FAIL，四TTFT失败；068 VALID FAIL，fast/overall/chain失败，其余8门CP通过。turn13/13对统计方法敏感，Wilson允许12；不能当稳健胜出。
@@ -14,9 +14,9 @@
 - FULL host占用中位99.903%，744样本中97.45%≥98%；只覆盖FULL，不含KDA host。evicted_tokens_total是device淘汰，dropped=0不排除host churn。
 - lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束至执行326.57→301.78秒。真LCP不证明有效混合检查点存在；保存/淘汰/恢复原因未知。
 - 下一069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
-- 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。工具2837b3c已部署并恢复队列，启动中，尚无新测量结果。
-- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；下一唤醒核对启动/预热/flush收据。
-- 启动需核对device KV=1,397,760、KDA=418不变，host FULL约2.904M token、KDA约23.72GB；CPU估计不能代替实际收据。
+- 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。工具2837b3c已部署并恢复队列，启动180秒后进入短预热，尚无新测量结果。
+- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动已核对；下一唤醒核对预热计划/预算与flush收据。
+- 启动实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on符合G_EXPECT。[启动收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json)。
 - 同ID跟踪缓存量、等待/执行、prefill批与全部11门；容量无收益再补定向事件trace。缓存命中改善也不能忽略新坏例/TPOT回退。
 - 068在99.02分钟后剩链<30，最后排空段不代表满N30；不拿尾窗好看抵消全量失败。
 
@@ -43,7 +43,7 @@
 ## 观测与溯源
 
 - GPU仓库：evidence/L<job>/window/保存健康与窗口原始证据；067/068已终态归档。
-- 常规查询：window_watch.sh <job> --status --changes-only。
+- 常规查询在GPU仓库运行：scripts/analysis/window_watch.sh <job> --status --changes-only；本地同名命令不读取GPU缓存，勿把本地空缓存当监控故障。
 - 每分钟后台健康采样；前台只看变化与到点诊断。原始日志按请求/时间段读取，不进入常驻上下文。
 - 每个run使用window_watch采样和本地window_notify桥接；后台轮询缓存，仅诊断/状态/异常变化唤醒当前会话。
   通路测试消息已由当前会话实际收到；无需Goal自动续跑。接收CLI/relay须保持运行，注册过期会拒发并留证重试。
