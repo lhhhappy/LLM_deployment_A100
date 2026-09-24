@@ -3,7 +3,7 @@
 只保留当前判断、下一动作与证据；规则见[评估协议](../evaluation.md)，运行安排见[queue](../queue.md)，完整结果见[experiments](../experiments.md)。
 单人持续优化SGLang，优先完整N30和四类TTFT；vLLM暂缓，偶尔独立review。开发集结果不预测正式N。
 
-## 当前：070启动时被驱逐；现有service revision2部署中（2026-09-24）
+## 当前：070启动时被驱逐；现有service revision2等待平台准入（2026-09-24）
 
 - 067/068/069：引擎759a6ebb8e31723519ad5daf438e26e24b32501a，mem0.87、新版180、MTP，311链/5601请求N30；同rep16预热与真flush。
 - 067开122、host32，四TTFT FAIL；068只关122，fast/overall/chain FAIL，没有整体优势证据。
@@ -28,9 +28,9 @@
 - 比较全部5601同ID、311个固定坏例与新增坏例、四TTFT点估计/余量、TPOT与前段块时间账。CPU真实调度器47项通过，独立复核无阻断。
 - 配置diff已核：[070计划](../../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。工具1ba32ec部署已见RUNTIME_DEPLOYED/DONE rc=0并恢复队列；29运行文件与069相同。070尚未测量即被平台驱逐；running/startup是旧缓存，不能当实时状态。
 - 平台22:13:28 UTC明确Evicted：本地临时存储超过20Gi；实际副本0/期望1。不能归因host64内存或122，也尚不知道哪个目录占满。[事故收据](../../evidence/L070-official_b_host64_full_n30_shortwarm/incident.json)。
-- 恢复update已接受，同service revision2=2103249397960679424，deploying/ReadinessPending；GPU product/8卡/资源限额/镜像/模型相同，仅env新增AX_WORKSPACE_ROOT，GPU显示名平台补NVIDIA前缀。未调用stop/delete/release。
+- 恢复update已接受，同service revision2=2103249397960679424，deploying/WaitingForAdmission，实际副本0；GPU product/8卡/资源限额/镜像/模型相同，仅env新增AX_WORKSPACE_ROOT，GPU显示名平台补NVIDIA前缀。未调用stop/delete/release。
 - 共享内存754Gi计入1509Gi总内存，不能视为额外资源；8项CPU工作目录回归通过，JIT暂留原路径，noexec未核实。新Pod冷编译缓存须作为071与069的比较限制，不能把差异全归122。
-- 下一动作：等watch070从retrying恢复up的通知（新Pod可exec），先运行GPU仓库scripts/pod/bootstrap并强制核WORKSPACE_LAYOUT applied=true、tmpfs/mem；还原冻结数据且核哈希，再qpush新run071/init/resume，挂watch071后结束旧070 watcher。步骤见[恢复交接](../reports/pod-storage-recovery-0924.md)。
+- 下一动作：等watch070从retrying恢复up的通知（新Pod可exec），先运行GPU仓库scripts/pod/bootstrap并强制核WORKSPACE_LAYOUT applied=true、tmpfs/mem；长链数据已补回GPU开发机并核三项SHA，Pod恢复后再还原并核哈希，然后qpush新run071/init/resume，挂watch071后结束旧070 watcher。步骤见[恢复交接](../reports/pod-storage-recovery-0924.md)。
 - 数据manifest SHA256 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c；正式46173/46174不重复提交。
 
 ## 待定位问题与可能方向

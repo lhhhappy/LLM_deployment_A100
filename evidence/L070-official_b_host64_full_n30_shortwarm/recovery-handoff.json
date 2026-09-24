@@ -2,17 +2,19 @@
   "service_id": "2102486579267252224",
   "revision": 2,
   "revision_id": "2103249397960679424",
-  "last_status": "deploying/ReadinessPending",
+  "last_status": "deploying/WaitingForAdmission; actual_replicas=0",
   "new_run": "071-official_b_host64_full_n30_shortwarm",
   "new_run_queued": false,
   "workspace_code_commit": "0cb9c09",
   "gpu_workspace_scripts_sha_verified": true,
   "local_data_transfer_to_gpu": {
-    "status": "running",
+    "status": "complete; three frozen file hashes verified",
     "exec_session_id": 45127,
     "log": "data-stage-transfer.log",
     "destination": "/sjtu/linhang/arena/repo/data/s1-dev-longchain",
-    "must_verify_hashes_before_pod_push": true
+    "must_verify_hashes_before_pod_push": true,
+    "exit_code": 0,
+    "hash_receipt": "data-stage-sha256.txt"
   },
   "wake_bridge_pid": 21269,
   "wake_gpu_watcher": "watch070",

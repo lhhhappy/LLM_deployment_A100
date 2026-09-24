@@ -9,8 +9,8 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录，编译缓存冷启动 | 计划已备，未入队；等待revision2 Pod就绪并完成bootstrap/容量核验 |
-| 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC Pod临时存储超20Gi被驱逐；实际副本0，原service已更新revision2，deploying/ReadinessPending |
+| 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录，编译缓存冷启动 | 计划已备，未入队；平台WaitingForAdmission、实际副本0；GPU开发机数据已补回且核SHA，等待Pod后bootstrap/容量核验 |
+| 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC Pod临时存储超20Gi被驱逐；实际副本0，原service已更新revision2，deploying/WaitingForAdmission |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
 | 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
