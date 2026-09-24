@@ -29,13 +29,14 @@ S1 = S0 + `114-indexer-row-shard.patch`, with the same launch configuration; run
 | 115-dcp-sm80 | decode context parallel on A100: 64-head sparse kernel + DSA address fix | candidate | `--dcp-size N` (off) | no (dev box TP2+DCP2 only) |
 | 120-sched-protect-chain | decode turn after each prefill; continuation capped while others wait; short hits share the batch | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP` (2048), `_SHORT_TOKENS` (4096) | yes |
 | 121-sched-cap-while-decoding | also cap continuations while any request is decoding | candidate | — (patch applied = on) | only inside multi-change runs 027/028 |
-| 122-adaptive-decode-rounds | after each prefill batch, decode rounds proportional to its estimated time while requests decode | candidate | `SGLANG_AX_TPOT_TARGET` (off) | pending (S1+122 at N22) |
+| 122-tpot-paced-prefill | prefill token budget from each decoder's measured TPOT pace (Sarathi-style), full chunks only, short-hit reserve replaces COLD_CAP; replaces interval/120 decode turn when on | candidate | `SGLANG_AX_PACE_TPOT` (off) | no; CPU tests + simulation only |
 | 123-srpt-admission | admit waiting requests by remaining prefill work (with aging) instead of prefix length | candidate | `SGLANG_AX_SRPT_AGING` (off) | pending (S1+122+123 at N22) |
 | 130-async-tokenize | tokenizer off the HTTP event loop; routing key plumbed | candidate | `SGLANG_AX_ASYNC_TOKENIZE` (1) | no single-change run |
 | 140-kda-dual-snapshot | fp32 KDA states at the role boundary and prompt end from one prefill | yes | `SGLANG_AX_KDA_DUAL_SNAPSHOT` (0) | yes |
 | 150-startup-warmup | representative-shape warmup at startup | candidate | `--warmups ax_shapes` (off) | no single-change run |
 | 160-nextn-sm80 | MTP/NEXTN speculative decoding on sm80 | candidate | `--speculative-algorithm NEXTN ...` (off) | only inside multi-change runs 028/034 |
 | 170-glm-bcg-prefill | breakable prefill CUDA graph for GLM | candidate | `--cuda-graph-backend-prefill breakable` (off) | v2 fix proven on TP2 only; TP8 recheck pending |
+| 171-kda-bf16-proj-fusion | fuse already unquantized KDA projections within the FP8 model | candidate | `SGLANG_AX_KDA_FUSE_PROJ` (0) | no; single-GPU operator/loader screening, see [171](171-kda-bf16-proj-fusion.md) |
 
 Every candidate applies alone on top of S0 (checked with `patch_stack.py`, evidence/T57), so each can be tested as a single change.
 

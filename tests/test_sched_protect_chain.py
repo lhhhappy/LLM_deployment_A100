@@ -166,14 +166,13 @@ def load_source(root=CANDIDATE):
     names = {'get_next_batch_to_run', 'get_new_batch_prefill', '_get_new_batch_prefill_raw',
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_limits', '_ax_should_decode',
-             'get_num_allocatable_reqs', '_ax_decode_rounds_owed'}
+             'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
+             '_ax_pace_should_decode', '_ax_pace_limits'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
-    # module-level helpers some patches add (skipped when the tree does not define them)
-    helpers = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in {'_ax_tpot_params'}]
     ns.setdefault('math', math)
     ns.setdefault('os', os)
-    mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), *helpers, cls], type_ignores=[])
+    mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
     runtime = ModuleType('sglang.srt.runtime_context')
@@ -192,7 +191,7 @@ def make_scheduler(root=CANDIDATE, waiting=(), chunk=None, running=(), budget=81
                  'enable_priority_preemption', 'enable_priority_scheduling',
                  'enable_dynamic_chunking', 'is_mixed_chunk', 'enable_overlap'):
         setattr(s, name, False)
-    s.ps = NS(pp_size=1)
+    s.ps = NS(pp_size=1, tp_size=1, tp_rank=0)
     s.dllm_config = None
     s.disaggregation_mode = 'null'
     s.chunked_prefill_size = budget
