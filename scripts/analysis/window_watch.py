@@ -81,6 +81,15 @@ if levels:
                     candidates.append(raw)
             if len(candidates) == 1:
                 h['raw_age_s'] = round(time.time()-candidates[0].stat().st_mtime, 1)
+                stamps = []
+                with candidates[0].open() as handle:
+                    for line in handle:
+                        if not line.endswith('\n'): break
+                        row = json.loads(line)
+                        stamps.append(row['client_dispatch_at_s'])
+                if stamps:
+                    h['first_observed_dispatch_s'] = min(stamps)
+                    h['completed_rows'] = len(stamps)
     gpu = level/'gpu_util.csv'
     if gpu.is_file(): h['gpu_latest'] = tail(gpu, 4096).splitlines()[-8:]
     if (level/'rundev_exit_code').is_file(): h['phase'] = 'scoring_or_finished'
@@ -196,6 +205,13 @@ def health_alerts(meta):
     return alerts
 
 
+def next_check(t0, first_delay, interval, last_deadline=None):
+    """Start at +15m, then +30m; anchor to dispatch time, never to download duration."""
+    first = t0 + first_delay
+    if last_deadline is None: return first
+    return first + (max(0, round((last_deadline-first)/interval)) + 1) * interval
+
+
 def render(meta, rows, out, job, width):
     complete = is_complete(meta, rows)
     drained = is_drained(meta, rows)
@@ -232,10 +248,14 @@ def main(argv=None):
     ap.add_argument('window_min', type=float, nargs='?', default=25)
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--notify', action='store_true')
+    ap.add_argument('--first-report-s', type=float,
+                    help='first report after this many measured seconds, then interval_s')
     args = ap.parse_args(argv)
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job name')
     if any(not math.isfinite(v) or v <= 0 for v in (args.interval_s, args.window_min)):
         ap.error('interval and window must be finite and positive')
+    if args.first_report_s is not None and (not math.isfinite(args.first_report_s) or args.first_report_s <= 0):
+        ap.error('first-report-s must be finite and positive')
     out = ROOT / 'evidence' / ('L'+args.job) / 'window'
     out.mkdir(parents=True, exist_ok=True)
     runtime = ROOT / 'build' / 'scratch' / 'window-watch' / args.job
@@ -250,7 +270,8 @@ def main(argv=None):
         terminal = False
         try:
             if args.notify: notify(state, path)
-            due = args.once or time.time() >= state.get('next_report_at', 0)
+            scheduled = args.first_report_s is not None
+            due = args.once or time.time() >= state.get('next_report_at', float('inf') if scheduled else 0)
             meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, int(due)), 'WINDOW_META '))
             terminal = meta['job_state'] in TERMINAL
             state.update(health='up', job_state=meta['job_state'])
@@ -266,11 +287,26 @@ def main(argv=None):
                 with (out/'alerts.jsonl').open('a') as f:
                     f.write(json.dumps(health, ensure_ascii=False)+'\n')
             state['alerts'] = alerts
+            anchor = meta.get('health', {}).get('first_observed_dispatch_s')
+            if scheduled and anchor is not None:
+                state['measurement_anchor_s'] = anchor
+                state['next_report_at'] = next_check(anchor, args.first_report_s, args.interval_s,
+                                                     state.get('last_scheduled_deadline'))
+                due = args.once or time.time() >= state['next_report_at']
+                if due and not meta['data']:
+                    meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, 1), 'WINDOW_META '))
+                    terminal = meta['job_state'] in TERMINAL
             if meta['data']:
                 rows = download(meta, out)
                 line = render(meta, rows, out, args.job, args.window_min)
                 print(line, flush=True)
-                state.update(last_report=line, next_report_at=time.time()+args.interval_s)
+                state['last_report'] = line
+                if scheduled and anchor is not None:
+                    state['last_scheduled_deadline'] = state['next_report_at']
+                    state['next_report_at'] = next_check(anchor, args.first_report_s, args.interval_s,
+                                                         state['last_scheduled_deadline'])
+                else:
+                    state['next_report_at'] = time.time()+args.interval_s
                 if args.notify: state['notification'] = line
             elif terminal:
                 line = args.job+': '+meta['job_state']+', no measured raw; no score'

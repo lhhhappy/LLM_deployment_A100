@@ -59,6 +59,13 @@ class Windows(unittest.TestCase):
         meta = json.loads(watch.marked(output, 'WINDOW_META '))
         self.assertLess(meta['health']['raw_age_s'], 10)
         self.assertEqual(watch.health_alerts(meta), [])
+        self.assertEqual(meta['health']['first_observed_dispatch_s'], now-10)
+
+    def test_first_fifteen_then_thirty_minutes_is_anchored_to_measurement(self):
+        first = watch.next_check(100, 900, 1800)
+        second = watch.next_check(100, 900, 1800, first)
+        third = watch.next_check(100, 900, 1800, second)
+        self.assertEqual((first, second, third), (1000, 2800, 4600))
 
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
