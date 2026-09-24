@@ -302,11 +302,12 @@ class TokenizerControlMixin:
         )
 
     async def flush_cache(
-        self: TokenizerManager, timeout_s: Optional[float] = None
+        self: TokenizerManager, timeout_s: Optional[float] = None,
+        verify_empty: bool = False,
     ) -> FlushCacheReqOutput:
         self.auto_create_handle_loop()
         results = await self.flush_cache_communicator(
-            FlushCacheReqInput(timeout_s=timeout_s)
+            FlushCacheReqInput(timeout_s=timeout_s, verify_empty=verify_empty)
         )
         # [arena D0] Succeed only if EVERY worker flushed (was: results[0] only,
         # which could mask another DP worker's failure). No responses = failure.

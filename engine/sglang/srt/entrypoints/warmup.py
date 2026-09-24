@@ -159,3 +159,10 @@ async def prefill_shapes(disaggregation_mode: str, tokenizer_manager: TokenizerM
             generate_req_input.bootstrap_host = FAKE_BOOTSTRAP_HOST
 
         await tokenizer_manager.generate_request(generate_req_input, None).__anext__()
+
+
+@warmup("ax_shapes")
+async def ax_shapes(disaggregation_mode: str, tokenizer_manager: TokenizerManager):
+    from sglang.srt.entrypoints.ax_shapes import run
+
+    await run(disaggregation_mode, tokenizer_manager)

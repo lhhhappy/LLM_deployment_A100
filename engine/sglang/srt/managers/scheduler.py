@@ -1206,10 +1206,13 @@ class Scheduler(
         self.last_batch: Optional[ScheduleBatch] = None
         self.forward_ct = 0
         self.return_health_check_ipcs: Deque[Optional[str]] = deque()
+        from sglang.srt.entrypoints.ax_shapes import verify_empty as ax_verify_empty
+
         self.flush_wrapper = SchedulerFlushWrapper(
             flush_cache=self.flush_cache,
             is_fully_idle=self.is_fully_idle,
             ipc_channels=self.ipc_channels,
+            verify_empty=lambda success: ax_verify_empty(self, success),
         )
         self._last_logged_elastic_radix_namespace: Optional[str] = None
         self.session_controller = SessionController(self.tree_cache)

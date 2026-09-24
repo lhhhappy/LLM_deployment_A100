@@ -200,6 +200,8 @@ class RequestMetricsExporterManager:
 
     async def write_record(self, obj, out_dict: dict) -> None:
         """Write a record using all configured exporters."""
+        if not obj.log_metrics:
+            return
         for exporter in self._exporters:
             await exporter.write_record(obj, out_dict)
 
