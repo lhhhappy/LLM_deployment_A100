@@ -3,7 +3,7 @@
 只保留当前判断、下一动作与证据；规则见[评估协议](../evaluation.md)，运行安排见[queue](../queue.md)，完整结果见[experiments](../experiments.md)。
 单人持续优化SGLang，优先完整N30和四类TTFT；vLLM暂缓，偶尔独立review。开发集结果不预测正式N。
 
-## 当前：069已归档，070引擎启动中（2026-09-24）
+## 当前：070启动时被平台驱逐，恢复准备中（2026-09-24）
 
 - 067/068/069：引擎759a6ebb8e31723519ad5daf438e26e24b32501a，mem0.87、新版180、MTP，311链/5601请求N30；同rep16预热与真flush。
 - 067开122、host32，四TTFT FAIL；068只关122，fast/overall/chain FAIL，没有整体优势证据。
@@ -20,13 +20,16 @@
 - FULL host占用中位99.903%，89.11%样本≥98%；不含KDA host。evicted_tokens_total是device淘汰，write_through dropped=0不排除host churn。
 - 067/068/069自然排空（剩链<30）从97.88/99.02/82.14分钟开始；尾段不当满N30稳态产能。
 
-## 下一轮070：host64上单独重开修复122
+## 070事故与恢复：现有service、新run071
 
 - 入口scripts/pod/jobs/official_b_host64_full_n30_shortwarm.sh；源码759a6eb，host64、mem0.87、MTP、数据和rep16全部沿用069。
 - 只变PACE0→.085及G_EXPECT122on；改变整套块预算/节奏，包含替代固定interval与冷块上限，不能单归因τ。
 - 假设：缓存减少工作量后，prefill预算是否能减少剩余chain等待/执行；不承诺收益，不追求仅少两条临界过门。
 - 比较全部5601同ID、311个固定坏例与新增坏例、四TTFT点估计/余量、TPOT与前段块时间账。CPU真实调度器47项通过，独立复核无阻断。
-- 配置diff已核：[070计划](../../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。工具1ba32ec部署已见RUNTIME_DEPLOYED/DONE rc=0并恢复队列；29运行文件与069相同。watch070与桥PID21269均up。等待阶段事件，核实际mechanisms/device与host池、预热/flush。
+- 配置diff已核：[070计划](../../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。工具1ba32ec部署已见RUNTIME_DEPLOYED/DONE rc=0并恢复队列；29运行文件与069相同。070尚未测量即被平台驱逐；running/startup是旧缓存，不能当实时状态。
+- 平台22:13:28 UTC明确Evicted：本地临时存储超过20Gi；实际副本0/期望1。不能归因host64内存或122，也尚不知道哪个目录占满。[事故收据](../../evidence/L070-official_b_host64_full_n30_shortwarm/incident.json)。
+- 恢复计划保留原service ID与8卡规格，只env update生成修订；不调用stop/delete/release。bootstrap显式把/tmp/ax迁到现有/dev/shm，先核tmpfs与cgroup余量，拒绝覆盖已有数据。
+- 共享内存754Gi计入1509Gi总内存，不能视为额外资源；8项CPU工作目录回归通过，JIT暂留原路径，noexec未核实。新Pod冷编译缓存须作为071与069的比较限制，不能把差异全归122。
 - 数据manifest SHA256 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c；正式46173/46174不重复提交。
 
 ## 待定位问题与可能方向

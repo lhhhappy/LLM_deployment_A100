@@ -1,0 +1,13 @@
+test_dry_run_does_not_create_workspace (test_pod_workspace.Workspace) ... ok
+test_empty_probe_directories_preserved (test_pod_workspace.Workspace) ... ok
+test_foreign_link_refuses (test_pod_workspace.Workspace) ... ok
+test_fresh_layout_and_repeat_preserve_evidence (test_pod_workspace.Workspace) ... ok
+test_non_tmpfs_or_low_memory_refuses (test_pod_workspace.Workspace) ... ok
+test_nonempty_workspace_refuses_without_mutation (test_pod_workspace.Workspace) ... ok
+test_target_link_cannot_redirect_back_to_disk (test_pod_workspace.Workspace) ... ok
+test_target_old_queue_cannot_be_attached (test_pod_workspace.Workspace) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.005s
+
+OK

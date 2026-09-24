@@ -1,0 +1,33 @@
+{
+  "service_id": "2102486579267252224",
+  "observed_actual_replicas": 0,
+  "desired_replicas": 1,
+  "action": "update existing service env only; mint new revision, keep service ID",
+  "env_add": {
+    "AX_WORKSPACE_ROOT": "/dev/shm/arena-runtime"
+  },
+  "idempotency_key": "95e0791e-3196-4c87-ac43-219b7f587087",
+  "unchanged": [
+    "image_ref",
+    "model mount /mnt/models",
+    "gpu_count8",
+    "gpu product",
+    "replicas1",
+    "existing resource limits",
+    "HTTP server command"
+  ],
+  "prohibited_operations_used": [],
+  "preparation": [
+    "prepare_workspace.py refuses nonempty or foreign workspace links",
+    "bootstrap applies tmpfs layout before mkdir/ppush",
+    "JIT cache directories remain unchanged pending executable-mount check"
+  ],
+  "required_postchecks": [
+    "new revision and8GPUs unchanged",
+    "actual tmpfs mount and cgroup headroom",
+    "post-startup cgroup/shm/root cache usage",
+    "archive snapshots externally"
+  ],
+  "comparison_scope": "new Pod cold compiler caches; cannot isolate122 vs069 without noting infrastructure change",
+  "next_run": "071: same engine/config as070, fresh run ID after infrastructure interruption"
+}

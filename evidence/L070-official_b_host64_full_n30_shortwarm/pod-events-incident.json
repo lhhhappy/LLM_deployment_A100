@@ -1,0 +1,72 @@
+{
+  "items": [
+    {
+      "ts": "2026-09-24T22:13:28.791960556Z",
+      "line": "Evicted: Pod ephemeral local storage usage exceeds the total limit of containers 20Gi.  | Pod/lh-arena-sess-b-7ffb5c8489-8dj2g on e01-cn-vwg4p4cls0c",
+      "stream": {
+        "cluster": "w1",
+        "detected_level": "unknown",
+        "event_type": "Warning",
+        "kind": "Pod",
+        "log_type": "event",
+        "log_window": "2026092422",
+        "name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "namespace": "team-4565272-837c-arena",
+        "pod": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "service_name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "trisol_variant": "stable"
+      }
+    },
+    {
+      "ts": "2026-09-24T22:13:28.805519868Z",
+      "line": "Killing: Stopping container server | Pod/lh-arena-sess-b-7ffb5c8489-8dj2g on e01-cn-vwg4p4cls0c",
+      "stream": {
+        "cluster": "w1",
+        "detected_level": "unknown",
+        "event_type": "Normal",
+        "kind": "Pod",
+        "log_type": "event",
+        "log_window": "2026092422",
+        "name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "namespace": "team-4565272-837c-arena",
+        "pod": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "service_name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "trisol_variant": "stable"
+      }
+    },
+    {
+      "ts": "2026-09-24T22:13:38.793294296Z",
+      "line": "ExceededGracePeriod: Container runtime did not kill the pod within specified grace period. | Pod/lh-arena-sess-b-7ffb5c8489-8dj2g on e01-cn-vwg4p4cls0c",
+      "stream": {
+        "cluster": "w1",
+        "detected_level": "unknown",
+        "event_type": "Warning",
+        "kind": "Pod",
+        "log_type": "event",
+        "log_window": "2026092422",
+        "name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "namespace": "team-4565272-837c-arena",
+        "pod": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "service_name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "trisol_variant": "stable"
+      }
+    },
+    {
+      "ts": "2026-09-24T22:14:17.10275027Z",
+      "line": "FinishedWorkload: Workload 'team-4565272-837c-arena/pod-lh-arena-sess-b-7ffb5c8489-8dj2g-3066c' is declared finished | Pod/lh-arena-sess-b-7ffb5c8489-8dj2g",
+      "stream": {
+        "cluster": "w1",
+        "detected_level": "unknown",
+        "event_type": "Normal",
+        "kind": "Pod",
+        "log_type": "event",
+        "log_window": "2026092422",
+        "name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "namespace": "team-4565272-837c-arena",
+        "pod": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "service_name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+        "trisol_variant": "stable"
+      }
+    }
+  ]
+}

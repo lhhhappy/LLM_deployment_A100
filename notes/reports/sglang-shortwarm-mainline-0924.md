@@ -1,6 +1,6 @@
 # SGLang 组合验证与短预热（2026-09-24）
 
-当前069已完成5601条，VALID FAIL，10/11门通过，仅chain31/29失败；070已启动，在host64上单独重开122。
+当前069已完成5601条，VALID FAIL，10/11门通过，仅chain31/29失败；070启动时Pod被平台驱逐，无测量，准备恢复。
 最新判断与行动见[迭代索引](../iterations/codex.md)，完整067/068/069对照见[实验记录](../experiments.md)。
 下文保留最初组合定义、统一短预热协议和各检查点原始判断，用于追溯。
 原始正式组合对应已上传attempt46174/镜像0924d/引擎759a6ebb8e31723519ad5daf438e26e24b32501a。
@@ -317,3 +317,14 @@ chain仍31，超过全量CP允许29的下界结论不变。31条现存坏例均�
 070保持host64只重新开启修复122 .085；47项CPU回归与独立设计复核通过。逐ID追踪已有坏例和新增回退，不将两条临界跨门称为稳定收益。
 
 070部署queue-20260924T220817-20847完成，已核RUNTIME_DEPLOYED及DONE rc=0，队列恢复；工具1ba32ec的29文件与069逐字节相同。job已打印ENGINE_COMMIT759与DATA_READY，watch070/通知桥PID21269健康。引擎启动与预热结束事件继续核有效配置、池与flush；测量首发后15分钟首次诊断，之后每30分钟。
+
+
+## 070启动事故：平台临时盘驱逐
+
+2026-09-24 22:13:28.791 UTC Pod事件明确临时存储超过20Gi，随后Stopping container/ExceededGracePeriod/FinishedWorkload。
+服务实际副本0、期望1，旧Pod ContainerStatusUnknown/137；137不能另作OOM证据。监控cached running/startup为最后可读状态，非实时引擎状态。
+070无测量，不作SLO FAIL或122收益比较。067—069完整证据已外部归档，旧Pod尚未导出的文件不假设可恢复。
+事故来源见[incident](../../evidence/L070-official_b_host64_full_n30_shortwarm/incident.json)，当前只知道总临时盘超限，未知具体目录贡献。
+恢复设计保留原service ID及8卡，以env-only修订启用AX_WORKSPACE_ROOT=/dev/shm/arena-runtime；bootstrap先核tmpfs/cgroup余量，拒绝非空原目录覆盖，再维持/tmp/ax兼容路径。
+JIT缓存暂留原可执行盘；/dev/shm noexec与各缓存变量覆盖须实查，不能笼统迁移.so。基础材料约632MB，旧诊断大文件多少未知；共享内存与host64同计cgroup，不宣称彻底消除容量风险。
+恢复后用新run071，原数据/预算/引擎条件沿用070，但新Pod冷编译缓存构成与069比较的限制。工作目录CPU8项通过；独立设计review无阻断。

@@ -1,0 +1,33 @@
+{
+  "run": "070-official_b_host64_full_n30_shortwarm",
+  "classification": "INFRA_INTERRUPTED_BEFORE_MEASUREMENT",
+  "measurement_valid": false,
+  "evaluation_status": null,
+  "verified_cause": {
+    "event_type": "eviction",
+    "reason_code": "ephemeral_exhausted",
+    "reason_human": "服务实例的本地临时存储用量超过限额，Pod 被节点驱逐（Pod ephemeral local storage usage exceeds the total limit of containers 20Gi.）",
+    "event_class": "fault",
+    "recovery": {
+      "condition": "降低服务写入本地盘的数据量（日志、缓存、中间产物改写到共享存储）后重新部署即可恢复"
+    },
+    "fallback": {
+      "action": "重新部署服务，并把大体积写入改到共享存储卷；如确需更高本地临时存储配额请联系平台支持"
+    },
+    "resource_refs": [
+      "service/2102486579267252224",
+      "revision/2102486579267252225",
+      "pod/lh-arena-sess-b-7ffb5c8489-8dj2g"
+    ],
+    "event_id": "eviction-2102486579267252225-b1793426"
+  },
+  "event_timestamp": "2026-09-24T22:13:28.791960556Z",
+  "actual_replicas": 0,
+  "desired_replicas": 1,
+  "last_readable_job_state": "running/startup; historical snapshot only",
+  "directory_cause": "unknown; old Pod cannot be entered",
+  "evidence_safety": "067-069 complete raw/run/receipts already exported locally; old unexported Pod files not assumed recoverable",
+  "recovery_plan": "recovery-plan.json",
+  "workspace_cpu_tests": 8,
+  "review": "independent reviewer supports existing-service env-only revision; no stop/delete/release; JIT noexec and total RAM caveats retained"
+}

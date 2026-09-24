@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "name": "lh-arena-sess-b-7ffb5c8489-8dj2g",
+      "variant": "stable",
+      "provider_kind": "k8s",
+      "node": "",
+      "status": "ContainerStatusUnknown",
+      "status_message": "The container could not be located when the pod was terminated",
+      "gpu": 8,
+      "started_at": "2026-09-23T03:51:09Z",
+      "restarts": 1,
+      "ready": false,
+      "containers": [
+        "server"
+      ],
+      "last_restart_reason": "ContainerStatusUnknown",
+      "last_restart_message": "The container could not be located when the pod was deleted.  The container used to be Running",
+      "last_restart_exit_code": 137
+    }
+  ]
+}

@@ -4,6 +4,10 @@
 # jobs; podq init starts the worker. A fresh workspace starts paused.
 set -euo pipefail
 D=$(cd "$(dirname "$0")" && pwd); source "$D/common.sh"; cd "$D/../.."
+# Before any payload upload: opt-in tmpfs layout for fresh replacement pods.
+# Existing nonempty workspaces are rejected, never silently moved or deleted.
+WORKSPACE_CODE=$(base64 -w0 "$D/prepare_workspace.py")
+bexec "python3 -c \"import base64; exec(base64.b64decode('$WORKSPACE_CODE'))\" --apply"
 bexec "nvidia-smi --query-gpu=index,name,memory.used --format=csv,noheader | head -8; ls /mnt/models | head -3"
 bexec "mkdir -p $POD_AX/queue/{pending,running,done,failed,cancelled} $POD_AX/runs && touch $POD_AX/queue/PAUSE"
 S1SRC=s1-dev; [ -d $S1SRC/data ] || S1SRC=../s1-dev
