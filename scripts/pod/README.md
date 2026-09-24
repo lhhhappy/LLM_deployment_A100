@@ -16,7 +16,7 @@
 
 CPU 回归：`python3 -B -m unittest discover -s tests -p test_eval_tools.py`。
 
-独立合成长链集由[通用生成器](../analysis/longchain.py)构建并冻结。新job可显式设置 `G_DATA_ROOT`、`G_DATA_SET`、`G_COHORT`，模板将同一root用于回放和判定；自定义root必须三项齐全。`LADDER_UP="22"` 或 `"26"` 可分别安排固定N研究，现有爬坡仍在首次FAIL后停。取证时传 `fetch_level.sh <run> <N> --data-root <本地对应数据目录>`，可另传 `--harness-dir`；不能用dev的root或LCP账本分析新集合。此项是本地脚本接入，不表示新数据或工具已同步pod，也没有新增入队。
+独立合成长链集由[通用生成器](../longchain/longchain.py)构建并冻结。新job可显式设置 `G_DATA_ROOT`、`G_DATA_SET`、`G_COHORT`，模板将同一root用于回放和判定；自定义root必须三项齐全。`LADDER_UP="22"` 或 `"26"` 可分别安排固定N研究，现有爬坡仍在首次FAIL后停。取证时传 `fetch_level.sh <run> <N> --data-root <本地对应数据目录>`，可另传 `--harness-dir`；不能用dev的root或LCP账本分析新集合。此项是本地脚本接入，不表示新数据或工具已同步pod，也没有新增入队。
 
 只读审阅用 `scripts/pod/pread status|ls|tail|head|cat|grep|analyze`。`analyze` 只显示已有的单档判定 JSON 和服务日志末尾，不重跑评分。允许的 CPU 分析命令用 `scripts/pod/pexec_codex`，输出只写 `/tmp/ax/codex/`。这些审阅入口不会改变队列或服务。
 
