@@ -3,5 +3,7 @@
   "candidate_plan": "build/scratch/queue070-plan",
   "identical_runtime_files": 29,
   "different_files": [],
-  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a"
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "candidate_bundle": "build/queue/queue-20260924T220817-20847",
+  "actual_bundle_verified": true
 }

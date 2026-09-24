@@ -1,0 +1,13 @@
+{
+  "bundle": "build/queue/queue-20260924T220817-20847",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "runtime_git_commit": "1ba32ec",
+  "runtime_files_match_069": 29,
+  "job_sha256": "d038f3f12189e945e9381e1a54e64c7fd120ad434ab7935233f1bae8efd30df8",
+  "published": true,
+  "deployment_receipt": [
+    "QUEUED 070-official_b_host64_full_n30_shortwarm.sh engine_commit=759a6ebb8e31723519ad5daf438e26e24b32501a",
+    "RUNTIME_DEPLOYED engine_commit_v1; queue remains paused for review",
+    "DONE rc=0"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "job": "070-official_b_host64_full_n30_shortwarm",
+  "pid": 21269,
+  "started_at": 1790287792.183781,
+  "target": "codex",
+  "poll_seconds": 60
+}

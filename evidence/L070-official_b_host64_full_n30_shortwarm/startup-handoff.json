@@ -1,0 +1,13 @@
+{
+  "job": "070-official_b_host64_full_n30_shortwarm",
+  "queue_resumed": true,
+  "engine_commit_seen_in_job_log": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "data_ready": "full chains=311 requests=5601 N30 full_replay=true warmup=rep16-v1",
+  "watcher": "watch070",
+  "bridge_pid": 21269,
+  "bridge_health": "up",
+  "source_health": "up",
+  "checkpoint_schedule": "measurement first dispatch +900 seconds, then every1800seconds",
+  "at": 1790287841.8172393,
+  "next_action": "on startup/preflight/warmup/measurement event verify effective mechanisms, pools, rep16 receipt and trueflush before claiming measurement ready"
+}
