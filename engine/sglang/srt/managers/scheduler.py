@@ -212,6 +212,9 @@ from sglang.srt.managers.schedule_policy import (
     AddReqResult,
     PrefillAdder,
     SchedulePolicy,
+    _ax_sched_protect_config,
+    is_dsa_prefill_cp_in_seq_split,
+    is_prefill_context_parallel_enabled,
 )
 from sglang.srt.managers.scheduler_components.batch_result_processor import (
     SchedulerBatchResultProcessor,
@@ -1252,6 +1255,58 @@ class Scheduler(
                     "Dynamic chunking will be disabled."
                 )
                 self.enable_dynamic_chunking = False
+
+    def _ax_sched_protect_enabled(self) -> bool:
+        # 120 is scoped to ordinary TP serving. Specialized schedulers keep
+        # their collective/cadence/admission contracts (including mixed mode).
+        return (
+            _ax_sched_protect_config() is not None
+            and self.chunked_prefill_size is not None
+            and self.ps.pp_size == 1
+            and not self.require_mlp_sync
+            and not is_dsa_prefill_cp_in_seq_split()
+            and not is_prefill_context_parallel_enabled()
+            and not self.tree_cache.disable
+            and self.disaggregation_mode == DisaggregationMode.NULL
+            and self.dllm_config is None
+            and not self.is_mixed_chunk
+            and not self.is_hybrid_swa
+            and not self.enable_hisparse
+            and not self.enable_hierarchical_cache
+            and not get_memory().enable_flexkv
+            and not self.enable_lora
+            and not self.enable_priority_preemption
+            and self.prefill_delayer is None
+        )
+
+    def _ax_sched_protect_limits(self, chunk_size):
+        if not self._ax_sched_protect_enabled():
+            return None
+        from sglang.srt.runtime_context import mamba_checkpoint_grid
+
+        cap, short = _ax_sched_protect_config()
+        grid = math.lcm(self.page_size, self.truncation_align_size or 1)
+        if self.tree_cache.supports_mamba():
+            grid = math.lcm(grid, mamba_checkpoint_grid(self.tree_cache.page_size))
+        budget = min(chunk_size, self.max_prefill_tokens)
+        if budget < grid:
+            return None
+        # A user cap below one grid unit is rounded UP to permit progress.
+        cap = max(grid, cap // grid * grid)
+        return min(cap, budget // grid * grid), short, grid
+
+    def _ax_should_decode(self, running_batch: ScheduleBatch) -> bool:
+        if not self._ax_sched_protect_enabled() or self.prefill_decode_interval:
+            return False
+        due = getattr(self, "_ax_decode_due", False)
+        self._ax_decode_due = False
+        # Called AFTER last extend is merged, so newly completed short requests
+        # count as running. With no decoders, immediately continue cold prefill.
+        return (
+            due
+            and not running_batch.is_prefill_only
+            and any(not req.finished() for req in running_batch.reqs)
+        )
 
     def _should_defer_prefill(self) -> bool:
         if self._prefill_decode_interval_remaining == 0:
@@ -3453,7 +3508,7 @@ class Scheduler(
 
         if self.dllm_config is not None:
             new_batch = self.get_new_batch_dllm(running_batch)
-        elif self._should_defer_prefill():
+        elif self._should_defer_prefill() or self._ax_should_decode(running_batch):
             new_batch = None
         else:
             prefill_plan = self.get_new_batch_prefill(running_batch)
@@ -3498,6 +3553,8 @@ class Scheduler(
             )
         ret = converted
         self._arm_prefill_decode_interval(ret)
+        if self._ax_sched_protect_enabled() and self.prefill_decode_interval == 0:
+            self._ax_decode_due = ret is not None and ret.forward_mode.is_extend()
 
         # Handle ngram embedding
         ret = self.ngram_embedding_manager.prepare_for_forward(
@@ -3652,6 +3709,7 @@ class Scheduler(
             dllm_config=self.dllm_config,
             waiting_queue_len=len(self.waiting_queue),
             prefill_tile_block_m=prefill_tile_block_m,
+            ax_protect=self._ax_sched_protect_limits(chunked_prefill_size),
         )
 
         if self.chunked_req is not None:
@@ -3768,6 +3826,18 @@ class Scheduler(
                             req.kv.mamba_pool_idx.unsqueeze(-1)
                         )
                         req.kv.mamba_pool_idx = None
+                if (
+                    adder.ax_protect is not None
+                    and not added
+                    and res == AddReqResult.OTHER
+                    and (
+                        adder.ax_continuation is not None
+                        or adder.new_chunked_req is not None
+                    )
+                ):
+                    # A long/non-fitting waiter must not hide a short hit. Keep
+                    # the native rejection cleanup above, and keep LPM order.
+                    continue
                 break
 
         if mamba_allocator is not None:

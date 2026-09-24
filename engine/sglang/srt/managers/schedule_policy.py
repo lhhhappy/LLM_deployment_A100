@@ -488,6 +488,18 @@ _ROLE_BOUNDARY_SCAN_WINDOW = int(
 )
 
 
+@lru_cache(maxsize=1)
+def _ax_sched_protect_config():
+    """120: process-start knobs; off does not parse or validate tuning knobs."""
+    if os.environ.get("SGLANG_AX_SCHED_PROTECT", "1") == "0":
+        return None
+    cap = int(os.environ.get("SGLANG_AX_SCHED_COLD_CAP", "2048"))
+    short = int(os.environ.get("SGLANG_AX_SCHED_SHORT_TOKENS", "4096"))
+    if cap <= 0 or short <= 0:
+        raise ValueError("AX scheduler token limits must be positive")
+    return cap, short
+
+
 class AddReqResult(Enum):
     CONTINUE = auto()  # Continue to add requests
     NO_TOKEN = auto()  # No token left
@@ -513,8 +525,13 @@ class PrefillAdder:
         dllm_config: Optional[DllmConfig] = None,
         waiting_queue_len: int = 0,
         prefill_tile_block_m: int = 64,
+        ax_protect: Optional[tuple] = None,
     ):
         self.page_size = page_size
+        # (aligned cold cap, short-hit threshold, checkpoint/alignment grid).
+        # Only the normal TP scheduler opts in; other callers retain stock.
+        self.ax_protect = ax_protect
+        self.ax_continuation = None
         self.prefill_tile_block_m = prefill_tile_block_m
         self.tree_cache = tree_cache
         self.token_to_kv_pool_allocator = token_to_kv_pool_allocator
@@ -1032,6 +1049,14 @@ class PrefillAdder:
         stats[tag + "taken"] += 1
         return split_len
 
+    def _ax_short_hit(self, req: Req) -> bool:
+        return (
+            len(req.prefix_indices) > 0
+            and not req.needs_host_load_back()
+            and 0 < len(req.full_untruncated_fill_ids) - len(req.prefix_indices)
+            <= self.ax_protect[1]
+        )
+
     def add_chunked_req(self, req: Req):
         if self.dllm_config is not None:
             _rem_tokens = self._get_dllm_remain_tokens()
@@ -1053,6 +1078,21 @@ class PrefillAdder:
                 if self.is_hybrid_swa or os.environ.get("SGLANG_AX_DEFER_CHUNK_ON_NO_KV", "1") == "1":
                     return req
                 _rem_tokens = self.rem_chunk_tokens
+
+        if self.ax_protect is not None:
+            self.ax_continuation = req
+            cap, _, grid = self.ax_protect
+            # v2: cap the cold continuation only while other requests are waiting (otherwise it just
+            # multiplies rounds and shrinks MoE batches; decode interleave still protects running reqs).
+            if self.waiting_queue_len > 0:
+                _rem_tokens = min(_rem_tokens, cap, self.rem_input_tokens)
+            else:
+                _rem_tokens = min(_rem_tokens, self.rem_input_tokens)
+            # Preserve checkpoint, KV-page and DSA/deterministic alignment.
+            # Below one grid unit retain the native resource-limited progress;
+            # the no-starvation bound assumes room for at least one unit.
+            if _rem_tokens >= grid:
+                _rem_tokens = _rem_tokens // grid * grid
 
         # A mid-chunk rank prefills this pass regardless of the delayer
         # verdict, so report prefillable=True and ignore the result.
@@ -1251,6 +1291,20 @@ class PrefillAdder:
     def add_one_req(
         self, req: Req, has_chunked_req: bool, truncation_align_size: Optional[int]
     ):
+        if self.ax_protect is not None and (
+            self.ax_continuation is not None or self.new_chunked_req is not None
+        ):
+            # Reserve/charge the active chunk FIRST (including its request row).
+            # Spend the rest only on complete device-cache short hits, in LPM
+            # order. No host reload, second partial, or budget overshoot.
+            needed = self.ceil_paged_tokens(
+                len(req.full_untruncated_fill_ids) - len(req.prefix_indices)
+            )
+            if not self._ax_short_hit(req) or needed > min(
+                self.rem_chunk_tokens, self.rem_input_tokens
+            ):
+                return AddReqResult.OTHER
+
         # TODO support cp with multiple requests
         # Enabling context parallelism currently presents precision issues;
         # therefore, the prefill-batch setting is temporarily set to 1.
@@ -1386,6 +1440,14 @@ class PrefillAdder:
                 # - if the can_run_list is empty, always accept the first prefill request
                 return AddReqResult.OTHER
 
+            if self.ax_protect is not None:
+                cap, _, grid = self.ax_protect
+                chunk_tokens_limit = min(chunk_tokens_limit, self.rem_input_tokens)
+                if not self._ax_short_hit(req) and self.waiting_queue_len > 1:
+                    chunk_tokens_limit = min(chunk_tokens_limit, cap)  # v2: only if others wait
+                if input_tokens > chunk_tokens_limit:
+                    chunk_tokens_limit = chunk_tokens_limit // grid * grid
+
             if self.dllm_config is not None:
                 if self.rem_dllm_tokens <= 0:
                     return AddReqResult.OTHER
@@ -1454,6 +1516,10 @@ class PrefillAdder:
                     storage_hit_len=req.storage_hit_length,
                 )
             else:
+                if self.ax_protect is not None and (
+                    has_chunked_req or self.new_chunked_req is not None
+                ):
+                    return AddReqResult.OTHER
                 # [ax] at most one partial prefill per round while the role split is on
                 if _role_boundary_token_ids() and self.new_chunked_req is not None:
                     return AddReqResult.OTHER
