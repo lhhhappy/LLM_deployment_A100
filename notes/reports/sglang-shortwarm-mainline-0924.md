@@ -278,3 +278,19 @@ lc302等待区间内141个prefill批，553,856新token、中位4096，126个单�
 
 CPU补充：对引擎759a6eb运行现有HiCacheTierTests，5项通过（含device短命中可合批、host候选不合入active chunk且不调用init_load_back）。
 使用真实调度/PrefillAdder方法与假请求/池，仅验证机制条件，不能证明lc302实际命中分支；未修改运行中的引擎或评测。收据[host-guard-cpu.txt](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/host-guard-cpu.txt)。
+
+
+## 069第75分钟检查
+
+冻结4084条，通知的较晚健康4154条不混入；4084条唯一无错误，原预算/prompt/gap一致，服务端时间戳单调；前2338条是原样字节前缀，窗口统计复算一致。
+四桶p95 fast/overall/turn/chain=4.2983/5.7845/13.6406/50.6068秒，超标/本子集允许222/188、195/200、7/12、31/26；TPOT均值/p95=.032471/.061839，仍2条>.10。
+068相同4084条超标454/403/13/50，TPOT=.039703/.075863；fast修复360新增128、overall320/112、turn12/6、chain24/5。
+相同请求实际未命中28.261M→16.921M token。新增完成1746条仅fast10/overall16超标、turn/chain无新增，TPOT=.028799/.044286；这是完成增量，不能冒充45–75分钟投递窗口。
+255链已结束，剩56链，尚非最后排空。所有窗口仍open，不把已完成子集直接当整档或官方收益。
+
+chain仍31，超过全量CP允许29的下界结论不变。31条现存坏例均在前38.377分钟发出，20条queue_time≥80% TTFT；执行至首token中位8.658秒，2条超过30秒。
+两条分别是251,916-token链首（exec→first31.484s、等待99.614s）和252,115-token链首（exec→first31.694s、等待3.162s）。执行段含分块/解码调度，不是纯kernel时间；也不能把队列时间扣掉就宣称另一调度可通过。
+31条有效桶成员是25个cohort链首+6个非链首context_reset；raw phase中出现intra/turn_start正常，原harness优先按idx=0归chain_start。
+剩余222个fast坏例205条实际未命中≤4096、195条queue_time占比≥80%，前段短请求等待与长链prefill时间仍值得分别分析。
+较晚21:24:01两个metrics样本FULL host占用99.894%、无retraction，FULL device不可淘汰占用.8076、KDA .1842；只作点状观察。
+继续全量，下一105分钟检查21:51:57 UTC。证据：[check75](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/)，含4084条同ID CSV、31条chain原始字段与分解、冻结快照和metrics。

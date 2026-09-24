@@ -1,0 +1,109 @@
+{
+  "sample_time": 1790285041.4,
+  "sample_utc": "2026-09-24T21:24:01.400000+00:00",
+  "interval_s": 10.100000143051147,
+  "values": [
+    {
+      "name": "hicache_dropped_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\",reason=\"host_pressure\"}",
+      "value": 0.0
+    },
+    {
+      "name": "hicache_dropped_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\",reason=\"host_pressure\"}",
+      "value": 0.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 142151680.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 85232.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 312903680.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 16912.0
+    },
+    {
+      "name": "hicache_host_used_tokens",
+      "labels": "{engine_type=\"unified\",model_name=\"default\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}",
+      "value": 2900736.0
+    },
+    {
+      "name": "hicache_host_total_tokens",
+      "labels": "{engine_type=\"unified\",model_name=\"default\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}",
+      "value": 2903808.0
+    }
+  ],
+  "deltas": [
+    {
+      "name": "hicache_dropped_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\",reason=\"host_pressure\"}",
+      "value": 0.0,
+      "delta": 0.0
+    },
+    {
+      "name": "hicache_dropped_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\",reason=\"host_pressure\"}",
+      "value": 0.0,
+      "delta": 0.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 142151680.0,
+      "delta": 198656.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 85232.0,
+      "delta": 144.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 312903680.0,
+      "delta": 0.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 16912.0,
+      "delta": 0.0
+    },
+    {
+      "name": "hicache_host_used_tokens",
+      "labels": "{engine_type=\"unified\",model_name=\"default\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}",
+      "value": 2900736.0,
+      "delta": 15616.0
+    },
+    {
+      "name": "hicache_host_total_tokens",
+      "labels": "{engine_type=\"unified\",model_name=\"default\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}",
+      "value": 2903808.0,
+      "delta": 0.0
+    }
+  ],
+  "overview": {
+    "full_token_usage": 0.8075549450549451,
+    "mamba_usage": 0.18421052631578946,
+    "num_running_reqs": 19.0,
+    "num_queue_reqs": 1.0,
+    "num_retracted_reqs": 0.0,
+    "hicache_host_used_tokens": 2900736.0,
+    "hicache_host_total_tokens": 2903808.0,
+    "spec_accept_length": 3.216530849825378
+  },
+  "host_full_occupancy": 0.9989420788151283,
+  "limitations": "Two later samples, not whole-window stats; host gauge is FULL only; device usage excludes evictable cache; pool counters may aggregate TP ranks."
+}

@@ -1,0 +1,33 @@
+{
+  "scope": "31 observed chain-start TTFT>30s cases; no unfinished requests included",
+  "n": 31,
+  "by_phase": {
+    "intra": 18,
+    "turn_start": 5,
+    "context_reset": 6,
+    "session_start": 2
+  },
+  "dispatch_min_max": [
+    0.002314337094624837,
+    38.37698348760605
+  ],
+  "queue_ge80pct": 20,
+  "exec_to_first_over30": 2,
+  "exec_to_first_min_median_max": [
+    0.2737398147583008,
+    8.657553911209106,
+    31.69438123703003
+  ],
+  "prompt_min_median_max": [
+    13812,
+    71499,
+    252115
+  ],
+  "new_versus_baseline": 5,
+  "limitations": "recv-to-exec includes nonqueue work; exec-to-first includes chunk/decode scheduling and is not kernel cost. Even if its duration is <=30, subtracting queue does not prove a feasible alternative schedule.",
+  "by_effective_bucket_role": {
+    "chain_head_idx0": 30,
+    "nonhead_context_reset": 1
+  },
+  "phase_note": "Raw phase can be intra or turn_start at a cohort head; original harness assigns idx_in_chain=0 to chain_start."
+}
