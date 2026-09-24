@@ -1,6 +1,6 @@
 # 长链数据交接与文档索引
 
-2026-09-24更新。**唯一现行造数规范：[scripts/analysis/longchain.md](../scripts/analysis/longchain.md)**。s1-dev作为素材库，允许取A session的query或完整片段，原样或局部改写后接到B，构造B自己的长程历史。Phoenix只供行为/时间结构，生产正文不进入成品。session独立是依赖与历史独立，不是素材必须唯一，不是强制KV隔离。
+2026-09-24更新。**唯一现行造数规范：[scripts/longchain/longchain.md](../scripts/longchain/longchain.md)**。s1-dev作为素材库，允许取A session的query或完整片段，原样或局部改写后接到B，构造B自己的长程历史。Phoenix只供行为/时间结构，生产正文不进入成品。session独立是依赖与历史独立，不是素材必须唯一，不是强制KV隔离。
 
 已按[task.md](../llm-challenge-arena-v1/task.md)第167–222、488行及原harness的drive/call_engine核对：离线冻结组合与固定轨迹回放兼容，工具不执行，本次回答不回填下一轮，压测不评回答语义正确性。review聚焦长度、前缀、事件、间隔、预算及依赖；无需复原完整故事。文本仍可能影响tokenization、MTP和MoE路径，不能承诺任意改字后同分。
 
@@ -10,7 +10,7 @@
 - Phoenix最近7完整日分层采集1000/1000 session完成，55,860个LLM span、44,119个主调用；236条连续边的压缩计数增加。分层过采长尾，需用抽样权重；不同模型的token不冒充GLM token。[结构统计](../evidence/phoenix-longchain-20260924/expanded/behavior-profile.json)
 - 公共素材全量去重盘点完成：433条非reminder user候选、371条无tool_calls assistant、2,381个可配对工具组。user候选还可能含控制消息，工具组按完整JSON去重，均非已验收可用续接数。[盘点与定义](../evidence/longchain-design-20260924/material-inventory.json)
 - Luna low已试制24条有来源的局部追问和12条通用追问；仅素材试制，尚未进入新版测试集。
-- **事件核心已实现**：跨session追问、工具续跑、显式重建和重建后增长；完整311链/5601请求已生成并通过真实GLM全量检查与原harness自检；小集与cache已清除。当前唯一成品、完整集进度和生成命令见[data入口](../data/README.md)与[实现说明](../scripts/analysis/longchain.md)。三路审查的失败反例已修复，GPU尚未测量。
+- **事件核心已实现**：跨session追问、工具续跑、显式重建和重建后增长；完整311链/5601请求已生成并通过真实GLM全量检查与原harness自检；小集与cache已清除。当前唯一成品、完整集进度和生成命令见[data入口](../data/README.md)与[实现说明](../scripts/longchain/longchain.md)。三路审查的失败反例已修复，GPU尚未测量。
 
 ## 生成与验收顺序
 
@@ -25,7 +25,7 @@
 
 | 入口 | 用途 |
 |---|---|
-| [longchain.md](../scripts/analysis/longchain.md) | 唯一现行设计，含跨session组合、容量、task原理核对与review范围 |
+| [longchain.md](../scripts/longchain/longchain.md) | 唯一现行设计，含跨session组合、容量、task原理核对与review范围 |
 | [数据状态](reports/codex-data.md) | 完成项、限制、下一步 |
 | [四类TTFT与造数依据](codex-四类请求与造数建议.md) | 原dev/048、Phoenix及冻结候选缺口 |
 | [来源约束](codex-长链来源约束.md) | 可见正文与不可恢复字段；不作为禁止合成的规则 |
@@ -33,9 +33,9 @@
 | [旧候选实现/验收/命令](codex-方案-长链负载与N22-N26验证.md) | 96链/1718请求的历史实现事实 |
 | [旧独立验收](reports/review-data-sol.md)、[机器收据](../evidence/longchain-audit/independent-freeze-acceptance.json) | 不代表新版通过 |
 | [负载策略](fable-合成负载-2026-09-24.md) | 与部署实验的关系 |
-| [longchain.py](../scripts/analysis/longchain.py)、[checker](../scripts/analysis/longchain_check.py) | 当前事件构建与独立检查代码；v2不使用旧polish后处理 |
-| [可选回放防护](../scripts/analysis/longchain_replay.py) | 全量离线验收后调用原runner；只换root/set/cohort，防止缺正文假PASS与陈旧正文cache |
-| [素材盘点脚本](../scripts/analysis/longchain_material_inventory.py) | 复算素材供应，不生成轨迹 |
+| [longchain.py](../scripts/longchain/longchain.py)、[checker](../scripts/longchain/longchain_check.py) | 当前事件构建与独立检查代码；v2不使用旧polish后处理 |
+| [可选回放防护](../scripts/longchain/longchain_replay.py) | 全量离线验收后调用原runner；只换root/set/cohort，防止缺正文假PASS与陈旧正文cache |
+| [素材盘点脚本](../scripts/longchain/longchain_material_inventory.py) | 复算素材供应，不生成轨迹 |
 | [协调](coordination.md)、[队列](queue.md) | 本会话只做数据/CPU工作，不操作8卡队列 |
 
 ## 证据与数据

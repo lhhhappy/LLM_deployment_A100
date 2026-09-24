@@ -14,7 +14,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "s1-dev/harness"))
 from s1_common import Renderer
-from scripts.analysis.longchain_check import check_dataset, _actual_append_edge
+from scripts.longchain.longchain_check import check_dataset, _actual_append_edge
 
 
 class CharacterRenderer:

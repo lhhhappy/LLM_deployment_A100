@@ -3,7 +3,7 @@
 `longchain_distribution.py` 只读标准数据文件，使用原 harness 的索引、四门与 gap cap 规则，独立对比公开 s1-dev 与合成集。它不修改生成器、checker 或回放协议，也不代替完整验收。
 
 ```bash
-uv run --offline --with-requirements scripts/analysis/requirements-longchain.txt python -B scripts/analysis/longchain_distribution.py --root data/s1-dev-longchain --out evidence/longchain-design-20260924/pilot-v2b-distribution.json
+uv run --offline --with-requirements scripts/longchain/requirements-longchain.txt python -B scripts/longchain/longchain_distribution.py --root data/s1-dev-longchain --out evidence/longchain-design-20260924/pilot-v2b-distribution.json
 ```
 
 完整集在 `cache/s1-dev-longchain-build` 完成后可只换 `--root` 与输出文件名；正式替换当前成品后继续使用 `data/s1-dev-longchain`。输出 JSON 和同名 Markdown，必须放在数据根目录外。生成中 `BUILDING` 的目录拒绝审计。`--skip-head-tokens` 可先作结构分布诊断，但会明确省略 token 级链首审计。

@@ -18,7 +18,7 @@ sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "s1-dev/harness"))
 from s1_common import load_index, in_ttft_gate, Renderer
 from s1_loadgen import build_gap_plan
-from scripts.analysis.longchain import canonical, digest, file_digest, read_jsonl, tool_pairing
+from scripts.longchain.longchain import canonical, digest, file_digest, read_jsonl, tool_pairing
 
 
 def stats(values):

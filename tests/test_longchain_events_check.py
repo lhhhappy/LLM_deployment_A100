@@ -3,7 +3,7 @@ import copy
 import json
 import unittest
 
-from scripts.analysis.longchain_check import (
+from scripts.longchain.longchain_check import (
     _canonical_digest, _new_message_suffix, _new_tool_block_errors, _rebuild_errors,
 )
 

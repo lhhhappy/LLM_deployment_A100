@@ -11,11 +11,11 @@
 在仓库根目录执行；输出目录必须不存在，避免覆盖冻结数据：
 
 ```bash
-uv run --with-requirements scripts/analysis/requirements-longchain.txt python -B scripts/analysis/longchain.py build \
+uv run --with-requirements scripts/longchain/requirements-longchain.txt python -B scripts/longchain/longchain.py build \
   --chains 311 --seed 20260924 --set s1-dev-longchain \
   --out cache/s1-dev-longchain-build
 
-uv run --with-requirements scripts/analysis/requirements-longchain.txt python -B scripts/analysis/longchain_replay.py \
+uv run --with-requirements scripts/longchain/requirements-longchain.txt python -B scripts/longchain/longchain_replay.py \
   --root cache/s1-dev-longchain-build \
   --out evidence/longchain-design-20260924/full-acceptance --self-check
 ```

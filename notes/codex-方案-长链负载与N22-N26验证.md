@@ -1,6 +1,6 @@
 # Codex 分析：旧长链候选的实现、验收与使用边界
 
-本页保留96链/1718请求冻结候选的实现与验收事实，不是下一版生成规范。**现行规范统一见[longchain.md](../scripts/analysis/longchain.md)**：s1-dev为素材库，允许将A session的query/完整片段改写后续接到B；不要求恢复原故事，按事件计划构造长短链、工具续跑、等待和重建。Phoenix只提供行为结构。task.md的固定轨迹回放兼容这种离线组合；review聚焦负载和依赖，不逐条审文学/问答正确性。
+本页保留96链/1718请求冻结候选的实现与验收事实，不是下一版生成规范。**现行规范统一见[longchain.md](../scripts/longchain/longchain.md)**：s1-dev为素材库，允许将A session的query/完整片段改写后续接到B；不要求恢复原故事，按事件计划构造长短链、工具续跑、等待和重建。Phoenix只提供行为结构。task.md的固定轨迹回放兼容这种离线组合；review聚焦负载和依赖，不逐条审文学/问答正确性。
 
 交接入口及全部相关文档地址见 [长链数据 handoff](codex-handoff-长链数据设计与文档索引.md)，当前状态以 [数据状态页](reports/codex-data.md) 为准。旧候选曾生成并[冻结留档](../evidence/longchain-audit/frozen-candidate/README.md)，最新完整CPU校验为1718/1718、0错误；冻结时结构/哈希复查通过，主会话安排的独立验收已确认[ACCEPTED_DIAGNOSTIC_CPU_ARCHIVE](../evidence/longchain-audit/independent-freeze-acceptance.json)，本候选分析工作收尾；成品副本随后已按用户要求删除。**它不满足代表性长压测的质量要求，仅是诊断候选，不能替代原开发集或按当前数据安排代表性N22/N26评测。**本会话不操作 GPU 队列、不正式提交。执行层与编排线按 [coordination.md](coordination.md) 并行，原 [执行层 handoff](codex-handoff-执行层并行任务.md) 作为任务背景。
 
@@ -18,7 +18,7 @@
 
 ## 旧候选实际生成规则（供复现）
 
-唯一生成入口 [scripts/analysis/longchain.py](../scripts/analysis/longchain.py)：`build / polish / check`。不用 Pi、在线工具模拟、模型权重或外部 API；完整历史工具结果已经在公开数据中。三个 GPT-6 Luna、medium 辅助来源审计、独立校验和 query 审查；核心选择、生成、传播与冻结代码由本会话实现。
+唯一生成入口 [scripts/longchain/longchain.py](../scripts/longchain/longchain.py)：`build / polish / check`。不用 Pi、在线工具模拟、模型权重或外部 API；完整历史工具结果已经在公开数据中。三个 GPT-6 Luna、medium 辅助来源审计、独立校验和 query 审查；核心选择、生成、传播与冻结代码由本会话实现。
 
 1. 对源 canon/serving 请求按精确 `pack:view:logical_call_id` 连 body；链内按原 harness 的 dispatch/id 顺序排列。不能从 req_id 字符串拆出 session，`chain_index` 也不是轮次。
 2. 按 pack × 源链长度分层配额选96链；固定 seed=20260924，在128次候选抽样中选择源平均链长、prompt、输出与家族碰撞概率较接近者。选择过程完全不看引擎成绩。实际65个 system/tools 家族，家族成对相同概率1.95%，全来源为1.74%；这只是家族指标，不能当成实际 token 前缀命中率。
@@ -88,7 +88,7 @@
 - [raw早期检查](../evidence/longchain-audit/reviewed-raw-check.json)：1,718/1,718渲染与LCP核对通过；其当时的VALID不包含后来补入的body_ref/hash/phase事件检查，不作为最终验收依据。
 - [原harness raw自检](../evidence/longchain-audit/raw-self-check.log)：失配0，共1718，PASS。原self-check会跳过缺body，因此必须配合独立ID全集检查。
 - [前48语义审查](../evidence/longchain-audit/query-edits-a-review.md)、[后48语义审查](../evidence/longchain-audit/query-review-b.md)：建议不是自动批准，root再审后冻结。
-- 校验器 [longchain_check.py](../scripts/analysis/longchain_check.py) 检查request/body/cohort覆盖与顺序、实际shard引用、冻结产物hash/cohort自校验、正输出/非负gap/上下文预算、完整新增工具调用组及synthetic实际事件phase、官方渲染、精确前驱LCP、再生成冻结标签和body/provenance；输出逐请求与联合分布。
+- 校验器 [longchain_check.py](../scripts/longchain/longchain_check.py) 检查request/body/cohort覆盖与顺序、实际shard引用、冻结产物hash/cohort自校验、正输出/非负gap/上下文预算、完整新增工具调用组及synthetic实际事件phase、官方渲染、精确前驱LCP、再生成冻结标签和body/provenance；输出逐请求与联合分布。
 - CPU `VALID` 只证明数据自洽，不证明引擎KV/KDA状态正确、能力过双90、SLO通过或正式负载等价。独立诊断归档验收已通过；该候选不安排GPU回放。历史生成阶段源码字节未归档，现行代码快照不能反证历史执行过程。
 
 ### 独立复核修复
@@ -102,4 +102,4 @@
 
 旧成品与未润色父数据副本已按用户清理要求删除，不再保留在cache。原冻结hash与验收仍见 [归档收据](../evidence/longchain-audit/frozen-candidate/README.md)；其中历史绝对路径是当时环境，不是现行入口。
 
-旧追加式构建命令已移除，避免用当前事件生成器冒充复现旧算法。当前唯一成品见 [data/README.md](../data/README.md)，生成/验收命令见 [longchain.md](../scripts/analysis/longchain.md)。本页保留旧候选的工作量分析与限制，不再维护第二套生成方案。
+旧追加式构建命令已移除，避免用当前事件生成器冒充复现旧算法。当前唯一成品见 [data/README.md](../data/README.md)，生成/验收命令见 [longchain.md](../scripts/longchain/longchain.md)。本页保留旧候选的工作量分析与限制，不再维护第二套生成方案。

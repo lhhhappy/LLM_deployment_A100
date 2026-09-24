@@ -8,7 +8,7 @@
 - 旧96链/1718请求候选及父数据副本已按用户要求删除，冻结收据仍在[evidence](../../evidence/longchain-audit/frozen-candidate/README.md)。失败/过时生成中间件、Phoenix原始正文cache和旧工具下载缓存已清除，迁移记录见[data-relocation.json](../../evidence/longchain-design-20260924/data-relocation.json)。不再把旧候选作为当前集。
 - 311链/5601请求完整扩展集已交付，沿用源摘要链长，非正式341链/5150请求的恢复。没有新数据GPU成绩，也不预测正式N@SLO。
 
-设计、复现命令和实现边界以[longchain.md](../../scripts/analysis/longchain.md)为准；文档索引见[交接](../codex-handoff-长链数据设计与文档索引.md)。
+设计、复现命令和实现边界以[longchain.md](../../scripts/longchain/longchain.md)为准；文档索引见[交接](../codex-handoff-长链数据设计与文档索引.md)。
 
 ## 本轮完整集事实
 

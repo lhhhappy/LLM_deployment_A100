@@ -2,9 +2,9 @@
 """Optional guard around the unchanged S1 runner; no new replay/scoring policy.
 
 CPU acceptance (no service calls):
-  python -B scripts/analysis/longchain_replay.py --root DATA --out NEW_OUT --self-check
+  python -B scripts/longchain/longchain_replay.py --root DATA --out NEW_OUT --self-check
 Replay after the same full token acceptance:
-  python -B scripts/analysis/longchain_replay.py --root DATA --out NEW_OUT --n 6 --base-url URL
+  python -B scripts/longchain/longchain_replay.py --root DATA --out NEW_OUT --n 6 --base-url URL
 
 Every invocation needs a fresh output directory outside DATA. This prevents the
 original runner's unbound body cache from mixing different frozen artifacts.
@@ -24,7 +24,7 @@ import sys
 REPO = Path(__file__).resolve().parents[2]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(REPO))
-from scripts.analysis.longchain_check import check_dataset
+from scripts.longchain.longchain_check import check_dataset
 
 HARNESS = REPO / "s1-dev/harness"
 RUNNER = REPO / "s1-dev/run_dev.py"

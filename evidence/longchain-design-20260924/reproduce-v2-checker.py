@@ -13,7 +13,7 @@ import tempfile
 REPO = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(REPO), str(REPO / "tests"), str(REPO / "s1-dev/harness")]
 from s1_common import Renderer
-from scripts.analysis.longchain_check import check_dataset, _canonical_digest
+from scripts.longchain.longchain_check import check_dataset, _canonical_digest
 from test_longchain_events_check import LongchainEventsCheckTests, replacement, group
 
 
@@ -99,5 +99,5 @@ if __name__ == "__main__":
     cases = ["baseline", "prefix_unclosed_call", "initial_task_removed", "unaccounted_summary_text",
              "summary_unpaired_call", "duplicate_excerpt", "nonobject_excerpt"]
     print(json.dumps({"versions": {n: importlib.metadata.version(n) for n in ("transformers", "tokenizers", "jinja2")},
-                      "checker_sha256": hashlib.sha256((REPO / "scripts/analysis/longchain_check.py").read_bytes()).hexdigest(),
+                      "checker_sha256": hashlib.sha256((REPO / "scripts/longchain/longchain_check.py").read_bytes()).hexdigest(),
                       "fixtures": [run_fixture(renderer, c) for c in cases]}, ensure_ascii=False, indent=2))

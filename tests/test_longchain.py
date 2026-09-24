@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-PATH = Path(__file__).resolve().parents[1] / "scripts/analysis/longchain.py"
+PATH = Path(__file__).resolve().parents[1] / "scripts/longchain/longchain.py"
 spec = importlib.util.spec_from_file_location("longchain_build", PATH)
 lc = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = lc

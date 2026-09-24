@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.analysis import longchain_replay as replay
+from scripts.longchain import longchain_replay as replay
 
 
 class ReplayGuardTests(unittest.TestCase):

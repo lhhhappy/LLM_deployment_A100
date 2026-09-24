@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phoenix 连续轨迹样本</title>
+<style>
+:root{color-scheme:light dark;font:15px/1.6 system-ui,sans-serif}body{margin:28px auto;padding:0 20px;max-width:1500px}h1{font-size:25px;margin-bottom:8px}p{max-width:1000px}label{display:inline-block;margin:5px 18px 5px 0}input,select,button{font:inherit;padding:5px 9px}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}td,th{padding:9px 12px;text-align:right;border-bottom:1px solid GrayText;white-space:nowrap}td:first-child,th:first-child,td:last-child,th:last-child{text-align:left}.scroll{overflow:auto}button{margin:0 8px 10px 0}small{font-size:13px}#count{margin:14px 0}a{color:LinkText}summary{cursor:pointer}.notes{margin:16px 0}#details{overflow:auto}code{overflow-wrap:anywhere}
+</style></head><body>
+<h1>Phoenix 连续轨迹样本 · __COUNT__ 个会话</h1>
+<p>2026-09-17 至 09-23 北京时间。按数据库周内主代理计费记录数分层抽样，长会话有意多抽；这里展示样本原始计数。会话、用户消息、run、连续调用段是不同单位。</p>
+<label>长度层 <select id="bucket"><option value="">全部</option><option>1-4</option><option>5-8</option><option>9-15</option><option>16-30</option><option>31-99</option><option>100+</option></select></label>
+<label>行为 <select id="tag"><option value="">全部</option><option>长连续段</option><option>压缩前后</option><option>长等待</option><option>异常或字段缺失</option></select></label>
+<label>排序 <select id="sort"><option value="main_calls">主代理调用数</option><option value="max_contiguous">最长连续段</option><option value="compressions">压缩次数</option><option value="max_gap_s">最长等待</option><option value="prompt_max">最大上下文</option></select></label>
+<label>会话 ID <input id="search" type="search" placeholder="输入 ID 片段"></label>
+<div id="count" aria-live="polite"></div>
+<button id="prev" type="button">上一页</button><button id="next" type="button">下一页</button>
+<div class="scroll"><table><thead><tr><th>会话 / 证据</th><th>主调用</th><th>用户消息</th><th>run</th><th>最长连续段</th><th>压缩边</th><th>最长间隔 s</th><th>最大源 token</th><th>行为</th></tr></thead><tbody id="rows"></tbody></table></div>
+<details class="notes"><summary>这些样本如何用于生成数据</summary><p>连续段可作为增长、输出、等待与压缩的事件模板。遥测正文有截断，可复用已有文字并合成缺失部分；尚未验证任何一条是可直接精确回放的完整请求。长段应保留内部顺序，跨 run 和跨会话拼接必须标注为合成边界。压缩边是连续调用之间累计计数增加，不等于比赛评分的 reset 标签。源 token 和供应商缓存不能替代 GLM 渲染长度或被测部署命中率。</p></details>
+<script id="data" type="application/json">__CATALOG_DATA__</script>
+<script>
+const data=JSON.parse(document.getElementById('data').textContent);
+const byId=id=>document.getElementById(id);let page=0;
+function matching(){const bucket=byId('bucket').value,tag=byId('tag').value,search=byId('search').value.toLowerCase(),key=byId('sort').value;return data.filter(r=>(!bucket||r.bucket===bucket)&&(!tag||r.tags.includes(tag))&&r.session_id.includes(search)).sort((a,b)=>(b[key]||0)-(a[key]||0)||a.session_id.localeCompare(b.session_id));}
+function render(){const selected=matching(),last=Math.max(0,Math.ceil(selected.length/30)-1);page=Math.min(last,Math.max(0,page));byId('count').textContent=`筛选 ${selected.length} / ${data.length} 个会话 · 第 ${page+1} / ${last+1} 页`;byId('prev').disabled=page===0;byId('next').disabled=page===last;byId('rows').replaceChildren();for(const r of selected.slice(page*30,(page+1)*30)){const tr=document.createElement('tr'),name=document.createElement('td'),a=document.createElement('a');a.href=r.sample_path;a.textContent=r.session_id.slice(0,8)+'…';a.title=r.session_id;name.append(a,document.createTextNode(` [${r.bucket}]`));tr.append(name);for(const k of ['main_calls','user_messages','runs','max_contiguous','compressions','max_gap_s','prompt_max']){const td=document.createElement('td');td.textContent=r[k]===null?'缺失':Number(r[k]).toLocaleString();tr.append(td);}const tags=document.createElement('td');tags.textContent=r.tags.join(' / ');tr.append(tags);byId('rows').append(tr);}}
+for(const id of ['bucket','tag','sort','search'])byId(id).addEventListener('input',()=>{page=0;render();});byId('prev').addEventListener('click',()=>{page--;render();});byId('next').addEventListener('click',()=>{page++;render();});render();
+</script></body></html>

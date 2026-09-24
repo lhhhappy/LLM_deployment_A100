@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.analysis.longchain_check import (check_dataset, _chain_summary_errors, _workload_ledger,
+from scripts.longchain.longchain_check import (check_dataset, _chain_summary_errors, _workload_ledger,
                                              _canonical_digest, _actual_append_edge, _new_tool_block_errors)
 
 

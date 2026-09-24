@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.analysis.longchain_distribution import blocks, head_comparison, inspect, normalized_block
+from scripts.longchain.longchain_distribution import blocks, head_comparison, inspect, normalized_block
 
 
 def tool_group(call_id):
