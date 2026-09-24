@@ -1,0 +1,9 @@
+queue-20260924T131913-33855
+PUSH_OK 2 chunks
+QUEUED 061s-official_a_122_full_n30_70m.sh engine_commit=c92acd57a61eb6f9eed3222cc048877eef7963d9
+QUEUED 063s-official_a_122_180_full_n30_70m.sh engine_commit=c92acd57a61eb6f9eed3222cc048877eef7963d9
+RUNTIME_DEPLOYED engine_commit_v1
+DONE rc=0
+RESUMED 061s then063s; NEXTN CLI / EAGLE effective config
+061s ENGINE_READY after 155s; MECHANISMS OK, 120=on 122=on spec=EAGLE
+061s TIMED_DIAGNOSTIC N=30 admission_seconds=4200 drain_all_admitted=true

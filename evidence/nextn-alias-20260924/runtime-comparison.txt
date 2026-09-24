@@ -1,0 +1,2 @@
+Compared bin/, engine/, verify_kit/ between previous and new deployment bundles.
+Changed files: []

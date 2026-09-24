@@ -9,8 +9,8 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 061s-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | 修正启动配置检查后重新部署；执行层 Codex 跟踪 |
-| 063s-official_a_122_180_full_n30_70m | 同 061s，仅加新版 180 的三个 HiCache 参数 | 修正启动配置检查后重新部署，排061s后；不要求前一项SLO通过 |
+| 061s-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | running，MECHANISMS OK已确认，进入前检/预热；执行层 Codex 跟踪 |
+| 063s-official_a_122_180_full_n30_70m | 同 061s，仅加新版 180 的三个 HiCache 参数 | pending，排061s后；不要求前一项SLO通过 |
 
 两项固定同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，源码含正式 A 全部13项改动。
 171/172/123/DCP关闭；122以 `SGLANG_AX_PACE_TPOT=0.085` 开启。
