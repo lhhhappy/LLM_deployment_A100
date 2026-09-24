@@ -1,5 +1,6 @@
 # Calibration: the exact official A launch (attempt 45979, image 0923a; submission/official-0923-A.json) on the dev set at N14.
 # Official A passed N14 with tpot 0.0174/0.0364, TTFT p95 fast 1.52 overall 3.87 turn 6.39 chain 30.23; compare gate by gate.
+# Stack = the 13 patches of image 0923a including 121 (tree verified IDENTICAL to the image, 4690 files).
 # Stack = the 13 patches of image 0923a including 121 (verified IDENTICAL to the image tree, 4690 files; 044/045 first ran without 121 and are invalid as calibration).
 G_NAME=off_a
 G_PATCHES="000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch 150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch"
