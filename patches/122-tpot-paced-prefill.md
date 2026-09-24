@@ -4,19 +4,19 @@
 - 0/722 条请求 TPOT 超过 0.10，p5 的请求仍有 2.4 s 没用掉的停顿预算（中位 11 s）。
 - 挂的是首 token：chain_start 超标请求的 recv→exec 中位 55.7 s，overall_intra 为 7.3 s。
 - 79% 的 prefill token 是在 ≤4096 的块里算的（121 的固定上限 + `--prefill-decode-interval 2`）。
-- 满载下一个周期实测：4096 块 0.446 s，8192 块 0.739 s（n=1933/43）。有效 prefill 9.2k→11.1k token/s。
+- 有请求在等、也有请求在 decode 时，相邻两次 prefill 日志的间隔：4096 块中位 0.446 s（n=1933），8192 块 0.739 s（n=43）。这个间隔含 2 轮 decode，8192 的样本少。
 
-结论：TPOT 余量闲着，TTFT 在排队；固定小块付了过多的每块固定开销。
+假设（待 8 卡验证）：这一档 TPOT 还有余量，而首 token 在排队；更大的块能少付每块固定开销。
 
 ## 机制（借鉴 Sarathi-Serve 的"按 SLO 定每轮 token 预算"）
 不同点：我们的门是每请求平均 TPOT，所以按每个请求实测的进度记账，而不是按单步 TBT。
 
-- 每个正在 decode 的请求：`slack = t0 + τ·(已出 token) − now + 允许欠账`。t0 是第一次看到它首 token 的时刻。
+- 每个正在 decode 的请求：`slack = t0 + τ·(已出 token − 锚定时 token) − now + 允许欠账`。t0 是它第一次出现在运行批中的时刻；首 token 尚未处理的按刚出首 token 计。
 - 规则：让所有请求保持 `slack ≥ 0`，最终 TPOT ≤ τ + 欠账/(n−1)。欠账默认 0.5 s，且不超过 (0.10−τ)·(n−1)。
 - 每轮：预测成本 `C0 + c·(C1 + C2·上下文)` 放得进最小 slack 的整块（或剩余全部工作）就 prefill，否则 decode 一轮。连续 decode 最多 32 轮。
 - 块内预算扣掉等待中完整缓存命中短请求所需的 token，余下给续算/冷请求。这取代 121 固定的 COLD_CAP。
 - 开启时取代固定 interval 与 120 的单轮 decode。
-- 8 个 TP rank 用一次 CPU all_reduce(MAX) 对齐时钟，保证决策一致。只在"有 decoder 且有 prefill 待做"时调用。
+- 8 个 TP rank 用一次 CPU all_reduce(MAX) 对齐时钟，保证决策一致。只在"有未完成的 decoder 且有 prefill 待做"时调用，这个条件在各 rank 上相同。
 
 ## 开关
 全部在引擎启动时读一次，生效值打印在 `[ax-pace] on:` 日志行。
@@ -35,19 +35,22 @@
 每 30 s 打一行 `[ax-pace] decisions/forced_decode/mean_budget`，用来核对实际行为。
 
 ## 证据
-CPU：`tests/test_tpot_paced_prefill.py`，8 个用例，跑在真实调度器代码上，另有 27 个 120 旧用例，全部通过。
-- 关闭时与正式 A 逐步 trace 相同。
-- rank 时钟一致性。
-- 假时钟仿真：成本模型成立时所有请求 TPOT ≤0.10。
+**CPU（真实调度代码）：** `tests/test_tpot_paced_prefill.py` 11 个用例，加 `test_sched_protect_chain.py` 27 个，共 38 个全部通过。测试从源码树中抽出真实的 `get_next_batch_to_run`、`_get_new_batch_prefill_raw`、`PrefillAdder` 执行，模型、池与 batch 是假的。
+- 关闭时与正式 A 逐步 trace 相同；
+- rank 时钟取 max 且只在需要时调用；
+- 新到请求 `full_untruncated_fill_ids` 为空时按 `seqlen` 计；
+- overlap 下首 token 未处理的 decoder 仍计账；
+- 上限放行整块。
 
-仿真（假成本模型，MTP 接受长度 3.3，负载约 7.7k token/s，5 个种子）：
-- 冷请求 TTFT p95 下降约 30–45%，短命中 p95 0.6→0.67 s，TPOT p95 0.06→0.08。
-- 成本低估 25% 时仍优于 A。
-- 无 MTP 时反而变差：TPOT 本来没有余量，它会先守 TPOT。所以只用于 MTP 部署。
+**仿真（同一真实调度代码 + 假时钟与假成本模型）：** 仅说明机制按设计工作，不是性能预测。
+- MTP 接受长度 3.3、约 7.7k token/s、5 个种子：冷请求首 token p95 降约 30–45%，TPOT p95 约 0.08；
+- 成本低估 25% 时 TPOT 仍在门内；
+- 无 MTP 时首 token 变差（TPOT 本无余量，机制优先守 TPOT）。
 
-**仿真只说明机制按设计工作，不是性能预测。** 8 卡结果待测。
+**8 卡：** 未测。草案 `scripts/pod/jobs/drafts/offA_122_n14.sh`（正式 A + 122，dev N14，对照 044r）。
 
 ## 已知限制
-- 首次锚点最多晚一步。
-- 成本模型不含 batch 内多个请求的差异。
-- 为了追求 N，会把 tpot_mean 从 0.017 左右抬到 0.06–0.08；排名第二键会变差。
+- 锚点在第一次看到该请求时建立，最多比真实首 token 晚一步。
+- 成本模型不含 batch 内多请求差异；C0、C2 是推断值，需 A 配置 TP8 实测曲线替换。
+- 每个需要决策的调度步多一次 TP CPU 组 all_reduce，开销未在 8 卡实测。
+- 会抬高 tpot_mean（仿真中 0.06→0.08 量级）；只有 N 提升时才有排名意义。

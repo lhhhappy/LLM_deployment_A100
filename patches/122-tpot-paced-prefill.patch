@@ -1,6 +1,6 @@
 --- a/python/sglang/srt/managers/scheduler.py
 +++ b/python/sglang/srt/managers/scheduler.py
-@@ -1311,6 +1311,138 @@
+@@ -1311,6 +1311,143 @@
              and any(not req.finished() for req in running_batch.reqs)
          )
  
@@ -52,22 +52,24 @@
 +
 +    def _ax_pace_slack(self, running_batch: ScheduleBatch, now: float, cfg) -> Optional[float]:
 +        # Pace slack of a decoding request: t0 + tau * (tokens since t0) - now, anchored at the first step
-+        # that sees its first token (the agreed clock, so every rank anchors identically; at most one step
-+        # after the real first token, which the tau < gate margin covers). Keeping
-+        # slack >= -deficit_r at every step bounds its final TPOT by tau + deficit_r / (n - 1), and
-+        # deficit_r <= (gate - tau) * (n - 1) keeps that bound under the gate for short outputs.
++        # that sees it in the running batch (the agreed clock, so every rank anchors identically). A request
++        # whose first token is not yet processed (overlap lag) counts as having just produced it, so a
++        # prefill chunk cannot be scheduled against it unseen; the anchor is at most one step late, which
++        # the tau < gate margin covers. Keeping slack >= -deficit_r at every step bounds its final TPOT by
++        # tau + deficit_r / (n - 1); deficit_r <= (gate - tau) * (n - 1) keeps that under the gate.
 +        worst = None
 +        for req in running_batch.reqs:
-+            if req.finished() or not req.output_ids:
++            if req.finished():
 +                continue
++            produced = max(len(req.output_ids), 1)
 +            anchor = getattr(req, "_ax_pace_anchor", None)
 +            if anchor is None:
-+                anchor = req._ax_pace_anchor = (now, len(req.output_ids))
++                anchor = req._ax_pace_anchor = (now, produced)
 +            n = getattr(req.sampling_params, "max_new_tokens", None) or 0
 +            deficit = cfg["deficit"]
 +            if n > 1:
 +                deficit = min(deficit, (cfg["gate"] - cfg["tau"]) * (n - 1))
-+            slack = anchor[0] + cfg["tau"] * (len(req.output_ids) - anchor[1]) - now + deficit
++            slack = anchor[0] + cfg["tau"] * (produced - anchor[1]) - now + deficit
 +            worst = slack if worst is None else min(worst, slack)
 +        return worst
 +
@@ -79,7 +81,7 @@
 +            return False
 +        if self.chunked_req is None and not self.waiting_queue:
 +            return False  # no prefill work: the decode round runs anyway
-+        if not any(not req.finished() and req.output_ids for req in running_batch.reqs):
++        if all(req.finished() for req in running_batch.reqs):
 +            self._ax_pace_forced = 0
 +            return False
 +        now = self._ax_pace_now()
@@ -91,22 +93,25 @@
 +        stats[0] += 1
 +        if self.chunked_req is not None:
 +            ctx = len(self.chunked_req.prefix_indices)
-+            pending = len(self.chunked_req.full_untruncated_fill_ids) - ctx
++            pending = self.chunked_req.seqlen - ctx
 +        else:
++            # waiting requests: fill ids are only built at admission, so use origin + output length;
++            # prefix matches may be from the previous round (new arrivals: none) -> overestimates work
 +            ctx = 0
 +            pending = min(
-+                max(len(r.full_untruncated_fill_ids) - len(r.prefix_indices), 1)
-+                for r in self.waiting_queue[:64]
++                max(r.seqlen - len(r.prefix_indices), 1) for r in self.waiting_queue[:64]
 +            )
 +        per_token = cfg["c1"] + cfg["c2"] * ctx
 +        tokens = int((slack - cfg["c0"]) / per_token) if slack > cfg["c0"] else 0
-+        if tokens < min(cfg["min_chunk"], pending) and self._ax_pace_forced < cfg["max_decode"]:
++        need = min(cfg["min_chunk"], pending)
++        if tokens < need and self._ax_pace_forced < cfg["max_decode"]:
 +            self._ax_pace_forced += 1
 +            stats[1] += 1
 +            decode = True
 +        else:
++            # after max_decode rounds the guard admits one full chunk so prefill always progresses
 +            self._ax_pace_forced = 0
-+            self._ax_pace_tokens = max(tokens, 1)
++            self._ax_pace_tokens = max(tokens, need)
 +            stats[2] += tokens < self.chunked_prefill_size
 +            stats[3] += min(tokens, self.chunked_prefill_size)
 +            decode = False
@@ -128,7 +133,7 @@
 +            budget = min(budget, max(grid, self._ax_pace_tokens // grid * grid))
 +        reserve = 0
 +        for req in self.waiting_queue:
-+            new = len(req.full_untruncated_fill_ids) - len(req.prefix_indices)
++            new = req.seqlen - len(req.prefix_indices)  # prefix matched by calc_priority this round
 +            if len(req.prefix_indices) > 0 and not req.needs_host_load_back() and 0 < new <= short:
 +                reserve += -(-new // self.page_size) * self.page_size
 +                if reserve >= budget:
@@ -139,7 +144,7 @@
      def _should_defer_prefill(self) -> bool:
          if self._prefill_decode_interval_remaining == 0:
              return False
-@@ -3511,7 +3643,11 @@
+@@ -3511,7 +3648,11 @@
  
          if self.dllm_config is not None:
              new_batch = self.get_new_batch_dllm(running_batch)
@@ -152,7 +157,7 @@
              new_batch = None
          else:
              prefill_plan = self.get_new_batch_prefill(running_batch)
-@@ -3695,6 +3831,10 @@
+@@ -3695,6 +3836,10 @@
          else:
              prefill_tile_block_m = 64  # Fallback for non-Triton backends
  
@@ -163,7 +168,7 @@
          adder = PrefillAdder(
              self.page_size,
              self.tree_cache,
-@@ -3712,7 +3852,7 @@
+@@ -3712,7 +3857,7 @@
              dllm_config=self.dllm_config,
              waiting_queue_len=len(self.waiting_queue),
              prefill_tile_block_m=prefill_tile_block_m,

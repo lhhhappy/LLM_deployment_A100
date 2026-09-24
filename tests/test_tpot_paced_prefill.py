@@ -185,6 +185,42 @@ class PacedPrefill(unittest.TestCase):
             modes = [step(s)['mode'] for _ in range(3)]
             self.assertEqual(modes, ['decode', 'decode', 'prefill'])
 
+    def test_waiting_lengths_do_not_depend_on_unbuilt_fill_ids(self):
+        # real waiting requests have empty full_untruncated_fill_ids until admission (schedule_batch.py:974)
+        clock = Clock()
+        with patch.dict(os.environ, PACE):
+            dec = Req('dec', 1, output=300)
+            dec.output_ids = [1]
+            cold = Req('cold', 30000)
+            cold.full_untruncated_fill_ids = []
+            s, _ = build(CAND, clock, waiting=[cold], running=[dec])
+            # fresh decoder: slack 0.5 s < cost of a full 8192 chunk (0.57 s) -> decode, not a sliver of prefill
+            self.assertEqual(step(s)['mode'], 'decode')
+            hit = Req('hit', 1000, cached=60000)
+            hit.full_untruncated_fill_ids = []
+            s, _ = build(CAND, clock, waiting=[Req('cold', 30000), hit])
+            t = step(s)
+            self.assertEqual(dict((r[0], r[2] - r[1]) for r in t['reqs'])['cold'], 7168)  # reserve still seen
+
+    def test_decoder_whose_first_token_is_unprocessed_still_counts(self):
+        clock = Clock()
+        with patch.dict(os.environ, PACE):
+            lag = Req('lag', 1, output=300)  # in the running batch, output not yet appended (overlap)
+            s, _ = build(CAND, clock, waiting=[Req('cold', 30000)], running=[lag])
+            self.assertEqual(step(s)['mode'], 'decode')
+            self.assertEqual(lag._ax_pace_anchor, (1000.0, 1))
+
+    def test_guard_admits_a_full_chunk(self):
+        clock = Clock()
+        with patch.dict(os.environ, dict(PACE, SGLANG_AX_PACE_MAX_DECODE='1')):
+            dec = Req('dec', 1, output=300)
+            dec.output_ids = [1]
+            s, _ = build(CAND, clock, waiting=[Req('cold', 30000)], running=[dec])
+            dec._ax_pace_anchor = (clock.t - 100.0, 1)
+            self.assertEqual(step(s)['mode'], 'decode')
+            t = step(s)
+            self.assertEqual((t['mode'], new_tokens(t)), ('prefill', 8192))
+
     def test_ranks_agree_on_one_clock(self):
         clock = Clock()
         calls = []

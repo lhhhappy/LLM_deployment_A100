@@ -115,6 +115,10 @@ class Req:
     def needs_host_load_back(self):
         return self.host_hit_length > 0
 
+    @property
+    def seqlen(self):
+        return len(self.origin_input_ids) + len(self.output_ids)
+
     def finished(self):
         return len(self.output_ids) >= self.sampling_params.max_new_tokens
 
