@@ -7,7 +7,9 @@
 Each DIR is an evidence level directory (raw_*.jsonl, server.log, level_verdict.json). Fails closed: each level's
 verdict must be VALID and its raw must hold exactly the frozen cohort's request ids (each once, no errors, server
 timestamps present). Gates are judged at raw precision; values are rounded only for display/CSV. A true-LCP pair is
-used only if its prompt and its predecessor's prompt match this run's raw (else the gap is unknown). Per request it pairs TTFT, wait
+used only if its prompt length, chain/idx and predecessor's prompt length match this run's raw ("metadata-checked";
+else unknown). Pairs are not bound to prompt content or a cohort content hash: the gap is an unverified-source
+diagnostic, not evidence for cache causality. Per request it pairs TTFT, wait
 (exec_start - recv), run (first - exec_start), cached/new tokens and the true-LCP gap, so that a change in a gate can
 be split into requests whose own work changed (cache), requests that waited less or more (batch formation /
 admission) and requests whose own execution changed (chunking). Engine-side: prefill batch size distribution,
@@ -23,7 +25,6 @@ import csv
 import datetime as dt
 import glob
 import json
-import math
 import re
 import sys
 from pathlib import Path
@@ -66,14 +67,14 @@ def load(d, cohort_ids):
     if None in ident:
         sys.exit(f"INVALID: {d} run config lacks the workload identity")
     t_lo, t_hi = min(r["t_recv_s"] for r in by.values()), max(r["t_first_token_s"] for r in by.values())
-    lo, hi = math.ceil(t_lo), math.floor(t_hi)  # whole log seconds strictly inside the window
+    # a log line stamped ts covers [ts, ts+1): interior only if that whole second lies inside [t_lo, t_hi]
     batches, pace, outside, edge = [], [], 0, 0
     for line in open(d / "server.log", errors="replace"):
         t = TS.match(line)
         if not t:
             continue
         ts = epoch(t.group(1))
-        where = "in" if lo <= ts <= hi else "edge" if math.floor(t_lo) <= ts <= math.ceil(t_hi) else "out"
+        where = "in" if ts >= t_lo and ts + 1 <= t_hi else "edge" if ts < t_hi and ts + 1 > t_lo else "out"
         m = PRE.search(line)
         if m:
             if where == "in":
@@ -180,8 +181,8 @@ def main():
     tb = [r["b_tpot"] for r in rows if r["b_tpot"] != ""]
     tc = [r["c_tpot"] for r in rows if r["c_tpot"] != ""]
     n_pair = sum(1 for rid in B if rid in pairs)
-    print(f"  true-LCP gap: verified pairs {n_pair - bad_pairs}, rejected {bad_pairs}, no pair (unknown) {len(B) - n_pair}"
-          f" of {len(B)}; workload identity {ib}")
+    print(f"  LCP gap (T56 pairs, unverified source, diagnostic only): metadata-checked {n_pair - bad_pairs}, "
+          f"rejected {bad_pairs}, no pair (unknown) {len(B) - n_pair} of {len(B)}; workload identity {ib}")
     print(f"  prefill lines excluded: before/after the window base {ob_out[0]} cand {oc_out[0]}, in boundary seconds "
           f"base {ob_out[1]} cand {oc_out[1]}")
     print(f"  tpot per request > 0.10: {sum(x > .10 for x in tb)} -> {sum(x > .10 for x in tc)}")

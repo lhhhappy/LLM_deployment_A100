@@ -129,7 +129,8 @@ def main():
         print(f"  {lab:32s} {n:3d} | wait p50 {med('wait'):6.2f}s run p50 {med('run'):5.2f}s | new p50 {med('new'):6d} "
               f"| window batches p50 {med('win_batches')}, with partial p50 {med('win_partial')}")
     print("  (labels are descriptive; log lines have 1 s resolution; wait includes decode rounds and scheduling)")
-    print(f"  true-LCP pairs rejected (prompt/predecessor mismatch with this raw): {rejected}")
+    print(f"  T56 LCP pairs rejected (length/chain/predecessor mismatch with this raw): {rejected}; kept pairs are "
+          f"metadata-checked only (not bound to prompt content): reuse_gap and full-reuse counts are diagnostics")
     left = a.chunk - a.cap
     cls = [o for o in out if o["cached"] > 0 and left < o["new"] <= a.short]
     if cls and left > 0:
@@ -137,7 +138,7 @@ def main():
         lost = sum(1 for o in ov if o["new_at_full_reuse"] != "" and o["new_at_full_reuse"] <= left)
         wb = sum(o["win_batches"] for o in ov)
         print(f"  hits with {left} < new <= {a.short}: {len(ov)}/{len(cls)} over; of the overs {lost} would have had "
-              f"new <= {left} at full true-LCP reuse (cache and budget confounded); in their wait windows "
+              f"new <= {left} at full reuse per the unverified T56 LCP (diagnostic); in their wait windows "
               f"{sum(o['win_partial_only'] for o in ov)}/{wb} batches ran a partial alone at <= {a.cap} tokens")
     if a.csv:
         with a.csv.open("w", newline="") as f:

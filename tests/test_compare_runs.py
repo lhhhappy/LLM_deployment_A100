@@ -49,8 +49,10 @@ class CompareRuns(unittest.TestCase):
             line = next(l for l in out.splitlines() if l.strip().startswith(gate + " ("))
             self.assertIn("fixed 0 {}", line)
             self.assertIn("new 0 {}", line)
-        self.assertIn("verified pairs 411, rejected 0, no pair (unknown) 311 of 722", out)
+        self.assertIn("metadata-checked 411, rejected 0, no pair (unknown) 311 of 722", out)
         self.assertIn("before/after the window base 919 cand 919", out)
+        # the last measured second (partly after the last first token) is an edge second, not interior
+        self.assertIn("in boundary seconds base 1 cand 1", out)
 
     def test_missing_row_on_both_sides_is_invalid(self):
         b, c = self.copy("b"), self.copy("c")
@@ -121,7 +123,7 @@ class CompareRuns(unittest.TestCase):
         pf = self.tmp / "pairs.json"
         pf.write_text(json.dumps(pairs))
         rc, out = run(b, c, "--pairs", str(pf))
-        self.assertIn("verified pairs 410, rejected 1", out)
+        self.assertIn("metadata-checked 410, rejected 1", out)
 
 
 if __name__ == "__main__":
