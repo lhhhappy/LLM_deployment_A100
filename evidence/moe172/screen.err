@@ -1,0 +1,11 @@
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/moe172/kit/tests/gpu/test_moe_swiglu_172.py", line 162, in <module>
+    if args.full: full_moe()
+                  ^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/moe172/kit/tests/gpu/test_moe_swiglu_172.py", line 145, in full_moe
+    compare(run(True), run(False), f'full_moe_{tokens}')
+  File "/sjtu/linhang/arena/runs/moe172/kit/tests/gpu/test_moe_swiglu_172.py", line 38, in compare
+    assert nan_ok and inf_ok and not different, result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'case': 'full_moe_256', 'different': 6, 'elements': 1048576, 'max_abs': 0.0009765625, 'nan_mask_equal': True, 'inf_mask_equal': True}

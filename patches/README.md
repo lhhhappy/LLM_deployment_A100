@@ -37,6 +37,7 @@ S1 = S0 + `114-indexer-row-shard.patch`, with the same launch configuration; run
 | 160-nextn-sm80 | MTP/NEXTN speculative decoding on sm80 | candidate | `--speculative-algorithm NEXTN ...` (off) | only inside multi-change runs 028/034 |
 | 170-glm-bcg-prefill | breakable prefill CUDA graph for GLM | candidate | `--cuda-graph-backend-prefill breakable` (off) | v2 fix proven on TP2 only; TP8 recheck pending |
 | 171-kda-bf16-proj-fusion | fuse already unquantized KDA projections within the FP8 model | candidate | `SGLANG_AX_KDA_FUSE_PROJ` (0) | no; single-GPU operator/loader screening, see [171](171-kda-bf16-proj-fusion.md) |
+| 172-moe-clamped-swiglu | fuse BF16 clamped SwiGLU in Marlin MoE, preserving intermediate rounding | candidate | `SGLANG_AX_MOE_FUSE_SWIGLU` (0) | no; single-GPU numeric and full MoE cost screening, see [172](172-moe-clamped-swiglu.md) |
 
 Every candidate applies alone on top of S0 (checked with `patch_stack.py`, evidence/T57), so each can be tested as a single change.
 

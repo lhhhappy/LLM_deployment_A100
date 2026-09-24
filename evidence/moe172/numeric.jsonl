@@ -1,0 +1,17 @@
+{"kind": "setup", "gpu": "NVIDIA A100-SXM4-80GB", "torch": "2.13.0+cu130", "source": "/sjtu/linhang/arena/runs/moe172/src/sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py", "sha256": "c33fc53e551572f27a142412c18566deae2186a2a6aff4f9a37a81f9b740d999", "dtype": "bfloat16", "intermediate_per_tp8_rank": 256, "actual_tp": 1, "random_weights": true}
+{"kind": "numeric", "case": "negative_control_inf_sign", "different": 0, "elements": 1, "max_abs": 0, "nan_mask_equal": true, "inf_mask_equal": false}
+{"kind": "negative_control", "inf_sign_rejected": true}
+{"kind": "numeric", "case": "all_gate_bits", "different": 0, "elements": 458752, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "all_up_bits", "different": 0, "elements": 458752, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_0", "different": 0, "elements": 0, "max_abs": 0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_1", "different": 0, "elements": 256, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_33", "different": 0, "elements": 8448, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_37", "different": 0, "elements": 9472, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_63", "different": 0, "elements": 16128, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_65", "different": 0, "elements": 16640, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "row_stride_513", "different": 0, "elements": 131328, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "fallback_torch.float16_1_10.0", "different": 0, "elements": 9472, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "fallback_torch.bfloat16_2_10.0", "different": 0, "elements": 9472, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "numeric", "case": "fallback_torch.bfloat16_1_7.0", "different": 0, "elements": 9472, "max_abs": 0.0, "nan_mask_equal": true, "inf_mask_equal": true}
+{"kind": "negative_control", "fully_fp32_expression_differences": 269110}
+{"kind": "done", "passed": true}

@@ -1,0 +1,228 @@
+{
+  "scope": "single A100, random weights, TP8 per-rank shapes; no collectives or model/SLO claim",
+  "full_audit_numeric_limit": "Old audit wrapper wrote fused for both arms. Only same-input activation equality and unwrapped cost are used.",
+  "arm_audit": [
+    {
+      "kind": "numeric",
+      "case": "full_moe_reference_repeat_256",
+      "different": 224,
+      "elements": 1048576,
+      "max_abs": 0.00390625,
+      "rel_l2": 4.7733607061672956e-05,
+      "nan_mask_equal": true,
+      "inf_mask_equal": true
+    },
+    {
+      "kind": "numeric",
+      "case": "full_moe_candidate_256",
+      "different": 140,
+      "elements": 1048576,
+      "max_abs": 0.00390625,
+      "rel_l2": 4.767744758282788e-05,
+      "nan_mask_equal": true,
+      "inf_mask_equal": true
+    },
+    {
+      "kind": "numeric",
+      "case": "fixed_routing_reference_repeat",
+      "different": 0,
+      "elements": 1048576,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "nan_mask_equal": true,
+      "inf_mask_equal": true
+    },
+    {
+      "kind": "numeric",
+      "case": "fixed_routing_candidate",
+      "different": 0,
+      "elements": 1048576,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "nan_mask_equal": true,
+      "inf_mask_equal": true
+    }
+  ],
+  "cost": [
+    {
+      "tokens": 33,
+      "baseline": {
+        "wall_ms": 0.46770814806222916,
+        "gpu_ms": 0.4630847930908203,
+        "order_wall_medians": [
+          0.4685819149017334,
+          0.46672001481056213
+        ],
+        "extra_allocated_bytes": [
+          9676800,
+          9676800
+        ]
+      },
+      "fused": {
+        "wall_ms": 0.4498511552810669,
+        "gpu_ms": 0.44514880180358884,
+        "order_wall_medians": [
+          0.4489075392484665,
+          0.45203492045402527
+        ],
+        "extra_allocated_bytes": [
+          9676800,
+          9676800
+        ]
+      },
+      "wall_reduction_fraction": 0.03817977697234043
+    },
+    {
+      "tokens": 256,
+      "baseline": {
+        "wall_ms": 0.7705729454755783,
+        "gpu_ms": 0.7656288146972656,
+        "order_wall_medians": [
+          0.7722314447164536,
+          0.7703900337219238
+        ],
+        "extra_allocated_bytes": [
+          27163136,
+          27163136
+        ]
+      },
+      "fused": {
+        "wall_ms": 0.7467342540621758,
+        "gpu_ms": 0.7417824029922485,
+        "order_wall_medians": [
+          0.7461894303560257,
+          0.7467415183782578
+        ],
+        "extra_allocated_bytes": [
+          27163136,
+          27163136
+        ]
+      },
+      "wall_reduction_fraction": 0.03093632024504822
+    },
+    {
+      "tokens": 1024,
+      "baseline": {
+        "wall_ms": 1.0746939107775688,
+        "gpu_ms": 1.068985605239868,
+        "order_wall_medians": [
+          1.0773856192827225,
+          1.0741256177425385
+        ],
+        "extra_allocated_bytes": [
+          102103040,
+          102103040
+        ]
+      },
+      "fused": {
+        "wall_ms": 1.0331597179174423,
+        "gpu_ms": 1.0273279666900634,
+        "order_wall_medians": [
+          1.0335076600313187,
+          1.0325804352760315
+        ],
+        "extra_allocated_bytes": [
+          102103040,
+          102103040
+        ]
+      },
+      "wall_reduction_fraction": 0.038647462727387616
+    },
+    {
+      "tokens": 4096,
+      "baseline": {
+        "wall_ms": 2.906118892133236,
+        "gpu_ms": 2.900227165222168,
+        "order_wall_medians": [
+          2.8998948633670807,
+          2.9206879436969757
+        ],
+        "extra_allocated_bytes": [
+          396588544,
+          396588544
+        ]
+      },
+      "fused": {
+        "wall_ms": 2.770952135324478,
+        "gpu_ms": 2.7644703865051268,
+        "order_wall_medians": [
+          2.7682699263095856,
+          2.774975448846817
+        ],
+        "extra_allocated_bytes": [
+          354645504,
+          354645504
+        ]
+      },
+      "wall_reduction_fraction": 0.046511089816266504
+    },
+    {
+      "tokens": 8192,
+      "baseline": {
+        "wall_ms": 5.81160131841898,
+        "gpu_ms": 5.8047487258911135,
+        "order_wall_medians": [
+          5.812438204884529,
+          5.81076443195343
+        ],
+        "extra_allocated_bytes": [
+          793100288,
+          793100288
+        ]
+      },
+      "fused": {
+        "wall_ms": 5.527297966182232,
+        "gpu_ms": 5.520617675781249,
+        "order_wall_medians": [
+          5.526014417409897,
+          5.528581514954567
+        ],
+        "extra_allocated_bytes": [
+          709214208,
+          709214208
+        ]
+      },
+      "wall_reduction_fraction": 0.04891996829439971
+    },
+    {
+      "tokens": 16384,
+      "baseline": {
+        "wall_ms": 11.404438503086567,
+        "gpu_ms": 11.396492767333985,
+        "order_wall_medians": [
+          11.397669836878777,
+          11.406594514846802
+        ],
+        "extra_allocated_bytes": [
+          1586123264,
+          1586123264
+        ]
+      },
+      "fused": {
+        "wall_ms": 10.869970545172691,
+        "gpu_ms": 10.862329864501952,
+        "order_wall_medians": [
+          10.85439920425415,
+          10.902319848537445
+        ],
+        "extra_allocated_bytes": [
+          1418351104,
+          1418351104
+        ]
+      },
+      "wall_reduction_fraction": 0.04686490770845264
+    }
+  ],
+  "files": {
+    "arm-audit.err": "34868b15fa088507b1627f8ae60d0ad75fb5942f920fb9f0482e0cfc761caa90",
+    "arm-audit.jsonl": "d5d91b9144de50cedd7a29e552ddfaf2753c01b5a3f81a7d10c6fcd6fc8d6685",
+    "full-audit-test.py": "1470813806b8d09a9b097c3abfe469e0a5cf3a344098dd4a8d1e4a743a40416f",
+    "full-audit.err": "34868b15fa088507b1627f8ae60d0ad75fb5942f920fb9f0482e0cfc761caa90",
+    "full-audit.jsonl": "c301f26c424581d6dc8759edc946a109743ecfa3a8e4410a050cd9849fb517ae",
+    "numeric.err": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "numeric.jsonl": "5d2a8fa0db8e109aaf8b4ccadc26949092b9ea8fd800603281d4bead90bb9bd9",
+    "screen.err": "7c6a0779c878a87da1a1c33b6e91ea030f3e6b220320124793401c7976d9a674",
+    "screen.jsonl": "0fb9c71aa9186d1c25503b7e74a1fbd64278d39399178c54466c95e7e1ba71c7",
+    "summarize.py": "ede7b71bcc872f20d400db1dbd484d1d55ab33646775be013ad0191cd6920e30"
+  }
+}

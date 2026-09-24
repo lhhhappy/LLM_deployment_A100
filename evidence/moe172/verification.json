@@ -1,0 +1,19 @@
+{
+  "patch_sha256": "2752e70a32a732294b6025bd13ad6226c269c885c25fb96800885da5b669d606",
+  "current_test_sha256": "fd23f69a2834d1d9d29bf4b78a7ec2b8f0cc23b1cbedb4d4c4ed28a0ef8e4de0",
+  "current_patched_source_sha256": "c33fc53e551572f27a142412c18566deae2186a2a6aff4f9a37a81f9b740d999",
+  "jobs": {
+    "moe172-screen": 1,
+    "moe172-numeric": 0,
+    "moe172-full-audit": 0,
+    "moe172-arm-audit": 0
+  },
+  "formal_a_plus_172_fuzz0_apply": true,
+  "review": "notes/reports/review-kernels-sol.md",
+  "limits": [
+    "single A100; random weights; no collectives",
+    "full-audit numeric baseline labels invalid; arm-audit supersedes them",
+    "cost measured after audit wrapper restoration",
+    "full TP8 and quality/SLO still pending"
+  ]
+}
