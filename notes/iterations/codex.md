@@ -15,17 +15,17 @@
 - lc139:0002在067/068均cached=0；069为75,520，TTFT265.63→8.143秒，距真LCP仍差1,792 token。缺口显著缩小，但有效状态保存/淘汰/恢复的具体事件仍未知。
 - 当前069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
 - 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。工具2837b3c已部署并恢复队列，启动180秒、rep16预热112.832秒，20:06:39 UTC真flush后已进入全量测量。
-- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，75分钟已复核；下一105分钟诊断21:51:57 UTC。
+- watch069与本地桥PID5264已启动；后台每分钟健康检查，测量t0+15/45/75分钟诊断；启动、16条原prompt长度/输出预算、同plan哈希和flush已核对；首测量dispatch 20:06:57.676 UTC，105分钟已复核；等待终态通知，若未结束则下一135分钟22:21:57 UTC。
 - 启动实测device KV=1,397,760、KDA=418不变，host FULL=2,903,808 token、KDA host=23.73GB；122off/180on符合G_EXPECT。[启动收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json)。
-- 069第75分钟冻结快照4084条，唯一、0错误、原预算/gap/时间戳核对通过，前2338条是原样字节前缀；通知的较晚4154条不混入。四桶p95=4.298/5.784/13.641/50.607秒，TPOT均值/p95=.032471/.061839。
-- 与068相同4084条相比，四桶超标454→222、403→195、13→7、50→31；未命中28.261M→16.921M token，TPOT均值.039703→.032471。仍是已完成子集，保留选择/时序偏差。
-- 新增完成1746条中仅fast10、overall16超标，turn/chain零新增；按完成增量，不冒充45–75分钟发出窗口。剩56链，尚非最后排空。
+- 069第105分钟冻结快照5585条，唯一、0错误、原预算/gap/时间戳核对通过，前4084条是原样字节前缀；较晚健康5594条不混入。四桶p95=2.710/3.644/13.641/40.336秒，TPOT均值/p95=.028889/.055932。
+- 与068相同5585条相比，四桶超标461→222、410→195、13→7、50→31；未命中30.745M→19.067M token，TPOT均值.034343→.028889。仍非完整结果，保留选择/时序偏差。
+- 新增完成1501条没有新增TTFT超标。308链已结束、剩3链16请求；82.135分钟起剩链<30，尾段不能当满N30。[105分钟审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check105/audit.json)、[剩余请求](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check105/remaining-requests.json)。
 - chain累计31仍超过全量432样本CP允许29；若最终数据有效，该本地门无法通过，继续完整回放。31坏例均在前38.38分钟发出，20条queue_time≥80% TTFT，2条exec→first本身>30s；不能把执行段当纯kernel时间或简单扣队列推算可达收益。
-- fast修复360新增128；222坏例中205条实际未命中≤4096、195条queue_time≥80% TTFT。[75分钟审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/audit.json)、[31个chain坏例](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/chain-badcases.csv)。
+- 当前fast修复367新增128、overall327/112、turn12/6、chain24/5；坏例数较75分钟不变，222个fast坏例中205条实际未命中≤4096、195条queue_time≥80% TTFT。[75分钟审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/audit.json)、[31个chain坏例](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check75/chain-badcases.csv)。
 - 新坏例lc302:0017两轮cached45,824不变，TTFT.369→82.872秒，其中scheduler queue82.573秒；lc117:0032同cached71,168，.419→55.005秒。
 - 源码120在partial存在时提前拒绝needs_host_load_back请求，180保留此规则；当前源码5项CPU HiCache调度测试通过，确认host候选会被暂缓；但最终cached不证明案例等待时层级或实际skip原因，仍需定向证据。[45分钟审计](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/audit.json)、[持续坏例](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/persistent-cases.json)、[新坏例与源码线索](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/check45/slow-fast-cases.json)。
 - 同ID跟踪缓存量、等待/执行、prefill批与全部11门；容量无收益再补定向事件trace。缓存命中改善也不能忽略新坏例/TPOT回退。
-- 068在99.02分钟后剩链<30，最后排空段不代表满N30；不拿尾窗好看抵消全量失败。
+- 067/068/069自然排空（剩链<30）分别始于97.88/99.02/82.14分钟；尾段不能抵消前段坏例，也不能单独量化满载吞吐。
 
 ## 已发现问题与处理边界
 

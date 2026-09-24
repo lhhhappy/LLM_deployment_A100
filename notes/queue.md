@@ -9,7 +9,7 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 全量N30测量中；75分钟4084条/0错，尚余56链；chain仍31/全量允许29，继续收齐；下次21:51:57 UTC |
+| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 测量收尾；105分钟5585条/0错，剩3链16请求；chain仍31/全量允许29；等待终态，若未结束下一22:21:57 UTC |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
 | 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
 | 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
