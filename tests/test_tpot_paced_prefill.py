@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 """Patch 122 (TPOT-paced prefill budget) on the real scheduler code with CPU fakes and a fake clock.
 
-Build the trees first (official A stack, with and without 122):
-  A="000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer \
-     111-sm80-fp8-moe-marlin 114-indexer-row-shard 120-sched-protect-chain 121-sched-cap-while-decoding"
-  B="130-async-tokenize 140-kda-dual-snapshot 150-startup-warmup 160-nextn-sm80 170-glm-bcg-prefill"
-  python3 scripts/patch_stack.py apply build/p122/baseA $A $B
-  python3 scripts/patch_stack.py apply build/p122/candidate $A 122-tpot-paced-prefill $B
-then: python3 -m unittest discover -s tests -p test_tpot_paced_prefill.py
+Trees come from the engine git history (scripts/engine/tree.py): official-A-0923a and the 122 commit.
+Run: python3 -m unittest discover -s tests -p test_tpot_paced_prefill.py
 
 The fake clock charges C0 + C1 * new tokens per prefill batch and DECODE_S per decode round (optionally scaled, to model
 cost-model error). The simulation checks the invariant the patch is built on: when the cost model holds, every request's
@@ -20,10 +15,10 @@ import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import patch
 
-from test_sched_protect_chain import ROOT, Req, make_scheduler, step
+from test_sched_protect_chain import ROOT, Req, make_scheduler, step, tree_dir
 
-BASE = ROOT / 'build/p122/baseA/sglang'
-CAND = ROOT / 'build/p122/candidate/sglang'
+BASE = tree_dir('official-A-0923a')
+CAND = tree_dir('mech:122')
 # official A launch: chunk 8192 (default), interval 2, COLD_CAP 4096, SHORT_TOKENS 8192
 A_ENV = {'SGLANG_AX_SCHED_PROTECT': '1', 'SGLANG_AX_SCHED_COLD_CAP': '4096', 'SGLANG_AX_SCHED_SHORT_TOKENS': '8192'}
 PACE = {'SGLANG_AX_PACE_TPOT': '0.085'}

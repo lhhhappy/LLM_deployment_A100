@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Patch 123 (shortest remaining prefill first with aging) on the real scheduler code with CPU fakes.
 
-Build the tree first:
-  python3 scripts/patch_stack.py apply build/p123/candidate 000-interface-compliance 101-role-boundary-split \
-      106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 120-sched-protect-chain 123-srpt-admission
-then: python3 -m unittest discover -s tests -p test_srpt_admission.py
+The tree is the 123 commit of the engine git history (scripts/engine/tree.py).
+Run: python3 -m unittest discover -s tests -p test_srpt_admission.py
 """
 import os
 import time
@@ -12,9 +10,9 @@ import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import patch
 
-from test_sched_protect_chain import ROOT, Req, load_source, make_scheduler, step
+from test_sched_protect_chain import ROOT, Req, load_source, make_scheduler, step, tree_dir
 
-P123 = ROOT / 'build/p123/candidate/sglang'
+P123 = tree_dir('mech:123')
 
 
 def req(rid, work, cached=0, waited=0.0):

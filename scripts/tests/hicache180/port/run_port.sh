@@ -1,7 +1,8 @@
 #!/bin/bash
-# Regenerate patch 180 from refs/pr*.diff: upstream hunks + the adaptations listed in patches/180-hicache-glm-dsa.md.
+# Regenerate the 180 change from refs/pr*.diff: upstream hunks + the adaptations listed in engine/docs/180-hicache-glm-dsa.md.
 # usage: run_port.sh SRC_TREE_DIR OUT_DIR   (trees contain sglang/; SRC = the deployed stack 000..170)
-# then: python3 scripts/patch_stack.py make SRC OUT new.patch <files> ; cmp with patches/180-hicache-glm-dsa.patch
+# then compare with the 180 commit: c=$(python3 scripts/engine/tree.py --mechanism 180); git diff $c^ $c -- engine/sglang
+# (the scheduler.py guard change in that commit is a local addition, not produced by these port steps).
 set -e
 H=$(dirname $(readlink -f $0))
 rm -rf "$2"; mkdir -p "$2"; cp -r "$1/sglang" "$2/sglang"

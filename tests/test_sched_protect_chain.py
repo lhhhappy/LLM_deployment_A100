@@ -3,11 +3,9 @@
 
 No CUDA/torch import; model forwards, cache/pools and ScheduleBatch are faked.
 The decision methods, 101 split, resource accounting and LPM sort are production
-code. Build the trees first (T57):
-  python3 scripts/patch_stack.py apply build/p120/baseline 000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin
-  python3 scripts/patch_stack.py apply build/p120/candidate <same> 120-sched-protect-chain
-  (optional) python3 scripts/patch_stack.py apply build/p180/candidate <official A 13 patches> 180-hicache-glm-dsa
-then: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
+code. Trees come from the engine git history (scripts/engine/tree.py, cached under build/engine/trees):
+the commit before 120, the 120 commit, and HEAD (all candidates, default off) for the HiCache tier tests.
+Run: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
 """
 from __future__ import annotations
 
@@ -32,8 +30,11 @@ from typing import Union
 from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / 'build/p120/baseline/sglang'
-CANDIDATE = ROOT / 'build/p120/candidate/sglang'
+sys.path.insert(0, str(ROOT / 'scripts/engine'))
+from tree import tree_dir  # noqa: E402
+
+BASE = tree_dir('before:120')
+CANDIDATE = tree_dir('mech:120')
 EVIDENCE = ROOT / 'evidence/T41'
 
 
@@ -612,11 +613,10 @@ class ProtectTests(unittest.TestCase):
             self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
 
-# A + 180 tree (build: patch_stack.py apply build/p180/candidate <official A 13 patches> 180-hicache-glm-dsa).
-TREE_180 = ROOT / 'build/p180/candidate/sglang'
+# HEAD carries 180 on top of official A and the other default-off candidates.
+TREE_180 = tree_dir('mech:180')
 
 
-@unittest.skipUnless(TREE_180.exists(), 'build the official A + 180 tree first')
 class HiCacheTierTests(unittest.TestCase):
     """180 keeps 120/121's contracts with the L1/L2 host tier; only L3 storage bypasses them."""
 
