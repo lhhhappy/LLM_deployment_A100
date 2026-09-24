@@ -4,6 +4,29 @@
 
 ## 当前开发集对照
 
+### 067：组合全量长链N30（2026-09-24，Codex）
+
+正式A + mem0.87 + 新版180 + 修复122，MTP保留；引擎759a6eb、运行工具296caaa。
+rep16-v1预热101.696秒后真flush；完整311链/5601请求每条恰好一次，原输出预算全部匹配、0错误，TTFT全部服务端打点。
+本地独立原harness复算为**VALID FAIL**：四类TTFT失败，其余7门通过。测量约123分钟，无人工截断。
+
+| 门 | 样本 | p95秒 | 超标 / CP允许 | 结果 |
+|---|---:|---:|---:|---|
+| fast_intra | 4765 | 7.6457 | 492 / 263 | FAIL |
+| overall_intra | 5010 | 8.5156 | 401 / 276 | FAIL |
+| turn_start | 159 | 25.0138 | 14 / 13 | FAIL |
+| chain_start | 432 | 93.7016 | 55 / 29 | FAIL |
+| TPOT | 5601 | .067469 | 0条超过.10 | PASS |
+
+TPOT均值.033498秒/token。原固定稳态窗[10,70)分钟2585条，有效：逻辑TPM 2,787,756.35、decode TPM 29,805.45。
+这些是本地冻结合成集结果，不与正式榜单直接排名；CP是本地估计口径，Wilson/Wald的整档结论也均FAIL。
+
+冻结616个唯一TTFT坏例（桶重叠，不能把超标数相加）。fast坏例455/492在前60分钟；97.88分钟后剩余链<30，尾段不当满N30。
+坏例recv→exec中位依次约5.4/8.0/21.1/63.4秒；该间隔不能直接归因调度。8条慢fast已验证prompt LCP大于cached，尚不能证明有效混合状态曾存在或被淘汰。
+下一项068只切122 off；比较整个节奏/块预算机制，不预设净收益，不同时改成本模型或180。
+
+[完整判定与收据](../evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json)、[唯一坏例CSV](../evidence/L067-official_b_full_n30_shortwarm/N30/ttft-cases.csv)、[数据与raw哈希](../evidence/L067-official_b_full_n30_shortwarm/N30/case-list-manifest.json)、[过程与归因边界](reports/sglang-shortwarm-mainline-0924.md)。
+
 | 实验 | 只改什么 / 环境 | 完整档结果 | 结论与证据 |
 |---|---|---|---|
 | 026 N18 | S0：底包 + `000 101 106 110 111 120 140`；完整 `dev-combined-v1` | 722 条；四道 TTFT 门通过，`tpot_mean=0.083`、`tpot_p95=0.219`，整档 FAIL | 解码 p95 是硬门；真实链内缓存缺口上限约 8%，不能用旧的冻结 token 差值归因。原始 [raw](../evidence/T53/026_N18_raw.jsonl)、[独立审阅](../research/codex/R19_progress_and_cache_review.md)、[真实 LCP](../research/codex/R20_true_lcp_attribution.md) |

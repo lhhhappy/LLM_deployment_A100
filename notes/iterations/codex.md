@@ -4,25 +4,19 @@
 当前单人优化SGLang，优先完整N30和四类TTFT；vLLM暂缓。允许偶尔独立代码审查。
 用户提供线上榜单参照：N@SLO30、TPOT均值.046204、TPM1,557,557.2、decode TPM19,434；本地未过门样本不可直接排名。
 
-## 当前轮：067（2026-09-24）
+## 当前轮：068准备；067已完整归档（2026-09-24）
 
-- 问题：正式A + mem0.87 + 新版180 + 修复122能否稳定完成N30，哪道门最紧？本轮只评价组合整体。
-- 引擎759a6eb，运行工具296caaa，对应正式46174/0924d；120/122/180 on，MTP保留。
-- 完整311链/5601请求，rep16-v1短预热、真flush，无70分钟截止；064已停、065/066撤销。
-- 服务启动175s；16条预热101.696s，原预算逐条独立核对通过；15:15:31 UTC真flush成功。
-- 已完成记录中的最早发送为15:15:50.669 UTC；检查点15:30:50、16:00:50、16:30:50……。
-- 105分钟快照4976条完成，0错误/预算差异/时间戳逆序；四桶累计p95 8.64/9.48/25.01/93.70s，TPOT .0362/.0691。
-- 本地CP预判无法PASS：四桶超标492/401/14/55，均超全量允许263/276/13/29；未闭合，不预测官方。
-- 第97.88分钟起剩余链<30，快照时295/311链已完成、余16链；尾段低延迟不能当满N30表现。
-- 当前fast坏例455/492在前60分钟；60–90分钟已有改善且尚未最终排空，按压力阶段和同请求对照分析。
-- 第30分钟后最慢8条fast坏例，按本轮256-token树边界复算差额10,752–171,776，中位31,360；不能证明检查点曾存在。
-- 下一动作：收到终态即取回全量、核验5601条及11门；否则17:30:50 UTC检查。查状态保存/host搬回与准入，下一轮补分层指标。
-- 15:55桥接SSH单次断连触发通知；只读复查恢复，完成1622→1645且健康无告警；未停回放。
-- 检查点证据：[15](../../evidence/L067-official_b_full_n30_shortwarm/check15/)、[45](../../evidence/L067-official_b_full_n30_shortwarm/check45/)、[75](../../evidence/L067-official_b_full_n30_shortwarm/check75/)、[105分钟](../../evidence/L067-official_b_full_n30_shortwarm/check105/)。
-- check45/ttft-cases.csv固定391个唯一TTFT坏例及四桶标签；完跑后补全集，下轮逐ID比较修复、新增坏例与TPOT回归。
-- N30已核对：当前loadgen进程--n 30且非warmup，输出N30目录；raw可见链区间交叠下界达30，非HTTP并发保证。
-- 首轮原始配置与审计：[L067证据](../../evidence/L067-official_b_full_n30_shortwarm/)。
-- 机制与预热边界：[组合报告](../reports/sglang-shortwarm-mainline-0924.md)。
+- 067：正式A + mem0.87 + 新版180 + 修复122；引擎759a6eb、工具296caaa，对应正式46174/0924d。
+- 311链/5601请求每条恰好一次，原预算/gap一致、0错误，真flush；独立review复算通过。VALID FAIL，仅四类TTFT失败。
+- 四桶p95 fast/overall/turn/chain = 7.6457/8.5156/25.0138/93.7016秒；超标/允许 = 492/263、401/276、14/13、55/29。
+- TPOT均值/p95 .033498/.067469；固定[10,70)分钟TPM 2,787,756.35、decode 29,805.45。全部只是本地冻结集结果。
+- 完整[判定](../../evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json)、[616个唯一坏例](../../evidence/L067-official_b_full_n30_shortwarm/N30/ttft-cases.csv)、[绑定哈希](../../evidence/L067-official_b_full_n30_shortwarm/N30/case-list-manifest.json)。
+- 455/492 fast坏例在前60分钟；97.88分钟后余链<30，尾段不是满N30。N30已用启动实参与raw链区间核对。
+- 偏置样本8条慢fast有真实prompt LCP与cached差额，不能证明有效混合检查点曾存在；详细溯源见[报告](../reports/sglang-shortwarm-mainline-0924.md)。
+- 068唯一引擎变化：PACE .085→0；同源码/数据/N30/rep16/真flush。检验122整体，不只解释为某一预算参数。
+- CPU真实调度47项通过，独立review认为设计成立；新工具增加已有HiCache分层指标并收紧预热校验，记录观测开销不确定性。
+- 下一动作：空闲队列已暂停，提交068入口与记录、qpush核对RUNTIME_DEPLOYED和DONE，再resume；接上15/45/75分钟后台消息。
+- 067的16条预热101.696秒，预算严格核对通过；无70分钟截止、未因局部FAIL停止。
 
 ## 已发现问题与处理边界
 
@@ -45,10 +39,10 @@
 
 ## 观测与溯源
 
-- GPU仓库：evidence/L067-official_b_full_n30_shortwarm/window/保存健康与窗口原始证据。
-- 常规查询：window_watch.sh 067-official_b_full_n30_shortwarm --status --changes-only。
+- GPU仓库：evidence/L<job>/window/保存健康与窗口原始证据；067已终态归档。
+- 常规查询：window_watch.sh <job> --status --changes-only。
 - 每分钟后台健康采样；前台只看变化与到点诊断。原始日志按请求/时间段读取，不进入常驻上下文。
-- watch067v3采样；本地window_notify桥接已启动，后台轮询缓存，仅诊断/状态/异常变化发消息唤醒当前会话。
+- 每个run使用window_watch采样和本地window_notify桥接；后台轮询缓存，仅诊断/状态/异常变化唤醒当前会话。
   通路测试消息已由当前会话实际收到；无需Goal自动续跑。接收CLI/relay须保持运行，注册过期会拒发并留证重试。
 - 全量闭合再判11门；不按5%或局部FAIL自动停。严重bug留证后只停单个job。
 - 当前代码核验：短预热5、评估14、队列5、调度32、122 15、窗口监控12项通过；CPU不代替TP8。

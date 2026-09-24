@@ -9,13 +9,20 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | running；短预热101.7s完成，15:15:31 UTC真flush成功，进入N30测量 |
+| 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；引擎源码、mem0.87、新版180、N30、数据、预热不变 | 准备部署；CPU真实调度器47项通过，队列空闲且已暂停 |
+| 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
 | 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
 | 065 / 066 | 仅mem0.87 / 再加新版180 | 已从pending撤销，不再阻挡组合验证 |
 
 067引擎固定759a6ebb8e31723519ad5daf438e26e24b32501a，运行工具296caaa；
 120/122/180 on，171/172/123/DCP off。配置对应已上传正式46174/0924d，**不重复提交官方attempt**。
 正式46173/46174的上传与成绩只看[submissions.md](submissions.md)及official_status，不从本地推断。
+
+068的唯一引擎开关变化为`SGLANG_AX_PACE_TPOT=.085→0`，`G_EXPECT 122=off`，源码仍759a6eb。
+检验122整体在本负载下的取舍：关闭也会恢复固定decode interval与4096冷块上限，不能把差异只归给某一个参数。
+数据manifest SHA256 `19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c`。
+判据为全部5601条同ID、四桶修复/新增坏例与TPOT回归；未预设关闭会更好。
+新运行库补采已有HiCache分层指标（同10秒频率）并收紧预热校验；067的16条原预算已另行严格核对通过。
 
 ## 测量与比较
 
