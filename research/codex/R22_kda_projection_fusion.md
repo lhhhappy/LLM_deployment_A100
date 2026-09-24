@@ -59,7 +59,7 @@ JSONL 明确 `scope=kda_projection_only`、`emulated_ranks=true`；P、请求 ba
 
 ## 复现与证据
 
-- 最终[原始 JSONL](../../evidence/kda171/final.jsonl)、[stderr](../../evidence/kda171/final.err)、[job 完成记录](../../evidence/kda171/job.log)、[汇总](../../evidence/kda171/summary.json)。补丁与源码 SHA256 均写在首行，并在本地与当前候选核对相等。
+- 最终[原始 JSONL](../../evidence/kda171/final.jsonl)、[stderr](../../evidence/kda171/final.err)、[job 完成记录](../../evidence/kda171/job.log)、[汇总](../../evidence/kda171/summary.json)。补丁与源码 SHA256 均写在首行，对应原171提交 `eefc2ab` 的GPU测试版。后续仅新增逐层加载路径日志，使当前patch SHA变为 `08eee808be8632776721c90769162a3a30622b8e73fd806565a0c94cdb10026e`；旧GPU记录不冒充新哈希的运行，049用于新的真实TP8筛选。
 - [早期完整探针](../../evidence/kda171/initial-result.jsonl)在 dtype 跟随修正前，BF16 数学路径相同；没有 MTP/FP16 检查，仅用于保留测量波动证据。当前结论以 final 为准。更早两个试跑因测试上下文配置失败，未得到完整结果，不计通过。
 - CPU 的 3 个资格测试通过；底包/S0/正式 A 栈以 fuzz=0 应用，AST 语法检查通过。没有新增正式提交或 8 卡 SLO 结果。
 
