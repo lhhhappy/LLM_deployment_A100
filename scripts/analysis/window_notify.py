@@ -42,7 +42,7 @@ def message(job, key, state, health, now):
     brief = state.get('last_report', '暂无诊断快照')
     alerts = '; '.join(view['alerts'])[:300]
     return (f'[N30 watcher event {key[:12]}] {job}: '
-            f"状态={view['job_state']} 监控={view['monitor']} 完成={view['completed']}; "
+            f"状态={view['job_state']} 阶段={view['phase']} 监控={view['monitor']} 完成={view['completed']}; "
             f'{brief}; alerts={alerts}; error={view["error"]}. '
             '程序触发检查：先读 notes/iterations/codex.md 和缓存摘要，按需取证。'
             '完成简短分析、更新日志后结束本轮，等待下一事件；不因局部FAIL自动停任务。')[:1600]

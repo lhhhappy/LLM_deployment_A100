@@ -99,6 +99,7 @@ class Windows(unittest.TestCase):
         text = bridge.message('job', original, s, h, 1070)
         self.assertLessEqual(len(text), 1600)
         self.assertIn('完成=420', text)
+        self.assertIn('阶段=measurement', text)
 
     def test_bridge_debounces_transport_and_keeps_real_alerts_immediate(self):
         state = {}
