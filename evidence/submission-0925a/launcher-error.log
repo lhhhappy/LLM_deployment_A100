@@ -1,0 +1,1 @@
+/bin/bash: scripts/submit_official.sh: /usr/bin/env: bad interpreter: Permission denied

@@ -1,0 +1,11 @@
+{
+  "id": 164813,
+  "name": "lh-img:0924d",
+  "url": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0924d",
+  "status": 2,
+  "project_id": 4727808,
+  "dockerfile_matches_archive_except_removed_final_newline": true,
+  "embedded_patch_matches_frozen_git_diff": true,
+  "catalog_dockerfile_sha256": "941cd053eb95973186e01bee388a71f59312f1371afc8a892c987a3d42a1b107",
+  "queried_at_epoch": 1790291989
+}

@@ -1,0 +1,16 @@
+{
+  "status": "BUNDLE_VERIFIED",
+  "bundle": "build/submit_0925_A.zip",
+  "bundle_sha256": "4de54e297f2534830be9a7e7a97bfbaefb40c72a0ad165d41b9ce509b978aa61",
+  "submission_sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9",
+  "entries": 16,
+  "engine_submission_copies": [
+    "outputs/submission.json",
+    "execution/results/submission.json",
+    "results/submission.json"
+  ],
+  "all_engine_submission_copies_byte_identical": true,
+  "root_submission_json": "CLI metadata, references correct payload SHA",
+  "review": "review_eval_shortwarm independently verified 069 config, 4692-entry source digest, no engine mutation",
+  "attempts_to_submit": 1
+}

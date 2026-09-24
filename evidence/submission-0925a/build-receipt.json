@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "data": {
+    "buildType": 2,
+    "buildTypeText": "dockerfile",
+    "createTime": "2026-09-25T07:21:34+08:00",
+    "id": 165027,
+    "imageDesc": "",
+    "imageName": "dp/native/prod-4727808/4650601/lh-img:0925a",
+    "imageUrl": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a",
+    "lbgImageId": 165027,
+    "projectId": 4727808,
+    "repoName": "dp/native/prod-4727808/4650601/lh-img",
+    "sandboxId": "",
+    "sizeBytes": 14409615279,
+    "status": 2,
+    "statusText": "success",
+    "tag": "0925a",
+    "uncompressSizeBytes": 28819230557,
+    "updateTime": "2026-09-25T07:22:00+08:00"
+  },
+  "meta": {
+    "request_id": "441b6de4-4076-48f5-8b3b-3177cb5298f0",
+    "cli_version": "2.7.7",
+    "cli_commit": "f4868539d66dffeb6fb2ef217c36342155e97eda",
+    "cli_modified": false,
+    "command": "bohr image build",
+    "timestamp": 1790292121
+  }
+}

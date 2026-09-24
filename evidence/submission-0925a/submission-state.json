@@ -1,0 +1,10 @@
+{
+  "state": "submitted",
+  "max_new_attempts": 1,
+  "image_id": 165027,
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "bundle_sha256": "4de54e297f2534830be9a7e7a97bfbaefb40c72a0ad165d41b9ce509b978aa61",
+  "attempt_id": "46251",
+  "platform_status": "queued",
+  "job_id": 24499
+}

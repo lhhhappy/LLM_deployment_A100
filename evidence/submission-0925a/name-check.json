@@ -1,0 +1,9 @@
+{
+  "target": "lh-img:0925a",
+  "matches": [],
+  "data_shape": "dict",
+  "data_keys": [
+    "items",
+    "pagination"
+  ]
+}

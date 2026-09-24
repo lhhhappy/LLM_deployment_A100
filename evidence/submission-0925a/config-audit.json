@@ -1,0 +1,24 @@
+{
+  "status": "LOCAL_ENGINE_CONFIG_MATCH",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "image": "lh-img:0925a",
+  "parent_image": "lh-img:0924d",
+  "source_files": 4692,
+  "symlink_count": 1,
+  "source_digest": "35da0a20d41a54e16c159cd7cc30c1540d5b3675c90b1a790cbbbcd3a168b3d9",
+  "digest_definition": "SHA256 over sorted entries: kind f/l + relative path UTF-8 + NUL + binary SHA256(file contents or symlink target)",
+  "dockerfile_bytes": 43299,
+  "archived_0924d_patch_matches_git": true,
+  "actual_069_extra_argv_match": true,
+  "actual_069_mechanism_env_match": true,
+  "launch_topk_v2": "0 (same as lib.sh launch prefix)",
+  "inherited_library_metadata": {
+    "NCCL_VERSION": "2.28.3-1"
+  },
+  "runtime_differences": {
+    "port": "local 30000 -> official 8000",
+    "code_path": "local PYTHONPATH exported source -> image installed package; content asserted during image build",
+    "evaluation": "official platform controls data, warmup, flush and ladder; local rep16/N30 is not submitted"
+  },
+  "submission_sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9"
+}

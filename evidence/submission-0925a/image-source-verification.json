@@ -1,0 +1,11 @@
+{
+  "image_id": 165027,
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "source_files": 4692,
+  "source_digest": "35da0a20d41a54e16c159cd7cc30c1540d5b3675c90b1a790cbbbcd3a168b3d9",
+  "build_assertion_lines": [
+    "#6 0.715 ENGINE_SOURCE_VERIFIED 4692 35da0a20d41a54e16c159cd7cc30c1540d5b3675c90b1a790cbbbcd3a168b3d9"
+  ],
+  "independent_review_passed": true,
+  "submission_sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9"
+}
