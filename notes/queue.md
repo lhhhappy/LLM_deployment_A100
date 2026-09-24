@@ -23,6 +23,7 @@
 | 055-official_a_combo_cost | 正式配置与171+172组合短测速 | 按用户最新顺序要求主动停止，队列记failed为stopjob终止，不是候选错误；不作完整组合结论 |
 | 056-official_a_171_n22 | 现有正式配置只加171，完整原开发集N22 | 完成并独立复算：722条VALID FAIL，fast35/23、overall57/27、turn1/3、chain64/22，TPOT .0628/.0869通过；无引擎错误，非一致性门退出。34层实际融合；KV 1,024,960、状态槽318，少于047的1,036,288/321。单次收益混合，尚无净收益结论 |
 | 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 完成并独立复算：722条VALID FAIL、0请求错误；fast33/23、overall53/27、turn2/3、chain62/22，TPOT .0610/.0850通过。KV 1,036,288、状态槽321与047一致。均值略降但fast/overall TTFT p95上升，未证明稳定净收益 |
+| 058-official_a_longchain_lite_n14 | 正式 A 原样，64条完整链／1123请求的 lite 集，固定 N14 | 已入队running，启动引擎中。Pod侧8个数据artifact校验通过，13补丁逐项SHA256全部OK（含121），源码补丁签名`5a359e41c183750a`与047一致；参数/env与正式A一致，保留MTP。只跑lite，预热后严格flush，原harness完整评分。证据入口 evidence/L058-official_a_longchain_lite_n14/ |
 
 049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。056/057均已完成；057结束后pread确认无running/pending job，服务未停止或释放，常驻watcher继续监控。
 
@@ -59,3 +60,7 @@
 ## 用户最新要求：直接分别测171、172
 
 先056测171，再057测172；不再以重复生成token/logprob相同为前置，不再排固定排序诊断，暂不测组合。清缓存必须2xx且JSON success为true；preflight/warmup之后、正式测量之前再清，失败终止该档。代码缓存与CUDA graph保留。以实际TTFT、TPOT、TPM和全部赛题硬门判断效果，生成文本允许变化；局部算子速度不能当成正式并发晋档。
+
+## 用户后续安排：正式 A 的长链 lite N14
+
+全量311链的任务尚未入队，按用户调整先058跑`data/s1-dev-longchain-lite/`。该子集为64条完整链／1123请求，manifest SHA256 `b8f8b668189d9a6ded593ff88462cda37285d8e7a68f7654cea9ab1624f9b999`，cohort顺序ID `f5ef90c6218b260f`；本次已核artifact哈希与完整roster，不重复整套CPU渲染自检。回放root/set/cohort及评分requests都指向lite，使用新输出目录；不追加原开发集、N18或其他候选。正式A等价13补丁为`000 101 106 110 111 114 120 121 130 140 150 160 170`，含MTP；Pod启动前再次逐项核对冻结补丁哈希。原harness的preflight/warmup/flush继续保留，无重复输出一致性门。指标采集增加KV/Mamba池的free/evictable/used以及实际暴露的淘汰计数，并保存标签；缺失指标不视为零。

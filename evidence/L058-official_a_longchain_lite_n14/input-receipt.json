@@ -1,0 +1,18 @@
+{
+  "manifest_sha256": "b8f8b668189d9a6ded593ff88462cda37285d8e7a68f7654cea9ab1624f9b999",
+  "artifact_sha256": {
+    "bodies/s1-dev-longchain-lite.jsonl.gz": "a48f5490f984632149b49a2c2565cf8bea030985c6917938d2fc1cd86e1b4571",
+    "chains.jsonl": "8f54f08bdd6c2cc81cedc66f1461a87c941d70f130bb7c4f411aadbe919f9bdb",
+    "cohort.json": "cfaaa05d8acda995059eb897e5455921bc4055f9179544c512fb5347486a5482",
+    "event-plans.jsonl": "1b97ec81571ef40e6e25667cc826283d431824551483e1706eeb73dc26a62380",
+    "provenance.jsonl": "5009e7a4f362dda6eb70a4309e11a04db29efe70f0acc8348e5bec7435603165",
+    "requests.jsonl": "f92caac90cc004e68eef0d8f8d7466104a50a5fea1e128162eef0cd9d6cacd35",
+    "samples/s1-dev-longchain-lite.jsonl": "37710ea9ef8436ee2f0317ce479cee4ca7ec3218e085b9c2da19955bb70a6ff7",
+    "subset-selection.json": "de80367d4a15efe25f91c81fdbe9475552e31c01275e080913b510610ca432a7"
+  },
+  "cohort_id": "f5ef90c6218b260f",
+  "chains": 64,
+  "requests": 1123,
+  "status": "HASH_AND_ROSTER_VERIFIED",
+  "self_check": "not rerun; direct lite replay requested"
+}
