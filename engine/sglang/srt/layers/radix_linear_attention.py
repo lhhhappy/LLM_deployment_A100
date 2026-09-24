@@ -169,8 +169,9 @@ def _linear_attention_with_output_impl(
             layer=attention_layer,
             forward_batch=forward_batch,
             mixed_qkv=mixed_qkv[:real_num_tokens],
-            a=a[:real_num_tokens],
-            b=b[:real_num_tokens],
+            # [ax] 170 (upstream #38522): GLM KDA gates are [1, T, ...]; trim the token dim.
+            a=a.narrow(0 if a.ndim == 2 else 1, 0, real_num_tokens),
+            b=b.narrow(0 if b.ndim == 2 else 1, 0, real_num_tokens),
             linear_attn_output=logical_output,
         )
     finally:
@@ -227,6 +228,18 @@ def unified_linear_attention_with_output(
     )
 
 
-bcg_unified_linear_attention_with_output = eager_on_graph(True)(
-    unified_linear_attention_with_output
-)
+# [ax] 170 (upstream #38522): capture-only stub so capture does not run KDA on capture
+# slots (warmup and replay still run the real break with the live batch).
+def _linear_attention_capture_stub(
+    mixed_qkv: torch.Tensor,
+    a: torch.Tensor,
+    b: torch.Tensor,
+    output: torch.Tensor,
+    layer_id: int,
+) -> None:
+    output.zero_()
+
+
+bcg_unified_linear_attention_with_output = eager_on_graph(
+    True, capture_stub=_linear_attention_capture_stub
+)(unified_linear_attention_with_output)

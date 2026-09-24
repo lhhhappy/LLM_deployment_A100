@@ -275,6 +275,11 @@ def disable_breakable_cudagraph_if_incompatible(server_args: Any):
     rules = [
         (
             "KDA hybrid linear attention",
+            # GLM-5.3 Flash supports explicit BCG opt-in, but stays off by
+            # default like other KDA models. Explicit backends skip these rules.
+            # [ax] 170: base already honours this -- apply_cuda_graph_compatibility
+            # returns early when (PREFILL, "backend") is locked by
+            # --cuda-graph-backend-prefill breakable, so no code change is needed.
             lambda: uses_kda_attention(model_config_of(server_args).hf_config),
         ),
         # DSV4 is BCG-compatible but introduces heavy memory pressure: the
@@ -384,6 +389,91 @@ def disable_prefill_cuda_graph_for_deepseek_trtllm_mla(server_args: Any):
         "_disable_prefill_cuda_graph_for_deepseek_trtllm_mla",
         cuda_graph_config=with_phase(
             cfg.cuda_graph_config, Phase.PREFILL, backend=Backend.DISABLED
+        ),
+    )
+
+
+def apply_glm5_chunked_prefill_default(server_args: Any):
+    """Set the opted-in GLM BCG chunk default before memory budgeting.
+    [ax] 170: port of upstream #38522; only fires when --chunked-prefill-size is unset."""
+    cfg = resolving_view(server_args)
+    if (
+        get_platform().is_cuda
+        and (Phase.PREFILL, "backend") in server_args._cuda_graph_config_locked
+        and cfg.cuda_graph_config.prefill.backend == Backend.BREAKABLE
+        and cfg.chunked_prefill_size is None
+        and "Glm5NextForConditionalGeneration"
+        in model_config_of(server_args).hf_config.architectures
+    ):
+        declare_resolution(
+            server_args,
+            "_apply_glm5_chunked_prefill_default",
+            chunked_prefill_size=4096,
+        )
+
+
+def apply_glm5_prefill_cuda_graph_policy(server_args: Any):
+    """Set capture sizes for explicitly enabled GLM breakable prefill graphs."""
+    cfg = resolving_view(server_args)
+    if (
+        cfg.cuda_graph_config.prefill.backend != Backend.BREAKABLE
+        or "Glm5NextForConditionalGeneration"
+        not in model_config_of(server_args).hf_config.architectures
+    ):
+        return
+    locked = server_args._cuda_graph_config_locked
+    if not any((Phase.PREFILL, key) in locked for key in ("max_bs", "bs")):
+        # [ax] 170: upstream captures up to 4096 unconditionally. A prefill forward never
+        # holds more than chunked_prefill_size tokens (no mixed chunk on this stack), so
+        # cap the ceiling at the chunk size to skip dead buckets (capture time + pool).
+        max_bs = 4096
+        chunk = cfg.chunked_prefill_size
+        if chunk is not None and 4 <= chunk < max_bs:
+            max_bs = chunk
+        # Capacity defaults have already populated buckets. Replace the unlocked
+        # ceiling and its buckets together.
+        declare_resolution(
+            server_args,
+            "_apply_glm5_prefill_cuda_graph_policy",
+            cuda_graph_config=with_phase(
+                cfg.cuda_graph_config,
+                Phase.PREFILL,
+                max_bs=max_bs,
+                bs=generate_prefill_cuda_graph_batch_sizes(max_bs),
+            ),
+        )
+    _ax170_align_prefill_buckets_for_attn_tp_scatter(server_args)
+    apply_deepep_adjustments(server_args)
+
+
+def _ax170_align_prefill_buckets_for_attn_tp_scatter(server_args: Any):
+    """[ax] 170: --enable-attn-tp-input-scattered pads every extend batch to a multiple of
+    tp_size (ForwardBatch.prepare_attn_tp_scatter_input) and all-gathers equal per-rank
+    slices. Stock buckets 4/12/20/28 are not multiples of 8, so capturing them under TP8
+    scatter would all-gather uneven shards. Round buckets up to tp_size multiples (same
+    approach as apply_deepep_adjustments); real padded batches are already multiples."""
+    cfg = resolving_view(server_args)
+    tp = cfg.tp_size or 1
+    if not getattr(cfg, "enable_attn_tp_input_scattered", False) or tp <= 1:
+        return
+    bs = cfg.cuda_graph_config.prefill.bs
+    if not bs:
+        return
+    aligned = sorted({((b + tp - 1) // tp) * tp for b in bs})
+    if aligned == sorted(bs):
+        return
+    logger.info(
+        "[ax] 170 breakable prefill CUDA graph with attn-tp input scatter: aligning "
+        "buckets to multiples of tp_size=%d: %s -> %s",
+        tp,
+        sorted(bs),
+        aligned,
+    )
+    declare_resolution(
+        server_args,
+        "_ax170_align_prefill_buckets_for_attn_tp_scatter",
+        cuda_graph_config=with_phase(
+            cfg.cuda_graph_config, Phase.PREFILL, bs=aligned, max_bs=aligned[-1]
         ),
     )
 

@@ -50,6 +50,10 @@ from sglang.srt.model_executor.forward_context import (
     get_token_to_kv_pool,
 )
 from sglang.srt.model_executor.runner import get_is_capture_mode
+# [ax] 170: upstream #38522 -- BCG prefill bridge for the pooled-key indexer.
+from sglang.srt.model_executor.runner_backend_utils.breakable_cuda_graph import (
+    is_in_breakable_cuda_graph,
+)
 from sglang.srt.runtime_context import get_device, get_parallel
 
 if TYPE_CHECKING:
@@ -1620,6 +1624,44 @@ class IndexerKPool(MultiPlatformOp):
         layer_id: int,
         return_indices: bool = True,
     ) -> Optional[torch.Tensor]:
+        if (
+            is_in_breakable_cuda_graph()
+            and forward_batch.forward_mode.is_extend_without_speculative()
+        ):
+            from sglang.srt.layers.attention.dsa.kpool_prefill_cuda_graph import (
+                bcg_kpool_indexer_prefill_with_output,
+            )
+
+            # [ax] 170: the bridge re-enters OUR _forward_cuda_impl (110/112/113 sm80
+            # kernels, 114 row-shard all-gather) eagerly with the live batch.
+            # K-pool prefill plans contain request-specific tensors and launch
+            # counts. Like the ordinary DSA indexer, execute them eagerly and
+            # bridge the result into a stable buffer for captured attention.
+            output = torch.empty(
+                (
+                    x.shape[0] if return_indices else 0,
+                    self.index_topk + self.index_kpool - 1,
+                ),
+                dtype=torch.int32,
+                device=x.device,
+            )
+            bcg_kpool_indexer_prefill_with_output(
+                self, x, q_lora, positions, output, layer_id
+            )
+            return output if return_indices else None
+        return self._forward_cuda_impl(
+            x, q_lora, positions, forward_batch, layer_id, return_indices
+        )
+
+    def _forward_cuda_impl(
+        self,
+        x: torch.Tensor,
+        q_lora: torch.Tensor,
+        positions: torch.Tensor,
+        forward_batch: ForwardBatch,
+        layer_id: int,
+        return_indices: bool = True,
+    ) -> Optional[torch.Tensor]:
         if is_hip():
             from sglang.kernels.ops.attention.dsa.tilelang_kernel import act_quant
         elif not is_npu():
@@ -1635,6 +1677,12 @@ class IndexerKPool(MultiPlatformOp):
             and get_is_capture_mode()
             and q_lora.shape[0] > 0
             and q_lora.shape[0] <= DUAL_STREAM_TOKEN_THRESHOLD
+            # [ax] 170: The BCG eager break must finish its indexer work before starting
+            # the next capture segment; keep its projections on one stream.
+            and not (
+                is_in_breakable_cuda_graph()
+                and forward_batch.forward_mode.is_extend_without_speculative()
+            )
         )
 
         # Skip DSA if the attention backend chooses to skip this batch.

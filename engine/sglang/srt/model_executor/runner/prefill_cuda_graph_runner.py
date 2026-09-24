@@ -749,12 +749,33 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
                         if embeds_name in kwargs:
                             kwargs[embeds_name] = None
                             break
-                return self.layer_model.forward(
-                    input_ids,
-                    positions,
-                    forward_batch,
-                    **kwargs,
-                )
+                # [ax] 170 v2 (T52b root cause): capture calls layer_model.forward directly,
+                # bypassing the outer *ForConditionalGeneration.forward that wraps the body in
+                # get_attn_tp_context().maybe_input_scattered(). With
+                # --enable-attn-tp-input-scattered the body was therefore captured in the
+                # NON-scattered layout (all-reduce, full residual), while replay runs the outer
+                # forward eagerly WITH scatter on: VocabParallelEmbedding skips its all-reduce
+                # and the graph consumes per-rank partial embeddings -> fluent garbage at every
+                # length (8-card 026j 0/12; dev-box TP2 repro in evidence/T52b). Capture under
+                # the same scatter decision the replay-time outer forward will make.
+                from sglang.srt.layers.communicator import get_attn_tp_context
+
+                attn_tp_ctx = get_attn_tp_context()
+                scattered = attn_tp_ctx.use_input_scattered(forward_batch)
+                if scattered:
+                    tp = get_parallel().tp_size
+                    assert num_tokens % tp == 0, (
+                        f"[ax] 170: prefill graph bucket {num_tokens} is not a multiple of "
+                        f"tp_size={tp} under --enable-attn-tp-input-scattered"
+                    )
+                self._ax170_capture_input_scattered = scattered
+                with attn_tp_ctx.maybe_input_scattered(forward_batch):
+                    return self.layer_model.forward(
+                        input_ids,
+                        positions,
+                        forward_batch,
+                        **kwargs,
+                    )
             # tc_piecewise: compile/capture the outer model.forward path.
             pp_kwargs = self.model_runner._pp_kwargs(pp_proxy_tensors)
             return self.model_runner.model.forward(
@@ -1230,6 +1251,17 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
             ),
         ):
             return False
+        # [ax] 170 v2: replay is only valid if the replay-time outer forward makes the same
+        # attn-tp scatter decision the body was captured with; otherwise run eager.
+        captured_scattered = getattr(self, "_ax170_capture_input_scattered", None)
+        if captured_scattered is not None and self._uses_eager_prefill_tail():
+            from sglang.srt.layers.communicator import get_attn_tp_context
+
+            if (
+                get_attn_tp_context().use_input_scattered(forward_batch)
+                != captured_scattered
+            ):
+                return False
         if getattr(self, "enable_cp_v2_bcg_capture", False) and is_cp_v2_active(
             forward_batch
         ):
@@ -1496,7 +1528,7 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
 
         # Main's monolithic BCG runner never invokes
         # on_after_cuda_graph_warmup between warmup iterations — the BCG
-        # contract is to keep warmup state untouched and let
+        # contract is to keep warmup metadata untouched and let
         # init_forward_metadata_in_graph (recorded inside the captured
         # forward) do any raw->full upgrade. cg-refactor's runner_backend
         # abstraction exposes a post_warmup_hook for backends that need
@@ -1506,6 +1538,19 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
         # corrupt warmup iter 2's metadata read.
         if isinstance(self.backend, BreakableCudaGraphBackend):
             post_warmup_hook = None
+            # [ax] 170 (upstream #38522): warmup runs the real KDA break on capture slots;
+            # zero those mamba slots before/after warmup so no dummy state survives.
+            req_pool = self.model_runner.req_to_token_pool
+            mamba_pool = getattr(req_pool, "mamba_pool", None)
+            if mamba_pool is not None and not prefix_num_chunks:
+                capture_state_indices = req_pool.translate_mamba_indices(
+                    req_pool.get_mamba_indices(forward_batch.req_pool_indices)
+                ).unique()
+
+                def post_warmup_hook():
+                    mamba_pool.clear_slots(capture_state_indices)
+
+                post_warmup_hook()
         else:
             post_warmup_hook = getattr(attn_backend, "on_after_cuda_graph_warmup", None)
         self.backend.capture_one(
@@ -1681,6 +1726,16 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
                 or forward_batch.return_pooled_hidden_states
             ),
         )
+        # [ax] 170: patch 140 (KDA dual fp32 snapshot) adds per-request descriptors that
+        # the field whitelist above does not know. Under BCG the KDA eager break reads
+        # context.forward_batch == static_forward_batch, so without this the role
+        # snapshot would be silently skipped while the scheduler still hands the extra
+        # slot to the radix tree (stale state => wrong cache hits). They are only read
+        # inside the eager linear-attention break, so live (non-static) tensors are safe.
+        for _ax_name in ("ax_kda_snapshot_offsets", "ax_kda_snapshot_slots"):
+            _ax_val = getattr(forward_batch, _ax_name, None)
+            if _ax_val is not None:
+                setattr(static_forward_batch, _ax_name, _ax_val)
         if self._is_full_backend:
             forward_batch.next_token_logits_buffer = (
                 static_forward_batch.next_token_logits_buffer
