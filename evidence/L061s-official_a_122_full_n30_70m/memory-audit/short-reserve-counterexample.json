@@ -1,0 +1,355 @@
+[
+  {
+    "short_hit_new_tokens": 8192,
+    "trace": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            0,
+            64
+          ]
+        ],
+        "waiting": [
+          "hit"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          8128,
+          16320,
+          128,
+          128
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            64,
+            128
+          ]
+        ],
+        "waiting": [
+          "hit"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          8128,
+          16320,
+          128,
+          128
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            128,
+            192
+          ]
+        ],
+        "waiting": [
+          "hit"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          8128,
+          16320,
+          128,
+          128
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "short_hit_new_tokens": 8128,
+    "trace": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            0,
+            64
+          ],
+          [
+            "hit",
+            60000,
+            68128
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            68128
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            68128
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "short_hit_new_tokens": 8000,
+    "trace": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            0,
+            192
+          ],
+          [
+            "hit",
+            60000,
+            68000
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            68000
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            68000
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "short_hit_new_tokens": 4096,
+    "trace": [
+      {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            0,
+            4096
+          ],
+          [
+            "hit",
+            60000,
+            64096
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            64096
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      },
+      {
+        "mode": "decode",
+        "reqs": [
+          [
+            "hit",
+            60000,
+            64096
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          8192,
+          8560,
+          8320
+        ],
+        "verdicts": [
+          [
+            "hit",
+            "OTHER"
+          ]
+        ]
+      }
+    ]
+  }
+]

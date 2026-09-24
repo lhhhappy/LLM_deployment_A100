@@ -4,18 +4,22 @@
 
 ## 当前安排（2026-09-24，用户最新决定）
 
-今天只比较以下两项，使用**新源码流程、全量长链集、N30、70分钟准入后排空**。
-不再跑 lite、额外 A 基准或单独 180。正式提交候选是这两项，晋档只能由平台确认。
+按已准备的三项对照方案（来源：[执行说明](reports/claude-orchestration.md)，80abc38），
+带122缺陷的061s已停、063s已撤。由于同名peer对授权来源反复确认/否认，已请求用户在本会话直接确认；**队列保持暂停，尚未构建/上传正式镜像或正式提交**。准备的实验为**全量长链集、N30、70分钟准入后排空**的三个逐项对照。
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 061s-official_a_122_full_n30_70m | A 的参数与 MTP + 122，HiCache 关闭 | running，MECHANISMS OK已确认，进入前检/预热；执行层 Codex 跟踪 |
-| 063s-official_a_122_180_full_n30_70m | 同 061s，仅加新版 180 的三个 HiCache 参数 | pending，排061s后；不要求前一项SLO通过 |
+| 064-official_a_full_n30_70m | 正式 A 参数与 MTP；120 on、122 off、180 off | pending、队列暂停；执行层 Codex 跟踪 |
+| 065-official_a_mem087_full_n30_70m | 同064，仅加 `--mem-fraction-static 0.87` | pending、队列暂停，排064后 |
+| 066-official_a_180_mem087_full_n30_70m | 同065，仅加新版180的三个HiCache参数 | pending、队列暂停，排065后 |
 
-两项固定同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，源码含正式 A 全部13项改动。
-171/172/123/DCP关闭；122以 `SGLANG_AX_PACE_TPOT=0.085` 开启。
-新版180为主机层保留120/122；启动日志须与任务的 `G_EXPECT` 一致。
-063s只加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；暂不加NUMA绑定。
+三项同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，含正式 A 全部13项改动。
+171/172/123/DCP关闭；显式 `SGLANG_AX_PACE_TPOT=0` 关闭122。
+066加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；不加NUMA绑定。
+122的修复由Claude接续复核/提交；不混入此次冻结源码。
+
+两个拟议正式校准候选为065与066，提交JSON和38749字节Dockerfile已准备并通过离线检查。用户直接确认范围后才继续；每项本地启动、机制检查及测量前20分钟无错误后再提交。
+本地结果不能替代正式能力门或宣布晋档。正式上传进度单独记 [submissions.md](submissions.md)。
 
 ## 测量与比较
 
@@ -28,6 +32,9 @@
 - 每25分钟只读监控，运行中完成记录的窗口标open；不因部分样本超过门限自动停止。
 
 ## 已撤下的旧任务
+
+- 061s：在预热中主动停止，队列标failed；122为无法与续块同批完成的短命中预留预算，出现连续64-token续块。CPU真实调度器反例已复现；无正式测量成绩。
+- 063s：pending撤为cancelled；无测量。061s独立显存与阶段证据见 [memory-audit](../evidence/L061s-official_a_122_full_n30_70m/memory-audit/snapshot.json)。显存数是预热采样峰值，不能证明全程安全余量；扩大预算还会增加KDA状态池，不能全部折算KV token。
 
 - 061r：引擎正常就绪，但任务把NEXTN别名错误地与内部EAGLE名称比较，测量前误判退出；现修正G_EXPECT为spec=EAGLE。063r有同一检查，已停，无测量raw。证据见 [修复记录](../evidence/nextn-alias-20260924/README.md)。
 

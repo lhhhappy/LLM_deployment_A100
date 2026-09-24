@@ -77,12 +77,18 @@ class EffectiveMechanisms(unittest.TestCase):
         template = (ROOT/'scripts/pod/jobs/dev_ladder_template.sh').read_text()
         check = template[template.index('[ -n "${G_EXPECT:-}" ]'):template.index('\ngrep -h "KV Cache')]
         with tempfile.TemporaryDirectory() as d:
-            for suffix, host in [('', False), ('_180', True)]:
-                job = (ROOT/f'scripts/pod/jobs/official_a_122{suffix}_full_n30_70m.sh').read_text()
+            for suffix, host, larger_mem in [('', False, False), ('_mem087', False, True),
+                                             ('_180_mem087', True, True)]:
+                job = (ROOT/f'scripts/pod/jobs/official_a{suffix}_full_n30_70m.sh').read_text()
                 expected = re.search(r'^G_EXPECT="([^"]+)"', job, re.M)[1]
                 self.assertIn('--speculative-algorithm NEXTN', job)
-                observed = line.replace('180=off:no_hierarchical_cache', '180=on') if host else line
-                for log, rc in [(observed, 0), (observed.replace('122=on', '122=off:test'), 2),
+                self.assertIn('SGLANG_AX_PACE_TPOT=0 ', job)
+                self.assertEqual('--mem-fraction-static 0.87' in job, larger_mem)
+                # Alias comes from the observed log; mechanism states below
+                # model the newly requested jobs, not an observed GPU result.
+                observed = line.replace('122=on', '122=off:SGLANG_AX_PACE_TPOT_unset')
+                if host: observed = observed.replace('180=off:no_hierarchical_cache', '180=on')
+                for log, rc in [(observed, 0), (observed.replace('122=off:SGLANG_AX_PACE_TPOT_unset', '122=on'), 2),
                                 (observed.replace('spec=EAGLE', 'spec=-'), 2)]:
                     Path(d, 'server.log').write_text(log+'\n')
                     result = subprocess.run(['bash', '-c', check], text=True, capture_output=True,

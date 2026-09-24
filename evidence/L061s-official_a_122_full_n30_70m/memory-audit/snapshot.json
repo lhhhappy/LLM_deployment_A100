@@ -1,0 +1,309 @@
+{
+  "observed_at": 1790258014.0686305,
+  "run": "061s-official_a_122_full_n30_70m",
+  "phase_receipt": {
+    "schema_version": 1,
+    "runner_started_s": 1790256273.5603993,
+    "n": 30,
+    "flush_success": false,
+    "runner_rc": null,
+    "scope": "fixed_duration_diagnostic"
+  },
+  "gpu": {
+    "0": {
+      "samples": 347,
+      "first": 1790256273.652,
+      "last": 1790258009.382,
+      "min_mib": 67290,
+      "max_mib": 70446,
+      "peak_at": 1790256694.558,
+      "util_sum": 22548
+    },
+    "1": {
+      "samples": 347,
+      "first": 1790256273.656,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.578,
+      "util_sum": 22491
+    },
+    "2": {
+      "samples": 347,
+      "first": 1790256273.658,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.578,
+      "util_sum": 22678
+    },
+    "3": {
+      "samples": 347,
+      "first": 1790256273.662,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.578,
+      "util_sum": 22329
+    },
+    "4": {
+      "samples": 347,
+      "first": 1790256273.664,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.58,
+      "util_sum": 22698
+    },
+    "5": {
+      "samples": 347,
+      "first": 1790256273.665,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.582,
+      "util_sum": 22516
+    },
+    "6": {
+      "samples": 347,
+      "first": 1790256273.666,
+      "last": 1790258009.382,
+      "min_mib": 66790,
+      "max_mib": 69946,
+      "peak_at": 1790256729.583,
+      "util_sum": 22996
+    },
+    "7": {
+      "samples": 347,
+      "first": 1790256273.668,
+      "last": 1790258009.382,
+      "min_mib": 66934,
+      "max_mib": 70234,
+      "peak_at": 1790256729.583,
+      "util_sum": 22716
+    }
+  },
+  "metrics": {
+    "cache_hit_rate": {
+      "min": 0.0,
+      "max": 0.9960454770143351,
+      "first": 0.0,
+      "last": 0.0,
+      "max_at": 1790257468.5
+    },
+    "evicted_tokens_total": {
+      "min": 232960.0,
+      "max": 40634368.0,
+      "first": 232960.0,
+      "last": 40634368.0,
+      "max_at": 1790258010.3
+    },
+    "eviction_duration_seconds_count": {
+      "min": 40.0,
+      "max": 6544.0,
+      "first": 40.0,
+      "last": 6544.0,
+      "max_at": 1790258010.3
+    },
+    "eviction_duration_seconds_sum": {
+      "min": 0.36295256251469254,
+      "max": 32.5961183514446,
+      "first": 0.36295256251469254,
+      "last": 32.5961183514446,
+      "max_at": 1790258010.3
+    },
+    "full_token_usage": {
+      "min": 0.0,
+      "max": 0.998641304347826,
+      "first": 0.0,
+      "last": 0.5668848814229249,
+      "max_at": 1790256655.2
+    },
+    "gen_throughput": {
+      "min": 0.0,
+      "max": 952.2839998606057,
+      "first": 0.0,
+      "last": 46.86849662827219,
+      "max_at": 1790256946.2
+    },
+    "generation_tokens_total": {
+      "min": 8.0,
+      "max": 311304.0,
+      "first": 8.0,
+      "last": 311304.0,
+      "max_at": 1790258000.3
+    },
+    "kv_available_tokens": {
+      "min": 256.0,
+      "max": 1036288.0,
+      "first": 1036288.0,
+      "last": 2304.0,
+      "max_at": 1790256274.0
+    },
+    "kv_evictable_tokens": {
+      "min": 0.0,
+      "max": 524608.0,
+      "first": 0.0,
+      "last": 446528.0,
+      "max_at": 1790257448.5
+    },
+    "kv_used_tokens": {
+      "min": 0.0,
+      "max": 1034880.0,
+      "first": 0.0,
+      "last": 587456.0,
+      "max_at": 1790256655.2
+    },
+    "mamba_available_tokens": {
+      "min": 2.0,
+      "max": 321.0,
+      "first": 321.0,
+      "last": 2.0,
+      "max_at": 1790256274.0
+    },
+    "mamba_evictable_tokens": {
+      "min": 0.0,
+      "max": 299.0,
+      "first": 0.0,
+      "last": 299.0,
+      "max_at": 1790257829.7
+    },
+    "mamba_usage": {
+      "min": 0.0,
+      "max": 0.2616822429906542,
+      "first": 0.0,
+      "last": 0.06230529595015576,
+      "max_at": 1790256595.0
+    },
+    "mamba_used_tokens": {
+      "min": 0.0,
+      "max": 84.0,
+      "first": 0.0,
+      "last": 20.0,
+      "max_at": 1790256595.0
+    },
+    "num_queue_reqs": {
+      "min": 0.0,
+      "max": 29.0,
+      "first": 0.0,
+      "last": 25.0,
+      "max_at": 1790256354.2
+    },
+    "num_requests_total": {
+      "min": 1.0,
+      "max": 459.0,
+      "first": 1.0,
+      "last": 459.0,
+      "max_at": 1790258000.3
+    },
+    "num_retracted_reqs": {
+      "min": 0.0,
+      "max": 0.0,
+      "first": 0.0,
+      "last": 0.0,
+      "max_at": 1790256274.0
+    },
+    "num_running_reqs": {
+      "min": 0.0,
+      "max": 20.0,
+      "first": 0.0,
+      "last": 4.0,
+      "max_at": 1790256605.0
+    },
+    "num_used_tokens": {
+      "min": 0.0,
+      "max": 1034880.0,
+      "first": 0.0,
+      "last": 587456.0,
+      "max_at": 1790256655.2
+    },
+    "pending_prealloc_token_usage": {
+      "min": 0.0,
+      "max": 0.0,
+      "first": 0.0,
+      "last": 0.0,
+      "max_at": 1790256274.0
+    },
+    "prompt_tokens_total": {
+      "min": 34.0,
+      "max": 35794731.0,
+      "first": 34.0,
+      "last": 35794731.0,
+      "max_at": 1790258000.3
+    },
+    "spec_accept_length": {
+      "min": 0.0,
+      "max": 3.925,
+      "first": 0.0,
+      "last": 3.5126582278481013,
+      "max_at": 1790256324.1
+    },
+    "swa_token_usage": {
+      "min": 0.0,
+      "max": 0.0,
+      "first": 0.0,
+      "last": 0.0,
+      "max_at": 1790256274.0
+    },
+    "token_usage": {
+      "min": 0.0,
+      "max": 1.0,
+      "first": 0.0,
+      "last": 0.57,
+      "max_at": 1790256655.2
+    }
+  },
+  "metric_first": 1790256274.0,
+  "metric_last": 1790258010.3,
+  "metric_samples": 174,
+  "config": {
+    "mem_fraction_static": 0.7885,
+    "mamba_full_memory_ratio": 0.9,
+    "max_mamba_cache_size": null,
+    "max_running_requests": 32,
+    "page_size": 64,
+    "speculative_num_draft_tokens": 4,
+    "mamba_scheduler_strategy": null
+  },
+  "pool_lines": [
+    "[2026-09-24 13:23:16 TP5] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:16 TP3] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:16 TP6] Load weight begin. avail mem=77.87 GB",
+    "[2026-09-24 13:23:16 TP1] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:16 TP4] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:16 TP0] Load weight begin. avail mem=77.87 GB",
+    "[2026-09-24 13:23:16 TP2] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:16 TP7] Load weight begin. avail mem=77.73 GB",
+    "[2026-09-24 13:23:58 TP3] Load weight end. elapsed=42.51 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP7] Load weight end. elapsed=42.51 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP5] Load weight end. elapsed=42.60 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP4] Load weight end. elapsed=42.62 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP1] Load weight end. elapsed=42.62 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP2] Load weight end. elapsed=42.66 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.58 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP6] Load weight end. elapsed=42.67 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.72 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:23:58 TP0] Load weight end. elapsed=42.67 s, type=Glm5NextForConditionalGeneration, quant=fp8, fmt=e4m3, avail mem=38.72 GB, mem usage=39.15 GB.",
+    "[2026-09-24 13:24:06 TP0] Load weight begin. avail mem=38.72 GB",
+    "[2026-09-24 13:24:06 TP3] Load weight begin. avail mem=38.58 GB",
+    "[2026-09-24 13:24:06 TP7] Load weight begin. avail mem=38.58 GB",
+    "[2026-09-24 13:24:06 TP6] Load weight begin. avail mem=38.72 GB",
+    "[2026-09-24 13:24:06 TP2] Load weight begin. avail mem=38.58 GB",
+    "[2026-09-24 13:24:06 TP4] Load weight begin. avail mem=38.58 GB",
+    "[2026-09-24 13:24:06 TP1] Load weight begin. avail mem=38.58 GB",
+    "[2026-09-24 13:24:06 TP5] Load weight begin. avail mem=38.58 GB",
+    "Multi-thread loading shards:  66% Completed | 41/62 [00:02<00:00, 26.28it/s][2026-09-24 13:24:09 TP2] Load weight end. elapsed=3.01 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "Multi-thread loading shards:  73% Completed | 45/62 [00:02<00:00, 28.15it/s][2026-09-24 13:24:09 TP1] Load weight end. elapsed=3.22 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:09 TP3] Load weight end. elapsed=3.44 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:09 TP0] Load weight end. elapsed=3.57 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.87 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:10 TP4] Load weight end. elapsed=3.73 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:10 TP7] Load weight end. elapsed=3.82 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:10 TP6] Load weight end. elapsed=3.82 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.87 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:10 TP5] Load weight end. elapsed=4.29 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.",
+    "[2026-09-24 13:24:30 TP0] max_total_num_tokens=1036288, chunked_prefill_size=8192, max_prefill_tokens=16384, max_running_requests=32, context_len=1048576, available_gpu_mem=14.08 GB"
+  ],
+  "warmup_tail": "[cohort] s1-dev-longchain\uff1a311 \u94fe / 5601 \u8bf7\u6c42\uff0csha=2b6321a87d500375\n[pacing] chain-total-gap-scaled-v1 | cap=3600s | \u538b\u7f29 0/311 \u6761 chain\uff08\u5f71\u54cd 0 \u8bf7\u6c42\uff09| \u03a3gap 11.4h \u2192 11.4h\n           \u2191 \u5c3e\u90e8\u957f\u94fe\u53ea\u538b\u7f29\u7b49\u5f85\u65f6\u95f4\uff0c**\u4e0d\u5220\u9664\u4efb\u4f55\u8bf7\u6c42**\uff1bworkload_hash=19bd577a8e042d2b\n",
+  "tail": [
+    "[2026-09-24 13:53:33 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 0, full token usage: 0.57, mamba usage: 0.06, #running-req: 4, #queue-req: 25, #pending-token: 1705669, cuda graph: False, input throughput (token/s): 101.14",
+    "[2026-09-24 13:53:33 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 0, full token usage: 0.57, mamba usage: 0.06, #running-req: 4, #queue-req: 25, #pending-token: 1705605, cuda graph: False, input throughput (token/s): 245.70",
+    "[2026-09-24 13:53:33 TP0] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 0, full token usage: 0.57, mamba usage: 0.06, #running-req: 4, #queue-req: 25, #pending-token: 1705541, cuda graph: False, input throughput (token/s): 141.32"
+  ]
+}
