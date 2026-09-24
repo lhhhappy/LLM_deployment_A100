@@ -1,0 +1,6 @@
+[cohort] s1-dev-longchain：311 链 / 5601 请求，sha=2b6321a87d500375
+[物化] 单遍扫描 bodies（3.4 GB，数分钟）
+  物化 1/1 分片，已得 5601/5601
+[transformers] You are using a model of type `glm5_next` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+自检结果：失配=0 ；共=5601
+SELF_CHECK: PASS

@@ -2,7 +2,7 @@
 
 2026-09-24。当前实现为 `longchain.py` + `longchain_events.py`：先冻结事件计划，再编译不可变历史快照；复用原 Renderer、数据布局和回放程序。正文以 s1-dev 为素材，Phoenix 只指导结构与等待，生产正文不进入成品。独立性指每条接收链的历史和依赖自足，不强制隔离 KV，也不要求每个文本片段唯一。
 
-唯一成品入口是 [`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/s1-dev-longchain-build/`，通过验收才替换成品。旧96链候选已原字节归档至 `cache/longchain-legacy/`，不是当前测试集。
+唯一成品入口是 [`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/s1-dev-longchain-build/`，通过验收才替换成品。旧96链候选及其父数据副本已按用户要求删除，仅保留验收/分析记录，不再占用cache。Phoenix原始正文cache也已删除；冻结结构profile仍支持复现生成。
 
 三路审查已修复重建摘要被下一步删除、素材不足绕过压力重建、丢弃试选污染使用计数，以及重建收据和工具边界漏检。极短中间历史的摘要可能比原文更长，生成器会收紧同一次重建的尾部/摘录并重新真实渲染，仍不缩短则拒绝生成；调整写入来源账本。
 
@@ -175,3 +175,9 @@ N是逻辑槽数；等待占槽，但该链此时没有在飞模型请求。其�
 方案review不是向用户再索取批准的关口；在既有授权下推进。发现不一致就修复并记录，不能用review作为一直不生成数据的理由。
 
 证据入口：[四类请求与来源审查](../../notes/codex-四类请求与造数建议.md)、[Phoenix采样框](../../evidence/phoenix-longchain-20260924/expanded/sampling-frame.json)、[旧候选冻结](../../evidence/longchain-audit/frozen-candidate/README.md)。
+
+## 当前完整集的代表性边界
+
+311链/5601请求的完整扩展集已生成；它保持源摘要链长和phase计数，但位置与素材组合仍为合成。累计prompt393.887M（源485.059M）；缺失请求的源冻结新增预算18.936M，生成部分实际LCP新增5.109M。该静态差额不能等同GPU工作量差额，也不能忽略：本集能补充长程增长/重建/等待的机制覆盖，尚不代表已经恢复完整算量分布。
+
+未实现N槽闭环驻留模拟。已有token三本账不包含共享前缀物理驻留、淘汰、KV/KDA状态池和请求服务时长，不能据此推算可通过的N。真实GPU对照和等待分解校准仍待执行层另行安排。

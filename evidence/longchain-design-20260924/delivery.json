@@ -1,0 +1,27 @@
+{
+  "status": "CPU_VALIDATED_DIAGNOSTIC",
+  "chains": 311,
+  "requests": 5601,
+  "original_requests": 722,
+  "synthetic_requests": 4879,
+  "manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "full_token_check": {
+    "status": "VALID",
+    "errors": 0,
+    "report": "evidence/longchain-design-20260924/full-acceptance/dataset-validation.json",
+    "sha256": "e32687b6f4bf72f7ce3d5901207858d22fe9470bdfd2bb9c74b6c386e4e0d792"
+  },
+  "original_harness_self_check": {
+    "status": "PASS",
+    "matched_requests": 5601,
+    "log": "evidence/longchain-design-20260924/full-acceptance/self-check.log",
+    "sha256": "47f464792e165c7ffe89a3b618663baa3c1a9175c4f91ab51e1acd0ed6ea5c57"
+  },
+  "distribution_report": "evidence/longchain-design-20260924/full-distribution.json",
+  "cohort_sha256": "2b6321a87d500375",
+  "gpu_evaluated": false,
+  "closed_loop_residency_simulated": false,
+  "note": "Manifest records immutable build status; this receipt records subsequent CPU acceptance. Not an official-distribution or SLO claim.",
+  "current_path": "data/s1-dev-longchain",
+  "acceptance_sha256": "4430017f550ac619e5c2e6457803587f7044b3e53c356812ffe829e535f080ad"
+}

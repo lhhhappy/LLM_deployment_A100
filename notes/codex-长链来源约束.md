@@ -2,7 +2,7 @@
 
 现行口径见[统一设计](../scripts/analysis/longchain.md)：允许A session的query/完整片段改写后续接B，构造合成轨迹；无需恢复原始故事。下文的“无法恢复”限定真实来源证据，不限制合成数量。正文可以组合/局部生成，时间与预算可明确估计，测量必须真实。
 
-审查日期：2026-09-23。只读检查 `s1-dev/data/dev-combined-v1/`、旧候选（现归档至 `cache/longchain-legacy/longchain-screen/`）、harness、生成器和仓库公开数据索引；未改数据/生成器，未访问外部平台、GPU、队列或提交。以下源统计直接来自公开文件；重新计算项是推断/一致性检查，不代表恢复了隐藏原始轨迹。
+审查日期：2026-09-23。只读检查 `s1-dev/data/dev-combined-v1/`、旧候选（成品副本现已清除，分析收据保留）、harness、生成器和仓库公开数据索引；未改数据/生成器，未访问外部平台、GPU、队列或提交。以下源统计直接来自公开文件；重新计算项是推断/一致性检查，不代表恢复了隐藏原始轨迹。
 
 ## 同链历史的可恢复长度
 
@@ -38,7 +38,7 @@
 
 edge 摘要也有入边口径。所选源 `total_edges=1,690`，比输出内部边数1,622多68；这68条正好对应 source 首行 `gap_valid=true` 的外部入边，其中17条是 append-only。剔除外部入边后，源内部目标 append 边1,544；输出内部实际 append 边1,613（99.4%），因为生成的1,471条新边全是 append。按源汇总减可见内部边，约有69条缺失边应为非 append；当前 append-only donor 延展不能恢复其具体 reset/断点位置。
 
-我审查早期构建时确认过 `append_only_edges` 曾原样复制 source aggregate、`total_edges` 却按输出重算，二者不可混列。当前共享的 `cache/longchain-legacy/longchain-screen/chains.jsonl` 已重算输出内部 `append_only_edges`、`total_edges`、fraction（单请求链fraction为null）、prompt/uncached/cap sum、phase、当前首 dispatch；source 原摘要留在 `source_chain_targets`。source `first/last` offset 只描述原链。可见的真实相邻对中，411对有404对满足 `next.dispatch - previous.end == replay_gap_ms`；harness 的 gap 是前一请求完成后的等待，不是纯 dispatch 间隔。synthetic 前一轮没有观测 end，因此从 donor gap 推出的 synthetic dispatch offset只能排序，不能当真实时间戳。
+我审查早期构建时确认过 `append_only_edges` 曾原样复制 source aggregate、`total_edges` 却按输出重算，二者不可混列。当前共享的 旧候选的 `chains.jsonl` 已重算输出内部 `append_only_edges`、`total_edges`、fraction（单请求链fraction为null）、prompt/uncached/cap sum、phase、当前首 dispatch；source 原摘要留在 `source_chain_targets`。source `first/last` offset 只描述原链。可见的真实相邻对中，411对有404对满足 `next.dispatch - previous.end == replay_gap_ms`；harness 的 gap 是前一请求完成后的等待，不是纯 dispatch 间隔。synthetic 前一轮没有观测 end，因此从 donor gap 推出的 synthetic dispatch offset只能排序，不能当真实时间戳。
 
 源首末跨度是可用的“长链”筛选条件，不是可拆的逐轮时间表。所选96源链 `last_end-first_dispatch` 的中位数约3.1分钟、均值33.5分钟；仅4链≥2小时、3链≥3小时，最长26.4小时。链跨度、gap 总和和并发 replay 墙钟时间是不同量；现有合成 gap 不足以证明某条链是真实2–3小时。
 

@@ -45,5 +45,37 @@
     "old": "data/longchain-events-pilot-v2b",
     "new": "data/s1-dev-longchain",
     "action": "current accepted 24-chain pilot"
+  },
+  {
+    "path": "cache/longchain-legacy",
+    "action": "deleted per user cleanup; retained structural inputs/validation receipts only"
+  },
+  {
+    "path": "cache/longchain-validation",
+    "action": "deleted per user cleanup; retained structural inputs/validation receipts only"
+  },
+  {
+    "path": "cache/phoenix-longchain-1000-20260924",
+    "action": "deleted per user cleanup; retained structural inputs/validation receipts only"
+  },
+  {
+    "path": "cache/phoenix-longchain-20260924",
+    "action": "deleted per user cleanup; retained structural inputs/validation receipts only"
+  },
+  {
+    "path": "cache/e1-tools",
+    "action": "deleted per user cleanup; retained structural inputs/validation receipts only"
+  },
+  {
+    "path": "data/s1-dev-longchain",
+    "action": "deleted 24-chain pilot; replaced by accepted 311-chain/5601-request full dataset"
+  },
+  {
+    "path": "cache/s1-dev-longchain-build",
+    "action": "moved to data/s1-dev-longchain after full acceptance; empty cache directory removed"
+  },
+  {
+    "path": "evidence/longchain-design-20260924/full-acceptance/body_cache_s1-dev-longchain.jsonl",
+    "action": "deleted disposable rendered cache after successful self-check"
   }
 ]

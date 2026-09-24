@@ -10,12 +10,12 @@
 - Phoenix最近7完整日分层采集1000/1000 session完成，55,860个LLM span、44,119个主调用；236条连续边的压缩计数增加。分层过采长尾，需用抽样权重；不同模型的token不冒充GLM token。[结构统计](../evidence/phoenix-longchain-20260924/expanded/behavior-profile.json)
 - 公共素材全量去重盘点完成：433条非reminder user候选、371条无tool_calls assistant、2,381个可配对工具组。user候选还可能含控制消息，工具组按完整JSON去重，均非已验收可用续接数。[盘点与定义](../evidence/longchain-design-20260924/material-inventory.json)
 - Luna low已试制24条有来源的局部追问和12条通用追问；仅素材试制，尚未进入新版测试集。
-- **事件核心已实现**：跨session追问、工具续跑、显式重建和重建后增长；已做真实GLM小集生成/验收。当前唯一成品、完整集进度和生成命令见[data入口](../data/README.md)与[实现说明](../scripts/analysis/longchain.md)。三路审查的失败反例已修复，GPU尚未测量。
+- **事件核心已实现**：跨session追问、工具续跑、显式重建和重建后增长；完整311链/5601请求已生成并通过真实GLM全量检查与原harness自检；小集与cache已清除。当前唯一成品、完整集进度和生成命令见[data入口](../data/README.md)与[实现说明](../scripts/analysis/longchain.md)。三路审查的失败反例已修复，GPU尚未测量。
 
 ## 生成与验收顺序
 
 1. 先冻结分布/事件计划，再取素材。B的旧历史保持稳定；借A的query不搬入A的整份prompt/system/tools；工具组闭合、局部引用适配，来源另存。
-2. 小集24–32链检查接缝和关键机制；通过后以源311链/约5,601次调用为首个规模目标。该规模是建议，非完成或正式分布声明；原722条正文不限制合成请求数量。
+2. 小集24–32链检查接缝和关键机制；通过后以源311链/约5,601次调用为首个规模目标。该规模现已完成并通过CPU验收，不是正式分布声明；原722条正文不限制合成请求数量。
 3. 长短链混合；一次借入的query可接多次工具调用，不把每次LLM请求都变成用户追问。重建应真改变输入；长等待不强制miss，不加盐、不每session flush。
 4. 全量CPU检查真实GLM token/LCP、工具ID、稳定历史、预算、事件分布、跨session重复和原harness自检。按同一冻结成品A/B；后续由执行层安排真实缓存/MTP/时长与全部门的测量。
 
@@ -41,6 +41,6 @@
 ## 证据与数据
 
 - [原始s1-dev](../s1-dev/data/dev-combined-v1/)、[原harness](../s1-dev/harness/)、[tokenizer](../s1-dev/glm_tok/)均只读。
-- Phoenix：[抽样框](../evidence/phoenix-longchain-20260924/expanded/sampling-frame.json)、[1000份收集状态](../evidence/phoenix-longchain-20260924/expanded/collection.json)、[连续联合事件](../evidence/phoenix-longchain-20260924/expanded/joint-events.jsonl)、[事件窗](../evidence/phoenix-longchain-20260924/expanded/event-windows/)。原始正文仅在被git忽略的私有cache保留，不入合成正文。
-- 旧数据：[旧冻结候选](../cache/longchain-legacy/longchain-screen/)、[完整CPU校验](../evidence/longchain-audit/final-check.json)、[原harness自检](../evidence/longchain-audit/final-self-check.log)、[三本账](../evidence/longchain-audit/workload-ledger.csv)、[导出比较](../evidence/longchain-audit/export-audit.json)。旧冻结数据字节保持不变，目录已移出data归档；阶段pilot收据不能代替最终收据。
+- Phoenix：[抽样框](../evidence/phoenix-longchain-20260924/expanded/sampling-frame.json)、[1000份收集状态](../evidence/phoenix-longchain-20260924/expanded/collection.json)、[连续联合事件](../evidence/phoenix-longchain-20260924/expanded/joint-events.jsonl)、[事件窗](../evidence/phoenix-longchain-20260924/expanded/event-windows/)。原始正文cache已按用户清理要求删除；结构事件与抽样记录保留，不影响离线生成。
+- 旧数据：旧成品字节已删除，仅保留[完整CPU校验](../evidence/longchain-audit/final-check.json)、[原harness自检](../evidence/longchain-audit/final-self-check.log)、[三本账](../evidence/longchain-audit/workload-ledger.csv)、[导出比较](../evidence/longchain-audit/export-audit.json)。旧冻结数据及父数据副本已按用户要求删除，仅留收据；阶段pilot收据不能代替最终收据。
 - 原dev与正式A/B差异：[实验](experiments.md)、[提交](submissions.md)、[当前事实](knowledge.md)。不据此拟合数据让某个部署通过。

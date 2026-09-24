@@ -32,7 +32,7 @@
 
 ## 新数据与算子线
 
-- **长链数据**：96链/1,718请求诊断候选已冻结并独立验收；36文件hash全过、35项大小匹配、1,718条全量渲染收据与成品零失配，原harness自检通过。cohort=`cd106a80519548d4`；[冻结入口](../evidence/longchain-audit/frozen-candidate/README.md)、[独立验收](../evidence/longchain-audit/independent-freeze-acceptance.json)。后续工作量、长gap/reset和语义关联缺口仍成立，不作代表集、不入队。下一版方案已确认：s1-dev跨session借query/片段适配续接，Phoenix千session观测供行为结构，按[统一设计](../scripts/analysis/longchain.md)实现并验收；旧dev保留独立回归，算子队列不等新数据。见 [交接入口](codex-handoff-长链数据设计与文档索引.md)与[独立复核](reports/review-data-sol.md)。
+- **长链数据**：新版311链/5601请求已生成并完成CPU验收，独立真实GLM检查VALID、原harness自检PASS，均5601/5601、0错误。唯一成品为`data/s1-dev-longchain/`，见[data入口](../data/README.md)与[数据状态](reports/codex-data.md)。新增139次追问/118次重建；链长中位8、最大240，保持长尾。旧副本、失败产物和cache已清除。生成新增算量仍明显低于源摘要，gap分解为估计，仍是诊断集，不替代dev、不预测正式N。尚无GPU成绩，未做N槽闭环驻留模拟；本会话未改8卡实际队列。
 - **171 KDA投影融合**：开发机加载/状态/MTP/graph与成本证据已交付；056首次完整TP8性能回放已独立复核，未证明净收益，暂不加入部署组合。fast执行段p50 .57→.55s，但首执行前等待p95 4.32→9.78s；不能用执行段代替孤立kernel测速。缓存池差异在graph捕获前已出现，加载后空闲显存不同，具体分配来源及对TTFT的影响未隔离。见[056对照](../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)。
 - **172 MoE clamped SwiGLU**：单卡随机权重完整Marlin路径墙钟减少3.1–4.9%；BF16激活与graph检查通过。057完整TP8回放已独立复核，TPOT均值少约1.6%、chain超时73→62，但fast超时不变、fast/overall p95变差，不能认定稳定整体提升；保留候选，暂不合入或自动叠加171。缓存池未缩小；62条chain超时中55条在首执行前已超过30秒。下一步算子投入须对准整段prefill成本与等待积压，不能只优化均值。见[057对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、research/codex/R23。
 - **170 prefill graph**：现有v2 TP2证据仍不能代替TP8；待171独立验证后决定下一项，不与171/122一起改。
