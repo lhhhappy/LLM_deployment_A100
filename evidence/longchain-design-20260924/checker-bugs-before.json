@@ -1,0 +1,74 @@
+[
+  {
+    "case": "baseline",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "missing_provenance",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 4,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "unknown_kind",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "duplicate_call_across_blocks",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "silent_system_change",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "missing_session_id",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "session_changes_mid_chain",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "invalid_gap_decomposition",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "nonexistent_original_source",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  }
+]

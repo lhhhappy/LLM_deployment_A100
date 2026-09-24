@@ -1,0 +1,46 @@
+{
+  "scope": "All public serving canon bodies; exact JSON deduplication across snapshots.",
+  "definitions": {
+    "non_reminder_user": "Candidate only: role=user, nonempty, no system-reminder; may include controller/compression messages, not verified human queries.",
+    "assistant_without_calls": "Nonempty assistant message without tool_calls; reuse still requires context review.",
+    "complete_tool_group": "Assistant calls plus contiguous results; explicit ID matching or implicit-order count matching. Source IDs retained in exact JSON hash; normalized semantic diversity may be lower.",
+    "candidate_pairs": "Distinct query candidate x receiving source chain, same pack and different source session. Not accepted continuations or statistically independent examples."
+  },
+  "source_files": {
+    "requests.jsonl": "00c79cb68219a95420bb73048e701719953c8931b5dc70dd6822cc4ff3d4d047",
+    "chains.jsonl": "48d30c359099f9a6fc26cc68c5b5aabf927ba5de8d0fe4aea6463cb57c213e3f",
+    "bodies/dev-combined-v1.jsonl.gz": "41a4b6fb88311bfac353105c351acd764138d1ebbdaa1829357dfcf1ac5bf37f"
+  },
+  "public_requests": 722,
+  "source_chains": 311,
+  "source_sessions": 136,
+  "source_declared_requests": 5601,
+  "distinct_system_tools_bodies": 156,
+  "snapshot_occurrences": {
+    "non_reminder_user": 3178,
+    "incomplete_tool_group": 2034,
+    "complete_tool_group": 9025,
+    "assistant_without_calls": 2398
+  },
+  "unique_materials": {
+    "non_reminder_user": 433,
+    "assistant_without_calls": 371,
+    "complete_tool_group": 2381
+  },
+  "unique_materials_by_pack": {
+    "biomaster": {
+      "non_reminder_user": 276,
+      "assistant_without_calls": 241,
+      "complete_tool_group": 2011
+    },
+    "scimaster": {
+      "non_reminder_user": 158,
+      "assistant_without_calls": 130,
+      "complete_tool_group": 370
+    }
+  },
+  "same_pack_cross_session_query_chain_candidate_pairs": 69899,
+  "human_query_count": null,
+  "accepted_join_count": null,
+  "new_dataset_generated": false
+}

@@ -1,0 +1,88 @@
+[
+  {
+    "case": "baseline",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "missing_provenance",
+    "status": "INVALID",
+    "errors": [
+      "generated dataset is missing provenance.jsonl",
+      "p:canon:a: missing or unknown generated provenance kind",
+      "p:canon:b: missing or unknown generated provenance kind"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 4,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "unknown_kind",
+    "status": "INVALID",
+    "errors": [
+      "p:canon:b: missing or unknown generated provenance kind"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "duplicate_call_across_blocks",
+    "status": "INVALID",
+    "errors": [
+      "p:canon:b: introduced tool call ID reuses an existing history ID"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "silent_system_change",
+    "status": "INVALID",
+    "errors": [
+      "p:canon:b: synthetic continuation changes system/tools without an implemented event"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "missing_session_id",
+    "status": "INVALID",
+    "errors": [
+      "p:canon:b: generated session_id must be a nonempty string"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "session_changes_mid_chain",
+    "status": "INVALID",
+    "errors": [
+      "chain c: generated session_id changes or is absent within chain"
+    ],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "invalid_gap_decomposition",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  },
+  {
+    "case": "nonexistent_original_source",
+    "status": "VALID",
+    "errors": [],
+    "rendered_prompts": 2,
+    "verified_artifacts": 5,
+    "note": "Fresh complete manifest/cohort; no network/engine. Renderer type: CharacterRenderer"
+  }
+]

@@ -1,0 +1,152 @@
+{
+  "short_id_rename": [
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "new_0",
+          "function": {
+            "name": "calculate",
+            "arguments": "{}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "new_0",
+      "content": "data"
+    }
+  ],
+  "cascading_rename": [
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "new_0",
+          "function": {
+            "name": "Read"
+          }
+        },
+        {
+          "id": "new_1",
+          "function": {
+            "name": "Read"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "new_0",
+      "content": "ok"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "new_1",
+      "content": "ok"
+    }
+  ],
+  "alternate_id_rename": [
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "tool_call_id": "new_0",
+          "function": {
+            "name": "Read"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "new_0",
+      "content": "ok"
+    }
+  ],
+  "structure_path_rename": [
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "scoped_0",
+          "type": "function",
+          "function": {
+            "name": "assistant",
+            "arguments": {
+              "name": "scoped_0",
+              "type": "scoped_0",
+              "role": "scoped_0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "scoped_0",
+      "content": {
+        "name": "scoped_0"
+      }
+    }
+  ],
+  "fixture": {
+    "status": "VALID",
+    "errors": []
+  },
+  "first_polish": {
+    "status": "VALID",
+    "errors": []
+  },
+  "second_polish": {
+    "status": "VALID",
+    "errors": []
+  },
+  "tampered_parent": {
+    "status": "INVALID",
+    "errors": [
+      "manifest artifact SHA256 mismatch: requests.jsonl",
+      "chain c: chains.jsonl max_output_i_sum=10, recomputed=777"
+    ]
+  },
+  "polished_tamper": {
+    "rejected": "polish parent artifact hash/path mismatch: requests.jsonl"
+  },
+  "identity_time_build": {
+    "checker": {
+      "status": "VALID",
+      "errors": []
+    },
+    "rows": 8,
+    "sessions_by_chain": {
+      "c0": [
+        "lc_123_000"
+      ],
+      "c1": [
+        "lc_123_001"
+      ]
+    },
+    "offsets_by_chain": {
+      "c0": [
+        10,
+        60,
+        105,
+        110
+      ],
+      "c1": [
+        10,
+        60,
+        105,
+        110
+      ]
+    },
+    "source_session_ids": [
+      "shared-source-session"
+    ],
+    "synthetic_offset_origin": [
+      "synthetic_order_only_not_observed_time"
+    ],
+    "cohort_requests": 8
+  }
+}
