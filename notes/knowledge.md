@@ -6,12 +6,12 @@
 
 - 正式排名（主办方确认，2026-09-24）逐级比较：`n_at_slo` 越大越好（一档都过不了排最后）→ TPOT（`tpot_mean`）越小越好 → TPM 越大越好 → 先提交者靠前。能力 AIME26/GPQA Diamond 都须严格高于 90 分。正式爬坡从 N=10 开始，过了 +4、没过 −4；题面规定的 11 门均须通过。四道 TTFT 门按题面统计余量判，`tpot_p95 ≤0.10 s/token` 无余量。[task.md](../llm-challenge-arena-v1/task.md)
 - 开发集是链前缀抽样，722 请求、311 条在本轮出现的链；链首占比远高于正式集。它只适合我们自己配置之间的 A/B 与回归，不推出正式 N@SLO。不能使用截链、去间隔等改变负载的参数。见 [R19](../research/codex/R19_progress_and_cache_review.md) 与 task.md 开发集约束。
-- 判分先检查本轮 cohort 中每个请求恰好出现一次、runner 成功和指标完整，再调用 harness 的 `s1_score.evaluate`（`scripts/score_formal.py`）并核对题面的 TPOT p95 门。空 raw、缺请求、缺指标或 runner 失败是 **INVALID**，不是 PASS。`run_dev.py` 对 flush 的公开检查只看 HTTP 成功，不能据此证明缓存真清；另核对真实清除行为。[R19 §2](../research/codex/R19_progress_and_cache_review.md)、[level_verdict.py](../scripts/pod/verify/level_verdict.py)
+- 判分先检查本轮 cohort 中每个请求恰好出现一次、runner 成功和指标完整，再调用 harness 的 `s1_score.evaluate`（`scripts/score_formal.py`）并核对题面的 TPOT p95 门。空 raw、缺请求、缺指标或 runner 失败是 **INVALID**，不是 PASS。原 `run_dev.py` 忽略 flush 失败返回值。现新增 checked runner 在失败时阻断测量；level_verdict 核对本次 receipt、调用时间窗及真实服务日志，缺证据标 INVALID。CP 主评分不变，Wilson/Wald 仅诊断方法敏感性；本地修复待负责人同步 pod。[修复与历史影响](fable-审计-2026-09-24.md)。[R19 §2](../research/codex/R19_progress_and_cache_review.md)、[level_verdict.py](../scripts/pod/verify/level_verdict.py)
 - `meta_info` 的时间戳、prompt/cached/completion token 计数必须如实；thinking、输出预算、历史和 tools 保持原样；`/flush_cache` 必须清掉前缀 KV。性能改善不能以牺牲这些条件取得。见 task.md「质量前提」「约束」。
 
 ## 已证实的性能状态
 
-- **09-24 00:47 UTC最新复核**：037b–042已结束，完整dev N22仍无全过。037d的123准入排序将chain33→23，但TPOT p95 .1466失败；122实际为固定耗时公式，target=.17不等于.10的门限，K≈8预测p95≈.09已被037c实测否定。400槽将同链对齐缺口约864k–916k→450k、全prefill只少5%–6%；关闭140则缺口约1.304M。DCP8在冒烟阶段因[33,1,512]/[40,1,512]不匹配失败，未获性能结论。S1重跑fast7→15，单次小差异不能当稳定收益。[codex-分析](codex-分析-2026-09-24.md)、[完整实验](experiments.md)
+- **09-24 00:47 UTC最新复核**：037b–042已结束，完整dev N22仍无全过。037d的123准入排序将chain33→23（CP允许22，Wald允许23，方法敏感不改变整档失败），但TPOT p95 .1466失败；122实际为固定耗时公式，target=.17不等于.10的门限，K≈8预测p95≈.09已被037c实测否定。400槽将同链对齐缺口约864k–916k→450k、全prefill少5%–6%，但不能据此判短请求收益次要；042→040的intra真实缺口687,552→450,496（少34.5%），其SLO收益仍须复验；关闭140则缺口约1.304M。DCP8在冒烟阶段因[33,1,512]/[40,1,512]不匹配失败，未获性能结论。S1重跑fast7→15，单次小差异不能当稳定收益。[codex-分析](codex-分析-2026-09-24.md)、[完整实验](experiments.md)
 
 - S0 当前 7 个补丁与 026/035 源码树逐文件一致；不要沿用旧文档「现在的 120 与 S0 不同」的说法。[等价性记录](../evidence/T57/equivalence.log)
 - S0 在 N18 的 026 与 N22 的 035 均通过四道 TTFT 门，但分别以 `tpot_p95=0.219`、`0.296` 失败；035 共 722 条完整请求、0 错，11 门过 10 门。[026 复核](../evidence/T53/)、[035 复核](../evidence/T58/)、[035 分数](../evidence/L035/score_formal.json)
@@ -48,3 +48,15 @@
 ## 正式最终评测的规模（主办方确认，2026-09-24）
 - 回放 341 条会话链、5150 个请求（平均每链约 15.1 个请求；开发集为 311 链 / 722 请求，每链约 2.3 个），按档搜索最大 N，整轮约 8–10 小时。由此估算，链首约占 6.6%，开发集为 43%。
 - 排名顺序见上文「赛题与测量」。task.md 与 `challenge.json` 摘要里的旧排名写法（TPM 不排名；或 TPM(decode) → chain_start p95）以主办方这次确认为准。
+
+## Fable 评估复核后的决策边界（Codex，2026-09-24）
+
+- 逻辑 TPM 含缓存输入；数值相近不能证明实际 prefill 工作或产能相同。参考集 intra 请求数占 91% 也不等于计算量占 91%，不能据此排除执行效率瓶颈。
+- 开发集已能观测驻留/复用问题，400 槽的单变量结果就是证据；更长历史与竞争分配覆盖不足需另做机制探针。仅拉长无竞争的 gap 不能检验 LRU 驱逐。相同开发负载上的候选比较仍有效，迁移到正式排名须校准。
+- 超时伴随真实 LCP 缺口不等于超时由该缺口单独造成；冻结差值尤其不能当缓存损失。040 的 12 条 fast 超时中仅 10 条有 >64-token 真实缺口。启动阶段 19.79GB 空闲也不是已证实可回收的稳态显存。
+- 旧“正式 chain 一定最松”“领先者故意牺牲最大5%链首”“A@N18几乎不可能挂TPOT”均无直接证据，不指导实验。Fable 评估正文已替换为[复核结论](fable-评估-2026-09-24.md)，逐请求复算见 [证据](../evidence/eval-tools-audit-20260924/fable-review.json)。
+
+## 公开榜单（用户转贴，2026-09-24 约 07:20）
+- 我们（正式 A，45979）：N14，tpot_mean 0.017435（全榜最小），tpm_all 1,757,558（接近全榜最大），tpm_decode 20,547，排第 17。
+- 前列：N26 两名 tpot 0.040 / 0.055（第三名 0.043）、tpm 1.46–1.61M；N22 四名 tpot 0.027–0.052；N18 九名 tpot 0.024–0.048。
+- 推断：tpm 约 1.76M/min 封顶，接近固定回放速率的需求量；tpm 更低的提交，TPOT 都更高，说明没有完全跟上回放速率，但仍守住了 TTFT 门。我们的 decode 速度余量大，缺的是 N，应优先改 TTFT 与缓存驻留；TPOT 只需守住不明显退步。
