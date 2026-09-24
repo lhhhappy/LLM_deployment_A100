@@ -4,6 +4,8 @@ import torch
 import triton
 import triton.language as tl
 
+from sglang.kernels.ops.attention.dsa.ax_soft_fp8 import _ax_fp8_view, _ax_store_fp8  # [ax] 110: sm80 soft fp8
+
 
 # Triton implementation
 @triton.jit
@@ -74,7 +76,7 @@ def _act_quant_kernel(
 
     # Store quantized output
     y_ptrs = Y_ptr + rows[:, None] * N + cols[None, :]
-    tl.store(y_ptrs, y, mask=mask)
+    _ax_store_fp8(y_ptrs, y, mask)  # [ax] 110
 
     # Store scales
     s_cols = pid_n
@@ -122,7 +124,7 @@ def act_quant(
 
     _act_quant_kernel[grid](
         x_flat,
-        y_flat,
+        _ax_fp8_view(y_flat),  # [ax] 110
         s_flat,
         M,
         N,

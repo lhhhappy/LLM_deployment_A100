@@ -23,6 +23,10 @@ if is_cuda():
         import deep_gemm
     except ImportError as e:
         deep_gemm = e
+    # [ax] 110: sm80 has no DeepGEMM MQA-logits kernels; see dsa/sm80_deep_gemm.py
+    from sglang.srt.layers.attention.dsa.sm80_deep_gemm import maybe_wrap as _ax_wrap
+
+    deep_gemm = _ax_wrap(deep_gemm)
 
 if is_npu():
     import custom_ops  # noqa: F401
