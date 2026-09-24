@@ -1,0 +1,27 @@
+{
+  "read_utc": "2026-09-24T11:56:09.062603+00:00",
+  "state": "MEASURING",
+  "checkpoint": {
+    "n_done": 900,
+    "n_attempted": 900,
+    "raw_file": "raw_s1-dev-longchain-lite_N14_1790249447.jsonl",
+    "at_s": 1790250905.103283
+  },
+  "expected_requests": 1123,
+  "flush": {
+    "started_s": 1790249439.5892258,
+    "finished_s": 1790249439.648799,
+    "http_status": 200,
+    "success": true
+  },
+  "recent_server_excerpt_time": "2026-09-24 11:47:00\u201311:47:08 UTC",
+  "recent_kv_usage_range": [
+    0.22,
+    0.4
+  ],
+  "recent_queue_range": [
+    0,
+    1
+  ],
+  "verdict": "NOT_AVAILABLE_INCOMPLETE"
+}

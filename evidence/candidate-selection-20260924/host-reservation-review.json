@@ -1,0 +1,29 @@
+{
+  "method": "actual method ASTs, fake request fields; no DMA or model execution",
+  "results": [
+    {
+      "case": "device_only",
+      "short_hit": true,
+      "budget": 8192,
+      "cold_cap_after_reserve": 7168
+    },
+    {
+      "case": "kv_host",
+      "short_hit": false,
+      "budget": 8192,
+      "cold_cap_after_reserve": 8192
+    },
+    {
+      "case": "swa_host",
+      "short_hit": false,
+      "budget": 8192,
+      "cold_cap_after_reserve": 8192
+    },
+    {
+      "case": "kda_host",
+      "short_hit": false,
+      "budget": 8192,
+      "cold_cap_after_reserve": 8192
+    }
+  ]
+}

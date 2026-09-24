@@ -1,0 +1,17 @@
+test_budget_fits_a_fresh_decoders_allowed_deficit (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_cost_model_error_degrades_gracefully (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_decode_rounds_are_bounded (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_decoder_behind_pace_gets_decode_rounds_until_it_recovers (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_decoder_whose_first_token_is_unprocessed_still_counts (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_guard_admits_a_full_chunk (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_in_flight_prefill_is_charged_under_overlap (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_no_decoders_uses_full_chunk_minus_short_hit_reserve (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_off_is_identical_to_official_a (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_ranks_agree_on_one_clock (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_simulated_tpot_stays_under_gate_when_cost_model_holds (test_tpot_paced_prefill.PacedPrefill) ... ok
+test_waiting_lengths_do_not_depend_on_unbuilt_fill_ids (test_tpot_paced_prefill.PacedPrefill) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 2.707s
+
+OK

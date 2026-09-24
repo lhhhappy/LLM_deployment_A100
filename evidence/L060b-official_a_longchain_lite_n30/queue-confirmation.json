@@ -1,0 +1,6 @@
+{
+  "status": "PENDING_CONFIRMED",
+  "checked_utc": "2026-09-24T11:56:09.063192+00:00",
+  "receipt": "QUEUED 060b-official_a_longchain_lite_n30 after=060 before=061 patches=13 tools_unchanged=7 data=058 N30 fresh_flush no_predecessor_PASS_gate",
+  "enqueue_exit_code": 0
+}

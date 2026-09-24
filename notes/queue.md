@@ -24,7 +24,10 @@
 | 056-official_a_171_n22 | 现有正式配置只加171，完整原开发集N22 | 完成并独立复算：722条VALID FAIL，fast35/23、overall57/27、turn1/3、chain64/22，TPOT .0628/.0869通过；无引擎错误，非一致性门退出。34层实际融合；KV 1,024,960、状态槽318，少于047的1,036,288/321。单次收益混合，尚无净收益结论 |
 | 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 完成并独立复算：722条VALID FAIL、0请求错误；fast33/23、overall53/27、turn2/3、chain62/22，TPOT .0610/.0850通过。KV 1,036,288、状态槽321与047一致。均值略降但fast/overall TTFT p95上升，未证明稳定净收益 |
 | 058-official_a_longchain_lite_n14 | 正式 A 原样，64条完整链／1123请求的 lite 集，固定 N14 | 完成并独立复算：1123条VALID、0请求错误、flush有效；仅chain 12/8失败，fast8/59、overall13/62、turn0/4通过，TPOT .01585/.04425通过。12条chain坏例全在开场约40秒内，11条首执行前已等30秒；后期并发下降，不能据全程均值认定等价线上。完整三方对照见 evidence/L058-official_a_longchain_lite_n14/three-way-review.md |
-| 059-official_a_180_hicache_lite_n14 | 058原样，只加180与HiCache三个参数；同一lite、N14 | 已running、引擎已处理预检/预热请求。主机KV每卡1,394,368 token，GPU KV仍1,036,288。Pod确认14补丁与8数据产物哈希正确、源码sig=32989fc8418538ae，058的7个回放/评分/启动工具哈希不变。每卡主机缓存32GB、write_through，不加NUMA。GPU数值与性能尚无结果；本轮为启动、恢复、flush与完整负载调试。证据 evidence/L059-official_a_180_hicache_lite_n14/ |
+| 059-official_a_180_hicache_lite_n14 | 058原样，只加180与HiCache三个参数；同一lite、N14 | 正式测量中：11:30 UTC严格flush成功，11:55检查点900/1123完成，未判分。主机KV每卡1,394,368 token，GPU KV仍1,036,288。14补丁、8数据产物及058的7个工具哈希已核，源码sig=32989fc8418538ae；每卡32GB、write_through、不加NUMA。证据 evidence/L059-official_a_180_hicache_lite_n14/ |
+| 060-official_a_180_hicache_lite_n30 | 复用059已预热引擎，同一lite，只将并发改为N30 | 已确认pending，执行层Codex入队并跟踪；跳过重复预热，保留原preflight和每档新flush，不要求059的SLO通过。14补丁、参数/env、池容量配置不变；引擎身份和完成预热的收据须吻合。证据 evidence/L060-official_a_180_hicache_lite_n30/ |
+| 060z-official_a_longchain_lite_n30 | 058原样13补丁、同lite，只将N14改为N30 | 已确认pending，排060之后、061之前。Claude提供脚本，本会话核验并入队/跟踪；同样冻结8数据产物和7工具，首次预热后严格flush。为180与122各自提供同负载N30基准；入队后只将待运行编号060b调整为060z，并按worker实际sort确认在060与061之间，脚本/补丁未变；不以本地全部门通过为选候选前提。证据 evidence/L060b-official_a_longchain_lite_n30/ |
+| 061-official_a_122_lite_n30 | 正式A原13补丁+冻结122，048参数/env，改用同一lite N30 | 已确认pending，排060z后，执行层Codex入队并跟踪。14补丁/8数据产物/7工具哈希逐项核验；新引擎首次预热后严格flush，无生成重复门、无前档SLO通过前置。与060是候选间比较，不是单变量归因；058为N14，不能冒充A原样N30对照。证据 evidence/L061-official_a_122_lite_n30/ |
 
 049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。056/057均已完成；057结束后pread确认无running/pending job，服务未停止或释放，常驻watcher继续监控。
 
@@ -52,7 +55,7 @@
 
 1. 直接研究N22/N26，不以本地N14或开发集PASS为前提。有效FAIL逐门分析；INVALID、数值错误先排查。
 2. 原开发集用于同配置比较和回归，不能预测正式N；新数据是来源可追溯的合成集，仍有gap、重建、工具语义等偏差。
-3. 每次只改一个机制；算子和编排各自有效后再测组合，局部收益不能相加。差异接近重跑波动时补对照。
+3. 优先单机制对照；多变量组合只评价组合，局部收益不能相加。用户已取消同配置自动整档重跑；小差异如实保留不确定性。
 4. 所有硬门完整报告；profile扰动窗口不判档；12题只作能力冒烟。
 5. 8卡只做必要确认与完整服务对照；开发机做算子迭代。不得停止/删除/释放Trisol服务；只通过既有队列切换实验引擎。正式发布须满足质量与证据要求。
 
@@ -72,4 +75,12 @@
 
 用户在咨询材料整理期间明确要求先提交计算任务。059沿用058的完整基线、MTP、冻结lite数据、预热/真实flush和评分工具，只增加`180-hicache-glm-dsa.patch`及`--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`。`--hicache-size`按每卡计；`--numa-node 0 0 0 0 1 1 1 1`留待后续独立实验。没有恢复生成逐字一致性门，也没有追加自动复测。
 
-180 SHA256为`3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848`。Claude报告52项CPU测试通过；GPU主机恢复的数值正确性、恢复延迟及decode干扰尚未验证。本轮按用户授权直接调试和回放，不能将CPU通过或本轮SLO结果视为完整数值正确性证明。任务文件已从草案冻结为`scripts/pod/jobs/official_a_180_hicache_lite_n14.sh`；通过现有ppush/worker发布，未覆盖058的公共工具。远端发布回执`QUEUED ... patches=14 tools_unchanged=7 data=058 N14`、`DONE rc=0`已保存。
+180 SHA256为`3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848`。Claude的最终CUDA测试日志52/52通过；独立复核另跑3项真实CUDA搬运/分叉/flush槽复用均通过，负对照失败。52项并非全都执行设备搬运；真实模型与TP8恢复的数值、恢复延迟及decode干扰仍无完整验证，见 evidence/HC180-GPU-contract/README.md。059按用户授权直接调试和回放，不把局部检查或SLO结果当完整数值证明。远端发布回执`QUEUED ... patches=14 tools_unchanged=7 data=058 N14`、`DONE rc=0`已保存。
+
+## 当前提交目标：122、180、122+180 三选二
+
+用户明确今天从正式A+122、A+180、A+122+180中选两套正式提交，目标N@SLO至少22、争取26。本地固定lite N30比较，需要加压再测N34，不要求先过全部线上门。先完成180、A基准和122各自的lite N30，再决定组合是否值得测试和占提交名额；不将本地N30换算为正式晋档。后续代码复核、队列与提交准备由本会话自己完成，不再向Claude或subagent派新任务。
+
+171/172只测过原dev N22，尚未在新长链/lite上测过。因此旧结果既不能证明新负载无效，也不能证明足以晋档；仍保留候选。今日用户明确的三选二池是122/180/组合，不因旧dev结果把两个算子永久归档。
+
+CPU集成已核：A+122和A+122+180均按冻结顺序零fuzz应用、语法通过，真实调度方法的12项CPU测试各通过；不代表组合GPU验证。代码确认122的短命中预留排除KV/SWA/KDA任一仍需主机恢复的请求，搬回时间未进入成本模型。纯64→256对齐的额外复用损失最多192token，不能预先认定对预算可忽略。详见 evidence/candidate-selection-20260924/README.md。
