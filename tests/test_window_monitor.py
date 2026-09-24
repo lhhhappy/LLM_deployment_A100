@@ -67,6 +67,24 @@ class Windows(unittest.TestCase):
         third = watch.next_check(100, 900, 1800, second)
         self.assertEqual((first, second, third), (1000, 2800, 4600))
 
+    def test_compact_poll_ignores_ticks_but_detects_alert_staleness_and_recovery(self):
+        state = dict(job_state='running', health='up', heartbeat=1000, last_report='open')
+        health = dict(phase='measurement', completed_rows=12, alerts=[])
+        view, original = watch.compact_status(state, health, 1010)
+        health['completed_rows'] = 13
+        self.assertEqual(watch.compact_status(state, health, 1060)[1], original)
+        self.assertEqual(view['completed'], 12)
+        self.assertNotEqual(watch.compact_status(state, health, 1200)[1], original)
+        health['alerts'] = ['server error']
+        self.assertNotEqual(watch.compact_status(state, health, 1010)[1], original)
+        health['alerts'] = []
+        state.update(health='retrying', error='transport unavailable')
+        self.assertNotEqual(watch.compact_status(state, health, 1010)[1], original)
+        state.update(health='up')
+        self.assertEqual(watch.compact_status(state, health, 1010)[1], original)
+        state['last_scheduled_deadline'] = 900
+        self.assertNotEqual(watch.compact_status(state, health, 1010)[1], original)
+
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
         p.write_text('{"req_id":"a"}\n{"req_id":')

@@ -39,7 +39,7 @@ preflight仍为原先的一条链；随后真实flush必须2xx且success=true，
 
 | 时点/数据 | 内容与用途 |
 | --- | --- |
-| 每30分钟快照（30/60/90分钟等） | 已完成请求数、各桶样本量/超标量/统计余量、TTFT p95、TPOT均值/p95、错误；实时窗口保持open，不漏算慢请求后宣称通过 |
+| 首次15分钟、随后每30分钟快照（15/45/75…） | 已完成请求数、各桶样本量/超标量/统计余量、TTFT p95、TPOT均值/p95、错误；实时窗口保持open，不漏算慢请求后宣称通过 |
 | 每请求raw，共5601条 | 唯一ID、阶段、发送/接收/准入/执行/首token/结束时间、prompt/cached/output tokens、TTFT/TPOT、错误。服务端字段缺失就明确标缺，不补造 |
 | 每10秒metrics、每5秒GPU采样 | 排队/运行量、KV/KDA压力、显存与利用率；结合服务日志观察prefill块长、MTP接受长度和恢复行为 |
 | 全量完成 | cohort每请求恰好一次、runner成功、本轮flush证据、原评分器+统计余量+TPOT门；缺记录INVALID，有效但任一门失败为FAIL |
@@ -48,7 +48,7 @@ preflight仍为原先的一条链；随后真实flush必须2xx且success=true，
 11门：coverage、harness_data、harness_render、engine_error、infra_error、四道TTFT、
 gated_phases_have_samples、tpot_p95。TPOT p95≤0.10，无TTFT统计余量。
 TPM遵循原harness的固定稳态窗口与有效性检查，不用全程墙钟/预热/首轮输出替代。
-启动后30分钟是诊断检查点，不是整档通过结论；完整集VALID也只是本地结果，不换算正式N@SLO。
+测量后的15/45/75…分钟是诊断检查点，不是整档通过结论；完整集VALID也只是本地结果，不换算正式N@SLO。
 
 原harness及数据目录只读。新增wrapper和任务均在scripts/；默认原预热路径不变。
 CPU回归覆盖真实冻结集选择、原loadgen执行16请求且预算不变、只替换warmup阶段、

@@ -212,6 +212,57 @@ def next_check(t0, first_delay, interval, last_deadline=None):
     return first + (max(0, round((last_deadline-first)/interval)) + 1) * interval
 
 
+def compact_status(state, health, now):
+    """A bounded view; progress ticks alone do not count as a new diagnostic."""
+    age = max(0, now-state.get('heartbeat', 0))
+    stale = age > 180 and state.get('job_state') not in TERMINAL
+    monitor = 'stale' if stale else state.get('health', 'unknown')
+    view = dict(job_state=state.get('job_state', 'unknown'), monitor=monitor,
+                phase=health.get('phase', 'unknown'),
+                completed=health.get('completed_rows', health.get('completed_at_checkpoint')),
+                alerts=health.get('alerts', []),
+                next_report_utc=time.strftime('%H:%M:%S', time.gmtime(state['next_report_at']))
+                    if state.get('next_report_at') else None,
+                last_report=state.get('last_report'),
+                error=str(state.get('error', ''))[:400] if monitor != 'up' else None)
+    # Keep the latest counts available without flooding each poll with unchanged
+    # diagnosis. A stale watcher, recovery or new alert always breaks deduplication.
+    key = {k: view[k] for k in ('job_state', 'monitor', 'phase', 'alerts', 'last_report', 'error')}
+    key['report_deadline'] = state.get('last_scheduled_deadline')
+    digest = hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()
+    return view, digest
+
+
+def show_status(out, runtime, job, changes_only):
+    def read(path):
+        return json.loads(path.read_text()) if path.is_file() else {}
+    view, digest = compact_status(read(runtime/'watch-state.json'), read(out/'health.json'), time.time())
+    cursor = runtime/'status-cursor.json'
+    if changes_only and read(cursor).get('digest') == digest:
+        print(job+': unchanged; latest counts in '+str(out/'health.json'))
+    else:
+        report = read(out/'window_gates.json').get(job, {})
+        if report:
+            whole = report['whole']
+            view.pop('last_report', None)
+            snapshot_at = read(out/'snapshot.json').get('observed_at')
+            view['diagnostic'] = dict(rows=report['n_rows'], complete=report.get('complete_data', False),
+                snapshot_utc=time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(snapshot_at)) if snapshot_at else None,
+                ttft={k: dict(n=v['n'], p95=v['p95']) for k, v in whole['gates'].items()},
+                tpot=whole['tpot'], errors=whole['errors'], cache=whole['tokens'])
+        def rounded(value):
+            if isinstance(value, float): return round(value, 4)
+            if isinstance(value, dict): return {k: rounded(v) for k, v in value.items()}
+            if isinstance(value, list): return [rounded(v) for v in value]
+            return value
+        print(job+': '+json.dumps(rounded(view), ensure_ascii=False))
+        print('evidence: '+str(out))
+        if changes_only:
+            runtime.mkdir(parents=True, exist_ok=True)
+            atomic_json(cursor, dict(digest=digest))
+    return 2 if view['monitor'] in ('stale', 'unknown', 'retrying') else 0
+
+
 def render(meta, rows, out, job, width):
     complete = is_complete(meta, rows)
     drained = is_drained(meta, rows)
@@ -248,17 +299,21 @@ def main(argv=None):
     ap.add_argument('window_min', type=float, nargs='?', default=25)
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--notify', action='store_true')
+    ap.add_argument('--status', action='store_true', help='read cached status only; no pod request')
+    ap.add_argument('--changes-only', action='store_true', help='with --status, suppress repeated diagnosis')
     ap.add_argument('--first-report-s', type=float,
                     help='first report after this many measured seconds, then interval_s')
     args = ap.parse_args(argv)
+    if args.changes_only and not args.status: ap.error('changes-only requires status')
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job name')
     if any(not math.isfinite(v) or v <= 0 for v in (args.interval_s, args.window_min)):
         ap.error('interval and window must be finite and positive')
     if args.first_report_s is not None and (not math.isfinite(args.first_report_s) or args.first_report_s <= 0):
         ap.error('first-report-s must be finite and positive')
     out = ROOT / 'evidence' / ('L'+args.job) / 'window'
-    out.mkdir(parents=True, exist_ok=True)
     runtime = ROOT / 'build' / 'scratch' / 'window-watch' / args.job
+    if args.status: return show_status(out, runtime, args.job, args.changes_only)
+    out.mkdir(parents=True, exist_ok=True)
     runtime.mkdir(parents=True, exist_ok=True)
     lock = (runtime/'watch.lock').open('a')
     try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -275,6 +330,7 @@ def main(argv=None):
             meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, int(due)), 'WINDOW_META '))
             terminal = meta['job_state'] in TERMINAL
             state.update(health='up', job_state=meta['job_state'])
+            state.pop('error', None)
             alerts = health_alerts(meta)
             health = dict(observed_at=meta['observed_at'], job_state=meta['job_state'],
                           **meta.get('health', {}), alerts=alerts)
@@ -318,8 +374,12 @@ def main(argv=None):
             atomic_json(path, state)
             if args.notify: notify(state, path)
         except Exception as e:
-            state.update(health='retrying', error=str(e), last_error_at=time.time())
-            print(args.job+': monitor retry: '+str(e), flush=True)
+            error = str(e)[:400]
+            changed = state.get('health') != 'retrying' or state.get('error') != error
+            if changed or time.time()-state.get('last_error_print_at', 0) >= 600:
+                print(args.job+': monitor retry: '+error, flush=True)
+                state['last_error_print_at'] = time.time()
+            state.update(health='retrying', error=error, last_error_at=time.time())
             atomic_json(path, state)
             if args.once: return 2
             terminal = False
