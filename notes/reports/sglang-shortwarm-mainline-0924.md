@@ -56,3 +56,14 @@ CPU回归覆盖真实冻结集选择、原loadgen执行16请求且预算不变�
 
 证据：`evidence/L067-official_b_full_n30_shortwarm/config-verification.json`、
 `expected-short-warmup-plan.json`；运行后的真实receipt须与计划SHA核对。
+
+## 首个检查点：15:31:49 UTC（运行中）
+
+484条完成、0错误；四桶TTFT p95（fast/overall/turn/chain）20.65/21.36/28.05/253.38秒，
+样本323/358/42/84。TPOT均值/p95为.0547/.0806，484条中无TPOT超过.10；所有窗口仍open。
+fast坏例64条的recv→exec中位7.56秒、exec→first中位1.62秒、实际未命中中位15,256.5 token。
+优先调查真实前驱LCP、缓存状态与准入等待；冻结uncached_expected的差额不能直接归因淘汰，
+两段时间也不是纯GPU计时。当前证据不足以只调122成本参数。
+服务区间日志1107个prefill块，中位8192，仅2个≤64；未见此前持续碎块形态。
+继续完整回放，下次16:00:50 UTC检查趋势；不把已完成请求统计当整档判定。
+原始快照、日志区间、badcase工具结果及CSV见[evidence/check15](../../evidence/L067-official_b_full_n30_shortwarm/check15/)。
