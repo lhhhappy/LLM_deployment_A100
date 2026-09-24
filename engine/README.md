@@ -16,7 +16,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 - Every mechanism is switchable (flag/env) and its default-off path is the base code. No silent bypass: an unsupported
   combination works with tests or refuses to start.
 - The scheduler logs one `[ax] mechanisms:` line at startup (`101 120 122 123 140 180` as `on` / `off:<reason>`, plus
-  speculative algorithm, DCP size and the requested model-side switches). Pod jobs declare `G_EXPECT` and refuse to
+  speculative algorithm as resolved by the base, so `--speculative-algorithm NEXTN` shows as `spec=EAGLE`, DCP size and the requested model-side switches). Pod jobs declare `G_EXPECT` and refuse to
   measure on a mismatch.
 - Trees for tests and tools: `python3 scripts/engine/tree.py <ref>` (`official-A-0923a`, `HEAD`, `mech:NNN` = latest
   commit of NNN, `before:NNN` = before its first commit).

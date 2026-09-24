@@ -682,7 +682,8 @@ class HiCacheTierTests(unittest.TestCase):
         mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy})
         mods.start()
         self.addCleanup(mods.stop)
-        ns['get_spec'] = lambda: NS(speculative_algorithm='NEXTN')
+        # The base resolves --speculative-algorithm NEXTN to EAGLE before the scheduler starts (061r log).
+        ns['get_spec'] = lambda: NS(speculative_algorithm='EAGLE')
         ns['get_parallel'] = lambda: NS(dcp_size=1)
         env = {'SGLANG_AX_KDA_DUAL_SNAPSHOT': '0', 'SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS': ''}
         with patch.dict(os.environ, env):
@@ -697,7 +698,7 @@ class HiCacheTierTests(unittest.TestCase):
             rep = s._ax_mechanism_report()
         self.assertIn('120=on 122=on', rep)
         self.assertIn('180=on', rep)
-        self.assertIn('spec=NEXTN dcp=1', rep)
+        self.assertIn('spec=EAGLE dcp=1', rep)
 
 if __name__ == '__main__':
     unittest.main()
