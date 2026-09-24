@@ -344,6 +344,8 @@ class KDAKernelDispatcher:
         **kwargs,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
         kernel = self.extend_kernel
+        if kwargs.get("snapshot_offsets") is not None:
+            kernel = self.triton_kernel
         if kwargs.get("lower_bound") is not None and not getattr(
             kernel, "supports_safe_gate", True
         ):
@@ -741,7 +743,15 @@ class KDAAttnBackend(MambaAttnBackendBase):
             a = a[:, :logical_num_tokens]
             b = b[:, :logical_num_tokens]
 
-        if self.forward_metadata.has_mamba_track_mask:
+        snapshot_offsets = forward_batch.ax_kda_snapshot_offsets
+        snapshot_slots = forward_batch.ax_kda_snapshot_slots
+        if snapshot_offsets is not None:
+            from sglang.kernels.ops.attention.fla.kda_snapshot import store_conv
+
+            assert ssm_states.dtype == torch.float32
+            store_conv(mixed_qkv, mamba_cache_params.conv[0], query_start_loc,
+                       snapshot_offsets, snapshot_slots)
+        if self.forward_metadata.has_mamba_track_mask and snapshot_offsets is None:
             # Snapshot the conv sliding window at the last track-aligned chunk
             # boundary into the ping-pong track slots (the prefix-cache restore
             # source). The KDA pool stores conv states as [kernel-1, dim], so
@@ -774,7 +784,7 @@ class KDAAttnBackend(MambaAttnBackendBase):
         if gate_was_flat:
             a = a.unflatten(-1, (-1, layer.head_k_dim))
 
-        track_ssm = self.forward_metadata.has_mamba_track_mask
+        track_ssm = self.forward_metadata.has_mamba_track_mask and snapshot_offsets is None
         core_attn_out = self.kernel_dispatcher.extend(
             q=q,
             k=k,
@@ -793,6 +803,8 @@ class KDAAttnBackend(MambaAttnBackendBase):
             # in place (e.g. FlashKDA) must not run for it.
             is_spec_decode=forward_batch.forward_mode.is_draft_extend_v2(),
             return_intermediate_states=track_ssm,
+            snapshot_offsets=snapshot_offsets,
+            snapshot_slots=snapshot_slots,
             # Which global chunk rows of h the track snapshot will read; lets
             # kernels that cannot materialize per-chunk states (NVIDIA KDA) take the
             # fast path when the snapshot only needs the final state.

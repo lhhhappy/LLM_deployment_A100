@@ -50,7 +50,7 @@ GDN_CHUNK_H_NUM_STAGES = int(os.getenv("SGLANG_GDN_CHUNK_H_NUM_STAGES", "2"))
     **autotune_cache_kwargs,
 )
 @triton.jit(do_not_specialize=["T"])
-def chunk_gated_delta_rule_fwd_kernel_h_blockdim64(
+def chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot(
     k,
     v,
     w,
@@ -61,6 +61,8 @@ def chunk_gated_delta_rule_fwd_kernel_h_blockdim64(
     initial_state,
     initial_state_indices,
     stride_init_state,
+    snapshot_offsets,
+    snapshot_slots,
     cu_seqlens,
     chunk_offsets,
     T,
@@ -78,6 +80,7 @@ def chunk_gated_delta_rule_fwd_kernel_h_blockdim64(
     IS_VARLEN: tl.constexpr,
     NT_BUCKET: tl.constexpr,
     USE_EXP2: tl.constexpr,
+    EXPORT_SNAPSHOTS: tl.constexpr,
 ):
     i_v, i_nh = tl.program_id(0), tl.program_id(1)
     i_n, i_h = i_nh // H, i_nh % H
@@ -292,6 +295,27 @@ def chunk_gated_delta_rule_fwd_kernel_h_blockdim64(
             b_k = tl.load(p_k, boundary_check=(0, 1))
             b_h4 += tl.trans(tl.dot(b_k, b_v))
 
+
+        # 140: do not round through h. The two destinations never alias an
+        # active request slot; every layer writes its own pool view.
+        if EXPORT_SNAPSHOTS:
+            for snap in tl.static_range(2):
+                depth = tl.load(snapshot_offsets + i_n * 2 + snap)
+                dst = tl.load(snapshot_slots + i_n * 2 + snap).to(tl.int64)
+                if valid_state and dst >= 0 and depth == (i_t + 1) * BT and depth <= T:
+                    target = initial_state + dst * stride_init_state + i_h * V * K
+                    p_snap = tl.make_block_ptr(target, (V, K), (K, 1), (i_v * BV, 0), (BV, 64), (1, 0))
+                    tl.store(p_snap, b_h1, boundary_check=(0, 1))
+                    if K > 64:
+                        p_snap = tl.make_block_ptr(target, (V, K), (K, 1), (i_v * BV, 64), (BV, 64), (1, 0))
+                        tl.store(p_snap, b_h2, boundary_check=(0, 1))
+                    if K > 128:
+                        p_snap = tl.make_block_ptr(target, (V, K), (K, 1), (i_v * BV, 128), (BV, 64), (1, 0))
+                        tl.store(p_snap, b_h3, boundary_check=(0, 1))
+                    if K > 192:
+                        p_snap = tl.make_block_ptr(target, (V, K), (K, 1), (i_v * BV, 192), (BV, 64), (1, 0))
+                        tl.store(p_snap, b_h4, boundary_check=(0, 1))
+
     # epilogue
     if INPLACE_UPDATE and valid_state:
         p_ht = tl.make_block_ptr(ht, (V, K), (K, 1), (i_v * BV, 0), (BV, 64), (1, 0))
@@ -313,7 +337,7 @@ def chunk_gated_delta_rule_fwd_kernel_h_blockdim64(
             tl.store(p_ht, b_h4.to(p_ht.dtype.element_ty), boundary_check=(0, 1))
 
 
-def chunk_gated_delta_rule_fwd_h(
+def chunk_gated_delta_rule_fwd_h_snapshot(
     k: torch.Tensor,
     w: torch.Tensor,
     u: torch.Tensor,
@@ -328,17 +352,6 @@ def chunk_gated_delta_rule_fwd_h(
     snapshot_offsets: Optional[torch.Tensor] = None,
     snapshot_slots: Optional[torch.Tensor] = None,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    if snapshot_offsets is not None or os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1":
-        from sglang.kernels.ops.attention.fla.chunk_delta_h_snapshot import (
-            chunk_gated_delta_rule_fwd_h_snapshot,
-        )
-
-        return chunk_gated_delta_rule_fwd_h_snapshot(
-            k=k, w=w, u=u, g=g, gk=gk, initial_state=initial_state,
-            initial_state_indices=initial_state_indices, save_new_value=save_new_value,
-            cu_seqlens=cu_seqlens, chunk_indices=chunk_indices, use_exp2=use_exp2,
-            snapshot_offsets=snapshot_offsets, snapshot_slots=snapshot_slots,
-        )
     assert not (
         use_exp2 and g is not None
     ), "use_exp2 covers only the per-channel gk path; scalar g stays natural-exp"
@@ -359,6 +372,10 @@ def chunk_gated_delta_rule_fwd_h(
         )
     assert K <= 256, "current kernel does not support head dimension larger than 256."
 
+    if snapshot_offsets is not None:
+        assert initial_state is not None and initial_state.dtype == torch.float32
+        assert snapshot_offsets.shape == snapshot_slots.shape == (N, 2)
+        assert snapshot_offsets.is_contiguous() and snapshot_slots.is_contiguous()
     h = k.new_empty(B, NT, H, V, K)
 
     v_new = torch.empty_like(u) if save_new_value else None
@@ -366,7 +383,7 @@ def chunk_gated_delta_rule_fwd_h(
     def grid(meta):
         return (triton.cdiv(V, meta["BV"]), N * H)
 
-    chunk_gated_delta_rule_fwd_kernel_h_blockdim64[grid](
+    chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot[grid](
         k=k,
         v=u,
         w=w,
@@ -379,6 +396,8 @@ def chunk_gated_delta_rule_fwd_h(
         # Envelope-strided state pools (page-major / unified memory) have a
         # per-slot pitch != H*V*K; contiguous pools pass exactly H*V*K.
         stride_init_state=(initial_state.stride(0) if initial_state is not None else 0),
+        snapshot_offsets=snapshot_offsets,
+        snapshot_slots=snapshot_slots,
         cu_seqlens=cu_seqlens,
         chunk_offsets=chunk_offsets,
         T=T,
@@ -395,5 +414,6 @@ def chunk_gated_delta_rule_fwd_h(
         IS_VARLEN=cu_seqlens is not None,
         NT_BUCKET=(0 if NT <= 32 else (1 if NT <= 128 else 2)),
         USE_EXP2=use_exp2,
+        EXPORT_SNAPSHOTS=snapshot_offsets is not None,
     )
     return h, v_new

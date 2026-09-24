@@ -248,4 +248,6 @@ class TritonKDAKernel(LinearAttnKernelBase):
             lower_bound=lower_bound,
             beta_is_raw=beta_is_raw,
             output_intermediate_states=return_intermediate_states,
+            snapshot_offsets=kwargs.get("snapshot_offsets"),
+            snapshot_slots=kwargs.get("snapshot_slots"),
         )

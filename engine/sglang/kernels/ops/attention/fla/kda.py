@@ -6,6 +6,7 @@
 # the following copyright notice:
 # Copyright (c) 2023-2025, Songlin Yang, Yu Zhang
 
+import os
 from typing import Optional
 
 import torch
@@ -1094,6 +1095,8 @@ def chunk_kda_fwd(
     dt_bias: Optional[torch.Tensor] = None,
     lower_bound: Optional[float] = None,
     output_intermediate_states: bool = False,
+    snapshot_offsets: Optional[torch.Tensor] = None,
+    snapshot_slots: Optional[torch.Tensor] = None,
 ):
     chunk_size = 64
     # Pre-compute chunk indices once and thread through all downstream kernels.
@@ -1144,6 +1147,11 @@ def chunk_kda_fwd(
     _H_pr = q.shape[-2]
     _B = q.shape[0]
     _small_grid = _B * _NT_pr * _H_pr <= 256
+    # 140: prefix length must not change intra-chunk arithmetic. The fused
+    # small-grid variant rounds differently, so a long extend and its short
+    # prefix otherwise disagree even with an exact fp32 state exporter.
+    if os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1":
+        _small_grid = False
     w, u, _, kg, Aqk, _ = chunk_kda_fwd_intra(
         q=q,
         k=k,
@@ -1169,6 +1177,8 @@ def chunk_kda_fwd(
         cu_seqlens=cu_seqlens,
         chunk_indices=chunk_indices,
         use_exp2=True,
+        snapshot_offsets=snapshot_offsets,
+        snapshot_slots=snapshot_slots,
     )
     del w, u, kg
 
@@ -1238,4 +1248,6 @@ def chunk_kda(
         dt_bias=dt_bias,
         lower_bound=lower_bound,
         output_intermediate_states=output_intermediate_states,
+        snapshot_offsets=kwargs.get("snapshot_offsets"),
+        snapshot_slots=kwargs.get("snapshot_slots"),
     )

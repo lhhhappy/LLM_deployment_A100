@@ -276,6 +276,9 @@ class UnifiedRadixCache(BasePrefixCache):
             "l3_sum_rate_main_weighted": 0.0,
         }
 
+        from sglang.srt.mem_cache.kda_dual_snapshot import configure
+
+        self.ax_kda_dual_snapshot = configure(self, params)
         self.reset()
         logger.info(
             f"Init Unified Radix Cache. Components: {self.tree_components}. "
@@ -897,6 +900,10 @@ class UnifiedRadixCache(BasePrefixCache):
             insert_params.key = radix_key
             insert_params.value = values
             result = self.insert(insert_params)
+            if self.ax_kda_dual_snapshot:
+                from sglang.srt.mem_cache.kda_dual_snapshot import commit
+
+                commit(self, req, insert_params, result)
 
             # Free unaligned tail (+ deferred truncation tail)
             segments = [(kv_indices[page_aligned_len:], page_aligned_len)]
@@ -995,6 +1002,10 @@ class UnifiedRadixCache(BasePrefixCache):
         insert_params.key = radix_key
         insert_params.value = values
         result = self.insert(insert_params)
+        if self.ax_kda_dual_snapshot:
+            from sglang.srt.mem_cache.kda_dual_snapshot import commit
+
+            commit(self, req, insert_params, result)
 
         # Match prefix. SWA insertion retains one extra window before the
         # page-aligned boundary, so the normal match remains safe to repoint.

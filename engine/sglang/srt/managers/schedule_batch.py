@@ -871,6 +871,10 @@ class ReqKvInfo:
     mamba_last_track_idx: Optional[int] = None  # 0 or 1
     # Seq len of the last cached mamba state
     mamba_last_track_seqlen: Optional[int] = None
+    # 140: one optional slot owned by this request until commit/discard.
+    ax_kda_snapshot_slot: Optional[torch.Tensor] = None
+    ax_kda_snapshot_depth: Optional[int] = None
+    ax_kda_role_depth: int = 0
     # Deferred COW: source mamba pool index from radix cache node (copy on forward stream)
     mamba_cow_src_index: Optional[torch.Tensor] = None
     # Deferred clear: newly allocated mamba slot needs zeroing on forward stream
@@ -2234,6 +2238,9 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
     mamba_track_buffer_indices: Optional[List[int]] = None  # shape: [b], 0 or 1
     mamba_track_mask: torch.Tensor = None  # shape: [b], bool
     mamba_track_seqlens: torch.Tensor = None  # shape: [b], int64
+    ax_kda_dual_snapshot_batch: bool = False
+    ax_kda_snapshot_offsets: Optional[torch.Tensor] = None  # [b, 2], relative tokens
+    ax_kda_snapshot_slots: Optional[torch.Tensor] = None  # [b, 2], physical slots
     mamba_track_mask_cpu: Optional[List[bool]] = None  # shape: [b]
     mamba_track_mask_next_cpu: Optional[List[bool]] = None  # shape: [b]
     mamba_decode_batch_idx_cpu: Optional[List[int]] = None  # shape: [b]
@@ -2565,6 +2572,12 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         mamba_track_mask_cpu = []
         mamba_track_indices_cpu = []
         mamba_track_seqlens_cpu = []
+        if getattr(self.tree_cache, "ax_kda_dual_snapshot", False):
+            from sglang.srt.mem_cache.kda_dual_snapshot import batch_supported
+
+            self.ax_kda_dual_snapshot_batch = batch_supported(
+                self, mamba_checkpoint_grid(self.tree_cache.page_size)
+            )
 
         for i, (req, seq_len, pre_len) in enumerate(zip(reqs, seq_lens, prefix_lens)):
             assert seq_len - pre_len == req.extend_range.length
@@ -2750,6 +2763,12 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 device=self.device,
             )
 
+        if self.ax_kda_dual_snapshot_batch:
+            from sglang.srt.mem_cache.kda_dual_snapshot import prepare
+
+            prepare(self, mamba_track_indices_cpu, mamba_track_mask_cpu,
+                    mamba_checkpoint_grid(self.tree_cache.page_size))
+
         # Collect mamba init info for deferred ops on forward stream
         if any(req.kv.holds_mamba for req in reqs):
             self._collect_deferred_mamba_cow_and_clear(reqs)
@@ -2835,7 +2854,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                         req.kv.mamba_next_track_idx
                     )
                 )
-            if req.mamba_branching_seqlen is not None:
+            if req.mamba_branching_seqlen is not None and not self.ax_kda_dual_snapshot_batch:
                 # track branching point in this forward if the branching point
                 # is within the current extend batch.
                 branching_seqlen_aligned_mask = (
@@ -3438,6 +3457,9 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         self.mamba_track_buffer_indices = None
         self.mamba_track_mask = None
         self.mamba_track_seqlens = None
+        self.ax_kda_snapshot_offsets = None
+        self.ax_kda_snapshot_slots = None
+        self.ax_kda_dual_snapshot_batch = False
         self.mamba_track_mask_cpu = None
         self.mamba_track_mask_next_cpu = None
         self.mamba_decode_batch_idx_cpu = None
@@ -3504,6 +3526,9 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         self.mamba_track_buffer_indices = None
         self.mamba_track_mask = None
         self.mamba_track_seqlens = None
+        self.ax_kda_snapshot_offsets = None
+        self.ax_kda_snapshot_slots = None
+        self.ax_kda_dual_snapshot_batch = False
         self.mamba_track_mask_cpu = None
         self.mamba_track_mask_next_cpu = None
         self.mamba_decode_batch_idx_cpu = None

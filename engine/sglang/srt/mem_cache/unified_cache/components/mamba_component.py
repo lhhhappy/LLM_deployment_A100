@@ -224,6 +224,13 @@ class MambaComponent(TreeComponent):
         cache_actions: list[CacheAction | ComponentAction],
     ) -> None:
         assert params.mamba_value is not None
+        if getattr(self.cache, "ax_kda_dual_snapshot", False):
+            # Role wins permanently at this exact depth; split parents start
+            # untagged, while the old child's depth and tag stay unchanged.
+            node.ax_kda_role = getattr(node, "ax_kda_role", False) or getattr(params, "ax_kda_role", False)
+            node.ax_kda_tail = not node.ax_kda_role and (
+                getattr(node, "ax_kda_tail", False) or getattr(params, "ax_kda_tail", False)
+            )
         if is_new_leaf:
             node.component_data[self.component_type].value = params.mamba_value
             self.tree_core.lru_lists[self.component_type].insert_mru(node)
@@ -289,9 +296,15 @@ class MambaComponent(TreeComponent):
             return
 
         tracker = {component: 0 for component in self.cache.tree_components}
-        for node in reversed(holders):
-            if excess <= 0 or node is tail:
+        ordered = list(reversed(holders))
+        if getattr(self.cache, "ax_kda_dual_snapshot", False):
+            ordered.sort(key=lambda n: (getattr(n, "ax_kda_role", False),
+                                        not getattr(n, "ax_kda_tail", False)))
+        for node in ordered:
+            if excess <= 0:
                 break
+            if node is tail:
+                continue
             if node.component_data[ct].lock_ref > 0 or len(node.children) != 1:
                 continue
             if node in self.tree_core.evictable_device_leaves:
@@ -386,6 +399,10 @@ class MambaComponent(TreeComponent):
         ct = self.component_type
         lru = self.tree_core.lru_lists[ct]
         enabled = self.tree_core.enable_session_radix_cache
+        if getattr(self.cache, "ax_kda_dual_snapshot", False):
+            from sglang.srt.mem_cache.kda_dual_snapshot import eviction_candidate
+
+            self._evict_device_cursor = eviction_candidate(lru, ct)
         if self._evict_device_cursor is not None and not lru.in_list(
             self._evict_device_cursor
         ):
@@ -550,6 +567,11 @@ class MambaComponent(TreeComponent):
                 if write_pos_buf is not None:
                     cache_len -= int(write_pos_buf[req.kv.mamba_pool_idx].item())
                     write_pos_buf[req.kv.mamba_pool_idx] = 0
+
+        if getattr(self.cache, "ax_kda_dual_snapshot", False):
+            role = req.kv.ax_kda_role_depth
+            insert_params.ax_kda_role = bool(role and cache_len == role)
+            insert_params.ax_kda_tail = bool(role and cache_len and cache_len > role)
 
         if is_finished:
             if cache_len is None:

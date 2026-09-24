@@ -191,12 +191,18 @@ class FullComponent(TreeComponent):
         ref = self.session_ref(node)
         return ref > 0, ref, self.tree_core.eviction_strategy.get_priority(node)
 
+    def _ax_eviction_priority(self, node):
+        key = self.session_ref_eviction_strategy(node)
+        if getattr(self.cache, "ax_kda_dual_snapshot", False):
+            return (not getattr(node, "ax_kda_tail", False), key)
+        return key
+
     def _evict_device_start(self, request_cnt: int) -> None:
         self._ensure_eviction_strategy()
         self._evict_device_request_cnt = request_cnt
         self._evict_device_last_node = None
         self._evict_device_heap = [
-            (self.session_ref_eviction_strategy(n), n)
+            (self._ax_eviction_priority(n), n)
             for n in self.tree_core.evictable_device_leaves
         ]
         heapq.heapify(self._evict_device_heap)
@@ -216,7 +222,7 @@ class FullComponent(TreeComponent):
         ):
             heapq.heappush(
                 self._evict_device_heap,
-                (self.session_ref_eviction_strategy(lv.parent), lv.parent),
+                (self._ax_eviction_priority(lv.parent), lv.parent),
             )
         self._evict_device_last_node = None
         while tracker[ct] < self._evict_device_request_cnt and self._evict_device_heap:

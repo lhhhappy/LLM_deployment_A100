@@ -427,6 +427,8 @@ class ForwardBatch(ForwardBatchDeepSeekMHAMixin):
     mamba_track_mask: Optional[torch.Tensor] = None  # shape: [b], bool
     # The seqlens to track mamba state if masked, prefill only.
     mamba_track_seqlens: Optional[torch.Tensor] = None  # shape: [b], int64
+    ax_kda_snapshot_offsets: Optional[torch.Tensor] = None
+    ax_kda_snapshot_slots: Optional[torch.Tensor] = None
     # Deferred mamba init ops: COW pairs and clear indices (performed on forward stream)
     mamba_cow_src_indices: Optional[torch.Tensor] = None
     mamba_cow_dst_indices: Optional[torch.Tensor] = None
@@ -792,6 +794,8 @@ class ForwardBatch(ForwardBatchDeepSeekMHAMixin):
             mamba_track_indices=batch.mamba_track_indices,
             mamba_track_mask=batch.mamba_track_mask,
             mamba_track_seqlens=batch.mamba_track_seqlens,
+            ax_kda_snapshot_offsets=batch.ax_kda_snapshot_offsets,
+            ax_kda_snapshot_slots=batch.ax_kda_snapshot_slots,
             mamba_cow_src_indices=batch.mamba_cow_src_indices,
             mamba_cow_dst_indices=batch.mamba_cow_dst_indices,
             mamba_clear_indices=batch.mamba_clear_indices,
@@ -1549,6 +1553,13 @@ class ForwardBatch(ForwardBatchDeepSeekMHAMixin):
             )
         if self.mamba_track_mask is not None:
             self.mamba_track_mask = self._pad_tensor_to_size(self.mamba_track_mask, bs)
+        if self.ax_kda_snapshot_offsets is not None:
+            self.ax_kda_snapshot_offsets = self._pad_tensor_to_size(
+                self.ax_kda_snapshot_offsets, bs, value=-1
+            )
+            self.ax_kda_snapshot_slots = self._pad_tensor_to_size(
+                self.ax_kda_snapshot_slots, bs, value=-1
+            )
         if self.mamba_track_seqlens is not None:
             self.mamba_track_seqlens = self._pad_tensor_to_size(
                 self.mamba_track_seqlens, bs

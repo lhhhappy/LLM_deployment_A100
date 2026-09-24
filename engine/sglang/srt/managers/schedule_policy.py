@@ -476,6 +476,8 @@ class SchedulePolicy:
 def _role_boundary_token_ids() -> frozenset:
     """[ax] Role/message boundary token ids (GLM <|user|>=154827, <|observation|>=154829),
     from SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS. Empty = feature off (stock behaviour)."""
+    if os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1":
+        return frozenset()
     raw = os.environ.get("SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS", "").strip()
     if not raw:
         return frozenset()

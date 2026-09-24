@@ -1531,6 +1531,10 @@ class HybridReqToTokenPool(ReqToTokenPool):
     def free_mamba_cache(
         self, req: Req, mamba_ping_pong_track_buffer_to_keep: Optional[int] = None
     ):
+        if req.kv.ax_kda_snapshot_slot is not None:
+            from sglang.srt.mem_cache.kda_dual_snapshot import discard
+
+            discard(self, req)
         mamba_index = req.kv.mamba_pool_idx
         assert mamba_index is not None, "double free? mamba_index is None"
         self.mamba_allocator.free(mamba_index.unsqueeze(0))
