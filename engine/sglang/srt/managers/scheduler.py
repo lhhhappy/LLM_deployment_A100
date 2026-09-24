@@ -1259,32 +1259,78 @@ class Scheduler(
                 )
                 self.enable_dynamic_chunking = False
 
-    def _ax_sched_protect_enabled(self) -> bool:
-        # 120 is scoped to ordinary TP serving. Specialized schedulers keep
-        # their collective/cadence/admission contracts (including mixed mode).
-        return (
-            _ax_sched_protect_config() is not None
-            and self.chunked_prefill_size is not None
-            and self.ps.pp_size == 1
-            and not self.require_mlp_sync
-            and not is_dsa_prefill_cp_in_seq_split()
-            and not is_prefill_context_parallel_enabled()
-            and not self.tree_cache.disable
-            and self.disaggregation_mode == DisaggregationMode.NULL
-            and self.dllm_config is None
-            and not self.is_mixed_chunk
-            and not self.is_hybrid_swa
-            and not self.enable_hisparse
+    def _ax_sched_protect_blocker(self) -> Optional[str]:
+        """Why 120's protection is off here (None = on). 120 is scoped to ordinary TP serving: specialized
+        schedulers keep their collective/cadence/admission contracts (including mixed mode)."""
+        checks = (
+            ("SGLANG_AX_SCHED_PROTECT=0", _ax_sched_protect_config() is None),
+            ("no_chunked_prefill", self.chunked_prefill_size is None),
+            ("pipeline_parallel", self.ps.pp_size != 1),
+            ("mlp_sync", self.require_mlp_sync),
+            ("dsa_prefill_cp", is_dsa_prefill_cp_in_seq_split()),
+            ("prefill_context_parallel", is_prefill_context_parallel_enabled()),
+            ("radix_cache_disabled", self.tree_cache.disable),
+            ("disaggregation", self.disaggregation_mode != DisaggregationMode.NULL),
+            ("dllm", self.dllm_config is not None),
+            ("mixed_chunk", self.is_mixed_chunk),
+            ("hybrid_swa", self.is_hybrid_swa),
+            ("hisparse", self.enable_hisparse),
             # The L1/L2 host tier (180) keeps these contracts: the cold-chunk cap
             # and the decode turn ignore cache tiers, and short-hit sharing
             # excludes requests that need a host load-back. L3 storage prefetch
             # changes admission, so it still bypasses the protection.
-            and not self.enable_hicache_storage
-            and not get_memory().enable_flexkv
-            and not self.enable_lora
-            and not self.enable_priority_preemption
-            and self.prefill_delayer is None
+            ("hicache_storage", self.enable_hicache_storage),
+            ("flexkv", get_memory().enable_flexkv),
+            ("lora", self.enable_lora),
+            ("priority_preemption", self.enable_priority_preemption),
+            ("prefill_delayer", self.prefill_delayer is not None),
         )
+        return next((name for name, blocked in checks if blocked), None)
+
+    def _ax_sched_protect_enabled(self) -> bool:
+        return self._ax_sched_protect_blocker() is None
+
+    def _ax_mechanism_report(self) -> str:
+        """[ax] Effective state of the scheduler-side mechanisms, one token per mechanism ("NNN=on" or
+        "NNN=off:reason"), followed by the requested model-side switches. Jobs compare it with the
+        expected set and refuse to measure on a mismatch, so no mechanism can be silently off."""
+        from sglang.srt.managers.schedule_policy import _ax_srpt_aging, _role_boundary_token_ids
+
+        blocker = self._ax_sched_protect_blocker()
+        dual = os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1"
+        if _role_boundary_token_ids():
+            m101 = "on"
+        else:
+            m101 = "off:140_dual_snapshot" if dual else "off:role_ids_unset"
+        tau = float(os.environ.get("SGLANG_AX_PACE_TPOT", "0") or 0)
+        if tau <= 0:
+            m122 = "off:SGLANG_AX_PACE_TPOT_unset"
+        else:
+            m122 = "on" if blocker is None else f"off:120_{blocker}"
+        if _ax_srpt_aging() is None:
+            m123 = "off:SGLANG_AX_SRPT_AGING_unset"
+        else:
+            m123 = "on" if self.schedule_policy == "lpm" else f"off:policy_{self.schedule_policy}"
+        if not self.enable_hierarchical_cache:
+            m180 = "off:no_hierarchical_cache"
+        else:
+            m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
+        items = {
+            "101": m101,
+            "120": "on" if blocker is None else f"off:{blocker}",
+            "122": m122,
+            "123": m123,
+            "140": "on" if dual else "off",
+            "180": m180,
+        }
+        requested = " ".join(
+            f"{k}={os.environ.get(k, '-')}"
+            for k in ("SGLANG_AX_SM80_INDEXER", "SGLANG_AX_SM80_FP8_MOE_MARLIN", "SGLANG_AX_INDEXER_ROW_SHARD",
+                      "SGLANG_AX_KDA_FUSE_PROJ", "SGLANG_AX_MOE_FUSE_SWIGLU")
+        )
+        spec = get_spec().speculative_algorithm or "-"
+        return (" ".join(f"{k}={v}" for k, v in items.items())
+                + f" | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
 
     def _ax_sched_protect_limits(self, chunk_size):
         if not self._ax_sched_protect_enabled():
@@ -1996,6 +2042,8 @@ class Scheduler(
         # Triton kernel device-load is a lazy first-use at serving time.
         triton_load_watch.install()
         triton_load_watch.mark_serving_started()
+        if self.ps.tp_rank == 0:
+            logger.info(f"[ax] mechanisms: {self._ax_mechanism_report()}")
 
         if use_mlx():
             # MLX overlap uses mx.async_eval for CPU/GPU overlap,
