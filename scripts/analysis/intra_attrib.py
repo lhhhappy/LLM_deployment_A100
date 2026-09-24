@@ -81,10 +81,13 @@ def main():
         new = r["prompt_tokens"] - r["cached_tokens"]
         p = pairs.get(r["req_id"])
         gap = None if p is None else max(0, p["true_lcp"] // 64 * 64 - r["cached_tokens"])
+        ideal = None if p is None else r["prompt_tokens"] - p["true_lcp"] // 64 * 64  # new tokens at full reuse
         lo = bisect.bisect_left(times, int(r["t_recv_s"]))
         hi = bisect.bisect_right(times, int(r["t_exec_start_s"]))
         win = batches[lo:hi]
         partial = sum(1 for b in win if b[6] > 0)
+        # a partial alone, at most chunk - leftover tokens: the leftover was unused while this request waited
+        solo = sum(1 for b in win if b[6] > 0 and b[1] == 1 and b[2] <= a.cap)
         admissible = r["cached_tokens"] > 0 and new <= a.short and new <= a.chunk - a.cap
         over = r["ttft_s"] > lim
         label = ""
@@ -100,7 +103,9 @@ def main():
         out.append(dict(req_id=r["req_id"], gate="fast_intra" if fast else "overall_intra", limit=lim,
                         ttft=round(r["ttft_s"], 3), over=int(over), label=label, wait=round(wait, 3), run=round(run, 3),
                         prompt=r["prompt_tokens"], cached=r["cached_tokens"], new=new,
-                        lcp_gap="" if gap is None else gap, win_batches=len(win), win_partial=partial,
+                        frozen_expected=r.get("uncached_expected"), lcp_gap="" if gap is None else gap,
+                        new_at_full_reuse="" if ideal is None else ideal,
+                        win_batches=len(win), win_partial=partial, win_partial_only=solo,
                         win_tokens=sum(b[2] for b in win), win_max_queue=max((b[5] for b in win), default=0),
                         admissible_next_to_partial=int(admissible)))
 
@@ -114,6 +119,15 @@ def main():
         print(f"  {lab:32s} {n:3d} | wait p50 {med('wait'):6.2f}s run p50 {med('run'):5.2f}s | new p50 {med('new'):6d} "
               f"| window batches p50 {med('win_batches')}, with partial p50 {med('win_partial')}")
     print("  (labels are descriptive; log lines have 1 s resolution; wait includes decode rounds and scheduling)")
+    left = a.chunk - a.cap
+    cls = [o for o in out if o["cached"] > 0 and left < o["new"] <= a.short]
+    if cls and left > 0:
+        ov = [o for o in cls if o["over"]]
+        lost = sum(1 for o in ov if o["new_at_full_reuse"] != "" and o["new_at_full_reuse"] <= left)
+        wb = sum(o["win_batches"] for o in ov)
+        print(f"  hits with {left} < new <= {a.short}: {len(ov)}/{len(cls)} over; of the overs {lost} would have had "
+              f"new <= {left} at full true-LCP reuse (cache and budget confounded); in their wait windows "
+              f"{sum(o['win_partial_only'] for o in ov)}/{wb} batches ran a partial alone at <= {a.cap} tokens")
     if a.csv:
         with a.csv.open("w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(out[0].keys()))
