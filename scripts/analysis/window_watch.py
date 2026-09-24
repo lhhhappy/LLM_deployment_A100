@@ -5,6 +5,8 @@ Run through window_watch.sh JOB [interval_s=1500] [window_min=25].
 Live raw contains completed requests only: all windows remain open until a
 matching VALID complete-data receipt is available. Failed jobs may be complete
 SLO failures or incomplete measurements; queue state alone cannot distinguish them.
+Heartbeat, PID and lock live in ignored build/scratch/window-watch/JOB/;
+evidence/LJOB/window/ contains result snapshots only.
 """
 import argparse
 import base64
@@ -172,10 +174,12 @@ def main(argv=None):
         ap.error('interval and window must be finite and positive')
     out = ROOT / 'evidence' / ('L'+args.job) / 'window'
     out.mkdir(parents=True, exist_ok=True)
-    lock = (out/'watch.lock').open('a')
+    runtime = ROOT / 'build' / 'scratch' / 'window-watch' / args.job
+    runtime.mkdir(parents=True, exist_ok=True)
+    lock = (runtime/'watch.lock').open('a')
     try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError: ap.error('a watcher already holds this job lock')
-    path = out / 'watch-state.json'
+    path = runtime / 'watch-state.json'
     state = json.loads(path.read_text()) if path.exists() else {}
     while True:
         state.update(pid=os.getpid(), heartbeat=time.time())
