@@ -176,6 +176,6 @@ Backends: FlashKDA/NVIDIA/CuteDSL have different `h` contracts (see the F-lines)
 
 ## Current implementation and open questions
 
-The preceding sections map the unpatched base. S0 uses 101 to track a role boundary and 140 to retain both the boundary and prompt-tail state, including an fp32 intermediate snapshot. Patch 140 also changes state retention priority. Read [their patch notes](../../../patches/README.md) before applying base-only suggestions from older reports.
+The preceding sections map the unpatched base. S0 uses 101 to track a role boundary and 140 to retain both the boundary and prompt-tail state, including an fp32 intermediate snapshot. Patch 140 also changes state retention priority. Read [their patch notes](../../../engine/README.md) before applying base-only suggestions from older reports.
 
 The remaining measurable issue is how often a reachable state is evicted or skipped under pressure. R20 measured the maximum useful LCP gap on 026/N18 at 850,432 tokens (8.0% of actual prefill), so cache changes alone cannot be assumed to solve the N22 TPOT failure. Check each proposal against actual LCP, slot free/evict counts, skipped snapshots, KV use, and all 11 scoring gates. A lower-precision state or KV format also needs numerical and ability validation.

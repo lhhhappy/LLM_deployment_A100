@@ -4,7 +4,7 @@
 
 ## 改动与依据
 
-[171 patch](../../patches/171-kda-bf16-proj-fusion.patch) 只改 `glm5_next.py`，默认关闭。模型级 FP8 配置存在时，逐项检查原 KDA 投影是否免量化，再启用底包已有融合模块。没有改变 MoE、卷积、KDA recurrence 或 MTP 接受算法。加载布局、开关、兼容条件见[同名说明](../../patches/171-kda-bf16-proj-fusion.md)。
+[171 patch](../../engine/docs/171-kda-bf16-proj-fusion.md) 只改 `glm5_next.py`，默认关闭。模型级 FP8 配置存在时，逐项检查原 KDA 投影是否免量化，再启用底包已有融合模块。没有改变 MoE、卷积、KDA recurrence 或 MTP 接受算法。加载布局、开关、兼容条件见[同名说明](../../engine/docs/171-kda-bf16-proj-fusion.md)。
 
 checkpoint 配置的 34 个 KDA 层满足条件。实际基线输入侧为 qkv、b、f_a、g_a 四次 linear，融合后一次；f_b、g_b 再由两次 linear 合成一次 bmm。CPU profiler 验证原路径 `aten::linear=6, aten::mm=6`，候选 `linear=1, mm=1, bmm=1`，没有额外 clone/contiguous 出现在这段投影中。此 profiler 仅用于计调用，速度另测。
 

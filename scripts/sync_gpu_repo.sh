@@ -17,7 +17,7 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
 fi
 
 DEST=/sjtu/linhang/arena/repo
-MANAGED=(scripts engine patches tests notes research docs plans cases submission data)
+MANAGED=(scripts engine tests notes research docs plans cases submission data)
 ROOT_FILES=(README.md AGENTS.md CLAUDE.md .gitignore)
 ARCHIVE=()
 for path in "${MANAGED[@]}" "${ROOT_FILES[@]}"; do

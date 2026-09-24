@@ -1,6 +1,6 @@
 # R23 — Marlin MoE 的 clamped SwiGLU 融合
 
-2026-09-24。开发机 A100-SXM4-80GB，真实生产 Marlin 函数、随机权重、TP8 每卡形状；实际 TP=1。补丁 [172](../../patches/172-moe-clamped-swiglu.md) 默认关闭，不新增持久权重、KV、SSM 或通信。
+2026-09-24。开发机 A100-SXM4-80GB，真实生产 Marlin 函数、随机权重、TP8 每卡形状；实际 TP=1。补丁 [172](../../engine/docs/172-moe-clamped-swiglu.md) 默认关闭，不新增持久权重、KV、SSM 或通信。
 
 ## 选择依据与数值契约
 

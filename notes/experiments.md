@@ -50,7 +50,7 @@
 ## 过去尝试留下的教训
 
 - 早期 v0.5.20 替身与模拟器无法代表正式底包；现在按只读 `build/base_exact/` 写补丁，以 TP8 真实权重/运行验证性能与正确性。底包和当前 S0 的等价性见 [evidence/T57/equivalence.log](../evidence/T57/equivalence.log)。
-- `000/110/111` 等解决了接口与 A100 算子启动问题；功能能启动不等于能过能力和 SLO。补丁的开关和覆盖范围见 [patches/README.md](../patches/README.md)。
+- `000/110/111` 等解决了接口与 A100 算子启动问题；功能能启动不等于能过能力和 SLO。补丁的开关和覆盖范围见 [engine/README.md](../engine/README.md)。
 - 025 系列 DCP 遇到高位地址错误；历史 116 的修复现已并入 115，只在 TP2 开发机修复并复现，TP8 待验。旧「DCP 获得约 7.8 倍 KV」说法是错误写入路径上的计算。[evidence/T50](../evidence/T50/)
 - 170 的 BCG+scatter 旧版 TP8 输出错误；v2 在 TP2 通过，真实 TP8 和与 140 的组合仍待验。[evidence/T52b](../evidence/T52b/)
 - 旧 `analyze_run.py` 可把空 raw 判为通过，`numcheck` 有截断/分叉漏判。当前用完整性先行的 `level_verdict.py` 与 harness 评分器，数值验证要能检出已知反例。[R19 §2](../research/codex/R19_progress_and_cache_review.md)、[evidence/T54](../evidence/T54/)

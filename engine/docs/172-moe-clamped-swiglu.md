@@ -6,7 +6,7 @@
 
 关键契约：SiLU 的结果先舍入到 BF16，再与已 clamp 的 up 相乘。不能把整条表达式都放在 FP32 算完才舍入。比较式 clamp 保留 NaN；测试覆盖全部 65,536 种 BF16 编码，并交换 gate/up 的角色。
 
-开发机入口：[test_moe_swiglu_172.py](../tests/gpu/test_moe_swiglu_172.py)，使用真实生产函数与 TP8 每卡中间维度256。`--numeric-only` 做数值与负对照，默认再测激活 eager/graph，`--full` 追加289专家、8路由+1共享专家的随机权重 Marlin 对照。实际只有一张卡，不是TP8模型验证。
+开发机入口：[test_moe_swiglu_172.py](../../tests/gpu/test_moe_swiglu_172.py)，使用真实生产函数与 TP8 每卡中间维度256。`--numeric-only` 做数值与负对照，默认再测激活 eager/graph，`--full` 追加289专家、8路由+1共享专家的随机权重 Marlin 对照。实际只有一张卡，不是TP8模型验证。
 
 初轮 A100 筛选：激活全编码、非整齐/非连续行、dtype/layout/limit回退、graph反复换输入均通过；c=16,384（展开147,456行）激活 eager 约0.660→0.135ms，额外临时 allocated 从288MiB降为0。这里只计激活，尚不能推出整层或整档收益。
 
@@ -23,8 +23,8 @@
 | 8192 | 5.8116 → 5.5273 | 4.9% |
 | 16384 | 11.4044 → 10.8700 | 4.7% |
 
-测速时审计 wrapper 已恢复，不受上述审计标签错误影响。没有新增持久缓冲；该探针的整MoE额外allocated峰值在4k/8k/16k分别少40/80/160MiB，不能当成服务KV池扩容。原始记录、历史脚本与复算见 [evidence/moe172](../evidence/moe172/summary.json)，完整边界见 [R23](../research/codex/R23_moe_swiglu_fusion.md)。
+测速时审计 wrapper 已恢复，不受上述审计标签错误影响。没有新增持久缓冲；该探针的整MoE额外allocated峰值在4k/8k/16k分别少40/80/160MiB，不能当成服务KV池扩容。原始记录、历史脚本与复算见 [evidence/moe172](../../evidence/moe172/summary.json)，完整边界见 [R23](../../research/codex/R23_moe_swiglu_fusion.md)。
 
-8卡实验057已完成并独立复算：[official_a_172_n22.sh](../scripts/pod/jobs/official_a_172_n22.sh)，正式A只加172，原开发集N22，以047作对照。722条完整、0请求错误、严格flush成功，整档VALID FAIL。fast超时33→33、overall55→53、turn2→2、chain73→62；TPOT均值.061976→.060998、p95 .087032→.085004，单请求TPOT>.10为8→0。fast/overall TTFT p95分别5.23→7.87s、10.80→12.15s，不能只按超时条数或均值称全面改善。KV 1,036,288、状态槽321与基准一致。单次对照没有噪声估计，保留为待复验候选，尚无稳定整档净收益或正式并发晋档结论。[完整对照](../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、[配置/接口/容量复核](../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。
+8卡实验057已完成并独立复算：`official_a_172_n22.sh`（已退役，原文见 git 历史），正式A只加172，原开发集N22，以047作对照。722条完整、0请求错误、严格flush成功，整档VALID FAIL。fast超时33→33、overall55→53、turn2→2、chain73→62；TPOT均值.061976→.060998、p95 .087032→.085004，单请求TPOT>.10为8→0。fast/overall TTFT p95分别5.23→7.87s、10.80→12.15s，不能只按超时条数或均值称全面改善。KV 1,036,288、状态槽321与基准一致。单次对照没有噪声估计，保留为待复验候选，尚无稳定整档净收益或正式并发晋档结论。[完整对照](../../evidence/L057-official_a_172_n22/N22/compare_vs_047.txt)、[配置/接口/容量复核](../../evidence/L057-official_a_172_n22/N22/comparison-verification.json)。
 
 生成输出逐字一致性前置已按用户要求取消，清缓存、完整性及赛题评分门保留。050未加载172，不能算172错误；057未加171或122，单卡MoE省时不能直接推出N22/N26。

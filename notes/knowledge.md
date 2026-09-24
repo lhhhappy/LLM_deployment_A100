@@ -1,6 +1,6 @@
 # 当前已核实的事实与使用边界
 
-赛规以 [task.md](../llm-challenge-arena-v1/task.md) 为准。本页只放会改变下一轮实验选择的事实；每个性能结论须能追到完整原始记录。补丁开关、依赖与 S0/S1 见 [patches/README.md](../patches/README.md)。
+赛规以 [task.md](../llm-challenge-arena-v1/task.md) 为准。本页只放会改变下一轮实验选择的事实；每个性能结论须能追到完整原始记录。补丁开关、依赖与 S0/S1 见 [engine/README.md](../engine/README.md)。
 
 ## 赛题与测量
 

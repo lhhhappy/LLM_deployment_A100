@@ -10,7 +10,7 @@
 - 启动启用 `--incremental-streaming-output`；输出累计 token 计数和原生 ignore_eos 行为保留。
 - 原 `s1-dev/run_dev.py` 顺序是 preflight → warmup → flush → 正式测量。外层 checked runner 只加固 flush 失败即终止，未修改只读原harness或负载。
 
-源代码：[000补丁](../../patches/000-interface-compliance.patch)、[启动器](../../scripts/pod/lib.sh)、[checked runner](../../scripts/pod/verify/run_dev_checked.py)。
+源代码：[000补丁](../../engine/docs/000-interface-compliance.md)、[启动器](../../scripts/pod/lib.sh)、[checked runner](../../scripts/pod/verify/run_dev_checked.py)。
 
 ## 已有实测记录
 

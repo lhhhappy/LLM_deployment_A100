@@ -114,7 +114,7 @@ MLA 在 TP8 下每卡一份完整副本，所以 8 卡各存一份相同内容�
 
 L3 预取会改变准入流程，180 也拒绝 L3，所以继续绕开。
 
-测试 `tests/test_sched_protect_chain.py::HiCacheTierTests`（在正式 A + 180 树上运行，树由 `patch_stack.py` 构建到 `build/p180/candidate`）覆盖三点：
+测试 `tests/test_sched_protect_chain.py::HiCacheTierTests`（在最新引擎提交上运行，树由 `scripts/engine/tree.py` 从 git 取）覆盖三点：
 - 只开 HiCache 时保护生效，开 L3 时关闭；
 - 纯设备命中负载下，开与不开 HiCache 的调度决定逐步相同，冷块仍被压、短命中照样插队；
 - 待主机搬回的请求不插入进行中的块，也不触发搬回。
@@ -189,7 +189,7 @@ CPU 上跑真实代码：真实设备池、主机池、组装策略、`HybridCac
 ## 10. 复现
 
 ```bash
-python3 scripts/patch_stack.py apply /tmp/t180 000-interface-compliance.patch 101-role-boundary-split.patch \
+python3 scripts/engine/tree.py apply /tmp/t180 000-interface-compliance.patch 101-role-boundary-split.patch \
   106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch \
   120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch \
   150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch 180-hicache-glm-dsa.patch

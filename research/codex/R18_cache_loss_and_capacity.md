@@ -43,7 +43,7 @@
 
 因此“输出少于256”不是精确判据：应看实际forward的绝对序列位置有没有跨网格；输出可能很短却刚好跨界。反过来，结束时已生成的最后token可能尚无KV，不能用 `prompt_tokens+completion_tokens` 直接冒充 `kv_committed_len`。
 
-普通TP8网格64、decode网格256；DCP8的树页变512时两个网格都变512。`S/runtime_context.py:1920`、`:1928`。原版中间h为bf16，再写回fp32池不会恢复丢失精度；140导出fp32解决的是另一个正确性前提，不能仅靠多存一个bf16 h替代。`K/ops/attention/fla/chunk_delta_h.py:349`；`patches/140-kda-dual-snapshot.md:1`。
+普通TP8网格64、decode网格256；DCP8的树页变512时两个网格都变512。`S/runtime_context.py:1920`、`:1928`。原版中间h为bf16，再写回fp32池不会恢复丢失精度；140导出fp32解决的是另一个正确性前提，不能仅靠多存一个bf16 h替代。`K/ops/attention/fla/chunk_delta_h.py:349`；`engine/docs/140-kda-dual-snapshot.md:1`。
 
 ### 2.3 锁、LRU、淘汰的联动
 
@@ -84,7 +84,7 @@ physical_resident_fraction = 1 - free / capacity
 
 ### 4.1 短间隔5–8k回退的精确机制
 
-**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。当时独立的105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。旧 `101-d1v12-on-base` 与 105 已合并为当前 [101 补丁](../../patches/101-role-boundary-split.patch)；本节的旧行号只可在 git 历史中核对。
+**VERIFIED（源码机制，T49-02）**：101 `_role_split_len` 在 `prefix < branch <= full_len` 时返回None，统计 `skip_branch_conflict`；角色扫描仅用于可完成的尾块/准入完整请求，且受已有partial、32768扫描窗口、grid等条件限制。当时独立的105只补“继续中的partial存在时不要再截第二个partial”的保护，没有新增状态，也没有保活TTL。旧 `101-d1v12-on-base` 与 105 已合并为当前 [101 补丁](../../engine/docs/101-role-boundary-split.md)；本节的旧行号只可在 git 历史中核对。
 
 一个可手工检查的机制例子（**合成，不是那19条的伪造trace**）：
 
@@ -159,7 +159,7 @@ D类证明冻结LCP本身需审计：raw374冻结93013而实际与raw371只有52
 
 **VERIFIED，140已有实现**：
 
-- 开启后101 helper返回空，避免额外拆分与105相应限制；tracking不再让branch覆盖end；每个extend可导出end及当前最后user/observation角色点，含fp32 SSM和conv历史。`patches/140-kda-dual-snapshot.patch:638`、`:669`、`:748`。
+- 开启后101 helper返回空，避免额外拆分与105相应限制；tracking不再让branch覆盖end；每个extend可导出end及当前最后user/observation角色点，含fp32 SSM和conv历史。`engine/docs/140-kda-dual-snapshot.md:638`、`:669`、`:748`。
 - 先提交常规end，再临时锁住end，用**树拥有的KV**插入角色状态，处理duplicate，不重用已free的请求旧KV。`同文件:784`。它不是每多一个状态就复制一整条KV。
 - 同时改变FULL叶子优先级、MAMBA扫描和path-cap顺序，优先牺牲标记为tail且非role的状态。`同文件:845`、`:878`、`:892`、`:910`。更早把“tail优先淘汰”全部留给141的方案已过时。
 - 额外role槽条件是 `available_size() > len(batch.reqs)`，**不把evictable算成free，也不先淘汰**。因此状态池满时140可能只存end。`同文件:762`。
@@ -284,7 +284,7 @@ KDA活动部分通常3N=78槽≈1.34GiB，另树中受保护状态和捐赠瞬�
 
 输入R由已分配两池反算，原始budget的取整剩余未取回，槽数可能相差1；重启后graph/weight/workspace变化也会改变R。0.9→0.5不是旧文所说1.5×。0.3可覆盖130万中心情景但缺历史KV余量，状态槽减半也可能增加重算；若当前MAMBA先触发，盲减r可能变慢。
 
-`extra_buffer_lazy`节省的是每活动请求约一个槽，N26约0.447GiB可用于更多历史状态，**固定池大小下不直接增KV**；并发预算比例5→4。当前140明确拒绝lazy（`patches/140-kda-dual-snapshot.patch:708`），不能直接组合。`--max-mamba-cache-size`可在扩大f时固定状态池，使增量更多给KV，但须用历史状态/slot_skip证据确定大小。
+`extra_buffer_lazy`节省的是每活动请求约一个槽，N26约0.447GiB可用于更多历史状态，**固定池大小下不直接增KV**；并发预算比例5→4。当前140明确拒绝lazy（`engine/docs/140-kda-dual-snapshot.md:708`），不能直接组合。`--max-mamba-cache-size`可在扩大f时固定状态池，使增量更多给KV，但须用历史状态/slot_skip证据确定大小。
 
 **早期容量探针情景的审阅**：固定状态200槽时并发cap40；按相同总预算KV约**1500544（1.59×）**，再按上述graph64自动f约**1569152（1.66×）**。不是自动2×，也不是零风险：N26活动78槽、树锁及临时捐赠/role槽之外只剩有限历史状态；若原先MAMBA先满，会放大重算。可以做受控探针，但应同时记录slot free/evict、140 skip、峰值和SLO，不能用4%作安全论据。
 

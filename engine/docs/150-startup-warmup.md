@@ -1,6 +1,6 @@
 # 150 — 启动期请求预热（T46 / W20）
 
-> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/patch_stack.py`）。
+> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/engine/tree.py`）。
 
 按数字顺序叠加，单独叠在 S0 上可打。
 内部启动参数增加 `--warmups ax_shapes` 即启用；不加时不发送请求。
@@ -64,7 +64,7 @@ PD、HiCache、DP/PP、多tokenizer模式在发请求前拒绝。池验证支持
 
 ## Autotune / JIT key审计
 
-历史静态枚举脚本已清理；[evidence/T46/jit_inventory.json](../evidence/T46/jit_inventory.json)保留当时对候选树全部显式 `triton.jit/autotune`（含赋值包装）的枚举，记录源码SHA、函数行号、key、constexpr、do_not_specialize、heuristics。
+历史静态枚举脚本已清理；[evidence/T46/jit_inventory.json](../../evidence/T46/jit_inventory.json)保留当时对候选树全部显式 `triton.jit/autotune`（含赋值包装）的枚举，记录源码SHA、函数行号、key、constexpr、do_not_specialize、heuristics。
 `evidence/T46/kernel_keys.md`逐函数展开FLA、Mamba conv与112/113重点文件；其它后端/辅助kernel明确不声称服务覆盖。
 这是源码库存，不是模型实际调用图。GPU收据另列真实执行的少量kernel组；完整TP8运行取值尚未测得。
 
@@ -115,8 +115,8 @@ SGLANG_CACHE_DIR亦可统一第三方缓存（`environ.py:third_party_cache_defa
 
 ## 验证与回滚
 
-CPU：当时的21项mock/生产方法测试，以及两个真实CPU Gloo rank的健康/非主rank泄漏/拒绝flush验证，结果见[证据索引](../evidence/T46/README.md)。旧的一次性 runner 和生成器已清理；历史验证还包括11补丁stack fuzz=0、确定性生成、Python编译、反向整栈还原、只读base不变。
-GPU：历史开发机算子测试使用隔离cache，编译hook/benchmark计数与文件SHA变化；最终cold5首次12组113次JIT miss/实际编译、102次autotune benchmark，同形状重复12组各项全0，600→601新增2编译。原 runner 已清理，[日志与收据](../evidence/T46/)保留；这些结果不能代替TP8服务。
+CPU：当时的21项mock/生产方法测试，以及两个真实CPU Gloo rank的健康/非主rank泄漏/拒绝flush验证，结果见[证据索引](../../evidence/T46/README.md)。旧的一次性 runner 和生成器已清理；历史验证还包括11补丁stack fuzz=0、确定性生成、Python编译、反向整栈还原、只读base不变。
+GPU：历史开发机算子测试使用隔离cache，编译hook/benchmark计数与文件SHA变化；最终cold5首次12组113次JIT miss/实际编译、102次autotune benchmark，同形状重复12组各项全0，600→601新增2编译。原 runner 已清理，[日志与收据](../../evidence/T46/)保留；这些结果不能代替TP8服务。
 
 L2待Claude：相同配置140 off/on分别冷启动，核对启动时长和峰值内存；逐case日志+实际kernel keys；确认HTTP ready后同计划/未见过的长度/原dev请求的新编译数量；首次真实请求cached_tokens=0、metrics无预热请求；服务flush忙拒绝/闲恢复；原dev所有TTFT/TPOT/能力门。
 有graph与无graph须单列；MTP跳过不算通过。保留启动期编译日志和首个正常请求时刻。

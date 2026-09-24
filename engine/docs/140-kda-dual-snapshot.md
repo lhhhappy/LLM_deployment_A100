@@ -1,6 +1,6 @@
 # 140 — KDA 双点 fp32 快照（T45 / W19）
 
-> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/patch_stack.py`）。
+> T57（09-24）：105 已并入 101，112/113 已并入 110，116 已并入 115；文中的旧编号指这些现已合并的部分。补丁按数字顺序叠加，单独叠在 S0 上可打（`scripts/engine/tree.py`）。
 
 140 属于 S0 基线，按数字顺序叠加（000→101→106→110→111→120→140）。
 启动时 `SGLANG_AX_KDA_DUAL_SNAPSHOT=1` 开启；默认/`0` 保持原栈。未加入 RELEASE、构建脚本或任何队列。
@@ -45,9 +45,9 @@
 
 结果索引：`evidence/T45/README.md`、`summary.json`；完整数字以该收据为准。
 
-- **历史栈校验**：当时的完整000→101→110→111→140→120旧栈应用、编译、再生成和反向恢复见[收据](../evidence/T45/verify.log)；旧 runner 已清理。现行合并补丁按[patches/README.md](README.md)使用。
-- **历史调度/准入测试**：关闭32组×30轮JSON轨迹字节相同，开启8组；role prompt从2次extend变为1次。[测试日志](../evidence/T45/scheduler_tests.log)保留，原一次性 runner 已清理。
-- **开发机 CPU/GPU 与离线回放**：真实 controller/tree/components 的缓存测试、64×128 KDA 随机权重数值、原 Renderer+glm_tok 的722请求回放分别见[证据索引](../evidence/T45/README.md)。这些一次性 runner 已清理；离线回放不模拟真实并发、淘汰或解码，不能当作缓存命中或 SLO 结果。
+- **历史栈校验**：当时的完整000→101→110→111→140→120旧栈应用、编译、再生成和反向恢复见[收据](../../evidence/T45/verify.log)；旧 runner 已清理。现行合并补丁按[engine/README.md](../README.md)使用。
+- **历史调度/准入测试**：关闭32组×30轮JSON轨迹字节相同，开启8组；role prompt从2次extend变为1次。[测试日志](../../evidence/T45/scheduler_tests.log)保留，原一次性 runner 已清理。
+- **开发机 CPU/GPU 与离线回放**：真实 controller/tree/components 的缓存测试、64×128 KDA 随机权重数值、原 Renderer+glm_tok 的722请求回放分别见[证据索引](../../evidence/T45/README.md)。这些一次性 runner 已清理；离线回放不模拟真实并发、淘汰或解码，不能当作缓存命中或 SLO 结果。
 
 | 调度chunk | off命中token（101+105） | on命中token | 增加 | off→on extend次数 |
 |---:|---:|---:|---:|---:|

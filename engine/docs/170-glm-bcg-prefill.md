@@ -45,7 +45,7 @@
   所有 BCG 臂的 prefill 都走图（51/51）。v2 在 TP2 scatter 下的残差（0.14）与“只换通信布局”的参照（0.145）同量级；v1 是 10 倍以上的错误，并且首 token 翻转。
 - **未做**：TP2 同配置 eager 两次重启的噪声底；DONE 已交给 T50b，GPU 让出，没有再跑。0.14 的残差按推断归为 TP2 下 NCCL 归约顺序差异，最终要以 8 卡能力冒烟 12/12 + numcheck 为准。
 - **fuzz=0（实测）**：全栈（…160 170，含 MTP 顺序）、tier-1+140+120+170、tier-1+170、026 栈 B+114+140+120+170 都通过，全栈结果与移植树逐字节相同。
-- **历史复跑条件**：TP2、GPU0/1，BCG/eager 与 scatter/no-scatter 四臂，使用只在测试树应用的[上下文敏感初始化补丁](../evidence/T52/t52_test_dummy_init.patch)。原一次性 runner 和汇总脚本已清理；[T52b 原始结果](../evidence/T52b/)保留，本段不是现行命令。
+- **历史复跑条件**：TP2、GPU0/1，BCG/eager 与 scatter/no-scatter 四臂，使用只在测试树应用的[上下文敏感初始化补丁](../../evidence/T52/t52_test_dummy_init.patch)。原一次性 runner 和汇总脚本已清理；[T52b 原始结果](../../evidence/T52b/)保留，本段不是现行命令。
 
 ## 按请求变化的部分：graph-safe 还是 eager break（静态审查）
 | 组件 | BCG 下 | 依据 |
@@ -59,12 +59,12 @@
 | logits / 采样 / logprob | eager 尾部 | BCG 只 capture 层体（body capture），`return_logprob` 仍可 replay |
 
 ## 验证（开发机 GPU1，TP1，8 层 rank 替身，dummy 权重，全栈 000…160+170，`SGLANG_AX_KDA_DUAL_SNAPSHOT=1`）
-当时的运行脚本已清理；实验事实见[证据](../evidence/T52/)。
+当时的运行脚本已清理；实验事实见[证据](../../evidence/T52/)。
 - **fuzz=0**：全栈（000 101 105 106 110 111 112 113 114 115 140 120 130 150 160 170）、tier-1+140+120+170、tier-1+170 都能应用；全栈结果与移植树逐字节相同；开发机上也重新从补丁构建过。
 - **启动/capture（实测）**：`--cuda-graph-backend-prefill breakable --chunked-prefill-size 4096` 时捕获 50 个桶 `[4,8,…,1024,1280,…,4096]`，17–27 s，池 1.25 GB。所有 prefill 行都显示 `cuda graph: True`（173/173、132/132、41/41）。
 - **数值（实测）**：13 个请求。P∈{0, 2万, 10万}（实际命中 0/19968/99968）× c∈{100, 1000, 3000}（都不是桶大小，replay 时 padding 到最近的桶），外加两个预热请求，以及并发混合对（2万前缀+500，冷 1500）。每个请求 greedy 生成 32 个 token，带 top-5 logprob。
   - 默认 ±1e-3 dummy 权重下，BCG、eager、base（无 170）逐位相同。但**负对照**（eager、chunk 2048 对 4096）也逐位相同，说明 logits 只看当前 token，这组结果不能作为证据。
-  - 改用仅测试用的[初始化补丁](../evidence/T52/t52_test_dummy_init.patch)（norm=1，scale=1，矩阵 ±1/√fan_in，只在测试树，**不能进入产品补丁栈**）后：
+  - 改用仅测试用的[初始化补丁](../../evidence/T52/t52_test_dummy_init.patch)（norm=1，scale=1，矩阵 ±1/√fan_in，只在测试树，**不能进入产品补丁栈**）后：
     | 对比 | token 一致 | 生成 token logprob 最大差 | 首 token top-5 最大差 |
     |---|---|---|---|
     | eager170 对 BCG | 13/13（32/32） | 3.4e-4 | 0.156 |

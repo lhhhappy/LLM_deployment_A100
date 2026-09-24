@@ -3,8 +3,7 @@ import ast
 import json
 import os
 from pathlib import Path
-import subprocess
-import tempfile
+import sys
 from types import MappingProxyType, SimpleNamespace
 from typing import List, Mapping
 import unittest
@@ -12,6 +11,8 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "build/base_exact/sglang"
+sys.path.insert(0, str(ROOT / "scripts/engine"))
+from tree import tree_dir  # noqa: E402
 
 
 def definitions(path, names, ns):
@@ -26,14 +27,7 @@ def definitions(path, names, ns):
 class EligibilityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmp = tempfile.TemporaryDirectory()
-        pkg = Path(cls.tmp.name)
-        model = pkg / "srt/models/glm5_next.py"
-        model.parent.mkdir(parents=True)
-        model.write_bytes((BASE / "srt/models/glm5_next.py").read_bytes())
-        with (ROOT / "patches/171-kda-bf16-proj-fusion.patch").open() as f:
-            subprocess.run(["patch", "-p3", "--fuzz=0", "-s", "-d", str(pkg)],
-                           stdin=f, check=True)
+        model = tree_dir("mech:171") / "srt/models/glm5_next.py"
         ns = dict(List=List, Mapping=Mapping, MappingProxyType=MappingProxyType)
         definitions(BASE / "srt/layers/quantization/utils.py",
                     {"_module_path_match", "_FALLBACK_FUSED_SHARDS", "is_layer_skipped"}, ns)
@@ -42,9 +36,6 @@ class EligibilityTest(unittest.TestCase):
         cls.can_fuse = staticmethod(ns["_ax171_can_fuse_kda_projections"])
         cls.config = json.loads((ROOT / "s1-dev/glm_tok/config.json").read_text())
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.tmp.cleanup()
 
     def qc(self, ignored=None, name="fp8"):
         return SimpleNamespace(get_name=lambda: name, packed_modules_mapping={},

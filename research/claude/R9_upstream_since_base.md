@@ -1,6 +1,6 @@
 # R9 — Upstream scan since our serving base (SGLang + vLLM, 2026-09-01 → 2026-09-23)
 
-> 这是 09-23 的上游快照，不是当前任务优先级。#38522 已移植为候选补丁 170；A100/SM80 的 110/111 与当前 S0 已解决基础启动问题。下表的 HIGH/MED 表示当时的移植兴趣，不代表已经验证过本负载收益。当前实验结果看根目录 [README](../../README.md)、[补丁索引](../../patches/README.md)和 R19–R21。
+> 这是 09-23 的上游快照，不是当前任务优先级。#38522 已移植为候选补丁 170；A100/SM80 的 110/111 与当前 S0 已解决基础启动问题。下表的 HIGH/MED 表示当时的移植兴趣，不代表已经验证过本负载收益。当前实验结果看根目录 [README](../../README.md)、[补丁索引](../../engine/README.md)和 R19–R21。
 
 Scope note (VERIFIED): our stated base hash `fe236ea6c3` is **not itself an ancestor of `sgl-project/sglang` main**. It resolves (via GitHub API) to author date 2026-09-01T07:15Z, commit message `fix(modelopt_fp4): skip NVFP4 swiglu-fusion interleave for shared experts with swiglu_limit`, which is the same fix that landed on main as **`32a1d554` / PR #37378** ("fix(modelopt_fp4): ... swiglu_limit", merged 2026-09-05). I used `32a1d554` as the practical diff boundary on main (`git log 32a1d554..origin/main`): **916 commits** total since base, of which **204** touch the path list in the task (GLM-5.3-Flash/Glm5Next, DSA/indexer/kpool, KDA/FLA, unified/mamba mem_cache, scheduler, fp8/marlin quant, speculative/nextn).
 

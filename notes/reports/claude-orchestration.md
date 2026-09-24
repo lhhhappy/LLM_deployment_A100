@@ -4,20 +4,15 @@
 
 ## 现状摘要（2026-09-24 夜）
 
-- **测试口径**：按用户要求，以后只在 lite 长链集 N30（加压 N34）上比较方案，选 N30 上最好的。
-- **补丁 180（HiCache）**：
-  - 内容：移植上游 #40913→#40915 的主机池声明（KV、DSA 索引键、KDA 状态、MTP 草稿池），以及 #38212 的树与检查点部分。
-  - 冻结版 sha256 `3b63d9c8…`，见 [180](../../patches/180-hicache-glm-dsa.md)。
-  - 测试：52 项测试在 CPU 和开发机真实 CUDA 拷贝上通过；不加 180 时同一组测试失败，说明测试能区分对错。
-  - 8 卡：059（lite N14）运行中，已完成 700/1123，无报错；060（lite N30）排队。
-  - 未验证：主机恢复后模型输出的数值、恢复耗时、恢复对 decode 的干扰。
-- **补丁 122（按 TPOT 余量给 prefill 预算）**：048 在旧开发集 N22 上让 fast 门转为通过，overall、chain 仍失败。061（A+122，lite N30）排队。
-- **N30 基线**：`scripts/pod/jobs/official_a_longchain_lite_n30.sh`（058 原样，只改 N），已请执行层入队。
+- **测试口径（用户定）**：全量长链集（311 链、5601 请求）N30，第 70 分钟停止准入后排空；只比较方案，不要求本地过线上门，也不换算正式 N。判断补丁看它针对的机制量（缓存命中、重算、主机搬回、首执行前等待、TPOT），门照常全部报告。
+- **引擎改为 git 源码**：`engine/sglang/`，标签 `engine-base`、`official-A-0923a`（与 0923a 镜像源码逐文件一致），每个机制一个或一组 `engine NNN:` 提交；启动打印 `[ax] mechanisms:`，任务 `G_EXPECT` 不符即不测。见 [engine/README.md](../../engine/README.md)。镜像构建以我们已注册的镜像为底，只嵌增量（`scripts/build_image.sh`）。
+- **180（HiCache）**：已修正旧版在 HiCache 下悄悄关闭 120/122 的问题（059 因此不是单变量）。059 实测：每请求重算均值 4,661→4,068 token；fast/overall 变差来自 120 被关（有人排队时 8192 大块批次 10/1061→648/866，新增 fast 超时多出的时间全在准入到执行之间）。
+- **8 卡当前**：061r（A+122）运行中，063r（A+122+新 180）排队；同一提交 c92acd5，两者只差 HiCache 参数。执行层挂 25 分钟监控。
 - **下一步（Claude）**：
-  - 059/060/基线/061 出结果后，按请求类型、等待还是重算做 N30 失败归因；
-  - 写补丁 181：恢复计时与回退原因埋点、恢复/备份优先级；
-  - 准备 NUMA 单变量。
-- **暂停**：124（短命中留位）已冻结在候选；驻留账本在真实长链运行校准前不用于决策。
+  - 两项出结果后，按请求类型、等待还是重算做失败归因，重点看 122 是否压住开场冷启动排队、180 的重算减少与主机搬回对 decode 的影响；
+  - HEAD 用正式 A 参数与 official-A 的 8 卡等价确认（补做）；
+  - 主机搬回计时与回退原因埋点（并入 180）。
+- **暂停**：124 未迁移（与 122/123 冲突，功能在 122 里）；驻留账本在真实长链运行校准前不用于决策。
 
 ## 048 对照（A+122 冻结版 vs 047 A 原样，均 dev N22；单变量）2026-09-24
 
@@ -77,7 +72,7 @@
    - 超限的都在等别人的 partial：100%，未超者 49%，全程基线 91%。
    - 22 条超 3 s 的 fast 请求中 19 条属于这一类。4096 正是 A 的 chunk−COLD_CAP。
 3. **045r（正式 B，剩余预算 0）：** 缓存命中 ≤8192 的请求 59/341 超限，都在等 partial。与 B 正式挂 fast 方向一致（描述性，不是因果证明）。
-4. **补丁：** `patches/124-short-hit-reserve.patch`，sha256 `3e256b48d0180e41bdf544d266b4a814dd6cb136b498680b8a738a56c7724c64`。
+4. **补丁（未迁移，原文在 git 历史）：** `patches/124-short-hit-reserve.patch`，sha256 `3e256b48d0180e41bdf544d266b4a814dd6cb136b498680b8a738a56c7724c64`。
    - 规则：续算上限 = min(COLD_CAP, chunk − 等待中短命中请求的分页新 token)。没有这类请求时与 A 相同；batch 预算不变。
    - 开关 `SGLANG_AX_SHORT_RESERVE=1`。
    - 与 122 互斥：122 含同一规则并叠加了进度控制，124 用于拆分 048 的效果。
@@ -139,8 +134,8 @@ A 实际是 EAGLE/NEXTN 加 overlap（044r 的 server_args：`disable_overlap_sc
 ```
 A="000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 114-indexer-row-shard 120-sched-protect-chain 121-sched-cap-while-decoding"
 B="130-async-tokenize 140-kda-dual-snapshot 150-startup-warmup 160-nextn-sm80 170-glm-bcg-prefill"
-python3 scripts/patch_stack.py apply build/p122/baseA $A $B
-python3 scripts/patch_stack.py apply build/p122/candidate $A 122-tpot-paced-prefill $B
+python3 scripts/engine/tree.py apply build/p122/baseA $A $B
+python3 scripts/engine/tree.py apply build/p122/candidate $A 122-tpot-paced-prefill $B
 cd tests && python3 -m unittest test_tpot_paced_prefill test_sched_protect_chain   # Ran 39, OK
 ```
 122 也能在 S1 栈（无 121）上干净应用。
@@ -153,5 +148,5 @@ cd tests && python3 -m unittest test_tpot_paced_prefill test_sched_protect_chain
 推翻条件：首 token 各门都没有改善，或 tpot_p95 > 0.10，或块并未变大。
 
 ### 相关文档
-- 补丁说明：[122 .md](../../patches/122-tpot-paced-prefill.md)
+- 补丁说明：[122 .md](../../engine/docs/122-tpot-paced-prefill.md)
 - 分析：[roadmap](../roadmap.md)、[introduction](../introduction.md)

@@ -23,7 +23,7 @@ no HiCache, no DP attention; other modes bypass the protection.
 
 ## Evidence
 - CPU: `tests/test_sched_protect_chain.py` runs the real scheduler and `PrefillAdder` code on fakes (27 tests pass; build the trees
-  with `scripts/patch_stack.py` as its header says).
+  with `scripts/engine/tree.py` as its header says).
 - 8 cards: N6 intra queue p95 6.41 → 0.36 s with the always-cap variant (013). With this behaviour: N10 TTFT gates pass but
   tpot_p95 0.13 (025b); S0 at N18 (026) passes the TTFT gates, tpot_p95 0.219; S0 at N22 (035) passes 10 of 11 gates, tpot_p95
   0.296 (F96). Remaining problem: during heavy prefill a stream gets one decode step per 16k chunk (~1.3 s).

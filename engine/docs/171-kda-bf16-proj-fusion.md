@@ -29,13 +29,13 @@
 
 CPU：`python3 -B -m unittest discover -s tests -p test_kda_fusion_171.py -v`。真实 checkpoint 配置的 34 个 KDA 层、默认关闭、部分免量化、未知量化方式与不匹配 TP 条件均检查。补丁在只读底包副本、S0、正式 A 的完整补丁栈上均以 `--fuzz=0` 应用。
 
-GPU 算子入口：[test_kda_fusion_171.py](../tests/gpu/test_kda_fusion_171.py)。从当前候选 `PYTHONPATH` 导入真实模型类与加载器；在一张 A100 上依次模拟 TP8 各 rank 的权重切片。使用真实模型维度和随机 BF16 权重，检查加载顺序、投影、prefill→decode→后续请求状态、重复 graph 输入，以及独立计时。
+GPU 算子入口：[test_kda_fusion_171.py](../../tests/gpu/test_kda_fusion_171.py)。从当前候选 `PYTHONPATH` 导入真实模型类与加载器；在一张 A100 上依次模拟 TP8 各 rank 的权重切片。使用真实模型维度和随机 BF16 权重，检查加载顺序、投影、prefill→decode→后续请求状态、重复 graph 输入，以及独立计时。
 
-**这不是实际 TP8 通信或真实权重模型验证。** 投影没有历史依赖，成本记录中 P、服务 batch、KV/KDA 容量均为 null；不能把它当 `T(c,P,B)` 服务成本。完整模型成本应扩展通用 [extend_check.py](../scripts/analysis/extend_check.py)，使用真实缓存历史。
+**这不是实际 TP8 通信或真实权重模型验证。** 投影没有历史依赖，成本记录中 P、服务 batch、KV/KDA 容量均为 null；不能把它当 `T(c,P,B)` 服务成本。完整模型成本应扩展通用 [extend_check.py](../../scripts/analysis/extend_check.py)，使用真实缓存历史。
 
 2026-09-24 新增了显式启用时的 `[ax-kda171]` 每层加载路径日志（head rank0），用于真实 TP8 核对是否实际融合。新补丁 SHA `08eee808be8632776721c90769162a3a30622b8e73fd806565a0c94cdb10026e`；下述 `evidence/kda171` 来自 eefc2ab 的旧哈希版本，两者计算/加载逻辑相同，仅日志不同，不能混写哈希。
 
-开发机 A100 实测已通过：8 个模拟 rank 的加载/投影、非整齐行、冷 prefill→decode→后续 prefill、MTP 非融合 verify 及接受 1–4 token 的 SSM/conv 提交、11 种形状的投影 graph 重放、FP16 dtype 覆盖。逐位相等并非通用要求；完整误差、边界与原始记录见 [R22](../research/codex/R22_kda_projection_fusion.md) 和 [final.jsonl](../evidence/kda171/final.jsonl)。
+开发机 A100 实测已通过：8 个模拟 rank 的加载/投影、非整齐行、冷 prefill→decode→后续 prefill、MTP 非融合 verify 及接受 1–4 token 的 SSM/conv 提交、11 种形状的投影 graph 重放、FP16 dtype 覆盖。逐位相等并非通用要求；完整误差、边界与原始记录见 [R22](../../research/codex/R22_kda_projection_fusion.md) 和 [final.jsonl](../../evidence/kda171/final.jsonl)。
 
 单层投影调用实测 6 linear → 1 linear + 1 bmm。非 profile 的重复计时：256 行 eager 墙钟中位数约 141→87µs；4096 行约 588→477µs；16384 行约 2082→1872µs。1024 行 eager 两组存在明显 host 波动，不使用混合中位数宣称 2×；同形状投影 graph 约 160→119µs。这里的 graph 是算子图，不是 170 的模型 BCG。
 
@@ -43,8 +43,8 @@ GPU 算子入口：[test_kda_fusion_171.py](../tests/gpu/test_kda_fusion_171.py)
 
 ## 真实 TP8 完整回放：056
 
-[official_a_171_n22.sh](../scripts/pod/jobs/official_a_171_n22.sh)已完成完整原开发集N22，以047为对照，34层实际启用融合。722条完整、0请求错误，清缓存HTTP200且JSON success=true，本地独立重判VALID FAIL；不设置生成输出重复一致性门。049未加载171，不能算171错误。
+`official_a_171_n22.sh`（已退役，原文见 git 历史）已完成完整原开发集N22，以047为对照，34层实际启用融合。722条完整、0请求错误，清缓存HTTP200且JSON success=true，本地独立重判VALID FAIL；不设置生成输出重复一致性门。049未加载171，不能算171错误。
 
-fast超标33→35/23、overall55→57/27、turn2→1/3、chain73→64/22；TPOT均值.061976→.062802、p95 .087032→.086897。单次收益混合，没有已证实的整档净收益或并发晋档，暂不加入部署组合。详细同请求比较见[056](../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)。
+fast超标33→35/23、overall55→57/27、turn2→1/3、chain73→64/22；TPOT均值.061976→.062802、p95 .087032→.086897。单次收益混合，没有已证实的整档净收益或并发晋档，暂不加入部署组合。详细同请求比较见[056](../../evidence/L056-official_a_171_n22/N22/compare_vs_047.txt)。
 
 服务实际KV 1,036,288→1,024,960，Mamba槽321→318，容量差在graph捕获前已出现。加载阶段显存记录不同，但现有日志不能隔离具体分配来源；不能由单层参数字节不变推断服务零显存成本，也不能由容量差直接解释TTFT。后续若继续171，先解决这笔分配账并测完整模型成本，不恢复逐字一致性前置。完整回放只验证当前接口、负载和性能，尚无新的正式能力评测结果。

@@ -79,4 +79,4 @@
 
 The sections above explain the base source. S0 runs with 110/111 and tilelang DSA backends; fa3 is Hopper-only for this model's path on A100 (F57). The earlier suggestion to select fa3 or tune an unworkable FP8 Triton MoE path is obsolete. `SGLANG_OPT_USE_TOPK_V2=0` remains required on A100 (task.md:424).
 
-The [patch inventory](../../../patches/README.md) records current mechanisms and their 8-card evidence. Candidate 114 divides indexer prefill rows; 115 adds DCP on sm80; 160 brings NEXTN; 170 adds opt-in breakable prefill CUDA graph. The candidate labels are not claims of scoring benefit. Compare complete dev levels with the harness scorer and check output/ability before promotion.
+The [patch inventory](../../../engine/README.md) records current mechanisms and their 8-card evidence. Candidate 114 divides indexer prefill rows; 115 adds DCP on sm80; 160 brings NEXTN; 170 adds opt-in breakable prefill CUDA graph. The candidate labels are not claims of scoring benefit. Compare complete dev levels with the harness scorer and check output/ability before promotion.
