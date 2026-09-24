@@ -1,14 +1,16 @@
 # Agentic Science Challenge：GLM-5.3-Flash 推理服务
 
-本地脚本已完成第二轮清理（2026-09-24）；GPU 机仓库镜像待现有队列结束且 SSH 恢复后同步。
+2026-09-24：当前两个任务与Pod运行库已统一到按源码提交号部署的流程。
 
 这是 8×A100-80GB 上的推理服务部署赛。唯一赛规是 [task.md](llm-challenge-arena-v1/task.md)：能力评测 AIME26 与 GPQA Diamond 都须严格高于 90 分；压测排名（主办方确认）逐级比较：通过全部硬门的最大并发档 `n_at_slo` 越大越好 → `tpot_mean` 越小越好 → TPM 越大越好 → 先提交者靠前。平台从 N=10 开始，成功加 4、失败减 4；单档约 4 小时。每档有完整性、错误率、四道 TTFT 和 `tpot_p95 ≤ 0.10 s/token` 等 11 道硬门；TTFT 按题面规定的统计余量判定，TPOT p95 没有余量。开发集只能比较我们自己的 A/B 和回归，不能预测正式 N@SLO（task.md「开发集」与「压测」节）。
 
 ## 现在做什么
 
-截至 2026-09-24 00:47 UTC已复核：037b–042这批队列已结束，完整dev N22尚无全过配置。S1+122/123（037d）把chain超标降到23/22，仍以TPOT p95=0.147失败；状态槽400使同链缓存缺口约减半，但TPOT仍失败；DCP8在冒烟时出现33/40行张量形状错误，没有完整档。S1原样重跑fast超标7→15，单次小差异需谨慎解释。详见 [codex-分析](notes/codex-分析-2026-09-24.md)和[实验记录](notes/experiments.md)。下一步问题看[任务队列](notes/queue.md)，实时状态以pod为准。补丁与S0/S1精确定义见[patches/README.md](patches/README.md)；当前7个S0补丁与026/035源码等价性见[记录](evidence/T57/equivalence.log)。
+方向见 [notes/roadmap.md](notes/roadmap.md)，实时实验安排见 [notes/queue.md](notes/queue.md)。今天按用户决定只比较两项：**A+122 与 A+122+新版180**，同一个引擎源码提交、全量长链集311链/5601请求、N30；每项70分钟停止新准入后排空。061r已启动，063r排队。预热后真实清KV；不要求重复生成相同。
 
-每轮按这个循环：从 [任务队列](notes/queue.md) 取一个明确的问题 → 复制现行 job，优先只改一个变量 → 入队跑完整开发集 → 用原 harness 评分器和题面规则核对完整性及 11 门 → 看原始记录解释瓶颈 → 更新补丁和 [实验记录](notes/experiments.md) → 再跑。多变量组合只评价组合，后续再拆分归因。失败或数据不完整就记失败或 INVALID。12 题能力测试只用于冒烟，不能证明能力门通过。
+引擎已迁移到 [engine/sglang](engine/README.md)，按提交号部署和构建。源码含正式A全部13项改动；任务通过 `G_EXPECT` 核对调度与HiCache确实生效。旧28份任务入口已清理并留档，实验原始记录保留。
+
+70分钟测量可能只覆盖全量集的一部分，发送与完成台账须闭合；结果用于候选间比较，不冒充完整集VALID或预测正式N。已有058/059与dev校准的完整记录见 [experiments.md](notes/experiments.md)。
 
 ## 操作入口
 
@@ -17,8 +19,9 @@
 | 要做的事 | 入口 |
 |---|---|
 | 查看 8 卡队列和日志 | `scripts/pod/pread status`；队列说明见 [scripts/pod/README.md](scripts/pod/README.md) |
-| 准备下一项 8 卡实验 | 先看 [任务队列](notes/queue.md) 和已入队[原始 job 快照](evidence/jobs-0924/)。当前旧名队列（037b–042）冻结，**不要用本地 job 重新 `qpush`**；这批任务全部开跑、GPU 镜像同步后，再按 [pod 工具说明](scripts/pod/README.md)入队新实验 |
-| 判定单档 | job 的 `LEVEL` 行由 `scripts/pod/verify/level_verdict.py` 生成：先查 cohort、runner 与原始记录，再调用 `scripts/score_formal.py`（harness 评分器）并补上题面 TPOT 门 |
+| 准备下一项 8 卡实验 | 先看 [任务队列](notes/queue.md) 与 pod 实时状态，由当前负责人按 [pod 工具说明](scripts/pod/README.md)安排。037b–042 的[原始 job 快照](evidence/jobs-0924/)仅供追溯，不能当新实验重复推送；本地工具同步需协调 |
+| 判定单档 | `level_verdict.py` 核对 N、完整 cohort、runner 与本次清缓存证据，再调用原 harness 和题面补充门；CP 为估计口径，其他区间仅诊断。修复及验证见[审计](notes/fable-审计-2026-09-24.md)，本地改动待负责人同步 pod |
+| 取回并复核单档 | `scripts/analysis/fetch_level.sh <完整run目录名> <N>`；输出在 `evidence/L<完整run目录名>/N<N>/`，按 summary 选文件，返回 0=有效通过、1=有效失败、2=无效/工具失败 |
 | 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
 | 修改引擎 | 在 `engine/sglang/` 里改，按机制提交（`engine NNN:`）；见 [engine/README.md](engine/README.md) |
 | 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)，官方结果用 `scripts/official_status.sh <attempt_id>` 查；只在明确安排正式提交时使用 |
@@ -31,7 +34,7 @@ GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/lin
 |---|---|
 | `llm-challenge-arena-v1/`、`s1-dev/` | 赛题原文、公开开发集与 harness；只读 |
 | `build/base_exact/`、`refs/sglang-fe236ea6c3/` | 底包副本与上游参考；只读 |
-| `engine/` | 引擎源码（git 管理）、机制说明与开关；`patches/` 仅保留到 061/062 结束后删除 |
+| `engine/` | 引擎源码（git 管理）、机制说明与开关；旧补丁文件仅供迁移追溯，当前任务不再读取 |
 | `scripts/pod/` | 8 卡队列、job 模板、判定与只读访问 |
 | `research/` | 源码地图、仍有效的分析；入口见 `research/README.md` |
 | `notes/queue.md` | 下一步问题与实验顺序；一条任务只写问题、判据、状态 |
