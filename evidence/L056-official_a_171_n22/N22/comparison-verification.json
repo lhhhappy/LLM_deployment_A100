@@ -1,0 +1,125 @@
+{
+  "baseline": "047-official_a_n22",
+  "candidate": "056-official_a_171_n22",
+  "baseline_patch_count": 13,
+  "candidate_patch_count": 14,
+  "only_added_patch": {
+    "171-kda-bf16-proj-fusion.patch": "08eee808be8632776721c90769162a3a30622b8e73fd806565a0c94cdb10026e"
+  },
+  "server_config_differences": {
+    "random_seed": [
+      503622811,
+      924177375
+    ]
+  },
+  "request_metadata_equal": [
+    "prompt_tokens",
+    "glm_tokens",
+    "uncached_expected",
+    "max_output_i",
+    "phase",
+    "chain_id",
+    "idx_in_chain",
+    "edge_type",
+    "replay_gap_ms",
+    "effective_replay_gap_ms"
+  ],
+  "baseline_kv_tokens": [
+    1036288
+  ],
+  "candidate_kv_tokens": [
+    1024960
+  ],
+  "baseline_mamba_slots": [
+    321
+  ],
+  "candidate_mamba_slots": [
+    318
+  ],
+  "kda171_fused_layers_tp0": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30,
+    32,
+    33,
+    34,
+    36,
+    37,
+    38,
+    40,
+    41,
+    42,
+    44
+  ],
+  "candidate_interface": {
+    "rows": 722,
+    "unique_ids": 722,
+    "errors": 0,
+    "server_ttft": 722,
+    "prompt_tokens_exact": 722,
+    "output_tokens_exact": 722
+  },
+  "candidate_flush_receipt": {
+    "schema_version": 1,
+    "runner_started_s": 1790233495.429164,
+    "n": 22,
+    "flush_success": true,
+    "runner_rc": 0,
+    "flush_started_s": 1790234002.7704391,
+    "flush_http_status": 200,
+    "flush_response": {
+      "success": true,
+      "message": "Cache flushed."
+    },
+    "flush_finished_s": 1790234003.0823271,
+    "runner_finished_s": 1790235166.876035,
+    "raw": "raw_dev-combined-v1_N22_1790234008.jsonl",
+    "run": "run_dev-combined-v1_N22_1790234008.json"
+  },
+  "independent_score_matches_pod": true,
+  "memory_observation": {
+    "baseline_target_load_usage_gb": 39.15,
+    "candidate_target_load_usage_gb": 39.18,
+    "baseline_draft_load_usage_gb": 0.85,
+    "candidate_draft_load_usage_gb": 1.02,
+    "pool_allocated_before_cuda_graph_capture": true,
+    "interpretation": "Pool difference exists before graph capture. Load-stage free-memory differs; logs do not isolate parameter storage, allocator blocks, workspace or other allocations. No proof that capacity difference caused TTFT change."
+  },
+  "limits": [
+    "Single A/B run; no same-configuration N22 variance estimate",
+    "random_seed was assigned independently on startup; no output equality requirement",
+    "047 had local ability smoke before original harness; 056 skipped local smoke; both flush after original harness preflight/warmup",
+    "LCP pairs metadata checked only, source not verified",
+    "Execution spans include scheduling/chunking effects; not isolated kernel timings",
+    "No formal concurrency or quality-evaluation result"
+  ],
+  "files": {
+    "job.log": "788b8d703b323571dfa6f79d3b53c6e5b3d652440b0f495011219bd862b94f41",
+    "server.log": "3c2815ddfb05bd7fadf246a5f22699baa2826971ab6993f68542acc2f077576b",
+    "level_verdict.json": "91d81af1162bd02d1c072a11c7718245d4e25d91a86c98caa60b0a6ca82478f8",
+    "compare_vs_047.txt": "bebd39845a5f9a4cfcc32c17a782bbedef171cb26b3527838e9af2285120496f",
+    "compare_vs_047.csv": "84fc2dff9bec740f8fcc2a881965d0e765d12a92f963e7bb172a3655b5438a90"
+  },
+  "compare_tool_sha256": "707422df864f81dbc62f1cab1656636324942a5f08555390ad8778f4a658afa4"
+}

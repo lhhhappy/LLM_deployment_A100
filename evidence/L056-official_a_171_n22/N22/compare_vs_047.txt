@@ -1,0 +1,22 @@
+== N22 vs evidence/L056-official_a_171_n22/N22: 722 requests each, same ids
+  base: VALID passed=False tpot 0.0620/0.0870 | fast_intra:33/23(p95 5.23) overall_intra:55/27(p95 10.80) turn_start:2/3(p95 39.38) chain_start:73/22(p95 93.09)
+  cand: VALID passed=False tpot 0.0628/0.0869 | fast_intra:35/23(p95 10.47) overall_intra:57/27(p95 12.84) turn_start:1/3(p95 19.58) chain_start:64/22(p95 81.20)
+  fast_intra (> 3 s, per-request limit): base 33 cand 35 | fixed 11 {'cache more': 3, 'wait': 8} | new 13 {'cache less': 2, 'wait': 11}
+      wait: p50 0.39 -> 0.36 | p95 4.32 -> 9.78
+      run: p50 0.57 -> 0.55 | p95 0.72 -> 0.71
+  overall_intra (> 5 s, per-request limit): base 55 cand 57 | fixed 18 {'cache more': 1, 'wait': 17} | new 20 {'cache less': 2, 'wait': 18}
+      wait: p50 0.43 -> 0.39 | p95 9.23 -> 11.76
+      run: p50 0.59 -> 0.58 | p95 2.08 -> 2.01
+  turn_start (> 15 s, per-request limit): base 2 cand 1 | fixed 2 {'wait': 2} | new 1 {'wait': 1}
+      wait: p50 0.89 -> 0.34 | p95 36.72 -> 14.58
+      run: p50 0.70 -> 0.69 | p95 7.39 -> 7.38
+  chain_start (> 30 s, per-request limit): base 73 cand 64 | fixed 16 {'wait': 9, 'cache more': 5, 'cache less': 2} | new 7 {'wait': 4, 'cache more': 2, 'cache less': 1}
+      wait: p50 1.64 -> 2.44 | p95 85.47 -> 80.53
+      run: p50 0.71 -> 0.70 | p95 13.02 -> 12.64
+  LCP gap (T56 pairs, unverified source, diagnostic only): metadata-checked 411, rejected 0, no pair (unknown) 311 of 722; workload identity ('c6645ee02c86494e', '997e98a98033b24b')
+  prefill lines excluded: before/after the window base 919 cand 916, in boundary seconds base 1 cand 2
+  tpot per request > 0.10: 8 -> 3
+  cached tokens total: 24.51M -> 24.50M; requests with |delta cached| >= 1024: 75
+  base prefill batches 2301 {'<=8k': 388, '<=4k': 1805, '<=2k': 108} | tokens 9.92M | partial alone 1815
+  cand prefill batches 2295 {'<=4k': 1796, '<=8k': 401, '<=2k': 98} | tokens 9.92M | partial alone 1803
+wrote 722 rows to evidence/L056-official_a_171_n22/N22/compare_vs_047.csv

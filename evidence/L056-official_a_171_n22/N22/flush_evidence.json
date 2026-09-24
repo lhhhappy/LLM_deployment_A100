@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "runner_started_s": 1790233495.429164,
+  "n": 22,
+  "flush_success": true,
+  "runner_rc": 0,
+  "flush_started_s": 1790234002.7704391,
+  "flush_http_status": 200,
+  "flush_response": {
+    "success": true,
+    "message": "Cache flushed."
+  },
+  "flush_finished_s": 1790234003.0823271,
+  "runner_finished_s": 1790235166.876035,
+  "raw": "raw_dev-combined-v1_N22_1790234008.jsonl",
+  "run": "run_dev-combined-v1_N22_1790234008.json"
+}
