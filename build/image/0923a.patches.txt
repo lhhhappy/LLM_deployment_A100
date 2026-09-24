@@ -1,1 +1,7 @@
-000-interface-compliance 101-d1v12-on-base 105-role-split-single-partial 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 112-sm80-indexer-kernels 113-sm80-prefill-indexer 114-indexer-row-shard 140-kda-dual-snapshot 120-sched-protect-chain 130-async-tokenize 150-startup-warmup 160-nextn-sm80 170-glm-bcg-prefill
+# Image 0923a (official attempts 45979/45980). Built with the pre-consolidation patch files (old names, in this order):
+#   000-interface-compliance 101-d1v12-on-base 105-role-split-single-partial 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer
+#   111-sm80-fp8-moe-marlin 112-sm80-indexer-kernels 113-sm80-prefill-indexer 114-indexer-row-shard 140-kda-dual-snapshot
+#   120-sched-protect-chain(v3, which already contained 121's cap-while-decoding) 130-async-tokenize 150-startup-warmup
+#   160-nextn-sm80 170-glm-bcg-prefill
+# Equivalent current stack (13 patches; source tree verified IDENTICAL to the image, 4690 files; evidence/T57):
+000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 114-indexer-row-shard 120-sched-protect-chain 121-sched-cap-while-decoding 130-async-tokenize 140-kda-dual-snapshot 150-startup-warmup 160-nextn-sm80 170-glm-bcg-prefill
