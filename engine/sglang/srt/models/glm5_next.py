@@ -65,6 +65,7 @@ from sglang.srt.layers.moe.utils import (
     is_shared_experts_fusion_disabled,
 )
 from sglang.srt.layers.quantization.base_config import QuantizationConfig
+from sglang.srt.layers.quantization.utils import is_layer_skipped
 from sglang.srt.layers.radix_linear_attention import RadixLinearAttention
 from sglang.srt.layers.rotary_embedding import get_rope
 from sglang.srt.layers.utils.common import PPMissingLayer
@@ -126,6 +127,7 @@ from sglang.srt.utils.common import (
     BumpAllocator,
     LazyValue,
     add_prefix,
+    get_bool_env_var,
     log_info_on_rank0,
     make_layers,
     set_weight_attrs,
@@ -324,6 +326,29 @@ class Glm5NextVisionModel(GlmOcrVisionModel):
         )
 
 
+def _ax171_can_fuse_kda_projections(quant_config, prefix, head_shard_size, tp_size):
+    # [ax] 171: only fuse projections that already use unquantized weights.
+    # The checkpoint's model-wide FP8 setting does not describe every linear.
+    if head_shard_size != tp_size:
+        return False
+    if quant_config is None:
+        return True  # Preserve the base's unquantized-model path.
+    if not get_bool_env_var("SGLANG_AX_KDA_FUSE_PROJ", "false"):
+        return False
+    if quant_config.get_name() != "fp8":
+        return False
+    return all(
+        is_layer_skipped(
+            f"{prefix}.{name}",
+            quant_config.ignored_layers,
+            fused_mapping=quant_config.packed_modules_mapping,
+        )
+        for name in (
+            "qkv_proj", "b_proj", "f_a_proj", "g_a_proj", "f_b_proj", "g_b_proj"
+        )
+    )
+
+
 class Glm5NextLinearAttention(nn.Module):
     def __init__(
         self,
@@ -367,7 +392,9 @@ class Glm5NextLinearAttention(nn.Module):
         projection_size = self.head_dim * self.num_heads
         self.conv_size = config.linear_attn_config["short_conv_kernel_size"]
 
-        self.do_fuse_qkvbfg = quant_config is None and head_shard_size == self.tp_size
+        self.do_fuse_qkvbfg = _ax171_can_fuse_kda_projections(
+            quant_config, prefix, head_shard_size, self.tp_size
+        )
         if self.do_fuse_qkvbfg:
             self.qkvb_sizes = [
                 projection_size,
@@ -381,21 +408,24 @@ class Glm5NextLinearAttention(nn.Module):
                 self.hidden_size,
                 self.qkvb_sizes,
                 self.fg_sizes,
-                quant_config=quant_config,
+                # Eligibility above covers the ORIGINAL module names. A new
+                # fused name must not accidentally select an FP8 quant method.
+                quant_config=None,
                 prefix=f"{prefix}.fused_qkvbfg_a_proj",
+                tp_rank=head_shard_rank,
+                tp_size=head_shard_size,
             )
             self.split_sizes = [
                 3 * projection_size // head_shard_size,
                 self.num_heads // head_shard_size,
                 2 * self.head_dim,
             ]
-            fused_dtype = (
-                getattr(config, "dtype", None)
-                or getattr(config, "torch_dtype", None)
-                or torch.get_default_dtype()
-            )
+            # Match the actual parameter dtype (including a --dtype override),
+            # rather than the checkpoint's possibly different config dtype.
+            fused_dtype = self.fused_qkvbfg_a_proj.weight.dtype
             self.fused_fg_b_proj = ColumnParallelBatchedLinear(
-                2, self.head_dim, projection_size, dtype=fused_dtype
+                2, self.head_dim, projection_size, dtype=fused_dtype,
+                tp_rank=head_shard_rank, tp_size=head_shard_size,
             )
         else:
             self.qkv_proj = QKVParallelLinear(
@@ -453,6 +483,13 @@ class Glm5NextLinearAttention(nn.Module):
                 prefix=f"{prefix}.g_b_proj",
                 tp_rank=head_shard_rank,
                 tp_size=head_shard_size,
+            )
+
+        if get_bool_env_var("SGLANG_AX_KDA_FUSE_PROJ", "false") and head_shard_rank == 0:
+            logger.info(
+                "[ax-kda171] layer=%s fused=%s head_tp=%s model_tp=%s dtype=%s",
+                layer_idx, self.do_fuse_qkvbfg, head_shard_size, self.tp_size,
+                self.fused_qkvbfg_a_proj.weight.dtype if self.do_fuse_qkvbfg else None,
             )
 
         self.dt_bias = nn.Parameter(
