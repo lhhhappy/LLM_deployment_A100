@@ -45,7 +45,7 @@
 
 结果索引：`evidence/T45/README.md`、`summary.json`；完整数字以该收据为准。
 
-- **历史栈校验**：当时的完整000→101→110→111→140→120旧栈应用、编译、再生成和反向恢复见[收据](../../evidence/T45/verify.log)；旧 runner 已清理。现行合并补丁按[engine/README.md](../README.md)使用。
+- **历史栈校验**：当时的完整000→101→110→111→140→120旧栈应用、编译、再生成和反向恢复见[收据](../../evidence/T45/verify.log)；旧 runner 已清理。现行合并补丁按[engine/README.md](../../README.md)使用。
 - **历史调度/准入测试**：关闭32组×30轮JSON轨迹字节相同，开启8组；role prompt从2次extend变为1次。[测试日志](../../evidence/T45/scheduler_tests.log)保留，原一次性 runner 已清理。
 - **开发机 CPU/GPU 与离线回放**：真实 controller/tree/components 的缓存测试、64×128 KDA 随机权重数值、原 Renderer+glm_tok 的722请求回放分别见[证据索引](../../evidence/T45/README.md)。这些一次性 runner 已清理；离线回放不模拟真实并发、淘汰或解码，不能当作缓存命中或 SLO 结果。
 

@@ -130,15 +130,11 @@ A 实际是 EAGLE/NEXTN 加 overlap（044r 的 server_args：`disable_overlap_sc
   - 两个假时钟仿真（机制自检，不是性能预测）。
 - 另有 27 个 120 原有用例。
 
-复现：
+复现（测试直接从 git 取源码树：official-A-0923a 与 122 的提交）：
 ```
-A="000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin 114-indexer-row-shard 120-sched-protect-chain 121-sched-cap-while-decoding"
-B="130-async-tokenize 140-kda-dual-snapshot 150-startup-warmup 160-nextn-sm80 170-glm-bcg-prefill"
-python3 scripts/engine/tree.py apply build/p122/baseA $A $B
-python3 scripts/engine/tree.py apply build/p122/candidate $A 122-tpot-paced-prefill $B
-cd tests && python3 -m unittest test_tpot_paced_prefill test_sched_protect_chain   # Ran 39, OK
+python3 -m unittest discover -s tests -p "test_tpot_paced_prefill.py"   # 12 OK
+python3 -m unittest discover -s tests -p "test_sched_protect_chain.py"  # 32 OK
 ```
-122 也能在 S1 栈（无 121）上干净应用。
 
 ### 048 判据
 - 全部 11 门与 047 逐门对照；

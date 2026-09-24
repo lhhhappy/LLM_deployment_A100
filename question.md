@@ -149,5 +149,5 @@ A 的部署为 SGLang 路线、TP8、MTP/NEXTN（3 steps、top-k 1、draft token
 - 赛规：`llm-challenge-arena-v1/task.md`；本地评分：`scripts/score_formal.py`。
 - 三方数字、来源拆分、开场坏例与采样：`evidence/L058-official_a_longchain_lite_n14/three-way-review.md`；配置核对：同目录 `config-audit.json`；原始单档记录：同目录 `N14/`。
 - 数据来源、验收与偏差：`data/README.md`、`notes/reports/codex-data.md`、`evidence/longchain-design-20260924/timing-distribution.md`。
-- 180 的设计、CPU 测试与未验证项：`patches/180-hicache-glm-dsa.md`、`notes/reports/claude-orchestration.md`。
+- 180 的设计、CPU 测试与未验证项：`engine/docs/180-hicache-glm-dsa.md`、`notes/reports/claude-orchestration.md`。
 - 旧路线与边界：`notes/roadmap.md`、`notes/queue.md`。二者较早的驻留推断与 058 实测冲突时，以 058 原始复核和本咨询中的“未证实”边界为准。
