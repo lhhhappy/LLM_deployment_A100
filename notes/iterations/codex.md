@@ -2,6 +2,7 @@
 
 本页只保留当前判断、下一动作与证据；完整规则见[评估协议](../evaluation.md)，运行安排见[queue](../queue.md)。
 当前单人优化SGLang，优先完整N30和四类TTFT；vLLM暂缓。允许偶尔独立代码审查。
+用户提供线上榜单参照：N@SLO30、TPOT均值.046204、TPM1,557,557.2、decode TPM19,434；本地未过门样本不可直接排名。
 
 ## 当前轮：067（2026-09-24）
 
@@ -16,6 +17,7 @@
 - 下一动作：16:30:50 UTC看趋势；优先查这些请求的状态检查点、host备份/搬回与准入；继续回放，不据局部门禁自动停。
 - 15:55桥接SSH单次断连触发通知；只读复查恢复，完成1622→1645且健康无告警；未停回放。
 - 检查点证据：[check15](../../evidence/L067-official_b_full_n30_shortwarm/check15/)、[check45](../../evidence/L067-official_b_full_n30_shortwarm/check45/)。
+- check45/ttft-cases.csv固定391个唯一TTFT坏例及四桶标签；完跑后补全集，下轮逐ID比较修复、新增坏例与TPOT回归。
 - N30已核对：当前loadgen进程--n 30且非warmup，输出N30目录；raw可见链区间交叠下界达30，非HTTP并发保证。
 - 首轮原始配置与审计：[L067证据](../../evidence/L067-official_b_full_n30_shortwarm/)。
 - 机制与预热边界：[组合报告](../reports/sglang-shortwarm-mainline-0924.md)。

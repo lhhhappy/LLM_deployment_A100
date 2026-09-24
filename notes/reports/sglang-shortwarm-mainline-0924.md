@@ -90,3 +90,14 @@ chain共432，允许29，当前已43。因此本轮后续全部达标也无法PA
 
 复现：`.venv-longchain/bin/python scripts/analysis/replay_lcp.py evidence/L067-official_b_full_n30_shortwarm/check45/raw.jsonl --data-root data/s1-dev-longchain --tok-dir s1-dev/glm_tok --since-min 30 --limit 8 --out /tmp/067-lcp.json`。
 证据：[check45](../../evidence/L067-official_b_full_n30_shortwarm/check45/)，包含raw、窗口、服务区间日志、lcp结果、全量桶余量与N30实参审计。
+
+## 下一轮怎样核对改进
+
+check45/ttft-cases.csv保留391个唯一坏例、前驱、四桶标签、时间分解、输入/缓存/输出预算；
+case-list-manifest.json绑定raw与冻结数据manifest哈希。四桶超标数为302/252/13/43，fast与overall重叠，不能相加当唯一请求数。
+本轮完跑后以完整raw补齐清单。修复用相同冻结数据、N30、rep16预热和真flush重跑；先用同一ID复现，
+再看全量超标数是否下降、原坏例改善多少、新增哪些坏例，以及TPOT/正确性是否回归。小样本探针不替代全量判定。
+每个方向分别记录事实、待验证解释、CPU最小反例、修复提交和对照证据；没有功能bug也可做有证据的性能优化。
+
+用户提供的线上榜单快照：N@SLO30，TPOT均值.046204，逻辑TPM1,557,557.2、decode TPM19,434。
+作为正式目标参照；当前本地未过门的局部样本不与其直接排名，TPM等完整固定稳态评分后再讨论。
