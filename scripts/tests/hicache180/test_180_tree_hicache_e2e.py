@@ -169,6 +169,8 @@ class TestTreeHiCacheIndexerOwnership(unittest.TestCase):
         )
         self.cache = UnifiedRadixCache(params)
         self.cache.init_hicache(self.args, params)
+        # See test_180_glm_host_pools: release pinned host registrations per test.
+        self.addCleanup(self.cache.cache_controller.mem_pool_host.destroy)
         H.register_device_tensors(H.device_tensors(self.req_pool, self.kv))
         self.model = _Model(self.kv.full_kv_pool)
         self.tree_page = self.cache.page_size

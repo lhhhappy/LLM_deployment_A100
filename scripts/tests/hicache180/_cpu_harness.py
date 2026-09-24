@@ -172,7 +172,7 @@ def glm_like_pools(
 
     shape = Mamba2StateShape.create(
         tp_world_size=1, intermediate_size=16, n_groups=1, num_heads=1,
-        head_dim=16, state_size=2, conv_kernel=4,
+        head_dim=16, state_size=4, conv_kernel=4,  # conv row (16+2*4)*3*bf16=144 B: CUDA mamba copy needs 16-byte items
     )
     mamba_layers = [i for i in range(num_layers) if i not in dsa_layers]
     req_pool = HybridReqToTokenPool(

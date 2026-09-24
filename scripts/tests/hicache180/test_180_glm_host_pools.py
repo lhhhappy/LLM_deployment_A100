@@ -107,6 +107,10 @@ class TestGlmHostTier(unittest.TestCase):
             server_args=None,
             load_cache_event=threading.Event(),
         )
+        # Unregister pinned host buffers when the test ends. Leaked registrations
+        # make a later allocation at a reused address fail on real CUDA
+        # (cudaErrorHostMemoryAlreadyRegistered); production builds pools once.
+        self.addCleanup(result.host_pool_group.destroy)
         H.register_device_tensors(H.device_tensors(req_pool, kv, draft))
         return req_pool, kv, draft, allocator, result
 
