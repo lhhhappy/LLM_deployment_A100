@@ -1,0 +1,22 @@
+{
+  "patch_sha256": "8312cbf75425e72ae72c837f6d812c15ae213d9d26764b6d2342d4f6e0f2b1b6",
+  "checks": {
+    "old": {
+      "protect": false,
+      "pace": false,
+      "l3_protect": false
+    },
+    "new": {
+      "protect": true,
+      "pace": true,
+      "l3_protect": false
+    }
+  },
+  "changed_python_files": [
+    "srt/managers/scheduler.py"
+  ],
+  "tier_tests": 3,
+  "pace_tests": 12,
+  "pace_test_host_tier": true,
+  "control": "A+new180, same host tier; initial exploratory A-with-host-off-switch control was inappropriate and retained in separate log"
+}

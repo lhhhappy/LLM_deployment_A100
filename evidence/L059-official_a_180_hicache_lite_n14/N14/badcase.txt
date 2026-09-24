@@ -1,0 +1,28 @@
+== raw_s1-dev-longchain-lite_N14_1790249447.jsonl: 1123 requests, wall 2737 s, 1347 prefill batches logged in the window
+prefill batches >=8192 new tokens: 350; of these with requests decoding and an EMPTY queue: 79 (23%)
+prefill new tokens in window: 4.60M
+
+== TPOT: 20/1123 requests > 0.10 s/token (1.8%); mean 0.0148, p95 0.0275
+  output tokens [0,100): 3/21 over (14%)
+  output tokens [100,300): 17/269 over (6%)
+  output tokens [300,1000): 0/605 over (0%)
+  output tokens [1000,inf): 0/228 over (0%)
+  prompt tokens [0,16384): 2/17 over (12%)
+  prompt tokens [16384,65536): 13/620 over (2%)
+  prompt tokens [65536,131072): 2/360 over (1%)
+  prompt tokens [131072,inf): 3/126 over (2%)
+  worst minutes (first token, UTC): 11:31 18/19, 11:30 1/2, 11:43 1/43, 11:32 0/47, 11:33 0/33
+  during their decode: prefill batches p50 35, big chunks p50 35, prefill tokens p50 287k
+   0.132 s/tok out=227 prompt=30183 decode 29.9 s: 42 prefill batches (42 >=8192)
+   0.128 s/tok out=59 prompt=253884 decode 7.4 s: 12 prefill batches (12 >=8192)
+   0.126 s/tok out=224 prompt=35399 decode 28.2 s: 40 prefill batches (40 >=8192)
+   0.124 s/tok out=291 prompt=18695 decode 35.9 s: 51 prefill batches (51 >=8192)
+   0.123 s/tok out=228 prompt=35576 decode 27.9 s: 40 prefill batches (40 >=8192)
+
+== TTFT gate overs (harness buckets)
+  fast_intra: 26/958 over | recv-to-exec p50 5.6s exec-to-first p50 0.7s | frozen excess >4096 (not verified cache loss) 5
+  overall_intra: 23/1008 over | recv-to-exec p50 6.2s exec-to-first p50 0.7s | frozen excess >4096 (not verified cache loss) 3
+  turn_start: 0/29 over
+  chain_start: 11/86 over | recv-to-exec p50 42.3s exec-to-first p50 3.5s | frozen excess >4096 (not verified cache loss) 4
+
+wrote 80 rows to evidence/L059-official_a_180_hicache_lite_n14/N14/badcases.csv

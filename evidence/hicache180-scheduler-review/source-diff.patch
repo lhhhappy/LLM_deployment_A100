@@ -1,0 +1,15 @@
+--- old/srt/managers/scheduler.py
++++ new/srt/managers/scheduler.py
+@@ -1275,7 +1275,11 @@
+             and not self.is_mixed_chunk
+             and not self.is_hybrid_swa
+             and not self.enable_hisparse
+-            and not self.enable_hierarchical_cache
++            # The L1/L2 host tier (180) keeps these contracts: the cold-chunk cap
++            # and the decode turn ignore cache tiers, and short-hit sharing
++            # excludes requests that need a host load-back. L3 storage prefetch
++            # changes admission, so it still bypasses the protection.
++            and not self.enable_hicache_storage
+             and not get_memory().enable_flexkv
+             and not self.enable_lora
+             and not self.enable_priority_preemption

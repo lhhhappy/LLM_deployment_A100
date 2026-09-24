@@ -1,0 +1,2 @@
+LEVEL N=14 status=VALID formal_est=FAIL tpot_mean=0.0148 tpot_p95=0.0275 | fast_intra:1.5440(26/59) overall_intra:1.8635(23/62) turn_start:6.8093(0/4) chain_start:47.1495(11/8) | failed=['chain_start(<=30s)']
+CI_DIAGNOSTIC primary=clopper_pearson organizer_method=unknown {"diagnostic_only": true, "primary_method": "clopper_pearson", "organizer_method_unknown": true, "sensitive_ttft_gates": [], "all_gates_pass_by_method": {"clopper_pearson": false, "wilson": false, "wald": false}}

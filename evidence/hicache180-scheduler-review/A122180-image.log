@@ -1,0 +1,8 @@
+Dockerfile: /workspace/Agentic_science_challenge/build/image/Dockerfile
+Dockerfile size: 28013 bytes (limit 65536)
+payload OK  p0.patch  sha256=cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b
+payload OK  p1.patch  sha256=8312cbf75425e72ae72c837f6d812c15ae213d9d26764b6d2342d4f6e0f2b1b6
+
+Not built. To build and register:
+  bohr image build --dockerfile build/image/Dockerfile --name lh-img:0924c --project-id <PROJECT_ID> --wait -o json
+Use the returned image URL with a unique tag in submission.json (the platform rejects tag@sha256).

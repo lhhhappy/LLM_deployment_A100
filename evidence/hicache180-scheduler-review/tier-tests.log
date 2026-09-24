@@ -1,0 +1,8 @@
+test_device_hit_decisions_identical_with_and_without_host_tier (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_host_hit_does_not_join_active_chunk (test_sched_protect_chain.HiCacheTierTests) ... ok
+test_host_tier_keeps_protection_storage_bypasses (test_sched_protect_chain.HiCacheTierTests) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.097s
+
+OK

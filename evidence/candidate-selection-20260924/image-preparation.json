@@ -43,12 +43,12 @@
       "170-glm-bcg-prefill.patch": "48eeac6b956102d4394ace56e6fbbed343082b060b9aefd9548f73cc644320d5"
     },
     "added_patch_hashes": {
-      "180-hicache-glm-dsa.patch": "3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848"
+      "180-hicache-glm-dsa.patch": "8312cbf75425e72ae72c837f6d812c15ae213d9d26764b6d2342d4f6e0f2b1b6"
     },
-    "dockerfile_bytes": 23132,
-    "dockerfile_sha256": "cc28acd8f771982dce2b1513b8a19bb674a630760677a4e6c452ac9b5fd40e61",
+    "dockerfile_bytes": 23432,
+    "dockerfile_sha256": "88e50e2cee1d2866e714739b91860ed2e3c1571dd54238c672fcfe8f5bb831ab",
     "total_patch_count": 14,
-    "source_check": "base A hashes match T57 image equivalence; append order applies at zero fuzz; 122 variants match scheduled insertion order source",
+    "source_check": "New 180 8312cbf7; zero-fuzz A/A122 trees and real host-tier scheduler methods reviewed; preserves protection. No GPU performance result yet.",
     "status": "RENDERED_PAYLOAD_VERIFIED_NOT_BUILT_OR_PUBLISHED"
   },
   "A122180": {
@@ -70,12 +70,12 @@
     },
     "added_patch_hashes": {
       "122-tpot-paced-prefill.patch": "cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b",
-      "180-hicache-glm-dsa.patch": "3b63d9c88cb28520102455bc9081e5e8a7d9f9b0654bd1f1dde1f401747c8848"
+      "180-hicache-glm-dsa.patch": "8312cbf75425e72ae72c837f6d812c15ae213d9d26764b6d2342d4f6e0f2b1b6"
     },
-    "dockerfile_bytes": 27709,
-    "dockerfile_sha256": "03de691fff690179f0316b2c89d698e4ef97432672291bb85ed8acc8af4c2ece",
+    "dockerfile_bytes": 28013,
+    "dockerfile_sha256": "8ea915238e60d06f42ca45189f2d68329159608d371b9e39535ef6086e739398",
     "total_patch_count": 15,
-    "source_check": "base A hashes match T57 image equivalence; append order applies at zero fuzz; 122 variants match scheduled insertion order source",
+    "source_check": "New 180 8312cbf7; zero-fuzz A/A122 trees and real host-tier scheduler methods reviewed; preserves protection. No GPU performance result yet.",
     "status": "RENDERED_PAYLOAD_VERIFIED_NOT_BUILT_OR_PUBLISHED"
   }
 }

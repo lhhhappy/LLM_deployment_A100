@@ -1,0 +1,27 @@
+{
+  "size": 463463,
+  "sha256": "68bbee8ac825ddb775662af84efbb1bf8efae318bd863740662c796958655579",
+  "source": "pod",
+  "run": "059-official_a_180_hicache_lite_n14",
+  "n": 14,
+  "raw": "raw_s1-dev-longchain-lite_N14_1790249447.jsonl",
+  "files": [
+    "flush_evidence.json",
+    "gpu_util.csv",
+    "job.log",
+    "loadgen.log",
+    "metrics.jsonl",
+    "raw_s1-dev-longchain-lite_N14_1790249447.jsonl",
+    "run_dev.log",
+    "run_s1-dev-longchain-lite_N14_1790249447.json",
+    "rundev_exit_code",
+    "score.log",
+    "server.log",
+    "summary.json",
+    "verdict_exit_code"
+  ],
+  "data_root": "/workspace/Agentic_science_challenge/data/s1-dev-longchain-lite",
+  "harness_dir": "/workspace/Agentic_science_challenge/s1-dev/harness",
+  "exit_code": 1,
+  "recheck": "corrected default dev index to frozen lite; no remote refetch"
+}

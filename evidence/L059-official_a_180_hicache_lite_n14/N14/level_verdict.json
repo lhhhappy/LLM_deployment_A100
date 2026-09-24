@@ -1,0 +1,161 @@
+{
+ "status": "VALID",
+ "n": 14,
+ "passed": false,
+ "failed_gates": [
+  "chain_start(<=30s)"
+ ],
+ "tpot_mean": 0.014759889925999078,
+ "tpot_p95": 0.02750054120393208,
+ "ttft_gates": {
+  "fast_intra": {
+   "n": 958,
+   "p95": 1.5439786911010742,
+   "over_limit": 26,
+   "allowed_over": 59,
+   "rate_ci_lower": 0.01908523163293109,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.01908523163293109,
+      "allowed_over": 59,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.01974626913701837,
+      "allowed_over": 58,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.01850465042937298,
+      "allowed_over": 60,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "overall_intra": {
+   "n": 1008,
+   "p95": 1.863525629043579,
+   "over_limit": 23,
+   "allowed_over": 62,
+   "rate_ci_lower": 0.015643721276876986,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.015643721276876986,
+      "allowed_over": 62,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.016264260928680694,
+      "allowed_over": 61,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.015081424142938431,
+      "allowed_over": 63,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "turn_start": {
+   "n": 29,
+   "p95": 6.809346914291382,
+   "over_limit": 0,
+   "allowed_over": 4,
+   "rate_ci_lower": 0.0,
+   "pass_estimated": true,
+   "pass_point": true,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 4,
+      "pass_estimated": true
+     },
+     "wilson": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 3,
+      "pass_estimated": true
+     },
+     "wald": {
+      "rate_ci_lower": 0.0,
+      "allowed_over": 4,
+      "pass_estimated": true
+     }
+    },
+    "method_sensitive": false
+   }
+  },
+  "chain_start": {
+   "n": 86,
+   "p95": 47.14953017234802,
+   "over_limit": 11,
+   "allowed_over": 8,
+   "rate_ci_lower": 0.07341422361317307,
+   "pass_estimated": false,
+   "pass_point": false,
+   "interval_sensitivity": {
+    "diagnostic_only": true,
+    "organizer_method_unknown": true,
+    "methods": {
+     "clopper_pearson": {
+      "rate_ci_lower": 0.07341422361317307,
+      "allowed_over": 8,
+      "pass_estimated": false
+     },
+     "wilson": {
+      "rate_ci_lower": 0.07983364820359974,
+      "allowed_over": 7,
+      "pass_estimated": false
+     },
+     "wald": {
+      "rate_ci_lower": 0.06866813558269043,
+      "allowed_over": 8,
+      "pass_estimated": false
+     }
+    },
+    "method_sensitive": false
+   }
+  }
+ },
+ "rows": 1123,
+ "raw": "raw_s1-dev-longchain-lite_N14_1790249447.jsonl",
+ "run": "run_s1-dev-longchain-lite_N14_1790249447.json",
+ "wall_s": 2737.1031296253204,
+ "harness_point_all_pass": false,
+ "flush": {
+  "verified": true,
+  "mode": "checked_runner_receipt_and_server_log",
+  "server_log": "evidence/L059-official_a_180_hicache_lite_n14/N14/server.log",
+  "window_start_s": 1790249439.5892258,
+  "window_end_s": 1790249439.648799,
+  "matched_server_flush_s": 1790249439.0,
+  "server_log_clock": "UTC, second precision"
+ },
+ "interval_sensitivity": {
+  "diagnostic_only": true,
+  "primary_method": "clopper_pearson",
+  "organizer_method_unknown": true,
+  "sensitive_ttft_gates": [],
+  "all_gates_pass_by_method": {
+   "clopper_pearson": false,
+   "wilson": false,
+   "wald": false
+  }
+ }
+}

@@ -24,10 +24,12 @@
 | 056-official_a_171_n22 | 现有正式配置只加171，完整原开发集N22 | 完成并独立复算：722条VALID FAIL，fast35/23、overall57/27、turn1/3、chain64/22，TPOT .0628/.0869通过；无引擎错误，非一致性门退出。34层实际融合；KV 1,024,960、状态槽318，少于047的1,036,288/321。单次收益混合，尚无净收益结论 |
 | 057-official_a_172_n22 | 现有正式配置只加172，完整原开发集N22 | 完成并独立复算：722条VALID FAIL、0请求错误；fast33/23、overall53/27、turn2/3、chain62/22，TPOT .0610/.0850通过。KV 1,036,288、状态槽321与047一致。均值略降但fast/overall TTFT p95上升，未证明稳定净收益 |
 | 058-official_a_longchain_lite_n14 | 正式 A 原样，64条完整链／1123请求的 lite 集，固定 N14 | 完成并独立复算：1123条VALID、0请求错误、flush有效；仅chain 12/8失败，fast8/59、overall13/62、turn0/4通过，TPOT .01585/.04425通过。12条chain坏例全在开场约40秒内，11条首执行前已等30秒；后期并发下降，不能据全程均值认定等价线上。完整三方对照见 evidence/L058-official_a_longchain_lite_n14/three-way-review.md |
-| 059-official_a_180_hicache_lite_n14 | 058原样，只加180与HiCache三个参数；同一lite、N14 | 正式测量中：11:30 UTC严格flush成功，11:55检查点900/1123完成，未判分。主机KV每卡1,394,368 token，GPU KV仍1,036,288。14补丁、8数据产物及058的7个工具哈希已核，源码sig=32989fc8418538ae；每卡32GB、write_through、不加NUMA。证据 evidence/L059-official_a_180_hicache_lite_n14/ |
-| 060-official_a_180_hicache_lite_n30 | 复用059已预热引擎，同一lite，只将并发改为N30 | 已确认pending，执行层Codex入队并跟踪；跳过重复预热，保留原preflight和每档新flush，不要求059的SLO通过。14补丁、参数/env、池容量配置不变；引擎身份和完成预热的收据须吻合。证据 evidence/L060-official_a_180_hicache_lite_n30/ |
-| 060z-official_a_longchain_lite_n30 | 058原样13补丁、同lite，只将N14改为N30 | 已确认pending，排060之后、061之前。Claude提供脚本，本会话核验并入队/跟踪；同样冻结8数据产物和7工具，首次预热后严格flush。为180与122各自提供同负载N30基准；入队后只将待运行编号060b调整为060z，并按worker实际sort确认在060与061之间，脚本/补丁未变；不以本地全部门通过为选候选前提。证据 evidence/L060b-official_a_longchain_lite_n30/ |
-| 061-official_a_122_lite_n30 | 正式A原13补丁+冻结122，048参数/env，改用同一lite N30 | 已确认pending，排060z后，执行层Codex入队并跟踪。14补丁/8数据产物/7工具哈希逐项核验；新引擎首次预热后严格flush，无生成重复门、无前档SLO通过前置。与060是候选间比较，不是单变量归因；058为N14，不能冒充A原样N30对照。证据 evidence/L061-official_a_122_lite_n30/ |
+| 059-official_a_180_hicache_lite_n14 | 058原样加旧180（3b63d9c8），同lite N14；后来确认保护总开关随HiCache关闭 | 已完成并独立复算1123条VALID FAIL：fast26/59、overall23/62、turn0/4过，chain11/8失败，TPOT .01476/.02750；非崩溃。旧180隐含关闭120/121，因此不能当作保留A调度保护的HiCache效果。证据 evidence/L059-official_a_180_hicache_lite_n14/N14/ |
+| 060-official_a_180_hicache_lite_n30 | 复用059旧180引擎，同lite N30；旧版同时关闭调度保护 | 已按用户要求通过stopjob中断，734条部分记录仅诊断，不是完整FAIL成绩。保持服务存续；新版测试另列062。证据 evidence/L060-official_a_180_hicache_lite_n30/window/ |
+| 060z-official_a_longchain_lite_n30 | 058原样13补丁、同lite，只将N14改为N30 | 已确认running，060停止后接续；原样A基准，排061之前。Claude提供脚本，本会话核验并入队/跟踪；同样冻结8数据产物和7工具，首次预热后严格flush。为180与122各自提供同负载N30基准；入队后只将待运行编号060b调整为060z，并按worker实际sort确认在060与061之间，脚本/补丁未变；不以本地全部门通过为选候选前提。证据 evidence/L060b-official_a_longchain_lite_n30/ |
+| 061-official_a_122_lite_n30 | 正式A原13补丁+冻结122，048参数/env，改用同一lite N30 | 已确认pending，排060z后，执行层Codex入队并跟踪。14补丁/8数据产物/7工具哈希逐项核验；新引擎首次预热后严格flush，无生成重复门、无前档SLO通过前置。主要对照060z；旧060已中断，不拿部分记录替代完整对照；058为N14，不能冒充A原样N30对照。证据 evidence/L061-official_a_122_lite_n30/ |
+
+| 062-official_a_180_sched_lite_n30 | 正式A原13补丁+新180（8312cbf7），同lite N30；主机层保留120/121保护 | 已确认pending，排061后；14补丁与原7工具/冻结数据逐项核验，旧180仅在060已停后更新。3项缓存层开关+12项显式开启host的pace CPU测试通过；新引擎首次预热和测量前真实flush。与060z比较，尚无性能结果。证据 evidence/L062-official_a_180_sched_lite_n30/ |
 
 049/050因主会话自行设置的重复生成一致性门提前退出，不构成171/172实现错误的证据。用户已明确取消该门：删除两份旧数值门job入口、移除通用template的NUMREF阻断，停止后续逐字一致性排查。比赛要求的接口、清缓存、完整性和评分门继续保留。056/057均已完成；057结束后pread确认无running/pending job，服务未停止或释放，常驻watcher继续监控。
 
@@ -84,3 +86,7 @@
 171/172只测过原dev N22，尚未在新长链/lite上测过。因此旧结果既不能证明新负载无效，也不能证明足以晋档；仍保留候选。今日用户明确的三选二池是122/180/组合，不因旧dev结果把两个算子永久归档。
 
 CPU集成已核：A+122和A+122+180均按冻结顺序零fuzz应用、语法通过，真实调度方法的12项CPU测试各通过；不代表组合GPU验证。代码确认122的短命中预留排除KV/SWA/KDA任一仍需主机恢复的请求，搬回时间未进入成本模型。纯64→256对齐的额外复用损失最多192token，不能预先认定对预算可忽略。详见 evidence/candidate-selection-20260924/README.md。
+
+## 062后的准备与工具
+
+窗口监控已修复：运行中的已完成raw不能证明早期窗口完整，故保持open；分块下载核验长度与摘要；pending/断连继续等待。058真实数据完整校准、10项监控/定时回放CPU回归通过。70分钟全量诊断工具已准备：停止新发送后排空、发送台账闭合，不冒充全量VALID；原稳态TPM的t_last边界保持原判定。全量数据在同步，任务尚未入队，本轮优先完成新版180 lite比较。说明 evidence/full-n30-preparation/README.md。

@@ -214,3 +214,23 @@ raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只�
 负载变化明显：按token加权cache hit为71.50%→93.35%；实际新算prompt 9.808M→5.234M，输出.216M→.799M，chain门占比43.49%→7.66%。lite前20分钟762请求TPOT均值/p95为.020318/.060085；后27分钟大幅退载，全程时间平均存活链7.43、在途请求4.55，测量窗GPU利用率约76.6%（原dev94.2%）。全程均值接近线上不代表持续压力一致：lite的fast/overall更容易、turn/chain更难，线上未返回逐请求数据。两本地运行均缺完整固定稳态TPM窗口，保持null；线上TPM(all)=1,757,558.42、decode=20,546.92。
 
 主会话完成原始复算，GPT-6 Sol medium独立复核12条坏例，结论一致。用户已取消同配置自动重跑；058无第二轮GPU回放。下一项优先补全量311链持续负载证据，当前尚未入队。[完整三方分析](../evidence/L058-official_a_longchain_lite_n14/three-way-review.md)、[结构化指标与复现脚本](../evidence/L058-official_a_longchain_lite_n14/three-way-metrics.json)、[完整评分](../evidence/L058-official_a_longchain_lite_n14/N14/level_verdict.json)。
+
+## 059：旧180，lite N14；060按用户要求中断
+
+059原13补丁保留，另加旧180（3b63d9c8）及每卡32GB主机池、write_through。1123/1123唯一请求、0错误，严格flush有效，主会话用本集requests和原harness独立复算，与pod一致。
+
+| 指标 | 058 A | 059 旧180 |
+|---|---|---|
+| fast 超标 / 允许 | 8/59 | 26/59 |
+| overall | 13/62 | 23/62 |
+| turn | 0/4 | 0/4 |
+| chain | 12/8 | 11/8 |
+| TPOT mean / p95 (s/token) | .015852/.044248 | .014760/.027501 |
+
+两轮同1123请求、cohort/workload和冻结元数据已逐项核对；059是VALID FAIL，仅chain门失败，非服务崩溃。TPOT改善与短命中TTFT变差同时发生，不能宣称全面提升。
+
+代码后续发现旧180开启HiCache时触发120原有排除条件，冷块保护/短命中共享失效；121依赖同一保护参数；若叠122，其总开关也关闭。故059不代表保留正式A调度保护的HiCache对照。120专用decode让轮本就仅在interval=0运行，正式A=2，不能将其一并说成新丢失的机制。
+
+用户要求中断060旧版N30，已用stopjob执行，保留734条不完整记录作诊断，不报整档成绩。新180（8312cbf7）只改总开关到排除L3 storage，独立CPU真实方法复核protect/pace启用；3项tier和12项host开启的pace测试通过。新版本062 lite N30已入队，与060z原样A比较，GPU结果待测。
+
+证据：[059完整判分](../evidence/L059-official_a_180_hicache_lite_n14/N14/level_verdict.json)、[059原始记录目录](../evidence/L059-official_a_180_hicache_lite_n14/N14/)、[总开关复核](../evidence/hicache180-scheduler-review/README.md)。

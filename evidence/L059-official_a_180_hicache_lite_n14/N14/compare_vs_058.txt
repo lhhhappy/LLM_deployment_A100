@@ -1,0 +1,42 @@
+OBSERVED ONLY; old180 also disables120/121
+{
+  "requests": 1123,
+  "complete": true,
+  "identity_checks": [
+    "cohort_sha256",
+    "workload_hash",
+    "N",
+    "per_request_frozen_metadata"
+  ],
+  "note": "Old180 also disabled120/121; not a cache-only attribution. cohort_sha256_canonical absent in these generated cohorts; no canonical hash invented.",
+  "gates": {
+    "fast_intra": {
+      "n": 958,
+      "baseline_over": 8,
+      "candidate_over": 26,
+      "rescued": 7,
+      "new_overs": 25
+    },
+    "overall_intra": {
+      "n": 1008,
+      "baseline_over": 13,
+      "candidate_over": 23,
+      "rescued": 12,
+      "new_overs": 22
+    },
+    "turn_start": {
+      "n": 29,
+      "baseline_over": 0,
+      "candidate_over": 0,
+      "rescued": 0,
+      "new_overs": 0
+    },
+    "chain_start": {
+      "n": 86,
+      "baseline_over": 12,
+      "candidate_over": 11,
+      "rescued": 2,
+      "new_overs": 1
+    }
+  }
+}
