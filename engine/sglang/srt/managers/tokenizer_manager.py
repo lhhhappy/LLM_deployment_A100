@@ -56,6 +56,7 @@ from sglang.srt.disaggregation.utils import DisaggregationMode
 from sglang.srt.environ import envs
 from sglang.srt.lora.lora_registry import LoRARef, LoRARegistry
 from sglang.srt.managers.async_dynamic_batch_tokenizer import AsyncDynamicbatchTokenizer
+from sglang.srt.managers.async_text_tokenizer import AsyncTextTokenizer
 from sglang.srt.managers.disagg_service import start_disagg_service
 from sglang.srt.managers.embed_types import PositionalEmbeds
 from sglang.srt.managers.io_struct import (
@@ -540,6 +541,17 @@ class TokenizerManager(TokenizerControlMixin, TokenizerManagerScoreMixin):
         else:
             self.async_dynamic_batch_tokenizer = None
 
+        # Dynamic batching keeps its existing strategy. Otherwise serialize all
+        # regular text calls off-loop, including small inputs, to avoid races in
+        # tokenizer-global padding/truncation state. No text or ids are cached.
+        self.async_text_tokenizer = (
+            AsyncTextTokenizer()
+            if os.environ.get("SGLANG_AX_ASYNC_TOKENIZE", "1") != "0"
+            and self.tokenizer is not None
+            and self.async_dynamic_batch_tokenizer is None
+            else None
+        )
+
     def _validate_cuda_vmm_feature_transport_support(self) -> None:
         if get_mm().mm_feature_transport != "cuda_vmm":
             return
@@ -887,6 +899,19 @@ class TokenizerManager(TokenizerControlMixin, TokenizerManagerScoreMixin):
         # For true batches, return as-is
         return input_ids, token_type_ids
 
+    def _tokenize_texts_sync(self, tokenizer_input, tokenizer_kwargs, is_cross_encoder):
+        """The original full-text encoding operation, with identical arguments."""
+        if not is_cross_encoder and (not getattr(self.tokenizer, "is_fast", False)):
+            input_ids = [self.tokenizer.encode(t) for t in tokenizer_input]
+            token_type_ids = None
+        else:
+            encoded = self.tokenizer(tokenizer_input, **tokenizer_kwargs)
+            input_ids = encoded["input_ids"]
+            token_type_ids = (
+                encoded.get("token_type_ids") if is_cross_encoder else None
+            )
+        return input_ids, token_type_ids
+
     async def _tokenize_texts(
         self, texts: Union[str, List[str]], is_cross_encoder: bool = False
     ) -> Union[
@@ -927,14 +952,16 @@ class TokenizerManager(TokenizerControlMixin, TokenizerManagerScoreMixin):
         else:
             logger.debug(f"Using regular tokenizer for {len(tokenizer_input)} inputs")
 
-            if not is_cross_encoder and (not getattr(self.tokenizer, "is_fast", False)):
-                input_ids = [self.tokenizer.encode(t) for t in tokenizer_input]
-                token_type_ids = None
+            if self.async_text_tokenizer is not None:
+                input_ids, token_type_ids = await self.async_text_tokenizer.run(
+                    self._tokenize_texts_sync,
+                    tokenizer_input,
+                    tokenizer_kwargs,
+                    is_cross_encoder,
+                )
             else:
-                encoded = self.tokenizer(tokenizer_input, **tokenizer_kwargs)
-                input_ids = encoded["input_ids"]
-                token_type_ids = (
-                    encoded.get("token_type_ids") if is_cross_encoder else None
+                input_ids, token_type_ids = self._tokenize_texts_sync(
+                    tokenizer_input, tokenizer_kwargs, is_cross_encoder
                 )
 
         # vLLM's OpenAI embeddings endpoint includes special tokens for
@@ -3184,6 +3211,9 @@ class TokenizerManager(TokenizerControlMixin, TokenizerManagerScoreMixin):
                 await asyncio.sleep(5)
             else:
                 break
+
+        if self.async_text_tokenizer is not None:
+            self.async_text_tokenizer.close()
 
         # Stop the watchdog: child exits are expected during shutdown, not crashes.
         if self._subprocess_watchdog is not None:

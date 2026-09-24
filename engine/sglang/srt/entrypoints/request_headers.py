@@ -31,3 +31,15 @@ def apply_header_overrides(obj, headers) -> None:
             raise HTTPException(
                 status_code=400, detail=f"invalid {header} header {value!r}: {e}"
             ) from e
+
+
+def apply_s1_routing_key(obj, headers) -> None:
+    """Use S1 affinity hints only when the body has no explicit routing key.
+
+    Session-ID is a routing fallback, never native session_params/cache_salt.
+    Starlette Headers provides case-insensitive lookups. Ignore empty hints.
+    """
+    if obj.routing_key is None:
+        obj.routing_key = headers.get("x-s1-routing-key") or headers.get(
+            "x-s1-session-id"
+        ) or None
