@@ -1,0 +1,30 @@
+{
+  "status": "PASS_CPU_PARAMETER_SCREEN",
+  "source_sha256": "b97da2a2dca99c0d227989816997daa62fe0d827d6dcae7268a73850ee4948fb",
+  "single_job_variable": "--hicache-size 32 -> 64 decimal GB/rank",
+  "tp": 8,
+  "incremental_host_budget_bytes": 256000000000,
+  "total_new_host_budget_bytes": 512000000000,
+  "cgroup_limit_bytes": 1620276412416,
+  "cgroup_current_bytes": 637739372544,
+  "conservative_reserve_bytes": 68719476736,
+  "source_helper_probe": {
+    "32": {
+      "kv_sidecar_gb": 20.140368384,
+      "mamba_gb": 11.859631616000001,
+      "kv_only_gb": 17.840603136,
+      "full_tokens_proxy": 1451904
+    },
+    "64": {
+      "kv_sidecar_gb": 40.280736768,
+      "mamba_gb": 23.719263232000003,
+      "kv_only_gb": 35.681206272,
+      "full_tokens_proxy": 2903808
+    }
+  },
+  "expected_full_host_tokens_inclusive": [
+    2903744,
+    2903808
+  ],
+  "limitations": "Source sizing helpers with pool proxies; no allocation or performance measurement. Memory is a snapshot. Startup must verify both host pools and unchanged device KV=1397760, Mamba=418."
+}

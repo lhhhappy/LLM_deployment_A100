@@ -4,26 +4,20 @@
 当前单人优化SGLang，优先完整N30和四类TTFT；vLLM暂缓。允许偶尔独立代码审查。
 用户提供线上榜单参照：N@SLO30、TPOT均值.046204、TPM1,557,557.2、decode TPM19,434；本地未过门样本不可直接排名。
 
-## 当前轮：068运行；067已完整归档（2026-09-24）
+## 当前轮：068已归档；069准备扩host容量（2026-09-24）
 
-- 067：正式A + mem0.87 + 新版180 + 修复122；引擎759a6eb、工具296caaa，对应正式46174/0924d。
-- 311链/5601请求每条恰好一次，原预算/gap一致、0错误，真flush；独立review复算通过。VALID FAIL，仅四类TTFT失败。
-- 四桶p95 fast/overall/turn/chain = 7.6457/8.5156/25.0138/93.7016秒；超标/允许 = 492/263、401/276、14/13、55/29。
-- TPOT均值/p95 .033498/.067469；固定[10,70)分钟TPM 2,787,756.35、decode 29,805.45。全部只是本地冻结集结果。
-- 完整[判定](../../evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json)、[616个唯一坏例](../../evidence/L067-official_b_full_n30_shortwarm/N30/ttft-cases.csv)、[绑定哈希](../../evidence/L067-official_b_full_n30_shortwarm/N30/case-list-manifest.json)。
-- 455/492 fast坏例在前60分钟；97.88分钟后余链<30，尾段不是满N30。N30已用启动实参与raw链区间核对。
-- 偏置样本8条慢fast有真实prompt LCP与cached差额，不能证明有效混合检查点曾存在；详细溯源见[报告](../reports/sglang-shortwarm-mainline-0924.md)。
-- 068唯一引擎变化：PACE .085→0；同源码/数据/N30/rep16/真flush。检验122整体，不只解释为某一预算参数。
-- CPU真实调度47项通过，独立review认为设计成立；新工具增加已有HiCache分层指标并收紧预热校验，记录观测开销不确定性。
-- 068工具e77933d已部署（queue-20260924T173137-86399，RUNTIME_DEPLOYED、DONE rc=0），队列恢复；watch068和桥PID88265健康，实际measurement消息已送达。
-- 068实际122off/180on与G_EXPECT一致，KV容量1,397,760与067相同；启动165s、rep16预热114.722s，17:38:55 UTC真flush后进入测量。
-- 068第106分钟快照4938条，唯一、0错误、预算/gap/时间戳复核通过，前3114条原样保留；四桶p95 10.23/11.12/20.88/100.38秒，TPOT .03725/.07402。
-- fast/overall/chain累计超标461/410/50超过全量CP允许263/276/29；turn为13，仍可能按全量余量通过。整档未闭合，不预测官方。
-- 同ID子集fast超标492→461、overall401→410、turn14→13、chain55→50；TPOT p95 .06916→.07402。有选择/时序偏差，终态再比较完整收益。
-- 已完成293/311链，剩18链；99.02分钟起剩链<30，尾段不能当满N30。[105分钟检查证据](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/check105/)。
-- lc139:0002在两轮均零命中且等待数分钟，关闭122未消除此例。下一步仍查混合状态保留/恢复及准入，不能仅凭LCP差额归因淘汰。
-- 继续跑到终态；若未结束，下一检查19:54:14 UTC。全量取回后用compare_runs --cohort data/s1-dev-longchain/cohort.json --no-pairs核对全部同ID，不加载旧T56账本。
-- 067的16条预热101.696秒，预算严格核对通过；无70分钟截止、未因局部FAIL停止。
+- 067/068同引擎759a6eb、mem0.87、新版180、MTP、311链/5601请求N30；068只关122。两轮每条恰好一次，0错误、原预算/gap一致、真flush，独立review通过。
+- 067 VALID FAIL，四TTFT失败；068 VALID FAIL，fast/overall/chain失败，其余8门CP通过。turn13/13对统计方法敏感，Wilson允许12；不能当稳健胜出。
+- 068 p95 fast/overall/turn/chain=8.3800/9.6509/20.8841/100.3816秒；超标/允许461/263、410/276、13/13、50/29。
+- TPOT均值/p95：067 .033498/.067469 → 068 .034262/.072501；固定稳态TPM 2.788M→2.733M，关闭122未见整体优势。
+- 唯一TTFT坏例616→589；fast修复282新增251、overall修复251新增260。完整[对照](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.txt)、[589坏例](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/ttft-cases.csv)、[哈希](../../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/case-list-manifest.json)；详见[experiments](../experiments.md)。
+- FULL host占用中位99.903%，744样本中97.45%≥98%；只覆盖FULL，不含KDA host。evicted_tokens_total是device淘汰，dropped=0不排除host churn。
+- lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束至执行326.57→301.78秒。真LCP不证明有效混合检查点存在；保存/淘汰/恢复原因未知。
+- 下一069以068为基线，只改host预算32→64GB/rank，保持122off；测试容量假设，不把122off当最佳配置。KV/indexer与KDA host一起扩，8卡+256GB主机内存；CPU尺寸函数/内存余量筛查通过，独立review支持。
+- 069源码759a6eb，冻结集manifest 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c，rep16/真flush/全量N30不变。准备部署，尚无新测量结果。
+- 启动需核对device KV=1,397,760、KDA=418不变，host FULL约2.904M token、KDA约23.72GB；CPU估计不能代替实际收据。
+- 同ID跟踪缓存量、等待/执行、prefill批与全部11门；容量无收益再补定向事件trace。缓存命中改善也不能忽略新坏例/TPOT回退。
+- 068在99.02分钟后剩链<30，最后排空段不代表满N30；不拿尾窗好看抵消全量失败。
 
 ## 已发现问题与处理边界
 
@@ -39,7 +33,7 @@
 
 | 假设 | 需要什么证据 | 下一步 |
 | --- | --- | --- |
-| 缓存能减少工作量（当前优先） | 8条偏置坏例已证实真LCP与cached有大差额；不能证明有效状态曾存在 | 查保存/淘汰/搬回事件，缺证据则下轮加定向trace |
+| 缓存能减少工作量（当前优先） | 全程FULL host高占用与重复缺口；尚不能归因淘汰 | 069先做容量干预，无收益再定向trace |
 | 准入/批形成拖慢TTFT | 同请求recv→exec与actual prefill块；冷续块/短命中同批情况 | 复现调度反例，先CPU验证 |
 | 执行单位成本偏高 | 长链exec→first分解；同形状块成本、MoE与通信时间 | 测成本曲线，评估A内实现 |
 | 122节奏过保守 | 解码余量与冷请求等待同步变化；forced-decode/实际块 | 校准成本模型，仍守TPOT尾部 |
@@ -47,7 +41,7 @@
 
 ## 观测与溯源
 
-- GPU仓库：evidence/L<job>/window/保存健康与窗口原始证据；067已终态归档。
+- GPU仓库：evidence/L<job>/window/保存健康与窗口原始证据；067/068已终态归档。
 - 常规查询：window_watch.sh <job> --status --changes-only。
 - 每分钟后台健康采样；前台只看变化与到点诊断。原始日志按请求/时间段读取，不进入常驻上下文。
 - 每个run使用window_watch采样和本地window_notify桥接；后台轮询缓存，仅诊断/状态/异常变化唤醒当前会话。

@@ -4,6 +4,41 @@
 
 ## 当前开发集对照
 
+### 068：关闭122，全量长链N30（2026-09-24，Codex，独立复核通过）
+
+相对067唯一引擎变化为PACE .085→0，同源码759a6eb、mem0.87、新版180、MTP与32GB/rank HiCache。
+关闭122同时恢复固定decode interval=2与冷块4096，不能把差异归给单一预算常数。
+工具e77933d增加已有HiCache指标、收紧预热校验；采样仍10秒，观测开销没有单独量化。
+同rep16计划预热114.722秒、真flush，完整311链/5601条每条恰好一次，原预算/gap一致，0错误。
+约125分钟完成，原harness复算 **VALID FAIL**：三道TTFT失败，其余8门按当前CP通过。
+
+| 门 | 样本 | p95秒 | 超标 / CP允许 | 结果 |
+|---|---:|---:|---:|---|
+| fast_intra | 4765 | 8.3800 | 461 / 263 | FAIL |
+| overall_intra | 5010 | 9.6509 | 410 / 276 | FAIL |
+| turn_start | 159 | 20.8841 | 13 / 13 | PASS（方法敏感） |
+| chain_start | 432 | 100.3816 | 50 / 29 | FAIL |
+| TPOT | 5601 | .072501 | 4条超过.10 | PASS |
+
+TPOT均值.034262；固定[10,70)分钟TPM 2,733,104.87、decode 29,532.55，窗口有效。
+turn_start按CP/Wald通过、Wilson允许12故失败；整档所有方法均FAIL，不当作稳健过门或官方预测。
+
+全部5601条同ID比较：fast修复282/新增251，overall251/260，turn7/6，chain19/14。
+唯一TTFT坏例616→589，但fast/overall/chain的p95和TPOT均回退，关闭122没有整体优势证据。
+测量内部prefill批7178→9707、new tokens约32.81M→30.98M、partial-only2847→5168；更少工作量没有兑现为整体延迟收益。
+缓存总量361.26M→363.08M，不能由这一个对照独立区分缓存、到达时序和调度的作用。
+
+068测量窗744个样本：FULL host占用中位99.903%，97.45%样本≥98%。这只是FULL KV，不含KDA host；
+`evicted_tokens_total`计device KV淘汰，不能当作host淘汰；write_through下dropped=0也不排除host churn。
+lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束到执行326.57→301.78秒，不能只用45.82秒发送gap推测状态寿命。
+真实LCP证明有可复用文本，不证明有效混合检查点存在、被淘汰或恢复成功。589条唯一坏例已冻结，下一轮逐ID跟踪。
+
+069以068为基线，只扩host预算32→64GB/rank，122继续off；检验总host容量干预，不宣称已经定位缓存淘汰bug。
+KV/indexer与KDA host份额一起增加，8卡总预算256→512GB，GPU池预算不变；CPU源码尺寸函数与cgroup余量筛查通过。
+实际容量、启动、短预热与flush必须再次核对；容量无收益再补定向保存/淘汰/恢复trace。独立参与者复核全量原始数据后支持此设计，无阻断问题。
+
+证据：[完整判定](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/level_verdict.json)、[5601条对照](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.csv)、[对照摘要](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.txt)、[589条坏例](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/ttft-cases.csv)、[哈希](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/case-list-manifest.json)、[指标口径](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/cache-runtime-summary.json)、[069预算筛查](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)。
+
 ### 067：组合全量长链N30（2026-09-24，Codex）
 
 正式A + mem0.87 + 新版180 + 修复122，MTP保留；引擎759a6eb、运行工具296caaa。

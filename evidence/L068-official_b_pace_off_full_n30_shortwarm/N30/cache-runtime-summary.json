@@ -1,0 +1,93 @@
+{
+  "scope": "measurement-time samples; warmup excluded, counters may aggregate TP ranks",
+  "first_t": 1790271562.8,
+  "last_t": 1790279025.6,
+  "stats": {
+    "hicache_host_used_tokens": {
+      "n": 744,
+      "min": 52736.0,
+      "median": 1450496.0,
+      "max": 1451776.0
+    },
+    "hicache_host_total_tokens": {
+      "n": 744,
+      "min": 1451904.0,
+      "median": 1451904.0,
+      "max": 1451904.0
+    },
+    "full_token_usage": {
+      "n": 744,
+      "min": 0.0,
+      "median": 0.8090430402930403,
+      "max": 0.9976648351648352
+    },
+    "mamba_usage": {
+      "n": 744,
+      "min": 0.0,
+      "median": 0.20334928229665072,
+      "max": 0.29904306220095694
+    },
+    "num_queue_reqs": {
+      "n": 744,
+      "min": 0.0,
+      "median": 0.0,
+      "max": 26.0
+    },
+    "num_retracted_reqs": {
+      "n": 744,
+      "min": 0.0,
+      "median": 0.0,
+      "max": 0.0
+    },
+    "host_occupancy": {
+      "n": 744,
+      "median": 0.9990302389138676,
+      "fraction_ge_98pct": 0.9744623655913979
+    }
+  },
+  "counter_start": [
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 7096320.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 1824.0
+    }
+  ],
+  "counter_end": [
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 261255168.0
+    },
+    {
+      "name": "hicache_backup_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 129880.0
+    },
+    {
+      "name": "evicted_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\"}",
+      "value": 405270528.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"kv\"}",
+      "value": 159602688.0
+    },
+    {
+      "name": "load_back_tokens_total",
+      "labels": "{cache_type=\"UnifiedRadixCache\",pool=\"mamba\"}",
+      "value": 13376.0
+    }
+  ],
+  "metric_scope_notes": {
+    "hicache_host_used_tokens": "FULL KV only; does not measure Mamba host pool occupancy",
+    "evicted_tokens_total": "device KV eviction; not host eviction",
+    "hicache_dropped_tokens_total": "zero in write_through does not exclude host churn",
+    "pool_mamba_counters": "state slots, not KV tokens; retain pool labels"
+  }
+}

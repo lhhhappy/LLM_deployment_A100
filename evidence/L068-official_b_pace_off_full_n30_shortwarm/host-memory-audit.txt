@@ -1,0 +1,2 @@
+{"meminfo": {"MemTotal": 2163293720576, "MemAvailable": 1805770108928, "Mlocked": 163840, "Unevictable": 163840}, "cgroup": {"/sys/fs/cgroup/memory/memory.limit_in_bytes": "1620276412416", "/sys/fs/cgroup/memory/memory.usage_in_bytes": "637739372544"}}
+exit_code: 0

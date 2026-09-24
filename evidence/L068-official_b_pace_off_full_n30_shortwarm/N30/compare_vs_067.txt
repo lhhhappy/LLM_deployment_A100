@@ -1,0 +1,22 @@
+== N30 vs evidence/L068-official_b_pace_off_full_n30_shortwarm/N30: 5601 requests each, same ids
+  base: VALID passed=False tpot 0.0335/0.0675 | fast_intra:492/263(p95 7.65) overall_intra:401/276(p95 8.52) turn_start:14/13(p95 25.01) chain_start:55/29(p95 93.70)
+  cand: VALID passed=False tpot 0.0343/0.0725 | fast_intra:461/263(p95 8.38) overall_intra:410/276(p95 9.65) turn_start:13/13(p95 20.88) chain_start:50/29(p95 100.38)
+  fast_intra (> 3 s, per-request limit): base 492 cand 461 | fixed 282 {'cache more': 148, 'wait': 117, 'cache less': 17} | new 251 {'wait': 143, 'cache less': 99, 'cache more': 8, 'run': 1}
+      wait: p50 0.31 -> 0.27 | p95 5.55 -> 5.80
+      run: p50 0.27 -> 0.26 | p95 1.48 -> 1.23
+  overall_intra (> 5 s, per-request limit): base 401 cand 410 | fixed 251 {'cache more': 138, 'wait': 99, 'cache less': 14} | new 260 {'wait': 131, 'cache more': 16, 'cache less': 110, 'run': 3}
+      wait: p50 0.31 -> 0.27 | p95 6.33 -> 6.87
+      run: p50 0.28 -> 0.27 | p95 1.99 -> 1.80
+  turn_start (> 15 s, per-request limit): base 14 cand 13 | fixed 7 {'wait': 3, 'cache more': 2, 'cache less': 2} | new 6 {'cache less': 3, 'wait': 3}
+      wait: p50 0.38 -> 0.32 | p95 17.55 -> 13.40
+      run: p50 0.67 -> 0.53 | p95 9.98 -> 10.98
+  chain_start (> 30 s, per-request limit): base 55 cand 50 | fixed 19 {'wait': 16, 'cache less': 1, 'cache more': 2} | new 14 {'wait': 7, 'cache less': 5, 'cache more': 2}
+      wait: p50 0.34 -> 0.29 | p95 91.36 -> 95.84
+      run: p50 0.92 -> 1.02 | p95 13.24 -> 13.72
+  LCP gap (T56 pairs, unverified source, diagnostic only): metadata-checked 0, rejected 0, no pair (unknown) 5601 of 5601; workload identity ('s1-dev-longchain', '2b6321a87d500375', None, '19bd577a8e042d2b')
+  prefill lines excluded: before/after the window base 111 cand 204, in boundary seconds base 1 cand 1
+  tpot per request > 0.10: 0 -> 4
+  cached tokens total: 361.26M -> 363.08M; requests with |delta cached| >= 1024: 771
+  base prefill batches 7178 {'<=8k': 3614, '<=2k': 2793, '<=4k': 771} | tokens 32.81M | partial alone 2847
+  cand prefill batches 9707 {'<=8k': 1203, '<=4k': 5501, '<=2k': 3003} | tokens 30.98M | partial alone 5168
+wrote 5601 rows to evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.csv

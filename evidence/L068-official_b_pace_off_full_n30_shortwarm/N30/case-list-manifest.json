@@ -1,0 +1,21 @@
+{
+  "scope": "complete VALID N30 candidate 068; baseline for host-capacity test 069",
+  "rows": 5601,
+  "unique_bad_requests": 589,
+  "gate_overs": {
+    "chain_start": 50,
+    "fast_intra": 461,
+    "overall_intra": 410,
+    "turn_start": 13
+  },
+  "raw_sha256": "a058e7b12d933f5522494937cf7f66781a0169f3682f6da5fe9b538f40c2a9e0",
+  "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "cohort_sha256": "60799f7856cd5c08685ac11f0d6e452fa4de05dd3518d13c22b2030c09e75ed6",
+  "requests_sha256": "060fecce235ee4c1437230ad9e88a879eecf2b239c33af91dc3e0bc091c453e9",
+  "original_output_budgets_match": true,
+  "output_tokens_match": true,
+  "timestamps_monotonic": true,
+  "errors": 0,
+  "bucket_membership_overlaps": "fast_intra is included in overall_intra",
+  "comparison": "same frozen workload, same N and warmup; pair all 5601 requests, report fixed and new bad cases"
+}

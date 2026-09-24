@@ -213,3 +213,20 @@ canonical仅在run和cohort都缺失/None时允许省略；非空字符串必须
 新增--no-pairs用于当前长链完整对照，避免默认使用旧T56和64-token对齐的LCP账本。名单/节拍身份检查不代表正文hash验证，也不替代独立档位评分。
 18项CPU回归和另一参与者独立复核通过，包括真实067的5601条自比较全桶fixed/new=0、缺hash/假canonical/名单重排/同链gap交换拒绝。
 这是本地分析工具修复；原run元数据、评分器、当前Pod均不修改。自比较输出已保存check105/comparison-tool-selfcheck.txt。
+
+
+## 068终态与069容量干预
+
+068全量5601条、0错误，原harness及另一参与者独立复算均确认VALID FAIL。完整数字和同ID比较归档在[experiments](../experiments.md)，589条唯一TTFT坏例固定，不在本页重复长表。
+关闭122未见整体优势：较少重算token但更多prefill批，三类TTFT p95与TPOT回退。turn13/13只是CP/Wald余量通过，Wilson不通过；整档结论无歧义。
+
+缓存证据口径纠正：host_used/total仅FULL KV；evicted_tokens_total源码定义为device KV淘汰，不能从标签推为host；write_through的dropped=0不能排除host淘汰。
+068完整测量744样本FULL host占用中位99.903%，97.45%≥98%。高占用是LRU常见现象，只支持容量干预的动机，不能证明瓶颈。
+lc139:0002前驱结束到发送约45.82秒，但到执行实际326.57→301.78秒；cached0仍有未建检查点、淘汰、恢复失败等多种解释。现有日志无法区分。
+
+下一069仅将068的hicache-size 32→64GB/rank，122继续off，source759a6eb、mem0.87、全量N30、rep16、flush不变。
+这是同时扩大KV/indexer与KDA host的总容量干预，不能进一步把收益拆到某一池。
+8卡host名义预算256→512GB。当前cgroup约637.74GB/1620.28GB，主机MemAvailable约1805.77GB；连“当前占用+整份新512GB+64GiB余量”的保守CPU检查也通过，但快照不保证未来峰值。
+执行真实源码的拆分/sidecar尺寸函数并核对新旧job只有该参数不同；[CPU收据](../../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)不是实际大内存分配或速度测量。
+启动核对device KV1,397,760与KDA418不变、两类host容量增加；完整比较同ID坏例、缓存/重算、等待/执行、TPOT及11门。
+独立复核支持此设计，无阻断理由；若容量干预不能缓解重复缺口，再补节点发布/备份、两级淘汰、匹配、恢复/回退定向trace。
