@@ -476,6 +476,27 @@ if envs.SGLANG_ENABLE_REQUEST_DECOMPRESSION.get():
 
     app.add_middleware(RequestDecompressionMiddleware)
 
+
+
+class _ArenaRecvTimeMiddleware:
+    """[arena D0] Stamp the server-side receive time (perf_counter, the same
+    clock domain as req_time_stats.created_time) at ASGI entry, before FastAPI
+    reads and parses the JSON body. /generate uses it as ``received_time`` so
+    ``request_received_ts`` does not exclude body-parsing time."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") == "http":
+            scope["arena_recv_perf"] = time.perf_counter()
+        await self.app(scope, receive, send)
+
+
+# Added after CORS/decompression; later-added middlewares (e.g. metrics or
+# API-key) wrap outside it, which only adds their negligible time.
+app.add_middleware(_ArenaRecvTimeMiddleware)
+
 # Include routers
 from sglang.srt.entrypoints.v1_loads import router as v1_loads_router
 
@@ -907,6 +928,8 @@ if os.environ.get("DUMPER_SERVER_PORT") == "reuse":
 )
 async def generate_request(obj: GenerateReqInput, request: Request):
     """Handle a generate request."""
+    # [arena D0] server receive time from the ASGI entry stamp.
+    obj.received_time = request.scope.get("arena_recv_perf")
     if envs.SGLANG_ENABLE_REQUEST_HEADER_OVERRIDES.get():
         apply_header_overrides(obj, request.headers)
     if obj.stream:
@@ -982,15 +1005,14 @@ async def classify_request(obj: EmbeddingReqInput, request: Request):
 async def flush_cache(timeout: float = Query(0.0, ge=0.0)):
     """Flush the radix cache."""
     ret = await _global_state.tokenizer_manager.flush_cache(timeout_s=timeout)
-    if ret.success:
-        content = (
-            "Cache flushed.\nPlease check backend logs for more details. "
-            "(When there are running or waiting requests, the operation will not be performed.)\n"
-        )
-    else:
-        content = ret.message or "Flush cache failed.\n"
-    return Response(
-        content=content,
+    # [arena D0] task.md requires 2xx + JSON {"success": true}; failures are
+    # reported honestly as 400 + {"success": false}.
+    return ORJSONResponse(
+        content={
+            "success": bool(ret.success),
+            "message": ret.message
+            or ("Cache flushed." if ret.success else "Flush cache failed."),
+        },
         status_code=200 if ret.success else HTTPStatus.BAD_REQUEST,
     )
 

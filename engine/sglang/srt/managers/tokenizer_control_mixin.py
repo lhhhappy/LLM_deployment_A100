@@ -305,12 +305,19 @@ class TokenizerControlMixin:
         self: TokenizerManager, timeout_s: Optional[float] = None
     ) -> FlushCacheReqOutput:
         self.auto_create_handle_loop()
-        result = (
-            await self.flush_cache_communicator(FlushCacheReqInput(timeout_s=timeout_s))
-        )[0]
-        if result.success and self.mm_processor is not None:
+        results = await self.flush_cache_communicator(
+            FlushCacheReqInput(timeout_s=timeout_s)
+        )
+        # [arena D0] Succeed only if EVERY worker flushed (was: results[0] only,
+        # which could mask another DP worker's failure). No responses = failure.
+        success = len(results) > 0 and all(r.success for r in results)
+        failed = [f"worker{i}: {r.message or 'failed'}"
+                  for i, r in enumerate(results) if not r.success]
+        message = "; ".join(failed) if failed else (
+            "" if results else "no worker responses")
+        if success and self.mm_processor is not None:
             self.mm_processor.clear_preprocess_cache()
-        return result
+        return FlushCacheReqOutput(success=success, message=message)
 
     async def clear_hicache_storage(self: TokenizerManager) -> ClearHiCacheReqOutput:
         """Clear the hierarchical cache storage."""
