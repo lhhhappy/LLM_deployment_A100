@@ -68,3 +68,19 @@
 - 修复清缓存失败仍测量、多档取证混文件、吞 runner/verdict 退出码及引擎复用缺日志；原 runner/harness 只读，CP 主评分不改，替代区间只输出敏感性。13个CPU回归用例通过，本地脚本语法检查通过。
 - 035–042共10个完整档逐项比较修改前后主评分报告，全部一致，仍均FAIL；037d只有chain对区间方法敏感，TPOT仍FAIL。此次回归只验证分数不变，不伪造旧归档缺失的run_dev.log。[评分回归](../evidence/eval-tools-audit-20260924/score-regression.json)
 - Fable评估中的冻结缓存归因、TPM推产能、驻留覆盖及正式门难度等旧判断已直接更正文；旧044/045同配置校准作废，使用044r/045r的完整重跑。没有同步pod、入队、打镜像或提交。[审计修复](fable-审计-2026-09-24.md)、[评估正文](fable-评估-2026-09-24.md)
+
+## 047：正式A原样 dev N22（2026-09-24，Codex）
+
+问题：保持正式A的13补丁、参数与环境变量，只把原开发集回放并发设为22，给122/执行层候选建立当前对照；无profiler。启动KV池1,036,288 token，12题冒烟12/12。完整回放722条、0请求错误、VALID；主会话取回raw/run/清缓存receipt与服务日志后，使用原harness及题面统计余量独立重判，与pod一致。
+
+| 门 | p95 | 超标 / 允许 | 判定 |
+|---|---:|---:|---|
+| fast TTFT | 5.2276s | 33 / 23 | FAIL |
+| overall TTFT | 10.8031s | 55 / 27 | FAIL |
+| turn TTFT | 39.3831s | 2 / 3 | PASS（统计余量） |
+| chain TTFT | 93.0873s | 73 / 22 | FAIL |
+| TPOT | mean .061976、p95 .087032 s/token | 8/722条 > .10 | PASS |
+
+其余硬门通过，整档有效FAIL；所查三种统计区间对本轮结论无敏感门。测量raw时间跨度1171.7s，TPM因未覆盖其规定窗口为null，不填外推值。此结果仍只代表原开发集，不预测正式N22。首token是本轮过门的重点；首执行前等待不能直接归因调度，需同请求、缓存与batch证据。048只加新版122，重点考察能否改善TTFT而守住TPOT；171/172另做真实TP8数值筛选。
+
+[完整归档与复算](../evidence/L047-official_a_n22/N22/)、[11门判定](../evidence/L047-official_a_n22/N22/level_verdict.json)、[逐请求坏例](../evidence/L047-official_a_n22/N22/badcases.csv)、[下载SHA与文件清单](../evidence/L047-official_a_n22/N22/fetch_status.json)。服务端与本地复算一致；失败原因归因仍待与048配对。

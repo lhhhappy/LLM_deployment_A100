@@ -8,8 +8,8 @@
 |---|---|---|
 | 044r / 045r | 正式 A@dev N14 / B@dev N10 校准 | 完成；各722条，主会话重新调用评分器复算一致，均有效FAIL；见 experiments.md 与 evidence/coordination-20260924/calibration-recheck.json |
 | 046r | S1@N22 混合 profile | 已自然结束进入done；两段TP0/TP4共4份trace已复算；仅诊断，不作判档/性能对照 |
-| 047-official_a_n22 | 正式 A 原样、原开发集 N22，不开 profiler | 已启动；13补丁/参数/env与正式A一致，能力冒烟12/12，KV池1,036,288 token；完整回放中 |
-| 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 已入队；冻结SHA cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b；独立审查未见阻断缺陷，39项CPU测试通过；看全部11门、实际块长、guard、TP同步和KV压力 |
+| 047-official_a_n22 | 正式 A 原样、原开发集 N22，不开 profiler | 完成且独立复算一致：722条VALID FAIL；TPOT .0620/.0870通过，fast33/23、overall55/27、chain73/22失败；13补丁/参数/env一致，冒烟12/12、KV池1,036,288。完整证据evidence/L047-official_a_n22/N22/ |
+| 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 正在运行；冻结SHA cefdb2688cbc291742fc3c3ad188e343420fad01407d172f164ca6746d712d3b；独立审查39项CPU测试通过；主要看能否改善047的TTFT失败并守住TPOT，核实际块长/guard/TP同步/KV压力 |
 | 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 已入队；非整齐长度、64k前缀尝试、MTP/decode图、融合路径日志与容量；不是逐层状态验收、能力门或SLO成绩 |
 | 050-official_a_172_num | 正式A与A+172各两次真实TP8输出/logprob初筛 | 已入队；正式A+172 fuzz0应用与独立脚本审查通过；数值对照后另录单请求trace，核对8个rank实际融合kernel；不是延迟/SLO对照 |
 

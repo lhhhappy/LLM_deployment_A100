@@ -1,0 +1,28 @@
+== raw_dev-combined-v1_N22_1790223788.jsonl: 722 requests, wall 1172 s, 2302 prefill batches logged in the window
+prefill batches >=8192 new tokens: 52; of these with requests decoding and an EMPTY queue: 4 (8%)
+prefill new tokens in window: 9.92M
+
+== TPOT: 8/722 requests > 0.10 s/token (1.1%); mean 0.0620, p95 0.0870
+  output tokens [0,100): 2/80 over (2%)
+  output tokens [100,300): 6/506 over (1%)
+  output tokens [300,1000): 0/104 over (0%)
+  output tokens [1000,inf): 0/32 over (0%)
+  prompt tokens [0,16384): 0/76 over (0%)
+  prompt tokens [16384,65536): 5/498 over (1%)
+  prompt tokens [65536,131072): 2/122 over (2%)
+  prompt tokens [131072,inf): 1/26 over (4%)
+  worst minutes (first token, UTC): 04:24 3/35, 04:25 2/37, 04:30 1/27, 04:37 1/48, 04:40 1/14
+  during their decode: prefill batches p50 41, big chunks p50 1, prefill tokens p50 188k
+   0.115 s/tok out=34 prompt=252115 decode 3.8 s: 14 prefill batches (1 >=8192)
+   0.114 s/tok out=170 prompt=38132 decode 19.3 s: 41 prefill batches (0 >=8192)
+   0.110 s/tok out=177 prompt=22565 decode 19.4 s: 44 prefill batches (1 >=8192)
+   0.104 s/tok out=242 prompt=35309 decode 25.1 s: 53 prefill batches (0 >=8192)
+   0.104 s/tok out=59 prompt=51873 decode 6.0 s: 15 prefill batches (1 >=8192)
+
+== TTFT gate overs (harness buckets)
+  fast_intra: 33/328 over | recv-to-exec p50 4.3s exec-to-first p50 0.7s | frozen excess >4096 (not verified cache loss) 12
+  overall_intra: 55/388 over | recv-to-exec p50 7.9s exec-to-first p50 1.4s | frozen excess >4096 (not verified cache loss) 12
+  turn_start: 2/20 over | recv-to-exec p50 36.7s exec-to-first p50 7.4s | frozen excess >4096 (not verified cache loss) 2
+  chain_start: 73/314 over | recv-to-exec p50 48.0s exec-to-first p50 3.5s | frozen excess >4096 (not verified cache loss) 27
+
+wrote 171 rows to /workspace/Agentic_science_challenge/evidence/L047-official_a_n22/N22/badcases.csv
