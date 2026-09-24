@@ -48,4 +48,12 @@ Claude：先交接当前 pod/开发机占用、已入队任务、尚未同步的
 - 数据：body_ref与冻结校验缺陷已修，独立负对照已拒绝；最终重建成品尚待验收。[报告](reports/review-data-sol.md)
 - 122：冻结版本独立39项CPU测试通过，未见阻断048的确定性缺陷。[报告](reports/review-scheduler-sol.md)
 - 171/172：未发现171加载阻断问题；172比较器Inf符号和数值审计臂标签问题已修，M256固定路由新旧实现逐位一致，单卡成本约快3–5%，可进入TP8筛选。[报告](reports/review-kernels-sol.md)
-- 047/048已完成并独立复算。048使fast转过，overall/chain改善但仍失败，TPOT守住；保留122候选，不据单轮宣布正式晋档。049正在运行，050待运行，详见queue.md。Claude优先读主会话已取回证据，报告只发里程碑，避免重复大包下载；124、DCP和新组合暂缓。
+- 047/048已完成并独立复算。048使fast转过，overall/chain改善但仍失败，TPOT守住；保留122候选，不据单轮宣布正式晋档。049/050均已在原版重复自检失败退出（13/16、15/16），两个算子候选都未加载；051已复现基线首token不稳定，052已发起逐层定位，详见queue.md。Claude优先读主会话已取回证据，报告只发里程碑，避免重复大包下载；124、DCP和新组合暂缓。
+
+## 队列主动监控（049/050漏报后修正）
+
+主会话负责从入队跟踪到结果处理，不能把“已入队”当作交付。常驻入口为 `python3 -u scripts/pod/watch_queue.py`，每60秒只读检查队列，任务新出现/状态变化、读取故障及恢复通知主会话；持久待送箱保留失败通知，历史failed不重复播报。运行锁、PID、heartbeat、通知状态见忽略目录 `build/scratch/coordination/queue-watch/`。脚本不会启动/停止引擎或修改队列。
+
+2026-09-24 05:58 UTC主会话已真实收到 `--notify-test` 消息；`--once`读取70个job并建立健康快照；后台监控已启动（PID及日志以运行目录为准）。CPU 9项测试通过，包括真实pread返回尾行、快速失败与通知重试。终端进程/relay重启可能使注册过期，通知保留待送；主会话每轮工作开始同时检查heartbeat和未送通知。通知送达后主会话主动读日志、定位、安排必要修复，不要求用户追问，不把内部排障移交Claude。
+
+GPU常驻记录层已于06:04 UTC启动并核对到持续heartbeat：`/sjtu/linhang/arena/repo/scripts/pod/watch_queue.py --gpu-record`，状态及事件在该repo的 `build/scratch/coordination/queue-watch-gpu/`。GPU记录层通过本机common.sh+bexec只读查询pod，不依赖本地SSH连接；本地watcher仍负责向主会话送消息。051完成通知已真实触发并处理。GPU记录层只记状态，不擅自重跑、放宽门或切换引擎。

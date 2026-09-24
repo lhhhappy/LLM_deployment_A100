@@ -1,0 +1,54 @@
+SCREEN_ONLY 172 real TP8; prefix=65536 lengths=33,37,63,65,256,1024,4096,8192,16384
+/tmp/ax/patches/172-moe-clamped-swiglu.patch: OK
+48616102b7b9e74e15f575330ec8c268eca490dab829e3083ac508e07900c12b  /tmp/ax/verify_kit/numcheck.py
+11438faf8f1c3ea5a5a0a091aa45376607739dd45c01be471004e936f1623482  /tmp/ax/verify_kit/numcheck_cmp.py
+src off_a_kernelref: 000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch 150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch sig=5a359e41c183750a
+PATCH_SHA e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6  000-interface-compliance.patch
+PATCH_SHA 0f6ee401c8bafd6d3c62f18a33545e1a777140eb9df53774029b60ae0a3694e0  101-role-boundary-split.patch
+PATCH_SHA a2c9f92d8a0abc96eaec515e6afa216a8ffa98037431748c1e0f846b66a03174  106-defer-chunk-on-no-kv.patch
+PATCH_SHA 6a592ffc62b655c91672d2c31d76d2ecf9bbc3526a6f86f95ff28907522c5360  110-sm80-dsa-indexer.patch
+PATCH_SHA 67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a  111-sm80-fp8-moe-marlin.patch
+PATCH_SHA 70c078d01b17c3d1051e18f31253dd0beab0f58b642599978d4630fcd7352a9c  114-indexer-row-shard.patch
+PATCH_SHA ef1744b3a51c2ee87fc0ceb858a04cca078c4720ad50b16ff7498a1b0ee7eb1a  120-sched-protect-chain.patch
+PATCH_SHA dee943778854ba4d19c804fcee9070338e9f6eb51529b30d658b13e8c0f5faa0  121-sched-cap-while-decoding.patch
+PATCH_SHA d48bf2a2d8a4c4daf68981aefdbc1646cf2d36b986ebf610f41e377a60ba2380  130-async-tokenize.patch
+PATCH_SHA 1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35  140-kda-dual-snapshot.patch
+PATCH_SHA 3d53476f8d94262e55241bb2295e3b9b96fb0ffc243469aaef9541d4169f20af  150-startup-warmup.patch
+PATCH_SHA 3547ff7d6d583b5ca19e0474a9ed0bd3fff3a355d5298868ee9f83ee96000a40  160-nextn-sm80.patch
+PATCH_SHA 48eeac6b956102d4394ace56e6fbbed343082b060b9aefd9548f73cc644320d5  170-glm-bcg-prefill.patch
+ENGINE_REUSED: off_a_kernelref 5a359e41c183750a | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_COLD_CAP=4096 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 
+NUMCHECK_DONE 16
+src off_a_kernelref: 000-interface-compliance.patch 101-role-boundary-split.patch 106-defer-chunk-on-no-kv.patch 110-sm80-dsa-indexer.patch 111-sm80-fp8-moe-marlin.patch 114-indexer-row-shard.patch 120-sched-protect-chain.patch 121-sched-cap-while-decoding.patch 130-async-tokenize.patch 140-kda-dual-snapshot.patch 150-startup-warmup.patch 160-nextn-sm80.patch 170-glm-bcg-prefill.patch sig=5a359e41c183750a
+PATCH_SHA e0d7924989ebb538e331110f4458ccd4e95a0bfa3cbd87dfb8324ac0328960f6  000-interface-compliance.patch
+PATCH_SHA 0f6ee401c8bafd6d3c62f18a33545e1a777140eb9df53774029b60ae0a3694e0  101-role-boundary-split.patch
+PATCH_SHA a2c9f92d8a0abc96eaec515e6afa216a8ffa98037431748c1e0f846b66a03174  106-defer-chunk-on-no-kv.patch
+PATCH_SHA 6a592ffc62b655c91672d2c31d76d2ecf9bbc3526a6f86f95ff28907522c5360  110-sm80-dsa-indexer.patch
+PATCH_SHA 67e358bb9e52da343f0848b6fe96c778e6473efcd32f9df450213c6dcfb7d26a  111-sm80-fp8-moe-marlin.patch
+PATCH_SHA 70c078d01b17c3d1051e18f31253dd0beab0f58b642599978d4630fcd7352a9c  114-indexer-row-shard.patch
+PATCH_SHA ef1744b3a51c2ee87fc0ceb858a04cca078c4720ad50b16ff7498a1b0ee7eb1a  120-sched-protect-chain.patch
+PATCH_SHA dee943778854ba4d19c804fcee9070338e9f6eb51529b30d658b13e8c0f5faa0  121-sched-cap-while-decoding.patch
+PATCH_SHA d48bf2a2d8a4c4daf68981aefdbc1646cf2d36b986ebf610f41e377a60ba2380  130-async-tokenize.patch
+PATCH_SHA 1fcb1ca8c6502b7c8a58f32c16bf34dbf3431d159cd649fdbf1b658ce7c2ff35  140-kda-dual-snapshot.patch
+PATCH_SHA 3d53476f8d94262e55241bb2295e3b9b96fb0ffc243469aaef9541d4169f20af  150-startup-warmup.patch
+PATCH_SHA 3547ff7d6d583b5ca19e0474a9ed0bd3fff3a355d5298868ee9f83ee96000a40  160-nextn-sm80.patch
+PATCH_SHA 48eeac6b956102d4394ace56e6fbbed343082b060b9aefd9548f73cc644320d5  170-glm-bcg-prefill.patch
+ENGINE_REUSED: off_a_kernelref 5a359e41c183750a | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_COLD_CAP=4096 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 
+NUMCHECK_DONE 16
+cold_1024        first_div=2     max_lp_diff=2.22 WRONG
+cold_16384       first_div=None  max_lp_diff=0.907 WRONG
+cold_256         first_div=1     max_lp_diff=2.14 WRONG
+cold_33          first_div=None  max_lp_diff=0.615 WRONG
+cold_37          first_div=0     max_lp_diff=3.96 WRONG
+cold_4096        first_div=2     max_lp_diff=2.15 WRONG
+cold_63          first_div=2     max_lp_diff=1.6 WRONG
+cold_65          first_div=9     max_lp_diff=2.99 WRONG
+cold_8192        first_div=None  max_lp_diff=0.36 ok
+hit_65536+333    first_div=2     max_lp_diff=2.92 WRONG
+hit_65536+512    first_div=2     max_lp_diff=3.85 WRONG
+mix_a_700        first_div=6     max_lp_diff=2.18 WRONG
+mix_b_1500       first_div=2     max_lp_diff=1.32 WRONG
+text_long        first_div=6     max_lp_diff=2.42 WRONG
+text_mid         first_div=6     max_lp_diff=0.365 WRONG
+text_short       first_div=6     max_lp_diff=1.46 WRONG
+NUMCMP wrong=15/16
+REFERENCE_UNSTABLE

@@ -10,8 +10,13 @@
 | 046r | S1@N22 混合 profile | 已自然结束进入done；两段TP0/TP4共4份trace已复算；仅诊断，不作判档/性能对照 |
 | 047-official_a_n22 | 正式 A 原样、原开发集 N22，不开 profiler | 完成且独立复算一致：722条VALID FAIL；TPOT .0620/.0870通过，fast33/23、overall55/27、chain73/22失败；13补丁/参数/env一致，冒烟12/12、KV池1,036,288。完整证据evidence/L047-official_a_n22/N22/ |
 | 048-official_a_122_n22 | 同047，仅加新版122、τ=.085 | 完成且独立复算一致：722条VALID FAIL；fast33→10/23转通过，overall55→28/27、chain73→62/22仍失败；TPOT .0617/.0840通过。保留122为有希望候选，尚无正式N收益结论；不插队继续扫参数 |
-| 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 正在运行，基线引擎已就绪；非整齐长度、64k前缀尝试、MTP/decode图、融合路径日志与容量；不是逐层状态验收、能力门或SLO成绩 |
-| 050-official_a_172_num | 正式A与A+172各两次真实TP8输出/logprob初筛 | 已入队；正式A+172 fuzz0应用与独立脚本审查通过；数值对照后另录单请求trace，核对8个rank实际融合kernel；不是延迟/SLO对照 |
+| 049-official_a_171_num | 正式A与A+171各两次真实TP8输出/logprob初筛 | 已退出：原版两次重复13/16未过一致性门，REFERENCE_UNSTABLE；171候选未加载，暂无TP8结论 |
+| 050-official_a_172_num | 正式A与A+172各两次真实TP8输出/logprob初筛 | 已退出：原版两次重复15/16未过一致性门，REFERENCE_UNSTABLE；172候选及路径trace均未运行 |
+
+| 051-official_a_baseline_diag | 正式A固定输入、逐次flush后首token/长续写重复 | 已完成16/16；逐次flush的单token cold37仍首token分叉，cold256同token logprob漂移.263；052准备逐层定位，不加载算子候选 |
+| 052-official_a_numtrace | 正式A目标prefill逐层张量指纹，冷37/256各三次 | 已发起入队；主会话检查插桩/边界/ARMED和hash，只作因果定位；不加载171/172 |
+
+049/050 的正式A基线含首token分叉，cold请求缓存均0、prompt长度相同；不能归因171/172或直接放宽数值门。051已复现原版首token漂移；052准备在同配置加同步张量收据定位最早差异，时序会受诊断影响。队列监控漏报由主会话负责；持久只读watcher已启动，每60秒轮询，真实通知已收到，运行状态见coordination.md。
 
 新任务使用修正的 checked runner、flush证据和评分kit；047打印工具及原数据哈希，每个job打印patch哈希。049使用通用numcheck，flush耗尽、并发请求失败、输出截断都会失败；其logprob阈值仅粗筛，原始差异必须复核。
 

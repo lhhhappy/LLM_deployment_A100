@@ -105,3 +105,26 @@
 原比较脚本的预热污染、完整性缺口和舍入跨门已修，10项CPU回归与独立复核通过。T56 LCP只核元数据与物理上界，来源未验证，不用于缓存因果归因。下一轮顺序仍是049/050单独算子筛选，再决定完整N22候选；124不插队。
 
 [完整归档](../evidence/L048-official_a_122_n22/N22/)、[同请求对照](../evidence/L048-official_a_122_n22/N22/compare_vs_047.txt)、[逐请求CSV](../evidence/L048-official_a_122_n22/N22/compare_vs_047.csv)、[单变量配置核验](../evidence/L048-official_a_122_n22/N22/comparison-verification.json)、[工具独立复核](reports/review-compare-sol.md)。
+
+## 049 / 050：正式 A 原版重复不稳定，算子候选未执行（2026-09-24，Codex）
+
+两项job均在ref1/ref2阶段触发`REFERENCE_UNSTABLE`退出：049为13/16未过，050为15/16未过。171/172候选均未加载、050融合路径trace未录制；没有TP8算子收益或正确性结论。
+
+主会话取回四份原始输出复算：049有11个用例token序列分叉，其中cold_37、cold_4096、text_short、text_mid首token已分叉；050有13个序列分叉，其中cold_37首token分叉。所有配对prompt_tokens和cached_tokens相同，cold用例缓存均0。temperature=0在底包转top_k=1并走greedy argmax，因此不能归因采样随机种子；首token发生在target prefill，仍须隔离计算、状态与执行路径。分叉后的logprob属于不同历史，最大差值不能作为局部算子误差；复核文件另列共同前缀上的差值。
+
+下一步051固定输入、每次flush、单token三次重复并录top10，再做独立48token重复，保持正式A与MTP配置不变。只作诊断，不放宽现有门。049/050入队后未持续跟踪导致延迟发现，由主会话承担；持久只读watcher已在05:58 UTC启动；真实通知主会话已收到，9项CPU回归及首次远程快照通过。
+
+[049原始与独立复核](../evidence/L049-official_a_171_num/reference-review.json)、[050原始与独立复核](../evidence/L050-official_a_172_num/reference-review.json)。
+
+## 051：原版每次flush后的单token重复诊断（2026-09-24，Codex）
+
+复用049/050的正式A原版引擎，未加载171/172；12个单token请求（cold37/256/1024/text_short各三次）及4个48token请求（cold37/text_short各两次），16/16完整且缓存均0。首token top10及完整请求响应已保存。
+
+- cold37单token首token为[7,5691,5691]；第一次top1两个token的logprob完全并列，后两次有差异。cold37长续写两次首token[62,25]。
+- cold256单token三次均22995，但同history、同token logprob最大差.2631，前两名间隔2.00→1.40625→2.09375；并非只有argmax并列。
+- cold1024单token三次均198，logprob差.0554；text_short单token三次576，top1/top2并列，logprob差.0144。
+- text_short两次48token首token均715，第6位置分叉，分叉前同token logprob最大差.1360。尚不能用少量顺序样本断言输出长度改变首token。
+
+结论：目标prefill边界已存在可测重复漂移，不能仅归因后续MTP verify或logprob拼接；仍未隔离哪个模块造成。下一项052按同输入逐层记录输入输出，定位首个差异，诊断同步可能改变执行时序，不能据此测速度。原数值门未放宽、候选未推进为通过。
+
+[汇总](../evidence/L051-official_a_baseline_diag/summary.json)、[完整响应](../evidence/L051-official_a_baseline_diag/responses.jsonl)。051 new→done通知已由常驻watcher主动送达，主会话随即取回并分析。
