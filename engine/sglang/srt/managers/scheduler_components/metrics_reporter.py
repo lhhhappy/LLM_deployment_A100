@@ -825,6 +825,9 @@ class SchedulerMetricsReporter:
             spec_cap_length = 0
             spec_block_accept_length = 0
         else:
+            # 160: exact window weights; rounded accept len alone cannot be aggregated.
+            msg += (f"spec tokens: {self.spec_num_accept_tokens}, "
+                    f"spec rounds: {self.spec_num_forward_ct}, ")
             spec_accept_length = self.spec_num_accept_tokens / self.spec_num_forward_ct
             num_correct_drafts = self.spec_num_accept_tokens - self.spec_num_forward_ct
             if get_spec().speculative_num_draft_tokens:
