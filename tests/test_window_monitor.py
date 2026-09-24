@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts/analysis'))
 import window_gates as gates
 import window_watch as watch
+import window_notify as bridge
 
 
 class Windows(unittest.TestCase):
@@ -84,6 +85,20 @@ class Windows(unittest.TestCase):
         self.assertEqual(watch.compact_status(state, health, 1010)[1], original)
         state['last_scheduled_deadline'] = 900
         self.assertNotEqual(watch.compact_status(state, health, 1010)[1], original)
+
+    def test_bridge_only_wakes_for_diagnostic_or_health_changes(self):
+        s = dict(job_state='running', health='up', heartbeat=1000,
+                 last_report='open window', last_scheduled_deadline=900)
+        h = dict(phase='measurement', completed_rows=400, alerts=[])
+        original = bridge.event_key(s, h, 1010)
+        h['completed_rows'] = 420
+        s['heartbeat'] = 1060
+        self.assertEqual(bridge.event_key(s, h, 1070), original)
+        s['last_scheduled_deadline'] = 2700
+        self.assertNotEqual(bridge.event_key(s, h, 1070), original)
+        text = bridge.message('job', original, s, h, 1070)
+        self.assertLessEqual(len(text), 1600)
+        self.assertIn('完成=420', text)
 
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'

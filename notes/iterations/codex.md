@@ -41,7 +41,8 @@
 - GPU仓库：evidence/L067-official_b_full_n30_shortwarm/window/保存健康与窗口原始证据。
 - 常规查询：window_watch.sh 067-official_b_full_n30_shortwarm --status --changes-only。
 - 每分钟后台健康采样；前台只看变化与到点诊断。原始日志按请求/时间段读取，不进入常驻上下文。
-- watch067v3已启动；当前自动的是采样/快照，尚未接通本会话定时唤醒，Goal查询为paused。勿冒充已自动分析。
+- watch067v3采样；本地window_notify桥接已启动，后台轮询缓存，仅诊断/状态/异常变化发消息唤醒当前会话。
+  通路测试消息已由当前会话实际收到；无需Goal自动续跑。接收CLI/relay须保持运行，注册过期会拒发并留证重试。
 - 全量闭合再判11门；不按5%或局部FAIL自动停。严重bug留证后只停单个job。
-- 当前代码核验：短预热5、评估14、队列5、调度32、122 15、窗口监控10项通过；CPU不代替TP8。
+- 当前代码核验：短预热5、评估14、队列5、调度32、122 15、窗口监控11项通过；CPU不代替TP8。
 - 正式46173/46174已上传，15:13查询仍queued；成绩见[submissions](../submissions.md)，不重复提交。
