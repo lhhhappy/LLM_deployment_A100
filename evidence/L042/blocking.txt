@@ -1,0 +1,21 @@
+== raw_dev-combined-v1_N22_1790203410.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate)
+-- fast_intra: 15 over | primary cause queue(arrangement) 11, cache gap(work) 3, own work(cost) 1 | TTFT seconds: queue 77%, own_cost_est 6%, cache_gap_s 16%, interleave 2%
+   their queue time was spent behind: head:>=64k 75%, followup:8k-64k 9%, followup:<8k 8%, head:8k-64k 6%, head:<8k 2%
+-- overall_intra: 18 over | primary cause queue(arrangement) 13, own work(cost) 3, cache gap(work) 2 | TTFT seconds: queue 73%, own_cost_est 16%, cache_gap_s 10%, interleave 1%
+   their queue time was spent behind: head:>=64k 68%, followup:8k-64k 12%, followup:<8k 8%, head:8k-64k 8%, followup:>=64k 2%, head:<8k 2%
+-- turn_start: 0 over
+-- chain_start: 17 over | primary cause queue(arrangement) 17 | TTFT seconds: queue 85%, own_cost_est 13%, cache_gap_s 0%, interleave 1%
+   their queue time was spent behind: head:>=64k 79%, head:8k-64k 17%, head:<8k 3%, followup:8k-64k 1%, followup:<8k 1%
+-- TPOT>0.10: 175 | share of their decode window with some other prefill active: p50 87% | that prefill belonged to: head:>=64k 69%, head:8k-64k 16%, followup:8k-64k 7%, followup:<8k 5%, head:<8k 2%, followup:>=64k 1%
+-- top blockers by TTFT-over queue time caused:
+     174.6s  head:>=64k       uncached  211336 prefill 15.9s  master:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1
+      67.8s  head:>=64k       uncached   81974 prefill 6.2s  master:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5
+      59.2s  head:>=64k       uncached  194725 prefill 15.6s  master:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1
+      55.8s  head:>=64k       uncached  195041 prefill 14.8s  master:canon:Gk3UkHQ6BpqSW7SdqZD7i:llm:1
+      52.7s  head:>=64k       uncached   85341 prefill 6.6s  -subagent-decc99ccea990cea699d5b97:llm:1
+-- top blockers by TPOT-over decode time caused:
+     319.9s  head:>=64k       uncached  252115 prefill 19.3s  master:canon:QSdTYVbowNG_k_R8lOG7T:llm:1
+     315.1s  head:>=64k       uncached  256733 prefill 19.3s  ster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159
+     306.7s  head:>=64k       uncached  222738 prefill 17.0s  master:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1
+     306.1s  head:>=64k       uncached  243724 prefill 18.4s  master:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1
+     242.4s  head:>=64k       uncached  177518 prefill 12.8s  master:canon:qciFldST32QKFYjmIIyWU:llm:1
