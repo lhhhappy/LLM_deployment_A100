@@ -17,7 +17,7 @@
 
 ## 新数据与算子线
 
-- **长链数据**：最新完整CPU checker为1,718/1,718、0错误，原harness自检通过；尚未完成最终冻结交接。body_ref与冻结校验修复、三本账均已独立复核，但后续工作量、长gap/reset和语义关联有缺口，96链只作诊断留档、不入队。下一版规则待用户关于真实分布/时间结构的讨论明确；候选质量及冻结验收后再安排A/单变量N22、N26。旧dev保留独立回归，算子队列不等新数据。见 [交接入口](codex-handoff-长链数据设计与文档索引.md)、[数据报告](reports/codex-data.md)与[独立复核](reports/review-data-sol.md)。
+- **长链数据**：96链/1,718请求诊断候选已冻结并独立验收；36文件hash全过、35项大小匹配、1,718条全量渲染收据与成品零失配，原harness自检通过。cohort=`cd106a80519548d4`；[冻结入口](../evidence/longchain-audit/frozen-candidate/README.md)、[独立验收](../evidence/longchain-audit/independent-freeze-acceptance.json)。后续工作量、长gap/reset和语义关联缺口仍成立，不作代表集、不入队。下一版等用户分布/时间结构方案；旧dev保留独立回归，算子队列不等新数据。见 [交接入口](codex-handoff-长链数据设计与文档索引.md)与[独立复核](reports/review-data-sol.md)。
 - **171 KDA投影融合**：开发机加载/状态/MTP/graph与成本证据已交付，真实TP8输出筛选为049。新增每层加载路径日志与旧GPU证据的哈希区别见 patch说明；还缺模型层级状态/质量确认及整档收益。
 - **172 MoE clamped SwiGLU**：单卡随机权重完整Marlin路径墙钟减少3.1–4.9%；BF16激活与graph检查通过。独立审查发现并修复探针两臂写同一实现的问题；补测M256原版自身也有数值波动，固定路由后原版重复/候选均逐位一致。单卡门槛通过，真实TP8筛选已安排050；未放宽容差，没有整模型或并发档收益结论。见patch说明与research/codex/R23。
 - **170 prefill graph**：现有v2 TP2证据仍不能代替TP8；待171独立验证后决定下一项，不与171/122一起改。

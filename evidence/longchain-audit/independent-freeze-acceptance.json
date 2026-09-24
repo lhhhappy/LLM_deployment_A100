@@ -1,0 +1,261 @@
+{
+  "status": "ACCEPTED_DIAGNOSTIC_CPU_ARCHIVE",
+  "scope": "read-only hash/size and receipt cross-check; full token rendering not repeated",
+  "frozen_at_utc": "2026-09-24T05:06:48.184862+00:00",
+  "checked_at_utc": "2026-09-24T05:10:22.635787+00:00",
+  "file_count": 36,
+  "freeze_file_count": 35,
+  "all_file_hashes_and_sizes_match": true,
+  "archive_copies_match": true,
+  "manifest_artifacts_verified": 7,
+  "cohort_order_sha256": "cd106a80519548d4",
+  "full_render_receipt": {
+    "status": "VALID",
+    "rendered_prompts": 1718,
+    "matched_bodies": 1718,
+    "errors": 0,
+    "adapted_source_verified": 20,
+    "per_request_ids_and_fields_match_current_rows": true,
+    "compared_fields": [
+      "rendered_prompt_tokens/glm_tokens",
+      "output_budget/max_output_i",
+      "gap_ms/replay_gap_ms",
+      "phase",
+      "lcp_tokens/provenance",
+      "added_tokens/provenance"
+    ],
+    "rendered_prompt_sum": 148080545
+  },
+  "freeze_structural_receipt": {
+    "status": "STRUCTURAL_OK",
+    "matched_bodies": 1718,
+    "errors": 0
+  },
+  "historical_polish_sha256": "39fa4d46f3837bcf127aad7a9b76b8db8c83abaffe7840901d3a726f26b220fa",
+  "historical_metadata_export_sha256": "096b685cc63369d1708d81bf44bded5158dc1f02118cacae1cef8db2605fe082",
+  "freeze_generator_sha256": "0609df4b69c88eb3e24721a38425f7b4659706ab9937bae53a29f801753f39cc",
+  "freeze_checker_sha256": "7f1da7660c01eda2fab24eac97bf5a32cd38c07eb810654a5f970c2077208ea0",
+  "historical_code_bytes_archived": false,
+  "quality_status": "DIAGNOSTIC_CANDIDATE_NOT_REPRESENTATIVE",
+  "eligible_for_representative_replay": false,
+  "gpu_result": null,
+  "errors": [],
+  "files": [
+    {
+      "path": "data/longchain-screen/applied-edits.json",
+      "bytes": 8011,
+      "sha256": "676ee613d5c9dbbde74b079bb7016727811e7f988dc0f2c8e33ddf8324a50672",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/bodies/longchain-screen.jsonl.gz",
+      "bytes": 184520978,
+      "sha256": "f210d22e0878be2310008f84dbef3b542a7f1cf0f7da9a6997fec77c846706fa",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/chains.jsonl",
+      "bytes": 126357,
+      "sha256": "d8400226a0140c8484afe0ac85b5be1d45e5bd1878d045ecfb7970454635244a",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/cohort.json",
+      "bytes": 110347,
+      "sha256": "2d6e05ab26806fb07dd6bd4db4881845846f6b217e9d1f0862df8ff1ab30f47f",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/manifest.json",
+      "bytes": 77015,
+      "sha256": "21b01b79aca8fe0ed27410c8a0b8ee60aa9e025b1cdfff470fdf380bef0bc791",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/provenance.jsonl",
+      "bytes": 1863304,
+      "sha256": "f247a4fc07e906232e5441ec95701ab8c2012c5cab716373f8ed1c95c51db8d1",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/requests.jsonl",
+      "bytes": 1826630,
+      "sha256": "48b197cf71667184830cc52212a1fd9eaba74ee8906173fa10304cd41c66237b",
+      "pass": true
+    },
+    {
+      "path": "data/longchain-screen/samples/longchain-screen.jsonl",
+      "bytes": 9671,
+      "sha256": "f7d7c16214c1164051651d5695e819c6f41b9230a7460bf2e5445c78aa68b820",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/README.md",
+      "bytes": 4441,
+      "sha256": "63446c5edb24dd73d91a44837feaf4dce882d9c4c5a787b6123eb025bfc28585",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/s1-dev/harness/s1_common.py",
+      "bytes": 15356,
+      "sha256": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/s1-dev/harness/s1_loadgen.py",
+      "bytes": 29972,
+      "sha256": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/s1-dev/run_dev.py",
+      "bytes": 9160,
+      "sha256": "4e5fdbd479b22ba05173ddeb71b30c108b4bca0fb57993eb0ab91746275b783f",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/scripts/analysis/longchain.py",
+      "bytes": 48090,
+      "sha256": "0609df4b69c88eb3e24721a38425f7b4659706ab9937bae53a29f801753f39cc",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/scripts/analysis/longchain_check.py",
+      "bytes": 48203,
+      "sha256": "7f1da7660c01eda2fab24eac97bf5a32cd38c07eb810654a5f970c2077208ea0",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/scripts/analysis/requirements-longchain.txt",
+      "bytes": 134,
+      "sha256": "245cf4ee6cd07f5f1b3f2843031de90a79b94f22d47010d483e9c59b39e2585b",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/tests/test_longchain.py",
+      "bytes": 7618,
+      "sha256": "f3590f0ff42d77d5dbbb1e09db3fa97ddb3db8e0191e8083c18386ec94e39739",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/code/tests/test_longchain_check.py",
+      "bytes": 24125,
+      "sha256": "43544b805629e86d2735492f9fb05d6bd578d28c1855ed8f6292f9cf236978d9",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/cohort.json",
+      "bytes": 110347,
+      "sha256": "2d6e05ab26806fb07dd6bd4db4881845846f6b217e9d1f0862df8ff1ab30f47f",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/freeze.json",
+      "bytes": 8374,
+      "sha256": "781d71094a78e058d47deed11f46c6de3caf2816479dad98a490dadae2401b2e",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/manifest.json",
+      "bytes": 77015,
+      "sha256": "21b01b79aca8fe0ed27410c8a0b8ee60aa9e025b1cdfff470fdf380bef0bc791",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/export-audit.json",
+      "bytes": 601,
+      "sha256": "e4b7708a6f771451333484e5cbe27cfa94fa4766470fe421b08aeee5e68dbc28",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-check-resource.json",
+      "bytes": 1229,
+      "sha256": "70d69fa069e2c5e6e1ba0bc8c6a52db01250bea26afc1affbc563ad81696c20e",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-check-workload-ledger.csv",
+      "bytes": 12609,
+      "sha256": "f8a06486a42a694b2db046c9dadac2f129267eaafc4fe6f7546f212b33ff473a",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-check.json",
+      "bytes": 1387147,
+      "sha256": "16744b9ecd28a116a0309e3cb644ab578f6949c3be21f2627968d2ad2ebc2cf8",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-check.txt",
+      "bytes": 54,
+      "sha256": "fb137728d0f121da05b884843e69b9d4fc75c7a78e946cf9ce11bd2a7655662c",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-self-check-resource.json",
+      "bytes": 85,
+      "sha256": "b26f024990f576f2fbc4726b478cf8a4bb6c347f7a66c6bae7bbcaddc5248888",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/final-self-check.log",
+      "bytes": 738,
+      "sha256": "4f2063c3a382961bb615d766556e71c45144b8adbd3a850c4cd8155f1b8611eb",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/freeze-structural-check.json",
+      "bytes": 1170866,
+      "sha256": "e4dfda24f4f50395551f610e3f8bed7495acc6b06e3ff5aff45117efb36e5976",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/freeze-structural-check.txt",
+      "bytes": 162,
+      "sha256": "d4bc4378e33bd744a0fa46766c209b1acfbd02f1201ab659faadd28564ca6400",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/freeze-structural-resource.json",
+      "bytes": 926,
+      "sha256": "064325d3adcf4a1f053cf9e02fe8ec504a093ce95bbf3ff8fe95f384775149c0",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/independent-fixture-recheck.json",
+      "bytes": 12277,
+      "sha256": "8fa1b835afeb0af27ec1d2ef2e2e7d269633c3cc0eda96fc171d94efd1975d68",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/polish-resource.json",
+      "bytes": 149,
+      "sha256": "de96e4a30a2ac9a74c385b45dbae0ae4aeef3e3d21d88d931acb56d41ffde2eb",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/query-acceptance.json",
+      "bytes": 972,
+      "sha256": "13b11d5c9a3a5b2d70901d33ed52873a70156118c2bc825f6ecc024902a4b58d",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/query-edits.jsonl",
+      "bytes": 7798,
+      "sha256": "9fb1255cd3deb293509b09bae1963e922426f3ad9c7aac4dda42959b4431178c",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/workload-ledger.csv",
+      "bytes": 11776,
+      "sha256": "0a95d40ac5a5ae6df0b434fa0679195f6c91a3030f498ce48b0fe9afa30b04ea",
+      "pass": true
+    },
+    {
+      "path": "evidence/longchain-audit/frozen-candidate/validation/workload-ledger.json",
+      "bytes": 509,
+      "sha256": "13248cd09eecd7f85f1ddd4e2e8d9fc20f8ccfc004b6d281bbdd1093d21238ee",
+      "pass": true
+    }
+  ]
+}
