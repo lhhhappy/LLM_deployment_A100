@@ -6,6 +6,7 @@ The decision methods, 101 split, resource accounting and LPM sort are production
 code. Build the trees first (T57):
   python3 scripts/patch_stack.py apply build/p120/baseline 000-interface-compliance 101-role-boundary-split 106-defer-chunk-on-no-kv 110-sm80-dsa-indexer 111-sm80-fp8-moe-marlin
   python3 scripts/patch_stack.py apply build/p120/candidate <same> 120-sched-protect-chain
+  (optional) python3 scripts/patch_stack.py apply build/p180/candidate <official A 13 patches> 180-hicache-glm-dsa
 then: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
 """
 from __future__ import annotations
@@ -610,6 +611,55 @@ class ProtectTests(unittest.TestCase):
                     'srt/managers/schedule_batch.py'):
             self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
+
+# A + 180 tree (build: patch_stack.py apply build/p180/candidate <official A 13 patches> 180-hicache-glm-dsa).
+TREE_180 = ROOT / 'build/p180/candidate/sglang'
+
+
+@unittest.skipUnless(TREE_180.exists(), 'build the official A + 180 tree first')
+class HiCacheTierTests(unittest.TestCase):
+    """180 keeps 120/121's contracts with the L1/L2 host tier; only L3 storage bypasses them."""
+
+    def setUp(self):
+        self.env = patch.dict(os.environ, {'SGLANG_AX_SCHED_PROTECT': '1',
+                              'SGLANG_AX_SCHED_COLD_CAP': '2048',
+                              'SGLANG_AX_SCHED_SHORT_TOKENS': '4096'})
+        self.env.start()
+        self.addCleanup(self.env.stop)
+
+    def run_trace(self, hicache):
+        s, _ = make_scheduler(TREE_180, waiting=[Req('cold', 100000)], running=[Req('running', 1)])
+        s.enable_hierarchical_cache = hicache
+        self.assertTrue(s._ax_sched_protect_enabled())
+        trace = [step(s)]
+        trace.append(step(s, [Req('short', 512, cached=65536)]))
+        trace += [step(s) for _ in range(4)]
+        return trace
+
+    def test_host_tier_keeps_protection_storage_bypasses(self):
+        s, _ = make_scheduler(TREE_180)
+        s.enable_hierarchical_cache = True
+        self.assertTrue(s._ax_sched_protect_enabled())
+        s.enable_hicache_storage = True
+        self.assertFalse(s._ax_sched_protect_enabled())
+
+    def test_device_hit_decisions_identical_with_and_without_host_tier(self):
+        off, on = self.run_trace(False), self.run_trace(True)
+        self.assertEqual(off, on)
+        # Protection is active: the cold chunk stays capped and the short hit joins it.
+        self.assertIn(['cold', 'short'], [[r[0] for r in t['reqs']][:2] for t in on])
+        self.assertTrue(all(t['reqs'][0][2] - p['reqs'][0][2] <= 2048
+                            for p, t in zip(on, on[1:]) if t['mode'] == 'prefill' and p['mode'] == 'prefill'
+                            and t['reqs'][0][0] == p['reqs'][0][0] == 'cold'))
+
+    def test_host_hit_does_not_join_active_chunk(self):
+        s, _ = make_scheduler(TREE_180, chunk=Req('cold', 20000),
+                              waiting=[Req('host', 100, cached=10000, host=100), Req('fits', 64, cached=8000)])
+        s.enable_hierarchical_cache = True
+        t = step(s)
+        self.assertEqual([r[0] for r in t['reqs']], ['cold', 'fits'])
+        self.assertEqual(t['waiting'], ['host'])
+        s.tree_cache.init_load_back.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()
