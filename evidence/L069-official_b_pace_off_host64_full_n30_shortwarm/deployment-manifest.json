@@ -1,0 +1,16 @@
+{
+  "tool_commit": "2837b3c",
+  "bundle": "queue-20260924T195929-4936",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "runtime_same_as_068": true,
+  "runtime_file_count": 29,
+  "job": "069-official_b_pace_off_host64_full_n30_shortwarm.sh",
+  "job_sha256": "dc4ce4e655b9edbb0393d23979dc0c110e91b210374f71b834953a6c4b4eba8a",
+  "publication_observed": [
+    "RUNTIME_DEPLOYED engine_commit_v1",
+    "DONE rc=0"
+  ],
+  "queue_resumed": true,
+  "gpu_watcher": "watch069",
+  "local_bridge_pid": 5264
+}

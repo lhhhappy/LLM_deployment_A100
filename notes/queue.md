@@ -9,7 +9,7 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | CPU预算与单变量筛查通过，独立复核支持；准备部署 |
+| 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 已部署并恢复队列，启动中；工具2837b3c，watch069+消息桥PID5264已挂起 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
 | 067-official_b_full_n30_shortwarm | 正式A + mem0.87 + 新版180 + 修复122；MTP保留 | 完成5601条/约123分钟，VALID FAIL；四类TTFT失败，其余7门通过，详见experiments |
 | 064-official_a_full_n30_70m | 原A参数 | 已按用户改变迭代方式停止；停止前仍在预热，无测量成绩 |
@@ -25,6 +25,7 @@
 判据为全部5601条同ID、四桶修复/新增坏例与TPOT回归；未预设关闭会更好。
 新运行库e77933d补采已有HiCache分层指标（同10秒频率）并收紧预热校验；067的16条原预算已另行严格核对通过。
 
+069部署queue-20260924T195929-4936已见RUNTIME_DEPLOYED和DONE rc=0；运行库29文件与068完全一致。
 069仍固定源码759a6eb与同一数据manifest、rep16、N30；不把122off当作最佳版本。
 只改`--hicache-size 32→64`，KV/indexer和KDA host同比扩，8卡增加约256GB主机内存；不改device池预算。
 CPU源码尺寸函数及cgroup余量检查通过，独立review无阻断理由；收据见[budget-probe](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)。
