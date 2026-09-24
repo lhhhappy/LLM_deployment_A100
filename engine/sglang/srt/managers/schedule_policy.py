@@ -1084,7 +1084,10 @@ class PrefillAdder:
             cap, _, grid = self.ax_protect
             # v2: cap the cold continuation only while other requests are waiting (otherwise it just
             # multiplies rounds and shrinks MoE batches; decode interleave still protects running reqs).
-            if self.waiting_queue_len > 0:
+            # v3: also cap while requests are decoding (a long uncapped chunk stalls their tokens:
+            # 8-card N10 tpot_p95 0.13 > 0.10 gate with v2). Uncapped only when fully idle.
+            decoding = self.running_batch is not None and not self.running_batch.is_empty()
+            if self.waiting_queue_len > 0 or decoding:
                 _rem_tokens = min(_rem_tokens, cap, self.rem_input_tokens)
             else:
                 _rem_tokens = min(_rem_tokens, self.rem_input_tokens)
@@ -1443,8 +1446,9 @@ class PrefillAdder:
             if self.ax_protect is not None:
                 cap, _, grid = self.ax_protect
                 chunk_tokens_limit = min(chunk_tokens_limit, self.rem_input_tokens)
-                if not self._ax_short_hit(req) and self.waiting_queue_len > 1:
-                    chunk_tokens_limit = min(chunk_tokens_limit, cap)  # v2: only if others wait
+                decoding = self.running_batch is not None and not self.running_batch.is_empty()
+                if not self._ax_short_hit(req) and (self.waiting_queue_len > 1 or decoding):
+                    chunk_tokens_limit = min(chunk_tokens_limit, cap)  # v3: if others wait or decode
                 if input_tokens > chunk_tokens_limit:
                     chunk_tokens_limit = chunk_tokens_limit // grid * grid
 
