@@ -5,20 +5,20 @@
 ## 当前安排（2026-09-24，用户最新决定）
 
 按已准备的三项对照方案（来源：[执行说明](reports/claude-orchestration.md)，80abc38），
-带122缺陷的061s已停、063s已撤。由于同名peer对授权来源反复确认/否认，已请求用户在本会话直接确认；**队列保持暂停，尚未构建/上传正式镜像或正式提交**。准备的实验为**全量长链集、N30、70分钟准入后排空**的三个逐项对照。
+带122缺陷的061s已停、063s已撤。旧双会话和错误消息投递已排除，当前Claude已按用户要求恢复队列，pread独立确认064运行、065/066排队。**尚未正式提交**。准备的实验为**全量长链集、N30、70分钟准入后排空**的三个逐项对照。
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 064-official_a_full_n30_70m | 正式 A 参数与 MTP；120 on、122 off、180 off | pending、队列暂停；执行层 Codex 跟踪 |
-| 065-official_a_mem087_full_n30_70m | 同064，仅加 `--mem-fraction-static 0.87` | pending、队列暂停，排064后 |
-| 066-official_a_180_mem087_full_n30_70m | 同065，仅加新版180的三个HiCache参数 | pending、队列暂停，排065后 |
+| 064-official_a_full_n30_70m | 正式 A 参数与 MTP；120 on、122 off、180 off | running，14:11 UTC开跑；执行层 Codex 跟踪 |
+| 065-official_a_mem087_full_n30_70m | 同064，仅加 `--mem-fraction-static 0.87` | pending，排064后 |
+| 066-official_a_180_mem087_full_n30_70m | 同065，仅加新版180的三个HiCache参数 | pending，排065后 |
 
 三项同一个引擎提交 `c92acd57a61eb6f9eed3222cc048877eef7963d9`，含正式 A 全部13项改动。
 171/172/123/DCP关闭；显式 `SGLANG_AX_PACE_TPOT=0` 关闭122。
 066加 `--enable-hierarchical-cache --hicache-size 32 --hicache-write-policy write_through`；不加NUMA绑定。
 122的修复由Claude接续复核/提交；不混入此次冻结源码。
 
-两个拟议正式校准候选为065与066，提交JSON和38749字节Dockerfile已准备并通过离线检查。用户直接确认范围后才继续；每项本地启动、机制检查及测量前20分钟无错误后再提交。
+两个拟议正式校准候选为065与066，提交JSON和38749字节Dockerfile已准备并通过离线检查。按报告所载用户安排推进；每项本地启动、机制检查及真正测量的前20分钟无错误后再提交。
 本地结果不能替代正式能力门或宣布晋档。正式上传进度单独记 [submissions.md](submissions.md)。
 
 ## 测量与比较
