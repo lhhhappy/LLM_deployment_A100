@@ -206,8 +206,18 @@ def health_alerts(meta):
     return alerts
 
 
-def next_check(t0, first_delay, interval, last_deadline=None):
-    """Start at +15m, then +30m; anchor to dispatch time, never to download duration."""
+def next_check(t0, first_delay, interval, last_deadline=None, report_offsets=None):
+    """Anchor reports to dispatch time, never to download duration."""
+    if report_offsets:
+        if last_deadline is None:
+            return t0 + report_offsets[0]
+        elapsed = last_deadline - t0
+        for offset in report_offsets:
+            if offset > elapsed + 1e-6:
+                return t0 + offset
+        return t0 + report_offsets[-1] + (
+            math.floor((elapsed - report_offsets[-1]) / interval) + 1
+        ) * interval
     first = t0 + first_delay
     if last_deadline is None: return first
     return first + (max(0, round((last_deadline-first)/interval)) + 1) * interval
@@ -308,6 +318,8 @@ def main(argv=None):
     ap.add_argument('--changes-only', action='store_true', help='with --status, suppress repeated diagnosis')
     ap.add_argument('--first-report-s', type=float,
                     help='first report after this many measured seconds, then interval_s')
+    ap.add_argument('--report-at-minutes',
+                    help='comma-separated measured-minute offsets, then repeat interval_s after the last')
     ap.add_argument('--baseline-raw', type=Path, help='validated full baseline raw for automatic same-ID reports')
     ap.add_argument('--baseline-label', default='baseline')
     ap.add_argument('--alignment-trace', action='store_true', help='summarize existing bounded alignment log per report')
@@ -320,6 +332,17 @@ def main(argv=None):
         ap.error('interval and window must be finite and positive')
     if args.first_report_s is not None and (not math.isfinite(args.first_report_s) or args.first_report_s <= 0):
         ap.error('first-report-s must be finite and positive')
+    report_offsets = None
+    if args.report_at_minutes:
+        try:
+            report_offsets = tuple(float(v) * 60 for v in args.report_at_minutes.split(','))
+        except ValueError:
+            ap.error('report offsets must be comma-separated numbers of minutes')
+        if (not report_offsets or any(not math.isfinite(v) or v <= 0 for v in report_offsets)
+                or any(b <= a for a, b in zip(report_offsets, report_offsets[1:]))):
+            ap.error('report offsets must be positive and strictly increasing')
+        if args.first_report_s is not None:
+            ap.error('use either --report-at-minutes or --first-report-s')
     out = ROOT / 'evidence' / ('L'+args.job) / 'window'
     runtime = ROOT / 'build' / 'scratch' / 'window-watch' / args.job
     if args.status: return show_status(out, runtime, args.job, args.changes_only)
@@ -335,7 +358,7 @@ def main(argv=None):
         terminal = False
         try:
             if args.notify: notify(state, path)
-            scheduled = args.first_report_s is not None
+            scheduled = report_offsets is not None or args.first_report_s is not None
             due = args.once or time.time() >= state.get('next_report_at', float('inf') if scheduled else 0)
             meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, int(due)), 'WINDOW_META '))
             terminal = meta['job_state'] in TERMINAL
@@ -357,7 +380,7 @@ def main(argv=None):
             if scheduled and anchor is not None:
                 state['measurement_anchor_s'] = anchor
                 state['next_report_at'] = next_check(anchor, args.first_report_s, args.interval_s,
-                                                     state.get('last_scheduled_deadline'))
+                                                     state.get('last_scheduled_deadline'), report_offsets)
                 due = args.once or time.time() >= state['next_report_at']
                 if due and not meta['data']:
                     meta = json.loads(marked(remote(SNAPSHOT_CODE, args.job, 1), 'WINDOW_META '))
@@ -370,7 +393,7 @@ def main(argv=None):
                 if scheduled and anchor is not None:
                     state['last_scheduled_deadline'] = state['next_report_at']
                     state['next_report_at'] = next_check(anchor, args.first_report_s, args.interval_s,
-                                                         state['last_scheduled_deadline'])
+                                                         state['last_scheduled_deadline'], report_offsets)
                 else:
                     state['next_report_at'] = time.time()+args.interval_s
                 if args.notify: state['notification'] = line

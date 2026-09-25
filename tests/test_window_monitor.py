@@ -68,6 +68,15 @@ class Windows(unittest.TestCase):
         third = watch.next_check(100, 900, 1800, second)
         self.assertEqual((first, second, third), (1000, 2800, 4600))
 
+    def test_custom_report_offsets_then_regular_interval(self):
+        offsets = (720, 3600, 5400)
+        deadlines = []
+        last = None
+        for _ in range(5):
+            last = watch.next_check(100, None, 1800, last, offsets)
+            deadlines.append(last)
+        self.assertEqual(deadlines, [820, 3700, 5500, 7300, 9100])
+
     def test_compact_poll_ignores_ticks_but_detects_alert_staleness_and_recovery(self):
         state = dict(job_state='running', health='up', heartbeat=1000, last_report='open')
         health = dict(phase='measurement', completed_rows=12, alerts=[])
