@@ -1,0 +1,14 @@
+{
+  "state": "submitted",
+  "max_new_attempts": 1,
+  "user_authorization": "那就078！出发！！！；帮我提交一下！",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a",
+  "config_sha256": "d87f0ba80f43cb8df94c3ef54f5d0a25a8ec60d1806d75fb9368462df03f1348",
+  "attempt_id": 46364,
+  "bundle_sha256": "b13814439399621adef1e0a8f3aaf8908848a64c81e9e80d568efb6b53d8704e",
+  "started_utc": "2026-09-25T15:18:35.308441+00:00",
+  "job_id": 24605,
+  "platform_status": "queued",
+  "upload_verified_utc": "2026-09-25T15:19:14.828158+00:00"
+}

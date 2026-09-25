@@ -1,0 +1,117 @@
+OK    submission fields match task.md schema
+OK    image is a non-empty string
+OK    first token is an executable: python3
+OK    no shell operators / expansions
+OK    --served-model-name == model_name == 'default'
+OK    env: 16 string->string entries
+OK    SGLANG_OPT_USE_TOPK_V2=0 set
+OK    all 29 flags exist in local sglang source (525 known)
+OK    trace: session_start + 2 message line(s) (user, assistant)
+=> 0 error(s), 0 warning(s)
+attempt_id=46364
+{
+  "schema_version": "playground-cli-submission/v0",
+  "status": "submitted",
+  "target": "play",
+  "api_base": "https://play.bohrium.com/api",
+  "worker_api_base": "http://47.92.88.121:443/api",
+  "challenge_id": "llm-challenge-arena-v1",
+  "attempt_id": "46364",
+  "attempt_url": "https://play.bohrium.com/#challenge/llm-challenge-arena-v1",
+  "bundle": "/workspace/Agentic_science_challenge/build/submit_0925_078.zip",
+  "bundle_sha256": "b13814439399621adef1e0a8f3aaf8908848a64c81e9e80d568efb6b53d8704e",
+  "attempt": {},
+  "bundle_response": {
+    "status": "queued",
+    "job_id": 24605,
+    "attempt_id": 46364,
+    "worker_tenant": "primary",
+    "metadata": {
+      "schema_version": "playground-worker-submission/v1",
+      "attempt_id": 46364,
+      "challenge_id": "llm-challenge-arena-v1",
+      "bundle": {
+        "sha256": "b13814439399621adef1e0a8f3aaf8908848a64c81e9e80d568efb6b53d8704e",
+        "bytes": 10804,
+        "entries": 16
+      },
+      "native_trace": {
+        "sha256": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f",
+        "bytes": 200
+      },
+      "manifest": {
+        "arm_version": "1.1",
+        "paper": {
+          "title": "llm-challenge-arena-v1",
+          "url": ""
+        },
+        "entrypoint": "src/reproduce.py",
+        "environment": {
+          "dependencies": "requirements.txt"
+        },
+        "execution": {
+          "ran_at": "2026-09-25T15:17:44Z",
+          "wall_time_s": 1,
+          "log_path": "execution/run.log",
+          "artifacts": [
+            {
+              "id": "artifact-1",
+              "path": "execution/results/submission.json",
+              "kind": "output",
+              "type": "file",
+              "format": "json"
+            }
+          ]
+        },
+        "expected_outputs": [
+          {
+            "name": "submission.json",
+            "path": "outputs/submission.json",
+            "type": "text",
+            "comparison_method": "harbor_checker",
+            "produced_by": [
+              "artifact-1"
+            ]
+          }
+        ],
+        "characterization": "characterization.json",
+        "trace": "traces/trace.jsonl",
+        "raw_messages": "raw_messages.jsonl",
+        "provenance": {
+          "created_by": "@paper2arm/playground-cli",
+          "created_at": "2026-09-25T15:17:44Z",
+          "challenge_id": "llm-challenge-arena-v1",
+          "task_id": "llm-challenge-arena-v1",
+          "run_id": "local-20260925t151744z-8135f5a6",
+          "model": "gpt-6",
+          "harness": "codex",
+          "declared_model": "gpt-6",
+          "declared_harness": "codex",
+          "detected_model": "",
+          "detected_harness": "",
+          "model_source": "declared",
+          "harness_source": "declared"
+        }
+      },
+      "worker_tenant": "primary",
+      "attempt_snapshot": {
+        "challenge_id": "llm-challenge-arena-v1",
+        "author_id": "bohrium_21221",
+        "type": "agent",
+        "method": "Playground CLI submission",
+        "detail": "official 078 2026-09-25",
+        "created_at": "2026-09-25T15:18:39",
+        "model_tag": "gpt-6",
+        "harness": "codex",
+        "author_name": "林杭",
+        "user_type": "human",
+        "operator_id": null,
+        "operator_confirmed": false,
+        "operator_name": null
+      }
+    },
+    "bundle_sha256": "b13814439399621adef1e0a8f3aaf8908848a64c81e9e80d568efb6b53d8704e",
+    "bundle_bytes": 10804,
+    "native_trace_sha256": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f"
+  }
+}

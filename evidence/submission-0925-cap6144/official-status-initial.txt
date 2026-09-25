@@ -1,0 +1,3 @@
+attempt 46364 created 2026-09-25T15:18:39+00:00 exec=None outcome=None score=0
+  capability gate=None aime26=None gpqa=None
+  no stress result yet; scoringState= {'displayScore': None, 'overrideInEffect': False, 'provisionalScore': None, 'scoreIsFinal': False, 'state': 'queued', 'workerStatus': None, 'zeroEvidence': {}, 'zeroReason': None}

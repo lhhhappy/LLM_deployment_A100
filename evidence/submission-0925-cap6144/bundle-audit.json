@@ -1,0 +1,16 @@
+{
+  "status": "BUNDLE_VERIFIED",
+  "bundle": "build/submit_0925_078.zip",
+  "bundle_sha256": "b13814439399621adef1e0a8f3aaf8908848a64c81e9e80d568efb6b53d8704e",
+  "submission_sha256": "d87f0ba80f43cb8df94c3ef54f5d0a25a8ec60d1806d75fb9368462df03f1348",
+  "entries": 16,
+  "engine_submission_copies": [
+    "outputs/submission.json",
+    "execution/results/submission.json",
+    "results/submission.json"
+  ],
+  "all_engine_submission_copies_byte_identical": true,
+  "only_config_change": "SGLANG_AX_SCHED_COLD_CAP4096->6144",
+  "baseline_attempt": 46251,
+  "max_new_attempts": 1
+}

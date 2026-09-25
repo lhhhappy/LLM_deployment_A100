@@ -1,0 +1,20 @@
+{
+  "status": "submitted as attempt46364; unchanged from audited078 candidate",
+  "baseline_attempt": 46251,
+  "baseline_file": "evidence/submission-0925a/submission.json",
+  "baseline_sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9",
+  "candidate_sha256": "d87f0ba80f43cb8df94c3ef54f5d0a25a8ec60d1806d75fb9368462df03f1348",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a",
+  "config_changes": {
+    "SGLANG_AX_SCHED_COLD_CAP": [
+      "4096",
+      "6144"
+    ]
+  },
+  "command_unchanged": true,
+  "image_unchanged": true,
+  "job078_explicit_env_and_args_match": true,
+  "purpose": "Test whether cold-prefill budget tradeoff observed locally transfers to official workload",
+  "observability": "Only highest passed level metrics are returned; no failed-level gate attribution"
+}
