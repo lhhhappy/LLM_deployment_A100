@@ -1,0 +1,27 @@
+{
+  "jobs": [
+    "081-cap6144_full_n30",
+    "082-cap6144_full_n34"
+  ],
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "baseline": "069",
+  "official_attempt": 46364,
+  "requests": 5601,
+  "warmup": "rep16-v1",
+  "measurement_cutoff": null,
+  "runtime_files_unchanged": 30,
+  "comparison": {
+    "081": "069: only COLD_CAP 4096 -> 6144",
+    "082": "081: only external N30 -> N34; max-running-requests stays 32"
+  },
+  "patches_excluded": [
+    "120 alignment repair",
+    "123",
+    "124",
+    "125"
+  ],
+  "job_sha256": {
+    "081-cap6144_full_n30.sh": "994b09e05e396e23492329f1e2480b6d711a04541d9d2c74ca4087c56a9ebd2d",
+    "082-cap6144_full_n34.sh": "cb461a0e0040bee0084fc001bae63a50aa005121a921a3d95d8045cb2b05fd8d"
+  }
+}
