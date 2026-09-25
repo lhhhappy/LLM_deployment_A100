@@ -44,7 +44,8 @@ def build(out, specs):
         jobs.append(dict(name=name, source=str(target), commit=commit))
     if not jobs or len({j['name'] for j in jobs}) != len(jobs):
         raise ValueError('empty or duplicate job list')
-    for p in [Path('scripts/pod/lib.sh'), Path('scripts/pod/jobs/dev_ladder_template.sh')]:
+    for p in [Path('scripts/pod/lib.sh'), Path('scripts/pod/storage_env.sh'),
+              Path('scripts/pod/jobs/dev_ladder_template.sh')]:
         dest = Path('bin')/p
         (out/dest).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT/p, out/dest)

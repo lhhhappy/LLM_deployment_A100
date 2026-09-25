@@ -1,0 +1,133 @@
+{
+  "utc": "2026-09-25T06:14:28.535539+00:00",
+  "hostname": "lh-arena-sess-b-5bb8db8565-ktgp9",
+  "workspace_env": "/dev/shm/arena-runtime",
+  "workspace_entries": [
+    {
+      "name": "codex",
+      "is_dir": true,
+      "symlink": false
+    }
+  ],
+  "paths": {
+    "/": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/",
+      "total_bytes": 471952154624,
+      "available_bytes": 208136556544,
+      "free_inodes": 27853113,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/tmp": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/tmp",
+      "total_bytes": 471952154624,
+      "available_bytes": 208136556544,
+      "free_inodes": 27853113,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/tmp/ax": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/tmp/ax",
+      "total_bytes": 471952154624,
+      "available_bytes": 208136556544,
+      "free_inodes": 27853113,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/dev/shm": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/dev/shm",
+      "total_bytes": 809601335296,
+      "available_bytes": 809601335296,
+      "free_inodes": 264073942,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/dev/shm/arena-runtime": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/dev/shm/arena-runtime"
+    },
+    "/root/.cache": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/root/.cache",
+      "total_bytes": 471952154624,
+      "available_bytes": 208136556544,
+      "free_inodes": 27853113,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/root/.triton": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/root/.triton"
+    },
+    "/workspace": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/workspace"
+    },
+    "/vllm-workspace": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/vllm-workspace"
+    }
+  },
+  "cgroup": {
+    "memory/memory.limit_in_bytes": "1620276412416",
+    "memory/memory.usage_in_bytes": "17227776",
+    "memory/memory.stat": "cache 0\nrss 17383424\nrss_huge 0\nshmem 0\nmapped_file 0\ndirty 0\nwriteback 0\nswap 0\npgpgin 35211\npgpgout 31513\npgfault 44154\npgmajfault 0\ninactive_anon 17833984\nactive_anon 0\ninactive_file 0\nactive_file 0\nunevictable 0\nhierarchical_memory_limit 1620276412416\nhierarchical_memsw_limit 1620276412416\ntotal_cache 0\ntotal_rss 17383424\ntotal_rss_huge 0\ntotal_shmem 0\ntotal_mapped_file 0\ntotal_dirty 0\ntotal_writeback 0\ntotal_swap 0\ntotal_pgpgin 35211\ntotal_pgpgout 31513\ntotal_pgfault 44154\ntotal_pgmajfault 0\ntotal_inactive_anon 17833984\ntotal_active_anon 0\ntotal_inactive_file 0\ntotal_active_file 0\ntotal_unevictable 0",
+    "memory/memory.failcnt": "0"
+  },
+  "directory_usage": {
+    "/tmp": {
+      "rc": 0,
+      "stdout": "8192\t/tmp/ax\n4096\t/tmp/torchinductor_root\n4096\t/tmp/wheels\n1327104\t/tmp/gdrcopy-2.5.1\n1347584\t/tmp\n",
+      "stderr": ""
+    },
+    "/root/.cache": {
+      "rc": 0,
+      "stdout": "11419648\t/root/.cache/pip\n40960\t/root/.cache/huggingface\n8192\t/root/.cache/sglang\n11472896\t/root/.cache\n",
+      "stderr": ""
+    }
+  },
+  "gpus": {
+    "rc": 0,
+    "stdout": "0, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n1, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n2, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n3, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n4, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n5, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n6, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n7, NVIDIA A100-SXM4-80GB, 81920, 0, 0\n",
+    "stderr": ""
+  },
+  "gpu_processes": {
+    "rc": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "limits": "statvfs describes backing filesystems, not Pod ephemeral quota/usage; du includes visible image files"
+}

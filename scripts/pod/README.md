@@ -18,14 +18,14 @@ CPU 回归：`python3 -B -m unittest discover -s tests -p test_eval_tools.py`。
 
 独立合成长链集由[通用生成器](../longchain/longchain.py)构建并冻结。新job可显式设置 `G_DATA_ROOT`、`G_DATA_SET`、`G_COHORT`，模板将同一root用于回放和判定；自定义root必须三项齐全。`LADDER_UP="22"` 或 `"26"` 可分别安排固定N研究，现有爬坡仍在首次FAIL后停。取证时传 `fetch_level.sh <run> <N> --data-root <本地对应数据目录>`，可另传 `--harness-dir`；不能用dev的root或LCP账本分析新集合。此项是本地脚本接入，不表示新数据或工具已同步pod，也没有新增入队。
 
-只读审阅用 `scripts/pod/pread status|ls|tail|head|cat|grep|analyze`。`analyze` 只显示已有的单档判定 JSON 和服务日志末尾，不重跑评分。允许的 CPU 分析命令用 `scripts/pod/pexec_codex`，输出只写 `/tmp/ax/codex/`。这些审阅入口不会改变队列或服务。
+只读审阅用 `scripts/pod/pread status|capacity|ls|tail|head|cat|grep|analyze`。`capacity` 输出有界的挂载、内存、指定目录大小与GPU空闲快照，不在Pod写文件，不遍历权重；底层文件系统空间不等于Pod临时存储配额。`analyze` 只显示已有的单档判定 JSON 和服务日志末尾，不重跑评分。允许的 CPU 分析命令用 `scripts/pod/pexec_codex`，输出只写 `/tmp/ax/codex/`。这些审阅入口不会改变队列或服务。
 
 分析已有profiler trace用`python3 -B scripts/pod/verify/prof_ledger.py TRACE.json.gz --json OUT.json`。一份trace只含一个GPU；工具按External id合并CUDA graph多个stream对同一次forward的标记，跨forward重叠无法按时间归因时返回错误。kernel分类靠名称，未命名算子需调用栈核对；no-kernel gap包含尚未归因的copy/依赖/host等待，不能直接认定CPU饥饿。组件duration份额不是关键路径占比，profile数据不用于宣称SLO成绩。CPU回归：`python3 -B -m unittest discover -s tests -p test_prof_ledger.py`。本地改动须经运行负责人同步kit后才作用于pod。
 
 ## 被驱逐后的工作目录恢复
 
 070在启动时因Pod本地临时存储超过20Gi被平台驱逐。现有service恢复时可声明`AX_WORKSPACE_ROOT=/dev/shm/arena-runtime`，bootstrap在首次mkdir/上传前运行prepare_workspace.py，核tmpfs及cgroup至少64GiB余量，并将兼容路径`/tmp/ax`链接到RAM工作目录。源或目标存在未绑定的非空内容/异链即拒绝；原空目录树保留备份。
-该64GiB是引导下限，模型与host64启动后须重新核余量；shm计入cgroup，不是额外内存。JIT缓存暂留原可执行盘，RAM数据不持久，完整raw/日志必须持续导出。新Pod编译缓存与旧Pod不同，比较时记录基础设施重建，不能把全部差异归给引擎开关。
+该64GiB是引导下限，模型与host64启动后须重新核余量；shm计入cgroup，不是额外内存。运行库storage_env.sh在引擎导入前核tmpfs可执行性及剩余内存，将编译缓存、临时文件和pycache放入RAM；兼容未遵循环境变量的依赖，还将/root下四个常见缓存目录链接到RAM，原小目录保留.before-ram备份，超过512MiB拒绝自动迁移。RAM数据不持久，完整raw/日志必须持续导出，不截断影响统计的记录。新Pod编译缓存与旧Pod不同，比较时记录基础设施重建，不能把全部差异归给引擎开关。
 
 ## 已结束运行：本地归档后清理Pod副本
 

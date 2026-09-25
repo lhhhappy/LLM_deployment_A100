@@ -2,6 +2,7 @@
 # READ-ONLY access to the L2 pod for reviewers (Codex/Fable). Cannot start/stop engines, write files or queue jobs.
 # Run from the local repo (it goes local -> gssh -> GPU box -> bohr exec). Paths must be under the allowed roots.
 #   scripts/pod/pread status                       queue state (running/pending/done/failed)
+#   scripts/pod/pread capacity                     bounded filesystem/memory/GPU snapshot (no writes)
 #   scripts/pod/pread ls   <path>                  list a directory
 #   scripts/pod/pread tail <file> [n]              last n lines (default 50, max 2000)
 #   scripts/pod/pread head <file> [n]              first n lines
@@ -17,6 +18,7 @@ num() { [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -le "${2:-2000}" ]; }
 remote() { GSSH_TIMEOUT=300 "$G" "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh >/dev/null 2>&1 && PEXEC_TIMEOUT=280 bexec $(q "$1")"; }
 cmd=${1:-}; shift || true
 case "$cmd" in
+  capacity) source_file="$(dirname "$0")/capacity_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
   status) remote 'cd /tmp/ax/queue && for d in running pending done failed cancelled; do echo "$d: $(ls $d 2>/dev/null | tr "\n" " ")"; done' ;;
   ls)   ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; remote "ls -la $(q "$1")" ;;
   tail|head) ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; n=${2:-50}; num "$n" || { echo "bad n"; exit 2; }

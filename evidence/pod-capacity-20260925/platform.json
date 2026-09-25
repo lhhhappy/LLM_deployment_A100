@@ -1,0 +1,45 @@
+{
+  "service": {
+    "id": "2102486579267252224",
+    "name": "lh-arena-sess-b",
+    "active_revision": {
+      "gpu_product_id": "2099127850496946176",
+      "gpu_display_name": "NVIDIA A100-SXM4-80GB",
+      "gpu_product_deleted": false,
+      "id": "2103249397960679424",
+      "revision": 2,
+      "created_at": "2026-09-24T22:25:07.733Z",
+      "status": "running",
+      "status_message": ""
+    },
+    "gpu_model": "NVIDIA A100-SXM4-80GB",
+    "gpu_count": 8,
+    "status": "running",
+    "actual_replicas": 1,
+    "desired_replicas": 1,
+    "runtime_observed_at": "2026-09-25T06:10:15.352Z",
+    "runtime_stale": true
+  },
+  "revision": 2,
+  "revision_id": "2103249397960679424",
+  "resources": {
+    "gpu_count": 8,
+    "gpu_model": "NVIDIA A100-SXM4-80GB",
+    "cpu": "88",
+    "memory": "1509Gi",
+    "shm_size": "754Gi",
+    "ephemeral_storage": "20Gi",
+    "replicas": 1,
+    "autoscale": {
+      "enabled": false,
+      "metrics": {}
+    }
+  },
+  "workspace_env": [
+    {
+      "name": "AX_WORKSPACE_ROOT",
+      "value": "/dev/shm/arena-runtime"
+    }
+  ],
+  "inspection_utc": "2026-09-25T06:14:28.535539+00:00"
+}
