@@ -312,7 +312,7 @@ def main(argv=None):
     ap.add_argument('--baseline-label', default='baseline')
     ap.add_argument('--alignment-trace', action='store_true', help='summarize existing bounded alignment log per report')
     ap.add_argument('--opening-analysis', action='store_true', help='automatically analyze and preserve a drained opening probe')
-    ap.add_argument('--opening-reference-job', help='completed opening probe for paired comparison')
+    ap.add_argument('--opening-reference-job', action='append', help='completed opening probe for paired comparison; repeat for multiple baselines')
     args = ap.parse_args(argv)
     if args.changes_only and not args.status: ap.error('changes-only requires status')
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job name')

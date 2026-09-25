@@ -328,10 +328,29 @@ def compare_report(report, out, target, reference_job):
             fixed=sum(a[r]['ttft_s']>limit>=b[r]['ttft_s'] for r in good),
             new=sum(a[r]['ttft_s']<=limit<b[r]['ttft_s'] for r in good))
     chain=changes['chain_start']
+    # Freeze the paired IDs by BASELINE actual work. Re-bucketing each run by
+    # its own cached_tokens silently changes the denominator when cache hits vary.
+    def work_bucket(row):
+        work=row['prompt_tokens']-row['cached_tokens']
+        return next((label for bound,label in [(2048,'<=2048'),(4096,'2049-4096'),
+                     (8192,'4097-8192')] if work<=bound), '>8192')
+    fast_work={}
+    for label in ['<=2048','2049-4096','4097-8192','>8192']:
+        ids=[rid for rid in common if in_ttft_gate(a[rid],'fast_intra')
+             and not a[rid].get('error') and not b[rid].get('error')
+             and work_bucket(a[rid])==label]
+        fast_work[label]=dict(n=len(ids),
+            reference_over3=sum(a[r]['ttft_s']>3 for r in ids),
+            candidate_over3=sum(b[r]['ttft_s']>3 for r in ids),
+            fixed=sum(a[r]['ttft_s']>3>=b[r]['ttft_s'] for r in ids),
+            new=sum(a[r]['ttft_s']<=3<b[r]['ttft_s'] for r in ids),
+            candidate_work_changed_bucket=sum(work_bucket(b[r])!=label for r in ids))
+    assert sum(v['n'] for v in fast_work.values())==changes['fast_intra']['n']
     pair=dict(reference_job=reference_job,reference_n=previous['n'],candidate_n=report['result']['n'],
         common_completed=len(common),common_chain=left['gates']['chain']['n'],common_chain_without_errors=chain['n'],
         reference_chain_over30=chain['reference_over'],candidate_chain_over30=chain['candidate_over'],
         chain_fixed=chain['fixed'],chain_new=chain['new'],gates=changes,reference=left,candidate=right,
+        paired_fast_by_reference_actual_work=fast_work,
         reference_only=len(a.keys()-b.keys()),candidate_only=len(b.keys()-a.keys()),
         scope='Both ten-minute admission cohorts drained. Closed-loop arrivals and reached IDs can change; paired requests alone do not isolate service order.')
     detail=[]
@@ -345,10 +364,8 @@ def compare_report(report, out, target, reference_job):
             w=csv.DictWriter(f,fieldnames=list(detail[0]));w.writeheader();w.writerows(detail)
     save(target/'comparison.json',pair)
     gate_text='，'.join(f"{g} {left['gates'][g]['over']}→{right['gates'][g]['over']}" for g in left['gates'])
-    report['brief']+=(f" 对074同ID {len(common)}条：{gate_text}；chain修复{chain['fixed']}/新增{chain['new']}；"
-                      f"TPOT>0.10 {left['tpot']['over_0.10']}/{left['tpot']['n']}→{right['tpot']['over_0.10']}/{right['tpot']['n']}。"
-                      if reference_job=='074-official_0925a_opening_n26' else
-                      f" 对N{previous['n']}同ID {len(common)}条：{gate_text}；chain修复{chain['fixed']}/新增{chain['new']}。")
+    report['brief']+=(f" 对{reference_job.split('-',1)[0]}同ID {len(common)}条：{gate_text}；chain修复{chain['fixed']}/新增{chain['new']}；"
+                      f"TPOT>0.10 {left['tpot']['over_0.10']}/{left['tpot']['n']}→{right['tpot']['over_0.10']}/{right['tpot']['n']}。")
     (target/'brief.txt').write_text(report['brief']+'\n')
     return pair
 
@@ -371,8 +388,12 @@ def build_report(out, job, meta, call, reference_job=None):
         (source/name).write_bytes(base64.b64decode(value,validate=True))
     save(target/'transport.json',info)
     report=analyze(out/'raw.jsonl',source,target)
-    if reference_job:
-        compare_report(report, out, target, reference_job)
+    references=[reference_job] if isinstance(reference_job,str) else (reference_job or [])
+    for i, reference in enumerate(dict.fromkeys(references)):
+        comparison_target=target if i==0 else target/'comparisons'/reference
+        comparison_target.mkdir(parents=True,exist_ok=True)
+        compare_report(report, out, comparison_target, reference)
+    (target/'brief.txt').write_text(report['brief']+'\n')
 
     return report
 
