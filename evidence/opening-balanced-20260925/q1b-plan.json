@@ -1,0 +1,30 @@
+{
+ "job": "078-opening_q1b_cold6144_n26",
+ "baseline": "074-official_0925a_opening_n26",
+ "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+ "n": 26,
+ "admission_seconds": 600,
+ "drain_all_admitted": true,
+ "warmup": "rep16-v1",
+ "host_gb_per_rank": 64,
+ "pace122": false,
+ "mem_fraction_static": 0.87,
+ "mtp": "3/1/4",
+ "sole_change": {
+  "old": "SGLANG_AX_SCHED_COLD_CAP=4096",
+  "new": "SGLANG_AX_SCHED_COLD_CAP=6144"
+ },
+ "why": [
+  "075 (cap 8192) used the whole 8192-token round (chunked_prefill_size=8192 in its server_args): while a cold continuation ran, no short hit could join; fast misses among requests needing <=2048 new tokens rose 9/131 -> 38/129 (paired with 074, server-side prompt minus cached tokens).",
+  "6144 leaves 2048 per round for complete short hits; in 074, 131 of 245 fast requests needed <=2048 new tokens, 85 needed 2049-4096 and would wait while a continuation runs.",
+  "Env-only on the 0925a image (759a6eb), so it is submittable today without a new build."
+ ],
+ "job_source": "scripts/pod/jobs/opening_q1b_cold6144_n26.sh",
+ "job_sha256": "a89458732e3528eb44ccd0037fe89b03e491546874367f55afb2ff9e9525aaa6",
+ "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+ "analysis": [
+  "paired 074 four TTFT gates with fixed/new",
+  "TPOT mean, p95 (harness floor(q*n)), max, count above 0.10",
+  "fast misses split by server-side new tokens"
+ ]
+}
