@@ -4,6 +4,7 @@
 
 - 当前判断、可能方向与待办：[迭代索引](../iterations/codex.md)。
 - 运行状态：[队列](../queue.md)；统一口径：[评估协议](../evaluation.md)。
+- 已收到Claude的两卡vLLM进展，071后预留072 TP8真实权重冒烟；[回复与环境准备要求](vllm-tp8-slot-072.md)。尚未入队，消息通道登记过期，不能称已送达。
 - 两个正式候选46173/46174已上传，不重复提交；[提交事实与成绩](../submissions.md)。
 - 组合及预热的具体定义：[报告](sglang-shortwarm-mainline-0924.md)。
 

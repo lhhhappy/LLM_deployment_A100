@@ -4,12 +4,13 @@
 
 ## 当前安排（2026-09-24，用户最新决定）
 
-当前Codex继续SGLang，Claude Code接手vLLM，共同探索N38。vLLM首阶段为基本开发/GPU调通和行为对齐；短探针先筛选，完整回放后判分，见[交接](handoffs/vllm-claude-code.md)。本安排未新增八卡任务，071冻结不变。围绕工作量、单位成本、调度改善做闭环；
+当前Codex继续SGLang，Claude Code接手vLLM，共同探索N38。vLLM首阶段为基本开发/GPU调通和行为对齐；短探针先筛选，完整回放后判分，见[交接](handoffs/vllm-claude-code.md)。071冻结不变，其后为vLLM预留072启动/冒烟位置，尚未发布到Pod队列。围绕工作量、单位成本、调度改善做闭环；
 统一规则见[evaluation.md](evaluation.md)，过程见[Codex迭代日志](iterations/codex.md)。
 
 | Job | 配置 | 状态 |
 |---|---|---|
 | 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录，编译缓存冷启动 | 计划已备，未入队；平台WaitingForAdmission、实际副本0；GPU开发机数据已补回且核SHA，等待Pod后bootstrap/容量核验 |
+| 072-vllm_tp8_real_smoke | 官方main a811738a6 + 000/010，已报告实现8e289cf4；TP8完整真实权重、MTP、接口/长上下文/缓存冒烟；最终部署源码与工具哈希待冻结 | **计划预留在071之后，未入队、未安装环境**；Claude准备独立venv容量/兼容性收据及vLLM任务入口，Codex协调共享队列；04:10 UTC复核Pod仍deploying/no Running。见[安排](reports/vllm-tp8-slot-072.md) |
 | 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC Pod临时存储超20Gi被驱逐；实际副本0，原service已更新revision2，deploying/WaitingForAdmission |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
@@ -43,6 +44,8 @@ host64、mem0.87、MTP、原数据/rep16/N30不变；这是122整体机制对照
 完整比较311个固定TTFT坏例和新增坏例，单轮临界跨门不认定稳定收益。设计收据见[070配置](../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。
 
 ## 测量与比较
+
+072是有限功能探针，不是完整N30或N38判分；启动/捕图与请求探针分别设预算，确认错误留证后立即结束自己的测试。071终态并取证、模型按任务边界退出后再运行072；不并驻两个完整模型、不停删共享service。现有qpush/启动器只支持SGLang，不能直接用于072，须先准备独立入口。072通过后再安排完整对照，不预先占用后续全量档。
 
 - 全量`data/s1-dev-longchain/`：311链/5601请求、N30，原顺序、正文、输出预算和gap；不设70分钟截止。
 - preflight一条链 → rep16-v1固定16完整请求短预热 → 真flush → 全量测量 → 原评分器11门。
