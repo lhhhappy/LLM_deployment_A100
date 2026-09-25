@@ -1,17 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Triton fallback for DeepGEMM's fp8_mqa_logits / fp8_paged_mqa_logits.
-
-Ported from github.com/wtdcode/vllm-backport (commit a6ef07a3f, Apache-2.0) for
-GPUs without DeepGEMM (A100). The fork's tuning environment variables are
-fixed to its defaults here; the performance notes are the fork's A100
-measurements.
-"""
+"""Triton fallback for DeepGEMM's fp8_mqa_logits / fp8_paged_mqa_logits."""
 
 import functools
+import os
 
 import torch
 
+from vllm import envs
 from vllm.platforms import current_platform
 from vllm.triton_utils import tl, triton
 from vllm.utils.platform_utils import num_compute_units
@@ -22,26 +18,81 @@ _IS_SM80 = current_platform.is_cuda() and current_platform.get_device_capability
     0,
 )
 
-# Paged decode: num_warps=4 measured fastest on A100 among {2, 4, 8} (the others
-# 1.5-1.7x slower at H=32, D=128, block_size=64). No register cap: capping at
-# 128 regs trades a 2-4% gain at long contexts for a similar loss at mid ones.
+# Paged decode: num_warps=4 dominated on A100/SM80 across {2,4,8}; the others
+# were 1.5–1.7× slower at (num_heads=32, head_dim=128, block_size=64), so
+# narrow the sweep to keep autotune from latching onto a bad pick under noise.
+#
+# Deliberately NOT carrying the `maxnreg=128` cap the prefill configs below do,
+# measured on A100 at H=64 D=128 block_size=64 (benchmark_dsv4_sm80.py
+# --kernel indexer-paged). Unconstrained the decode kernel takes 136 regs =
+# 3 CTAs/SM; the cap reaches 4 CTAs/SM at 2 B of spill, and that trades one
+# regime against another rather than winning outright:
+#
+#   CTAs (B x blocks)  |  15    64   209   418   3344   13376
+#   vs uncapped        | +2.4% +1.7% +1.6% -3.7%  -3.4%  -3.5%
+#
+# The sign follows wave quantization, not latency hiding: 108 SMs hold 324
+# concurrent CTAs at 3/SM and 432 at 4/SM, so the cap only pays past ~1.3
+# waves (n_compressed >~ 20.7k at batch 1, i.e. >~83k context, or any batched
+# decode), and below that the spill and the lost ILP cost ~2%. At the 107k
+# batch-1 point that is 0.43 us on a 21-calls-per-step kernel = 0.009 ms/step
+# against a ~10.9 ms step, so the win is not worth the mid-context loss. The
+# autotune key carries no context length, so the choice cannot be made per
+# call site without dropping @triton.autotune here.
 _PAGED_AUTOTUNE_CONFIGS = [
     triton.Config({}, num_warps=4, num_stages=ns) for ns in (2, 4)
 ]
 
-# Prefill: BLOCK_N=128 with num_warps=4 measured fastest at every swept shape
-# (M 1..2048, N 2048..131072); the key (num_heads, head_dim) is fixed per model,
-# so a wider sweep would only add cold-cache JIT. No register cap (the kernel
-# takes ~162 regs; a 128 cap spills and is neutral-to-worse).
+# Prefill: BLOCK_N=128 with num_warps=4 measured fastest at every shape
+# swept (M 1..2048, N 2048..131072) -- BN=64 is 1.25-1.40x worse, BN=32 up to
+# 2.41x. The autotune key is (num_heads, head_dim), both fixed for a model,
+# so a wider sweep cannot adapt per request; it only adds cold-cache JIT.
+#
+# maxnreg lives in VLLM_INDEXER_LOGITS_MAXNREG (0 = unconstrained, the
+# default). It used to be pinned at 128 on the reading that the kernel took
+# 132 regs, so 128 bought a 4th CTA/SM "with no spill regression", measured
+# 7.7-8.5% faster over (M 8..2048, N 8192..28672) at KV_GROUP=1.
+#
+# That measurement has expired (rule 47): this kernel now takes 162 regs, so
+# 128 is no longer a boundary but a 34-register cut, and it spills 6 B
+# unfactored / 14 B with FACTOR_K_SCALE. Re-measured on this tree, the cap is
+# neutral-to-worse everywhere and costs 4.0% at the shape serving actually
+# runs:
+#
+#   (M, N, G)      | (8, 8k, 1) (240, 8k, 1) (2048, 8k, 1) (240, 61440, 8)
+#   cap 128 vs off |     +6.7%       -0.0%         +1.2%          +4.0%
+#
+# Sixth confirmation of canon S8: every perturbation that raises resident
+# parallelism on this kernel family costs it more than the occupancy buys.
 _PREFILL_AUTOTUNE_CONFIGS = [
-    triton.Config({"BLOCK_N": 128}, num_warps=4, num_stages=ns) for ns in (2, 4)
+    triton.Config(
+        {"BLOCK_N": 128},
+        num_warps=4,
+        num_stages=ns,
+        maxnreg=envs.VLLM_INDEXER_LOGITS_MAXNREG or None,
+    )
+    for ns in (2, 4)
 ]
 
-# KV_GROUP is selected by the wrapper, not autotuned: one CTA owns KV_GROUP
-# consecutive BLOCK_N tiles of a query row, so q and the weights load once per
-# group. It helps only while the grouped grid still fills the machine (one wave
-# = SMs x 3 CTAs/SM at ~162 regs): measured +3.9% at the 128k prefill shape on
-# A100, but slower when the grouped grid falls below one wave.
+# KV_GROUP is selected by the wrapper from M and N, not autotuned: grouping 8
+# tiles per CTA reuses the q/weights load 8x and measures 3.9% faster at the
+# 128k prefill shape (7.11 -> 6.84 ms at M=2048, N=28672; G=16 turns back up),
+# but only large SM80 prefill grids select it; smaller grids, short contexts,
+# and other fallback devices keep the original ungrouped specialization.
+#
+# The gate used to be `m >= 512`, tuned at M=2048. Query sharding plus the
+# logits budget's sub-chunking made the production call M=240, so the
+# specialization the warmup path pre-compiles never once ran in serving
+# (rule 47). M alone is also the wrong variable: grouping divides the grid's
+# N dimension by KV_GROUP, so what decides it is whether the GROUPED grid
+# still fills the machine. Measured at maxnreg unconstrained, N >= 16384:
+#
+#   M x grid_y (grouped CTAs) |    128    480    512  14400
+#   grouped vs ungrouped      | +24.8%  -7.5%  -9.2%  -9.9%
+#
+# The sign flips at one wave (108 SMs x 3 CTAs/SM at 162 regs = 324), which
+# is what `_kv_group_min_ctas` computes -- and it gets all four corners right
+# where any single M threshold gets at most three.
 _KV_GROUP = 8
 _KV_GROUP_MIN_N = 16384
 _KV_GROUP_CTAS_PER_SM = 3
@@ -61,11 +112,16 @@ _INDEXER_LUT_NAN_VALUE = 480.0
 
 @functools.lru_cache
 def _paged_q_bf16_default(device: torch.device) -> bool:
-    """Whether to pre-decode q to bf16 once per call for the paged kernel.
+    """Whether to pre-decode q to bf16 on the host for the paged kernel.
 
-    Measured faster on A100-class parts (>= 160 KiB opt-in shared memory) and
-    slower on sm86/sm89, so it follows the device.
+    Wins on A100-class parts (the sm80 branch's measurement) but costs ~70%
+    on sm86/sm89 at TP4 shapes, so the unset default follows the device; an
+    explicit VLLM_INDEXER_PAGED_Q_BF16 value is honored. Cached: the env and
+    device do not change within a process.
     """
+    raw = os.environ.get("VLLM_INDEXER_PAGED_Q_BF16")
+    if raw is not None:
+        return raw == "1"
     return (
         torch.cuda.get_device_properties(device).shared_memory_per_block_optin
         >= 160 * 1024
@@ -150,7 +206,7 @@ def _fp8_paged_mqa_logits_kernel(
     # per KV block though q is identical across `block_rk` -- exactly half of
     # the kernel's 16k per-lane gathers, feeding one tl.dot. The wrapper
     # applies the same 256-entry table once instead. k keeps the LUT: it
-    # differs per block, and reading it as fp8 measured 6.8x slower.
+    # differs per block, and reading it as fp8 is 6.8x worse (canon S1).
     q_base = q_ptr + batch_id * stride_q_b + next_n_id * stride_q_n
     q_offs = offs_h[:, None] * stride_q_h + offs_d[None, :] * stride_q_d
     q_mask = mask_h[:, None] & mask_d[None, :]
@@ -218,10 +274,8 @@ def fp8_paged_mqa_logits_triton(
             the logits buffer and grid stay tight.
         clean_logits: when False, skip the -inf pre-fill of the output
             (indexer top-k reads only `[:context_len]` per row).
-
     Returns:
         logits:        [B*next_n, max_model_len] float32
-
     """
     B, next_n, num_heads, head_dim = q.shape
     _, block_size, one, d_plus_4 = kv_cache.shape
@@ -343,6 +397,7 @@ def _fp8_mqa_logits_kernel(
     BLOCK_D: tl.constexpr,
     BLOCK_N: tl.constexpr,
     KV_GROUP: tl.constexpr,
+    FACTOR_K_SCALE: tl.constexpr,
 ):
     # bf16 q/k inputs: the wrapper pre-decodes FP8 → bf16. At compute-bound
     # prefill this is ~2× the in-kernel LUT (LUT lookups contend with the
@@ -417,12 +472,19 @@ def _fp8_mqa_logits_kernel(
             k_scale = tl.load(k_scale_ptr + offs_n, mask=mask_n, other=0.0)
             s = tl.dot(q, tl.trans(k))
 
-            # relu is positively homogeneous and k_scale is a non-negative
-            # quantization magnitude, so the scale factors out of the head sum
-            # (BLOCK_N multiplies instead of BLOCK_H x BLOCK_N); only the
-            # rounding order of the sum changes.
-            s = tl.where(s > 0, s, 0.0) * w[:, None]
-            out = tl.sum(s, axis=0) * k_scale
+            # relu is positively homogeneous and k_scale is a quantization
+            # magnitude (>= 0), so the scale factors straight out of the head
+            # sum: BLOCK_H x BLOCK_N broadcast multiplies become BLOCK_N. The
+            # relu's threshold is at zero and a non-negative scale cannot move
+            # a sign, so the top-k's SELECTED set is bit-identical; only the
+            # sum's rounding order changes (one scaling instead of BLOCK_H).
+            if FACTOR_K_SCALE:
+                s = tl.where(s > 0, s, 0.0) * w[:, None]
+                out = tl.sum(s, axis=0) * k_scale
+            else:
+                s = s * k_scale[None, :]
+                s = tl.where(s > 0, s, 0.0) * w[:, None]
+                out = tl.sum(s, axis=0)
 
             # Store mask covers mask_n; -inf masks [ks, ke) only.
             out = tl.where((offs_n >= ks) & (offs_n < ke), out, float("-inf"))
@@ -442,6 +504,9 @@ def _kv_group_min_ctas(device_index: int) -> int:
 def _select_prefill_kv_group(m: int, n: int, device_index: int = 0) -> int:
     if not _IS_SM80 or n < _KV_GROUP_MIN_N:
         return 1
+    min_m = envs.VLLM_INDEXER_LOGITS_KV_GROUP_MIN_M
+    if min_m:
+        return _KV_GROUP if m >= min_m else 1
     grouped_ctas = m * triton.cdiv(n, _PREFILL_BLOCK_N * _KV_GROUP)
     if grouped_ctas >= _kv_group_min_ctas(device_index):
         return _KV_GROUP
@@ -466,10 +531,8 @@ def fp8_mqa_logits_triton(
         cu_seqlen_ke: [M] int32
         clean_logits: when False, skip the -inf pre-fill of the output
             (indexer top-k reads only `[ks, ke)` per row). Matches DeepGEMM.
-
     Returns:
         logits:       [M, N] float32
-
     """
     return _fp8_mqa_logits_triton_impl(
         q,
@@ -535,6 +598,7 @@ def _fp8_mqa_logits_triton_impl(
         BLOCK_H=BLOCK_H,
         BLOCK_D=BLOCK_D,
         KV_GROUP=kv_group,
+        FACTOR_K_SCALE=envs.VLLM_INDEXER_LOGITS_FACTOR_K_SCALE,
     )
     return logits
 

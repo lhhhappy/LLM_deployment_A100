@@ -20,7 +20,6 @@ from vllm.v1.engine import (
     EngineCoreRequest,
     FinishReason,
 )
-from vllm.v1.kv_hints import KvHintsEnvelope
 from vllm.v1.metrics.stats import PrefillStats, RequestSpecDecodeMetrics
 from vllm.v1.structured_output.request import StructuredOutputRequest
 from vllm.v1.utils import ConstantList
@@ -79,7 +78,6 @@ class Request:
         reasoning_ended: bool | None = None,
         reasoning_parser_kwargs: dict[str, Any] | None = None,
         abort_immediately: bool = False,
-        kv_hints: KvHintsEnvelope | None = None,
     ) -> None:
         self.request_id = request_id
         self.client_index = client_index
@@ -195,7 +193,6 @@ class Request:
         # trace_headers
         self.trace_headers = trace_headers
         self.session_id = session_id
-        self.kv_hints = kv_hints
 
         # True if this request is scheduled as a non-final prefill chunk.
         self.is_prefill_chunk = False
@@ -204,15 +201,6 @@ class Request:
         # in the (sparse) prefix cache; 0 means none. Set at admission for
         # hybrid/Mamba models when a shared prefix is detected (Marconi-style).
         self.shared_prefix_boundary = 0
-        # engine vllm 101: a follow-up prompt that diverges at this prompt's
-        # last turn-opening token matches full attention up to
-        # ``role_boundary`` and resumes Mamba state at ``role_checkpoint``
-        # (one hash unit lower under EAGLE block drop); 0 = none.
-        self.role_boundary = 0
-        self.role_checkpoint = 0
-        # DeepSeek-V4.1 only: SWA bounded replay. The request holds no
-        # sliding-window KV below this position; 0 when nothing replays.
-        self.replay_start = 0
 
         # The number of NaNs in logits. A value greater than 0
         # indicates that the output is corrupted
@@ -269,7 +257,6 @@ class Request:
             block_hasher=block_hasher,
             resumable=request.resumable,
             session_id=request.session_id,
-            kv_hints=request.kv_hints,
             reasoning_ended=request.reasoning_ended,
             reasoning_parser_kwargs=request.reasoning_parser_kwargs,
             abort_immediately=request.abort_immediately,
@@ -361,7 +348,8 @@ class Request:
         return prefill_stats
 
     def __lt__(self, other: "Request") -> bool:
-        """Compare two requests based on priority, arrival time, and request ID.
+        """
+        Compare two requests based on priority, arrival time, and request ID.
         Used in priority scheduling.
         """
         if self.priority != other.priority:

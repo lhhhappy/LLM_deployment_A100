@@ -115,7 +115,6 @@ pub(super) fn prepare_completion_request(
         mm_features: None,
         sampling_params: SamplingParams {
             temperature: request.temperature,
-            watermarking: request.watermarking,
             top_p: request.top_p,
             top_k: request.top_k,
             seed: request.seed,
@@ -155,9 +154,7 @@ pub(super) fn prepare_completion_request(
         add_special_tokens: request.add_special_tokens,
         data_parallel_rank: ctx.data_parallel_rank,
         session_id,
-        kv_hints: None,
-        reasoning_parser_kwargs: Default::default(),
-        reasoning_ended: None,
+        reasoning_parser_kwargs: None,
         lora_request: lora_resolution.lora_request.clone(),
         arrival_time: None,
     };

@@ -4,7 +4,6 @@
 
 from typing import TYPE_CHECKING
 
-from vllm.utils.math_utils import round_up
 from vllm.v1.core.kv_cache_utils import (
     resolve_dcp_kv_block_size,
     resolve_kv_cache_block_sizes,
@@ -12,12 +11,10 @@ from vllm.v1.core.kv_cache_utils import (
 from vllm.v1.kv_cache_interface import (
     AttentionSpec,
     FullAttentionSpec,
-    KVCacheGroupRole,
     KVCacheSpec,
     MLAAttentionSpec,
     SlidingWindowMLASpec,
     SlidingWindowSpec,
-    UniformTypeKVCacheSpecs,
     iter_layer_specs,
 )
 from vllm.v1.kv_offload.config import (
@@ -30,30 +27,17 @@ from vllm.v1.kv_offload.config import (
 
 if TYPE_CHECKING:
     from vllm.config import VllmConfig
-    from vllm.v1.kv_cache_interface import KVCacheConfig, KVCacheGroupSpec
+    from vllm.v1.kv_cache_interface import KVCacheConfig
 
 
-def get_offloading_group_ids(kv_cache_config: "KVCacheConfig") -> tuple[int, ...]:
-    if kv_cache_config.hisparse_host_num_blocks is None:
-        return kv_cache_config.prefix_cacheable_group_ids
-    return tuple(
-        group_id
-        for group_id, group in enumerate(kv_cache_config.kv_cache_groups)
-        if group.role is KVCacheGroupRole.HISPARSE_INDEXER
-    )
-
-
-def _group_kv_bytes_per_block(group: "KVCacheGroupSpec") -> int:
-    """Return the physical bytes occupied by one block of a cache group.
-
-    Worker configs may retain ``UniformTypeKVCacheSpecs`` while scheduler
-    configs flatten that wrapper to one representative per-layer spec.  Keep
-    the result invariant across those two representations.
-    """
-    spec = group.kv_cache_spec
-    if isinstance(spec, UniformTypeKVCacheSpecs):
-        return spec.page_size_bytes
-    return spec.page_size_bytes * len(group.layer_names)
+def compute_worker_kv_bytes_per_block(kv_cache_config: "KVCacheConfig") -> int:
+    """Per-worker KV bytes per block from this worker's kv_cache_config."""
+    if kv_cache_config.num_blocks <= 0 or not kv_cache_config.kv_cache_tensors:
+        return 0
+    # Every KVCacheTensor describes placement within the same backing allocation,
+    # so its size is the total, not a per-tensor share.
+    total_gpu_kv_bytes = kv_cache_config.kv_cache_tensors[0].size
+    return total_gpu_kv_bytes // kv_cache_config.num_blocks
 
 
 def build_offloading_config(
@@ -68,22 +52,15 @@ def build_offloading_config(
     engine_id = kv_transfer_config.engine_id
 
     parallel_config = vllm_config.parallel_config
-    selected_groups = tuple(
-        (group_id, kv_cache_config.kv_cache_groups[group_id])
-        for group_id in get_offloading_group_ids(kv_cache_config)
-    )
-    if not selected_groups:
-        raise ValueError("KV offloading found no eligible cache groups.")
     groups = tuple(
         OffloadingGroupConfig(
-            group_id=group_id,
             tokens_per_block=resolve_dcp_kv_block_size(
                 group.kv_cache_spec,
                 parallel_config.decode_context_parallel_size,
             ),
             layer_names=tuple(group.layer_names),
         )
-        for group_id, group in selected_groups
+        for group in kv_cache_config.kv_cache_groups
     )
 
     _, tokens_per_hash = resolve_kv_cache_block_sizes(kv_cache_config, vllm_config)
@@ -123,31 +100,24 @@ def build_offloading_config(
         )
 
         tokens_per_block = unique_tokens_per_block.pop()
-        if tokens_per_chunk_int % tokens_per_block == 0:
-            blocks_per_chunk = tokens_per_chunk_int // tokens_per_block
-        else:
-            raise ValueError(
-                f"'block_size'={tokens_per_chunk_int} in kv_connector_extra_config "
-                f"must be a multiple of the GPU KV cache block size "
-                f"({tokens_per_block} tokens). Use "
-                f"{round_up(tokens_per_chunk_int, tokens_per_block)} instead, or set "
-                f"'blocks_per_chunk' to express the chunk size in blocks."
-            )
+        assert tokens_per_chunk_int % tokens_per_block == 0
+        blocks_per_chunk = tokens_per_chunk_int // tokens_per_block
 
-    worker_kv_bytes_per_block = 0
-    if (
-        kv_cache_config.hisparse_host_num_blocks is None
-        and kv_cache_config.num_blocks > 0
-        and kv_cache_config.kv_cache_tensors
-    ):
-        # Scratch filtering must preserve the scheduler/worker allocation stride.
-        # Every KVCacheTensor describes placement within the same backing allocation,
-        # so its size is the total, not a per-tensor share.
-        total_gpu_kv_bytes = kv_cache_config.kv_cache_tensors[0].size
-        worker_kv_bytes_per_block = total_gpu_kv_bytes // kv_cache_config.num_blocks
-    elif kv_cache_config.num_blocks > 0:
-        worker_kv_bytes_per_block = sum(
-            _group_kv_bytes_per_block(group) for _, group in selected_groups
+    worker_kv_bytes_per_block = compute_worker_kv_bytes_per_block(kv_cache_config)
+    # With pipeline parallelism the PP stages hold different layer sets, so
+    # their local per-block byte counts differ. The shared-memory offload
+    # region is one file with one geometry shared by every process; size the
+    # per-worker slot by the global maximum (attached to KVCacheConfig by the
+    # engine) so all processes agree. Smaller stages just leave the slot tail
+    # unused (create_next_view fills slots front-to-back and asserts bounds).
+    global_max = getattr(kv_cache_config, "max_worker_kv_bytes_per_block", 0)
+    if global_max > worker_kv_bytes_per_block:
+        worker_kv_bytes_per_block = global_max
+    elif 0 < global_max < worker_kv_bytes_per_block:
+        raise ValueError(
+            f"max_worker_kv_bytes_per_block={global_max} is smaller than this "
+            f"worker's local value {worker_kv_bytes_per_block}; the engine-"
+            "computed maximum must cover every worker."
         )
 
     single_group_spec = (
@@ -231,20 +201,6 @@ def build_offloading_config(
             and parallel_config.decode_context_parallel_size == 1
             and parallel_config.prefill_context_parallel_size == 1
             and parallel_config.world_size == tp_size
-        )
-
-    if canonical_layout and is_parallelism_agnostic:
-        replicated_layout = (
-            all(
-                type(spec) is MLAAttentionSpec
-                for _, group in selected_groups
-                for spec in iter_layer_specs(group.kv_cache_spec)
-            )
-            and parallel_config.nnodes_within_dp == 1
-            and (
-                parallel_config.world_size == 1
-                or parallel_config.distributed_executor_backend == "mp"
-            )
         )
 
     kv_events_config = vllm_config.kv_events_config

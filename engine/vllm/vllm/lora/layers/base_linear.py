@@ -3,7 +3,7 @@
 
 
 import torch
-from transformers import PreTrainedConfig
+from transformers import PretrainedConfig
 
 from vllm import envs
 from vllm.config import get_current_vllm_config
@@ -68,10 +68,6 @@ if envs.VLLM_LORA_ENABLE_DUAL_STREAM:
 
 
 class BaseLinearLayerWithLoRA(BaseLayerWithLoRA):
-    # The adapter branch consumes the original activation, independently of
-    # whether the wrapped base layer can consume a pre-quantized activation.
-    requires_unquantized_input = True
-
     def __init__(self, base_layer: LinearBase):
         super().__init__()
 
@@ -105,7 +101,7 @@ class BaseLinearLayerWithLoRA(BaseLayerWithLoRA):
         self,
         max_loras: int,
         lora_config: LoRAConfig,
-        model_config: PreTrainedConfig | None = None,
+        model_config: PretrainedConfig | None = None,
     ) -> None:
         self.lora_config = lora_config
         if isinstance(self.base_layer, ReplicatedLinear):
@@ -244,7 +240,8 @@ class BaseLinearLayerWithLoRA(BaseLayerWithLoRA):
     def _apply_async_impl(
         self, x: torch.Tensor, bias: torch.Tensor | None = None
     ) -> torch.Tensor:
-        """Forward pass with base linear and LoRA on separate CUDA streams
+        """
+        Forward pass with base linear and LoRA on separate CUDA streams
         for overlap, using maybe_execute_in_parallel.
         Base layer runs on default stream; LoRA runs on aux stream.
         """

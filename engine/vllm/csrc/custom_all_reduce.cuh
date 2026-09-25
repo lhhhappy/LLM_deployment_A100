@@ -288,25 +288,45 @@ class CustomAllreduce {
 #define KL(ngpus, name)                                                       \
   name<T, ngpus><<<blocks, threads, 0, stream>>>(ptrs, sg_, self_sg_, output, \
                                                  rank_, size);
-#define REDUCE_CASE(ngpus)                              \
-  case ngpus: {                                         \
-    if (force_1stage) {                                 \
-      KL(ngpus, cross_device_reduce_1stage);            \
-    } else if (force_2stage) {                          \
-      KL(ngpus, cross_device_reduce_2stage);            \
-    } else {                                            \
-      if (world_size_ == 2) {                           \
-        KL(ngpus, cross_device_reduce_1stage);          \
-      } else if (fully_connected_) {                    \
-        if ((world_size_ <= 4 && bytes < 512 * 1024) || \
-            (world_size_ <= 8 && bytes < 256 * 1024)) { \
-          KL(ngpus, cross_device_reduce_1stage);        \
-        } else {                                        \
-          KL(ngpus, cross_device_reduce_2stage);        \
-        }                                               \
-      }                                                 \
-    }                                                   \
-    break;                                              \
+    // One-shot has every rank read the whole payload from all N-1 peers;
+    // two-shot reduce-scatters then all-gathers, moving ~4x less over the links
+    // but paying an extra barrier round. Below this size the barrier dominates
+    // and one-shot wins. Measured on 8xA100 NVLink (hidden 4096, bf16,
+    // cudagraph-captured, us/call, in-tree communicator bench / an independent
+    // probe):
+    //
+    //     128 KB  1stage 12 / 22.8   2stage 19 / 24.2
+    //     256 KB  1stage 16 / 26.2   2stage 23 / 28.2
+    //     384 KB  1stage 20 / 28.1   2stage 23 / 29.1
+    //     512 KB  1stage 24 / 30.1   2stage 23 / 29.1   <- crossover
+    //       1 MB  1stage 40 / 48.3   2stage 24 / 33.8
+    //
+    // The previous 256 KB put [256 KB, 512 KB) on two-shot while one-shot was
+    // still faster there. This threshold was measured at world_size 8;
+    // world_size 4 already used 512 KB. NOTE the value is applied to world_size
+    // 6 WITHOUT a measurement -- it sits between a shipped 512 (ws 4) and a
+    // measured 512 (ws 8), and one-shot's cost grows with N (N-1 peer reads),
+    // so a monotone crossover puts ws 6 at or above ws 8's 512.
+    constexpr size_t kOneShotMaxBytes = 512 * 1024;
+
+#define REDUCE_CASE(ngpus)                       \
+  case ngpus: {                                  \
+    if (force_1stage) {                          \
+      KL(ngpus, cross_device_reduce_1stage);     \
+    } else if (force_2stage) {                   \
+      KL(ngpus, cross_device_reduce_2stage);     \
+    } else {                                     \
+      if (world_size_ == 2) {                    \
+        KL(ngpus, cross_device_reduce_1stage);   \
+      } else if (fully_connected_) {             \
+        if (bytes < kOneShotMaxBytes) {          \
+          KL(ngpus, cross_device_reduce_1stage); \
+        } else {                                 \
+          KL(ngpus, cross_device_reduce_2stage); \
+        }                                        \
+      }                                          \
+    }                                            \
+    break;                                       \
   }
 
     switch (world_size_) {

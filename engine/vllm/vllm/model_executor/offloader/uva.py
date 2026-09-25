@@ -11,7 +11,11 @@ from torch.func import functional_call
 
 import vllm.envs as envs
 from vllm.logger import init_logger
-from vllm.model_executor.offloader.base import BaseOffloader, should_pin_memory
+from vllm.model_executor.offloader.base import (
+    BaseOffloader,
+    pin_exact,
+    should_pin_memory,
+)
 from vllm.utils.gpu_sync_debug import gpu_sync_allowed
 from vllm.utils.mem_utils import format_gib
 from vllm.utils.platform_utils import is_uva_available
@@ -34,7 +38,6 @@ class UVAOffloader(BaseOffloader):
         cpu_offload_max_bytes: Maximum bytes to offload to CPU.
         cpu_offload_params: Set of parameter name segments to selectively
             offload. If empty, all parameters are eligible up to the byte limit.
-
     """
 
     supports_tower_offload = True
@@ -113,7 +116,11 @@ class UVAOffloader(BaseOffloader):
 
             cpu_data = p.data.to(device="cpu")
             if self.pin_memory:
-                cpu_data = cpu_data.pin_memory()
+                # Exact-size page-locked allocation. Tensor.pin_memory() rounds to
+                # the next power of two (measured 1.78x on large expert blocks),
+                # which multiplies the host RAM an offloaded MoE needs and gets the
+                # worker OOM-killed during construction.
+                cpu_data = pin_exact(cpu_data)
 
             if not self.uva_offloading:
                 p.data = cpu_data

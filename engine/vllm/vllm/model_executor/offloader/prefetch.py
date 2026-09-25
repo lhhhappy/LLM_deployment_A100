@@ -151,7 +151,6 @@ class PrefetchOffloader(BaseOffloader):
         num_in_group: Offload this many layers per group (last N of each group).
         prefetch_step: Number of layers to prefetch ahead.
         mode: Offload mode ("cpu" is currently supported).
-
     """
 
     def __init__(
@@ -693,15 +692,20 @@ class _CpuParamOffloader(_BaseParamOffloader):
 
         if param.data.device.type == "cpu":
             if should_pin_memory() and not param.data.is_pinned():
-                pinned = torch.empty_strided(
+                # Allocate unpinned, then page-lock at exactly this size.
+                # pin_memory=True here rounds to the next power of two.
+                from vllm.model_executor.offloader.base import pin_exact
+
+                staging = torch.empty_strided(
                     size=param.data.size(),
                     stride=param.data.stride(),
                     dtype=param.data.dtype,
                     layout=param.data.layout,
                     device="cpu",
-                    pin_memory=True,
+                    pin_memory=False,
                 )
-                pinned.copy_(param.data)
+                staging.copy_(param.data)
+                pinned = pin_exact(staging)
                 self._cpu_storage = pinned
             else:
                 self._cpu_storage = param.data

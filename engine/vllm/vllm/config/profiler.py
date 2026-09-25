@@ -14,7 +14,6 @@ from vllm.utils.hashing import safe_hash
 logger = init_logger(__name__)
 
 ProfilerKind = Literal["torch", "cuda", "proton"]
-TorchProfilerActivity = Literal["CPU", "CUDA", "PrivateUse1", "XPU"]
 ProtonBackend = Literal["cupti"]
 ProtonContext = Literal["shadow", "python"]
 ProtonData = Literal["tree", "trace"]
@@ -52,12 +51,6 @@ class ProfilerConfig:
     worker's traces (CPU & GPU) will be saved under this directory. Note that
     it must be an absolute path."""
 
-    torch_profiler_activities: list[TorchProfilerActivity] | None = Field(
-        default=None, min_length=1
-    )
-    """Activities recorded by workers using the torch profiler. When unset,
-    each worker uses its platform default: CPU; CPU and CUDA; or CPU and XPU."""
-
     proton_profiler_dir: str = ""
     """Directory to save Triton Proton profiles. Each worker writes a
     separate rank-qualified file."""
@@ -82,10 +75,6 @@ class ProfilerConfig:
     proton_output_format: ProtonOutputFormat | None = None
     """Optional format passed to Proton when finalizing a profile. ``None``
     uses the default format for ``proton_data``."""
-
-    proton_graph_attribution: bool = False
-    """Observe CUDA graph capture so replayed kernels can be attributed.
-    Requires Triton >= 3.7 and ``proton_data='tree'``."""
 
     torch_profiler_with_stack: bool = True
     """If `True`, enables stack tracing in the torch profiler. Enabled by default
@@ -158,7 +147,8 @@ class ProfilerConfig:
     """
 
     def compute_hash(self) -> str:
-        """WARNING: Whenever a new field is added to this config,
+        """
+        WARNING: Whenever a new field is added to this config,
         ensure that it is included in the factors list if
         it affects the computation graph.
 
@@ -177,24 +167,7 @@ class ProfilerConfig:
     @model_validator(mode="after")
     def _validate_profiler_config(self) -> Self:
         has_delay_or_limit = self.delay_iterations > 0 or self.max_iterations > 0
-        activities = self.torch_profiler_activities
-        if activities is not None:
-            if self.profiler != "torch":
-                raise ValueError(
-                    "torch_profiler_activities is only applicable when profiler "
-                    "is set to 'torch'"
-                )
-            if len(activities) != len(set(activities)):
-                raise ValueError(
-                    "torch_profiler_activities must not contain duplicates"
-                )
-        records_cpu_activity = activities is None or "CPU" in activities
-        if (
-            self.profiler == "torch"
-            and has_delay_or_limit
-            and not self.ignore_frontend
-            and records_cpu_activity
-        ):
+        if self.profiler == "torch" and has_delay_or_limit and not self.ignore_frontend:
             logger.warning_once(
                 "Using 'torch' profiler with delay_iterations or max_iterations "
                 "while ignore_frontend is False may result in high overhead."
@@ -226,7 +199,6 @@ class ProfilerConfig:
                 ("proton_mode", self.proton_mode, None),
                 ("proton_hook", self.proton_hook, None),
                 ("proton_output_format", self.proton_output_format, None),
-                ("proton_graph_attribution", self.proton_graph_attribution, False),
             )
             if value != default
         ]
@@ -248,17 +220,6 @@ class ProfilerConfig:
 
         if self.profiler == "proton":
             output_format = self.proton_output_format
-            if self.proton_graph_attribution and self.proton_data != "tree":
-                raise ValueError("proton_graph_attribution requires proton_data='tree'")
-            if (
-                self.proton_graph_attribution
-                and self.proton_mode
-                and self.proton_mode.split(":", 1)[0].lower() == "periodic_flushing"
-            ):
-                raise ValueError(
-                    "proton_graph_attribution is incompatible with periodic_flushing: "
-                    "both manage Proton data phases."
-                )
             if output_format == "chrome_trace" and self.proton_data != "trace":
                 raise ValueError("chrome_trace output requires proton_data='trace'")
             if (

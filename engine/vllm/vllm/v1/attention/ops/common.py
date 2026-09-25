@@ -5,14 +5,13 @@ from typing import Any
 
 import torch
 
-from vllm.model_executor.warmup.jit_warmup import kernel_launcher
 from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     LaunchSpec,
     TritonWarmupTensor,
     VllmTritonJitKernel,
+    kernel_launcher,
 )
 from vllm.triton_utils import tl, triton
-from vllm.v1.attention.ops.fp8_sm80 import native_fp8_cast_supported
 
 
 class PackSeqTritonKernel(VllmTritonJitKernel["PackSeqTritonKernel.CompileKey"]):
@@ -155,6 +154,18 @@ class PackSeqTritonKernel(VllmTritonJitKernel["PackSeqTritonKernel.CompileKey"])
         )
 
 
+_FP8_DTYPES = frozenset(
+    dt
+    for dt in (
+        getattr(torch, "float8_e4m3fn", None),
+        getattr(torch, "float8_e4m3fnuz", None),
+        getattr(torch, "float8_e5m2", None),
+        getattr(torch, "float8_e5m2fnuz", None),
+    )
+    if dt is not None
+)
+
+
 def pack_seq_triton(
     x: torch.Tensor,
     lengths: torch.Tensor,
@@ -179,15 +190,16 @@ def pack_seq_triton(
 
     Returns:
         packed: [B, Lmax, ...] — packed tensor.
-
     """
-    if x.dtype == torch.float8_e4m3fn and not native_fp8_cast_supported():
-        # Below SM89 Triton cannot compile a float8 pointer argument, so pack
-        # the raw bytes. Pad slots are masked downstream by the context
-        # lengths, so a 0x00 pad is as good as the fp32 pad.
+    # fp8 tensors are packed as raw bytes: a float8 pointer argument does not
+    # compile in Triton below SM89, and the pad slots are masked downstream
+    # (context_lens), so an exact 0x00 byte pad is equivalent to the fp32 pad.
+    fp8_dtype = x.dtype if x.dtype in _FP8_DTYPES else None
+    if fp8_dtype is not None:
         return pack_seq_triton(x.view(torch.uint8), lengths, 0, block_t, block_d).view(
-            torch.float8_e4m3fn
+            fp8_dtype
         )
+
     is_uint8 = x.dtype == torch.uint8
     if is_uint8:
         assert isinstance(pad_value, int) and 0 <= pad_value <= 255, (
@@ -343,7 +355,8 @@ def unpack_seq_triton(
     block_t: int = 64,
     block_d: int = 64,
 ) -> torch.Tensor:
-    """Unpack a packed decode query tensor back to the original format.
+    """
+    Unpack a packed decode query tensor back to the original format.
     Efficient Triton implementation.
 
     Args:
@@ -354,8 +367,8 @@ def unpack_seq_triton(
 
     Returns:
         unpacked_tensor: [N, ...] where N = sum(lengths)
-
     """
+
     # Handle multi-dimensional input by reshaping to (B, Lmax, -1)
     original_shape = packed_tensor.shape
     if len(original_shape) > 3:

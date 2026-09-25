@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Whenever you add an architecture to this page, please also update
+"""
+Whenever you add an architecture to this page, please also update
 `tests/models/registry.py` with example HuggingFace models for it.
 """
 
@@ -376,7 +377,7 @@ _MULTIMODAL_MODELS = {
         "DeepseekV4ForConditionalGeneration",
     ),
     "DeepseekV41ForCausalLM": (
-        "vllm.models.deepseek_v41",
+        "vllm.models.deepseek_v4_1",
         "DeepseekV41ForCausalLM",
     ),
     "Dots3NoteForCausalLM": (
@@ -644,7 +645,7 @@ _SPECULATIVE_DECODING_MODELS = {
     "DFlashMuseGlimmerAssistantModel": ("qwen3_dflash", "DFlashQwen3ForCausalLM"),
     "DSparkDraftModel": ("vllm.models.deepseek_v4", "DSparkDeepseekV4ForCausalLM"),
     "DSparkV41DraftModel": (
-        "vllm.models.deepseek_v41",
+        "vllm.models.deepseek_v4_1",
         "DSparkDeepseekV4ForCausalLM",
     ),
     "Qwen3DSparkModel": ("qwen3_dspark", "Qwen3DSparkForCausalLM"),
@@ -712,7 +713,6 @@ _TRANSFORMERS_SUPPORTED_MODELS = {
     "GPTBigCodeForCausalLM": ("transformers", "TransformersForCausalLM"),
     "HunYuanDenseV1ForCausalLM": ("transformers", "TransformersForCausalLM"),
     "HunYuanMoEV1ForCausalLM": ("transformers", "TransformersMoEForCausalLM"),
-    "NanbeigeForCausalLM": ("transformers", "TransformersForCausalLM"),
     "OlmoForCausalLM": ("transformers", "TransformersForCausalLM"),
     "Olmo2ForCausalLM": ("transformers", "TransformersForCausalLM"),
     "Olmo3ForCausalLM": ("transformers", "TransformersForCausalLM"),
@@ -927,7 +927,9 @@ class _BaseRegisteredModel(ABC):
 
 @dataclass(frozen=True)
 class _RegisteredModel(_BaseRegisteredModel):
-    """Represents a model that has already been imported in the main process."""
+    """
+    Represents a model that has already been imported in the main process.
+    """
 
     interfaces: _ModelInfo
     model_cls: type[nn.Module]
@@ -948,7 +950,9 @@ class _RegisteredModel(_BaseRegisteredModel):
 
 @dataclass(frozen=True)
 class _LazyRegisteredModel(_BaseRegisteredModel):
-    """Represents a model that has not been imported in the main process."""
+    """
+    Represents a model that has not been imported in the main process.
+    """
 
     module_name: str
     class_name: str
@@ -1013,7 +1017,7 @@ class _LazyRegisteredModel(_BaseRegisteredModel):
             return None
 
     def _save_modelinfo_to_cache(self, mi: _ModelInfo, module_hash: str) -> None:
-        """Save dictionary json file to cache."""
+        """save dictionary json file to cache"""
         from vllm.model_executor.model_loader.weight_utils import atomic_writer
 
         try:
@@ -1123,7 +1127,8 @@ class _ModelRegistry:
         model_arch: str,
         model_cls: type[nn.Module] | str,
     ) -> None:
-        """Register an external model to be used in vLLM.
+        """
+        Register an external model to be used in vLLM.
 
         `model_cls` can be either:
 
@@ -1267,11 +1272,9 @@ class _ModelRegistry:
                     "'auto_map' (relevant if the model is custom)."
                 )
 
-        assert issubclass(model_module, transformers.PreTrainedModel)
-        transformers_model_cls: type[transformers.PreTrainedModel] = model_module
         if not (
-            transformers_model_cls.is_backend_compatible()
-            or transformers_model_cls._can_set_attn_implementation()
+            model_module.is_backend_compatible()
+            or model_module._can_set_attn_implementation()
         ):
             if model_config.model_impl != "transformers":
                 return None
@@ -1328,7 +1331,6 @@ class _ModelRegistry:
                     return (model_info, arch)
         elif model_config.model_impl == "terratorch":
             model_info = self._try_inspect_model_cls("Terratorch")
-            assert model_info is not None
             return (model_info, "Terratorch")
 
         # Fallback to transformers impl (after resolving convert_type)

@@ -178,9 +178,9 @@ class BreakableCUDAGraphCapture:
         assert not self._capturing
         g = torch.cuda.CUDAGraph()
         if self.pool is not None:
-            g.capture_begin(pool=self.pool)
+            g.capture_begin(pool=self.pool, capture_error_mode="thread_local")
         else:
-            g.capture_begin()
+            g.capture_begin(capture_error_mode="thread_local")
         self._current_graph = g
         self._capturing = True
 
@@ -256,10 +256,6 @@ class BreakableCUDAGraphWrapper:
         * If runtime mode mismatch / NONE, run eagerly.
         * Otherwise, lazily capture per ``batch_descriptor`` and replay
           on subsequent invocations with the same descriptor.
-
-    When ``runtime_mode`` is given, only that mode is captured/replayed;
-    other non-NONE modes fall through, so the wrapper can be nested under
-    a ``CUDAGraphWrapper`` for another mode.
     """
 
     _all_instances: ClassVar[weakref.WeakSet[BreakableCUDAGraphWrapper]] = (
@@ -275,14 +271,15 @@ class BreakableCUDAGraphWrapper:
         self,
         runnable: Callable[..., Any],
         vllm_config: VllmConfig,
-        runtime_mode: CUDAGraphMode | None = None,
     ) -> None:
-        # runtime_mode=None matches any non-NONE dispatch mode; entries
-        # are keyed by BatchDescriptor, which already encodes batch
-        # shape / uniformity.
+        # Unlike the original CUDAGraphWrapper which strictly matches a
+        # single runtime_mode, this wrapper captures whatever the
+        # dispatcher emits (any non-NONE runtime_mode) -- breakable's
+        # capture is identical for prefill and decode, so there's nothing
+        # to dispatch on at the runtime_mode level. Entries are keyed by
+        # BatchDescriptor which already encodes batch shape / uniformity.
         self.runnable = runnable
         self.vllm_config = vllm_config
-        self.runtime_mode = runtime_mode
         self.compilation_config = vllm_config.compilation_config
         self.graph_pool = current_platform.get_global_graph_pool()
         self.is_debugging_mode = envs.VLLM_LOGGING_LEVEL == "DEBUG"
@@ -301,9 +298,7 @@ class BreakableCUDAGraphWrapper:
         raise AttributeError(key)
 
     def unwrap(self) -> Callable[..., Any]:
-        # Recurse through nested wrappers to reach the original runnable.
-        runnable = self.runnable
-        return runnable.unwrap() if hasattr(runnable, "unwrap") else runnable
+        return self.runnable
 
     @property
     def cudagraph_wrapper(self) -> BreakableCUDAGraphWrapper:
@@ -322,13 +317,11 @@ class BreakableCUDAGraphWrapper:
         batch_descriptor = forward_context.batch_descriptor
         cudagraph_runtime_mode = forward_context.cudagraph_runtime_mode
 
-        # By default (runtime_mode=None) match any non-NONE mode; a set
-        # runtime_mode restricts capture so other modes can be handled by
-        # an outer wrapper (e.g. CUDAGraphWrapper for FULL).
-        if cudagraph_runtime_mode == CUDAGraphMode.NONE or (
-            self.runtime_mode is not None
-            and cudagraph_runtime_mode != self.runtime_mode
-        ):
+        # Capture whenever the dispatcher says "some cudagraph mode" --
+        # breakable produces the same artifact regardless of PIECEWISE
+        # vs FULL, so we match either. Entries are keyed by batch
+        # descriptor, which already encodes prefill/decode distinctions.
+        if cudagraph_runtime_mode == CUDAGraphMode.NONE:
             return self.runnable(*args, **kwargs)
 
         assert batch_descriptor is not None

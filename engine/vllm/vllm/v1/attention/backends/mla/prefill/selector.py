@@ -57,7 +57,6 @@ def _get_mla_prefill_backend_priorities(
 
     Returns:
         List of backends in priority order (highest priority first).
-
     """
     from vllm.platforms import current_platform
 
@@ -105,7 +104,6 @@ def get_mla_prefill_backend(
 
     Returns:
         The selected prefill backend class.
-
     """
     from vllm.platforms import current_platform
 
@@ -175,7 +173,6 @@ def _auto_select_mla_prefill_backend(
 
     Returns:
         The selected prefill backend class.
-
     """
     priorities = _get_mla_prefill_backend_priorities(
         device_capability,

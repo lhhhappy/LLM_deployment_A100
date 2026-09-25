@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Tests for the FlashInfer TRTLLM NvFP4 MoE backend
+"""
+Tests for the FlashInfer TRTLLM NvFP4 MoE backend
 (`TrtLlmNvFp4ExpertsModular`).
 
 Covers the activations the wrapper claims to support — SiLU, RELU^2 (non-gated),

@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 
+import os
+
 import torch
 
 from vllm.model_executor.layers.quantization.utils.quant_utils import (
@@ -317,6 +319,18 @@ def triton_reshape_and_cache_flash_per_token_head_quant(
     num_tokens, num_kv_heads, head_size = key.shape
     head_size_v = value.shape[2]
     head_size_padded = triton.next_power_of_2(max(head_size, head_size_v))
+
+    if os.environ.get("VLLM_DEBUG_PTH_SLOTS") == "1":
+        _cap = key_cache.shape[0] * key_cache.shape[1]
+        _mx = int(slot_mapping.max().item())
+        _mn = int(slot_mapping.min().item())
+        if _mx >= _cap or _mn < -1:
+            print(
+                f"[PTH-OOB] slot range [{_mn}, {_mx}] cap={_cap} "
+                f"key={tuple(key.shape)} kc={tuple(key_cache.shape)} "
+                f"ntok={num_tokens}",
+                flush=True,
+            )
 
     block_size = key_cache.shape[1]
 

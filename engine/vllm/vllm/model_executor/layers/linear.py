@@ -146,7 +146,6 @@ class LinearMethodBase(QuantizeMethodBase):
             input_size: Size of the input dim of the weight across all ranks.
             output_size: Size of the output dim of the weight across all ranks.
             params_dtype: Datatype of the parameters.
-
         """
         raise NotImplementedError
 
@@ -251,10 +250,7 @@ class LinearBase(PluggableLayer):
         prefix: Prefix for parameter names.
         return_bias: If true, return bias together with outputs in forward pass.
         disable_tp: If true, tensor parallelism will be disabled for this layer.
-
     """
-
-    requires_unquantized_input = False
 
     def __init__(
         self,
@@ -337,7 +333,6 @@ class ReplicatedLinear(LinearBase):
                         (e.g. model.layers.0.qkv_proj)
         return_bias: If true, return bias together with outputs in forward pass.
         disable_tp: Take no effect for replicated linear layers.
-
     """
 
     # --8<-- [end:replicated_linear]
@@ -385,8 +380,7 @@ class ReplicatedLinear(LinearBase):
 
         if bias:
             self.bias = Parameter(
-                torch.empty(self.output_size, dtype=self.params_dtype),
-                requires_grad=False,
+                torch.empty(self.output_size, dtype=self.params_dtype)
             )
             set_weight_attrs(
                 self.bias,
@@ -457,7 +451,6 @@ class ColumnParallelLinear(LinearBase):
             shard per rank (see ``DCPGroupColumnParallelLinear``).
         tp_size: Override the tensor-parallel world size used for sharding.
             Defaults to the global TP world size.
-
     """
 
     # --8<-- [end:column_parallel_linear]
@@ -532,8 +525,7 @@ class ColumnParallelLinear(LinearBase):
 
         if bias:
             self.bias = Parameter(
-                torch.empty(self.output_size_per_partition, dtype=params_dtype),
-                requires_grad=False,
+                torch.empty(self.output_size_per_partition, dtype=params_dtype)
             )
             set_weight_attrs(
                 self.bias,
@@ -694,7 +686,6 @@ class MergedColumnParallelLinear(ColumnParallelLinear):
         return_bias: If true, return bias together with outputs in forward pass.
         disable_tp: If true, all weights matrix won't be sharded, this layer
                     will be treated as a "Replicated" MergedLinear.
-
     """
 
     def __init__(
@@ -872,7 +863,8 @@ class MergedColumnParallelLinear(ColumnParallelLinear):
         loaded_weight: torch.Tensor,
         output_sizes: list[int] | None = None,
     ):
-        """Handle special case for models where MLP layers are already
+        """
+        Handle special case for models where MLP layers are already
         fused on disk. In this case, we have no shard id. This function
         determines the shard id by splitting these layers and then calls
         the weight loader using the shard id.
@@ -880,6 +872,7 @@ class MergedColumnParallelLinear(ColumnParallelLinear):
         An example of a model with these fused layers:
         https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
         """
+
         current_shard_offset = 0
         shard_offsets: list[tuple[int, int, int]] = []
         output_sizes = output_sizes or self.output_sizes
@@ -1021,7 +1014,6 @@ class QKVParallelLinear(ColumnParallelLinear):
                         (e.g. model.layers.0.qkv_proj)
         return_bias: If true, return bias together with outputs in forward pass.
         disable_tp: If true, weights matrix won't be sharded through tp rank.
-
     """
 
     def __init__(
@@ -1106,7 +1098,8 @@ class QKVParallelLinear(ColumnParallelLinear):
     def _load_fused_module_from_checkpoint(
         self, param: BasevLLMParameter, loaded_weight: torch.Tensor
     ):
-        """Handle special case for models where QKV layers are already
+        """
+        Handle special case for models where QKV layers are already
         fused on disk. In this case, we have no shard id. This function
         determines the shard id by splitting these layers and then calls
         the weight loader using the shard id.
@@ -1635,7 +1628,6 @@ class RowParallelLinear(LinearBase):
               | .   |
               | A_p |
                -   -
-
     Arguments:
         input_size: first dimension of matrix A.
         output_size: second dimension of matrix A.
@@ -1655,7 +1647,6 @@ class RowParallelLinear(LinearBase):
                         (e.g. model.layers.0.down_proj)
         return_bias: If true, return bias together with outputs in forward pass.
         disable_tp: If true, weights matrix won't be sharded through tp rank.
-
     """
 
     # --8<-- [end:row_parallel_linear]
@@ -1717,10 +1708,7 @@ class RowParallelLinear(LinearBase):
             )
 
         if bias:
-            self.bias = Parameter(
-                torch.empty(self.output_size, dtype=params_dtype),
-                requires_grad=False,
-            )
+            self.bias = Parameter(torch.empty(self.output_size, dtype=params_dtype))
             set_weight_attrs(
                 self.bias,
                 {

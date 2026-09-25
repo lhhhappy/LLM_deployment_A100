@@ -449,6 +449,89 @@ def test_fp8_paged_mqa_logits_triton_strided_pool_no_int32_overflow():
     )
 
 
+def _spread_k_scales(n: int, device: torch.device) -> torch.Tensor:
+    """Per-row quantization scales spanning orders of magnitude.
+
+    Canon rule 34: a distribution that makes the property trivially true makes
+    the test unable to fail. Real activations of this model drive per-row fp8
+    scales apart by ~2 decades, and it is exactly that spread that decides
+    whether reordering the head sum's scaling can move a near-tie. Uniform
+    scales cannot fail this test.
+    """
+    exponent = torch.linspace(-2.0, 2.0, n, device=device)
+    return (10.0**exponent).to(torch.float32)
+
+
+@pytest.mark.parametrize("kv_group", [1, 8])
+def test_factored_k_scale_keeps_the_relu_active_set_and_the_selection(
+    monkeypatch, kv_group
+):
+    """K7: hoisting `k_scale` out of the relu.
+
+    `out = sum_h w_h * relu(k_scale * s)` becomes
+    `out = k_scale * sum_h w_h * relu(s)`, exact in real arithmetic because
+    `k_scale >= 0` and relu is positively homogeneous.
+
+    What that argument does and does not buy, measured here rather than
+    assumed:
+
+    * The relu's ACTIVE SET is untouched -- a non-negative scale cannot move a
+      sign. That is exact and asserted exactly.
+    * The SELECTION is not guaranteed. The scaling happens once instead of
+      BLOCK_H times, so the head sum rounds differently, and on inputs with
+      the real spread (scales over ~4 decades, signed `weights_proj` output)
+      the perturbation reaches ~3e-3 against a tightest top-k boundary gap of
+      ~9e-4. The perturbation is therefore large enough to cross a near-tie
+      even though none of these rows does. The relative error is cancellation
+      in the signed head sum, not the factoring: with non-negative weights the
+      same inputs agree to 2.8e-7.
+
+    So this change carries a quality gate, not a selection-identity gate --
+    which is the opposite of what a uniform-scale test would have suggested
+    (canon rule 34).
+    """
+    device = torch.device("cuda")
+    torch.manual_seed(0)
+    M, N, H, D = 64, 4096, 64, 128
+
+    q_fp8 = torch.randn(M, H, D, dtype=torch.bfloat16, device=device).to(
+        torch.float8_e4m3fn
+    )
+    k_fp8 = torch.randn(N, D, dtype=torch.bfloat16, device=device).to(
+        torch.float8_e4m3fn
+    )
+    k_scales = _spread_k_scales(N, device)
+    weights = torch.randn(M, H, dtype=torch.float32, device=device)
+    ks = torch.zeros(M, dtype=torch.int32, device=device)
+    ke = torch.full((M,), N, dtype=torch.int32, device=device)
+
+    outs = {}
+    for factored in (False, True):
+        monkeypatch.setattr(
+            mqa_logits_mod.envs, "VLLM_INDEXER_LOGITS_FACTOR_K_SCALE", factored
+        )
+        outs[factored] = mqa_logits_mod._fp8_mqa_logits_triton_impl(
+            q_fp8, (k_fp8, k_scales), weights, ks, ke, kv_group
+        ).clone()
+
+    ref, factored_out = outs[False], outs[True]
+    # Which entries the relu zeroed is the observable half of "no sign moved",
+    # and it is exact in both variants.
+    assert torch.equal(ref == 0, factored_out == 0)
+
+    # The logits move by rounding only: bound the change against the size of
+    # the summands, not against the (cancelling) sum.
+    summand_scale = ref.abs().amax(dim=-1, keepdim=True).clamp_min(1e-30)
+    assert ((ref - factored_out).abs() / summand_scale).max() < 1e-4
+
+    # Fixed seed, so this is a deterministic regression guard on the property
+    # the indexer actually consumes -- not a proof that it cannot move.
+    k = 512
+    sel_ref = torch.topk(ref, k, dim=-1).indices.sort(dim=-1).values
+    sel_new = torch.topk(factored_out, k, dim=-1).indices.sort(dim=-1).values
+    assert torch.equal(sel_ref, sel_new)
+
+
 def test_paged_q_lut_hoist_is_bit_identical(monkeypatch):
     """K1: decoding q on the host must reproduce the in-kernel LUT exactly.
 
@@ -482,9 +565,7 @@ def test_paged_q_lut_hoist_is_bit_identical(monkeypatch):
 
     outs = {}
     for hoisted in (False, True):
-        monkeypatch.setattr(
-            mqa_logits_mod, "_paged_q_bf16_default", lambda _d, h=hoisted: h
-        )
+        monkeypatch.setattr(mqa_logits_mod.envs, "VLLM_INDEXER_PAGED_Q_BF16", hoisted)
         outs[hoisted] = fp8_paged_mqa_logits_triton(
             q,
             kv_cache,
@@ -495,3 +576,87 @@ def test_paged_q_lut_hoist_is_bit_identical(monkeypatch):
         ).clone()
 
     assert torch.equal(outs[False], outs[True])
+
+
+@torch.inference_mode()
+def test_fp8_paged_mqa_logits_torch_next_n_reads_planar_cache():
+    """The torch fallback's next_n>1 branch must read the planar block layout.
+
+    Regression for the layout mismatch class reported in
+    vllm-project/vllm#50576 (CuritisSun): the cache writer is block-planar
+    (all fp8 K bytes, then all fp32 scales), while a reader slicing the
+    nominal ``[NB, BS, 1, D+4]`` shape token-interleaved silently drifts K by
+    4 bytes/token and bitcasts value bytes as scales. Ground truth is derived
+    from the source K/scale arrays, never from a second read of the cache.
+    """
+    from vllm.v1.attention.ops.rocm_aiter_mla_sparse import (
+        fp8_paged_mqa_logits_torch,
+    )
+
+    torch.manual_seed(0)
+    device = "cuda"
+    num_blocks, block_size, dim, heads = 6, 8, 32, 4
+    batch_size, next_n = 2, 3
+    context_lens = torch.tensor([13, 7], dtype=torch.int32, device=device)
+    max_model_len = 16
+    # Non-monotonic block tables: logical order != physical order.
+    block_tables = torch.tensor([[3, 0], [5, 1]], dtype=torch.int32, device=device)
+
+    kv_bf16 = torch.randn(
+        num_blocks, block_size, dim, dtype=torch.bfloat16, device=device
+    )
+    packed = _pack_paged_kv(kv_bf16)
+    # Source-array dequant (writer's definition of the content).
+    amax = kv_bf16.abs().float().amax(dim=-1, keepdim=True).clamp_min(1e-4)
+    sf = (amax / 448.0).to(torch.float32)
+    k_fp8 = (kv_bf16.float() / sf).to(torch.float8_e4m3fn)
+    kv_deq = (k_fp8.float() * sf).view(num_blocks, block_size, 1, dim)
+
+    q = torch.randn(batch_size, next_n, heads, dim, dtype=torch.bfloat16, device=device)
+    weights = torch.rand(batch_size * next_n, heads, dtype=torch.float32, device=device)
+
+    out = fp8_paged_mqa_logits_torch(
+        q, packed, weights, context_lens, block_tables, max_model_len
+    )
+
+    # Ground truth: replicate the branch's math from the SOURCE arrays.
+    qf = q.float()
+    expected = torch.full(
+        [batch_size * next_n, max_model_len],
+        float("-inf"),
+        device=device,
+        dtype=torch.float32,
+    )
+    for i in range(batch_size):
+        context_len_i = int(context_lens[i].item())
+        q_offsets = torch.arange(context_len_i - next_n, context_len_i, device=device)
+        context_limit = torch.full(
+            (next_n,), context_len_i, dtype=torch.int32, device=device
+        )
+        weight_slice = (
+            weights[i * next_n : (i + 1) * next_n, :].transpose(0, 1).contiguous()
+        )
+        for block_rk in range(cdiv(context_len_i, block_size)):
+            block_idx = block_tables[i][block_rk]
+            qx, kx = qf[i], kv_deq[block_idx]
+            k_offsets = torch.arange(
+                block_rk * block_size, (block_rk + 1) * block_size, device=device
+            )
+            mask = (k_offsets[None, :] < context_limit[:, None]) & (
+                k_offsets[None, :] <= q_offsets[:, None]
+            )
+            s = torch.where(
+                mask[None, :, :],
+                (qx.transpose(0, 1) @ kx.transpose(0, 1).transpose(1, 2)).to(
+                    expected.dtype
+                ),
+                float("-inf"),
+            )
+            s = torch.relu(s) * weight_slice[..., None]
+            s = s.sum(dim=0)
+            expected[
+                i * next_n : (i + 1) * next_n,
+                block_rk * block_size : (block_rk + 1) * block_size,
+            ] = torch.where(k_offsets[None, :] <= q_offsets[:, None], s, float("-inf"))
+
+    assert torch.equal(out, expected)

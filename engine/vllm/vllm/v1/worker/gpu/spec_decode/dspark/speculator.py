@@ -26,12 +26,18 @@ backbone forward AND the sequential Markov sampling.
 from typing import Any
 
 import torch
+from torch.profiler import record_function
 
+from vllm import envs
 from vllm.config import VllmConfig
 from vllm.config.compilation import CUDAGraphMode
 from vllm.logger import init_logger
 from vllm.v1.worker.gpu.sample.gumbel import gumbel_sample
 from vllm.v1.worker.gpu.spec_decode.dflash.speculator import DFlashSpeculator
+from vllm.v1.worker.gpu.spec_decode.dspark.markov_argmax import (
+    FusedMarkovSampler,
+    build_fused_markov_sampler,
+)
 from vllm.v1.worker.gpu.spec_decode.dspark.utils import load_dspark_model
 
 logger = init_logger(__name__)
@@ -79,7 +85,16 @@ class DSparkSpeculator(DFlashSpeculator):
             self.draft_model_config.hf_config, "dspark_draft_topk", None
         )
 
-        self.use_confidence_head: bool = False
+        self.draft_token_confidence_probs = torch.empty_like(
+            self.draft_tokens, dtype=torch.float32
+        )
+        self.enable_adaptive_verification = (
+            self.speculative_config.enable_adaptive_verification
+        )
+
+        # Fused Markov chain (greedy vocab-sharded path only); built in
+        # load_draft_model once the head's weights and shard geometry exist.
+        self._fused_markov: FusedMarkovSampler | None = None
 
     def load_draft_model(
         self,
@@ -103,14 +118,26 @@ class DSparkSpeculator(DFlashSpeculator):
                 dtype=self.draft_logits.dtype,
                 device=self.device,
             )
-        self.use_confidence_head = (
-            self.enable_adaptive_verification
-            and model.model.confidence_head is not None
-        )
-        if self.use_confidence_head:
-            # The acceptance estimator is not needed when a trained confidence head
-            # is available.
-            self.use_acceptance_estimator = False
+        if self.enable_adaptive_verification and model.model.confidence_head is None:
+            raise ValueError(
+                "Adaptive verification needs a DSpark checkpoint with a confidence "
+                "head, and this one has none. Pass "
+                "enable_adaptive_verification=false in the speculative config to verify"
+                " a fixed number of drafts instead."
+            )
+        # `draft_logits is None` is greedy drafting, which is the only mode the
+        # fused step covers -- it reduces the logit row instead of emitting it.
+        # `_validate_local_argmax_reduction` rejects the other combination
+        # outright, but it runs after this method, so the condition is spelled
+        # out here rather than assumed.
+        if (
+            self.use_local_argmax_reduction
+            and self.draft_logits is None
+            and envs.VLLM_DSPARK_FUSED_MARKOV
+        ):
+            self._fused_markov = build_fused_markov_sampler(
+                model, self.max_num_reqs, self.num_speculative_steps, self.device
+            )
         return model
 
     def _sample_logits(
@@ -120,10 +147,8 @@ class DSparkSpeculator(DFlashSpeculator):
         sample_pos: torch.Tensor,
         step: int,
     ) -> torch.Tensor:
-        self._maybe_predict_acceptance(logits, idx_map, self._step_cols[step])
         if self.draft_logits is None:
-            draft_ids = logits.argmax(dim=-1)
-            return self.model.map_draft_to_target(draft_ids)
+            return self.model.map_draft_to_target(logits.argmax(dim=-1))
 
         # Probabilistic sampling and rejection operate in target-vocabulary
         # space. A reduced draft vocabulary is scattered into its target rows.
@@ -135,7 +160,7 @@ class DSparkSpeculator(DFlashSpeculator):
 
         # sample_pos is the predicted token's position P. Sampling keys a draw
         # by the position before the sampled token, P-1.
-        sampled = gumbel_sample(
+        return gumbel_sample(
             logits,
             idx_map,
             self.temperature,
@@ -147,11 +172,35 @@ class DSparkSpeculator(DFlashSpeculator):
             logits_cache_col=self._step_cols[step],
             use_fp64=self.use_fp64_gumbel,
         )
-        if self.draft_watermarker is not None:
-            sampled = self.draft_watermarker.sample(
-                logits, sampled, idx_map, self.temperature
+
+    def _validate_local_argmax_reduction(self) -> None:
+        # DSpark's greedy selection spans the SUM of two vocab-parallel heads
+        # (base draft logits + the Markov transition bias), so it needs a
+        # different pair of hooks than the base class's single get_top_tokens.
+        if not self.use_local_argmax_reduction:
+            return
+        if self.speculative_config.draft_sample_method == "probabilistic":
+            raise ValueError(
+                "use_local_argmax_reduction is not compatible with "
+                "draft_sample_method='probabilistic': verification needs whole "
+                "processed logit rows, which is exactly what the reduction "
+                "avoids materializing."
             )
-        return sampled
+        missing = [
+            name
+            for name in ("compute_draft_logits_shard", "select_draft_token_shard")
+            if not hasattr(self.model, name)
+        ]
+        if missing:
+            raise ValueError(
+                "use_local_argmax_reduction is enabled but DSpark draft model "
+                f"{self.model.__class__.__name__} does not implement "
+                f"{', '.join(missing)}()."
+            )
+        logger.info(
+            "DSpark: vocab-sharded Markov head with local argmax reduction "
+            "(communication: O(2*tp_size) vs O(vocab_size) per draft position)."
+        )
 
     def _sample_sequential(self, num_reqs: int, head_hidden: torch.Tensor) -> None:
         if self._draft_topk is not None:
@@ -164,7 +213,14 @@ class DSparkSpeculator(DFlashSpeculator):
         # Per-(req, position) head hidden, ordered (req, step).
         sample_hidden = head_hidden[self.sample_indices[:num_sample]]
         # Draft-vocab logits; sampled ids are remapped to target vocab below.
-        base_logits = self.model.compute_draft_logits(sample_hidden)
+        # Under the local-argmax reduction these are this rank's vocab columns
+        # only, so `vocab_size` below is the shard width -- nothing in this
+        # method reads it as a vocab id.
+        with record_function("dspark::draft_logits"):
+            if self.use_local_argmax_reduction:
+                base_logits = self.model.compute_draft_logits_shard(sample_hidden)
+            else:
+                base_logits = self.model.compute_draft_logits(sample_hidden)
         vocab_size = base_logits.shape[-1]
         base_logits = base_logits.view(num_reqs, n_spec, vocab_size)
 
@@ -176,11 +232,28 @@ class DSparkSpeculator(DFlashSpeculator):
         # read via the precomputed persistent index (fixed buffer for capture).
         prev = self.input_buffers.input_ids[self._anchor_idx[:num_reqs]]
 
+        if self._fused_markov is not None:
+            # Same chain as the loop below, with each step's seven kernels and
+            # three [num_reqs, shard_width] round trips collapsed into one
+            # pass over markov_w2. Writes draft_tokens directly.
+            self._fused_markov.sample(num_reqs, base_logits, prev, self.draft_tokens)
+            return
+
         for i in range(n_spec):
             # Sequential stage: Markov bias from the previously sampled token.
             markov_embed = self.model.markov_embed(prev)
-            if self.use_confidence_head:
+            if self.enable_adaptive_verification:
                 confidence_markov_embeds.append(markov_embed)
+            if self.use_local_argmax_reduction:
+                # Greedy-only (enforced in _validate_local_argmax_reduction):
+                # the argmax over base + bias reduces to one (value, id) pair
+                # per rank, so neither head materializes a full-vocab row.
+                draft_sampled_i = self.model.map_draft_to_target(
+                    self.model.select_draft_token_shard(markov_embed, base_logits[:, i])
+                )
+                self.draft_tokens[:num_reqs, i] = draft_sampled_i
+                prev = draft_sampled_i
+                continue
             bias = self.model.markov_bias(markov_embed)
             logits_i = base_logits[:, i] + bias
             draft_sampled_i = self._sample_logits(
@@ -189,7 +262,7 @@ class DSparkSpeculator(DFlashSpeculator):
             self.draft_tokens[:num_reqs, i] = draft_sampled_i
             prev = draft_sampled_i
 
-        if self.use_confidence_head:
+        if self.enable_adaptive_verification:
             confidence = self.model.compute_confidence(
                 sample_hidden,
                 torch.stack(confidence_markov_embeds, dim=1).flatten(0, 1),
@@ -224,7 +297,7 @@ class DSparkSpeculator(DFlashSpeculator):
 
         for i in range(n_spec):
             markov_embed = self.model.markov_embed(prev)
-            if self.use_confidence_head:
+            if self.enable_adaptive_verification:
                 confidence_markov_embeds.append(markov_embed)
             logits_i = self.model.apply_markov_bias_gathered(
                 markov_embed,
@@ -238,7 +311,7 @@ class DSparkSpeculator(DFlashSpeculator):
             self.draft_tokens[:num_reqs, i] = draft_sampled_i
             prev = draft_sampled_i
 
-        if self.use_confidence_head:
+        if self.enable_adaptive_verification:
             confidence = self.model.compute_confidence(
                 sample_hidden,
                 torch.stack(confidence_markov_embeds, dim=1).flatten(0, 1),
@@ -258,11 +331,16 @@ class DSparkSpeculator(DFlashSpeculator):
     ) -> None:
         # Full draft step (captured under CUDA graph): parallel backbone forward
         # then sequential Markov sampling over its hidden state outputs.
-        head_hidden = self._run_model(
-            num_tokens_padded,
-            attn_metadata,
-            slot_mappings,
-            num_tokens_across_dp,
-            cudagraph_runtime_mode,
-        )
-        self._sample_sequential(num_reqs, head_hidden)
+        # NOTE: these scopes are host-side, so they only resolve when the step
+        # runs eagerly. Under CUDA-graph replay the whole step is one launch and
+        # the ranges do not reappear -- profile with cudagraphs off to use them.
+        with record_function("dspark::draft_backbone"):
+            head_hidden = self._run_model(
+                num_tokens_padded,
+                attn_metadata,
+                slot_mappings,
+                num_tokens_across_dp,
+                cudagraph_runtime_mode,
+            )
+        with record_function("dspark::markov_sampling"):
+            self._sample_sequential(num_reqs, head_hidden)

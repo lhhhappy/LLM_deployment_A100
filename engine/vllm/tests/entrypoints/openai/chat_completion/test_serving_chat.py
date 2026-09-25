@@ -556,7 +556,6 @@ class MockModelConfig:
     skip_tokenizer_init: bool = False
     is_encoder_decoder: bool = False
     is_multimodal_model: bool = False
-    supports_multimodal_inputs: bool = False
     renderer_num_workers: int = 1
     enable_prompt_embeds: bool = False
 
@@ -1233,6 +1232,7 @@ async def test_serving_chat_mistral_token_ids_prompt_is_validated():
     """Regression test: when the Mistral tokenizer path returns token IDs
     directly, we must still apply input length + max_tokens validation.
     """
+
     mock_engine = MagicMock(spec=AsyncLLM)
     mock_engine.errored = False
     mock_engine.model_config = MockModelConfig(skip_tokenizer_init=True)
@@ -1271,6 +1271,7 @@ async def test_serving_chat_mistral_token_ids_prompt_too_long_is_rejected():
     """Regression test: MistralTokenizer token-id prompts must still enforce
     the max context length for the input itself (token_num >= max_model_len).
     """
+
     mock_engine = MagicMock(spec=AsyncLLM)
     mock_engine.errored = False
     mock_engine.model_config = MockModelConfig(skip_tokenizer_init=True)
@@ -1511,7 +1512,8 @@ async def _render_chat_prompt_token_ids(
 
 
 class TestServingChatWithHarmony:
-    """These tests ensure Chat Completion requests are being properly converted into
+    """
+    These tests ensure Chat Completion requests are being properly converted into
     Harmony messages and Harmony response messages back into Chat Completion responses.
     These tests are not exhaustive, but each one was created to cover a specific case
     that we got wrong but is now fixed.
@@ -2239,13 +2241,7 @@ async def test_tool_choice_validation_without_parser():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    ("engine_finish_reason", "expected_finish_reason"),
-    [("stop", "tool_calls"), ("length", "length")],
-)
-async def test_streaming_n_gt1_independent_tool_parsers(
-    engine_finish_reason: str, expected_finish_reason: str
-):
+async def test_streaming_n_gt1_independent_tool_parsers():
     """n>1 streaming must use independent parser instances
     and token-id histories per choice.
     """
@@ -2350,7 +2346,7 @@ async def test_streaming_n_gt1_independent_tool_parsers(
                     token_ids=[],
                     cumulative_logprob=0.0,
                     logprobs=None,
-                    finish_reason=engine_finish_reason,
+                    finish_reason="stop",
                 )
                 for choice_idx in range(num_choices)
             ],
@@ -2414,8 +2410,8 @@ async def test_streaming_n_gt1_independent_tool_parsers(
         assert len(reasons) == 1, (
             f"Choice {choice_idx}: expected exactly 1 finish_reason, got {reasons}"
         )
-        assert reasons[0] == expected_finish_reason, (
-            f"Choice {choice_idx}: expected finish_reason={expected_finish_reason!r}, "
+        assert reasons[0] == "tool_calls", (
+            f"Choice {choice_idx}: expected finish_reason='tool_calls', "
             f"got '{reasons[0]}'"
         )
 

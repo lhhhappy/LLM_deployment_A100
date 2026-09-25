@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""FileSystemTierManager: pure-Python filesystem tier for KV cache offloading.
+"""
+FileSystemTierManager: Pure-Python file system secondary tier for KV cache offloading.
 
 Store path:
     Data is written to a temp file (<dest_path.tmp>) via os.write,
@@ -14,6 +15,7 @@ File naming:  <base_path>_r<rank>/<hhh>/<hh>_g<group_idx>/<hash_hex>.bin
               (hash-based subdirectories to limit directory fan-out)
 """
 
+import contextlib
 import functools
 import json
 import os
@@ -40,7 +42,6 @@ from vllm.v1.kv_offload.base import (
 )
 from vllm.v1.kv_offload.file_mapper import FileMapper
 from vllm.v1.kv_offload.tiering.async_lookup import AsyncLookupManager
-from vllm.v1.kv_offload.tiering.backpressure import BackpressureDetector
 from vllm.v1.kv_offload.tiering.base import (
     JobId,
     JobResult,
@@ -49,6 +50,7 @@ from vllm.v1.kv_offload.tiering.base import (
     SecondaryTierManager,
     TransferJob,
 )
+from vllm.v1.kv_offload.tiering.fs.capacity import FsCapacityManager
 from vllm.v1.kv_offload.tiering.fs.io import (
     batch_load_block,
     batch_store_block,
@@ -84,7 +86,8 @@ class FsAsyncLookupManager(AsyncLookupManager):
 
 
 class FileSystemTierManager(SecondaryTierManager):
-    """Pure-Python disk-backed secondary tier.
+    """
+    Pure-Python disk-backed secondary tier.
 
     Read-priority threads service load jobs preferentially; write-priority
     threads service store jobs preferentially.  Both groups can drain either
@@ -116,27 +119,26 @@ class FileSystemTierManager(SecondaryTierManager):
         n_write_threads: int = 16,
         enable_kv_events: bool = False,
         locality: str | None = None,
-        backpressure_detector: BackpressureDetector | None = None,
+        max_capacity_gb: float = 0,
+        evict_watermark: float = 0.9,
+        evict_protect_s: float = 120.0,
     ):
-        """Args:
-        offloading_spec: Contains normalized offloading configuration and
-            blocks_per_chunk.
-        primary_kv_view: Memoryview of the primary tier's CPU KV cache.
-        tier_type: Tier type identifier, set by SecondaryTierFactory.
-        root_dir: Root directory for block files.
-        n_read_threads: Number of read-priority I/O threads.
-        n_write_threads: Number of write-priority I/O threads.
-        enable_kv_events: Emit BlockStored KV events for blocks
-            successfully stored to this tier. Effective only when KV
-            cache events are enabled globally (kv_events_config).
-        locality: Whether this tier's storage is LOCAL or REMOTE relative
-            to the publishing vLLM instance.
-        backpressure_detector: Optional backpressure detector.
-
         """
-        super().__init__(
-            offloading_spec, primary_kv_view, tier_type, backpressure_detector
-        )
+        Args:
+            offloading_spec: Contains normalized offloading configuration and
+                blocks_per_chunk.
+            primary_kv_view: Memoryview of the primary tier's CPU KV cache.
+            tier_type: Tier type identifier, set by SecondaryTierFactory.
+            root_dir: Root directory for block files.
+            n_read_threads: Number of read-priority I/O threads.
+            n_write_threads: Number of write-priority I/O threads.
+            enable_kv_events: Emit BlockStored KV events for blocks
+                successfully stored to this tier. Effective only when KV
+                cache events are enabled globally (kv_events_config).
+            locality: Whether this tier's storage is LOCAL or REMOTE relative
+                to the publishing vLLM instance.
+        """
+        super().__init__(offloading_spec, primary_kv_view, tier_type)
         self.locality = Locality(locality) if locality is not None else None
 
         self.events: list[OffloadingEvent] | None = None
@@ -155,8 +157,6 @@ class FileSystemTierManager(SecondaryTierManager):
         # Keys of in-flight load (promotion) jobs, so a failed load can mark
         # its own cached lookup verdicts False (see get_finished_jobs).
         self._load_job_keys: dict[JobId, list[OffloadKey]] = {}
-        # Block count per in-flight job, used to report transfer_bytes.
-        self._job_block_counts: dict[JobId, int] = {}
         # Per load job: how many blocks loaded before a failure (partial keep).
         # Written by the pool worker inside the load task before it raises (so
         # before task_done publishes the job); read on the scheduler thread in
@@ -206,6 +206,31 @@ class FileSystemTierManager(SecondaryTierManager):
             thread_name_prefix="vllm_kv_py_fs",
         )
 
+        # LRU capacity management (fork feature): 0 disables (unbounded).
+        # When exceeded, least-recently-used chunk files are unlinked until
+        # usage drops below max_capacity_gb * evict_watermark. Files stored or
+        # touched within evict_protect_s seconds are exempt, protecting
+        # lookup-hit -> load races. Assumes one manager owns root_dir.
+        self._capacity: FsCapacityManager | None = None
+        self._capacity_job_paths: dict[JobId, list[str]] = {}
+        if max_capacity_gb > 0:
+            self._capacity = FsCapacityManager(
+                capacity_bytes=int(max_capacity_gb * 1e9),
+                watermark=evict_watermark,
+                protect_s=evict_protect_s,
+            )
+            # Chunk files live under the mapper's base dir; legacy layouts
+            # used sibling per-rank dirs (<base>_r<idx>) - scan both.
+            base_path = os.path.dirname(config_path)
+            parent = os.path.dirname(base_path) or "."
+            base_name = os.path.basename(base_path)
+            scan_dirs = [base_path] + [
+                os.path.join(parent, d)
+                for d in sorted(os.listdir(parent))
+                if d.startswith(base_name + "_r")
+            ]
+            self._capacity.scan(scan_dirs)
+
         self._lookup_manager = FsAsyncLookupManager(tier=self, tier_type=self.tier_type)
 
     @override
@@ -217,6 +242,8 @@ class FileSystemTierManager(SecondaryTierManager):
         result = self._lookup_manager.lookup(key, req_context)
         if result is None:
             return LookupResult.RETRY
+        if result and self._capacity is not None:
+            self._capacity.record_use(self.file_mapper.get_file_name(key))
         return LookupResult.HIT if result else LookupResult.MISS
 
     @override
@@ -224,6 +251,10 @@ class FileSystemTierManager(SecondaryTierManager):
         keys = list(job_metadata.keys)
         if self.events is not None:
             self._store_job_keys[job_metadata.job_id] = keys
+        if self._capacity is not None:
+            self._capacity_job_paths[job_metadata.job_id] = [
+                self.file_mapper.get_file_name(key) for key in keys
+            ]
         task = functools.partial(
             batch_store_block,
             [self.file_mapper.get_file_name(key) for key in keys],
@@ -232,7 +263,6 @@ class FileSystemTierManager(SecondaryTierManager):
             self._block_size,
             self._use_o_direct,
         )
-        self._job_block_counts[job_metadata.job_id] = len(keys)
         self._pool.enqueue_store(job_metadata.job_id, 1, [task])
 
     @override
@@ -242,7 +272,6 @@ class FileSystemTierManager(SecondaryTierManager):
         # keys as a miss (see get_finished_jobs).
         keys = list(job_metadata.keys)
         self._load_job_keys[job_id] = keys
-        self._job_block_counts[job_id] = len(keys)
         paths = [self.file_mapper.get_file_name(key) for key in keys]
         offsets = [int(cid) * self._block_size for cid in job_metadata.chunk_ids]
 
@@ -281,8 +310,12 @@ class FileSystemTierManager(SecondaryTierManager):
         as a miss here (scheduler thread)."""
         results = []
         for job_id, success, transfer_time in self._pool.get_finished():
-            block_count = self._job_block_counts.pop(job_id, 0)
-            transfer_bytes = block_count * self._block_size if block_count else None
+            if self._capacity is not None:
+                cap_paths = self._capacity_job_paths.pop(job_id, None)
+                if success and cap_paths:
+                    for path in cap_paths:
+                        with contextlib.suppress(OSError):
+                            self._capacity.record_store(path, os.path.getsize(path))
             if self.events is not None:
                 keys = self._store_job_keys.pop(job_id, None)
                 if success and keys:
@@ -310,7 +343,6 @@ class FileSystemTierManager(SecondaryTierManager):
                         success=False,
                         successful_keys=tuple(successful) if successful else None,
                         transfer_time=transfer_time,
-                        transfer_bytes=transfer_bytes,
                     )
                 )
                 continue
@@ -319,7 +351,6 @@ class FileSystemTierManager(SecondaryTierManager):
                     job_id=job_id,
                     success=success,
                     transfer_time=transfer_time,
-                    transfer_bytes=transfer_bytes,
                 )
             )
         return results
@@ -340,11 +371,16 @@ class FileSystemTierManager(SecondaryTierManager):
 
     @override
     def on_schedule_end(self, context: ScheduleEndContext) -> None:
+        if self._capacity is not None:
+            # Cheap no-op while under capacity; keeps usage converging toward
+            # the limit even when no store jobs are completing.
+            self._capacity.evict()
         self._lookup_manager.flush()
 
     @override
     def shutdown(self) -> None:
-        """Release resources held by this tier.
+        """
+        Release resources held by this tier.
 
         Shuts down the lookup manager and the thread pool,
         clearing pending tasks and waiting for active threads to complete.

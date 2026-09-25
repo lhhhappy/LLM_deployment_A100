@@ -149,23 +149,19 @@ impl InferenceServiceImpl {
                 })?);
             }
 
-            let media = super::media::from_proto(media)?;
+            let media = convert::media_parts_from_request(media)?;
             if !media.is_empty() {
                 let Prompt::TokenIds(mut token_ids) = text_request.prompt else {
                     return Err(Status::invalid_argument(
                         "multimodal gRPC requests must provide token_ids input",
                     ));
                 };
-                let mm_features =
-                    self.state.chat.prepare_media(media, &mut token_ids).await.map_err(
-                        |error| {
-                            if error.is_request_validation_error() {
-                                Status::invalid_argument(error.to_report_string())
-                            } else {
-                                Status::internal(error.to_report_string())
-                            }
-                        },
-                    )?;
+                let mm_features = self
+                    .state
+                    .chat
+                    .prepare_media(media, &mut token_ids)
+                    .await
+                    .map_err(|error| Status::internal(error.to_report_string()))?;
                 text_request.prompt = Prompt::TokenIds(token_ids);
                 text_request.mm_features = mm_features;
             }
@@ -245,6 +241,12 @@ impl pb::inference_server::Inference for InferenceServiceImpl {
             .instrument(request_span.clone())
             .await
             .map_err(|error| log_text_error(&request_span, started_at, "collection", error))?;
+        info!(
+            parent: &request_span,
+            elapsed_ms = started_at.elapsed().as_millis() as u64,
+            "gRPC inference request completed"
+        );
+
         // Build the single aggregated response.
         let prompt_info = convert::to_prompt_info(
             &collected.prompt_token_ids,
@@ -257,7 +259,6 @@ impl pb::inference_server::Inference for InferenceServiceImpl {
             finish_reason: collected.finish_reason,
             kv_transfer_params: collected.kv_transfer_params,
             ec_transfer_params: collected.ec_transfer_params,
-            sampling_mask: collected.sampling_mask,
         };
 
         let outputs = convert::to_sequence_output(
@@ -266,11 +267,6 @@ impl pb::inference_server::Inference for InferenceServiceImpl {
             collected.logprobs.as_ref(),
             Some(&finish_info),
             &response_opts,
-        )?;
-        info!(
-            parent: &request_span,
-            elapsed_ms = started_at.elapsed().as_millis() as u64,
-            "gRPC inference request completed"
         );
 
         Ok(Response::new(pb::GenerateResponse {
@@ -335,21 +331,19 @@ impl pb::inference_server::Inference for InferenceServiceImpl {
                                     logprobs,
                                 },
                             finished,
-                        }) => convert::to_sequence_output(
-                            &decoded.text,
-                            &token_ids,
-                            logprobs.as_ref(),
-                            finished.as_deref(),
-                            &response_opts,
-                        )
-                        .map(|outputs| pb::GenerateResponse {
+                        }) => Ok(pb::GenerateResponse {
                             prompt_info: None,
-                            outputs: Some(outputs),
+                            outputs: Some(convert::to_sequence_output(
+                                &decoded.text,
+                                &token_ids,
+                                logprobs.as_ref(),
+                                finished.as_deref(),
+                                &response_opts,
+                            )),
                         }),
                     };
 
-                    let failed = response.is_err();
-                    if tx.send(response).await.is_err() || failed {
+                    if tx.send(response).await.is_err() {
                         break;
                     }
                 }

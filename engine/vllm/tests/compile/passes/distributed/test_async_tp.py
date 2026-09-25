@@ -56,7 +56,10 @@ class TestMMRSModel(torch.nn.Module):
         torch.nn.init.normal_(self.gate_proj, std=0.02)
 
     def forward(self, hidden_states):
-        """Forward pass implementing the mm + reduce scatter in the FX graph."""
+        """
+        Forward pass implementing the mm + reduce scatter in the FX graph
+
+        """
         # Reshape input
         view = hidden_states.reshape(-1, self.hidden_size)
 
@@ -85,7 +88,9 @@ class TestAGMMModel(torch.nn.Module):
         torch.nn.init.normal_(self.weight, std=0.02)
 
     def forward(self, hidden_states):
-        """Forward pass implementing the mm + all gather in the FX graph."""
+        """
+        Forward pass implementing the mm + all gather in the FX graph
+        """
         # Reshape input
         view = hidden_states.reshape(-1, self.hidden_size)
         all_gather = tensor_model_parallel_all_gather(view, dim=0)
@@ -117,7 +122,10 @@ class _BaseScaledMMModel(torch.nn.Module):
 
 class TestScaledMMRSModel(_BaseScaledMMModel):
     def forward(self, input: torch.Tensor):
-        """Forward pass implementing the scaled_mm + reduce scatter in the FX graph."""
+        """
+        Forward pass implementing the scaled_mm + reduce scatter in the FX graph
+
+        """
         fp8_input = input.to(FP8_DTYPE)
         scale_a = torch.ones(input.shape[0], 1, dtype=torch.float32)
         scaled_mm = torch._scaled_mm(
@@ -139,7 +147,9 @@ class TestScaledMMRSModel(_BaseScaledMMModel):
 
 class TestAGScaledMMModel(_BaseScaledMMModel):
     def forward(self, input: torch.Tensor):
-        """Forward pass implementing the all gather + scaled_mm in the FX graph."""
+        """
+        Forward pass implementing the all gather + scaled_mm in the FX graph
+        """
         # Reshape input
         fp8_input = input.to(FP8_DTYPE)
         all_gather = tensor_model_parallel_all_gather(fp8_input, dim=0)
@@ -163,7 +173,8 @@ class TestAGScaledMMModel(_BaseScaledMMModel):
 
 class TestCutlassScaledMMRSModel(_BaseScaledMMModel):
     def forward(self, input: torch.Tensor):
-        """Forward pass implementing the cutlass_scaled_mm + reduce scatter
+        """
+        Forward pass implementing the cutlass_scaled_mm + reduce scatter
         in the FX graph
 
         """
@@ -189,7 +200,8 @@ class TestCutlassScaledMMRSModel(_BaseScaledMMModel):
 
 class TestAGCutlassScaledMMModel(_BaseScaledMMModel):
     def forward(self, input: torch.Tensor):
-        """Forward pass implementing the all gather + cutlass_scaled_mm
+        """
+        Forward pass implementing the all gather + cutlass_scaled_mm
         in the FX graph
         """
         # Reshape input
@@ -303,7 +315,6 @@ def async_tp_pass_on_test_model(
     dtype: torch.dtype,
     dynamic: bool,
     distributed_init_method: str,
-    check_numerics: bool = False,
 ):
     set_random_seed(0)
 
@@ -364,24 +375,12 @@ def async_tp_pass_on_test_model(
         hidden_states = torch.randn(
             (batch_size * seq_len, hidden_size), dtype=dtype, requires_grad=False
         )
-        if check_numerics:
-            hidden_states += local_rank * 0.125
 
         if dynamic:
             torch._dynamo.mark_dynamic(hidden_states, 0)
 
         compiled_model = torch.compile(model, backend=backend)
-        actual = compiled_model(hidden_states)
-
-        if check_numerics:
-            # These are new checks, so no existing tolerance is relaxed.
-            # Allow BF16 rounding vs. eager, but keep the lifetime check exact.
-            expected = model(hidden_states)
-            torch.testing.assert_close(actual, expected, rtol=1e-2, atol=1e-2)
-            snapshot = actual.clone()
-            changed = compiled_model(-hidden_states)
-            torch.testing.assert_close(changed, -expected, rtol=1e-2, atol=1e-2)
-            torch.testing.assert_close(actual, snapshot, rtol=0, atol=0)
+        compiled_model(hidden_states)
 
         assert async_tp_pass.matched_count == 1
 

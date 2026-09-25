@@ -12,15 +12,10 @@ from torch import nn
 from typing_extensions import assert_never
 
 import vllm.envs as envs
-from vllm.config import (
-    LoadConfig,
-    ModelConfig,
-    VllmConfig,
-    replace,
-    set_current_vllm_config,
-)
+from vllm.config import ModelConfig, VllmConfig, set_current_vllm_config
 from vllm.logger import init_logger
 from vllm.model_executor.layers.attention import is_deferred_attention_layer
+from vllm.model_executor.layers.hpc import HpcModule
 from vllm.model_executor.layers.quantization.base_config import (
     QuantizationConfig,
     QuantizeMethodBase,
@@ -29,11 +24,9 @@ from vllm.model_executor.model_loader.reload import (
     record_metadata_for_reloading,
     set_torchao_reload_attrs,
 )
-from vllm.model_executor.model_loader.weight_cache.utils import (
-    is_draft_model_cacheable,
-)
 from vllm.model_executor.model_loader.weight_tying import maybe_retie_word_embeddings
 from vllm.model_executor.models.interfaces import SupportsQuant
+from vllm.model_executor.offloader.base import pin_exact, release_pinned
 from vllm.model_executor.utils import is_weights_pre_processed
 from vllm.tracing import instrument
 from vllm.utils.mem_utils import release_device_memory_under_pressure
@@ -41,33 +34,6 @@ from vllm.utils.platform_utils import is_pin_memory_available
 from vllm.utils.torch_utils import get_accelerator_view_from_cpu_tensor
 
 logger = init_logger(__name__)
-
-
-def get_draft_load_config(vllm_config: VllmConfig) -> LoadConfig:
-    """Get load config for the speculative draft model."""
-    speculative_config = vllm_config.speculative_config
-    if (
-        speculative_config is not None
-        and speculative_config.draft_load_config is not None
-    ):
-        return speculative_config.draft_load_config
-    load_config = vllm_config.load_config
-    if load_config is not None and load_config.load_format != "ipc_cache":
-        return load_config
-    kwargs = (
-        # Route the draft to the daemon's draft group.
-        {
-            "model_loader_extra_config": {
-                **load_config.model_loader_extra_config,
-                "is_draft": True,
-            }
-        }
-        if is_draft_model_cacheable(speculative_config)
-        # No daemon draft group for this method; load from disk instead of
-        # hitting the target daemon with a mismatching fingerprint.
-        else {"load_format": "auto", "model_loader_extra_config": {}}
-    )
-    return replace(load_config, **kwargs)
 
 
 @instrument(span_name="Initialize model")
@@ -189,6 +155,15 @@ def process_weights_after_loading(
             with device_loading_context(module, target_device):
                 module.process_weights_after_loading(model_config.dtype)
 
+    # Process HPC modules (HpcRopeNorm, etc.) that rely on
+    # process_weights_after_loading being called from the model's
+    # load_weights(). When using DummyModelLoader (e.g. profiling or
+    # sleep/wake_up reload), the model's load_weights() is not called, so we
+    # must handle HPC modules here generically.
+    for _, module in model.named_modules():
+        if isinstance(module, HpcModule):
+            module.process_weights_after_loading(model)
+
     # Model-level post-load hook, after the per-layer quant finalize.
     if hasattr(model, "process_weights_after_loading"):
         model.process_weights_after_loading()
@@ -207,7 +182,9 @@ def device_loading_context(module: torch.nn.Module, target_device: torch.device)
         return
 
     cpu_params: set[str] = set()
-    uva_offloaded_parameters: list[str] = []
+    # name -> data_ptr of the pinned host mapping backing the UVA view, so a
+    # re-offload after post-processing can release the first mapping.
+    uva_offloaded_parameters: dict[str, int] = {}
 
     # Store which parameters are on CPU and move them to the GPU
     for name, p in module.named_parameters():
@@ -215,7 +192,7 @@ def device_loading_context(module: torch.nn.Module, target_device: torch.device)
             cpu_params.add(name)
             p.data = p.data.to(target_device)
         if getattr(p, "_vllm_is_uva_offloaded", False):
-            uva_offloaded_parameters.append(name)
+            uva_offloaded_parameters[name] = p.data.data_ptr()
         # Parameters already on target device are not touched
 
     try:
@@ -238,9 +215,15 @@ def device_loading_context(module: torch.nn.Module, target_device: torch.device)
             if name in uva_offloaded_parameters and not getattr(
                 p, "_vllm_is_uva_offloaded", False
             ):
-                cpu_data = torch.empty_like(
-                    p.data, device="cpu", pin_memory=use_pin_memory
-                ).copy_(p.data)
+                # The parameter is being re-offloaded after post-processing
+                # replaced it (e.g. a Marlin repack). Pin at exact size again
+                # (see offloader.base.pin_exact) and release the mapping the
+                # first offload created, or both copies stay resident.
+                if use_pin_memory:
+                    cpu_data = pin_exact(p.data.to(device="cpu"))
+                    release_pinned(uva_offloaded_parameters[name])
+                else:
+                    cpu_data = torch.empty_like(p.data, device="cpu").copy_(p.data)
                 p.data = get_accelerator_view_from_cpu_tensor(cpu_data)
                 p._vllm_is_uva_offloaded = True
 
@@ -314,7 +297,8 @@ def get_architecture_class_name(model_config: ModelConfig) -> str:
 def configure_quant_config(
     quant_config: QuantizationConfig, model_class: type[nn.Module]
 ):
-    """Pass packed_modules_mapping by reference to quant_config so that
+    """
+    Pass packed_modules_mapping by reference to quant_config so that
     quant_config can properly match fused modules
 
     Note that model attributes are passed by reference to quant_config,

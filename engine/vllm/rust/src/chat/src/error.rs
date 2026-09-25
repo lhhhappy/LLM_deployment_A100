@@ -19,10 +19,6 @@ pub enum Error {
     ChatTemplate(String),
     #[error("{0}")]
     InvalidReasoningEffort(String),
-    #[error("{message}")]
-    InvalidReasoningControl { message: String },
-    #[error("chat role `{role}` is not supported by this chat renderer")]
-    UnsupportedChatRole { role: String },
     #[error("multimodal input is not supported by this chat renderer")]
     UnsupportedMultimodalRenderer,
     #[error("unsupported multimodal content: {0}")]
@@ -31,8 +27,6 @@ pub enum Error {
     UnsupportedModality { modality: String },
     #[error("At most {limit} {modality}(s) may be provided in one prompt.")]
     MmLimitExceeded { modality: String, limit: usize },
-    #[error("invalid inline multimodal features: {message}")]
-    InvalidPreprocessedMultimodal { message: String },
     #[error("multimodal preprocessing error: {0}")]
     Multimodal(#[message] String),
     #[error("{kind} parsing is not available for model `{model_id}`")]
@@ -59,11 +53,6 @@ pub enum Error {
     ParserInitialization {
         kind: &'static str,
         name: String,
-        #[source]
-        error: BoxedError,
-    },
-    #[error("failed to initialize request output parser")]
-    OutputParserInitialization {
         #[source]
         error: BoxedError,
     },
@@ -94,11 +83,8 @@ pub enum Error {
     ToolChoiceRequiresTools,
     #[error("tool_choice function `{name}` was not found in the available tools")]
     ToolChoiceFunctionNotFound { name: String },
-    #[error("failed to build output grammar")]
-    OutputGrammar {
-        #[source]
-        error: BoxedError,
-    },
+    #[error("failed to build structural tag: {message}")]
+    StructuralTag { message: String },
     #[error(transparent)]
     Text(#[from] vllm_text::Error),
     #[error(transparent)]
@@ -113,16 +99,13 @@ impl Error {
         match self {
             Self::PromptTooLong { .. }
             | Self::InvalidReasoningEffort(_)
-            | Self::InvalidReasoningControl { .. }
             | Self::DuplicateToolName { .. }
             | Self::ToolChoiceRequiresTools
-            | Self::ToolChoiceFunctionNotFound { .. }
-            | Self::UnsupportedChatRole { .. } => true,
+            | Self::ToolChoiceFunctionNotFound { .. } => true,
             Self::Text(error) => error.is_request_validation_error(),
             Self::UnsupportedMultimodalRenderer
             | Self::UnsupportedMultimodalContent(_)
             | Self::UnsupportedModality { .. }
-            | Self::InvalidPreprocessedMultimodal { .. }
             | Self::MmLimitExceeded { .. } => true,
 
             _ => false,

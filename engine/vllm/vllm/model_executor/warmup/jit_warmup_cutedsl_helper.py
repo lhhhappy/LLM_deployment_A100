@@ -3,25 +3,19 @@
 
 from abc import abstractmethod
 from collections.abc import Callable, Mapping
+from functools import wraps
 from typing import Any, ClassVar, Generic, TypeAlias, TypeVar
 
-from vllm.model_executor.warmup.jit_warmup import (
-    VllmJitKernel,
-)
+from vllm.model_executor.warmup.jit_warmup import VllmJitKernel
 
 DEFAULT_CUTEDSL_COMPILE_OPTIONS = "--enable-tvm-ffi"
 
 CompileKeyT = TypeVar("CompileKeyT")
-CuTeDSLLaunchSpec: TypeAlias = (
-    tuple[CompileKeyT, tuple[Any, ...]]
-    | tuple[CompileKeyT, tuple[Any, ...], Any]
-    | tuple[
-        CompileKeyT,
-        tuple[Any, ...],
-        Any,
-        Callable[[], Any],
-    ]
-)
+CuTeDSLLaunchSpec: TypeAlias = tuple[
+    CompileKeyT,
+    tuple[Any, ...],
+    Mapping[str, Any] | None,
+]
 
 
 def cutedsl_fake_stream(*, use_tvm_ffi_env_stream: bool = True) -> Any:
@@ -50,7 +44,6 @@ class VllmCuTeDSLJitKernel(VllmJitKernel[CompileKeyT], Generic[CompileKeyT]):
     """CuTeDSL owner whose compiled executor is shared by warmup and runtime."""
 
     kernel: ClassVar[Any]
-    bind_launch_inputs = False
 
     @abstractmethod
     def warmup_inputs(self, compile_key: CompileKeyT) -> tuple[Any, ...]:
@@ -65,15 +58,23 @@ class VllmCuTeDSLJitKernel(VllmJitKernel[CompileKeyT], Generic[CompileKeyT]):
             *self.warmup_inputs(compile_key),
         )
 
-    def launch(
-        self,
-        launch_spec: CuTeDSLLaunchSpec[CompileKeyT],
-        _inputs: Mapping[str, Any],
+
+def cutedsl_kernel_launcher(
+    call_fn: Callable[..., CuTeDSLLaunchSpec[CompileKeyT]],
+) -> Callable[..., Any]:
+    """Invoke a cached CuTeDSL executor from a declarative ``__call__``."""
+
+    @wraps(call_fn)
+    def wrapper(
+        self: VllmCuTeDSLJitKernel[CompileKeyT],
+        *args: Any,
+        **kwargs: Any,
     ) -> Any:
-        # (compile_key, args), optionally followed by output and epilogue.
-        compile_key, launch_args = launch_spec[:2]
-        executor = self._get_or_compile(compile_key)
-        result = executor(*launch_args)
-        if len(launch_spec) == 4:
-            return launch_spec[3]()
-        return launch_spec[2] if len(launch_spec) == 3 else result
+        compile_key, launch_args, runtime_context = call_fn(self, *args, **kwargs)
+        executor = self._get_or_compile(
+            compile_key,
+            runtime_context=runtime_context,
+        )
+        return executor(*launch_args)
+
+    return wrapper

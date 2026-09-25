@@ -28,10 +28,8 @@ from vllm.model_executor.layers.quantization.utils.flashinfer_utils import (
 from vllm.model_executor.layers.quantization.utils.quant_utils import (
     QuantKey,
     kNvfp4Dynamic,
-    kNvfp4DynamicToken,
     kNvfp4Static,
 )
-from vllm.model_executor.utils import is_weights_pre_processed
 from vllm.platforms import current_platform
 from vllm.utils.flashinfer import has_flashinfer_trtllm_fused_moe
 
@@ -43,7 +41,9 @@ _PER_TOKEN_BASE_GLOBAL_SCALE = 1.0 / (448.0 * 6.0)
 
 
 class TrtLlmNvFp4ExpertsBase:
-    """NvFp4 TRTLLM-Gen MoE kernels. Supports modular and monolithic interface."""
+    """
+    NvFp4 TRTLLM-Gen MoE kernels. Supports modular and monolithic interface.
+    """
 
     def __init__(
         self,
@@ -149,9 +149,8 @@ class TrtLlmNvFp4ExpertsBase:
         return self.quant_config.g1_alphas * self.quant_config.a2_gscale
 
     def process_weights_after_loading(self, layer: torch.nn.Module) -> None:
-        if not is_weights_pre_processed():
-            layer.w13_weight_scale_2.data.mul_(layer.w13_input_scale)
-            layer.w2_weight_scale_2.data.mul_(layer.w2_input_scale)
+        layer.w13_weight_scale_2.data.mul_(layer.w13_input_scale)
+        layer.w2_weight_scale_2.data.mul_(layer.w2_input_scale)
         # Recompute g1_scale_c since g1_alphas was just fused in-place.
         # Register as a layer parameter so EPLB rearranges it alongside
         # other expert weights.
@@ -223,10 +222,10 @@ class TrtLlmNvFp4ExpertsBase:
         activation_key: QuantKey | None,
     ) -> bool:
         """Supports Nvfp4 quantization."""
-        return weight_key == kNvfp4Static and activation_key in (
-            kNvfp4Dynamic,
-            kNvfp4DynamicToken,
-        )
+        SUPPORTED_W_A = [
+            (kNvfp4Static, kNvfp4Dynamic),
+        ]
+        return (weight_key, activation_key) in SUPPORTED_W_A
 
     @staticmethod
     def _supports_activation(activation: MoEActivation) -> bool:
@@ -299,7 +298,9 @@ class TrtLlmNvFp4ExpertsBase:
 
 
 class TrtLlmNvFp4ExpertsModular(TrtLlmNvFp4ExpertsBase, mk.FusedMoEExpertsModular):
-    """Modular version of the implementation (just the experts)."""
+    """
+    Modular version of the implementation (just the experts).
+    """
 
     @staticmethod
     def _supports_parallel_config(moe_parallel_config: FusedMoEParallelConfig) -> bool:
@@ -317,12 +318,22 @@ class TrtLlmNvFp4ExpertsModular(TrtLlmNvFp4ExpertsBase, mk.FusedMoEExpertsModula
         expert_tokens_meta: mk.ExpertTokensMetadata | None,
         activation: MoEActivation,
     ) -> tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]:
+        if self.per_token_activation:
+            # Deferred input quant leaves K unpacked here, breaking the
+            # workspace assumptions below. Per-token NVFP4 is only supported on
+            # the monolithic (non-EP) path for now.
+            raise NotImplementedError(
+                "NVFP4 per-token activation is only supported on the monolithic "
+                "(non-EP) FlashInfer TRTLLM MoE path."
+            )
+
         # The workspaces for this implementation are managed by flashinfer.
         workspace1 = (0,)
         workspace2 = (0,)
 
-        # Per-token inputs are unpacked; otherwise each byte holds two FP4 values.
-        assert self.hidden_dim == (K if self.expects_unquantized_inputs else K * 2)
+        # Hidden states are Nvfp4, packed into int8 dtype, so we
+        # need to multiply K by 2 to get the output shape right.
+        assert self.hidden_dim == K * 2
         output = (M, self.hidden_dim)
 
         return (workspace1, workspace2, output)
@@ -340,7 +351,7 @@ class TrtLlmNvFp4ExpertsModular(TrtLlmNvFp4ExpertsBase, mk.FusedMoEExpertsModula
         topk_ids: torch.Tensor,
         activation: MoEActivation,
         global_num_experts: int,
-        a1q_scale: torch.Tensor | None,
+        a1q_scale: torch.Tensor,
     ):
         import flashinfer
 
@@ -454,7 +465,9 @@ class TrtLlmNvFp4ExpertsModular(TrtLlmNvFp4ExpertsBase, mk.FusedMoEExpertsModula
 class TrtLlmNvFp4ExpertsMonolithic(
     TrtLlmNvFp4ExpertsBase, mk.FusedMoEExpertsMonolithic
 ):
-    """Monolithic version of the kernel (router + experts)."""
+    """
+    Monolithic version of the kernel (router + experts).
+    """
 
     def supports_routing_replay_capture(self) -> bool:
         return True

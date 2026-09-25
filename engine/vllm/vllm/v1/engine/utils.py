@@ -142,7 +142,8 @@ def _node_ip_from_resources(node_resources: dict) -> str | None:
 
 
 class CoreEngineProcManager:
-    """Utility class to handle creation, readiness, and shutdown
+    """
+    Utility class to handle creation, readiness, and shutdown
     of background processes used by the AsyncLLM and LLMEngine.
     """
 
@@ -254,6 +255,7 @@ class CoreEngineProcManager:
 
     def monitor_engine_liveness(self) -> None:
         """Monitor engine core process liveness."""
+
         sentinel_to_proc = {proc.sentinel: proc for proc in self.processes}
         sentinels = set(sentinel_to_proc.keys())
 
@@ -314,7 +316,8 @@ def set_assigned_physical_gpu_ids_for_dp_rank(
     local_dp_rank: int,
     user_assigned_gpu_ids: list[int] | None = None,
 ) -> None:
-    """Populate assigned_physical_gpu_ids on the config for the given DP rank.
+    """
+    Populate assigned_physical_gpu_ids on the config for the given DP rank.
 
     user_assigned_gpu_ids is the full (un-sharded) --device-ids list, if the
     user provided one; this DP rank's shard is sliced from it. It is passed
@@ -342,7 +345,8 @@ def get_physical_gpu_ids_for_local_dp_rank(
     local_world_size: int | None = None,
     user_assigned_gpu_ids: list[int] | None = None,
 ) -> list[int]:
-    """Returns list of physical GPU IDs for the specified
+    """
+    Returns list of physical GPU IDs for the specified
     data parallel rank.
 
     For example, if world_size=2 and local_dp_rank=1, and there are 4 devices,
@@ -395,7 +399,8 @@ def _apply_dp_identity_suffix(dp_vllm_config, dp_rank: int) -> None:
 
 
 class CoreEngineActorManager:
-    """Utility class to handle creation, readiness, and shutdown
+    """
+    Utility class to handle creation, readiness, and shutdown
     of core engine Ray actors used by the AsyncLLM and LLMEngine.
 
     Different from CoreEngineProcManager, this class manages
@@ -547,7 +552,10 @@ class CoreEngineActorManager:
     def create_dp_placement_groups(
         vllm_config: VllmConfig,
     ) -> tuple[list["PlacementGroup"], list[int]]:
-        """Create placement groups for data parallel."""
+        """
+        Create placement groups for data parallel.
+        """
+
         import ray
         from ray._private.state import available_resources_per_node
 
@@ -761,7 +769,9 @@ class CoreEngineActorManager:
     def add_dp_placement_groups(
         old_vllm_config: VllmConfig, new_data_parallel_size: int
     ) -> tuple[list["PlacementGroup"], list[int]]:
-        """Add placement groups for new data parallel size."""
+        """
+        Add placement groups for new data parallel size.
+        """
         import ray
         from ray._private.state import (
             available_resources_per_node,
@@ -1098,6 +1108,7 @@ def launch_core_engines(
     addresses: EngineZmqAddresses,
 ) -> Iterator[CoreEngineLaunch]:
     """Launch engine and DP coordinator processes as needed."""
+
     parallel_config = vllm_config.parallel_config
     dp_size = parallel_config.data_parallel_size
     local_engine_count = parallel_config.data_parallel_size_local

@@ -1,9 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Triton sparse MLA attention with split-KV for low-batch decode.
-
-Ported from github.com/wtdcode/vllm-backport (commit a6ef07a3f, Apache-2.0).
-"""
+"""Triton sparse MLA attention with split-KV for low-batch decode."""
 
 import functools
 
@@ -450,7 +447,6 @@ def triton_mla_sparse_attention(
 
     Returns:
         out:   [num_tokens, num_heads_q, _BLOCK_DV] bf16
-
     """
     num_tokens, num_heads_q, dim_qk = q.shape
     # DeepSeek-V3.2 / GLM-5 carry a 64-wide RoPE tail (dim_qk 576); GLM-5.3-Flash

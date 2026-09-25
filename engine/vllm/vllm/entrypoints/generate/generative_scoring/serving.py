@@ -60,7 +60,6 @@ class GenerativeScoringRequest(OpenAIBaseModel):
             the full vocab for those ids (False).
         item_first: If True, prepend items to query. Otherwise append items to query.
         add_special_tokens: Whether to add special tokens when tokenizing.
-
     """
 
     model: str | None = None
@@ -113,7 +112,6 @@ class GenerativeScoringItemResult(OpenAIBaseModel):
         index: The index of this item in the input items list.
         object: Type of object, always "score".
         score: The probability score for the first label token.
-
     """
 
     index: int
@@ -131,7 +129,6 @@ class GenerativeScoringResponse(OpenAIBaseModel):
         model: The model used for scoring.
         data: List of scoring results, one per input item.
         usage: Token usage information.
-
     """
 
     id: str = Field(default="")
@@ -191,7 +188,6 @@ class ServingGenerativeScoring(BaseServing):
         Returns:
             GenerativeScoringResponse with probabilities for each item, or
             ErrorResponse if an error occurred.
-
         """
         # Check model
         error_check_ret = await self._check_model(request)  # type: ignore[arg-type]
@@ -405,7 +401,6 @@ class ServingGenerativeScoring(BaseServing):
 
         Returns:
             Tuple of (list of EngineInput, list of prompt token counts).
-
         """
         # Tokenize query if it's a string
         if isinstance(request.query, str):
@@ -460,7 +455,6 @@ class ServingGenerativeScoring(BaseServing):
 
         Returns:
             Dictionary mapping token_id to probability.
-
         """
         if apply_softmax:
             # Normalize over only the label tokens (subset softmax)

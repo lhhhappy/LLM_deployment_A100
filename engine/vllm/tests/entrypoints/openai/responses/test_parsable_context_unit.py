@@ -36,6 +36,9 @@ class _NoOpParser(DelegatingParser):
     def is_reasoning_end(self, input_ids: list[int]) -> bool:
         return False
 
+    def extract_content_ids(self, input_ids: list[int]) -> list[int]:
+        return input_ids
+
     def extract_reasoning(self, model_output, request):
         return None, model_output
 
@@ -59,6 +62,9 @@ class _ReasoningOnlyParser(DelegatingParser):
 
     def is_reasoning_end(self, input_ids: list[int]) -> bool:
         return False
+
+    def extract_content_ids(self, input_ids: list[int]) -> list[int]:
+        return input_ids
 
     def extract_reasoning(self, model_output, request):
         if "<think>" in model_output and "</think>" in model_output:
@@ -124,6 +130,9 @@ class _ToolCallingParser(DelegatingParser):
 
     def is_reasoning_end(self, input_ids: list[int]) -> bool:
         return False
+
+    def extract_content_ids(self, input_ids: list[int]) -> list[int]:
+        return input_ids
 
     def extract_reasoning(self, model_output, request):
         return None, model_output

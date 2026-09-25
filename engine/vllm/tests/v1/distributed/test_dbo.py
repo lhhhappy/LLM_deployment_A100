@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Test Dual Batch Overlap (DBO) with Data Parallelism + Expert Parallelism.
+"""
+Test Dual Batch Overlap (DBO) with Data Parallelism + Expert Parallelism.
 
 DBO is specifically designed for DP+EP scenarios to hide communication latency
 by overlapping computation of two batches. This test validates that DBO works
@@ -53,7 +54,9 @@ DEEPEP_BACKENDS = [
     ),
 )
 def test_dbo_dp_ep_gsm8k(all2all_backend: str, num_gpus_available):
-    """Test DBO with DP+EP using GSM8K evaluation."""
+    """
+    Test DBO with DP+EP using GSM8K evaluation.
+    """
     lm_eval = pytest.importorskip("lm_eval")
     required_gpus = DP_SIZE
 

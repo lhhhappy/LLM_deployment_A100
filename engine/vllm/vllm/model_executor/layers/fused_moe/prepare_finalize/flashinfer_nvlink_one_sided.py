@@ -13,10 +13,9 @@ from vllm.model_executor.layers.fused_moe.utils import moe_kernel_quantize_input
 from vllm.utils.flashinfer import nvfp4_block_scale_interleave
 
 
-def get_local_sizes() -> list[int] | None:
+def get_local_sizes():
     dp_metadata = get_forward_context().dp_metadata
-    if dp_metadata is None:  # PCP with DP=1
-        return None
+    assert dp_metadata is not None
     return dp_metadata.get_chunk_sizes_across_dp_rank()
 
 

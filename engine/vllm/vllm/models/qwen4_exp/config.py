@@ -4,7 +4,7 @@
 
 from typing import Any, ClassVar, cast
 
-from transformers import PreTrainedConfig
+from transformers import PretrainedConfig
 from transformers.models.qwen3_vl.configuration_qwen3_vl import (
     Qwen3VLVisionConfig,
 )
@@ -18,12 +18,6 @@ _QSA_CONFIG_FIELDS = (
     "indexer_budget",
     "indexer_compress_ratio",
 )
-
-# Transformers labels Qwen4Exp's sparse-attention layers `qwen_sparse_attention`.
-# Older checkpoints label them `full_attention` and mark QSA by setting the
-# indexer fields for the whole model.
-QSA_LAYER_TYPE = "qwen_sparse_attention"
-ATTENTION_LAYER_TYPES = ("full_attention", QSA_LAYER_TYPE)
 
 
 class Qwen4ExpVisionConfig(Qwen3VLVisionConfig):
@@ -70,6 +64,16 @@ class Qwen4ExpTextConfig(Qwen3NextConfig):
 
         rope_scaling = kwargs.get("rope_scaling")
         rope_theta = kwargs.get("rope_theta", 10_000.0)
+        if layer_types is not None:
+            # transformers >= 5.16 re-serializes the checkpoint's
+            # "full_attention" entries as "qwen_sparse_attention"; accept both
+            # spellings so re-saved checkpoints (e.g. quantized exports) load.
+            layer_types = [
+                "full_attention"
+                if layer_type == "qwen_sparse_attention"
+                else layer_type
+                for layer_type in layer_types
+            ]
         super().__init__(layer_types=layer_types, **kwargs)
 
         normalized_rope_parameters = self.rope_parameters
@@ -140,11 +144,6 @@ class Qwen4ExpTextConfig(Qwen3NextConfig):
     def _validate_qsa_config(self) -> None:
         configured = {name: getattr(self, name, None) for name in _QSA_CONFIG_FIELDS}
         if all(value is None for value in configured.values()):
-            if QSA_LAYER_TYPE in (self.layer_types or ()):
-                raise ValueError(
-                    f"{QSA_LAYER_TYPE} layers require the QSA config fields: "
-                    f"{list(_QSA_CONFIG_FIELDS)}"
-                )
             return
 
         missing = [name for name, value in configured.items() if value is None]
@@ -176,7 +175,7 @@ class Qwen4ExpTextConfig(Qwen3NextConfig):
     @property
     def layers_block_type(self) -> list[str]:
         return [
-            "attention" if layer_type in ATTENTION_LAYER_TYPES else layer_type
+            "attention" if layer_type == "full_attention" else layer_type
             for layer_type in self.layer_types
         ]
 
@@ -201,9 +200,9 @@ class Qwen4ExpTextConfig(Qwen3NextConfig):
         return max(int(self.ngram_size) - 1, 0)
 
 
-class Qwen4ExpConfig(PreTrainedConfig):
+class Qwen4ExpConfig(PretrainedConfig):
     model_type = "qwen4_exp"
-    sub_configs: ClassVar[dict[str, type[PreTrainedConfig]]] = {
+    sub_configs: ClassVar[dict[str, type[PretrainedConfig]]] = {
         "vision_config": Qwen4ExpVisionConfig,
         "text_config": Qwen4ExpTextConfig,
     }

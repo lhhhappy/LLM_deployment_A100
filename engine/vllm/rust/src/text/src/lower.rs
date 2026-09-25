@@ -60,9 +60,7 @@ pub fn lower_text_request(
         priority: request.priority,
         data_parallel_rank: request.data_parallel_rank,
         session_id: request.session_id.clone(),
-        kv_hints: request.kv_hints.clone(),
-        reasoning_parser_kwargs: Some(request.reasoning_parser_kwargs.clone()),
-        reasoning_ended: request.reasoning_ended,
+        reasoning_parser_kwargs: request.reasoning_parser_kwargs.clone(),
         lora_request: request.lora_request.clone(),
         arrival_time: request.arrival_time,
         trace_headers: None,
@@ -94,7 +92,6 @@ pub fn lower_sampling_params(
 ) -> Result<EngineCoreSamplingParams> {
     let SamplingParams {
         temperature,
-        watermarking,
         top_p,
         top_k,
         seed,
@@ -167,7 +164,6 @@ pub fn lower_sampling_params(
 
     let params = EngineCoreSamplingParams {
         temperature,
-        watermarking,
         top_p,
         top_k,
         seed,
@@ -322,7 +318,6 @@ mod tests {
     use std::collections::{BTreeSet, HashMap};
 
     use serial_test::file_serial;
-    use vllm_engine_core_client::protocol::kv_hints::{KvHintAction, KvHintsEnvelope};
     use vllm_engine_core_client::protocol::multimodal::{
         MmFeatureSpec, MmModality, PlaceholderRange,
     };
@@ -637,7 +632,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 1.0,
-                watermarking: true,
                 top_p: 1.0,
                 top_k: 0,
                 seed: None,
@@ -692,7 +686,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 1.0,
-                watermarking: true,
                 top_p: 1.0,
                 top_k: 0,
                 seed: None,
@@ -809,8 +802,7 @@ mod tests {
     #[file_serial(hf_qwen3)]
     async fn lower_text_request_uses_real_qwen_generation_defaults() {
         let model_id = "Qwen/Qwen3-0.6B";
-        let files =
-            ResolvedModelFiles::new(model_id, None).await.expect("resolve qwen model files");
+        let files = ResolvedModelFiles::new(model_id).await.expect("resolve qwen model files");
         let backend = HfTextBackend::from_resolved_model_files(
             files,
             model_id.to_string(),
@@ -861,7 +853,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 0.6,
-                watermarking: true,
                 top_p: 0.95,
                 top_k: 20,
                 seed: None,
@@ -926,7 +917,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 1.0,
-                watermarking: true,
                 top_p: 1.0,
                 top_k: 0,
                 seed: None,
@@ -999,7 +989,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 0.2,
-                watermarking: true,
                 top_p: 0.3,
                 top_k: 4,
                 seed: None,
@@ -1250,7 +1239,6 @@ mod tests {
         expect_test::expect![[r#"
             EngineCoreSamplingParams {
                 temperature: 0.8,
-                watermarking: true,
                 top_p: 0.9,
                 top_k: 12,
                 seed: None,
@@ -1302,35 +1290,6 @@ mod tests {
 
         assert!(!prepared.text_request.intermediate);
         assert_eq!(prepared.generate_request.request_id, "text-1");
-    }
-
-    #[test]
-    fn lower_text_request_passes_kv_hints_through() {
-        let hints = KvHintsEnvelope {
-            protocol_version: "0.1".to_string(),
-            message_id: "msg-1".to_string(),
-            actions: vec![KvHintAction {
-                action_id: "action-1".to_string(),
-                action_type: "example.action".to_string(),
-                action_version: "1.0".to_string(),
-                payload: Default::default(),
-            }],
-        };
-        let request = TextRequest {
-            kv_hints: Some(hints.clone()),
-            ..sample_request()
-        };
-
-        let prepared = lower_text_request(
-            request,
-            vec![1, 2, 3],
-            sample_sampling_hints(),
-            sample_sampling_limits(),
-            &stub_tokenizer(),
-        )
-        .unwrap();
-
-        assert_eq!(prepared.generate_request.kv_hints, Some(hints));
     }
 
     #[test]

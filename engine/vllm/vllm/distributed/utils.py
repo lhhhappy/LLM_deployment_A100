@@ -111,7 +111,6 @@ def split_tensor_along_last_dim(
 
     Returns:
         A list of Tensors
-
     """
     # Get the size and dimension.
     last_dim = tensor.dim() - 1
@@ -123,6 +122,31 @@ def split_tensor_along_last_dim(
         return tuple(chunk.contiguous() for chunk in tensor_list)
 
     return tensor_list
+
+
+def balanced_row_counts(num_rows: int, size: int) -> list[int]:
+    """Per-rank row counts, ``base + (r < rem)``.
+
+    Remainder rows go one each to the lowest-numbered ranks, so the union over
+    ranks is exact with no gap, overlap, or padding row at any row count.
+    Per-rank counts may differ by one, which is why consumers gather with
+    ``all_gatherv(sizes=...)`` rather than ``all_gather``.
+
+    Every row-sharding feature (indexer query shard, unreplicated attention
+    GEMMs, mHC prenorm shard) must derive from this one rule; two features
+    splitting the same rows with different remainder policies would gather
+    matching sizes with scrambled content.
+    """
+    base, rem = divmod(num_rows, size)
+    return [base + (r < rem) for r in range(size)]
+
+
+def balanced_row_bounds(start: int, stop: int, rank: int, size: int) -> tuple[int, int]:
+    """This rank's contiguous half-open ``balanced_row_counts`` range within
+    ``[start, stop)``, in closed form."""
+    base, rem = divmod(stop - start, size)
+    lo = start + rank * base + min(rank, rem)
+    return lo, lo + base + (rank < rem)
 
 
 def get_pp_indices(
@@ -334,6 +358,7 @@ class StatelessProcessGroup:
     def barrier(self, timeout: float = 30.0):
         """A robust barrier to synchronize all ranks.
 
+
         Uses a multi-phase approach to ensure all processes reach the barrier
         before proceeding:
 
@@ -351,7 +376,6 @@ class StatelessProcessGroup:
 
         Raises:
             RuntimeError: If coordination fails or times out
-
         """
         # Generate a barrier ID that is globally unique
         try:
@@ -550,7 +574,8 @@ def init_gloo_process_group(
     group_size: int,
     timeout: timedelta,
 ) -> ProcessGroup:
-    """Stateless init ProcessGroup with gloo backend compatible with
+    """
+    Stateless init ProcessGroup with gloo backend compatible with
     different torch versions.
     """
     with suppress_stdout():
@@ -583,7 +608,8 @@ def stateless_init_torch_distributed_process_group(
     return_store: bool = False,
     listen_socket: socket.socket | None = None,
 ) -> ProcessGroup | tuple[ProcessGroup, Store]:
-    """A replacement for `torch.distributed.init_process_group` that does not
+    """
+    A replacement for `torch.distributed.init_process_group` that does not
     pollute the global state. The created ProcessGroup object can be used for
     some operations such as `allreduce`, because it does not depend on the
     global rank. However, some operations such as `broadcast` cannot be used
@@ -684,8 +710,9 @@ def stateless_init_torch_distributed_process_group(
 
 
 def stateless_destroy_torch_distributed_process_group(pg: ProcessGroup) -> None:
-    """Destroy ProcessGroup returned by
-    stateless_init_torch_distributed_process_group().
+    """
+    Destroy ProcessGroup returned by
+        stateless_init_torch_distributed_process_group().
     """
     pg.shutdown()
     _unregister_process_group(pg.group_name)
@@ -704,7 +731,6 @@ def get_worker_rank_suffix(global_rank: int | None = None) -> str:
     Returns:
         A string suffix identifying the worker's position in the
         distributed topology.
-
     """
     from vllm.distributed.parallel_state import (
         get_dcp_group,

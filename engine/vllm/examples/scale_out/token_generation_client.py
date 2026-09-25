@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Call a token-in/token-out server started with:
 
-vllm serve Qwen/Qwen3-0.6B --enable-scale-out
+VLLM_ENABLE_SCALE_OUT_ENDPOINTS=1 vllm serve Qwen/Qwen3-0.6B
 """
 
 import httpx

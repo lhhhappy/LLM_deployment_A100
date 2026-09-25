@@ -8,10 +8,10 @@ import pytest
 import torch
 
 import vllm.v1.worker.gpu.model_runner as model_runner_module
-from vllm.model_executor.warmup.jit_warmup import JitWarmupRegistry
 from vllm.v1.kv_cache_interface import (
     CircularBufferSpec,
     FullAttentionSpec,
+    KpoolTailSpec,
     KVCacheConfig,
     KVCacheGroupSpec,
     MambaSpec,
@@ -21,21 +21,11 @@ from vllm.v1.worker.gpu.block_table import BlockTables
 from vllm.v1.worker.gpu.model_runner import GPUModelRunner
 
 
-def test_prepare_padding_mask_marks_sequence_parallel_padding():
-    runner = GPUModelRunner.__new__(GPUModelRunner)
-    runner.input_buffers = SimpleNamespace(is_padding=torch.empty(8, dtype=torch.bool))
-
-    mask = runner._prepare_padding_mask(1, 8)
-
-    assert mask.tolist() == [False, True, True, True, True, True, True, True]
-    assert mask.data_ptr() == runner.input_buffers.is_padding.data_ptr()
-
-    mask = runner._prepare_padding_mask(0, 8)
-
-    assert mask.all()
-
-
-def test_qsa_circular_group_uses_custom_slot_mapping(monkeypatch):
+@pytest.mark.parametrize("spec_kind", ["circular", "kpool_tail"])
+def test_qsa_circular_group_uses_custom_slot_mapping(monkeypatch, spec_kind):
+    """Ring-buffer caches (QSA circular buffer, GLM-5.3 kpool tail) hold one
+    block per request and compute their own slot mapping; the generic
+    position-indexed mapping would index far past their 1-block table row."""
     runner = GPUModelRunner.__new__(GPUModelRunner)
     runner.max_model_len = 262144
     runner.is_encoder_decoder = False
@@ -52,7 +42,6 @@ def test_qsa_circular_group_uses_custom_slot_mapping(monkeypatch):
         parallel_config=parallel_config,
         cache_config=SimpleNamespace(mamba_cache_mode="none"),
     )
-    runner.jit_warmup_registry = JitWarmupRegistry(runner.vllm_config)
     runner.model_state = SimpleNamespace(
         get_additional_cg_support=lambda: (),
         num_new_sampled_tokens_per_step=1,
@@ -65,12 +54,21 @@ def test_qsa_circular_group_uses_custom_slot_mapping(monkeypatch):
     runner.max_num_tokens = 2
     runner.device = torch.device("cuda")
 
-    raw_spec = CircularBufferSpec(
-        block_size=8,
-        num_kv_heads=1,
-        head_size=128,
-        dtype=torch.bfloat16,
-    )
+    if spec_kind == "circular":
+        raw_spec = CircularBufferSpec(
+            block_size=8,
+            num_kv_heads=1,
+            head_size=128,
+            dtype=torch.bfloat16,
+        )
+    else:
+        raw_spec = KpoolTailSpec(
+            block_size=8,
+            num_kv_heads=1,
+            head_size=128,
+            dtype=torch.bfloat16,
+            sliding_window=8,
+        )
     compressed_spec = FullAttentionSpec(
         block_size=262144,
         num_kv_heads=1,
@@ -100,7 +98,7 @@ def test_qsa_circular_group_uses_custom_slot_mapping(monkeypatch):
     monkeypatch.setattr(
         model_runner_module,
         "init_attn_backend",
-        lambda *args, **kwargs: ([], attn_cg_support, [8, 262144]),
+        lambda *args: ([], attn_cg_support, [8, 262144]),
     )
     monkeypatch.setattr(
         model_runner_module,
@@ -140,6 +138,7 @@ def test_initialize_kv_cache_does_not_dcp_shard_mamba_block_table(
     expected: int,
 ):
     """Mamba/GDN block-table rows index global positions, unlike DCP KV."""
+
     max_model_len = 1_048_576
     attention_block_size = 1_536
     mamba_block_size = 16
@@ -252,7 +251,6 @@ def _make_capture_runner(captured: bool) -> GPUModelRunner:
     runner.attn_groups = None
     runner.kv_cache_config = None
     runner.use_aux_hidden_state_outputs = False
-    runner.kv_connector = model_runner_module.NO_OP_KV_CONNECTOR
     return runner
 
 

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Harmony ↔ Responses API conversion utilities.
+"""
+Harmony ↔ Responses API conversion utilities.
 
 Handles two directions:
   1. Response Input → Harmony Messages  (input parsing)
@@ -302,7 +303,7 @@ def _parse_browser_tool_call(message: Message, recipient: str) -> ResponseOutput
         action = ActionFind(
             pattern=browser_call.get("pattern", ""),
             url=f"cursor:{browser_call.get('url', '')}",
-            type="find_in_page",
+            type="find",
         )
     else:
         raise ValueError(f"Unknown browser action: {recipient}")

@@ -3,17 +3,16 @@
 import torch
 import torch.nn as nn
 
-from vllm.config import VllmConfig, replace
+from vllm.config import CompilationMode, VllmConfig, replace
 from vllm.distributed.parallel_state import get_pp_group
 from vllm.lora.layers.base import BaseLayerWithLoRA
 from vllm.model_executor.model_loader import get_model
-from vllm.model_executor.model_loader.utils import get_draft_load_config
 from vllm.model_executor.models.utils import PPMissingLayer
-from vllm.v1.worker.gpu.spec_decode.utils import get_pp_safe_draft_load_config
 
 
 def _should_share(eagle: nn.Module, flag: str, draft, target) -> bool:
     """Share when the draft has no own copy, or its copy matches the target."""
+
     if not getattr(eagle, flag, False) or draft is None:
         return True
     if target is None:
@@ -76,16 +75,52 @@ def load_eagle_model(target_model: nn.Module, vllm_config: VllmConfig) -> nn.Mod
     speculative_config = vllm_config.speculative_config
     assert speculative_config is not None
     draft_model_config = speculative_config.draft_model_config
-    vllm_config = speculative_config.apply_draft_overrides(vllm_config)
-    draft_load_config = get_pp_safe_draft_load_config(
-        get_draft_load_config(vllm_config)
-    )
-    if draft_load_config is not vllm_config.load_config:
-        vllm_config = replace(vllm_config, load_config=draft_load_config)
-    with set_model_tag("eagle_head"):
-        eagle_model = get_model(
-            vllm_config=vllm_config, model_config=draft_model_config
+    if speculative_config.moe_backend is not None:
+        # Otherwise the draft inherits the target's --moe-backend, which
+        # fails when the draft is unquantized and that backend is not.
+        vllm_config = replace(
+            vllm_config,
+            kernel_config=replace(
+                vllm_config.kernel_config,
+                moe_backend=speculative_config.moe_backend,
+            ),
         )
+    if speculative_config.kv_cache_dtype is not None:
+        vllm_config = replace(
+            vllm_config,
+            cache_config=replace(
+                vllm_config.cache_config,
+                cache_dtype=speculative_config.kv_cache_dtype,
+            ),
+        )
+    if speculative_config.attention_backend is not None:
+        # Before get_model(): the backend is read off the constructed layers.
+        # Only when set, so the draft keeps a KV cache layout the target shares.
+        vllm_config = replace(
+            vllm_config,
+            attention_config=replace(
+                vllm_config.attention_config,
+                backend=speculative_config.attention_backend,
+            ),
+        )
+    # enforce_eager on the speculative config must make the DRAFT eager too;
+    # otherwise the draft inherits the target's VLLM_COMPILE mode (dynamo
+    # fails on data-dependent asserts in some MTP heads, and concurrent
+    # draft+target AOT compiles race in TritonBundler's cache). Mutate the
+    # mode in place rather than replace(): the draft's attention layers
+    # register into this compilation_config's static_forward_context, which
+    # the runtime forward context looks up on the original object.
+    compilation_config = vllm_config.compilation_config
+    original_mode = compilation_config.mode
+    if speculative_config.enforce_eager:
+        compilation_config.mode = CompilationMode.NONE
+    try:
+        with set_model_tag("eagle_head"):
+            eagle_model = get_model(
+                vllm_config=vllm_config, model_config=draft_model_config
+            )
+    finally:
+        compilation_config.mode = original_mode
 
     target_language_model = (
         target_model.get_language_model()

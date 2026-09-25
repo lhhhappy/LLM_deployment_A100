@@ -284,19 +284,13 @@ impl JsonParamType {
     }
 }
 
-/// Recognize JSON and Python null spellings emitted by chat templates.
-fn is_null_literal(value: &str) -> bool {
-    value.eq_ignore_ascii_case("null") || value.eq_ignore_ascii_case("none")
-}
-
 /// Convert one parameter input to a normalized JSON value.
 fn convert_with_optional_schema(param_type: Option<&JsonParamType>, input: &ParamInput) -> Value {
     // Coerce the literal text `null` to JSON null, except for `string`-typed
     // params, where it must stay the string "null": a model emitting the literal
     // text "null" for a string field means the string, not a missing value.
-    // Python-style `None` follows the same schema coercion rules.
     if let ParamInput::Text(value) = input
-        && is_null_literal(value)
+        && value.eq_ignore_ascii_case("null")
         && param_type != Some(&JsonParamType::String)
     {
         return Value::Null;
@@ -339,7 +333,7 @@ fn try_convert_text_value(param_type: &JsonParamType, value: &str) -> Option<Val
             // For composite types with string input, simply interpret the string as JSON.
             serde_json::from_str(value).ok()
         }
-        JsonParamType::Null => is_null_literal(value).then_some(Value::Null),
+        JsonParamType::Null => value.eq_ignore_ascii_case("null").then_some(Value::Null),
         JsonParamType::OneOf(types) => {
             types.iter().find_map(|param_type| try_convert_text_value(param_type, value))
         }
@@ -716,12 +710,11 @@ mod tests {
             }
         }));
 
-        for literal in ["null", "NULL", "None", "none", "NONE"] {
-            assert_eq!(params.convert("name", text(literal)), json!(literal));
-            // Non-string and schema-less params share the same null coercion.
-            assert_eq!(params.convert("count", text(literal)), json!(null));
-            assert_eq!(params.convert("anything", text(literal)), json!(null));
-        }
+        assert_eq!(params.convert("name", text("null")), json!("null"));
+        assert_eq!(params.convert("name", text("NULL")), json!("NULL"));
+        // Non-string and schema-less params are unchanged: "null" -> null.
+        assert_eq!(params.convert("count", text("null")), json!(null));
+        assert_eq!(params.convert("anything", text("null")), json!(null));
     }
 
     #[test]
@@ -738,11 +731,9 @@ mod tests {
             }
         }));
 
-        for literal in ["null", "NULL", "None", "none", "NONE"] {
-            assert_eq!(params.convert("mode", text(literal)), json!(null));
-            assert_eq!(params.convert("color", text(literal)), json!(literal));
-        }
+        assert_eq!(params.convert("mode", text("null")), json!(null));
         assert_eq!(params.convert("mode", text("auto")), json!("auto"));
+        assert_eq!(params.convert("color", text("null")), json!("null"));
     }
 
     #[test]

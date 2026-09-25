@@ -170,6 +170,17 @@ class StreamingParserEngine:
 
         self.skip_tool_parsing = False
         self.skip_reasoning_parsing = False
+        # Function names declared by the request, or None when unknown.
+        # Consulted only by transitions with ``validate_tool_name``;
+        # set per request by the owning ParserEngine, like
+        # ``skip_tool_parsing`` it survives reset().
+        self.allowed_tool_names: frozenset[str] | None = None
+        # True when the request asked for tool_choice "none".  Recovery
+        # transitions are skipped while set, so text that looks like a
+        # recovered tool call stays plain content instead of being
+        # consumed and then suppressed.  Set per request by the owning
+        # ParserEngine; survives reset() like ``skip_tool_parsing``.
+        self.suppress_tool_calls = False
         self.reset(initial_state=initial_state)
 
     @property
@@ -189,12 +200,6 @@ class StreamingParserEngine:
         self._args_brace_depth: int = 0
         self._args_in_string: bool = False
         self._args_escape_next: bool = False
-
-    def _reset_array_state(self) -> None:
-        # State for ``tool_call_body_array``: whether the opening ``[`` has been
-        # seen, and whether a ``{...}`` element is currently being streamed.
-        self._array_started: bool = False
-        self._array_in_element: bool = False
 
     def reset(self, initial_state: ParserState | None = None) -> None:
         """Reset mutable state for reuse across requests.
@@ -219,7 +224,14 @@ class StreamingParserEngine:
         self._message_header_token_count = 0
         self._in_skipped_tool_span = False
         self._reset_args_state()
-        self._reset_array_state()
+        self._recovered_tool_call = False
+        self._pending_between_text = ""
+        self._hold_active = False
+        self._held_events: list[SemanticEvent] = []
+        self._held_raw: list[str] = []
+        self._held_name: list[str] = []
+        self._held_prior_state: ParserState = self.state
+        self._held_prior_tool_index: int = -1
 
     def feed(
         self,
@@ -296,6 +308,12 @@ class StreamingParserEngine:
 
         events.extend(self._process_lex_tokens(self._lexer.flush()))
 
+        if self._hold_active:
+            # Stream ended before the recovered tool name completed:
+            # the held events never validated, so flush the raw text
+            # as content in the pre-recovery state.
+            events.extend(self._abort_hold("".join(self._held_raw)))
+
         if self._args_buffer:
             events.append(
                 SemanticEvent(
@@ -313,12 +331,7 @@ class StreamingParserEngine:
             ParserState.TOOL_NAME,
             ParserState.TOOL_BETWEEN,
         ):
-            # In array mode a closed element has already emitted its
-            # TOOL_CALL_END; only a truncated (still-open) element needs one.
-            end_open_call = (
-                self._array_in_element if self.config.tool_call_body_array else True
-            )
-            if end_open_call and self.tool_index >= 0:
+            if self.tool_index >= 0:
                 events.append(
                     SemanticEvent(
                         EventType.TOOL_CALL_END,
@@ -415,6 +428,15 @@ class StreamingParserEngine:
         if transition is None:
             if self._has_drops and terminal == DROP_TERMINAL:
                 return []
+            if self._hold_active and self.state == ParserState.TOOL_NAME:
+                # A terminal with no meaning inside a held tool name,
+                # for example a real tool call start token, ends the
+                # hold: replay the held text as content, then handle
+                # the terminal again in the restored state so it keeps
+                # its normal meaning.
+                events = self._abort_hold("".join(self._held_raw))
+                events.extend(self._on_terminal(terminal, value, token_count))
+                return events
             # The projected skip state may not define the wrapper closer.
             if self.skip_tool_parsing and terminal in self._tool_exit_terminals:
                 self._in_skipped_tool_span = False
@@ -481,13 +503,28 @@ class StreamingParserEngine:
         return self._apply_transition(transition, value, token_count)
 
     def _emit_for_state(self, text: str, token_count: int = 0) -> list[SemanticEvent]:
+        if self._hold_active and self.state == ParserState.TOOL_NAME:
+            candidate = "".join(self._held_name) + text
+            if not self._can_grow_into_declared_name(candidate):
+                # The held text can no longer become a declared tool
+                # name, so holding longer would only stall streaming.
+                # Release everything consumed so far as content.
+                return self._abort_hold("".join(self._held_raw) + text)
+            self._held_raw.append(text)
+            self._held_name.append(text)
+            self._held_events.append(
+                SemanticEvent(
+                    EventType.TOOL_NAME,
+                    value=text,
+                    tool_index=self.tool_index,
+                )
+            )
+            return []
         if self.state == ParserState.MESSAGE_HEADER:
             self._message_header_buffer += text
             self._message_header_token_count += token_count
             return []
         if self.state == ParserState.TOOL_ARGS:
-            if self.config.tool_call_body_array:
-                return self._feed_array_text(text)
             if self.config.tool_args_json:
                 return self._feed_args_text(text)
             return [
@@ -508,6 +545,25 @@ class StreamingParserEngine:
                     token_count=token_count,
                 )
             ]
+        if self._recovered_tool_call and self.state == ParserState.TOOL_BETWEEN:
+            # A response that lost its opening wrapper usually loses the
+            # closing one too, so text after a recovered invoke is often
+            # the rest of the answer rather than padding before the next
+            # invoke.  Whitespace is held back because that is what
+            # padding looks like; as soon as anything else shows up the
+            # whole run is real output and goes out as content.
+            self._pending_between_text += text
+            if self._pending_between_text.strip():
+                held = self._pending_between_text
+                self._pending_between_text = ""
+                return [
+                    SemanticEvent(
+                        EventType.TEXT_CHUNK,
+                        value=held,
+                        tool_index=self.tool_index,
+                        token_count=token_count,
+                    )
+                ]
         return []
 
     def _on_content(self, text: str, token_count: int = 0) -> list[SemanticEvent]:
@@ -516,6 +572,90 @@ class StreamingParserEngine:
         return self._emit_for_state(text, token_count)
 
     def _apply_transition(
+        self,
+        transition: Transition,
+        value: str,
+        token_count: int = 0,
+    ) -> list[SemanticEvent]:
+        if self._hold_active:
+            return self._resolve_hold(transition, value, token_count)
+        if transition.validate_tool_name:
+            if self.suppress_tool_calls or self.allowed_tool_names is None:
+                # Recovery could never be accepted for this request, so
+                # the trigger text stays plain content and nothing is
+                # buffered.
+                return self._emit_for_state(value, token_count)
+            return self._begin_hold(transition, value, token_count)
+        return self._run_transition(transition, value, token_count)
+
+    def _begin_hold(
+        self,
+        transition: Transition,
+        value: str,
+        token_count: int = 0,
+    ) -> list[SemanticEvent]:
+        """Apply a ``validate_tool_name`` transition but hold its events.
+
+        The events (and every TOOL_NAME chunk that follows) stay
+        buffered until the name completes and validates, so a false
+        positive can be undone without having emitted anything.
+        """
+        prior_state = self.state
+        prior_tool_index = self.tool_index
+        self._held_events = self._run_transition(transition, value, token_count)
+        self._held_raw = [value]
+        self._held_name = []
+        self._held_prior_state = prior_state
+        self._held_prior_tool_index = prior_tool_index
+        self._hold_active = True
+        self._recovered_tool_call = True
+        return []
+
+    def _resolve_hold(
+        self,
+        transition: Transition,
+        value: str,
+        token_count: int = 0,
+    ) -> list[SemanticEvent]:
+        """End the hold window at the name-completing transition."""
+        name = "".join(self._held_name)
+        allowed = self.allowed_tool_names
+        if allowed is not None and name in allowed:
+            events = self._held_events
+            self._clear_hold()
+            events.extend(self._run_transition(transition, value, token_count))
+            return events
+        return self._abort_hold("".join(self._held_raw) + value)
+
+    def _abort_hold(self, raw: str) -> list[SemanticEvent]:
+        """Discard held events and re-emit the raw text as content."""
+        self.state = self._held_prior_state
+        self.tool_index = self._held_prior_tool_index
+        self._recovered_tool_call = self._held_prior_state in self._TOOL_STATES
+        self._clear_hold()
+        return self._emit_for_state(raw)
+
+    def _clear_hold(self) -> None:
+        self._hold_active = False
+        self._held_events = []
+        self._held_raw = []
+        self._held_name = []
+
+    def _can_grow_into_declared_name(self, candidate: str) -> bool:
+        """Return True when *candidate* is a prefix of a declared tool name.
+
+        Consulted while a recovery hold is active.  Membership in the
+        declared set is the only way a held name can validate, so once
+        the text seen so far stops being a prefix of any declared name
+        the caller aborts the hold.  This also bounds how much text a
+        hold can buffer to the length of the longest declared name.
+        """
+        allowed = self.allowed_tool_names
+        if allowed is None:
+            return False
+        return any(name.startswith(candidate) for name in allowed)
+
+    def _run_transition(
         self,
         transition: Transition,
         value: str,
@@ -540,11 +680,24 @@ class StreamingParserEngine:
             )
             self._args_buffer = ""
 
+        # Whatever is still held between invokes is whitespace padding,
+        # which the wrapped path drops too.
+        self._pending_between_text = ""
+
         if previous_state == ParserState.MESSAGE_HEADER:
             message_header = self._message_header_buffer
             message_header_token_count = self._message_header_token_count
             self._message_header_buffer = ""
             self._message_header_token_count = 0
+
+        # A real wrapper start (TOOL_PREAMBLE is only reachable through it)
+        # ends the recovered sequence: the wrapped block that follows keeps
+        # the ordinary between-invoke semantics.
+        if (
+            transition.next_state not in self._TOOL_STATES
+            or transition.next_state == ParserState.TOOL_PREAMBLE
+        ):
+            self._recovered_tool_call = False
 
         self.state = transition.next_state
 
@@ -578,8 +731,6 @@ class StreamingParserEngine:
             self._args_in_string = False
             self._args_escape_next = False
             self._args_safe_end = 0
-            if self.config.tool_call_body_array:
-                self._reset_array_state()
 
         return events
 
@@ -650,88 +801,3 @@ class StreamingParserEngine:
                 tool_index=self.tool_index,
             )
         ]
-
-    # ── JSON-array tool body (tool_call_body_array) ─────────────────────
-
-    def _feed_array_text(self, text: str) -> list[SemanticEvent]:
-        """Split a JSON-array tool body into one tool call per element.
-
-        Granite emits ``[{"name":..,"arguments":{..}}, ...]`` after the tool
-        marker. Element interiors are streamed through the string/brace-aware
-        :meth:`_feed_args_char`, so each element behaves exactly like a
-        single-object tool body; the array's ``]`` ends the region and any
-        trailing text becomes content.
-        """
-        events: list[SemanticEvent] = []
-        for i, ch in enumerate(text):
-            if self.state != ParserState.TOOL_ARGS:
-                # The array closed mid-chunk; the rest of the text is content.
-                events.extend(self._emit_for_state(text[i:]))
-                break
-            events.extend(self._feed_array_char(ch))
-        return events
-
-    def _feed_array_char(self, ch: str) -> list[SemanticEvent]:
-        if self._array_in_element:
-            events = self._feed_args_char(ch)
-            # Element object closed: top-level '}' with all braces balanced.
-            if (
-                ch == "}"
-                and not self._args_in_string
-                and not self._args_escape_next
-                and self._args_brace_depth == 0
-            ):
-                events.extend(self._end_array_element())
-            return events
-
-        # Between elements only structural array characters are expected.
-        if ch in " \t\r\n":
-            return []
-        if not self._array_started:
-            if ch == "[":
-                self._array_started = True
-                return []
-            return self._bail_array_to_content(ch)
-        if ch == ",":
-            return []
-        if ch == "{":
-            return self._start_array_element(ch)
-        if ch == "]":
-            self.state = ParserState.CONTENT
-            self._reset_array_state()
-            return []
-        return self._bail_array_to_content(ch)
-
-    def _start_array_element(self, ch: str) -> list[SemanticEvent]:
-        self.tool_index += 1
-        self._reset_args_state()
-        self._array_in_element = True
-        events = [SemanticEvent(EventType.TOOL_CALL_START, tool_index=self.tool_index)]
-        events.extend(self._feed_args_char(ch))
-        return events
-
-    def _end_array_element(self) -> list[SemanticEvent]:
-        self._array_in_element = False
-        events: list[SemanticEvent] = []
-        # Flush the held closing '}' so the slot body is the full element.
-        if self._args_buffer:
-            events.append(
-                SemanticEvent(
-                    EventType.ARG_VALUE_CHUNK,
-                    value=self._args_buffer,
-                    tool_index=self.tool_index,
-                )
-            )
-            self._args_buffer = ""
-            self._args_safe_end = 0
-        events.append(
-            SemanticEvent(EventType.TOOL_CALL_END, tool_index=self.tool_index)
-        )
-        return events
-
-    def _bail_array_to_content(self, ch: str) -> list[SemanticEvent]:
-        # Marker not followed by a JSON array (malformed) — revert to content
-        # so the remaining tokens are emitted as plain text, no tool call.
-        self.state = ParserState.CONTENT
-        self._reset_array_state()
-        return self._emit_for_state(ch)

@@ -18,7 +18,7 @@ import regex as re
 import torch
 from torch import nn
 from torch.utils._python_dispatch import TorchDispatchMode
-from transformers import PreTrainedConfig
+from transformers import PretrainedConfig
 
 import vllm.envs as envs
 from vllm.config import ModelConfig, ParallelConfig, VllmConfig, set_current_vllm_config
@@ -173,7 +173,7 @@ class TensorizerConfig(MutableMapping):
     deserialization_kwargs: dict[str, Any] | None = None
     _extra_serialization_attrs: dict[str, Any] | None = field(init=False, default=None)
     model_class: type[torch.nn.Module] | None = field(init=False, default=None)
-    hf_config: PreTrainedConfig | None = field(init=False, default=None)
+    hf_config: PretrainedConfig | None = field(init=False, default=None)
     dtype: str | torch.dtype | None = field(init=False, default=None)
     _is_sharded: bool = field(init=False, default=False)
     _fields: ClassVar[tuple[str, ...]]
@@ -403,7 +403,8 @@ class TensorizerArgs:
 
     @staticmethod
     def add_cli_args(parser: FlexibleArgumentParser) -> FlexibleArgumentParser:
-        """Tensorizer CLI arguments."""
+        """Tensorizer CLI arguments"""
+
         # Tensorizer options arg group
         group = parser.add_argument_group(
             "tensorizer options",
@@ -592,7 +593,8 @@ def tensorizer_weights_iterator(
 
 
 def is_vllm_tensorized(tensorizer_config: "TensorizerConfig") -> bool:
-    """Infer if the model is a vLLM model by checking the weights for
+    """
+    Infer if the model is a vLLM model by checking the weights for
     a vLLM tensorized marker.
 
     Args:
@@ -601,7 +603,6 @@ def is_vllm_tensorized(tensorizer_config: "TensorizerConfig") -> bool:
 
     Returns:
         bool: True if the model is a vLLM model, False otherwise.
-
     """
     tensorizer_args = tensorizer_config._construct_tensorizer_args()
     deserializer = TensorDeserializer(
@@ -710,7 +711,7 @@ def tensorize_vllm_model(
     tensorizer_config: TensorizerConfig,
     generate_keyfile: bool = True,
 ):
-    """Utility to load a model and then serialize it with Tensorizer.
+    """Utility to load a model and then serialize it with Tensorizer
 
     Intended to be used separately from running a vLLM server since it
     creates its own Engine instance.
@@ -772,7 +773,8 @@ def tensorize_vllm_model(
 
 
 def tensorize_lora_adapter(lora_path: str, tensorizer_config: TensorizerConfig):
-    """Uses tensorizer to serialize a LoRA adapter. Assumes that the files
+    """
+    Uses tensorizer to serialize a LoRA adapter. Assumes that the files
     needed to load a LoRA adapter are a safetensors-format file called
     adapter_model.safetensors and a json config file called adapter_config.json.
 

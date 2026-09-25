@@ -229,7 +229,6 @@ class MoeWNA16Method(FusedMoEMethodBase):
 
     Args:
         quant_config: The MOE WNA16 (W8A16/W4A16) quantization config.
-
     """
 
     def __init__(self, quant_config: MoeWNA16Config, moe: "FusedMoEConfig") -> None:
@@ -389,7 +388,7 @@ class MoeWNA16Method(FusedMoEMethodBase):
         self, layer: RoutedExperts
     ) -> FusedMoEQuantConfig | None:
         if self.wna16_backend == WNA16MoEBackend.HUMMING:
-            from vllm.model_executor.layers.quantization.utils.humming import (
+            from vllm.model_executor.layers.quantization.utils.humming_utils import (
                 get_humming_moe_quant_config,
             )
 

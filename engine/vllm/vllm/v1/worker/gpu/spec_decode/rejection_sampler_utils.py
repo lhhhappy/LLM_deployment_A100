@@ -4,7 +4,6 @@ import torch
 
 from vllm.triton_utils import tl, tldevice, triton
 from vllm.v1.worker.gpu.sample.gumbel import gumbel_block_argmax, tl_rand32
-from vllm.v1.worker.gpu.sample.watermark import philox_gumbel_block_argmax
 
 
 @triton.jit
@@ -247,7 +246,12 @@ def _compute_local_logits_stats_kernel(
             other=float("-inf"),
         ).to(tl.float32)
         value, idx = tl.max(target_logits, axis=0, return_indices=True)
-        token_id = block_idx * BLOCK_SIZE + idx
+        # Out-of-vocab tail lanes of this tile are loaded as -inf; when every
+        # in-vocab lane is also -inf/NaN the reduction can settle on one of
+        # them, yielding token_id >= vocab_size. Nothing downstream bounds a
+        # sampled token id. Clamp -- in that degenerate tile any index is
+        # equally arbitrary. (vllm-project/vllm#50843)
+        token_id = tl.minimum(block_idx * BLOCK_SIZE + idx, vocab_size - 1)
         tl.store(
             target_local_argmax_ptr
             + logit_idx * target_local_argmax_stride
@@ -694,39 +698,6 @@ def _rejection_kernel(
 
 
 @triton.jit
-def _seeded_resample_argmax(
-    residual_logits,
-    block,
-    mask,
-    resample_token_idx,
-    expanded_idx_mapping_ptr,
-    temp_ptr,
-    seed_ptr,
-    pos_ptr,
-    vocab_size,
-    USE_FP64: tl.constexpr,
-):
-    return gumbel_block_argmax(
-        residual_logits,
-        block,
-        mask,
-        resample_token_idx,
-        expanded_idx_mapping_ptr,
-        temp_ptr,
-        seed_ptr,
-        pos_ptr,
-        None,  # logits_cache_ptr
-        0,  # logits_cache_stride_0
-        0,  # logits_cache_stride_1
-        None,  # logits_cache_col_ptr
-        vocab_size,
-        IS_DRAFTING=False,
-        APPLY_TEMPERATURE=False,
-        USE_FP64=USE_FP64,
-    )
-
-
-@triton.jit(do_not_specialize=["watermark_key_0", "watermark_key_1"])
 def _resample_kernel(
     # [num_reqs, num_blocks]
     resampled_local_argmax_ptr,
@@ -761,20 +732,11 @@ def _resample_kernel(
     pos_ptr,
     # [num_logits]
     cumulative_log_p_ptr,
-    # [num_logits, CONTEXT_WIDTH]
-    contexts_ptr,
-    contexts_stride,
-    # [max_num_reqs], uint8 view of a bool tensor
-    watermarking_ptr,
-    watermark_key_0,
-    watermark_key_1,
     vocab_size,
     BLOCK_SIZE: tl.constexpr,
     HAS_DRAFT_LOGITS: tl.constexpr,
     USE_FP64: tl.constexpr,
     USE_BLOCK_VERIFICATION: tl.constexpr,
-    CONTEXT_WIDTH: tl.constexpr,
-    WATERMARK: tl.constexpr,
 ):
     req_idx = tl.program_id(0)
     resample_idx = tl.load(rejected_step_ptr + req_idx)
@@ -866,56 +828,27 @@ def _resample_kernel(
         ).to(tl.float32)
 
     # Resample the rejected/bonus token.
-    if WATERMARK:
-        # Padded and greedy rows retain the stock draw.
-        is_watermarked = (
-            tl.load(
-                watermarking_ptr + req_state_idx,
-                mask=req_state_idx >= 0,
-                other=0,
-            )
-            != 0
-        )
-        if is_watermarked & (temp != 0.0):
-            watermark_value, idx = philox_gumbel_block_argmax(
-                residual_logits,
-                mask,
-                block_idx,
-                contexts_ptr + resample_token_idx * contexts_stride,
-                watermark_key_0.to(tl.uint32),
-                watermark_key_1.to(tl.uint32),
-                CONTEXT_WIDTH,
-                BLOCK_SIZE,
-            )
-            # Detector compatibility fixes the keyed draw at fp32.
-            value = watermark_value.to(tl.float64) if USE_FP64 else watermark_value
-        else:
-            value, idx = _seeded_resample_argmax(
-                residual_logits,
-                block,
-                mask,
-                resample_token_idx,
-                expanded_idx_mapping_ptr,
-                temp_ptr,
-                seed_ptr,
-                pos_ptr,
-                vocab_size,
-                USE_FP64=USE_FP64,
-            )
-    else:
-        value, idx = _seeded_resample_argmax(
-            residual_logits,
-            block,
-            mask,
-            resample_token_idx,
-            expanded_idx_mapping_ptr,
-            temp_ptr,
-            seed_ptr,
-            pos_ptr,
-            vocab_size,
-            USE_FP64=USE_FP64,
-        )
-    token_id = block_idx * BLOCK_SIZE + idx
+    value, idx = gumbel_block_argmax(
+        residual_logits,
+        block,
+        mask,
+        resample_token_idx,
+        expanded_idx_mapping_ptr,
+        temp_ptr,
+        seed_ptr,
+        pos_ptr,
+        None,  # logits_cache_ptr
+        0,  # logits_cache_stride_0
+        0,  # logits_cache_stride_1
+        None,  # logits_cache_col_ptr
+        vocab_size,
+        IS_DRAFTING=False,
+        APPLY_TEMPERATURE=False,
+        USE_FP64=USE_FP64,
+    )
+    # See the note in _compute_local_logits_stats_kernel: bound the tile-local
+    # argmax so an all--inf tile cannot produce an out-of-vocab token id.
+    token_id = tl.minimum(block_idx * BLOCK_SIZE + idx, vocab_size - 1)
     tl.store(
         resampled_local_argmax_ptr
         + req_idx * resampled_local_argmax_stride
@@ -1021,9 +954,6 @@ def rejection_sample(
     synthetic_conditional_rates: torch.Tensor | None = None,
     use_fp64: bool = False,
     use_block_verification: bool = False,
-    contexts: torch.Tensor | None = None,
-    watermarking: torch.Tensor | None = None,
-    watermark_key: int | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     assert target_logits.ndim == 2 and target_logits.stride(-1) == 1
     assert draft_logits is None or (
@@ -1031,30 +961,6 @@ def rejection_sample(
     )
     num_reqs = cu_num_logits.shape[0] - 1
     num_logits, vocab_size = target_logits.shape
-
-    watermark = contexts is not None
-    assert watermark == (watermarking is not None) == (watermark_key is not None), (
-        "contexts, watermarking and watermark_key must be set together."
-    )
-    contexts_stride = 0
-    context_width = 1
-    watermarking_bytes: torch.Tensor | None = None
-    watermark_key_0 = 0
-    watermark_key_1 = 0
-    if contexts is not None:
-        assert watermarking is not None and watermark_key is not None
-        assert contexts.ndim == 2 and contexts.shape[0] == num_logits
-        # Context words are hashed as uint32, so int32 (the request-state token
-        # dtype) and int64 both land on the same PRF stream, -1 included.
-        assert contexts.dtype in (torch.int32, torch.int64)
-        if contexts.stride(-1) != 1:
-            contexts = contexts.contiguous()
-        assert watermarking.ndim == 1 and watermarking.dtype == torch.bool
-        contexts_stride = contexts.stride(0)
-        context_width = contexts.shape[-1]
-        watermarking_bytes = watermarking.view(torch.uint8)
-        watermark_key_0 = watermark_key & 0xFFFFFFFF
-        watermark_key_1 = watermark_key >> 32
     draft_logits_stride_0 = 0
     draft_logits_stride_1 = 0
     if has_draft_logits := draft_logits is not None:
@@ -1266,18 +1172,11 @@ def rejection_sample(
         seed,
         pos,
         cumulative_log_p,
-        contexts,
-        contexts_stride,
-        watermarking_bytes,
-        watermark_key_0,
-        watermark_key_1,
         vocab_size,
         BLOCK_SIZE=RESAMPLE_BLOCK_SIZE,
         HAS_DRAFT_LOGITS=has_draft_logits,
         USE_FP64=use_fp64,
         USE_BLOCK_VERIFICATION=use_block_verification,
-        CONTEXT_WIDTH=context_width,
-        WATERMARK=watermark,
     )
 
     # Insert the resampled tokens into the output sampled.

@@ -24,11 +24,6 @@ from vllm.model_executor.kernels.linear.nvfp4.flashinfer import (
     FlashInferCutlassNvFp4LinearKernel,
     FlashInferTrtllmNvFp4LinearKernel,
 )
-from vllm.model_executor.kernels.linear.scaled_mm.aiter import (
-    AiterHipbMMPerTokenFp8ScaledMMLinearKernel,
-    AiterPerTokenFp8ScaledMMLinearKernel,
-    AiterPreshuffledPerTokenFp8ScaledMMLinearKernel,
-)
 from vllm.model_executor.kernels.linear.scaled_mm.cutlass import (
     CutlassFP8ScaledMMLinearKernel,
 )
@@ -47,7 +42,6 @@ from vllm.model_executor.layers.fusion.quant_activation import (
     QuantizedActivation,
     as_quantized_activation,
     expose_input_quant_key,
-    get_input_quant_key,
 )
 from vllm.model_executor.layers.quantization.utils.quant_utils import (
     kFp8StaticTensorSym,
@@ -61,9 +55,6 @@ SUPPORTING = {
     FlashInferFP8ScaledMMLinearKernel,
     FlashInferCutlassNvFp4LinearKernel,
     PerTensorTorchFP8ScaledMMLinearKernel,
-    AiterHipbMMPerTokenFp8ScaledMMLinearKernel,
-    AiterPreshuffledPerTokenFp8ScaledMMLinearKernel,
-    AiterPerTokenFp8ScaledMMLinearKernel,
     FlashInferCutedslMxfp8LinearKernel,
     FlashInferCutlassMxfp8LinearKernel,
 }
@@ -127,13 +118,13 @@ def test_bridge_marks_supporting_and_skips_others():
     supported = _probe(FlashInferCutlassNvFp4LinearKernel)
     layer = torch.nn.Module()
     expose_input_quant_key(layer, supported)
-    assert get_input_quant_key(layer) == kNvfp4Dynamic
+    assert layer.input_quant_key == kNvfp4Dynamic
 
     unsupported = _probe(FlashInferTrtllmNvFp4LinearKernel)
     assert unsupported.input_quant_key() is None
     layer = torch.nn.Module()
     expose_input_quant_key(layer, unsupported)
-    assert get_input_quant_key(layer) is None
+    assert not hasattr(layer, "input_quant_key")
 
 
 def test_as_quantized_activation_validates_key():

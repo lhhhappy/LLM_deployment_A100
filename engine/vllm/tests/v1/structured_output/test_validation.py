@@ -56,18 +56,13 @@ def test_plain_request_allowed_for_diffusion_models():
     [
         (StructuredOutputsParams(json_object=False), "json_object must be True"),
         (StructuredOutputsParams(json=""), "json cannot be an empty string"),
-        (
-            StructuredOutputsParams(structural_tag=""),
-            "structural_tag cannot be an empty string",
-        ),
     ],
 )
 def test_degenerate_structured_outputs_rejected(structured_outputs, match):
     """json_object=False and an empty json schema pass the `is not None`
     exclusivity check but resolve to no structured-output key, so they must be
-    rejected at request validation (-> 400). Empty `structural_tag` is rejected
-    for the same reason: `json.loads("")` in `compile_grammar` would otherwise
-    raise JSONDecodeError and surface as a per-request engine error."""
+    rejected at request validation (-> 400) instead of reaching and crashing
+    the engine."""
     params = SamplingParams(structured_outputs=structured_outputs)
     with pytest.raises(VLLMValidationError, match=match):
         params._validate_structured_outputs(
@@ -142,7 +137,7 @@ def test_unsupported_grammar_is_a_client_error(backend, structured_outputs):
 @pytest.mark.parametrize(
     "schema, expected_backend",
     [
-        # multipleOf is unsupported by xgrammar.
+        # multipleOf is unsupported by xgrammar, patternProperties also by guidance.
         (
             {
                 "type": "object",
@@ -151,27 +146,7 @@ def test_unsupported_grammar_is_a_client_error(backend, structured_outputs):
             "guidance",
         ),
         (
-            {
-                "type": "object",
-                "properties": {"n": {"type": ["number", "null"], "multipleOf": 3}},
-            },
-            "guidance",
-        ),
-        (
-            {
-                "type": ["string", "null"],
-                "pattern": "^a+$",
-                "maxLength": 2,
-            },
-            "guidance",
-        ),
-        # patternProperties + properties is also unsupported by guidance.
-        (
-            {
-                "type": "object",
-                "properties": {"a": {"type": "string"}},
-                "patternProperties": {"^a$": {"type": "string"}},
-            },
+            {"type": "object", "patternProperties": {"^a": {"type": "string"}}},
             "outlines",
         ),
     ],

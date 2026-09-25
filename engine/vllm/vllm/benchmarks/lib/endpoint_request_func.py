@@ -167,12 +167,10 @@ async def async_request_openai_completions(
 
     Args:
         request_func_input: The input for the request function.
-        session: The aiohttp session used to issue the request.
         pbar: The progress bar to display the progress.
 
     Returns:
         The output of the request function.
-
     """
     api_url = request_func_input.api_url
     _validate_api_url(api_url, "OpenAI Completions API", "completions")
@@ -237,7 +235,8 @@ async def async_request_openai_completions(
                                 # First token
                                 if not first_chunk_received:
                                     first_chunk_received = True
-                                    output.ttft = timestamp - st
+                                    ttft = time.perf_counter() - st
+                                    output.ttft = ttft
 
                                 # Decoding phase
                                 else:
@@ -416,13 +415,12 @@ async def async_request_openai_chat_completions(
                                     output.itl.append(timestamp - most_recent_timestamp)
 
                                 generated_text += content or ""
-                                # Only token chunks advance the request end;
-                                # the trailing usage chunk carries no token.
-                                most_recent_timestamp = timestamp
                             elif usage := data.get("usage"):
                                 output.output_tokens = usage.get("completion_tokens")
                                 if (pt := usage.get("prompt_tokens")) is not None:
                                     output.prompt_len = pt
+
+                            most_recent_timestamp = timestamp
 
                 output.generated_text = generated_text
                 if first_chunk_received:
@@ -542,14 +540,12 @@ async def async_request_openai_audio(
                                         )
 
                                     generated_text += content or ""
-                                    # Only token chunks advance the request
-                                    # end; the trailing usage chunk carries no
-                                    # token.
-                                    most_recent_timestamp = timestamp
                                 elif usage := data.get("usage"):
                                     output.output_tokens = usage.get(
                                         "completion_tokens"
                                     )
+
+                                most_recent_timestamp = timestamp
 
                     output.generated_text = generated_text
                     if first_chunk_received:
@@ -608,7 +604,6 @@ async def _run_pooling_request(
     headers: dict[str, Any],
     pbar: tqdm | None = None,
     num_input_sequences: int = 1,
-    prompt_len: int = 0,
 ) -> RequestFuncOutput:
     output = RequestFuncOutput(num_input_sequences=num_input_sequences)
     st = time.perf_counter()
@@ -616,19 +611,11 @@ async def _run_pooling_request(
     try:
         async with session.post(url=api_url, headers=headers, json=payload) as response:
             if response.status == 200:
-                encoding_format = payload.get("encoding_format", "float")
-                if encoding_format in ("bytes", "bytes_only"):
-                    async for _ in response.content.iter_any():
-                        pass
-                else:
-                    await response.read()
                 output.ttft = output.latency = time.perf_counter() - st
 
-                if encoding_format == "bytes":
+                if payload.get("encoding_format", "float") == "bytes":
                     metadata = json.loads(response.headers["metadata"])
                     usage = metadata.get("usage", {})
-                elif encoding_format == "bytes_only":
-                    usage = {"prompt_tokens": prompt_len}
                 else:
                     data = await response.json()
                     usage = data.get("usage", {})
@@ -683,7 +670,6 @@ async def async_request_openai_embeddings(
         headers=headers,
         pbar=pbar,
         num_input_sequences=_get_num_input_sequences(request_func_input.prompt),
-        prompt_len=request_func_input.prompt_len,
     )
 
 
@@ -721,7 +707,6 @@ async def async_request_vllm_rerank(
         headers=headers,
         pbar=pbar,
         num_input_sequences=len(request_func_input.prompt) - 1,
-        prompt_len=request_func_input.prompt_len,
     )
 
 
@@ -756,7 +741,6 @@ async def async_request_openai_embeddings_chat(
         payload=payload,
         headers=headers,
         pbar=pbar,
-        prompt_len=request_func_input.prompt_len,
     )
 
 
@@ -861,7 +845,6 @@ async def async_request_infinity_embeddings(
         headers=headers,
         pbar=pbar,
         num_input_sequences=_get_num_input_sequences(request_func_input.prompt),
-        prompt_len=request_func_input.prompt_len,
     )
 
 
@@ -911,7 +894,6 @@ async def async_request_vllm_pooling(
         headers=headers,
         pbar=pbar,
         num_input_sequences=_get_num_input_sequences(request_func_input.prompt),
-        prompt_len=request_func_input.prompt_len,
     )
 
 

@@ -7,6 +7,8 @@ from typing import Any
 
 import torch
 
+import vllm.envs as envs
+
 
 class EventType(Enum):
     Main = 0
@@ -41,8 +43,9 @@ def maybe_execute_in_parallel(
 
     Returns:
         Tuple of (fn0_result, fn1_result).
-
     """
+    if envs.VLLM_DISABLE_MULTI_STREAM_PARALLEL:
+        aux_stream = None
     if aux_stream is not None:
         from vllm.compilation.breakable_cudagraph import BreakableCUDAGraphCapture
 
@@ -101,8 +104,17 @@ def execute_in_parallel(
     Returns:
         Tuple of (default_result, aux_results) where aux_results[i] is the
         result of aux_fns[i] (or None when skipped).
-
     """
+    if envs.VLLM_DISABLE_MULTI_STREAM_PARALLEL:
+        aux_streams = None
+    if aux_streams is not None and enable:
+        from vllm.compilation.breakable_cudagraph import BreakableCUDAGraphCapture
+
+        # Same rule as maybe_execute_in_parallel: no side-stream forks while
+        # a breakable capture is recording the surrounding segment.
+        if BreakableCUDAGraphCapture.is_active():
+            aux_streams = None
+
     aux_results: list[Any]
     if aux_streams is None or not enable:
         default_result = default_fn()

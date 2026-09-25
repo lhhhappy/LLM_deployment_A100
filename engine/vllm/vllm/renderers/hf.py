@@ -7,7 +7,7 @@ import inspect
 import itertools
 import weakref
 from collections import defaultdict, deque
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Final, Literal, cast, overload
 
@@ -758,6 +758,7 @@ def safe_apply_chat_template(
     tools: list[dict[str, Any]] | None = ...,
     chat_template: str | None = ...,
     tokenize: Literal[True] = ...,
+    return_assistant_tokens_mask: Literal[False] = ...,
     **kwargs,
 ) -> list[int]: ...
 @overload
@@ -769,8 +770,20 @@ def safe_apply_chat_template(
     tools: list[dict[str, Any]] | None = ...,
     chat_template: str | None = ...,
     tokenize: Literal[False] = ...,
+    return_assistant_tokens_mask: Literal[False] = ...,
     **kwargs,
 ) -> str: ...
+@overload
+def safe_apply_chat_template(
+    model_config: ModelConfig,
+    tokenizer: HfTokenizer,
+    conversation: list[ConversationMessage],
+    *,
+    tools: list[dict[str, Any]] | None = ...,
+    chat_template: str | None = ...,
+    return_assistant_tokens_mask: Literal[True],
+    **kwargs,
+) -> tuple[list[int], list[int] | None]: ...
 def safe_apply_chat_template(
     model_config: ModelConfig,
     tokenizer: HfTokenizer,
@@ -779,8 +792,9 @@ def safe_apply_chat_template(
     tools: list[dict[str, Any]] | None = None,
     chat_template: str | None = None,
     tokenize: bool = True,
+    return_assistant_tokens_mask: bool = False,
     **kwargs,
-) -> str | list[int]:
+) -> str | list[int] | tuple[list[int], list[int] | None]:
     chat_template = resolve_chat_template(
         tokenizer,
         chat_template=chat_template,
@@ -808,6 +822,38 @@ def safe_apply_chat_template(
         chat_template_kwargs=kwargs,
     )
 
+    # assistant_tokens_mask requires tokenized output — force tokenize=True.
+    if return_assistant_tokens_mask:
+        tokenize = True
+
+    # When return_assistant_tokens_mask is requested and the template supports it,
+    # request assistant_tokens_mask via return_dict.
+    # Check for the actual Jinja tag, not just the word "generation"
+    # (which also appears in add_generation_prompt).
+    if return_assistant_tokens_mask and "{% generation %}" in chat_template:
+        resolved_kwargs["return_assistant_tokens_mask"] = True
+        resolved_kwargs["return_dict"] = True
+        resolved_kwargs.pop("tokenize", None)
+        try:
+            result = tokenizer.apply_chat_template(
+                conversation=conversation,  # type: ignore[arg-type]
+                tools=tools,  # type: ignore[arg-type]
+                chat_template=chat_template,
+                tokenize=True,
+                **resolved_kwargs,
+            )
+        except (TypeError, ValueError) as exc:
+            logger.warning(
+                "apply_chat_template failed for assistant_tokens_mask: %s", exc
+            )
+        else:
+            if isinstance(result, Mapping):
+                token_ids = list(result.get("input_ids", []))
+                mask_raw = result.get("assistant_masks")
+                mask = list(mask_raw) if mask_raw is not None else None
+                return token_ids, mask
+            return list(result), None
+
     # transformers v5 changed the default of `return_dict` to True, which
     # makes `apply_chat_template(tokenize=True)` return a `BatchEncoding`
     # instead of `list[int]`. Force `return_dict=False` so downstream code
@@ -833,6 +879,9 @@ def safe_apply_chat_template(
         logger.warning("Chat template rejected the request: %s", e)
         raise VLLMValidationError(_template_error_reason(e)) from e
 
+    if return_assistant_tokens_mask:
+        assert isinstance(plain, list), f"Expected list[int], got {type(plain)}"
+        return plain, None
     return plain
 
 
@@ -851,7 +900,6 @@ def rebuild_mm_uuids_from_mm_data(
 
     Returns:
         Updated UUIDs dictionary with chunk UUIDs
-
     """
     vision_chunks = mm_data.get("vision_chunk")
     if vision_chunks is None:
@@ -884,7 +932,6 @@ def build_video_prompts_from_mm_data(
 
     Returns:
         List of video prompts, one per video.
-
     """
     vision_chunks = mm_data.get("vision_chunk")
     if vision_chunks is None:
@@ -966,7 +1013,8 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
             )
 
     def _can_produce_offsets(self) -> bool:
-        # Only fast tokenizers expose offset_mapping.
+        # HF tokenizers may be slow (use_fast=False); only fast tokenizers
+        # expose offset_mapping.
         return self.tokenizer is not None and self.tokenizer.is_fast
 
     def render_messages(
@@ -1016,12 +1064,22 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
                 logger.warning_once(_TOKENIZE_OVERRIDE_WARNING)
             chat_template_kwargs["tokenize"] = True
 
-        prompt_raw = safe_apply_chat_template(
-            model_config,
-            tokenizer,
-            conversation,
-            **chat_template_kwargs,
-        )
+        assistant_tokens_mask: list[int] | None = None
+        if params.return_assistant_tokens_mask:
+            prompt_raw, assistant_tokens_mask = safe_apply_chat_template(
+                model_config,
+                tokenizer,
+                conversation,
+                return_assistant_tokens_mask=True,
+                **chat_template_kwargs,
+            )
+        else:
+            prompt_raw = safe_apply_chat_template(
+                model_config,
+                tokenizer,
+                conversation,
+                **chat_template_kwargs,
+            )
 
         # NOTE: use_unified_vision_chunk is currently specific to Kimi-K2.5
         # model which uses unified vision chunks for both images and videos.
@@ -1046,6 +1104,9 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
             )
 
         prompt = parse_dec_only_prompt(prompt_raw)
+
+        if assistant_tokens_mask is not None:
+            cast(dict, prompt)["_assistant_tokens_mask"] = assistant_tokens_mask
 
         # When `prompt_embeds` is mixed with other modality data,
         # `_process_tokens` runs `_process_multimodal` first (expanding
@@ -1120,12 +1181,30 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
                 logger.warning_once(_TOKENIZE_OVERRIDE_WARNING)
             chat_template_kwargs["tokenize"] = True
 
-        prompt_raw = await self._apply_chat_template_async(
-            model_config,
-            tokenizer,
-            conversation,
-            **chat_template_kwargs,
-        )
+        assistant_tokens_mask: list[int] | None = None
+        if params.return_assistant_tokens_mask:
+            result_with_mask = cast(
+                tuple[list[int], list[int] | None],
+                await make_async(
+                    safe_apply_chat_template,
+                    executor=self._executor,
+                )(
+                    model_config,
+                    tokenizer,
+                    conversation,
+                    return_assistant_tokens_mask=True,  # type: ignore[arg-type]
+                    **chat_template_kwargs,
+                ),
+            )
+            prompt_raw: str | list[int] = result_with_mask[0]
+            assistant_tokens_mask = result_with_mask[1]
+        else:
+            prompt_raw = await self._apply_chat_template_async(
+                model_config,
+                tokenizer,
+                conversation,
+                **chat_template_kwargs,
+            )
 
         # NOTE: use_unified_vision_chunk is currently specific to Kimi-K2.5
         # model which uses unified vision chunks for both images and videos.
@@ -1150,6 +1229,9 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
             )
 
         prompt = parse_dec_only_prompt(prompt_raw)
+
+        if assistant_tokens_mask is not None:
+            cast(dict, prompt)["_assistant_tokens_mask"] = assistant_tokens_mask
 
         # See `render_messages` for the rationale.
         if prompt_embeds_tensors and mm_data:
@@ -1192,22 +1274,24 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
         processor records all placeholder offsets in the final (post-expansion)
         coordinate space, no offset shifting needed afterwards.
         """
+        assistant_tokens_mask = cast(dict, prompt).pop("_assistant_tokens_mask", None)
         prompt_embeds_info = cast(dict, prompt).pop("_prompt_embeds", None)
-        if prompt_embeds_info is None:
-            return super()._process_tokens(prompt, skip_mm_cache=skip_mm_cache)
-
-        tensors, placeholder_token_id = prompt_embeds_info
-        mm_updates = _build_prompt_embeds_updates(tensors, placeholder_token_id)
-        cast(dict, prompt)["prompt_token_ids"] = _expand_prompt_embeds_placeholders(
-            list(prompt["prompt_token_ids"]), mm_updates
-        )
+        if prompt_embeds_info is not None:
+            tensors, placeholder_token_id = prompt_embeds_info
+            mm_updates = _build_prompt_embeds_updates(tensors, placeholder_token_id)
+            cast(dict, prompt)["prompt_token_ids"] = _expand_prompt_embeds_placeholders(
+                list(prompt["prompt_token_ids"]), mm_updates
+            )
         engine_input = super()._process_tokens(prompt, skip_mm_cache=skip_mm_cache)
-        self._apply_prompt_embeds_to_engine_input(
-            cast(MultiModalInput, engine_input),
-            tensors,
-            mm_updates,
-        )
-
+        if prompt_embeds_info is not None:
+            tensors, _ = prompt_embeds_info
+            self._apply_prompt_embeds_to_engine_input(
+                cast(MultiModalInput, engine_input),
+                tensors,
+                mm_updates,
+            )
+        if assistant_tokens_mask is not None:
+            engine_input["assistant_tokens_mask"] = assistant_tokens_mask
         return engine_input
 
     @override
@@ -1218,26 +1302,26 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
         skip_mm_cache: bool = False,
     ) -> TokensInput | MultiModalInput:
         """Async equivalent of `_process_tokens`."""
+        assistant_tokens_mask = cast(dict, prompt).pop("_assistant_tokens_mask", None)
         prompt_embeds_info = cast(dict, prompt).pop("_prompt_embeds", None)
-        if prompt_embeds_info is None:
-            return await super()._process_tokens_async(
-                prompt, skip_mm_cache=skip_mm_cache
+        if prompt_embeds_info is not None:
+            tensors, placeholder_token_id = prompt_embeds_info
+            mm_updates = _build_prompt_embeds_updates(tensors, placeholder_token_id)
+            cast(dict, prompt)["prompt_token_ids"] = _expand_prompt_embeds_placeholders(
+                list(prompt["prompt_token_ids"]), mm_updates
             )
-
-        tensors, placeholder_token_id = prompt_embeds_info
-        mm_updates = _build_prompt_embeds_updates(tensors, placeholder_token_id)
-        cast(dict, prompt)["prompt_token_ids"] = _expand_prompt_embeds_placeholders(
-            list(prompt["prompt_token_ids"]), mm_updates
-        )
         engine_input = await super()._process_tokens_async(
             prompt, skip_mm_cache=skip_mm_cache
         )
-        self._apply_prompt_embeds_to_engine_input(
-            cast(MultiModalInput, engine_input),
-            tensors,
-            mm_updates,
-        )
-
+        if prompt_embeds_info is not None:
+            tensors, _ = prompt_embeds_info
+            self._apply_prompt_embeds_to_engine_input(
+                cast(MultiModalInput, engine_input),
+                tensors,
+                mm_updates,
+            )
+        if assistant_tokens_mask is not None:
+            engine_input["assistant_tokens_mask"] = assistant_tokens_mask
         return engine_input
 
     @staticmethod

@@ -10,14 +10,14 @@ import numpy as np
 import torch
 import torch.nn as nn
 from einops import rearrange
-from transformers import BaseImageProcessor, PreTrainedConfig
+from transformers import BaseImageProcessor, PretrainedConfig
 from transformers.activations import GELUActivation
 from transformers.feature_extraction_utils import BatchFeature
 from transformers.modeling_outputs import BaseModelOutput, BaseModelOutputWithPooling
 from transformers.utils import torch_int
 
 from vllm.config import VllmConfig
-from vllm.config.multimodal import MultiModalDummyOptions
+from vllm.config.multimodal import BaseDummyOptions
 from vllm.distributed import get_tensor_model_parallel_world_size
 from vllm.inputs import ModalityData, MultiModalDataDict
 from vllm.logger import init_logger
@@ -40,7 +40,6 @@ from vllm.multimodal.inputs import (
     ImageItem,
     MultiModalFeatureSpec,
     MultiModalFieldConfig,
-    MultiModalKwargsItem,
     MultiModalKwargsItems,
     VideoItem,
 )
@@ -125,12 +124,13 @@ def smart_resize(
 
 
 class KeyeImagePixelInputs(TensorSchema):
-    """Dimensions:
-    - bnp: Batch size * Number of patches
-    - c: Number of channels
-    - ps: Patch size
-    - ni: Number of images
-    - g: Grid dimensions (3 for t, h, w)
+    """
+    Dimensions:
+        - bnp: Batch size * Number of patches
+        - c: Number of channels
+        - ps: Patch size
+        - ni: Number of images
+        - g: Grid dimensions (3 for t, h, w)
     """
 
     type: Literal["pixel_values"]
@@ -141,12 +141,13 @@ class KeyeImagePixelInputs(TensorSchema):
 
 
 class KeyeImageEmbeddingInputs(TensorSchema):
-    """Dimensions:
-    - nf: Number of image features
-    - hs: Hidden size (must match the hidden size of language model
-      backbone)
-    - ni: Number of images
-    - g: Grid dimensions (3 for t, h, w)
+    """
+    Dimensions:
+        - nf: Number of image features
+        - hs: Hidden size (must match the hidden size of language model
+          backbone)
+        - ni: Number of images
+        - g: Grid dimensions (3 for t, h, w)
     """
 
     type: Literal["image_embeds"]
@@ -158,12 +159,13 @@ KeyeImageInputs: TypeAlias = KeyeImagePixelInputs | KeyeImageEmbeddingInputs
 
 
 class KeyeVideoPixelInputs(TensorSchema):
-    """Dimensions:
-    - bnp: Batch size * Number of patches
-    - c: Number of channels
-    - ps: Patch size
-    - ni: Number of images
-    - g: Grid dimensions (3 for t, h, w)
+    """
+    Dimensions:
+        - bnp: Batch size * Number of patches
+        - c: Number of channels
+        - ps: Patch size
+        - ni: Number of images
+        - g: Grid dimensions (3 for t, h, w)
     """
 
     type: Literal["pixel_values_videos"]
@@ -174,12 +176,13 @@ class KeyeVideoPixelInputs(TensorSchema):
 
 
 class KeyeVideoEmbeddingInputs(TensorSchema):
-    """Dimensions:
-    - nf: Number of video features
-    - hs: Hidden size (must match the hidden size of language model
-      backbone)
-    - nv: Number of videos
-    - g: Grid dimensions (3 for t, h, w)
+    """
+    Dimensions:
+        - nf: Number of video features
+        - hs: Hidden size (must match the hidden size of language model
+          backbone)
+        - nv: Number of videos
+        - g: Grid dimensions (3 for t, h, w)
     """
 
     type: Literal["video_embeds"]
@@ -191,7 +194,7 @@ KeyeVideoInputs: TypeAlias = KeyeVideoPixelInputs | KeyeVideoEmbeddingInputs
 
 
 class KeyeVisionEmbeddings(nn.Module):
-    def __init__(self, config: PreTrainedConfig):
+    def __init__(self, config: PretrainedConfig):
         super().__init__()
         self.config = config
         self.embed_dim = config.hidden_size
@@ -349,7 +352,7 @@ class KeyeSiglipAttention(nn.Module):
 
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -487,7 +490,7 @@ class SigLIPRotaryEmbedding(nn.Module):
 class KeyeSiglipEncoderLayer(nn.Module):
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -539,7 +542,7 @@ class KeyeSiglipEncoderLayer(nn.Module):
 class KeyeSiglipEncoder(nn.Module):
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -634,7 +637,7 @@ class KeyeSiglipEncoder(nn.Module):
 class KeyeSiglipVisionTransformer(nn.Module):
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -710,7 +713,7 @@ class KeyeSiglipVisionTransformer(nn.Module):
 
 
 class KeyeSiglipVisionModel(nn.Module):
-    config_class = PreTrainedConfig
+    config_class = PretrainedConfig
     main_input_name = "pixel_values"
 
     hf_to_vllm_mapper = WeightsMapper(
@@ -724,7 +727,7 @@ class KeyeSiglipVisionModel(nn.Module):
 
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -787,8 +790,8 @@ class KeyeSiglipVisionModel(nn.Module):
 class Projector(nn.Module):
     def __init__(
         self,
-        text_config: PreTrainedConfig,
-        vision_config: PreTrainedConfig,
+        text_config: PretrainedConfig,
+        vision_config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ):
@@ -1124,24 +1127,30 @@ class KeyeBaseDummyInputsBuilder(BaseDummyInputsBuilder[_I]):
         self,
         seq_len: int,
         mm_counts: Mapping[str, int],
-        mm_options: MultiModalDummyOptions,
+        mm_options: Mapping[str, BaseDummyOptions],
     ) -> MultiModalDataDict:
+        num_images = mm_counts.get("image", 0)
+        num_videos = mm_counts.get("video", 0)
+
         target_width, target_height = self.info.get_image_size_with_most_features()
         target_num_frames = self.info.get_num_frames_with_most_features(seq_len)
+
+        image_overrides = mm_options.get("image")
+        video_overrides = mm_options.get("video")
 
         mm_data = {
             "image": self._get_dummy_images(
                 width=target_width,
                 height=target_height,
-                num_images=mm_counts.get("image", 0),
-                overrides=mm_options.get("image"),
+                num_images=num_images,
+                overrides=image_overrides,
             ),
             "video": self._get_dummy_videos(
                 width=target_width,
                 height=target_height,
                 num_frames=target_num_frames,
-                num_videos=mm_counts.get("video", 0),
-                overrides=mm_options.get("video"),
+                num_videos=num_videos,
+                overrides=video_overrides,
             ),
         }
 
@@ -1153,7 +1162,7 @@ class KeyeDummyInputsBuilder(KeyeBaseDummyInputsBuilder[KeyeProcessingInfo]):
 
 
 class KeyeMultiModalProcessor(BaseMultiModalProcessor[KeyeProcessingInfo]):
-    def _get_hf_mm_text(self, mm_counts: Mapping[str, int]) -> str:
+    def _get_hf_processor_text(self, mm_counts: Mapping[str, int]) -> str:
         return self.dummy_inputs.get_dummy_text(mm_counts)
 
     def _get_prompt_updates(
@@ -1232,7 +1241,7 @@ class BaseKeyeModule(nn.Module, SupportsMultiModal):
 
     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
         super().__init__()
-        config: PreTrainedConfig = vllm_config.model_config.hf_config
+        config: PretrainedConfig = vllm_config.model_config.hf_config
         quant_config = vllm_config.quant_config
 
         self.config = config
@@ -1264,8 +1273,8 @@ class BaseKeyeModule(nn.Module, SupportsMultiModal):
     @abstractmethod
     def _build_projector(
         self,
-        text_config: PreTrainedConfig,
-        vision_config: PreTrainedConfig,
+        text_config: PretrainedConfig,
+        vision_config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ) -> nn.Module:
@@ -1455,9 +1464,6 @@ class BaseKeyeModule(nn.Module, SupportsMultiModal):
                 otherwise it will be `(seq_len,)`.
             intermediate_tensors: Intermediate tensors from prior forward pass.
             inputs_embeds: Optional tensor of input embeddings.
-            **kwargs: Multimodal inputs for this batch, forwarded to the
-                multimodal embedding path.
-
         """
         if intermediate_tensors is not None:
             inputs_embeds = None
@@ -1489,16 +1495,13 @@ class BaseKeyeModule(nn.Module, SupportsMultiModal):
             tower_model="visual.",
         )
 
-    def get_mm_lora_token_counts(
-        self,
-        *,
-        modality: str,
-        mm_kwargs: MultiModalKwargsItem | None,
-        num_mm_embeds: int,
-    ) -> tuple[int, int | None]:
-        del modality, mm_kwargs
+    def get_num_mm_encoder_tokens(self, num_image_tokens: int) -> int:
         merge_size = self.config.vision_config.spatial_merge_size
-        return num_mm_embeds * merge_size**2, num_mm_embeds
+        return num_image_tokens * merge_size**2
+
+    def get_num_mm_connector_tokens(self, num_vision_tokens: int) -> int:
+        merge_size = self.config.vision_config.spatial_merge_size
+        return num_vision_tokens // merge_size**2
 
 
 @MULTIMODAL_REGISTRY.register_processor(
@@ -1511,8 +1514,8 @@ class KeyeForConditionalGeneration(
 ):
     def _build_projector(
         self,
-        text_config: PreTrainedConfig,
-        vision_config: PreTrainedConfig,
+        text_config: PretrainedConfig,
+        vision_config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ) -> nn.Module:
@@ -1581,7 +1584,8 @@ class KeyeForConditionalGeneration(
     def _split_video_grid_thw(
         grid_thw: torch.Tensor | list[list[int]] | list[int],
     ) -> list[list[int]]:
-        """Split video grid_thw along the t dimension into per-frame rows.
+        """
+        Split video grid_thw along the t dimension into per-frame rows.
 
         This preserves Keye's current M-RoPE behavior, where a video is emitted
         as consecutive frame-level multimodal blocks rather than a single block

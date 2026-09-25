@@ -97,8 +97,7 @@ def test_triton_placeholder_language():
     lang = TritonLanguagePlaceholder()
     assert isinstance(lang, types.ModuleType)
     assert lang.__name__ == "triton.language"
-    assert lang.constexpr(2**31 - 1) == 2**31 - 1
-    assert lang.constexpr(1.5) == 1.5
+    assert lang.constexpr is None
     assert lang.dtype is None
     assert lang.int64 is None
     assert lang.int32 is None
@@ -144,4 +143,3 @@ def test_no_triton_fallback():
         assert triton.__class__.__name__ == "TritonPlaceholder"
         assert triton.language.__class__.__name__ == "TritonLanguagePlaceholder"
         assert tl.__class__.__name__ == "TritonLanguagePlaceholder"
-        assert tl.constexpr(2**31 - 1) == 2**31 - 1

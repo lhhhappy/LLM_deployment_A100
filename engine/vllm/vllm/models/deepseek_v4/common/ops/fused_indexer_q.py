@@ -6,15 +6,16 @@ from typing import Any
 
 import torch
 
-from vllm.model_executor.warmup.jit_warmup import kernel_launcher
 from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     LaunchSpec,
     TritonWarmupTensor,
     VllmTritonJitKernel,
+    kernel_launcher,
 )
 from vllm.platforms import current_platform
 from vllm.triton_utils import tl, triton
-from vllm.utils.import_utils import has_cutedsl
+from vllm.utils.import_utils import is_cutedsl_supported
+from vllm.v1.attention.ops.fp8_sm80 import _encode_fp8_u8
 
 # MXFP4: 32 elements per block, packed 2 nibbles per byte, ue8m0 block scale.
 MXFP4_BLOCK_SIZE = 32
@@ -163,9 +164,8 @@ class FusedIndexerQRopeQuantTritonKernel(
         index_q_scale = tl.div_rn(tl.maximum(amax, 1e-4), FP8_MAX)
         index_q_scale = tl.math.exp2(tl.math.ceil(tl.math.log2(index_q_scale)))
 
-        # Store quantized values to index_q_fp8. FNUZ (e4m3fnuz) on gfx942, OCP
-        # (e4m3fn) elsewhere -- matches the K cache.
-        fp8_dtype = tl.float8e4b8 if USE_FNUZ else tl.float8e4nv
+        # Store quantized values to index_q_fp8 as raw bytes. FNUZ (e4m3fnuz)
+        # on gfx942, OCP (e4m3fn) elsewhere -- matches the K cache.
         fp8_base_ptr = (
             index_q_fp8_ptr
             + tok_idx * index_q_fp8_stride0
@@ -174,16 +174,16 @@ class FusedIndexerQRopeQuantTritonKernel(
         if INDEX_Q_NOPE_DIM > 0:
             tl.store(
                 fp8_base_ptr + nope_offset,
-                tl.div_rn(x_nope, index_q_scale).to(fp8_dtype),
+                _encode_fp8_u8(tl.div_rn(x_nope, index_q_scale), USE_FNUZ),
             )
         fp8_rot_base = fp8_base_ptr + INDEX_Q_NOPE_DIM
         tl.store(
             fp8_rot_base + half_offset * 2,
-            tl.div_rn(r_even, index_q_scale).to(fp8_dtype),
+            _encode_fp8_u8(tl.div_rn(r_even, index_q_scale), USE_FNUZ),
         )
         tl.store(
             fp8_rot_base + half_offset * 2 + 1,
-            tl.div_rn(r_odd, index_q_scale).to(fp8_dtype),
+            _encode_fp8_u8(tl.div_rn(r_odd, index_q_scale), USE_FNUZ),
         )
 
         # FP8 weight-fold contract:
@@ -260,8 +260,9 @@ class FusedIndexerQRopeQuantTritonKernel(
             ),
             index_weights_softmax_scale=1.0,
             index_weights_head_scale=1.0,
+            # uint8 view: the kernel stores raw encoded bytes (see __call__).
             index_q_fp8=TritonWarmupTensor(
-                current_platform.fp8_dtype(),
+                torch.uint8,
                 shape=(1, compile_key.num_heads, compile_key.index_q_head_dim),
                 strides=(q_stride0, compile_key.index_q_head_dim, 1),
             ),
@@ -297,6 +298,14 @@ class FusedIndexerQRopeQuantTritonKernel(
             index_q_cos_sin_ptr=index_q_cos_sin_cache,
             index_q_cos_sin_stride=index_q_cos_sin_cache.stride(0),
             INDEX_Q_HALF_ROT_DIM=index_q_cos_sin_cache.shape[-1] // 2,
+            # uint8 view: an fp8-typed pointer arg would make Triton reject
+            # the kernel below SM89; the kernel stores raw encoded bytes. The
+            # warmup stand-in is already declared as uint8 (no .view()).
+            index_q_fp8_ptr=(
+                index_q_fp8.view(torch.uint8)
+                if isinstance(index_q_fp8, torch.Tensor)
+                else index_q_fp8
+            ),
             index_q_fp8_stride0=index_q_fp8.stride(0),
             index_q_fp8_stride1=index_q_fp8.stride(1),
             INDEX_Q_HEAD_DIM=index_q.shape[2],
@@ -309,22 +318,12 @@ class FusedIndexerQRopeQuantTritonKernel(
         )
 
 
-def _indexer_weights_out_dtypes(vllm_config: Any) -> tuple[torch.dtype, ...]:
-    """Weights dtypes the model's indexer layers ask for: fp32 for the dense
-    scoring kernels, plus bf16 when the DeepSeek V4.1 sparse-logits indexer
-    (`SparseMQAIndexer`) is enabled."""
-    if vllm_config.attention_config.indexer_sparse_logits:
-        return (torch.float32, torch.bfloat16)
-    return (torch.float32,)
-
-
 class FusedIndexerQRopeMxFp4TritonKernel(
     VllmTritonJitKernel["FusedIndexerQRopeMxFp4TritonKernel.CompileKey"]
 ):
     @dataclass(frozen=True)
     class CompileKey:
         dtype: torch.dtype
-        weights_out_dtype: torch.dtype
         num_heads: int
         index_q_half_rot_dim: int
         index_q_head_dim: int
@@ -444,14 +443,12 @@ class FusedIndexerQRopeMxFp4TritonKernel(
         self,
         *,
         dtype: torch.dtype,
-        weights_out_dtype: torch.dtype,
         num_heads: int,
         head_dim: int,
         rope_dim: int,
     ) -> CompileKey:
         return self.CompileKey(
             dtype=dtype,
-            weights_out_dtype=weights_out_dtype,
             num_heads=num_heads,
             index_q_half_rot_dim=rope_dim // 2,
             index_q_head_dim=head_dim,
@@ -468,7 +465,6 @@ class FusedIndexerQRopeMxFp4TritonKernel(
 
         return self._trace_dispatch(self.dispatch)(
             dtype=vllm_config.model_config.dtype,
-            weights_out_dtype=_indexer_weights_out_dtypes(vllm_config),
             num_heads=num_heads,
             head_dim=head_dim,
             rope_dim=rope_dim,
@@ -504,7 +500,7 @@ class FusedIndexerQRopeMxFp4TritonKernel(
                 shape=(1, compile_key.num_heads, scale_head_dim),
             ),
             index_weights_out=TritonWarmupTensor(
-                compile_key.weights_out_dtype,
+                torch.float32,
                 shape=(1, compile_key.num_heads),
             ),
         )
@@ -553,16 +549,12 @@ def fused_indexer_q_rope_quant(
     index_weights_softmax_scale: float,
     index_weights_head_scale: float,
     use_fp4: bool = False,
-    weights_out_dtype: torch.dtype = torch.float32,
+    output_buffers: tuple[torch.Tensor, ...] | None = None,
 ) -> tuple[
     torch.Tensor | tuple[torch.Tensor, torch.Tensor],
     torch.Tensor,
 ]:
     """Fused RoPE + quantize Q for the sparse indexer.
-
-    ``weights_out_dtype`` is the dtype the downstream scoring kernel takes:
-    fp32 for the dense MQA-logits kernels, bf16 for DeepGEMM's sparse
-    MQA-logits kernels (CUDA MXFP4 path only).
 
     Weight-fold semantics (important — the two paths differ):
 
@@ -595,7 +587,7 @@ def fused_indexer_q_rope_quant(
     num_index_q_heads = index_q.shape[1]
     index_q_head_dim = index_q.shape[2]
 
-    index_weights_out = torch.empty_like(index_weights, dtype=weights_out_dtype)
+    index_weights_out = torch.empty_like(index_weights, dtype=torch.float32)
 
     if use_fp4:
         assert index_q_head_dim % MXFP4_BLOCK_SIZE == 0, (
@@ -603,35 +595,41 @@ def fused_indexer_q_rope_quant(
             f"size {MXFP4_BLOCK_SIZE}"
         )
         num_scale_blocks = index_q_head_dim // MXFP4_BLOCK_SIZE
-        index_q_packed = torch.empty(
-            (num_tokens, num_index_q_heads, index_q_head_dim // 2),
-            dtype=torch.uint8,
-            device=index_q.device,
-        )
-        index_q_scale = torch.empty(
-            (num_tokens, num_index_q_heads, num_scale_blocks),
-            dtype=torch.uint8,
-            device=index_q.device,
-        )
-        if has_cutedsl():
+        packed_shape = (num_tokens, num_index_q_heads, index_q_head_dim // 2)
+        scale_shape = (num_tokens, num_index_q_heads, num_scale_blocks)
+        if output_buffers is None:
+            index_q_packed = torch.empty(
+                packed_shape,
+                dtype=torch.uint8,
+                device=index_q.device,
+            )
+            index_q_scale = torch.empty(
+                scale_shape,
+                dtype=torch.uint8,
+                device=index_q.device,
+            )
+        else:
+            index_q_packed, index_q_scale, _ = output_buffers
+        assert index_q_packed.shape == packed_shape
+        assert index_q_scale.shape == scale_shape
+        if is_cutedsl_supported():
             # lazily import, otherwise some tests fail due to CUDA driver init failure.
             from vllm.models.deepseek_v4.nvidia.ops.fused_indexer_q_cutedsl import (
-                _INDEXER_Q_MXFP4_KERNEL,
+                fused_indexer_q_rope_quant_mxfp4_cutedsl,
             )
 
-            _INDEXER_Q_MXFP4_KERNEL(
-                positions=positions,
-                q=index_q,
-                cos_sin_cache=index_q_cos_sin_cache,
-                weights=index_weights,
-                weights_softmax_scale=index_weights_softmax_scale,
-                weights_head_scale=index_weights_head_scale,
-                q_packed=index_q_packed,
-                q_scale=index_q_scale,
-                weights_out=index_weights_out,
+            fused_indexer_q_rope_quant_mxfp4_cutedsl(
+                positions,
+                index_q,
+                index_q_cos_sin_cache,
+                index_weights,
+                index_weights_softmax_scale,
+                index_weights_head_scale,
+                index_q_packed,
+                index_q_scale,
+                index_weights_out,
             )
         elif current_platform.is_xpu():
-            assert weights_out_dtype == torch.float32, weights_out_dtype
             torch.ops.vllm.xpu_deepseek_fused_indexer_q_rope_mxfp4(
                 index_q,
                 positions,
@@ -666,26 +664,29 @@ def fused_indexer_q_rope_quant(
             index_q_scale.view(torch.int32).squeeze(-1),
         ), index_weights_out
 
-    assert weights_out_dtype == torch.float32, weights_out_dtype
     fp8_dtype = current_platform.fp8_dtype()
     use_fnuz = fp8_dtype == torch.float8_e4m3fnuz
     fp8_max = 224.0 if use_fnuz else 448.0
-    index_q_fp8 = torch.empty_like(index_q, dtype=fp8_dtype)
-    if has_cutedsl():
+    if output_buffers is None:
+        index_q_fp8 = torch.empty_like(index_q, dtype=fp8_dtype)
+    else:
+        index_q_fp8, _ = output_buffers
+        assert index_q_fp8.shape == index_q.shape
+    if is_cutedsl_supported():
         # lazily import, otherwise some tests fail due to CUDA driver init failure.
         from vllm.models.deepseek_v4.nvidia.ops.fused_indexer_q_cutedsl import (
-            _INDEXER_Q_FP8_KERNEL,
+            fused_indexer_q_rope_quant_fp8_cutedsl,
         )
 
-        _INDEXER_Q_FP8_KERNEL(
-            positions=positions,
-            q=index_q,
-            cos_sin_cache=index_q_cos_sin_cache,
-            weights=index_weights,
-            weights_softmax_scale=index_weights_softmax_scale,
-            weights_head_scale=index_weights_head_scale,
-            q_fp8=index_q_fp8.view(torch.uint8),
-            weights_out=index_weights_out,
+        fused_indexer_q_rope_quant_fp8_cutedsl(
+            positions,
+            index_q,
+            index_q_cos_sin_cache,
+            index_weights,
+            index_weights_softmax_scale,
+            index_weights_head_scale,
+            index_q_fp8,
+            index_weights_out,
         )
     elif current_platform.is_xpu():
         torch.ops.vllm.xpu_deepseek_fused_indexer_q_rope_fp8(

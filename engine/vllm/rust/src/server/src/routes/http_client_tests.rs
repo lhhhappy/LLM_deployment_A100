@@ -168,7 +168,6 @@ impl ChatBackend for FakeChatBackend {
             self.tokenizer(),
             options.tool_call_parser,
             options.reasoning_parser,
-            options.tool_strict_level,
         )?))
     }
 }
@@ -187,7 +186,6 @@ impl ChatRenderer for FakeChatBackend {
         }
         Ok(RenderedPrompt {
             prompt: Prompt::Text(prompt),
-            media_order: None,
             effective_template_kwargs: Default::default(),
         })
     }

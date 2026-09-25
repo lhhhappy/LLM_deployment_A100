@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 import functools
+import os
 import time
 from collections import deque
 from collections.abc import Sequence
@@ -11,7 +12,6 @@ import numpy as np
 import torch
 
 from vllm import _custom_ops as ops
-from vllm.distributed.device_communicators.cuda_wrapper import CudaRTLibrary
 from vllm.logger import init_logger
 from vllm.platforms import current_platform
 from vllm.triton_utils import HAS_TRITON, triton
@@ -39,13 +39,10 @@ logger = init_logger(__name__)
 def _select_swap_blocks_fn(
     layer_refs_per_group: list[list[CanonicalKVCacheRef]],
     gpu_to_cpu: bool,
-    host_memory_is_pinned: bool = True,
 ):
     """Resolve the swap_blocks function for a handler at init time."""
     # GPU->CPU is bandwidth-bound; the dedicated copy engine beats Triton.
-    # The Triton kernel dereferences CPU pointers on the GPU, which is only
-    # valid for pinned host memory.
-    if gpu_to_cpu or not host_memory_is_pinned:
+    if gpu_to_cpu:
         return ops.swap_blocks_batch
     # Fall back to the C++ DMA path on platforms where Triton isn't usable
     # (e.g. ROCm host mappings) or where GPU kernels cannot directly
@@ -84,7 +81,8 @@ def compute_sub_block_ptrs(
     tensor: torch.Tensor,
     skip_count: int = 0,
 ):
-    """Compute byte pointers for sub-blocks of the given block IDs.
+    """
+    Compute byte pointers for sub-blocks of the given block IDs.
 
     Each block in block_ids contains blocks_per_chunk sub-blocks.
     The pointer for sub-block j of block b is:
@@ -101,7 +99,6 @@ def compute_sub_block_ptrs(
         output: pre-allocated pointer array to write pointers into.
         tensor: the source or destination tensor.
         skip_count: sub-blocks to skip in the first block.
-
     """
     assert skip_count < blocks_per_chunk
 
@@ -194,12 +191,11 @@ def _canonical_block_sizes(
     return canonical_bytes_per_block
 
 
-# Bound registration size to avoid driver limits on large host allocations.
-MAX_HOST_REGISTER_CHUNK_BYTES = 64 * 1024**3
+_PIN_SPAN_BYTES = 1 << 30
 
 
 def pin_mmap_region(region: SharedOffloadRegion) -> None:
-    """Register row-aligned chunks, rolling back on failure."""
+    """Register the entire mmap as CUDA pinned memory via cudaHostRegister."""
     if not current_platform.is_cuda_alike():
         logger.info(
             "Skipping mmap host registration on %s; cudaHostRegister is only "
@@ -209,65 +205,126 @@ def pin_mmap_region(region: SharedOffloadRegion) -> None:
         return
 
     rank = region.rank
-    try:
-        cudart = CudaRTLibrary()
-    except (AssertionError, AttributeError, OSError):
+    if rank is None:
+        return
+
+    if os.environ.get("VLLM_KV_OFFLOAD_SKIP_PIN") == "1":
         logger.warning(
-            "Could not load the CUDA runtime for host registration on rank=%d; "
-            "the offload region stays pageable",
-            rank,
-            exc_info=True,
+            "VLLM_KV_OFFLOAD_SKIP_PIN=1: leaving the offload region unpinned "
+            "(diagnostic knob; transfers will fail or crawl)"
         )
         return
 
+    # The region is shared by every worker process, and the CUDA driver only
+    # lets the FIRST process cudaHostRegister a given physical page - later
+    # registrations from sibling ranks fail with cudaErrorInvalidValue and the
+    # unpinned fallback then crashes the UVA transfer kernels at warmup.
+    # Register only the slots owned by this rank (disjoint across ranks).
     base_ptr = region._base.data_ptr()
-    total_size = region.total_size_bytes
-    # Chunks end on block-row boundaries, which are page aligned, so neither the
-    # driver's page rounding nor any single block transfer straddles two
-    # registrations.
-    rows_per_chunk = max(MAX_HOST_REGISTER_CHUNK_BYTES // region._row_stride, 1)
-    chunk_size = rows_per_chunk * region._row_stride
-
-    # Register, drain and roll back through the same runtime handle, so a
-    # failed chunk leaves neither a pending error nor a partly pinned region.
-    addresses: list[int] = []
-    for offset in range(0, total_size, chunk_size):
-        address = base_ptr + offset
-        size = min(chunk_size, total_size - offset)
-        result = cudart.cudaHostRegister(address, size)
-        if result == 0:
-            addresses.append(address)
-            continue
-        cudart.cudaGetLastError()
-        logger.warning(
-            "cudaHostRegister failed for rank=%d at %.2f of %.2f GB (code=%d); "
-            "the offload region stays pageable",
-            rank,
-            offset / 1e9,
-            total_size / 1e9,
-            result,
-        )
-        for registered in reversed(addresses):
-            unregister_result = cudart.cudaHostUnregister(registered)
-            if unregister_result != 0:
-                cudart.cudaGetLastError()
-                logger.warning(
-                    "cudaHostUnregister failed for rank=%d at %#x (code=%d); "
-                    "that chunk stays registered until the process exits",
-                    rank,
-                    registered,
-                    unregister_result,
-                )
-        return
-
-    region.pinned_addresses.extend(addresses)
+    slot_size = region._worker_area_end - region._worker_offset
+    # The driver caps the *number* of host registrations (about 2^18 across
+    # the GPUs of a node), not the bytes: one ~1 MB registration per chunk
+    # tops out at ~250 GB. When this worker owns whole rows (a single worker
+    # per row, e.g. DP/TP=1) its slots are contiguous, so register them in
+    # large chunks instead. Interleaved layouts (TP>1) keep one registration
+    # per slot because a page may only be registered by one process.
+    # (row_stride is page-padded, so test "only one slot fits in a row".)
+    contiguous = region._worker_offset == 0 and region._row_stride < 2 * slot_size
+    span_chunks = max(1, _PIN_SPAN_BYTES // slot_size) if contiguous else 1
+    cudart = torch.cuda.cudart()
+    registered: list[int] = []
+    had_failed_attempt = False
+    _t0 = time.perf_counter()
+    for chunk in range(0, region.num_chunks, span_chunks):
+        n_chunks = min(span_chunks, region.num_chunks - chunk)
+        off = chunk * region._row_stride + region._worker_offset
+        reg_size = slot_size if n_chunks == 1 else n_chunks * region._row_stride
+        # Transient failures happen under memory pressure (concurrent ranks
+        # pinning + model weights loading); retry before giving up.
+        for attempt in range(4):
+            result = cudart.cudaHostRegister(base_ptr + off, reg_size, 0)
+            if result.value == 0:
+                break
+            # NOTE: a failed runtime call also records itself in this
+            # thread's CUDA *last-error* slot. torch only reads that slot in
+            # its kernel-LAUNCH checks, so if it is not consumed the stale
+            # error resurfaces minutes later as a bogus AcceleratorError on
+            # the first launch-checked op (historically: the zero_() fill in
+            # warmup or add_request) and kills the boot. The fence after this
+            # loop consumes it; log the real failure here, at its origin.
+            had_failed_attempt = True
+            logger.warning(
+                "cudaHostRegister rank=%d chunk=%d attempt=%d failed with "
+                "code=%d; retrying",
+                rank,
+                chunk,
+                attempt,
+                result.value,
+            )
+            # Consume the stale last-error IMMEDIATELY, not just in the
+            # post-loop fence: on this code base NCCL collectives can run
+            # interleaved with registration, and NCCL's internal error
+            # checks inherit the stale code as "unhandled cuda error",
+            # killing the boot before the fence ever runs.
+            try:
+                _probe = torch.zeros(1, device="cuda")
+                _probe += 1
+                torch.cuda.synchronize()
+            except Exception:
+                pass
+            time.sleep(0.5 * (attempt + 1))
+        if result.value != 0:
+            for done in registered:
+                cudart.cudaHostUnregister(base_ptr + done)
+            # Unpinned is not a usable fallback: the UVA transfer kernels
+            # dereference these host pointers and crash later with an async
+            # cudaErrorInvalidValue far from this code. Fail fast instead.
+            raise RuntimeError(
+                f"cudaHostRegister failed for rank={rank} at chunk {chunk}/"
+                f"{region.num_chunks} (code={result.value}) after retries. "
+                "This usually means host memory pressure or insufficient "
+                "free /dev/shm. Check for stale vllm_offload_*.mmap files "
+                "and overall RAM usage."
+            )
+        registered.append(off)
+    region._pinned_slot_offsets = registered
     region.is_pinned = True
-    logger.debug(
-        "cudaHostRegister rank=%d %.2f GB in %d chunk(s)",
+    logger.info(
+        "cudaHostRegister rank=%d pinned %d chunks in %d registrations "
+        "(%.2f GB) in %.1fs",
         rank,
-        total_size / 1e9,
-        len(addresses),
+        region.num_chunks,
+        len(registered),
+        region.num_chunks * slot_size / 1e9,
+        time.perf_counter() - _t0,
     )
+
+    # Launch-check fence: force a kernel-launch error check NOW so that any
+    # stale last-error recorded during the registration phase (e.g. by a
+    # cudaHostRegister attempt that we retried successfully) is attributed
+    # and consumed here instead of poisoning the first launch-checked op of
+    # warmup minutes later (the boot-time "async cudaErrorInvalidValue"
+    # crash: torch.AcceleratorError at zero_()/torch.zeros with no real
+    # device fault behind it).
+    try:
+        probe = torch.zeros(8, device="cuda")
+        probe += 1
+        torch.cuda.synchronize()
+    except Exception as exc:
+        logger.warning(
+            "Consumed a stale CUDA error left over from the host "
+            "registration phase (had_failed_attempt=%s): %s -- verifying "
+            "the device is actually healthy.",
+            had_failed_attempt,
+            exc,
+        )
+        # A stale last-error is cleared by the read above; a genuinely
+        # broken context is not. Re-probe: if this also fails, the device
+        # is truly poisoned and the boot must die (fail fast).
+        probe = torch.zeros(8, device="cuda")
+        probe += 1
+        torch.cuda.synchronize()
+        logger.info("Device healthy after clearing stale CUDA error; continuing boot.")
 
 
 def _new_descriptor_buffers(
@@ -284,7 +341,8 @@ def _new_descriptor_buffers(
 
 
 class SingleDirectionOffloadingHandler:
-    """Handles transfers for a single direction, either CPU->GPU or GPU->CPU.
+    """
+    Handles transfers for a single direction, either CPU->GPU or GPU->CPU.
     Transfers are guaranteed to be executed in order of their submission.
     Each transfer uses a unique CUDA stream, and its stream will start
     executing only after the streams of previous transfers have finished.
@@ -298,9 +356,9 @@ class SingleDirectionOffloadingHandler:
         layer_refs_per_group: list[list[CanonicalKVCacheRef]],
         gpu_to_cpu: bool,
         canonical_layout: bool = False,
-        host_memory_is_pinned: bool = True,
     ):
-        """Initialize a SingleDirectionOffloadingHandler.
+        """
+        Initialize a SingleDirectionOffloadingHandler.
 
         Args:
             gpu_tensors: list of GPU KV cache tensors.
@@ -308,14 +366,10 @@ class SingleDirectionOffloadingHandler:
             cpu_tensors: list of CPU KV cache tensors.
                 Each of shape (num_cpu_chunks, cpu_page_size_bytes) with dtype int8.
                 Order should match gpu_tensors.
-            blocks_per_chunk: number of blocks transferred per chunk.
             layer_refs_per_group: list of CanonicalKVCacheRef per group.
             gpu_to_cpu: if True, transfer from GPU to CPU; otherwise CPU to GPU.
             canonical_layout: if True, CPU pages use the canonical layout
                 described by the refs' mappings.
-            host_memory_is_pinned: whether the CPU tensors are pinned, so GPU
-                kernels may dereference them directly.
-
         """
         assert len(gpu_tensors) == len(cpu_tensors)
         assert len(gpu_tensors) > 0
@@ -352,7 +406,7 @@ class SingleDirectionOffloadingHandler:
         self.gpu_to_cpu: bool = gpu_to_cpu
         self.layer_refs_per_group = layer_refs_per_group
         self._swap_blocks_batch = _select_swap_blocks_fn(
-            layer_refs_per_group, gpu_to_cpu, host_memory_is_pinned
+            layer_refs_per_group, gpu_to_cpu
         )
 
         # GPU blocks may be smaller
@@ -699,7 +753,7 @@ class SingleDirectionOffloadingHandler:
             last_event = last_transfer.end_event
             # assure job will start only after the previous one completes
             stream.wait_event(last_event)
-        # CPU->GPU reads from host memory, which is never written
+        # CPU->GPU reads from host pinned memory, which is never written
         # by a concurrent GPU stream, so CU_MEMCPY_SRC_ACCESS_ORDER_ANY is
         # safe and lets the driver pipeline source reads. GPU->CPU reads
         # from the live GPU KV cache, which the compute stream keeps
@@ -817,9 +871,6 @@ class CPUOffloadingWorker(OffloadingWorker):
         logger.info("Allocating %d CPU tensors...", len(kv_caches.tensors))
         if mmap_region is not None and pin_memory:
             pin_mmap_region(mmap_region)
-        host_memory_is_pinned = pin_memory and (
-            mmap_region is None or mmap_region.is_pinned
-        )
 
         canonical_bytes_per_block = (
             _canonical_block_sizes(kv_caches.group_data_refs, len(kv_caches.tensors))
@@ -869,7 +920,6 @@ class CPUOffloadingWorker(OffloadingWorker):
             layer_refs_per_group=kv_caches.group_data_refs,
             gpu_to_cpu=True,
             canonical_layout=canonical_layout,
-            host_memory_is_pinned=host_memory_is_pinned,
         )
 
         self._load_handler = SingleDirectionOffloadingHandler(
@@ -879,7 +929,6 @@ class CPUOffloadingWorker(OffloadingWorker):
             layer_refs_per_group=kv_caches.group_data_refs,
             gpu_to_cpu=False,
             canonical_layout=canonical_layout,
-            host_memory_is_pinned=host_memory_is_pinned,
         )
 
     def submit_store(

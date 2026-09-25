@@ -21,6 +21,7 @@ from vllm.models.deepseek_v4.common.ops.save_partial_states import (
     _SAVE_PARTIAL_STATES_KERNEL,
 )
 from vllm.platforms import current_platform
+from vllm.utils.import_utils import is_cutedsl_supported
 from vllm.v1.attention.backend import (
     AttentionBackend,
     AttentionCGSupport,
@@ -43,12 +44,10 @@ def _prefer_two_stage_compressor() -> bool:
 
 
 def _get_c128_boundary(metadata: CommonAttentionMetadata) -> bool | None:
-    seq_lens_cpu = metadata.seq_lens_cpu_upper_bound
-    if seq_lens_cpu is None:
+    starts = metadata._num_computed_tokens_cpu
+    if starts is None:
         return None
 
-    query_lens = metadata.query_start_loc_cpu[1:] - metadata.query_start_loc_cpu[:-1]
-    starts = seq_lens_cpu - query_lens
     starts_list = starts.tolist()
     query_start_loc = metadata.query_start_loc_cpu.tolist()
     return any(
@@ -66,7 +65,7 @@ class CompressorBackend(AttentionBackend):
         return "CompressorBackend"
 
     @staticmethod
-    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
         return [MultipleOf(1)]
 
     @classmethod
@@ -118,10 +117,6 @@ class CompressorMetadataBuilder(AttentionMetadataBuilder):
             _, _, num_decode_tokens, _ = split_decodes_and_prefills(
                 common_attn_metadata, decode_threshold=1
             )
-        async_spec_decode = (
-            self.vllm_config.scheduler_config.async_scheduling
-            and self.vllm_config.speculative_config is not None
-        )
         return CompressorMetadata(
             block_table=common_attn_metadata.block_table_tensor.clamp_(min=0),
             slot_mapping=common_attn_metadata.slot_mapping,
@@ -130,7 +125,7 @@ class CompressorMetadataBuilder(AttentionMetadataBuilder):
             num_decode_tokens=num_decode_tokens,
             c128_boundary=(
                 _get_c128_boundary(common_attn_metadata)
-                if self.block_size == 8 and not async_spec_decode
+                if self.block_size == 8
                 else None
             ),
         )
@@ -203,8 +198,8 @@ class DeepseekCompressor(nn.Module):
     prologue (kv/score split, save_partial_states launch). The
     compress → norm → RoPE → store step is dispatched to a triton kernel
     (``compress_norm_rope_store_triton``) by default, except for the NVIDIA
-    head_dim=512 path which uses the CuTeDSL compressor kernels for better
-    performance.
+    head_dim=128 indexer path which uses the cutedsl kernel
+    (``compress_norm_rope_store_cutedsl``) for better performance.
     """
 
     def __init__(
@@ -317,33 +312,7 @@ class DeepseekCompressor(nn.Module):
                 head_dim=self.head_dim,
                 compress_ratio=self.compress_ratio,
             )
-            if current_platform.is_cuda() and self.head_dim == 512:
-                from vllm.models.deepseek_v4.nvidia.ops.sparse_attn_compress_cutedsl import (  # noqa: E501
-                    _SPARSE_ATTN_COMPRESS_C128_BLOCK8_KERNEL,
-                    _SPARSE_ATTN_COMPRESS_NORM_ROPE_STORE_C4_KERNEL,
-                    _SPARSE_ATTN_COMPRESS_NORM_ROPE_STORE_FULL_C4_KERNEL,
-                    _SPARSE_ATTN_NORM_ROPE_STORE_FULL_KERNEL,
-                    _SPARSE_ATTN_NORM_ROPE_STORE_KERNEL,
-                )
-
-                store_full_kv = vllm_config.cache_config.cache_dtype != "fp8_ds_mla"
-                if self.compress_ratio == 4:
-                    (
-                        _SPARSE_ATTN_COMPRESS_NORM_ROPE_STORE_FULL_C4_KERNEL
-                        if store_full_kv
-                        else _SPARSE_ATTN_COMPRESS_NORM_ROPE_STORE_C4_KERNEL
-                    ).register_warmup()
-                else:
-                    _SPARSE_ATTN_COMPRESS_C128_BLOCK8_KERNEL.register_warmup()
-                    if store_full_kv:
-                        _SPARSE_ATTN_NORM_ROPE_STORE_FULL_KERNEL.register_warmup()
-                    else:
-                        _SPARSE_ATTN_NORM_ROPE_STORE_KERNEL.register_warmup(
-                            vllm_config,
-                            k_cache_prefix=self.k_cache_prefix,
-                            compress_ratio=self.compress_ratio,
-                        )
-            else:
+            if self.head_dim != 512:
                 from vllm.models.deepseek_v4.common.ops.fused_compress_quant_cache import (  # noqa: E501
                     _FUSED_KV_COMPRESS_NORM_ROPE_INSERT_INDEXER_TRITON_KERNEL,
                 )
@@ -443,15 +412,16 @@ class DeepseekCompressor(nn.Module):
         # cutedsl (head=512) accepts the full-cache flags; triton (indexer/AMD)
         # does not, so the two callables have different signatures.
         compress_norm_rope_store_fn: Any
-        if current_platform.is_cuda() and self.head_dim == 512:
+        if is_cutedsl_supported() and self.head_dim == 512:
             from .nvidia.ops.sparse_attn_compress_cutedsl import (
-                _SPARSE_ATTN_COMPRESSOR_CUTEDSL_KERNEL,
+                compress_norm_rope_store_cutedsl,
             )
 
-            # head=512 on CUDA always uses cutedsl, for both the fp8_ds_mla
-            # layout and the plain full-cache layout. The full-cache flags
-            # are consumed only here.
-            compress_norm_rope_store_fn = _SPARSE_ATTN_COMPRESSOR_CUTEDSL_KERNEL
+            # head=512 on SM90+ CUDA always uses cutedsl, for both the
+            # fp8_ds_mla layout and the plain full-cache layout. The
+            # full-cache flags are consumed only here. Pre-Hopper CUDA takes
+            # the Triton path below like AMD/XPU.
+            compress_norm_rope_store_fn = compress_norm_rope_store_cutedsl
             extra_kwargs: dict[str, Any] = dict(
                 store_full_kv=store_full_kv,
                 store_full_fp8=store_full_fp8,

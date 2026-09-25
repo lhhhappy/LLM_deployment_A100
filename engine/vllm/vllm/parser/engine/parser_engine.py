@@ -29,6 +29,7 @@ from vllm.parser.engine.parser_engine_config import ParserEngineConfig, ParserSt
 from vllm.parser.engine.streaming_parser_engine import StreamingParserEngine
 from vllm.tool_parsers.utils import (
     coerce_to_schema_type,
+    collect_tool_names,
     extract_types_from_schema,
     find_tool_name,
     find_tool_properties,
@@ -107,6 +108,7 @@ class ParserEngine(Parser):
         self._engine = StreamingParserEngine(
             parser_engine_config, tokenizer, vocab=self.vocab
         )
+        self._engine.allowed_tool_names = self._declared_tool_names()
 
         self._has_reasoning = (
             "THINK_END" in parser_engine_config.token_id_terminals
@@ -417,6 +419,11 @@ class ParserEngine(Parser):
 
     # ── Private helpers ─────────────────────────────────────────────
 
+    def _declared_tool_names(self) -> frozenset[str] | None:
+        if not self._tools:
+            return None
+        return collect_tool_names(self._tools) or None
+
     def _check_skip_tool_parsing(
         self,
         request: ChatCompletionRequest | ResponsesRequest,
@@ -424,10 +431,21 @@ class ParserEngine(Parser):
         tools = getattr(request, "tools", None)
         if tools:
             self._tools = tools
+            self._engine.allowed_tool_names = self._declared_tool_names()
+        else:
+            # The engine is reused across requests and reset() keeps this
+            # field, so it has to be cleared here.  Otherwise a request
+            # that declares no tools would inherit the names of the
+            # previous one and could recover a tool it never asked for.
+            self._engine.allowed_tool_names = None
         if not self.skip_tool_parsing and not self._suppress_tool_calls:
             tool_choice = getattr(request, "tool_choice", None)
             if tool_choice == "none" and tools:
                 self._suppress_tool_calls = True
+        # The engine needs the suppression state too: recovery
+        # transitions must not consume text that will never be allowed
+        # to become a tool call.
+        self._engine.suppress_tool_calls = self._suppress_tool_calls
 
     def _strip_content_whitespace(
         self,
@@ -645,57 +663,34 @@ class ParserEngine(Parser):
         for offset, token_id in enumerate(token_ids):
             if token_id in end_ids:
                 return offset
-        return len(token_ids)
+        return None
 
     def is_reasoning_end(self, input_ids: list[int]) -> bool:
-        config = self.parser_engine_config
-        wait_for_reasoning = config.wait_for_reasoning
-        if wait_for_reasoning is None:
-            wait_for_reasoning = config.initial_state is ParserState.REASONING
-        start_transition = config.transitions.get((config.initial_state, "THINK_START"))
-        start_opens_reasoning = (
-            start_transition is not None
-            and start_transition.next_state is ParserState.REASONING
-        )
-        end_ids = self._reasoning_end_token_ids
+        end_id = self._reasoning_end_token_id
         start_id = self._reasoning_start_token_id
-        boundary_ids = self._turn_boundary_token_ids
-        for token_id in reversed(input_ids):
-            if token_id in end_ids:
-                return True
-            if token_id == start_id:
-                if start_opens_reasoning:
+        if end_id is not None:
+            if not input_ids:
+                return self.parser_engine_config.initial_state != ParserState.REASONING
+            boundary_ids = self._turn_boundary_token_ids
+            for i in range(len(input_ids) - 1, -1, -1):
+                token_id = input_ids[i]
+                if token_id == end_id:
+                    return True
+                if start_id is not None and token_id == start_id:
                     return False
-                break
-            if token_id in boundary_ids:
-                break
-        return not wait_for_reasoning
+                if token_id in boundary_ids:
+                    return (
+                        self.parser_engine_config.initial_state != ParserState.REASONING
+                    )
+            return False
+        return self._reasoning_ended
 
     def extract_content_ids(self, input_ids: list[int]) -> list[int]:
-        config = self.parser_engine_config
-        wait_for_reasoning = config.wait_for_reasoning
-        if wait_for_reasoning is None:
-            wait_for_reasoning = config.initial_state is ParserState.REASONING
-        if not wait_for_reasoning:
-            return input_ids
-
         end_id = self._reasoning_end_token_id
         if end_id is not None:
             for i in range(len(input_ids) - 1, -1, -1):
                 if input_ids[i] == end_id:
                     return input_ids[i + 1 :]
-
-        end_ids = self._reasoning_end_token_ids
-        if end_ids:
-            turn_start = 0
-            boundary_ids = self._turn_boundary_token_ids
-            for i in range(len(input_ids) - 1, -1, -1):
-                if input_ids[i] in boundary_ids:
-                    turn_start = i + 1
-                    break
-            for i in range(turn_start, len(input_ids)):
-                if input_ids[i] in end_ids:
-                    return input_ids[i:]
         return input_ids
 
     def get_streaming_fallback_content(

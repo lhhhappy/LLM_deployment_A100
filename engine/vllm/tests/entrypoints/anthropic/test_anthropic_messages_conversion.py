@@ -480,7 +480,7 @@ class TestThinkingBlockConversion:
     """
 
     def test_thinking_plus_text_in_assistant_message(self):
-        """Thinking + text → reasoning field + plain-string content."""
+        """thinking + text → reasoning field + plain-string content."""
         request = _make_request(
             [
                 {"role": "user", "content": "Write me some code."},
@@ -542,7 +542,7 @@ class TestThinkingBlockConversion:
         assert asst.get("content") is None
 
     def test_thinking_plus_tool_use_in_assistant_message(self):
-        """Thinking + tool_use: reasoning field set, tool_calls populated."""
+        """thinking + tool_use: reasoning field set, tool_calls populated."""
         request = _make_request(
             [
                 {"role": "user", "content": "What is 2+2?"},
@@ -1610,32 +1610,6 @@ class TestStopSequenceReason:
         assert msg_deltas[0]["delta"]["stop_reason"] == "stop_sequence"
         assert msg_deltas[0]["delta"]["stop_sequence"] == "</tool>"
 
-    @pytest.mark.asyncio
-    async def test_streaming_no_stop_string_emits_explicit_null_stop_sequence(self):
-        """exclude_unset=True drops stop_sequence unless it is set explicitly."""
-
-        async def sse_input():
-            yield _make_stream_chunk(delta=DeltaMessage(role="assistant"))
-            yield _make_stream_chunk(delta=DeltaMessage(content="hi"))
-            yield _make_stream_chunk(finish_reason="stop")
-            yield _make_stream_chunk(
-                choices=[],
-                usage=UsageInfo(prompt_tokens=5, total_tokens=8, completion_tokens=3),
-            )
-            yield "data: [DONE]"
-
-        converter = _make_stream_converter()
-        output = []
-        async for event in converter.message_stream_converter(sse_input()):
-            output.append(event)
-
-        events = _parse_sse_events(output)
-        msg_deltas = [data for ev_type, data in events if ev_type == "message_delta"]
-        assert len(msg_deltas) == 1
-        assert msg_deltas[0]["delta"]["stop_reason"] == "end_turn"
-        assert "stop_sequence" in msg_deltas[0]["delta"]
-        assert msg_deltas[0]["delta"]["stop_sequence"] is None
-
 
 # ======================================================================
 # Client-caused errors are 4xx, not 500 (Issue #52088)
@@ -1727,3 +1701,54 @@ class TestClientErrorResponses:
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.json()["error"]["type"] == "BadRequestError"
+
+
+# ======================================================================
+# thinking config -> chat_template_kwargs mapping
+# ======================================================================
+
+
+class TestThinkingConfigMapping:
+    """The Anthropic `thinking` request field must reach the chat template.
+
+    Anthropic semantics: extended thinking is off unless the request carries
+    thinking: {"type": "enabled"}. Before this mapping existed the field was
+    silently dropped and the DeepSeek-V4 template default (thinking mode)
+    applied to every /v1/messages session, while the response parser expected
+    chat mode -- reasoning then streamed out as content and poisoned agentic
+    histories (wtdcode/vllm-backport#22).
+    """
+
+    def _kwargs(self, **request_kwargs):
+        req = _make_request([{"role": "user", "content": "hi"}], **request_kwargs)
+        chat_req = AnthropicServingMessages._build_base_request(
+            req, [{"role": "user", "content": "hi"}]
+        )
+        return chat_req.chat_template_kwargs
+
+    def test_omitted_thinking_maps_to_disabled(self):
+        assert self._kwargs()["thinking"] is False
+
+    def test_enabled_thinking_maps_to_enabled(self):
+        kwargs = self._kwargs(thinking={"type": "enabled", "budget_tokens": 4096})
+        assert kwargs["thinking"] is True
+
+    def test_disabled_thinking_maps_to_disabled(self):
+        assert self._kwargs(thinking={"type": "disabled"})["thinking"] is False
+
+    def test_adaptive_thinking_maps_to_enabled(self):
+        """Newer Claude Code sends type "adaptive"; a closed literal 400s the
+        client at startup. Unknown modes must validate and mean thinking on."""
+        assert self._kwargs(thinking={"type": "adaptive"})["thinking"] is True
+
+    def test_explicit_template_kwargs_win(self):
+        kwargs = self._kwargs(
+            thinking={"type": "enabled"},
+            chat_template_kwargs={"thinking": False},
+        )
+        assert kwargs["thinking"] is False
+
+    def test_enable_thinking_alias_wins(self):
+        kwargs = self._kwargs(chat_template_kwargs={"enable_thinking": True})
+        assert "thinking" not in kwargs
+        assert kwargs["enable_thinking"] is True

@@ -104,6 +104,8 @@ def test_raw_text_parts_preserve_reference_separator():
     [("user", "input_text"), ("assistant", "output_text")],
 )
 def test_responses_text_parts_match_chat_text_parts(role, responses_type):
+    # The Responses API carries text in input_text/output_text parts, which are
+    # equivalent to the chat completions text part.
     responses_message = {
         "role": role,
         "content": [{"type": responses_type, "text": "hello"}],

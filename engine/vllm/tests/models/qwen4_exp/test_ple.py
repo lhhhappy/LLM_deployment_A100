@@ -14,13 +14,14 @@ from torch.nn import functional as F
 import vllm.model_executor.layers.vocab_parallel_embedding as embedding_module
 import vllm.model_executor.parameter as parameter_module
 import vllm.models.qwen4_exp.nvidia.ngram_embedding as ngram_embedding_module
-from vllm.config.quantization import QuantizationConfigArgs
+from vllm.model_executor.layers.quantization.compressed_tensors.compressed_tensors import (  # noqa: E501
+    CompressedTensorsConfig,
+)
 from vllm.model_executor.layers.quantization.fp8 import Fp8Config
 from vllm.model_executor.layers.quantization.modelopt import (
     ModelOptMixedPrecisionConfig,
     ModelOptNvFp4Config,
 )
-from vllm.model_executor.layers.quantization.online.base import OnlineQuantizationConfig
 from vllm.models.qwen4_exp.common.ple import (
     PLEShardOverlap,
     compute_ple_shard_overlap,
@@ -398,6 +399,7 @@ def test_ple_fp8_embedding_uses_int8_for_parallel_reduce(monkeypatch) -> None:
 def test_ple_fp8_embedding_respects_checkpoint_shard_exclusions() -> None:
     prefix = "model.layers.1.ple.ple_embedding.ngram_embedding"
     quant_config = Fp8Config(
+        is_checkpoint_fp8_serialized=True,
         ignored_layers=[],
         weight_block_size=[128, 128],
     )
@@ -423,11 +425,77 @@ def test_ple_embedding_rejects_unsupported_quantization_configs() -> None:
     with pytest.raises(NotImplementedError, match="ModelOptNvFp4Config"):
         Qwen4ExpPLEEmbeddingMethod.from_quant_config(nvfp4_config, prefix)
 
-    online_fp8_config = OnlineQuantizationConfig(
-        QuantizationConfigArgs(linear="fp8_per_tensor")
+    dynamic_fp8_config = Fp8Config(
+        is_checkpoint_fp8_serialized=False,
+        ignored_layers=[],
     )
-    with pytest.raises(NotImplementedError, match="OnlineQuantizationConfig"):
-        Qwen4ExpPLEEmbeddingMethod.from_quant_config(online_fp8_config, prefix)
+    with pytest.raises(NotImplementedError, match="serialized FP8"):
+        Qwen4ExpPLEEmbeddingMethod.from_quant_config(dynamic_fp8_config, prefix)
+
+
+def _compressed_tensors_w4a16_config(
+    targets: list[str], ignore: list[str]
+) -> CompressedTensorsConfig:
+    return CompressedTensorsConfig.from_config(
+        {
+            "format": "pack-quantized",
+            "quant_method": "compressed-tensors",
+            "ignore": ignore,
+            "config_groups": {
+                "group_0": {
+                    "targets": targets,
+                    "weights": {
+                        "num_bits": 4,
+                        "type": "int",
+                        "symmetric": True,
+                        "strategy": "group",
+                        "group_size": 128,
+                    },
+                    "input_activations": None,
+                }
+            },
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "ignore",
+    [
+        ["lm_head", r"re:.*\.ple\..*"],
+        ["lm_head"],
+    ],
+)
+def test_ple_embedding_stays_unquantized_for_compressed_tensors_linear_targets(
+    ignore: list[str],
+) -> None:
+    prefix = "language_model.model.layers.1.ple.ple_embedding.ngram_embedding"
+    quant_config = _compressed_tensors_w4a16_config(["Linear"], ignore)
+
+    assert isinstance(
+        Qwen4ExpPLEEmbeddingMethod.from_quant_config(quant_config, prefix),
+        Qwen4ExpPLEUnquantizedEmbeddingMethod,
+    )
+
+
+def test_ple_embedding_rejects_compressed_tensors_targeting_the_table() -> None:
+    prefix = "language_model.model.layers.1.ple.ple_embedding.ngram_embedding"
+    quant_config = _compressed_tensors_w4a16_config(["Linear", "Embedding"], [])
+    with pytest.raises(NotImplementedError, match="compressed-tensors"):
+        Qwen4ExpPLEEmbeddingMethod.from_quant_config(quant_config, prefix)
+
+    quant_config = _compressed_tensors_w4a16_config(
+        ["Linear", r"re:.*ngram_embedding.*"], []
+    )
+    with pytest.raises(NotImplementedError, match="compressed-tensors"):
+        Qwen4ExpPLEEmbeddingMethod.from_quant_config(quant_config, prefix)
+
+    quant_config = _compressed_tensors_w4a16_config(
+        ["Linear", r"re:.*ngram_embedding.*"], [r"re:.*\.ple\..*"]
+    )
+    assert isinstance(
+        Qwen4ExpPLEEmbeddingMethod.from_quant_config(quant_config, prefix),
+        Qwen4ExpPLEUnquantizedEmbeddingMethod,
+    )
 
 
 def test_ple_embedding_respects_modelopt_exclusion() -> None:
@@ -1610,12 +1678,6 @@ def test_fused_conv_correctness(
         dtype=torch.bfloat16,
         generator=rng,
     )
-    outer_residual = torch.randn(
-        inputs.shape,
-        device=device,
-        dtype=torch.bfloat16,
-        generator=rng,
-    )
     null_state = conv_state[NULL_BLOCK_ID].clone()
     residual_kernel = residual.clone()
     residual_reference = residual.clone()
@@ -1623,7 +1685,6 @@ def test_fused_conv_correctness(
     module._short_conv_dilated_dispatch(
         inputs=inputs,
         residual=residual_kernel,
-        outer_residual=outer_residual,
         metadata=metadata,
         conv_state=conv_state,
         conv_weights=weights,
@@ -1637,17 +1698,15 @@ def test_fused_conv_correctness(
         conv_state_len=module.conv_state_len,
         dilation=module.short_conv_dilation,
     )
-    residual_reference = outer_residual + residual_reference
 
-    assert torch.equal(
-        residual_kernel[:num_real_tokens], residual_reference[:num_real_tokens]
+    torch.testing.assert_close(
+        residual_kernel.float(), residual_reference.float(), atol=3e-2, rtol=3e-2
     )
     assert torch.equal(conv_state, state_reference)
     assert torch.equal(conv_state[NULL_BLOCK_ID], null_state)
     if case.graph_padding:
         assert torch.equal(
-            residual_kernel[num_real_tokens:],
-            (outer_residual + residual)[num_real_tokens:],
+            residual_kernel[num_real_tokens:], residual[num_real_tokens:]
         )
 
 

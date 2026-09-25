@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from einops import rearrange
-from transformers import PreTrainedConfig
+from transformers import PretrainedConfig
 
 from vllm.distributed import parallel_state
 from vllm.distributed import utils as dist_utils
@@ -14,7 +14,6 @@ from vllm.model_executor.layers.activation import get_act_fn
 from vllm.model_executor.layers.attention.mm_encoder_attention import (
     MMEncoderAttention,
 )
-from vllm.model_executor.layers.conv import Conv3dLayer
 from vllm.model_executor.layers.linear import (
     ColumnParallelLinear,
     QKVParallelLinear,
@@ -44,7 +43,7 @@ class MiniMaxVLPatchEmbed(nn.Module):
     and projects each to a hidden-size embedding.
     """
 
-    def __init__(self, config: PreTrainedConfig) -> None:
+    def __init__(self, config: PretrainedConfig) -> None:
         super().__init__()
         compression = config.img_token_compression_config
         temporal_patch_size = compression.get("temporal_patch_size", 2)
@@ -56,7 +55,7 @@ class MiniMaxVLPatchEmbed(nn.Module):
         self.num_channels = num_channels
         self.hidden_size = config.hidden_size
 
-        self.patch_embedding = Conv3dLayer(
+        self.patch_embedding = nn.Conv3d(
             in_channels=num_channels,
             out_channels=config.hidden_size,
             kernel_size=(temporal_patch_size, patch_size, patch_size),
@@ -232,7 +231,7 @@ class MiniMaxVLEncoderLayer(nn.Module):
 
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
     ) -> None:
@@ -295,7 +294,7 @@ class MiniMaxVLEncoderLayer(nn.Module):
 class MiniMaxVLEncoder(nn.Module):
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         num_hidden_layers_override: int | None = None,
         quant_config: QuantizationConfig | None = None,
         prefix: str = "",
@@ -349,7 +348,7 @@ class MiniMaxVLVisionTransformer(nn.Module):
 
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         num_hidden_layers_override: int | None = None,
         require_post_norm: bool | None = None,
         quant_config: QuantizationConfig | None = None,
@@ -679,7 +678,7 @@ class MiniMaxVLVisionModel(nn.Module):
 
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         text_hidden_size: int,
         projector_hidden_size: int | None = None,
         quant_config: QuantizationConfig | None = None,

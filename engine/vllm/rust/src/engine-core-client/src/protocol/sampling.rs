@@ -20,10 +20,6 @@ fn default_temperature() -> f32 {
     1.0
 }
 
-fn default_watermarking() -> bool {
-    true
-}
-
 fn default_max_tokens() -> u32 {
     16
 }
@@ -72,9 +68,6 @@ pub struct EngineCoreSamplingParams {
     /// greedy sampling.
     #[serde(default = "default_temperature")]
     pub temperature: f32,
-    /// Whether to apply the engine's configured watermark to this request.
-    #[serde(default = "default_watermarking")]
-    pub watermarking: bool,
     /// Cumulative probability threshold for nucleus sampling.
     #[serde(default = "default_top_p")]
     pub top_p: f32,
@@ -162,7 +155,6 @@ impl EngineCoreSamplingParams {
     pub fn for_test() -> Self {
         Self {
             temperature: 1.0,
-            watermarking: true,
             top_p: 1.0,
             top_k: 0,
             seed: None,
@@ -237,7 +229,6 @@ mod tests {
 
         // Omitted fields -> Python defaults.
         assert_eq!(sampling.temperature, 1.0);
-        assert!(sampling.watermarking);
         assert_eq!(sampling.top_p, 1.0);
         assert_eq!(sampling.top_k, 0);
         assert_eq!(sampling.seed, None);

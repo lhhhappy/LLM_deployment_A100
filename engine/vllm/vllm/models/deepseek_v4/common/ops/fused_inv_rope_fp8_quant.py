@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Fused inverse RoPE + block-scaled FP8 quantization kernel for DeepseekV4 attention.
+"""
+Fused inverse RoPE + block-scaled FP8 quantization kernel for DeepseekV4 attention.
 
 Output scale format is pre-transformed (MN-major TMA-aligned; FP32 on SM90,
 INT32-packed UE8M0 on SM100) so fp8_einsum skips transform_sf_into_required_layout.
@@ -11,11 +12,11 @@ from typing import Any
 
 import torch
 
-from vllm.model_executor.warmup.jit_warmup import kernel_launcher
 from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     LaunchSpec,
     TritonWarmupTensor,
     VllmTritonJitKernel,
+    kernel_launcher,
 )
 from vllm.platforms import current_platform
 from vllm.triton_utils import tl, triton
@@ -145,57 +146,58 @@ class FusedInvRopeFP8QuantKernel(
                 + qb_start * QUANT_GROUP_SIZE
             )
             tl.store(out_base + offsets, x)
-            return
-
-        x_2d = tl.reshape(tl.abs(x), (CHUNKS_PER_HEAD, QUANT_GROUP_SIZE))
-        block_absmax = tl.maximum(tl.max(x_2d, axis=1), eps)
-        scale_raw = block_absmax * (1.0 / fp8_max)
-        scales = tl.math.exp2(tl.ceil(tl.log2(scale_raw)))
-
-        scales_exp = tl.reshape(
-            tl.broadcast_to(
-                tl.reshape(scales, (CHUNKS_PER_HEAD, 1)),
-                (CHUNKS_PER_HEAD, QUANT_GROUP_SIZE),
-            ),
-            (HEAD_DIM,),
-        )
-        x_quant = tl.clamp(x / scales_exp, -fp8_max, fp8_max).to(tl.float8e4nv)
-
-        out_base = (
-            out_ptr
-            + g * out_stride_group
-            + pid_token * out_stride_token
-            + qb_start * QUANT_GROUP_SIZE
-        )
-        tl.store(out_base + offsets, x_quant)
-
-        block_offsets = tl.arange(0, CHUNKS_PER_HEAD)
-        qb_indices = qb_start + block_offsets
-        if TMA_ALIGNED_SCALES:
-            scale_bits = scales.to(tl.int32, bitcast=True)
-            ue8m0_bytes = (scale_bits >> 23) & 0xFF
-            packed_val = tl.sum(
-                tl.reshape(ue8m0_bytes, (CHUNKS_PER_HEAD // 4, 4))
-                << (tl.arange(0, 4)[None, :] * 8),
-                axis=1,
-            )
-            packed_offsets = tl.arange(0, CHUNKS_PER_HEAD // 4)
-            scale_addr = (
-                scale_ptr
-                + g * scale_stride_group
-                + pid_token
-                + (head_in_group * (CHUNKS_PER_HEAD // 4) + packed_offsets)
-                * scale_stride_k
-            )
-            tl.store(scale_addr, packed_val)
         else:
-            scale_addrs = (
-                scale_ptr
-                + g * scale_stride_group
-                + pid_token
-                + qb_indices * scale_stride_k
+            # Kept under the constexpr branch (not after an early return) so
+            # the fp8 convert is pruned on archs without native e4m3 casts.
+            x_2d = tl.reshape(tl.abs(x), (CHUNKS_PER_HEAD, QUANT_GROUP_SIZE))
+            block_absmax = tl.maximum(tl.max(x_2d, axis=1), eps)
+            scale_raw = block_absmax * (1.0 / fp8_max)
+            scales = tl.math.exp2(tl.ceil(tl.log2(scale_raw)))
+
+            scales_exp = tl.reshape(
+                tl.broadcast_to(
+                    tl.reshape(scales, (CHUNKS_PER_HEAD, 1)),
+                    (CHUNKS_PER_HEAD, QUANT_GROUP_SIZE),
+                ),
+                (HEAD_DIM,),
             )
-            tl.store(scale_addrs, scales)
+            x_quant = tl.clamp(x / scales_exp, -fp8_max, fp8_max).to(tl.float8e4nv)
+
+            out_base = (
+                out_ptr
+                + g * out_stride_group
+                + pid_token * out_stride_token
+                + qb_start * QUANT_GROUP_SIZE
+            )
+            tl.store(out_base + offsets, x_quant)
+
+            block_offsets = tl.arange(0, CHUNKS_PER_HEAD)
+            qb_indices = qb_start + block_offsets
+            if TMA_ALIGNED_SCALES:
+                scale_bits = scales.to(tl.int32, bitcast=True)
+                ue8m0_bytes = (scale_bits >> 23) & 0xFF
+                packed_val = tl.sum(
+                    tl.reshape(ue8m0_bytes, (CHUNKS_PER_HEAD // 4, 4))
+                    << (tl.arange(0, 4)[None, :] * 8),
+                    axis=1,
+                )
+                packed_offsets = tl.arange(0, CHUNKS_PER_HEAD // 4)
+                scale_addr = (
+                    scale_ptr
+                    + g * scale_stride_group
+                    + pid_token
+                    + (head_in_group * (CHUNKS_PER_HEAD // 4) + packed_offsets)
+                    * scale_stride_k
+                )
+                tl.store(scale_addr, packed_val)
+            else:
+                scale_addrs = (
+                    scale_ptr
+                    + g * scale_stride_group
+                    + pid_token
+                    + qb_indices * scale_stride_k
+                )
+                tl.store(scale_addrs, scales)
 
     def dispatch(  # type: ignore[override]
         self,
@@ -379,7 +381,6 @@ def fused_inv_rope_fp8_quant(
     Returns:
         Rotated output in [T, G, D] and its FP8 scales. The scale tensor is
         empty when quantization is disabled.
-
     """
     from vllm.utils.deep_gemm import get_tma_aligned_size
 

@@ -43,12 +43,16 @@ class MambaHybridAttnMetadata(ModelSpecificAttnMetadata):
     num_decode_draft_tokens_cpu: torch.Tensor | None = None
 
     def get_extra_common_attn_kwargs(
-        self, kv_cache_group_id: int, num_reqs: int
+        self,
+        kv_cache_group_id: int,
+        num_reqs: int,
     ) -> dict[str, Any]:
         return {"is_prefilling": self.is_prefilling[:num_reqs]}
 
     def get_extra_attn_kwargs(
-        self, attn_metadata_builder: Any, num_reqs: int
+        self,
+        attn_metadata_builder: Any,
+        num_reqs: int,
     ) -> dict[str, Any]:
         if not isinstance(
             attn_metadata_builder,
@@ -108,14 +112,39 @@ class MambaHybridModelState(DefaultModelState):
             self._mamba_spec: MambaSpec | None = None
             self._mamba_state_copy_funcs: MambaStateCopyFuncsByType | None = None
 
+    @property
+    def _mamba_block_size(self) -> int:
+        """The mamba group's block size, resolved on read.
+
+        This must not be cached in `__init__`: at that point
+        `cache_config.mamba_block_size` is still unset and
+        `cache_config.block_size` still holds the attention default, so the
+        value comes out far smaller than the real mamba block size (16 vs 1152
+        on GLM-5.3-Flash). Both only settle once the KV cache groups are built,
+        which is also where `_mamba_spec` -- the authoritative source -- becomes
+        available.
+
+        `add_request` would otherwise seed `state_idx` with an out-of-range
+        block_table column, which the fused align pre-copy reads out of bounds
+        (vllm#53142).
+        """
+        if self._mamba_spec is not None:
+            return self._mamba_spec.block_size
+        return self.cache_config.mamba_block_size or self.cache_config.block_size
+
     def add_request(self, req_index: int, new_req_data: NewRequestData) -> None:
         super().add_request(req_index, new_req_data)
         # Must reset the speculative acceptance count in this idx which could be stale.
         self.num_accepted_tokens_gpu[req_index].fill_(1)
         if self._align_mode:
             # Seed the running state block from the resumed/prefilled position.
+            # The divisor must be the mamba group's block size, not the
+            # attention block size: on hybrids they differ, and a resume over a
+            # cached prefix would otherwise seed an out-of-range block_table
+            # column that the fused align pre-copy reads as a garbage block id
+            # (vllm#53142).
             self._mamba_state_idx_gpu[req_index].fill_(
-                (new_req_data.num_computed_tokens - 1) // self.cache_config.block_size
+                (new_req_data.num_computed_tokens - 1) // self._mamba_block_size
             )
 
     def _get_mamba_group_info(
@@ -165,9 +194,9 @@ class MambaHybridModelState(DefaultModelState):
         ctx = self._mamba_ctx
         if not ctx.is_initialized:
             forward_context = self.vllm_config.compilation_config.static_forward_context
-            # block_tables are batch-order slices of the persistent
-            # input_block_tables (stable data_ptr), so the metadata is captured
-            # once here and reused across steps.
+            # ``block_tables`` are the SOURCE per-request-slot tables (stable
+            # data_ptr, req-indexed), so the metadata is captured once here and
+            # reused across steps; the copy kernels index rows by req_idx.
             ctx.initialize_from_forward_context(
                 kv_cache_config,
                 forward_context,
@@ -235,10 +264,8 @@ class MambaHybridModelState(DefaultModelState):
         kv_cache_config: KVCacheConfig,
         for_capture: bool = False,
         ubatch_idx: int = 0,
-        model_specific_attn_metadata: ModelSpecificAttnMetadata | None = None,
     ) -> dict[str, Any]:
         assert ubatch_idx == 0, "DBO is not supported"
-        assert model_specific_attn_metadata is None
         if cudagraph_mode == CUDAGraphMode.FULL:
             num_reqs = input_batch.num_reqs_after_padding
             num_tokens = input_batch.num_tokens_after_padding
@@ -246,11 +273,7 @@ class MambaHybridModelState(DefaultModelState):
             num_reqs = input_batch.num_reqs
             num_tokens = input_batch.num_tokens
         query_start_loc_cpu = torch.from_numpy(input_batch.query_start_loc_np)
-        # Prefer the promised bound: a capture dummy's measured max is its even
-        # split, not the length the graph must replay.
-        max_query_len = input_batch.max_query_len
-        if max_query_len is None:
-            max_query_len = input_batch.num_scheduled_tokens.max().item()
+        max_query_len = input_batch.num_scheduled_tokens.max().item()
         seq_lens_cpu_upper_bound = input_batch.seq_lens_cpu_upper_bound
         if for_capture:
             # Capture with worst-case max_seq_len so the graph is valid at any replay.
@@ -278,11 +301,10 @@ class MambaHybridModelState(DefaultModelState):
             num_decode_draft_tokens_np = np.full(num_reqs, -1, dtype=np.int32)
             num_draft_tokens_per_req = input_batch.num_draft_tokens_per_req
             if num_draft_tokens_per_req is not None:
-                # Test request state, not num_scheduled_tokens == draft_count+1:
-                # adaptive rewrites num_scheduled_tokens to an even split, so that
-                # equality rarely holds and would demote every verify row to decode.
-                is_decode = (~input_batch.is_prefilling_np) & (
-                    input_batch.num_scheduled_tokens > 0
+                # A row is a spec-decode row only when its whole prompt is already
+                # computed, i.e. exactly one non-draft (decode) token is scheduled.
+                is_decode = (
+                    input_batch.num_scheduled_tokens == num_draft_tokens_per_req + 1
                 )
                 spec_decode_mask = (num_draft_tokens_per_req > 0) & is_decode
                 num_decode_draft_tokens_np[: input_batch.num_reqs] = np.where(
@@ -334,7 +356,9 @@ class MambaHybridModelState(DefaultModelState):
         )
         if self.recoverssm is not None:
             self.recoverssm.record_step(
-                attn_metadata, attn_groups, for_capture=for_capture
+                attn_metadata,
+                attn_groups,
+                for_capture=for_capture,
             )
         return attn_metadata
 

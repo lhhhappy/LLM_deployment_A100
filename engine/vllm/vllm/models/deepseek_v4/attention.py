@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""DeepseekV4 MLA Attention Layer."""
+"""
+DeepseekV4 MLA Attention Layer
+"""
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
@@ -13,6 +15,11 @@ from transformers import DeepseekV2Config, DeepseekV3Config
 
 import vllm.envs as envs
 from vllm.compilation.breakable_cudagraph import eager_break_during_capture
+from vllm.model_executor.kernels.linear.gemv_triton import (
+    bf16_gemv,
+    should_use_triton_gemv,
+)
+from vllm.model_executor.kernels.mhc.ar_int8 import ar_hoisted
 from vllm.model_executor.layers.linear import (
     ColumnParallelLinear,
     MergedColumnParallelLinear,
@@ -39,7 +46,12 @@ from vllm.config import (
     VllmConfig,
     get_current_vllm_config,
 )
-from vllm.distributed import get_tensor_model_parallel_world_size
+from vllm.distributed import (
+    get_tensor_model_parallel_rank,
+    get_tensor_model_parallel_world_size,
+    get_tp_group,
+)
+from vllm.distributed.utils import balanced_row_bounds, balanced_row_counts
 from vllm.forward_context import get_forward_context
 from vllm.logger import init_logger
 from vllm.model_executor.layers.attention_layer_base import AttentionLayerBase
@@ -68,6 +80,12 @@ from vllm.v1.kv_cache_interface import (
 )
 
 logger = init_logger(__name__)
+
+# Below this many tokens, token-sharding the replicated input GEMMs cannot pay
+# for the all-gather it adds: at TP=8 the merged trio's collective costs ~270 us
+# against a GEMM that only reaches that size well into prefill. Decode widths
+# (M<=8 under DSpark) are orders of magnitude below it.
+_UNREPLICATE_MIN_TOKENS = 1024
 
 
 @triton.jit
@@ -200,6 +218,28 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
         layer_id = extract_layer_index(prefix)
 
         self.prefix = prefix  # Alias for compatibility with compressor
+        # Read once: these gate per-forward branches in every layer.
+        self._unreplicate_gemms = envs.VLLM_UNREPLICATE_ATTN_GEMMS and tp_size > 1
+        self._multi_stream_threshold = envs.VLLM_MULTI_STREAM_GEMM_TOKEN_THRESHOLD
+        self._unreplicate_all_layers = envs.VLLM_UNREPLICATE_ATTN_GEMMS_ALL_LAYERS
+        if self._unreplicate_gemms:
+            # Rule 49: report the population the shard actually reaches, not
+            # just that the flag is on. Only the ratio-4 layers carry the
+            # merged input trio; every layer carries fused_wqa_wkv.
+            n_layers = config.num_hidden_layers
+            n_trio = sum(1 for r in config.compress_ratios[:n_layers] if max(1, r) == 4)
+            reached = n_layers if self._unreplicate_all_layers else n_trio
+            logger.info_once(
+                "VLLM_UNREPLICATE_ATTN_GEMMS: token-sharding fused_wqa_wkv on "
+                "%d/%d attention layers at >=%d tokens, TP=%d "
+                "(%d carry the merged input trio and shard it too, %d do not).",
+                reached,
+                n_layers,
+                _UNREPLICATE_MIN_TOKENS,
+                tp_size,
+                n_trio,
+                n_layers - n_trio,
+            )
         self.hidden_size = config.hidden_size
         self.n_heads = config.num_attention_heads
         assert self.n_heads % tp_size == 0
@@ -267,12 +307,17 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
         )
         self.wo_a.is_bmm = True
         self.wo_a.bmm_batch_size = self.n_local_groups
+        # When the all-reduce is hoisted (task #35) the decoder layer performs it,
+        # so this layer must not. Same predicate as the MoE half -- the suppressed
+        # set and the re-added set are derived from one source, never two.
+        self._ar_hoisted = ar_hoisted(vllm_config)
         self.wo_b = RowParallelLinear(
             self.n_groups * self.o_lora_rank,
             self.hidden_size,
             bias=False,
             quant_config=quant_config,
             return_bias=False,
+            reduce_results=not self._ar_hoisted,
             prefix=f"{prefix}.wo_b",
         )
 
@@ -316,6 +361,7 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
             # graph and MRV1 produces garbage (#51430).
             self._prepare_and_attn_fn = self._prepare_and_attn_eager
 
+        # Will be None on ROCm for now.
         self.aux_stream_list = aux_stream_list
         # [0]: GEMM start / post-GEMM event0. [1..3]: GEMM done events;
         # [1] doubles as post-GEMM event1. Reuse is safe: GEMM fully joins
@@ -365,6 +411,10 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
                 prefix=f"{prefix}.compressor",
                 k_cache_prefix=self.prefix,
             )
+
+        # Built after weight loading by `fuse_input_gemm_weights`; see there.
+        self.fused_input_weight: torch.Tensor | None = None
+        self.fused_input_splits: list[int] = []
 
         if vllm_config.kernel_config.enable_jit_warmup:
             from vllm.v1.attention.backends.mla.sparse_swa import (
@@ -418,17 +468,21 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
 
                 _COMBINE_TOPK_SWA_INDICES_KERNEL.register_warmup()
 
-            from vllm.utils.import_utils import has_cutedsl
+            from vllm.utils.import_utils import is_cutedsl_supported
 
             _FUSED_Q_KV_RMSNORM_KERNEL.register_warmup()
 
             backend_name = self.backend_cls.get_name()
             if current_platform.is_cuda():
-                from vllm.models.deepseek_v4.common.ops.fused_inv_rope_fp8_quant import (  # noqa: E501
-                    _FUSED_INV_ROPE_FP8_QUANT_KERNEL,
-                )
+                if backend_name != "TRITON_MLA_SPARSE_DSV4":
+                    # The SM8x path runs o_proj through rocm_inv_rope_einsum
+                    # and never calls this kernel, whose native fp8 stores do
+                    # not compile below SM89.
+                    from vllm.models.deepseek_v4.common.ops.fused_inv_rope_fp8_quant import (  # noqa: E501
+                        _FUSED_INV_ROPE_FP8_QUANT_KERNEL,
+                    )
 
-                _FUSED_INV_ROPE_FP8_QUANT_KERNEL.register_warmup()
+                    _FUSED_INV_ROPE_FP8_QUANT_KERNEL.register_warmup()
 
                 if self.compress_ratio == 128:
                     from vllm.models.deepseek_v4.sparse_mla import (
@@ -444,13 +498,7 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
                     )
 
                     _COMPUTE_GLOBAL_TOPK_INDICES_AND_LENS_KERNEL.register_warmup()
-                    if has_cutedsl():
-                        from vllm.models.deepseek_v4.nvidia.ops.dequant_gather_k_cutedsl import (  # noqa: E501
-                            _DEQUANT_GATHER_K_CACHE_CUTEDSL_KERNEL,
-                        )
-
-                        _DEQUANT_GATHER_K_CACHE_CUTEDSL_KERNEL.register_warmup()
-                    else:
+                    if not is_cutedsl_supported():
                         _DEQUANTIZE_AND_GATHER_K_CACHE_KERNEL.register_warmup()
                 elif backend_name == "FLASHINFER_MLA_SPARSE_DSV4":
                     from vllm.models.deepseek_v4.common.ops.cache_utils import (
@@ -460,6 +508,72 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
 
                     _COMPUTE_GLOBAL_TOPK_INDICES_AND_LENS_KERNEL.register_warmup()
                     _BUILD_FLASHINFER_MIXED_SPARSE_INDICES_KERNEL.register_warmup()
+                elif backend_name == "TRITON_MLA_SPARSE_DSV4":
+                    # SM8x reuses the ROCm Triton prefill, which gathers the
+                    # compressed/SWA caches through the Triton dequant kernel.
+                    from vllm.models.deepseek_v4.common.ops.cache_utils import (
+                        _DEQUANTIZE_AND_GATHER_K_CACHE_KERNEL,
+                    )
+
+                    _DEQUANTIZE_AND_GATHER_K_CACHE_KERNEL.register_warmup()
+
+    # NOTE: upstream sm80 round-2 fuses input GEMMs via a
+    # process_weights_after_loading loader hook; this fork keeps the original
+    # call site in nvidia/model.py instead. Defining the hook here as well
+    # made the fusion run twice, which measured as an ~8% single-stream
+    # decode regression on 4xA6000 TP4 -- do not re-add it without removing
+    # the model.py call.
+
+    def fuse_input_gemm_weights(self) -> None:
+        """Concatenate the three bf16 input projections into one weight.
+
+        `attn_gemm_parallel_execute` runs four GEMMs off the same
+        hidden_states. Three of them are unquantized and read the same x, so
+        one GEMM over the concatenated weight does the same work with a third
+        of the launches and a third of the x traffic. Measured per layer on
+        A100 with rotated (L2-cold) weights, us:
+
+            M          1      6      8     64    2048
+            separate  31.6   38.5   38.9   41.1  345.9
+            merged    20.2   21.0   21.0   22.9  213.6
+
+        i.e. -14 us/layer at batch-1 decode (x21 ratio-4 layers = -0.30 ms of
+        a ~10.9 ms step) and -132 us/layer on a 2048-token prefill chunk.
+
+        The three weights become views into the concatenated buffer, so the
+        only lasting allocation is the copy that replaces them; the originals
+        drop with their last reference. Nothing else has to change, because a
+        row-slice of a contiguous [N, K] tensor is itself contiguous.
+        """
+        if self.compressor is None or self.indexer is None:
+            # Only the ratio-4 layers carry all three; the others have one
+            # input GEMM and nothing to merge.
+            return
+        if not current_platform.is_cuda():
+            # The merged GEMM hands `weights_proj` to the indexer as fp32
+            # instead of bf16. The Triton indexer-q kernel casts to fp32 on
+            # entry either way (fused_indexer_q.py:169), but the XPU op
+            # documents a bf16 input (_xpu_ops.py:396), so platforms other
+            # than CUDA keep the three-GEMM path until measured there.
+            return
+        parts = [
+            self.compressor.fused_wkv_wgate.weight,
+            self.indexer.compressor.fused_wkv_wgate.weight,
+            self.indexer.weights_proj.weight,
+        ]
+        if any(
+            w is None or w.dtype != torch.bfloat16 or w.shape[1] != self.hidden_size
+            for w in parts
+        ):
+            return
+        merged = torch.cat([w.detach() for w in parts], dim=0).contiguous()
+        splits = [w.shape[0] for w in parts]
+        offset = 0
+        for w, n in zip(parts, splits):
+            w.data = merged[offset : offset + n]
+            offset += n
+        self.fused_input_weight = merged
+        self.fused_input_splits = splits
 
     def forward(
         self,
@@ -581,7 +695,7 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
 
         # Keep Q projection and KV insertion on the default stream. The indexer
         # and MLA compressor use aux streams 0 and 1; aux 2 is internal to the
-        # indexer.
+        # indexer. ROCm runs the same work sequentially without aux streams.
         if indexer is not None:
             assert compressor is not None
             q, (indexer_inputs, _) = execute_in_parallel(
@@ -627,10 +741,42 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
             o_padded,
         )
 
+    @staticmethod
+    def _shard_tokens(x: torch.Tensor) -> tuple[torch.Tensor, list[int]]:
+        """This rank's slice of the token dim, plus the split it came from.
+
+        `balanced_row_counts` is the split the indexer query-shard and the mHC
+        prenorm shard also use; sharing one partition is what lets these
+        features compose (refutations rule 19).
+        """
+        tp = get_tensor_model_parallel_world_size()
+        rows = balanced_row_counts(x.shape[0], tp)
+        lo, hi = balanced_row_bounds(
+            0, x.shape[0], get_tensor_model_parallel_rank(), tp
+        )
+        return x[lo:hi], rows
+
+    @staticmethod
+    def _gather_tokens(y: torch.Tensor, rows: list[int]) -> torch.Tensor:
+        """Undo `_shard_tokens`: reassemble the exact rows each rank owned."""
+        return get_tp_group().all_gatherv(y, dim=0, sizes=rows)
+
+    def _unreplicate_tokens(self, n_tokens: int) -> bool:
+        """Whether to token-shard the replicated input GEMMs for this batch.
+
+        Both GEMMs are replicated because their consumers need full-width
+        output on every rank (see the flag's note in envs.py), so sharding
+        costs an all-gather. That only pays at prefill widths: at decode the
+        GEMM is far smaller than the collective's fixed cost, and below one
+        row per rank there is nothing to split.
+        """
+        return self._unreplicate_gemms and n_tokens >= _UNREPLICATE_MIN_TOKENS
+
     def _fused_wqa_wkv_gemm(self, hidden_states: torch.Tensor) -> torch.Tensor:
         # Override point: the ROCm layer preshuffles this weight in place, so
         # it cannot go through fused_wqa_wkv directly.
         # MergedColumnParallelLinear returns (output, bias); bias is None.
+        # Token-sharded callers pass their own slice and gather themselves.
         qr_kv, _ = self.fused_wqa_wkv(hidden_states)
         return qr_kv
 
@@ -668,7 +814,56 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
         # fused_wqa_wkv (heaviest) on default; the three lighter input GEMMs
         # on aux streams 0..2 when their owning module exists. ln_events[0]
         # is the fan-out start event; ln_events[1..3] are per-aux done events.
+        # On ROCm, aux_streams is None and execute_in_parallel runs serially.
         aux_fns: list[Callable[[], Any] | None] = [None, None, None]
+
+        # fused_wqa_wkv is replicated on every rank in BOTH branches below, so
+        # the token-shard applies to both; the merged input trio only decides
+        # what else rides on the same sliced x. Gating the shard on the trio
+        # left the 22 layers without an indexer running it at full M on all 8
+        # ranks (rule 49).
+        sharded = self._unreplicate_tokens(hidden_states.shape[0]) and (
+            self.fused_input_weight is not None or self._unreplicate_all_layers
+        )
+        # Each GEMM gathers its own output; do NOT batch the gathers by
+        # concatenating (measured regression -- see the refutations doc).
+        # A copy-free variant (one ncclGroupStart/End around both
+        # all_gatherv calls) is the only merge worth retrying.
+        gemm_in, rows = (
+            self._shard_tokens(hidden_states) if sharded else (hidden_states, [])
+        )
+
+        if self.fused_input_weight is not None:
+            # One GEMM for all three (see fuse_input_gemm_weights). It occupies
+            # a single aux slot, so the other two stay None and nothing waits on
+            # events that were never recorded.
+            merged_w = self.fused_input_weight
+            splits = self.fused_input_splits
+
+            def merged_input_gemm() -> torch.Tensor:
+                # cuBLAS at every M; the CTA-per-row Triton GEMV wins only at
+                # M=1 here, not worth a second shape-specific gate.
+                return torch.mm(gemm_in, merged_w.T, out_dtype=torch.float32)
+
+            aux_fns[0] = merged_input_gemm
+            qr_kv, (merged_out, _, _) = execute_in_parallel(
+                lambda: self._fused_wqa_wkv_gemm(gemm_in),
+                aux_fns,
+                self.ln_events[0],
+                self.ln_events[1:4],
+                aux_streams,
+                enable=hidden_states.shape[0] <= self._multi_stream_threshold,
+            )
+            if sharded:
+                qr_kv = self._gather_tokens(qr_kv, rows)
+                merged_out = self._gather_tokens(merged_out, rows)
+            kv_score, indexer_kv_score, indexer_weights = merged_out.split(
+                splits, dim=-1
+            )
+            # weights_proj used to round through bf16 here; the merged GEMM
+            # accumulates in fp32 and the consumer casts to fp32 anyway
+            # (fused_indexer_q.py:169), so this is the more precise of the two.
+            return qr_kv, kv_score, indexer_kv_score, indexer_weights
 
         if self.compressor is not None:
             # Local ref so the closure keeps a non-None type for mypy.
@@ -687,6 +882,12 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
             indexer = self.indexer
 
             def indexer_weights_proj() -> torch.Tensor:
+                # N=64 is narrow enough that cuBLAS splits K and reduces --
+                # two launches for a 512 KB weight. One CTA per output row
+                # does it in one; measured 5.4 -> 2.8 us at M=1.
+                w = indexer.weights_proj.weight
+                if should_use_triton_gemv(hidden_states, w):
+                    return bf16_gemv(hidden_states, w)
                 # ReplicatedLinear returns (output, bias); bias is None.
                 weights, _ = indexer.weights_proj(hidden_states)
                 return weights
@@ -702,14 +903,15 @@ class DeepseekV4Attention(nn.Module, AttentionLayerBase, ABC):
             aux_fns[2] = indexer_compressor_kv_score
 
         qr_kv, (kv_score, indexer_weights, indexer_kv_score) = execute_in_parallel(
-            lambda: self._fused_wqa_wkv_gemm(hidden_states),
+            lambda: self._fused_wqa_wkv_gemm(gemm_in),
             aux_fns,
             self.ln_events[0],
             self.ln_events[1:4],
             aux_streams,
-            enable=hidden_states.shape[0]
-            <= envs.VLLM_MULTI_STREAM_GEMM_TOKEN_THRESHOLD,
+            enable=hidden_states.shape[0] <= self._multi_stream_threshold,
         )
+        if sharded:
+            qr_kv = self._gather_tokens(qr_kv, rows)
 
         return qr_kv, kv_score, indexer_kv_score, indexer_weights
 
@@ -929,28 +1131,13 @@ class DeepseekV4Indexer(nn.Module):
         self.n_head = config.index_n_heads  # 64
         self.head_dim = config.index_head_dim  # 128
         self.rope_dim = config.qk_rope_head_dim  # 64
-        self.q_lora_rank = q_lora_rank  # 1536
+        self.q_lora_rank = q_lora_rank  # 1024
         self.compress_ratio = compress_ratio
         self.use_fp4_kv = dsa_indexer_uses_fp4(vllm_config)
         logger.info_once(
             "Using %s indexer cache for Lightning Indexer.",
             "MXFP4" if self.use_fp4_kv else "FP8",
         )
-        if vllm_config.kernel_config.enable_jit_warmup:
-            from vllm.utils.import_utils import has_cutedsl
-
-            if current_platform.is_cuda() and has_cutedsl():
-                from vllm.models.deepseek_v4.nvidia.ops.fused_indexer_q_cutedsl import (  # noqa: E501
-                    _INDEXER_Q_FP8_KERNEL,
-                    _INDEXER_Q_MXFP4_KERNEL,
-                )
-
-                indexer_q_kernel = (
-                    _INDEXER_Q_MXFP4_KERNEL
-                    if self.use_fp4_kv
-                    else _INDEXER_Q_FP8_KERNEL
-                )
-                indexer_q_kernel.register_warmup()
 
         # no tensor parallel, just replicated
         self.wq_b = ReplicatedLinear(
@@ -1020,10 +1207,18 @@ class DeepseekV4Indexer(nn.Module):
             self.max_model_len,
             self.max_total_seq_len,
             self.topk_indices_buffer,
+            num_heads=self.n_head,
             skip_k_cache_insert=True,
             use_fp4_cache=self.use_fp4_kv,
             compress_ratio=self.compress_ratio,
         )
+
+        # Q-path half of VLLM_INDEXER_QUERY_SHARD. Read once, as the builder
+        # does. The FP4 path is excluded because its fused_indexer_q_rope_quant
+        # contract returns a re-viewed scale tensor, which full-size output
+        # buffers would have to reproduce outside the op; it also requires
+        # SM100 datacenter hardware.
+        self.shard_q_path = envs.VLLM_INDEXER_QUERY_SHARD and not self.use_fp4_kv
 
         # None on ROCm — maybe_execute_in_parallel falls back to sequential.
         self.aux_stream = aux_stream
@@ -1033,9 +1228,9 @@ class DeepseekV4Indexer(nn.Module):
         ]
 
         if vllm_config.kernel_config.enable_jit_warmup:
-            from vllm.utils.import_utils import has_cutedsl
+            from vllm.utils.import_utils import is_cutedsl_supported
 
-            if not has_cutedsl() and not current_platform.is_xpu():
+            if not is_cutedsl_supported() and not current_platform.is_xpu():
                 from vllm.models.deepseek_v4.common.ops.fused_indexer_q import (
                     _FUSED_INDEXER_Q_ROPE_MXFP4_TRITON_KERNEL,
                     _FUSED_INDEXER_Q_ROPE_QUANT_TRITON_KERNEL,
@@ -1047,16 +1242,100 @@ class DeepseekV4Indexer(nn.Module):
                     else _FUSED_INDEXER_Q_ROPE_QUANT_TRITON_KERNEL
                 ).register_warmup()
 
+    def _sharded_q_row_ranges(
+        self,
+        attn_metadata: Any,
+        num_tokens: int,
+    ) -> list[tuple[int, int]] | None:
+        """Query rows this rank's Q path must compute, or None for all of them.
+
+        Completes VLLM_INDEXER_QUERY_SHARD: that flag already gives each rank a
+        contiguous slice of the query rows to score, but every rank still runs
+        the replicated `wq_b` GEMM and the fused RoPE/quant kernel over *all*
+        rows and reads back one eighth. The ranges come from the chunk metadata
+        the same flag produced, so they are exactly the rows the indexer will
+        read -- there is no second partition that could disagree with it.
+        """
+        if not self.shard_q_path or not isinstance(attn_metadata, dict):
+            return None
+        indexer_metadata = cast(Any, attn_metadata[self.k_cache.prefix])
+        prefill = indexer_metadata.prefill
+        if prefill is None:
+            return None
+        # Derived once per step in the metadata builder; every indexer layer
+        # reads the same answer. Guard against a caller whose row count
+        # disagrees with the builder's rather than silently truncating.
+        ranges = prefill.q_row_ranges
+        if ranges is not None and ranges[-1][1] > num_tokens:
+            ranges = None
+        # Log both outcomes: a null A/B arm is otherwise indistinguishable from
+        # a flag that never engaged. Both messages take a bounded set of
+        # arguments, since `info_once` dedupes on them.
+        if ranges is None:
+            logger.info_once(
+                "Indexer Q-path sharding INACTIVE (%s): running the replicated "
+                "wq_b over every query row.",
+                "batch contains decode requests"
+                if indexer_metadata.num_decodes > 0
+                else "VLLM_INDEXER_QUERY_SHARD did not shard this batch",
+            )
+        else:
+            logger.info_once(
+                "Indexer Q-path sharding ENGAGED: wq_b and the fused "
+                "RoPE/quant kernel run over this rank's query rows only."
+            )
+        return ranges
+
+    def _wq_b_and_q_quant_rows(
+        self,
+        row_ranges: list[tuple[int, int]],
+        qr: torch.Tensor,
+        positions: torch.Tensor,
+        indexer_weights: torch.Tensor,
+        rotary_emb: nn.Module,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """`wq_b` + fused RoPE/quant over `row_ranges` only.
+
+        The outputs keep their full `[num_tokens, ...]` shape and the rows
+        outside `row_ranges` are never written: `sparse_attn_indexer` indexes
+        them globally (`q_quant[chunk.token_start : chunk.token_end]`), so
+        compacting the tensors would mean re-deriving those offsets in a second
+        place. Rows this rank does not own are never read -- `row_ranges` is
+        built from the very chunk bounds that do the reading.
+        """
+        q_quant = torch.empty(
+            (qr.shape[0], self.n_head, self.head_dim),
+            dtype=current_platform.fp8_dtype(),
+            device=qr.device,
+        )
+        weights = torch.empty(
+            (qr.shape[0], self.n_head), dtype=torch.float32, device=qr.device
+        )
+        for lo, hi in row_ranges:
+            # ReplicatedLinear returns (output, bias); bias is None.
+            q, _ = self.wq_b(qr[lo:hi])
+            q = q.view(-1, self.n_head, self.head_dim)
+            fused_indexer_q_rope_quant(
+                positions[lo:hi],
+                q,
+                rotary_emb.cos_sin_cache,
+                indexer_weights[lo:hi],
+                self.softmax_scale,
+                self.n_head**-0.5,
+                use_fp4=False,
+                output_buffers=(q_quant[lo:hi], weights[lo:hi]),
+            )
+        return q_quant, weights
+
     def forward(
         self,
         hidden_states: torch.Tensor,
         qr: torch.Tensor,
-        compressed_kv_score: torch.Tensor | None,
+        compressed_kv_score: torch.Tensor,
         indexer_weights: torch.Tensor,
         positions: torch.Tensor,
         rotary_emb: nn.Module,
         qr_scale: torch.Tensor | None = None,
-        skip_compressor: bool = False,
     ) -> tuple[torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
         compressor = self.compressor
 
@@ -1069,8 +1348,7 @@ class DeepseekV4Indexer(nn.Module):
             ):
                 # candidates num smaller than topk, every candidate is selected
                 # but we still need to build k cache
-                if not skip_compressor:
-                    compressor(compressed_kv_score, positions, rotary_emb)
+                compressor(compressed_kv_score, positions, rotary_emb)
                 assert self.topk_indices_buffer is not None
                 num_tokens = (
                     indexer_metadata.num_decode_tokens
@@ -1087,7 +1365,13 @@ class DeepseekV4Indexer(nn.Module):
                     )
                 return None, None, None
 
+        q_row_ranges = self._sharded_q_row_ranges(attn_metadata, qr.shape[0])
+
         def wq_b_and_q_quant():
+            if q_row_ranges is not None:
+                return self._wq_b_and_q_quant_rows(
+                    q_row_ranges, qr, positions, indexer_weights, rotary_emb
+                )
             q = self._wq_b_proj(qr, qr_scale)
             q = q.view(-1, self.n_head, self.head_dim)
             return fused_indexer_q_rope_quant(
@@ -1100,18 +1384,15 @@ class DeepseekV4Indexer(nn.Module):
                 use_fp4=self.use_fp4_kv,
             )
 
-        if not skip_compressor:
-            # compressor returns None and writes K to the indexer KV cache; the
-            # join orders that write before indexer_op (skip_k_cache_insert=True).
-            (q_quant, weights), _ = maybe_execute_in_parallel(
-                wq_b_and_q_quant,
-                lambda: compressor(compressed_kv_score, positions, rotary_emb),
-                self.ln_events[0],
-                self.ln_events[1],
-                self.aux_stream,
-            )
-        else:
-            q_quant, weights = wq_b_and_q_quant()
+        # compressor returns None and writes K to the indexer KV cache; the
+        # join orders that write before indexer_op (skip_k_cache_insert=True).
+        (q_quant, weights), _ = maybe_execute_in_parallel(
+            wq_b_and_q_quant,
+            lambda: compressor(compressed_kv_score, positions, rotary_emb),
+            self.ln_events[0],
+            self.ln_events[1],
+            self.aux_stream,
+        )
         if isinstance(q_quant, tuple):
             q, q_scale = q_quant
         else:

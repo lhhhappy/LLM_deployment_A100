@@ -139,14 +139,11 @@ class RobertaEmbeddingModel(BertEmbeddingModel):
         self, vllm_config: VllmConfig, prefix: str = ""
     ) -> BertModel | BertWithRope:
         hf_config = vllm_config.model_config.hf_config
+        kwargs = dict(vllm_config=vllm_config, prefix=prefix)
         if getattr(hf_config, "position_embedding_type", "absolute") == "absolute":
-            return BertModel(
-                vllm_config=vllm_config,
-                prefix=prefix,
-                embedding_class=RobertaEmbedding,
-            )
+            return BertModel(**kwargs, embedding_class=RobertaEmbedding)
         else:
-            return JinaRobertaModel(vllm_config=vllm_config, prefix=prefix)
+            return JinaRobertaModel(**kwargs)
 
     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]):
         weights_list = list(weights)
@@ -275,7 +272,6 @@ class RobertaForSequenceClassification(nn.Module, SupportsCrossEncoding):
     Attributes:
         roberta: An instance of BertModel used for forward operations.
         _pooler: An instance of Pooler used for pooling operations.
-
     """
 
     is_pooling_model = True

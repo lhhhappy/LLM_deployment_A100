@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
+import vllm.envs as envs
 from vllm.triton_utils import tl, triton
 from vllm.utils.torch_utils import direct_register_custom_op
 
@@ -60,6 +61,131 @@ def rmsnorm_nw(x: Tensor, eps: float) -> Tensor:
         num_warps=1 if RBLOCK <= 512 else (4 if RBLOCK <= 4096 else 8),
     )
     return out.view(orig_shape)
+
+
+# Below this token count the shard is not worth a collective: the GEMM is
+# already small and all_gatherv would add a barrier per boundary. The cuBLAS
+# route itself starts at 32 tokens; sharding wants a prefill-sized shape.
+#
+# The value is also load-bearing for a second reason: cudagraph capture tops
+# out at min(max_num_seqs * 2, 512) = 256 at the default max_num_seqs=128, so a
+# threshold at or above 512 guarantees every sharded batch runs eager and no
+# collective is ever captured into a decode graph. Lowering it below the
+# capture cap would put an all_gatherv inside a replayed graph.
+_PRENORM_SHARD_MIN_TOKENS = 512
+
+
+@triton.jit
+def _row_sqrsum_kernel(
+    x_ptr,
+    out_ptr,
+    stride_row,
+    K,
+    BLOCK_K: tl.constexpr,
+):
+    """out[row] = sum(x[row].float() ** 2): the fp32 sqrsum the prenorm GEMM
+    kernels produce as a side output, as a standalone one-pass reduction."""
+    row = tl.program_id(0)
+    offs = tl.arange(0, BLOCK_K)
+    acc = tl.zeros([BLOCK_K], dtype=tl.float32)
+    for k0 in range(0, K, BLOCK_K):
+        x = tl.load(
+            x_ptr + row * stride_row + k0 + offs,
+            mask=k0 + offs < K,
+            other=0.0,
+            eviction_policy="evict_first",
+        ).to(tl.float32)
+        acc += x * x
+    tl.store(out_ptr + row, tl.sum(acc))
+
+
+def _prenorm_shard_rows(num_rows: int, tp_size: int) -> list[int] | None:
+    """Row counts per TP rank, or None if this shape should stay replicated.
+
+    Sizes are returned rather than assumed even so ``all_gatherv`` can
+    reassemble any token count without a padding row -- there is then nothing
+    written-but-unread that could reach the sinkhorn.
+    """
+    if tp_size < 2 or num_rows < _PRENORM_SHARD_MIN_TOKENS:
+        return None
+    base, rem = divmod(num_rows, tp_size)
+    if base == 0:
+        return None
+    return [base + (r < rem) for r in range(tp_size)]
+
+
+def hc_prenorm_gemm_cublas(
+    x: Tensor,
+    fn: Tensor,
+    out: Tensor,
+    sqrsum: Tensor | None,
+) -> None:
+    """Prenorm GEMM as cuBLAS bf16 plus a companion sqrsum reduction.
+
+    The tilelang prenorm kernels re-read ``fn`` from every token tile, which
+    makes them L2-bound at large T; here cuBLAS reads ``x`` once for the GEMM
+    and ``_row_sqrsum_kernel`` reads it a second time — two passes total
+    instead of the fused kernel's fn re-reads.
+
+    Numerics: ``fn`` is rounded to bf16 (~3 mantissa bits below the fp32/tf32
+    reference) and the GEMM result is rounded to bf16 before the fp32 upcast
+    into ``out`` (cuBLAS will not emit fp32 from bf16 inputs via torch.mm).
+    The parity test in tests/kernels/test_mhc_kernels.py bounds both.
+
+    ``sqrsum`` may be None when the caller has already produced it -- the
+    kernel that writes ``x`` can accumulate the same reduction for free, which
+    saves re-reading ``x`` a second time.
+    """
+    assert out.shape[0] == 1
+    fn_bf16 = getattr(fn, "_hc_prenorm_bf16", None)
+    if fn_bf16 is None:
+        # Cached on the weight tensor itself so lifetime and identity track
+        # the weight; inference weights are never mutated in place.
+        fn_bf16 = fn.to(torch.bfloat16)
+        fn._hc_prenorm_bf16 = fn_bf16
+
+    num_rows, k = x.shape
+    rows = tp = None
+    # `sqrsum is None` is exactly the condition that the caller already produced
+    # it -- i.e. VLLM_MHC_POST_FUSE_SQRSUM is on -- and it is also what makes
+    # this shard worth doing: one gather per boundary instead of two. Sharding
+    # while still owing a sqrsum costs a second collective and gives most of the
+    # win back, so the pairing is enforced here rather than left to whoever
+    # writes the serve flags.
+    #
+    # Order matters: the token threshold is checked before anything reaches for
+    # the TP group, because get_tp_group() asserts when the group is not
+    # initialized and this kernel is also exercised single-process by the tests.
+    if (
+        envs.VLLM_MHC_PRENORM_SHARD
+        and sqrsum is None
+        and num_rows >= _PRENORM_SHARD_MIN_TOKENS
+    ):
+        from vllm.distributed.parallel_state import (
+            get_tp_group,
+            model_parallel_is_initialized,
+        )
+
+        if model_parallel_is_initialized():
+            tp = get_tp_group()
+            rows = _prenorm_shard_rows(num_rows, tp.world_size)
+
+    if rows is None:
+        out[0].copy_(x @ fn_bf16.t())
+        if sqrsum is not None:
+            assert sqrsum.shape[0] == 1
+            _row_sqrsum_kernel[(num_rows,)](
+                x, sqrsum[0], x.stride(0), k, BLOCK_K=1024, num_warps=4
+            )
+        return
+
+    # Every rank already holds the whole residual (mhc_post is replicated), so
+    # only the work is divided and nothing is scattered first. The gather
+    # carries the 24-wide output rather than the 16384-wide input, which is
+    # the entire reason this pays.
+    start = sum(rows[: tp.rank_in_group])
+    x_shard = x[start : start + rows[tp.rank_in_group]]
+    out[0].copy_(tp.all_gatherv(x_shard @ fn_bf16.t(), dim=0, sizes=rows))
 
 
 @triton.jit
@@ -141,129 +267,6 @@ def _hc_collapse_triton_fake(x: Tensor, pre_mix: Tensor) -> Tensor:
     return torch.empty(x.shape[0], x.shape[2], dtype=x.dtype, device=x.device)
 
 
-@triton.jit
-def _mhc_pre_mix_kernel(
-    gemm_ptr,
-    sqrsum_ptr,
-    hc_scale_ptr,
-    hc_base_ptr,
-    out_ptr,
-    splitk,
-    hc_mult: tl.constexpr,
-    gemm_stride_k,
-    gemm_stride_t,
-    gemm_stride_j,
-    sqrsum_stride_k,
-    sqrsum_stride_t,
-    out_stride_t,
-    out_stride_j,
-    inv_hc_hidden,
-    rms_eps,
-    hc_pre_eps,
-    SPLITK_BLOCK: tl.constexpr,
-    HC_BLOCK: tl.constexpr,
-):
-    """Recover the pre-mix gate from a split-k mHC pre GEMM output."""
-    token_idx = tl.program_id(0).to(tl.int64)
-    ks = tl.arange(0, SPLITK_BLOCK)
-    js = tl.arange(0, HC_BLOCK)
-    kmask = ks < splitk
-    jmask = js < hc_mult
-
-    # Only the first hc_mult GEMM columns feed the pre gate.
-    gemm = tl.load(
-        gemm_ptr
-        + ks[:, None] * gemm_stride_k
-        + token_idx * gemm_stride_t
-        + js[None, :] * gemm_stride_j,
-        mask=kmask[:, None] & jmask[None, :],
-        other=0.0,
-    ).to(tl.float32)
-    mixes = tl.sum(gemm, 0)
-
-    sqrsum = tl.load(
-        sqrsum_ptr + ks * sqrsum_stride_k + token_idx * sqrsum_stride_t,
-        mask=kmask,
-        other=0.0,
-    ).to(tl.float32)
-    rstd = tl.rsqrt(tl.sum(sqrsum, 0) * inv_hc_hidden + rms_eps)
-
-    scale = tl.load(hc_scale_ptr).to(tl.float32)
-    base = tl.load(hc_base_ptr + js, mask=jmask, other=0.0).to(tl.float32)
-
-    pre = tl.sigmoid(mixes * rstd * scale + base) + hc_pre_eps
-    tl.store(out_ptr + token_idx * out_stride_t + js * out_stride_j, pre, mask=jmask)
-
-
-def mhc_pre_mix_triton(
-    gemm_out: Tensor,
-    sqrsum: Tensor,
-    hc_scale: Tensor,
-    hc_base: Tensor,
-    hc_mult: int,
-    hc_hidden_size: int,
-    rms_eps: float,
-    hc_pre_eps: float,
-) -> Tensor:
-    """Pre-mix gate for the delayed mHC pre, from AITER's split-k GEMM output.
-
-    AITER's ``mhc_pre_big_fuse`` consumes the unreduced ``[splitk, tokens,
-    hc_mult3]`` GEMM output and the matching row square-sums, but only returns
-    the post and comb gates. The delayed formulation also needs the pre gate,
-    to carry into the next sublayer seam. It is the same slice of the same
-    numbers, so recover it here rather than repeating the projection.
-    """
-    assert gemm_out.ndim == 3 and gemm_out.dtype == torch.float32
-    assert sqrsum.ndim == 2 and sqrsum.dtype == torch.float32
-    splitk, num_tokens = gemm_out.shape[0], gemm_out.shape[1]
-    assert sqrsum.shape == (splitk, num_tokens)
-
-    out = torch.empty(num_tokens, hc_mult, dtype=torch.float32, device=gemm_out.device)
-    if num_tokens == 0:
-        return out
-
-    _mhc_pre_mix_kernel[(num_tokens,)](
-        gemm_out,
-        sqrsum,
-        hc_scale,
-        hc_base,
-        out,
-        splitk,
-        hc_mult,
-        gemm_out.stride(0),
-        gemm_out.stride(1),
-        gemm_out.stride(2),
-        sqrsum.stride(0),
-        sqrsum.stride(1),
-        out.stride(0),
-        out.stride(1),
-        1.0 / hc_hidden_size,
-        rms_eps,
-        hc_pre_eps,
-        SPLITK_BLOCK=triton.next_power_of_2(splitk),
-        HC_BLOCK=triton.next_power_of_2(hc_mult),
-        num_warps=1,
-        # Match the separate FP32 multiply and add in the Torch reference.
-        enable_fp_fusion=False,
-    )
-    return out
-
-
-def _mhc_pre_mix_triton_fake(
-    gemm_out: Tensor,
-    sqrsum: Tensor,
-    hc_scale: Tensor,
-    hc_base: Tensor,
-    hc_mult: int,
-    hc_hidden_size: int,
-    rms_eps: float,
-    hc_pre_eps: float,
-) -> Tensor:
-    return torch.empty(
-        gemm_out.shape[1], hc_mult, dtype=torch.float32, device=gemm_out.device
-    )
-
-
 def hc_head_reduce_triton_kernel(
     x: torch.Tensor,
     hc_fn: torch.Tensor,
@@ -338,12 +341,4 @@ direct_register_custom_op(
     op_func=hc_collapse_triton,
     mutates_args=[],
     fake_impl=_hc_collapse_triton_fake,
-)
-
-
-direct_register_custom_op(
-    op_name="mhc_pre_mix_triton",
-    op_func=mhc_pre_mix_triton,
-    mutates_args=[],
-    fake_impl=_mhc_pre_mix_triton_fake,
 )

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Fused compressor + FP8/MXFP4 UE8M0 quantization + KV cache insert kernels.
+"""
+Fused compressor + FP8/MXFP4 UE8M0 quantization + KV cache insert kernels.
 
 Three specialized kernels:
   - _fused_kv_compress_norm_rope_insert_sparse_attn:
@@ -25,15 +26,16 @@ from typing import Any
 
 import torch
 
-from vllm.model_executor.warmup.jit_warmup import kernel_launcher
 from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     LaunchSpec,
     TritonWarmupTensor,
     VllmTritonJitKernel,
+    kernel_launcher,
 )
 from vllm.platforms import current_platform
 from vllm.triton_utils import tl, triton
 from vllm.utils.math_utils import round_up
+from vllm.v1.attention.ops.fp8_sm80 import _encode_e4m3fn_u8
 
 if current_platform.is_rocm():
     from vllm.platforms.rocm import _ON_GFX950
@@ -289,8 +291,7 @@ def _fused_kv_compress_norm_rope_insert_sparse_attn(
     inv_scales_col = tl.reshape(inv_scales, (N_QUANT_BLOCKS, 1))
     x_scaled = quant_2d * inv_scales_col
     x_clamped = tl.clamp(x_scaled, -FP8_MAX, FP8_MAX)
-    x_fp8 = x_clamped.to(tl.float8e4nv)
-    x_uint8 = x_fp8.to(tl.uint8, bitcast=True)
+    x_uint8 = _encode_e4m3fn_u8(x_clamped)
     x_uint8_flat = tl.reshape(x_uint8, (TRITON_BLOCK_SIZE,))
 
     nope_mask = block < NOPE_HEAD_DIM
@@ -389,7 +390,7 @@ def _compress_gather_split_sparse_attn(
     NUM_SPLITS: tl.constexpr,
     HEAD_TILE: tl.constexpr,  # HEAD_SIZE // NUM_SPLITS
 ):
-    """Stage 1: per-(token, head-split) compress gather, write to fp32 scratch.
+    """Stage 1: per-(token, head-split) compress gather, write to fp32 scratch
 
     No-overlap gather (cr>=128) on rows [0, COMPRESS_RATIO)
     """
@@ -509,7 +510,7 @@ def _finalize_norm_rope_quant_store_sparse_attn(
     x_scaled = quant_2d * tl.reshape(inv_scales, (N_QUANT_BLOCKS, 1))
     x_clamped = tl.clamp(x_scaled, -FP8_MAX, FP8_MAX)
     x_uint8 = tl.reshape(
-        x_clamped.to(tl.float8e4nv).to(tl.uint8, bitcast=True),
+        _encode_e4m3fn_u8(x_clamped),
         (TRITON_BLOCK_SIZE,),
     )
     tl.store(fp8_ptr + block, x_uint8, mask=block < NOPE_HEAD_DIM)
@@ -638,7 +639,7 @@ def compress_norm_rope_store_two_stage_triton(
     num_decode_tokens: int,
     compress_scratch: torch.Tensor,
 ) -> None:
-    """Two-stage split compressor dispatch for head=512 cr>=128 (no-overlap).
+    """Two-stage split compressor dispatch for head=512 cr>=128 (no-overlap)
 
     Run the occupancy-fanned two-stage split for prefill [num_decodee_tokens:]
     to fill the CUs, and use the original single-pass launcher
@@ -871,8 +872,7 @@ def _fused_kv_compress_norm_rope_insert_indexer_attn(
 
     x_scaled = result_bf16 * inv_scale
     x_clamped = tl.clamp(x_scaled, -FP8_MAX, FP8_MAX)
-    x_fp8 = x_clamped.to(tl.float8e4nv)
-    x_uint8 = x_fp8.to(tl.uint8, bitcast=True)
+    x_uint8 = _encode_e4m3fn_u8(x_clamped)
 
     tl.store(fp8_ptr + block, x_uint8, mask=mask)
 

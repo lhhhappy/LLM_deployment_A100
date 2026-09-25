@@ -1,21 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, NamedTuple
 
-import numpy as np
 import torch
 
 import vllm.envs as envs
 from vllm.config import VllmConfig
-from vllm.distributed import get_dcp_group, get_pcp_group
+from vllm.distributed import get_dcp_group, get_pcp_group, get_tp_group
+from vllm.distributed.utils import balanced_row_bounds, balanced_row_counts
 from vllm.logger import init_logger
-from vllm.model_executor.warmup.jit_warmup import kernel_launcher, zip_inputs
 from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     LaunchSpec,
     TritonPointerInputVariant,
     TritonWarmupTensor,
     VllmTritonJitKernel,
+    kernel_launcher,
     triton_scalar_specialization_rep,
 )
 from vllm.platforms import current_platform
@@ -25,9 +25,7 @@ from vllm.utils.deep_gemm import (
     has_deep_gemm,
     native_next_n_supported,
 )
-from vllm.utils.math_utils import round_down
 from vllm.utils.platform_utils import num_compute_units
-from vllm.utils.torch_utils import PIN_MEMORY, async_tensor_h2d
 from vllm.v1.attention.backend import (
     AttentionBackend,
     AttentionCGSupport,
@@ -36,7 +34,6 @@ from vllm.v1.attention.backend import (
     MultipleOf,
 )
 from vllm.v1.attention.backends.mla.compressor_utils import get_compressed_slot_mapping
-from vllm.v1.attention.backends.mla.sparse_utils import request_row_bounds
 from vllm.v1.attention.backends.utils import (
     get_dcp_local_seq_lens,
     split_decodes_and_prefills,
@@ -181,6 +178,191 @@ class PrepareUniformDecodeKernel(
         )
 
 
+# Shard only when the top-k all-gather is repaid at least ~5x. Per indexer
+# layer the saving is (36.98 ms / 21) * T/8192 * 7/8, and the collective is
+# 168 us at T=8192 (ALLREDUCE.md, pynccl_ag 16 MiB), flattening near ~77 us
+# once the payload drops under ~4 MiB:
+#   T=8192 -> 9.2x    T=4096 -> 7.4x    T=2048 -> 5.0x    T=1024 -> 2.8x
+# 2048 is the crossover, and is above the cudagraph capture cap
+# (min(max_num_seqs*2, 512)), so a sharded batch is always an eager one.
+MIN_SHARD_TOKENS = 2048
+
+
+class ShardedChunkSpec(NamedTuple):
+    """One prefill sub-chunk after TP query-sharding.
+
+    ``shard_row_counts``/``gather_start`` travel with the slice they describe,
+    so the top-k all-gather can never pair sizes with the wrong chunk. They are
+    None for sub-chunks left replicated; every rank emits the same chunk list
+    either way, so the set of collectives is rank-uniform by construction.
+    """
+
+    req_slice: slice
+    query_slice: slice
+    skip_kv_gather: bool
+    # Per-rank row counts for all_gatherv(sizes=...); None => replicated.
+    shard_row_counts: list[int] | None
+    # The pre-shard first row, where the gathered chunk is written back.
+    gather_start: int | None
+
+
+def shard_chunk_specs_by_query(
+    chunk_specs: list[tuple[slice, slice]], tp_rank: int, tp_size: int
+) -> list[ShardedChunkSpec]:
+    """Narrow each ``(req_slice, query_slice)`` to this rank's rows.
+
+    Sub-chunks with fewer rows than ranks stay replicated (counts None)
+    instead of leaving some ranks with an empty shard: dropping a chunk on
+    only the empty ranks would make the per-chunk all-gather participant set
+    data-dependent, which hangs rather than misbehaves.
+    """
+    if tp_size <= 1:
+        return [ShardedChunkSpec(r, q, q.start > 0, None, None) for r, q in chunk_specs]
+
+    out: list[ShardedChunkSpec] = []
+    prev_req: tuple[int, int] | None = None
+    gathered_for_req = False
+    for req_slice, query_slice in chunk_specs:
+        req_key = (req_slice.start, req_slice.stop)
+        if req_key != prev_req:
+            # New request group => new K workspace contents => must re-gather.
+            prev_req = req_key
+            gathered_for_req = False
+        n = query_slice.stop - query_slice.start
+        if n < tp_size:
+            out.append(
+                ShardedChunkSpec(req_slice, query_slice, gathered_for_req, None, None)
+            )
+        else:
+            lo, hi = balanced_row_bounds(
+                query_slice.start, query_slice.stop, tp_rank, tp_size
+            )
+            out.append(
+                ShardedChunkSpec(
+                    req_slice,
+                    slice(lo, hi),
+                    gathered_for_req,
+                    balanced_row_counts(n, tp_size),
+                    query_slice.start,
+                )
+            )
+        gathered_for_req = True
+    return out
+
+
+def indexer_shard_size_for_batch(num_prefill_tokens: int, shard_size: int) -> int:
+    """``shard_size``, or 1 when this batch's prefill is too short to pay.
+
+    Below ``MIN_SHARD_TOKENS`` the per-chunk top-k all-gather costs more than
+    the indexer work it removes. Derived from CPU metadata every rank holds
+    identically: a rank-divergent answer here would desynchronise the
+    collective, which hangs rather than misbehaves.
+    """
+    return shard_size if num_prefill_tokens >= MIN_SHARD_TOKENS else 1
+
+
+def indexer_shard_is_eligible(tp_size: int, dcp_world_size: int, use_pcp: bool) -> bool:
+    """Whether this parallel config admits the indexer query shard at all.
+
+    Both halves (prefill rows, decode query groups) read this one predicate, so
+    neither can shard over a partition the other declines.
+    """
+    return tp_size > 1 and dcp_world_size == 1 and not use_pcp
+
+
+def indexer_decode_shard_rows(
+    bounds: tuple[int, int] | None, batch_size: int, next_n: int
+) -> tuple[int, int]:
+    """Batch-absolute top-k row range for this rank's decode query groups.
+
+    ``topk_indices_buffer`` is indexed by batch token, so query group ``g``
+    owns rows ``[g * next_n, (g + 1) * next_n)`` and this rank writes there
+    directly. Group-relative offsets are correct on rank 0 and silently
+    misplace every later rank's indices -- the failure that cost a gsm8k point
+    on the prefill half (canon rule 36).
+    """
+    lo, hi = bounds or (0, batch_size)
+    return lo * next_n, hi * next_n
+
+
+def indexer_decode_shard_bounds(
+    batch_size: int,
+    num_decodes: int,
+    shard_rank: int,
+    shard_size: int,
+    min_reqs: int,
+) -> tuple[int, int] | None:
+    """This rank's contiguous half-open slice of the decode query groups.
+
+    ``batch_size`` is the leading dimension the decode indexer kernels take:
+    one entry per request on the native path (each carrying ``next_n`` token
+    rows) and one per token on the flattening path, which is what SM80 runs at
+    ``next_n = 6``. Either way the entries are the kernel's independent query
+    groups and each owns a contiguous block of top-k rows, so partitioning this
+    dimension keeps every kernel call on a contiguous row range.
+
+    None means "compute every group" -- the replicated path -- and is returned
+    when the shard is off (``shard_size == 1``, i.e. tp=1/DCP/PCP/flag off),
+    when the batch has fewer than ``min_reqs`` decode requests, or when there
+    are fewer groups than ranks. The last case is what keeps every rank in the
+    reduction: a rank owning no group would still have to enter the collective,
+    and would launch the decode kernels over an empty row range to get there.
+
+    Every input is replicated batch metadata, so the answer is rank-uniform by
+    construction -- a rank-dependent one would desynchronise the per-layer
+    collective, which hangs rather than misbehaves.
+    """
+    if shard_size <= 1 or min_reqs <= 0:
+        return None
+    if num_decodes < min_reqs or batch_size < shard_size:
+        return None
+    return balanced_row_bounds(0, batch_size, shard_rank, shard_size)
+
+
+def indexer_q_row_ranges(
+    chunks: "list[DeepseekV32IndexerPrefillChunkMetadata]",
+    num_decodes: int,
+    num_tokens: int,
+) -> list[tuple[int, int]] | None:
+    """Rows of the indexer's Q path this rank must compute, or None for all.
+
+    The ranges are read back out of the chunk metadata rather than
+    re-partitioned, so they are by construction exactly the rows the chunk loop
+    will read (``q_quant[chunk.token_start : chunk.token_end]``). The caller
+    keeps ``q_quant``/``weights`` full-size and leaves every other row unwritten,
+    so no downstream index changes meaning and there is no second partition to
+    keep in step with this one.
+
+    None means "compute every row" -- the replicated path -- and is returned
+    whenever the rows that will be read are not covered by the chunks:
+
+    * ``num_decodes > 0``: the decode branch reads ``q_quant[:num_decode_tokens]``
+      and ``weights[:batch * next_n]``, ranges no chunk names (and the latter can
+      run past the decode region);
+    * no chunks, or ANY of them lacks ``shard_row_counts`` -- the whole batch
+      replicated (tp=1, DCP, PCP, under MIN_SHARD_TOKENS) or a mixed batch
+      where a sub-chunk with fewer rows than ranks stayed replicated; either
+      way some chunk needs every row, so the Q path computes every row;
+    * a chunk naming a row beyond ``num_tokens``, which would silently truncate.
+    """
+    if num_decodes > 0 or not chunks:
+        return None
+    if any(c.shard_row_counts is None for c in chunks):
+        return None
+
+    ranges: list[tuple[int, int]] = []
+    for c in chunks:
+        if c.token_end <= c.token_start:
+            continue
+        if c.token_start < 0 or c.token_end > num_tokens:
+            return None
+        if ranges and ranges[-1][1] == c.token_start:
+            ranges[-1] = (ranges[-1][0], c.token_end)
+        else:
+            ranges.append((c.token_start, c.token_end))
+    return ranges or None
+
+
 class DeepseekV32IndexerBackend(AttentionBackend):
     @classmethod
     def supports_pcp(cls) -> bool:
@@ -200,7 +382,7 @@ class DeepseekV32IndexerBackend(AttentionBackend):
         return "DEEPSEEK_V32_INDEXER"
 
     @staticmethod
-    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
         return [1, MultipleOf(16)] if current_platform.is_rocm() else [64]
 
     @classmethod
@@ -228,7 +410,7 @@ class KpoolTailBackend(DeepseekV32IndexerBackend):
         return []
 
     @staticmethod
-    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
         return [MultipleOf(1)]
 
     @staticmethod
@@ -237,15 +419,6 @@ class KpoolTailBackend(DeepseekV32IndexerBackend):
 
 
 class DeepseekV4IndexerBackend(DeepseekV32IndexerBackend):
-    @classmethod
-    def supports_device_cpu_query_lens_mismatch(cls) -> bool:
-        # ROCm runs adaptive verification through the per-token flattened
-        # indexer path, which derives row ownership from device decode lengths.
-        return (
-            current_platform.is_rocm()
-            or super().supports_device_cpu_query_lens_mismatch()
-        )
-
     @staticmethod
     def get_name() -> str:
         return "DEEPSEEK_V4_INDEXER"
@@ -257,110 +430,20 @@ class DeepseekV4IndexerBackend(DeepseekV32IndexerBackend):
         return (KVCacheLayout.BLHNC, KVCacheLayout.BLNHC)
 
     @staticmethod
-    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
-        # Block sizes count uncompressed tokens: C4 indexer pages hold 64 rows.
+    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
         return [256]
 
 
 class DeepseekV41IndexerBackend(DeepseekV4IndexerBackend):
-    @classmethod
-    def supports_device_cpu_query_lens_mismatch(cls) -> bool:
-        # The ROCm flattened-query support above is validated for the
-        # DeepSeek-V4 adaptive DSpark path only.
-        return DeepseekV32IndexerBackend.supports_device_cpu_query_lens_mismatch()
+    """DeepSeek-V4.1 indexer pages: 64 tokens on SM90 (FlashMLA), else 128."""
 
     @staticmethod
     def get_name() -> str:
         return "DEEPSEEK_V41_INDEXER"
 
     @staticmethod
-    def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
+    def get_supported_kernel_block_sizes() -> list[int | MultipleOf]:
         return [64 if current_platform.is_device_capability_family(90) else 128]
-
-
-@dataclass(frozen=True)
-class PCPGlobalChunkPlan:
-    """PCP packing for one indexer prefill chunk under PCP + DCP."""
-
-    # [num_reqs+1] cumsum of the padded per-request context (shard rows x W):
-    # the global layout.
-    row_start_cu: torch.Tensor
-    # [num_reqs+1] like row_start_cu, but only a region's FIRST row carries its
-    # extent.
-    global_cu: torch.Tensor
-    # [num_reqs+1] cumsum of shard rows: this rank's padded layout.
-    padded_local_cu: torch.Tensor
-    padded_local_total: int
-    total: int
-    # [total] for each global row, its position in the rank-major gathered buffer.
-    deinterleave_idx: torch.Tensor
-
-
-def build_pcp_global_chunk_plan(
-    row_req_idx: np.ndarray,
-    row_shard_rows: np.ndarray,
-    dcp_world_size: int,
-    device: torch.device,
-    interleave: int = 1,
-) -> PCPGlobalChunkPlan:
-    """Plan the PCP packing for one chunk from its requests' KV shard rows.
-
-    The global layout is padded to ``shard rows x W`` per request. Positions
-    past a request's true extent lie beyond every token's causal bound, so
-    the kernel never reads them.
-    """
-    shard_rows = np.ascontiguousarray(row_shard_rows, dtype=np.int64)
-    assert row_req_idx.shape == shard_rows.shape
-    num_rows = len(shard_rows)
-
-    row_bounds = request_row_bounds(row_req_idx)
-    region_first_row = row_bounds[:-1]
-    region_of_row = np.repeat(np.arange(len(region_first_row)), np.diff(row_bounds))
-
-    region_padded = shard_rows[region_first_row]
-    assert np.all(region_padded > 0), (
-        f"PCP+DCP prefill got an empty context: {region_padded.tolist()}"
-    )
-
-    # Pinned host buffers, filled in place so the copies below are async.
-    cu = torch.zeros((3, num_rows + 1), dtype=torch.int32, pin_memory=PIN_MEMORY)
-    row_start_cu, global_cu, padded_cu = cu
-    # Only a region's first row carries its extent.
-    first_row = torch.from_numpy(region_first_row)
-    row_padded = torch.zeros(num_rows, dtype=torch.int32)
-    row_padded[first_row] = torch.from_numpy(region_padded).int()
-    torch.cumsum(row_padded * dcp_world_size, 0, out=global_cu[1:])
-    torch.cumsum(row_padded, 0, out=padded_cu[1:])
-    row_start_cu[:num_rows] = global_cu[first_row][torch.from_numpy(region_of_row)]
-    row_start_cu[num_rows] = global_cu[num_rows]
-    total = int(global_cu[num_rows])
-    padded_total = int(padded_cu[num_rows])
-
-    idx = torch.empty(total, dtype=torch.int64, pin_memory=PIN_MEMORY)
-    idx_np = idx.numpy()
-    region_start = global_cu[first_row].numpy()
-    region_padded_start = padded_cu[first_row].numpy()
-    for i in range(len(region_first_row)):
-        g = int(region_padded[i]) * dcp_world_size
-        t = np.arange(g, dtype=np.int64)
-        local = round_down(t // dcp_world_size, interleave) + t % interleave
-        # Padded positions are outside causal bounds but must remain in-bounds.
-        local = np.minimum(local, region_padded[i] - 1)
-        idx_np[region_start[i] : region_start[i] + g] = (
-            ((t // interleave) % dcp_world_size) * padded_total
-            + region_padded_start[i]
-            + local
-        )
-
-    cu = async_tensor_h2d(cu, device=device)
-    return PCPGlobalChunkPlan(
-        row_start_cu=cu[0],
-        global_cu=cu[1],
-        padded_local_cu=cu[2],
-        padded_local_total=padded_total,
-        total=total,
-        deinterleave_idx=async_tensor_h2d(idx, device=device),
-    )
 
 
 @dataclass
@@ -380,8 +463,12 @@ class DeepseekV32IndexerPrefillChunkMetadata:
     local_cu_seq_lens: torch.Tensor | None = None
     local_total_seq_lens: int = 0
     max_local_total_seq_lens: int = 0
-
-    pcp_deinterleave_idx: torch.Tensor | None = None
+    # Per-rank row counts for the top-k all-gather under TP query-sharding.
+    # None means the indexer ran replicated and no gather is needed.
+    shard_row_counts: list[int] | None = None
+    # The pre-shard first row of this chunk (where the gathered rows land);
+    # set exactly when shard_row_counts is.
+    gather_token_start: int | None = None
 
 
 class BuildPrefillChunkMetadataKernel(
@@ -502,59 +589,35 @@ class BuildPrefillChunkMetadataKernel(
 
     def get_warmup_keys(self, vllm_config: VllmConfig) -> list[CompileKey]:
         max_tokens = max(1, min(vllm_config.scheduler_config.max_num_batched_tokens, 8))
-        hf_text_config = vllm_config.model_config.hf_text_config
+        hf_config = vllm_config.model_config.hf_config
         parallel_config = vllm_config.parallel_config
         dcp_world = parallel_config.decode_context_parallel_size
         dcp_interleave = parallel_config.cp_kv_cache_interleave_size
         dcp_rank = get_dcp_group().rank_in_group if dcp_world > 1 else 0
-        dcp_cases = [dict(DCP_RANK=dcp_rank, DCP_WORLD=dcp_world)]
-        if parallel_config.prefill_context_parallel_size > 1 and dcp_world > 1:
-            # PCP+DCP prefill constructs a global PCP chunk plan and therefore
-            # dispatches this kernel with already-localized row starts. The
-            # runtime key is normalized to rank 0/world 1 in that path; warm it
-            # explicitly so one PCP rank cannot enter a collective while
-            # another rank is still compiling the first real inference batch.
-            dcp_cases.append(dict(DCP_RANK=0, DCP_WORLD=1))
         compress_ratios = tuple(
             dict.fromkeys(
                 max(1, int(ratio))
                 for ratio in (
-                    *(getattr(hf_text_config, "compress_ratios", None) or (1,)),
-                    getattr(hf_text_config, "index_kpool", 1) or 1,
+                    *(getattr(hf_config, "compress_ratios", None) or (1,)),
+                    getattr(hf_config, "index_kpool", 1) or 1,
                 )
             )
         )
-        index_kpool = getattr(hf_text_config, "index_kpool", None)
+        index_kpool = getattr(hf_config, "index_kpool", None)
         if index_kpool and index_kpool > 1 and index_kpool not in compress_ratios:
             compress_ratios = compress_ratios + (index_kpool,)
         return self._trace_dispatch(self.dispatch)(
-            zip_inputs(*dcp_cases),
             # Cover Triton's divisible, exact-one, and generic i32 classes.
             query_slice_start=(0, 1, 2),
             query_slice_stop=(1, 2 * max_tokens - 1, 2 * max_tokens),
+            DCP_RANK=dcp_rank,
+            DCP_WORLD=dcp_world,
             DCP_INTERLEAVE=dcp_interleave,
             BLOCK_SIZE=self.BLOCK_SIZE,
             COMPRESS_RATIO=list(compress_ratios),
-            # PCP's global cumulative lengths are the second row of one packed
-            # allocation, so their pointer is not always 16-byte aligned.
-            # Prefill chunking can independently unalign uncompressed lengths.
             input_variant=(
-                TritonPointerInputVariant.from_alignment(
-                    uncompressed_seq_lens=True,
-                    cu_compressed_seq_lens=True,
-                ),
-                TritonPointerInputVariant.from_alignment(
-                    uncompressed_seq_lens=True,
-                    cu_compressed_seq_lens=False,
-                ),
-                TritonPointerInputVariant.from_alignment(
-                    uncompressed_seq_lens=False,
-                    cu_compressed_seq_lens=True,
-                ),
-                TritonPointerInputVariant.from_alignment(
-                    uncompressed_seq_lens=False,
-                    cu_compressed_seq_lens=False,
-                ),
+                TritonPointerInputVariant.from_alignment(uncompressed_seq_lens=True),
+                TritonPointerInputVariant.from_alignment(uncompressed_seq_lens=False),
             ),
         )
 
@@ -565,9 +628,7 @@ class BuildPrefillChunkMetadataKernel(
             uncompressed_seq_lens=compile_key.input_variant.pointer(
                 "uncompressed_seq_lens", torch.int32
             ),
-            cu_compressed_seq_lens=compile_key.input_variant.pointer(
-                "cu_compressed_seq_lens", torch.int32
-            ),
+            cu_compressed_seq_lens=int32_ptr,
             row_start_cu_compressed_seq_lens=int32_ptr,
             token_to_seq=int32_ptr,
             cu_compressed_seq_len_ks=int32_ptr,
@@ -609,6 +670,10 @@ class BuildPrefillChunkMetadataKernel(
 @dataclass
 class DeepseekV32IndexerPrefillMetadata:
     chunks: list[DeepseekV32IndexerPrefillChunkMetadata]
+    # Rows this rank's indexer Q path owns (indexer_q_row_ranges), or None for
+    # all of them. Derived once here rather than per indexer layer -- it is a
+    # pure function of this step's chunk metadata.
+    q_row_ranges: list[tuple[int, int]] | None = None
     max_prefill_seq_len: int = -1
 
 
@@ -620,6 +685,8 @@ class DeepSeekV32IndexerDecodeMetadata:
     #   - native MTP path: 2D (B, next_n) where [b,j] = L_b - next_n + j + 1
     # Both fp8_fp4_paged_mqa_logits and the topk kernels accept both shapes.
     seq_lens: torch.Tensor
+    # Upper bound in the same indexer-cache coordinate system as seq_lens.
+    max_seq_len: int
     decode_lens: torch.Tensor
     requires_padding: bool
     schedule_metadata: torch.Tensor
@@ -628,6 +695,10 @@ class DeepSeekV32IndexerDecodeMetadata:
     decode_is_uniform: bool = True
     write_max_decode_len: int = 0
     indices: torch.Tensor | None = None
+    # Query groups this rank owns (indexer_decode_shard_bounds), or None for
+    # all of them. Derived here so the consumer never re-partitions, and so
+    # `schedule_metadata` below is built from the same slice it describes.
+    shard_bounds: tuple[int, int] | None = None
 
 
 @dataclass
@@ -649,38 +720,6 @@ class DeepseekV32IndexerMetadata:
     prefill: DeepseekV32IndexerPrefillMetadata | None = None
 
 
-@triton.jit(do_not_specialize=["num_reqs", "num_actual_tokens", "num_tokens"])
-def _kpool_tail_slot_mapping_kernel(
-    slot_mapping_ptr,
-    block_table_ptr,
-    block_table_stride,
-    query_start_loc_ptr,
-    positions_ptr,
-    out_ptr,
-    num_reqs,
-    num_actual_tokens,
-    num_tokens,
-    kpool,
-    BLOCK: tl.constexpr,
-):
-    pid = tl.program_id(0)
-    if pid < num_reqs:
-        start = tl.load(query_start_loc_ptr + pid)
-        # Tokens past the last request's boundary (if any) also map to it.
-        end = tl.load(query_start_loc_ptr + pid + 1)
-        end = tl.where(pid == num_reqs - 1, num_actual_tokens, end)
-        own_block = tl.load(block_table_ptr + pid * block_table_stride).to(tl.int64)
-        for i in range(start, end, BLOCK):
-            offs = i + tl.arange(0, BLOCK)
-            mask = offs < end
-            pos = tl.load(positions_ptr + offs, mask=mask, other=0).to(tl.int64)
-            tl.store(out_ptr + offs, own_block * kpool + pos % kpool, mask=mask)
-    else:
-        offs = num_actual_tokens + (pid - num_reqs) * BLOCK + tl.arange(0, BLOCK)
-        mask = offs < num_tokens
-        tl.store(out_ptr + offs, tl.load(slot_mapping_ptr + offs, mask=mask), mask=mask)
-
-
 def compute_kpool_tail_slot_mapping(
     slot_mapping: torch.Tensor,
     block_table: torch.Tensor,
@@ -689,37 +728,25 @@ def compute_kpool_tail_slot_mapping(
     num_actual_tokens: int,
     num_reqs: int,
     kpool: int,
-    out: torch.Tensor | None = None,
+    out_full: torch.Tensor,
 ) -> torch.Tensor:
-    """Map every token to its request's one circular tail block."""
-    if out is None:
-        out = torch.empty_like(slot_mapping)
-    else:
-        assert out.shape == slot_mapping.shape
-    if slot_mapping.is_cuda and slot_mapping.dim() == 1 and num_reqs > 0:
-        block = 256
-        num_tokens = slot_mapping.shape[0]
-        num_actual_tokens = min(num_actual_tokens, num_tokens)
-        grid = (num_reqs + triton.cdiv(num_tokens - num_actual_tokens, block),)
-        _kpool_tail_slot_mapping_kernel[grid](
-            slot_mapping,
-            block_table,
-            block_table.stride(0),
-            query_start_loc,
-            positions,
-            out,
-            num_reqs,
-            num_actual_tokens,
-            num_tokens,
-            kpool,
-            BLOCK=block,
-            num_warps=4,
-        )
-        return out
-    # Torch fallback: CPU tensors (the CPU unit tests), non-1D or empty inputs.
-    # Production always takes the Triton path above — spec-decode tokens arrive
-    # flattened token-major, so slot_mapping is 1D there too.
-    out.copy_(slot_mapping)
+    """Map every token to its request's one circular tail block.
+
+    ``out_full`` must be a persistent buffer owned by the builder: under FULL
+    cudagraph capture the tail-consuming kernels are recorded with this
+    tensor's address baked in (the eager-break wrapper deliberately passes
+    FULL-mode captures through), so a fresh allocation per build leaves the
+    captured kernels reading freed memory on replay.
+
+    The whole buffer is re-filled with -1 every build: replayed kernels index
+    up to the *captured* padded length, which can exceed this step's padded
+    length, and -1 marks "no tail slot" (every consumer early-outs on
+    negative slots). Padded rows must never inherit ``slot_mapping``: that
+    mapping addresses the pool-granular indexer cache, not the tail ring.
+    """
+    n = slot_mapping.shape[0]
+    out_full.fill_(-1)
+    out = out_full[:n]
     if num_actual_tokens == 0:
         return out
     tokens = torch.arange(num_actual_tokens, device=slot_mapping.device)
@@ -746,8 +773,11 @@ class KpoolTailMetadataBuilder(AttentionMetadataBuilder):
         device: torch.device,
     ):
         super().__init__(kv_cache_spec, layer_names, vllm_config, device)
-        self.slot_mapping_buffer = torch.empty(
-            vllm_config.scheduler_config.max_num_batched_tokens,
+        # Persistent tail slot mapping. Address stability is load-bearing:
+        # see compute_kpool_tail_slot_mapping.
+        self.tail_slot_mapping_buffer = torch.full(
+            (vllm_config.scheduler_config.max_num_batched_tokens,),
+            -1,
             dtype=torch.int64,
             device=device,
         )
@@ -761,22 +791,27 @@ class KpoolTailMetadataBuilder(AttentionMetadataBuilder):
         num_decodes, num_prefills, num_decode_tokens, num_prefill_tokens = (
             split_decodes_and_prefills(common_attn_metadata)
         )
-        slot_mapping = common_attn_metadata.slot_mapping
         positions = common_attn_metadata.positions
-        if positions is not None:
-            slot_mapping_buffer = self.slot_mapping_buffer[
-                : slot_mapping.numel()
-            ].view_as(slot_mapping)
-            slot_mapping = compute_kpool_tail_slot_mapping(
-                slot_mapping,
-                common_attn_metadata.block_table_tensor,
-                common_attn_metadata.query_start_loc,
-                positions,
-                common_attn_metadata.num_actual_tokens,
-                common_attn_metadata.num_reqs,
-                self.kv_cache_spec.block_size,
-                out=slot_mapping_buffer,
+        if positions is None:
+            # Falling back to common_attn_metadata.slot_mapping is never
+            # correct here: that mapping addresses the pool-granular indexer
+            # cache, while this builder addresses the per-request tail ring.
+            # Using it writes far outside the tail tensor (illegal access).
+            raise ValueError(
+                "KpoolTailMetadataBuilder requires CommonAttentionMetadata."
+                "positions; the model runner must pass it (see "
+                "gpu/model_states/*.py -> build_attn_metadata)."
             )
+        slot_mapping = compute_kpool_tail_slot_mapping(
+            common_attn_metadata.slot_mapping,
+            common_attn_metadata.block_table_tensor,
+            common_attn_metadata.query_start_loc,
+            positions,
+            common_attn_metadata.num_actual_tokens,
+            common_attn_metadata.num_reqs,
+            self.kv_cache_spec.block_size,
+            out_full=self.tail_slot_mapping_buffer,
+        )
         return DeepseekV32IndexerMetadata(
             seq_lens=common_attn_metadata.seq_lens,
             max_seq_len=common_attn_metadata.max_seq_len,
@@ -817,15 +852,6 @@ def _supports_flattened_device_query_lens() -> bool:
     )
 
 
-def _rocm_supports_flattened_device_query_lens(vllm_config: VllmConfig) -> bool:
-    model_config = vllm_config.model_config
-    return (
-        current_platform.is_rocm()
-        and model_config is not None
-        and "DeepseekV4ForCausalLM" in model_config.architectures
-    )
-
-
 def _supports_native_decode(next_n: int) -> bool:
     """Whether decode can pass `next_n` Q rows per request to the kernel
     instead of flattening to one single-token row per query, which re-reads
@@ -846,10 +872,7 @@ def _use_flattening(vllm_config: VllmConfig) -> bool:
     return not _supports_native_decode(next_n) or (
         speculative_config is not None
         and speculative_config.enable_adaptive_verification
-        and (
-            _supports_flattened_device_query_lens()
-            or _rocm_supports_flattened_device_query_lens(vllm_config)
-        )
+        and _supports_flattened_device_query_lens()
     )
 
 
@@ -877,8 +900,54 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
         self.dcp_rank = get_dcp_group().rank_in_group if self.dcp_world_size > 1 else 0
         self.pcp_world_size = parallel_config.prefill_context_parallel_size
         self.use_pcp = self.pcp_world_size > 1
-        self.pcp_rank = get_pcp_group().rank_in_group if self.use_pcp else 0
         self.cp_kv_cache_interleave_size = parallel_config.cp_kv_cache_interleave_size
+        # TP query-sharding of the (replicated) indexer. Held as size/rank so
+        # the chunk partition is a pure function of them, and so size == 1
+        # reproduces the replicated path exactly.
+        self.indexer_shard_size = 1
+        self.indexer_shard_rank = 0
+        # Decode half of the same shard. Zero unless the family is eligible, so
+        # the two flags cannot select a decode shard over an ineligible
+        # partition.
+        self.decode_shard_min_reqs = 0
+        if envs.VLLM_INDEXER_QUERY_SHARD:
+            tp = get_tp_group()
+            # Log both outcomes. A silent fallback is indistinguishable from
+            # "the flag did nothing" once an A/B comes back null, so say which
+            # one happened and why.
+            if indexer_shard_is_eligible(
+                tp.world_size, self.dcp_world_size, self.use_pcp
+            ):
+                self.indexer_shard_size = tp.world_size
+                self.indexer_shard_rank = tp.rank_in_group
+                self.decode_shard_min_reqs = envs.VLLM_INDEXER_DECODE_SHARD_MIN_REQS
+                logger.info_once(
+                    "Indexer query-sharding ENABLED: prefill rows split across "
+                    "%d TP ranks (>= %d tokens); top-k all-gathered per chunk. "
+                    "Decode query groups split at >= %s decode requests "
+                    "(0 = decode half disabled); top-k all-reduced per layer.",
+                    self.indexer_shard_size,
+                    MIN_SHARD_TOKENS,
+                    self.decode_shard_min_reqs,
+                )
+            else:
+                logger.info_once(
+                    "Indexer query-sharding INACTIVE (replicated): tp_size=%d, "
+                    "dcp_world_size=%d, use_pcp=%s (requires tp_size>1, "
+                    "dcp_world_size==1, use_pcp=False).",
+                    tp.world_size,
+                    self.dcp_world_size,
+                    self.use_pcp,
+                )
+        # The DCP sparse-indexer code is parameterized by interleave size, but
+        # interleave > 1 is not yet validated end-to-end (gsm8k parity fails),
+        # so fail closed here rather than silently produce wrong output.
+        if self.dcp_world_size > 1 and self.cp_kv_cache_interleave_size > 1:
+            raise NotImplementedError(
+                "DCP sparse indexer currently supports only "
+                f"cp_kv_cache_interleave_size=1 (got "
+                f"{self.cp_kv_cache_interleave_size})."
+            )
         # NOTE(Chen):an estimated max size of flattened_kv. Need to double check.
         self.max_prefill_buffer_size = get_max_prefill_buffer_size(self.vllm_config)
         self.num_speculative_tokens = (
@@ -886,7 +955,7 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             if self.vllm_config.speculative_config
             else 0
         )
-        self.indexer_uses_fp4 = dsa_indexer_uses_fp4(self.vllm_config)
+        self.use_fp4_indexer_cache = dsa_indexer_uses_fp4(self.vllm_config)
 
         next_n = self.num_speculative_tokens + 1
         self.decode_threshold = next_n
@@ -899,7 +968,7 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             self.use_flattening,
             self.supports_varlen,
             next_n,
-            self.indexer_uses_fp4,
+            self.use_fp4_indexer_cache,
         )
 
         sm_count = num_compute_units(self.device.index)
@@ -943,12 +1012,6 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             ),
             dtype=torch.int32,
             device=self.device,
-        )
-        # Materialize the rank on device during builder initialization. Creating
-        # this scalar in build() would introduce a GPU<->CPU sync in the decode
-        # hot path.
-        self.dcp_rank_tensor = torch.tensor(
-            self.dcp_rank, dtype=torch.int32, device=self.device
         )
         self.expanded_block_table_buffer = torch.zeros(
             (scheduler_config.max_num_batched_tokens, block_table_width),
@@ -1003,7 +1066,7 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
         local_seq_lens = get_dcp_local_seq_lens(
             seq_lens,
             self.dcp_world_size,
-            self.dcp_rank_tensor,
+            self.dcp_rank,
             self.cp_kv_cache_interleave_size,
         )
         if seq_lens_is_buffer_view:
@@ -1157,52 +1220,27 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
         self.global_decode_seq_lens_buffer[actual_expanded:num_decode_tokens] = 0
         return self.global_decode_seq_lens_buffer[:num_decode_tokens]
 
-    def _split_pcp_dcp_prefill_chunks(
+    def _build_varlen_decode_indices(
         self,
-        row_req_idx: np.ndarray,
-        row_shard_rows: np.ndarray,
-        row_query_lens_cpu: torch.Tensor,
-        max_logits_bytes: int,
-        request_offset: int,
-    ) -> list[tuple[slice, slice]]:
-        """Chunk by request rather than by row, so a split prefill's two rows
-        charge their shared context once, then widen each chunk back to rows.
-
-        ``row_shard_rows`` holds the whole request's largest DCP shard on
-        every row, so the plan is identical on every PCP rank.
-        """
-        row_bounds = request_row_bounds(row_req_idx)
-        first_rows = row_bounds[:-1]
-        # Each request's context, padded to whole DCP shards.
-        seq_lens = row_shard_rows[first_rows] * self.dcp_world_size
-        # Every rank holds a full-size chunk of a split request (shorter ones
-        # are replicated), so rows x longest row is the same on every rank,
-        # whichever row holds the short tail.
-        row_query_lens = row_query_lens_cpu.numpy()
-        query_lens = np.diff(row_bounds) * np.maximum.reduceat(
-            row_query_lens, first_rows
+        decode_lens: torch.Tensor,
+        decode_lens_cpu: torch.Tensor,
+        num_decode_tokens: int,
+    ) -> torch.Tensor:
+        """Build request ids for flattened SM100 varlen rows."""
+        indices = self.decode_indices_buffer[:num_decode_tokens]
+        actual_expanded = int(decode_lens_cpu.sum().item())
+        num_decodes = decode_lens.shape[0]
+        indices[:actual_expanded] = torch.repeat_interleave(
+            self.arange_buffer[:num_decodes],
+            decode_lens,
+            output_size=actual_expanded,
         )
-        chunk_specs = self._split_indexer_prefill_chunks(
-            torch.from_numpy(seq_lens.astype(np.int32)),
-            torch.from_numpy(query_lens.astype(np.int32)),
-            self.max_prefill_buffer_size,
-            max_logits_bytes,
-        )
-        return [
-            (
-                slice(
-                    request_offset + int(row_bounds[request_slice.start]),
-                    request_offset + int(row_bounds[request_slice.stop]),
-                ),
-                query_slice,
+        if actual_expanded < num_decode_tokens:
+            pad = num_decode_tokens - actual_expanded
+            indices[actual_expanded:num_decode_tokens] = (
+                num_decodes + self.arange_buffer[:pad]
             )
-            for request_slice, query_slice in chunk_specs
-        ]
-
-    def _prefill_split_seq_lens(self, seq_lens_cpu: torch.Tensor) -> torch.Tensor:
-        """Per-request KV lengths the prefill chunker budgets logits with;
-        subclasses whose logits rows are wider than the context override."""
-        return seq_lens_cpu
+        return indices
 
     @staticmethod
     def _split_indexer_prefill_chunks(
@@ -1288,6 +1326,7 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
         assert num_decode_tokens + num_prefill_tokens == num_tokens
 
         compressed_slot_mapping = slot_mapping
+        compressed_seq_lens = seq_lens
         indexer_block_table = block_table
         if self.compress_ratio > 1:
             kernel_block_size = self.kernel_block_size
@@ -1299,18 +1338,10 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                 factor = self.kv_cache_spec.block_size // kernel_block_size
                 indexer_block_table = (block_table[:, ::factor] // factor).contiguous()
             padded_num_tokens = num_tokens
-            local_slot_mapping = slot_mapping
-            if self.use_pcp:
-                # The gathered layout holds each rank's local tokens, padded, in
-                # rank order, so this rank's segment lines up with query_start_loc.
+            if self.pcp_world_size > 1:
                 padded_num_tokens = slot_mapping.shape[0] // self.pcp_world_size
-                local_slot_mapping = slot_mapping[
-                    self.pcp_rank * padded_num_tokens : (self.pcp_rank + 1)
-                    * padded_num_tokens
-                ]
             compressed_slot_mapping = get_compressed_slot_mapping(
                 num_tokens,
-                local_slot_mapping,
                 query_start_loc,
                 seq_lens,
                 indexer_block_table,
@@ -1323,12 +1354,10 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                     self.compressed_slot_mapping_buffer[:padded_num_tokens],
                     dim=0,
                 )
+            compressed_seq_lens = seq_lens // self.compress_ratio
 
         prefill_metadata = None
         if num_prefills > 0:
-            compressed_seq_lens = (
-                seq_lens // self.compress_ratio if self.compress_ratio > 1 else seq_lens
-            )
             # This CPU value is an upper bound for async-spec extend rows.  It
             # is safe for chunking/allocation because CUDA metadata below is
             # built from exact device seq_lens and gather ignores the tail.
@@ -1347,56 +1376,38 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             # slice below).
             assert common_attn_metadata.seq_lens_cpu_upper_bound is not None
             seq_lens_cpu = common_attn_metadata.seq_lens_cpu_upper_bound
-            req_idx = None
-            shard_rows = None
-            if self.use_pcp and self.dcp_world_size > 1:
-                # The gathered KV must be packed identically on every PCP rank:
-                # chunk by request from its DCP shard rows, which every rank
-                # holds. A dummy batch bypasses the PCP manager and has one
-                # row per request, so its own extent is the request's.
-                req_idx = common_attn_metadata.req_idx
-                if req_idx is None:
-                    req_idx = np.arange(num_reqs)
-                shard_rows_cpu = common_attn_metadata.dcp_local_seq_lens_cpu_upper_bound
-                if shard_rows_cpu is None:
-                    shard_rows_cpu = get_dcp_local_seq_lens(
-                        seq_lens_cpu,
-                        self.dcp_world_size,
-                        0,
-                        self.cp_kv_cache_interleave_size,
-                    )
-                shard_rows = shard_rows_cpu.numpy()
-                chunk_specs = self._split_pcp_dcp_prefill_chunks(
-                    req_idx[num_decodes:],
-                    shard_rows[num_decodes:],
-                    prefill_query_lens_cpu,
-                    max_logits_bytes,
-                    request_offset=num_decodes,
-                )
-            else:
-                chunk_specs = self._split_indexer_prefill_chunks(
-                    self._prefill_split_seq_lens(compressed_seq_lens_cpu[num_decodes:]),
-                    prefill_query_lens_cpu,
-                    self.max_prefill_buffer_size,
-                    max_logits_bytes,
-                    request_offset=num_decodes,
-                )
+            chunk_specs = self._split_indexer_prefill_chunks(
+                compressed_seq_lens_cpu[num_decodes:],
+                prefill_query_lens_cpu,
+                self.max_prefill_buffer_size,
+                max_logits_bytes,
+                request_offset=num_decodes,
+            )
+
+            # Under TP query-sharding each rank keeps a contiguous slice of the
+            # rows and all-gathers the top-k afterwards; `skip_kv_gather` then
+            # has to mean "this rank already gathered K for this request group",
+            # which is not the same as "start > 0".
+            #
+            # Short prefills fall back to replicated; see
+            # indexer_shard_size_for_batch.
+            num_prefill_tokens = int(
+                query_start_loc_cpu[num_decodes + num_prefills]
+                - query_start_loc_cpu[num_decodes]
+            )
+            shard_size = indexer_shard_size_for_batch(
+                num_prefill_tokens, self.indexer_shard_size
+            )
+            shard_rank = self.indexer_shard_rank if shard_size > 1 else 0
+            sharded_specs = shard_chunk_specs_by_query(
+                chunk_specs, shard_rank, shard_size
+            )
 
             chunks = []
-            for req_slice, query_slice in chunk_specs:
-                pcp_plan = None
-                if req_idx is not None:
-                    assert shard_rows is not None
-                    pcp_plan = build_pcp_global_chunk_plan(
-                        req_idx[req_slice],
-                        shard_rows[req_slice],
-                        self.dcp_world_size,
-                        self.device,
-                        self.cp_kv_cache_interleave_size,
-                    )
+            for spec in sharded_specs:
                 metadata = build_prefill_chunk_metadata(
-                    req_slice.start,
-                    req_slice.stop,
+                    spec.req_slice.start,
+                    spec.req_slice.stop,
                     query_start_loc,
                     query_start_loc_cpu,
                     seq_lens,
@@ -1404,18 +1415,32 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                     compressed_seq_lens_cpu,
                     indexer_block_table,
                     self.compress_ratio,
-                    query_slice=query_slice,
-                    skip_kv_gather=query_slice.start > 0,
+                    query_slice=spec.query_slice,
+                    skip_kv_gather=spec.skip_kv_gather,
                     dcp_rank=self.dcp_rank,
                     dcp_world_size=self.dcp_world_size,
                     cp_kv_cache_interleave_size=self.cp_kv_cache_interleave_size,
-                    pcp_plan=pcp_plan,
                 )
                 # Skip when total_seq_lens is 0 (i.e., no compressed token).
                 if metadata is not None:
+                    # Counts travel with the slice they describe, so the
+                    # collective cannot disagree with the partition.
+                    metadata.shard_row_counts = spec.shard_row_counts
+                    if spec.gather_start is not None:
+                        # spec coordinates are request-group-relative; the
+                        # buffer write needs batch tokens. token_start is this
+                        # rank's slice start in batch tokens, so subtracting
+                        # the rank's offset within the chunk recovers the
+                        # chunk's absolute first row.
+                        metadata.gather_token_start = metadata.token_start - (
+                            spec.query_slice.start - spec.gather_start
+                        )
                     chunks.append(metadata)
             prefill_metadata = DeepseekV32IndexerPrefillMetadata(
                 chunks,
+                q_row_ranges=indexer_q_row_ranges(
+                    chunks, num_decodes, common_attn_metadata.num_actual_tokens
+                ),
                 max_prefill_seq_len=(
                     int(seq_lens_cpu[num_decodes:].max().item())
                     if num_prefills > 0
@@ -1425,15 +1450,12 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
 
         decode_metadata = None
         if num_decodes > 0:
-            if not self.supports_varlen:
-                torch.diff(
-                    common_attn_metadata.query_start_loc[: num_decodes + 1],
-                    out=self.decode_lens_buffer[:num_decodes],
-                )
-                self.per_req_decode_lens_buffer[:num_decodes].copy_(
-                    self.decode_lens_buffer[:num_decodes]
-                )
+            torch.diff(
+                common_attn_metadata.query_start_loc[: num_decodes + 1],
+                out=self.decode_lens_buffer[:num_decodes],
+            )
             decode_lens = self.decode_lens_buffer[:num_decodes]
+            self.per_req_decode_lens_buffer[:num_decodes].copy_(decode_lens)
             decode_lens_cpu = torch.diff(
                 common_attn_metadata.query_start_loc_cpu[: num_decodes + 1]
             )
@@ -1468,74 +1490,49 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                 and step_next_n_ok
             )
 
-            if not self.supports_varlen:
-                global_seq_lens_for_decode = self._prepare_global_decode_seq_lens(
-                    global_seq_lens=global_seq_lens_for_decode,
-                    decode_lens=decode_lens,
-                    decode_lens_cpu=decode_lens_cpu,
-                    query_start_loc=common_attn_metadata.query_start_loc[:num_decodes],
-                    num_decode_tokens=num_decode_tokens,
-                    use_native=use_native,
-                    max_decode_len=max_decode_len,
-                )
+            global_seq_lens_for_decode = self._prepare_global_decode_seq_lens(
+                global_seq_lens=global_seq_lens_for_decode,
+                decode_lens=decode_lens,
+                decode_lens_cpu=decode_lens_cpu,
+                query_start_loc=common_attn_metadata.query_start_loc[:num_decodes],
+                num_decode_tokens=num_decode_tokens,
+                use_native=use_native,
+                max_decode_len=max_decode_len,
+            )
 
             decode_indices = None
             if self.supports_varlen:
-                from vllm.v1.attention.ops.metadata import (
-                    _indexer_decode_metadata_kernel,
+                decode_indices = self._build_varlen_decode_indices(
+                    decode_lens=decode_lens,
+                    decode_lens_cpu=decode_lens_cpu,
+                    num_decode_tokens=num_decode_tokens,
                 )
 
-                capacity = self.decode_seq_lens_buffer.numel()
-                grid = max(
-                    num_decodes,
-                    num_decode_tokens + triton.cdiv(capacity - num_decode_tokens, 256),
+            seq_lens, block_table, decode_lens, batch_size, requires_padding = (
+                self._prepare_decode_tensors(
+                    seq_lens=seq_lens,
+                    block_table=block_table,
+                    decode_lens=decode_lens,
+                    decode_lens_cpu=decode_lens_cpu,
+                    query_start_loc=common_attn_metadata.query_start_loc[:num_decodes],
+                    num_decodes=num_decodes,
+                    num_decode_tokens=num_decode_tokens,
+                    use_native=use_native,
+                    next_n=next_n,
+                    max_decode_len=max_decode_len,
                 )
-                _indexer_decode_metadata_kernel[(grid,)](
-                    query_start_loc,
-                    seq_lens,
-                    block_table,
-                    self.decode_seq_lens_buffer,
-                    self.expanded_block_table_buffer,
-                    self.decode_lens_buffer,
-                    self.decode_indices_buffer,
-                    self.per_req_decode_lens_buffer,
-                    num_decodes,
-                    num_decode_tokens,
-                    capacity,
-                    block_table.stride(0),
-                    self.expanded_block_table_buffer.stride(0),
-                    BLOCK_COLS=block_table.shape[1],
-                    num_warps=4,
-                )
-                seq_lens = self.decode_seq_lens_buffer[:num_decode_tokens]
-                block_table = self.expanded_block_table_buffer[:num_decode_tokens]
-                decode_lens = self.decode_lens_buffer[:num_decode_tokens]
-                decode_indices = self.decode_indices_buffer[:num_decode_tokens]
-                requires_padding = False
-                if global_seq_lens_for_decode is not None and max_decode_len > 1:
-                    self.global_decode_seq_lens_buffer[:num_decode_tokens].copy_(
-                        seq_lens
-                    )
-                    global_seq_lens_for_decode = self.global_decode_seq_lens_buffer[
-                        :num_decode_tokens
-                    ]
-            else:
-                seq_lens, block_table, decode_lens, batch_size, requires_padding = (
-                    self._prepare_decode_tensors(
-                        seq_lens=seq_lens,
-                        block_table=block_table,
-                        decode_lens=decode_lens,
-                        decode_lens_cpu=decode_lens_cpu,
-                        query_start_loc=common_attn_metadata.query_start_loc[
-                            :num_decodes
-                        ],
-                        num_decodes=num_decodes,
-                        num_decode_tokens=num_decode_tokens,
-                        use_native=use_native,
-                        next_n=next_n,
-                        max_decode_len=max_decode_len,
-                    )
-                )
+            )
+
+            # Decode half of the indexer query shard. `batch_size` is the
+            # kernels' query-group dimension, so the partition is over exactly
+            # what the decode branch will slice.
+            decode_shard_bounds = indexer_decode_shard_bounds(
+                batch_size,
+                num_decodes,
+                self.indexer_shard_rank,
+                self.indexer_shard_size,
+                self.decode_shard_min_reqs,
+            )
 
             if self.compress_ratio > 1:
                 kernel_block_size = self.kernel_block_size
@@ -1577,8 +1574,12 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                     seq_lens //= self.compress_ratio
                 else:
                     # Copy to avoid mutating shared state; keeps CG address stable.
+                    # MTP warmup pads seq_lens beyond the active requests, so
+                    # seq_lens can hold num_decode_tokens rows while the
+                    # destination slice above only wants the active decode
+                    # rows; slicing the source keeps padding rows zeroed.
                     self.expanded_seq_lens_buffer[:num_decodes] = (
-                        seq_lens // self.compress_ratio
+                        seq_lens[:num_decodes] // self.compress_ratio
                     )
                     self.expanded_seq_lens_buffer[num_decodes:num_decode_tokens] = 0
                     seq_lens = self.expanded_seq_lens_buffer[:num_decode_tokens]
@@ -1589,17 +1590,15 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             if seq_lens.dim() == 1:
                 seq_lens = seq_lens.unsqueeze(-1)
 
-            # DeepGEMM is required for the paged MQA logits on CUDA devices
-            # it supports; other GPUs (A100) use Triton kernels that need no
-            # schedule metadata.
+            # DeepGEMM is required for the paged MQA logits on CUDA devices.
+            # Schedule the sharded rows, not the batch: this is the work
+            # decomposition for the very call the shard narrows.
             schedule_metadata = self.scheduler_metadata_buffer
-            if (
-                current_platform.is_cuda()
-                and has_deep_gemm()
-                and current_platform.support_deep_gemm()
-            ):
+            if current_platform.is_cuda() and has_deep_gemm():
                 metadata = get_paged_mqa_logits_metadata(
-                    seq_lens,
+                    seq_lens
+                    if decode_shard_bounds is None
+                    else seq_lens[decode_shard_bounds[0] : decode_shard_bounds[1]],
                     self.kv_cache_spec.num_states,
                     self.num_sms,
                     indices=decode_indices,
@@ -1610,11 +1609,13 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
             decode_metadata = DeepSeekV32IndexerDecodeMetadata(
                 block_table=block_table,
                 seq_lens=seq_lens,
+                max_seq_len=(common_attn_metadata.max_seq_len // self.compress_ratio),
                 decode_lens=decode_lens,
                 requires_padding=requires_padding,
                 schedule_metadata=schedule_metadata,
                 indices=decode_indices,
                 global_seq_lens=global_seq_lens_for_decode,
+                shard_bounds=decode_shard_bounds,
                 per_req_decode_lens=self.per_req_decode_lens_buffer[:num_decodes],
                 decode_is_uniform=write_is_uniform,
                 write_max_decode_len=max_decode_len,
@@ -1646,16 +1647,17 @@ def build_prefill_chunk_metadata(
     block_table: torch.Tensor,
     compress_ratio: int,
     query_slice: slice | None = None,
+    # Authoritative: the caller knows whether *this* rank has already gathered
+    # K for this request group. Deriving it here from `query_slice.start > 0`
+    # is only correct when sub-chunks are consecutive slices on one rank, which
+    # TP query-sharding breaks -- every rank but 0 starts at a nonzero row and
+    # has gathered nothing.
     skip_kv_gather: bool = False,
     dcp_rank: int = 0,
     dcp_world_size: int = 1,
     cp_kv_cache_interleave_size: int = 1,
-    pcp_plan: PCPGlobalChunkPlan | None = None,
 ) -> DeepseekV32IndexerPrefillChunkMetadata | None:
-    if pcp_plan is not None:
-        total_seq_lens = pcp_plan.total
-    else:
-        total_seq_lens = compressed_seq_lens_cpu[start_idx:end_idx].sum().item()
+    total_seq_lens = compressed_seq_lens_cpu[start_idx:end_idx].sum().item()
     if total_seq_lens == 0:
         return None
 
@@ -1663,22 +1665,15 @@ def build_prefill_chunk_metadata(
     device = block_table.device
     token_to_seq = torch.empty(total_seq_lens, dtype=torch.int32, device=device)
 
-    if pcp_plan is not None:
-        cu_seq_lens = pcp_plan.global_cu
-    else:
-        cu_seq_lens = torch.empty(num_reqs + 1, dtype=torch.int32, device=device)
-        # Assigning to slice avoids cpu sync.
-        cu_seq_lens[:1] = 0
-        torch.cumsum(compressed_seq_lens[start_idx:end_idx], dim=0, out=cu_seq_lens[1:])
+    cu_seq_lens = torch.empty(num_reqs + 1, dtype=torch.int32, device=device)
+    # Assigning to slice avoids cpu sync.
+    cu_seq_lens[:1] = 0
+    torch.cumsum(compressed_seq_lens[start_idx:end_idx], dim=0, out=cu_seq_lens[1:])
 
     local_cu_seq_lens = cu_seq_lens
     local_total_seq_lens = total_seq_lens
     max_local_total_seq_lens = total_seq_lens
-    if pcp_plan is not None:
-        local_cu_seq_lens = pcp_plan.padded_local_cu
-        local_total_seq_lens = pcp_plan.padded_local_total
-        max_local_total_seq_lens = pcp_plan.padded_local_total
-    elif dcp_world_size > 1:
+    if dcp_world_size > 1:
         # Per-rank local KV length under interleave-aware DCP sharding, shape
         # [num_reqs, dcp_world_size]. Reuse the canonical CP helper so the
         # sharding matches the rest of the DCP pipeline (decode/prefill).
@@ -1702,57 +1697,43 @@ def build_prefill_chunk_metadata(
         (query_start_loc_cpu[end_idx] - query_start_loc_cpu[start_idx]).item()
     )
     if query_slice is not None:
-        qs_start = min(query_slice.start, total_query_len)
-        qs_stop = min(query_slice.stop, total_query_len)
+        qs_start = query_slice.start
+        qs_stop = query_slice.stop
     else:
         qs_start = 0
         qs_stop = total_query_len
     output_query_len = qs_stop - qs_start
-    assert 0 <= output_query_len <= total_query_len - qs_start, (
-        f"query slice [{qs_start}, {qs_stop}) does not fit this rank's "
-        f"{total_query_len} tokens; the metadata tail would stay uninitialized"
-    )
 
     cu_seq_len_ks = torch.empty(output_query_len, dtype=torch.int32, device=device)
     cu_seq_len_ke = torch.empty(output_query_len, dtype=torch.int32, device=device)
 
-    if pcp_plan is not None:
-        row_start_cu = pcp_plan.row_start_cu
-        kernel_dcp_rank, kernel_dcp_world = 0, 1
-    else:
-        # Under DCP the kernel writes this rank's local row bounds into
-        # cu_seq_len_ks/ke; otherwise local_cu_seq_lens aliases cu_seq_lens.
-        row_start_cu = local_cu_seq_lens
-        kernel_dcp_rank, kernel_dcp_world = dcp_rank, dcp_world_size
+    # Under DCP the kernel writes this rank's local row bounds into
+    # cu_seq_len_ks/ke; otherwise local_cu_seq_lens aliases cu_seq_lens.
     _BUILD_PREFILL_CHUNK_METADATA_KERNEL(
         query_start_loc,
         uncompressed_seq_lens[start_idx:end_idx],
         cu_seq_lens,
-        row_start_cu,
+        local_cu_seq_lens,
         token_to_seq,
         cu_seq_len_ks,
         cu_seq_len_ke,
         qs_start,
         qs_stop,
-        kernel_dcp_rank,
-        kernel_dcp_world,
+        dcp_rank,
+        dcp_world_size,
         cp_kv_cache_interleave_size,
         num_reqs=num_reqs,
         COMPRESS_RATIO=compress_ratio,
     )
 
-    pcp_deinterleave_idx = pcp_plan.deinterleave_idx if pcp_plan is not None else None
-
     token_start = query_start_loc_cpu[start_idx].item()
     if query_slice is not None:
         token_end = token_start + qs_stop
         token_start = token_start + qs_start
-        skip_kv_gather = skip_kv_gather or qs_start > 0
     else:
         token_end = query_start_loc_cpu[end_idx].item()
 
     return DeepseekV32IndexerPrefillChunkMetadata(
-        pcp_deinterleave_idx=pcp_deinterleave_idx,
         cu_seqlen_ks=cu_seq_len_ks,
         cu_seqlen_ke=cu_seq_len_ke,
         cu_seq_lens=cu_seq_lens,

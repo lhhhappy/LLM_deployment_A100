@@ -91,6 +91,7 @@ def _remap_quantized_layers(
 
 def _remap_mtp_weight_name(name: str) -> str | None:
     """Map Qwen4Exp checkpoint paths into the standalone draft model."""
+
     for checkpoint_prefix in (
         "model.language_model.",
         "language_model.",
@@ -153,6 +154,24 @@ def _make_draft_vllm_config(
                 "quantized_layers",
                 _remap_quantized_layers(quantized_layers, mtp_start_layer_idx),
             )
+        # compressed-tensors keeps its ignore list under `.ignore` as regex
+        # patterns. Checkpoints that leave MTP in bf16 (e.g. AWQ W4A16 exports,
+        # whose quantization_config ignores `re:.*mtp\..*`) provide no packed
+        # weights for the draft, so extend the ignore list to the draft's
+        # layer indices to keep the whole draft unquantized.
+        ct_ignore = getattr(draft_quant_config, "ignore", None)
+        if isinstance(ct_ignore, list) and any(
+            "mtp" in pattern for pattern in ct_ignore
+        ):
+            draft_config = speculative_config.draft_model_config.hf_text_config
+            num_mtp_layers = int(getattr(draft_config, "mtp_num_hidden_layers", 1))
+            extra_ignores = [
+                rf"re:.*\.layers\.{mtp_start_layer_idx + offset}\..*"
+                for offset in range(num_mtp_layers)
+            ]
+            draft_quant_config.ignore = ct_ignore + [
+                pattern for pattern in extra_ignores if pattern not in ct_ignore
+            ]
 
     draft_vllm_config = replace(
         vllm_config,
@@ -259,6 +278,7 @@ class Qwen4ExpMultiTokenPredictor(nn.Module):
 
     def _iter_qsa_attentions(self):
         """Yield MTP attention modules that own a QSA indexer."""
+
         for layer in self.layers:
             attention = getattr(layer, "self_attn", None)
             if (
@@ -269,11 +289,13 @@ class Qwen4ExpMultiTokenPredictor(nn.Module):
 
     def set_skip_topk(self, skip: bool) -> None:
         """Select on MTP step 0 and reuse its QSA indices on later steps."""
+
         for attention in self._iter_qsa_attentions():
             attention.indexer.skip_topk = skip
 
     def compact_topk_indices(self, row_indices: torch.Tensor) -> None:
         """Keep each request's target-aligned step-0 sparse-index row."""
+
         num_rows = row_indices.numel()
         for attention in self._iter_qsa_attentions():
             buffer = attention.topk_indices_buffer

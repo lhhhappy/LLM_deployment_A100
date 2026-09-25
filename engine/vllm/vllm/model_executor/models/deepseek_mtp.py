@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterable
 
 import torch
 import torch.nn as nn
-from transformers import PreTrainedConfig
+from transformers import PretrainedConfig
 
 from vllm.compilation.decorators import support_torch_compile
 from vllm.config import VllmConfig
@@ -39,11 +39,9 @@ from .deepseek_v2 import (
     DeepseekV2MoE,
     _try_load_fp8_indexer_wk,
 )
-from .interfaces import SupportsPP
 from .utils import (
     get_pp_missing_layer_names,
     get_spec_layer_idx_from_weight_name,
-    make_empty_intermediate_tensors_factory,
     maybe_prefix,
 )
 
@@ -51,23 +49,18 @@ from .utils import (
 class SharedHead(nn.Module):
     def __init__(
         self,
-        config: PreTrainedConfig,
+        config: PretrainedConfig,
         prefix: str,
         quant_config: QuantizationConfig | None = None,
-        *,
-        defer_lm_head: bool = False,
     ) -> None:
         super().__init__()
         self.norm = RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
-        if defer_lm_head:
-            self.head = None
-        else:
-            self.head = ParallelLMHead(
-                config.vocab_size,
-                config.hidden_size,
-                quant_config=quant_config,
-                prefix=maybe_prefix(prefix, "head"),
-            )
+        self.head = ParallelLMHead(
+            config.vocab_size,
+            config.hidden_size,
+            quant_config=quant_config,
+            prefix=maybe_prefix(prefix, "head"),
+        )
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
         return self.norm(hidden_states)
@@ -237,7 +230,7 @@ class DeepSeekMultiTokenPredictor(nn.Module):
 
 
 @support_torch_compile
-class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts, SupportsPP):
+class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts):
     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
         super().__init__()
         self.config = vllm_config.model_config.hf_config
@@ -247,9 +240,6 @@ class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts, SupportsPP):
         )
         # Set MoE hyperparameters
         self.set_moe_parameters()
-        self.make_empty_intermediate_tensors = make_empty_intermediate_tensors_factory(
-            ["hidden_states", "residual"], self.config.hidden_size
-        )
 
     def set_moe_parameters(self):
         self.num_moe_layers = self.config.num_nextn_predict_layers
@@ -276,7 +266,7 @@ class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts, SupportsPP):
     def embed_input_ids(self, input_ids: torch.Tensor) -> torch.Tensor:
         return self.model.embed_input_ids(input_ids)
 
-    def forward(  # type: ignore[override]
+    def forward(
         self,
         input_ids: torch.Tensor | None,
         positions: torch.Tensor,
@@ -336,17 +326,21 @@ class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts, SupportsPP):
         for name, loaded_weight in weights:
             if "rotary_emb.inv_freq" in name:
                 continue
+            # Load the draft's own embed_tokens. The MTP module embeds the
+            # tokens it drafts via its own embed_tokens, but the checkpoint
+            # stores embed_tokens as a single top-level (shared/tied) weight
+            # whose spec_layer is None -- so the loop below skips it. Under
+            # pipeline parallelism the target model's embed_tokens is a
+            # PPMissingLayer on the draft's last stage, so the draft cannot
+            # borrow it and MUST load its own copy here, or it embeds tokens
+            # with uninitialized weights and produces garbage drafts.
+            if "embed_tokens" in name and (param := params_dict.get(name)) is not None:
+                weight_loader = getattr(param, "weight_loader", default_weight_loader)
+                weight_loader(param, loaded_weight)
+                loaded_params.add(name)
+                continue
             spec_layer = get_spec_layer_idx_from_weight_name(self.config, name)
             if spec_layer is None:
-                # A tied top-level embed_tokens has no spec layer to rewrite
-                # from; the draft needs its own copy under PP.
-                param = params_dict.get(name) if "embed_tokens" in name else None
-                if param is not None:
-                    weight_loader = getattr(
-                        param, "weight_loader", default_weight_loader
-                    )
-                    weight_loader(param, loaded_weight)
-                    loaded_params.add(name)
                 continue
             is_fusion_moe_shared_experts_layer = (
                 self.is_fused_shared_expert_enabled and ("mlp.shared_experts" in name)
@@ -534,7 +528,8 @@ class DeepSeekMTP(nn.Module, DeepseekV2MixtureOfExperts, SupportsPP):
         return loaded_params
 
     def _rewrite_spec_layer_name(self, spec_layer: int, name: str) -> str:
-        """Rewrite the weight name to match the format of the original model.
+        """
+        Rewrite the weight name to match the format of the original model.
         Add .mtp_block for modules in transformer layer block for spec layer
         and rename shared layer weights to be top level.
         """

@@ -58,7 +58,6 @@ class WeightTransferEngineFactory:
 
         Raises:
             ValueError: If an engine with the same name is already registered
-
         """
         if name in cls._registry:
             raise ValueError(f"Weight transfer engine '{name}' is already registered.")
@@ -102,7 +101,6 @@ class WeightTransferEngineFactory:
 
         Raises:
             ValueError: If the backend is not registered
-
         """
         backend = config.backend
         if backend not in cls._registry:
@@ -192,7 +190,6 @@ class WeightTransferTrainerFactory:
 
         Raises:
             ValueError: If `init_info.backend` is not registered.
-
         """
         backend = init_info.backend
         if backend not in cls._registry:

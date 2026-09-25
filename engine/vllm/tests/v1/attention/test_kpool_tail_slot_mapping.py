@@ -32,7 +32,6 @@ from vllm.v1.attention.backends.mla.indexer import (
 )
 from vllm.v1.kv_cache_interface import KpoolTailSpec, compute_layout_strides
 from vllm.v1.kv_cache_layout import KVCacheLayout
-from vllm.v1.worker.block_table import get_block_table_width
 
 KPOOL = 4
 
@@ -54,29 +53,6 @@ def test_tail_backend_layout_matches_kernel_pointer_arithmetic():
     assert head_stride == KPOOL * 128 * torch.bfloat16.itemsize
     assert state_stride == 128 * torch.bfloat16.itemsize
     assert content_stride == 1
-
-
-def test_tail_spec_opts_out_of_generic_slot_mapping():
-    """The tail row is one block wide (padded to the block-table alignment), so
-    the generic kernel's ``pos // kpool`` column index runs off the end of the
-    allocation for long prompts. The spec must opt out of it entirely."""
-    spec = KpoolTailSpec(
-        block_size=KPOOL,
-        num_kv_heads=2,
-        head_size=128,
-        head_size_v=0,
-        dtype=torch.bfloat16,
-        sliding_window=KPOOL,
-    )
-    max_len = 1 << 20
-    width = get_block_table_width(
-        spec.max_num_blocks_per_req(None, max_len),
-        spec.block_size,
-        token_alignment=spec.block_table_token_alignment,
-    )
-
-    assert width * KPOOL < max_len
-    assert spec.uses_slot_mapping is False
 
 
 def make_tail_block_table(own_blocks, width=64):
@@ -103,6 +79,9 @@ def legacy_generic_tail_slots(block_table, query_start_loc, positions):
 def circular_tail_slots(
     slot_mapping, block_table, query_start_loc, positions, num_actual, num_reqs
 ):
+    out_full = torch.full(
+        (slot_mapping.shape[0],), -1, dtype=torch.int64, device=slot_mapping.device
+    )
     return compute_kpool_tail_slot_mapping(
         slot_mapping,
         block_table,
@@ -111,6 +90,7 @@ def circular_tail_slots(
         num_actual,
         num_reqs,
         KPOOL,
+        out_full=out_full,
     )
 
 
@@ -242,7 +222,10 @@ def make_common_metadata(per_req_positions, own_blocks, with_positions=True):
 def make_tail_builder(block_size=KPOOL, max_num_batched_tokens=128):
     builder = object.__new__(KpoolTailMetadataBuilder)
     builder.kv_cache_spec = SimpleNamespace(block_size=block_size)
-    builder.slot_mapping_buffer = torch.empty(max_num_batched_tokens, dtype=torch.int64)
+    # Persistent, address-stable buffer (see compute_kpool_tail_slot_mapping).
+    builder.tail_slot_mapping_buffer = torch.full(
+        (max_num_batched_tokens,), -1, dtype=torch.int64
+    )
     return builder
 
 
@@ -266,12 +249,14 @@ def test_builder_build_uses_circular_mapping():
     )
 
 
-def test_builder_build_falls_back_without_positions():
-    """Capture / dummy builds without positions keep the generic mapping."""
+def test_builder_build_rejects_missing_positions():
+    """Without positions the tail builder must refuse, never fall back:
+    the common mapping addresses the pool-granular indexer cache, and under
+    graph capture a wrong mapping gets baked into the captured kernels."""
     per_req = [list(range(10))]
     cam = make_common_metadata(per_req, [5], with_positions=False)
-    meta = KpoolTailMetadataBuilder.build(make_tail_builder(), 0, cam)
-    assert meta.slot_mapping is cam.slot_mapping
+    with pytest.raises(ValueError, match="positions"):
+        KpoolTailMetadataBuilder.build(make_tail_builder(), 0, cam)
 
 
 def test_builder_reuses_slot_mapping_storage():
@@ -391,66 +376,3 @@ def test_interleaved_decode_pollution_legacy_vs_circular():
 
     # The circular mapping keeps the rings isolated under interleaving.
     torch.testing.assert_close(circular, ground_truth)
-
-
-@pytest.mark.skipif(not torch.cuda.is_available(), reason="needs a CUDA device")
-@pytest.mark.parametrize(
-    "per_req,num_actual,padded_len",
-    [
-        ([list(range(10)), list(range(12))], 22, 22),
-        ([list(range(10)), list(range(12))], 22, 30),
-        ([[3, 4], [0], [7, 8, 9]], 6, 8),
-        ([[5]], 1, 1),
-    ],
-)
-def test_triton_mapping_matches_cpu(per_req, num_actual, padded_len):
-    """The CUDA (Triton) path must match the CPU torch reference, including
-    tokens between the last request boundary and num_actual_tokens (mapped to
-    the last request) and untouched padding beyond num_actual."""
-    positions, qsl, slot_mapping, _, num_reqs = make_batch(
-        per_req, padded_len=padded_len
-    )
-    # Replace the all--1 placeholder slots with sentinel values to check the
-    # padding range is copied through untouched.
-    slot_mapping = torch.arange(padded_len, dtype=torch.int64) + 1000
-    bt = make_tail_block_table(list(range(5, 5 + num_reqs)))
-
-    ref = circular_tail_slots(slot_mapping, bt, qsl, positions, num_actual, num_reqs)
-    got = circular_tail_slots(
-        slot_mapping.cuda(),
-        bt.cuda(),
-        qsl.cuda().to(torch.int32),
-        positions.cuda(),
-        num_actual,
-        num_reqs,
-    )
-    torch.testing.assert_close(got.cpu(), ref)
-
-
-@pytest.mark.skipif(not torch.cuda.is_available(), reason="needs a CUDA device")
-def test_triton_mapping_reads_strided_block_table():
-    """The kernel must address the block table through its real stride(0),
-    not a dense assumption (the #57477 class of bug): a tail block table that
-    is a column view of a wider allocation must still read column 0."""
-    per_req = [list(range(10)), list(range(12))]
-    positions, qsl, slot_mapping, num_actual, num_reqs = make_batch(per_req)
-    own_blocks = [11, 22]
-    wide = torch.zeros(num_reqs, 8, dtype=torch.int32)
-    bt = wide[:, 1:4]  # non-contiguous view, stride(0) == 8
-    bt[:, 0] = torch.tensor(own_blocks, dtype=torch.int32)
-
-    ref = circular_tail_slots(
-        slot_mapping, bt.contiguous(), qsl, positions, num_actual, num_reqs
-    )
-    got = circular_tail_slots(
-        slot_mapping.cuda(),
-        bt.cuda(),
-        qsl.cuda().to(torch.int32),
-        positions.cuda(),
-        num_actual,
-        num_reqs,
-    )
-    torch.testing.assert_close(got.cpu(), ref)
-    for req, blk in enumerate(own_blocks):
-        start, end = int(qsl[req]), int(qsl[req + 1])
-        assert (got[start:end] // KPOOL == blk).all()

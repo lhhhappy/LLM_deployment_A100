@@ -14,9 +14,6 @@ if TYPE_CHECKING:
     import numpy.typing as npt
     import torch
 
-    from vllm.distributed.aux_output_connector.connector import (
-        AuxOutputConnectorMetadata,
-    )
     from vllm.distributed.ec_transfer.ec_connector.base import ECConnectorMetadata
     from vllm.distributed.kv_transfer.kv_connector.v1.base import KVConnectorMetadata
     from vllm.lora.request import LoRARequest
@@ -26,7 +23,6 @@ if TYPE_CHECKING:
     from vllm.v1.core.kv_cache_utils import KVCacheBlockCopy
     from vllm.v1.request import Request
 else:
-    AuxOutputConnectorMetadata = object
     ECConnectorMetadata = object
     KVConnectorMetadata = object
     KVCacheBlockCopy = object
@@ -52,8 +48,6 @@ class NewRequestData:
 
     # Only used for v2 model runner.
     prefill_token_ids: list[int] | None = None
-    # DeepSeek-V4.1 only: SWA bounded replay; see Request.replay_start.
-    replay_start: int = 0
 
     @classmethod
     def from_request(
@@ -79,7 +73,6 @@ class NewRequestData:
             prompt_embeds=request.prompt_embeds,
             prompt_is_token_ids=request.prompt_is_token_ids,
             prefill_token_ids=prefill_token_ids,
-            replay_start=request.replay_start,
         )
 
     @property
@@ -289,9 +282,6 @@ class SchedulerOutput:
     # synchronously during this step (load_async=False).
     has_sync_kv_loads: bool = False
 
-    # Execution-auxiliary output control metadata consumed by the worker connector.
-    aux_output_connector_metadata: AuxOutputConnectorMetadata | None = None
-
     # EC Cache Connector metadata
     ec_connector_metadata: ECConnectorMetadata | None = None
     # EC Cache Manager metadata
@@ -299,13 +289,12 @@ class SchedulerOutput:
     # Block IDs freshly allocated from the pool during this scheduling step.
     # The worker zeros the corresponding GPU memory before the blocks are used,
     # preventing stale NaN/data from corrupting attention or SSM computation.
-    new_block_ids_to_zero: list[int] | None = None
+    # Per kv-cache group: ids are group-scoped (virtual block splitting maps
+    # the same id to different pages in different groups).
+    new_block_ids_to_zero: list[list[int]] | None = None
 
     # CoW copies to apply after zeroing new blocks and before forward.
     kv_cache_block_copies: list[KVCacheBlockCopy] | None = None
-
-    # Complete block-table rows that replace incrementally appended block IDs.
-    block_table_updates: dict[str, tuple[list[int], ...]] | None = None
 
     # Scheduler-local; always None by the time this reaches a worker.
     kv_connector_block_state: KVConnectorBlockState | None = None

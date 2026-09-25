@@ -12,8 +12,6 @@ mid-decode (silent corruption of an unrelated request).
 """
 
 from collections import defaultdict
-from threading import Event, Lock
-from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -114,25 +112,20 @@ def test_local_descriptors_follow_each_region_pool_capacity():
     worker.block_len_per_layer = [16, 16]
     worker.block_stride_per_layer = [16, 16]
     worker.region_num_blocks = [2, 3]
-    worker._transfer_layer_region_indices = ()
 
     descriptors = worker._build_fa_local([100, 1000], block_size_ratio=1)
 
     assert descriptors[:, 0].tolist() == [100, 116, 1000, 1016, 1032]
 
 
-def _register_overlaid_mla_worker(
-    *, push_pp: bool = False, tail_bytes: int = 0, page_covers_view: bool = True
-):
-    """Register two MLA layers overlaid on one allocation.
+@pytest.mark.cpu_test
+def test_overlaid_transfer_groups_share_region_geometry():
+    """Groups overlaid on one allocation share its transfer region."""
+    import msgspec
 
-    ``tail_bytes`` leaves spare bytes past the last block, the way an allocation
-    rounded up to a page boundary does. Clearing ``page_covers_view`` narrows
-    each layer's view below its page, leaving the block interior non-contiguous.
-    """
     from vllm.distributed.kv_transfer.kv_connector.v1.nixl import base_worker as bw
-    from vllm.distributed.kv_transfer.kv_connector.v1.nixl.push_worker import (
-        NixlPushConnectorWorker,
+    from vllm.distributed.kv_transfer.kv_connector.v1.nixl.metadata import (
+        NixlAgentMetadata,
     )
     from vllm.distributed.kv_transfer.kv_connector.v1.nixl.worker import (
         NixlConnectorWorker,
@@ -153,27 +146,16 @@ def _register_overlaid_mla_worker(
     )
     page_size = spec.page_size_bytes
     block_stride = 2 * page_size
-    view_size = page_size if page_covers_view else page_size - 8
-    allocation = torch.zeros(num_blocks * block_stride + tail_bytes, dtype=torch.uint8)
-    backing = allocation[: num_blocks * block_stride].view(num_blocks, block_stride)
+    backing = torch.zeros(num_blocks, block_stride, dtype=torch.uint8)
     caches = {
-        "layer.0": backing[:, :view_size],
-        "layer.1": backing[:, :view_size],
+        "layer.0": backing[:, :page_size],
+        "layer.1": backing[:, :page_size],
     }
     groups = [KVCacheGroupSpec([layer_name], spec) for layer_name in caches]
 
-    worker_cls = NixlPushConnectorWorker if push_pp else NixlConnectorWorker
-    worker = object.__new__(worker_cls)
-    if push_pp:
-        worker._push_writer_stop = Event()
-        worker._push_writer_wake = Event()
-        worker._push_writer_thread = MagicMock()
-        worker._sending_transfers_lock = Lock()
-        worker._sending_transfers = defaultdict(list)
+    worker = object.__new__(NixlConnectorWorker)
     worker.tp_rank = 0
     worker.world_size = 1
-    worker.transfer_tp_rank = 0
-    worker.transfer_tp_size = 1
     worker.block_size = 4
     worker.engine_id = "local-engine"
     worker.use_mla = True
@@ -204,14 +186,11 @@ def _register_overlaid_mla_worker(
     worker.host_buffer_kv_cache_layout = "NHD"
     worker._physical_blocks_per_logical_kv_block = 1
     worker._logical_num_blocks = num_blocks
-    worker.region_mem_types = []
     worker.region_group_ids = []
+    worker.region_mem_types = []
     worker._mixed_mem_types = False
     worker.region_names = []
     worker.region_num_blocks = []
-    worker._transfer_layer_names = ()
-    worker._transfer_layer_region_indices = ()
-    worker._transfer_layer_group_ids = ()
     worker._region_is_mla = []
     worker.block_len_per_layer = []
     worker.block_stride_per_layer = []
@@ -219,8 +198,7 @@ def _register_overlaid_mla_worker(
     worker.use_host_buffer = False
     worker.host_xfer_buffers = {}
     worker.device_kv_caches = {}
-    worker.pp_size = 2 if push_pp else 1
-    worker._is_hma_required = True
+    worker.pp_size = 1
     worker.dcp_size = 1
     worker.pcp_size = 1
     worker.kv_buffer_device = "cuda"
@@ -229,7 +207,7 @@ def _register_overlaid_mla_worker(
         num_blocks=num_blocks,
         kv_cache_tensors=[
             KVCacheTensor(
-                size=allocation.nbytes,
+                size=backing.nbytes,
                 layers=[name],
                 layer_stride=page_size,
                 block_stride=block_stride,
@@ -239,51 +217,23 @@ def _register_overlaid_mla_worker(
         kv_cache_groups=groups,
     )
 
+    transfer_topology = MagicMock()
+
     with (
-        patch.object(bw, "TransferTopology", return_value=MagicMock()),
+        patch.object(bw, "TransferTopology", return_value=transfer_topology),
         patch.object(bw, "compute_nixl_compatibility_hash", return_value="hash"),
     ):
         worker.register_kv_caches(caches)
 
-    return SimpleNamespace(
-        worker=worker,
-        allocation=allocation,
-        num_blocks=num_blocks,
-        block_stride=block_stride,
-    )
-
-
-@pytest.mark.cpu_test
-@pytest.mark.parametrize("push_pp", [False, True])
-def test_overlaid_transfer_groups_share_region_geometry(push_pp):
-    """Groups overlaid on one allocation share its transfer region."""
-    import msgspec
-
-    from vllm.distributed.kv_transfer.kv_connector.v1.nixl.metadata import (
-        NixlAgentMetadata,
-    )
-
-    registered = _register_overlaid_mla_worker(push_pp=push_pp)
-    worker = registered.worker
-    allocation = registered.allocation
-    num_blocks = registered.num_blocks
-    block_stride = registered.block_stride
-
     assert worker.region_group_ids == [-1]
     assert worker.block_stride_per_layer == [block_stride]
     assert worker.nixl_wrapper.registered[0][0] == [
-        (allocation.data_ptr(), allocation.nbytes, 0, "")
+        (backing.data_ptr(), backing.nbytes, 0, "")
     ]
     expected_addrs = [
-        allocation.data_ptr() + block * block_stride for block in range(num_blocks)
+        backing.data_ptr() + block * block_stride for block in range(num_blocks)
     ]
-    num_desc_regions = 2 if push_pp else 1
-    assert worker.src_blocks_data[:, 0].tolist() == expected_addrs * num_desc_regions
-    assert worker.num_descs == num_blocks * num_desc_regions
-    assert (
-        worker.dst_region_num_blocks[worker.engine_id]
-        == [num_blocks] * num_desc_regions
-    )
+    assert worker.src_blocks_data[:, 0].tolist() == expected_addrs
 
     metadata = msgspec.msgpack.decode(
         worker.xfer_handshake_metadata.agent_metadata_bytes,
@@ -291,41 +241,7 @@ def test_overlaid_transfer_groups_share_region_geometry(push_pp):
     )
     assert metadata.region_group_ids == [-1]
     assert metadata.region_num_blocks == [num_blocks]
-    assert metadata.region_members == ([["layer.0", "layer.1"]] if push_pp else [])
     assert worker._block_ids_by_region(([0], [2]), worker.region_group_ids) == [[0, 2]]
-
-
-def _descriptor_geometry(registered) -> dict:
-    """The geometry handed to NIXL, addressed relative to the allocation."""
-    worker = registered.worker
-    base = registered.allocation.data_ptr()
-    return {
-        "block_len_per_layer": list(worker.block_len_per_layer),
-        "block_stride_per_layer": list(worker.block_stride_per_layer),
-        "desc_offsets": [addr - base for addr in worker.src_blocks_data[:, 0].tolist()],
-        "desc_lens": worker.src_blocks_data[:, 1].tolist(),
-    }
-
-
-@pytest.mark.cpu_test
-@pytest.mark.parametrize(
-    "page_covers_view", [True, False], ids=["dense-page", "narrow-view"]
-)
-def test_registration_ignores_a_sub_block_padding_tail(page_covers_view):
-    """A tail shorter than one block must not move a single descriptor.
-
-    An allocation rounded up to a page boundary keeps a few spare bytes past the
-    last block, which cannot hold another block. The narrow view is the branch
-    DeepSeek-V4-Flash's sliding-window cache lands in.
-    """
-    unpadded = _register_overlaid_mla_worker(page_covers_view=page_covers_view)
-    # More spare bytes than blocks, so dividing the padded length by the block
-    # count overshoots the stride and would shift every descriptor.
-    padded = _register_overlaid_mla_worker(
-        tail_bytes=2 * unpadded.num_blocks, page_covers_view=page_covers_view
-    )
-
-    assert _descriptor_geometry(padded) == _descriptor_geometry(unpadded)
 
 
 def _make_mla_hybrid_worker(local_block_size, kernel_block_size, num_logical_blocks):
@@ -387,6 +303,8 @@ def _make_mla_hybrid_worker(local_block_size, kernel_block_size, num_logical_blo
     # buffers are per-layer, so the HMA shared-tensor regions this test builds
     # would not be deduplicated. Pin it to the faked device type.
     vllm_config.kv_transfer_config.kv_buffer_device = "cuda"
+
+    from unittest.mock import MagicMock
 
     fake_backend = MagicMock()
     fake_backend.get_supported_kernel_block_sizes.return_value = [kernel_block_size]
@@ -634,16 +552,6 @@ def _make_remote_meta(
     )
 
 
-def _register_remote_agents(worker, metadata, tp_size):
-    """Mirror the async handshake callback that publishes prepared agents."""
-    worker._remote_agents[metadata.engine_id] = {
-        (0, rank): worker.add_remote_agent(
-            metadata, remote_tp_rank=rank, remote_tp_size=tp_size
-        )
-        for rank in range(tp_size)
-    }
-
-
 def _owned_byte_ranges(worker, group_logical_ids):
     """Byte ranges owned by a request: for each HMA region tensor, every
     logical block id of every group maps to one unified page."""
@@ -701,7 +609,8 @@ def test_hetero_ppl_multi_read_writes_stay_within_request_blocks():
         remote_num_logical=12,
         remote_ssm_sizes=(24, 32),
     )
-    _register_remote_agents(worker, meta_r, 2)
+    for rank in (0, 1):
+        worker.add_remote_agent(meta_r, remote_tp_rank=rank, remote_tp_size=2)
 
     # Request B: 17 matched tokens. Local: 2 logical blocks (24 tok
     # capacity); remote: 16 prefilled tokens -> 2 remote logical blocks.
@@ -717,7 +626,7 @@ def test_hetero_ppl_multi_read_writes_stay_within_request_blocks():
             "remote_block_ids": remote_ids,
             "remote_engine_id": "remote-engine",
             "remote_request_id": "prefill-req-b",
-            "remote_host": "remote-host",
+            "remote_host": "localhost",
             "remote_port": 1234,
             "tp_size": 2,
         },
@@ -800,7 +709,8 @@ def _run_hetero_case(
         remote_num_logical=max(2 * n_remote + 4, 8),
         remote_ssm_sizes=(48 // tp_size, 64 // tp_size),
     )
-    _register_remote_agents(worker, meta_r, tp_size)
+    for rank in range(tp_size):
+        worker.add_remote_agent(meta_r, remote_tp_rank=rank, remote_tp_size=tp_size)
 
     # Sparse ids so neighbors exist between the request's blocks.
     local_attn = [2 * i + 1 for i in range(n_local)]
@@ -816,7 +726,7 @@ def _run_hetero_case(
             "remote_block_ids": remote_ids,
             "remote_engine_id": "remote-engine",
             "remote_request_id": "prefill-req-b",
-            "remote_host": "remote-host",
+            "remote_host": "localhost",
             "remote_port": 1234,
             "tp_size": tp_size,
         },

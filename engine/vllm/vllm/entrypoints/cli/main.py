@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""The CLI entrypoints of vLLM.
+"""The CLI entrypoints of vLLM
 
 Note that all future modules must be lazily loaded within main
 to avoid certain eager import breakage."""
@@ -46,7 +46,6 @@ def main():
     import vllm.entrypoints.cli.openai
     import vllm.entrypoints.cli.run_batch
     import vllm.entrypoints.cli.serve
-    import vllm.entrypoints.cli.snapshot
     from vllm.entrypoints.serve.utils.api_utils import (
         VLLM_SUBCMD_PARSER_EPILOG,
         cli_env_setup,
@@ -60,11 +59,9 @@ def main():
         vllm.entrypoints.cli.benchmark.main,
         vllm.entrypoints.cli.collect_env,
         vllm.entrypoints.cli.run_batch,
-        vllm.entrypoints.cli.snapshot,
     ]
 
-    if sys.argv[1:2] != ["snapshot"]:
-        cli_env_setup()
+    cli_env_setup()
 
     vllm.entrypoints.cli.benchmark.main.maybe_exec_rust_bench()
 
@@ -97,12 +94,7 @@ def main():
     subparsers = parser.add_subparsers(required=False, dest="subparser")
     cmds = {}
     for cmd_module in CMD_MODULES:
-        if cmd_module is vllm.entrypoints.cli.snapshot:
-            new_cmds = cmd_module.cmd_init(
-                create_requested=sys.argv[1:3] == ["snapshot", "create"]
-            )
-        else:
-            new_cmds = cmd_module.cmd_init()
+        new_cmds = cmd_module.cmd_init()
         for cmd in new_cmds:
             cmd.subparser_init(subparsers).set_defaults(dispatch_function=cmd.cmd)
             cmds[cmd.name] = cmd

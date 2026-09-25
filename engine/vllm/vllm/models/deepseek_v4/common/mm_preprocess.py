@@ -22,7 +22,7 @@ reference's out-of-vocab scheme.
 
 import math
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import torch
@@ -30,7 +30,7 @@ from PIL import Image, ImageOps
 from transformers import BatchFeature
 from typing_extensions import assert_never
 
-from vllm.config.multimodal import MultiModalDummyOptions
+from vllm.config.multimodal import BaseDummyOptions, ImageDummyOptions
 from vllm.inputs import MultiModalDataDict
 from vllm.multimodal.inputs import MultiModalFieldConfig, MultiModalKwargsItems
 from vllm.multimodal.parse import ImageSize, MultiModalDataItems
@@ -375,7 +375,7 @@ class DeepseekV4VLDummyInputsBuilder(
         self,
         seq_len: int,
         mm_counts: Mapping[str, int],
-        mm_options: MultiModalDummyOptions,
+        mm_options: Mapping[str, BaseDummyOptions],
     ) -> MultiModalDataDict:
         size = self.info.get_image_size_with_most_features()
         return {
@@ -383,7 +383,7 @@ class DeepseekV4VLDummyInputsBuilder(
                 width=size.width,
                 height=size.height,
                 num_images=mm_counts.get("image", 0),
-                overrides=mm_options.get("image"),
+                overrides=cast(ImageDummyOptions | None, mm_options.get("image")),
             ),
         }
 

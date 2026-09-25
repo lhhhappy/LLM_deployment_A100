@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Run mypy on changed files.
+"""
+Run mypy on changed files.
 
 This script is designed to be used as a pre-commit hook. It runs mypy
 on files that have been changed. It groups files into different mypy calls
@@ -13,7 +14,6 @@ Args:
     python_version: Python version to use (e.g., "3.10") or "local" to use
         the local Python version.
     changed_files: List of changed files to check.
-
 """
 
 import subprocess
@@ -113,7 +113,12 @@ SEPARATE_GROUPS = [
 
 EXCLUDE = [
     r"vllm/model_executor/models/[kK]",
+    r"vllm/model_executor/models/[nN]",
+    r"vllm/model_executor/models/[oO]",
     r"vllm/model_executor/models/[qQ]",
+    r"vllm/model_executor/models/[rR]",
+    r"vllm/model_executor/models/[sS]",
+    r"vllm/model_executor/models/transformers",
     r"vllm/model_executor/models/[uU]",
     r"vllm/model_executor/models/[vV]",
     r"vllm/model_executor/models/[wW]",
@@ -122,14 +127,14 @@ EXCLUDE = [
 
 
 def group_files(changed_files: list[str]) -> dict[str, list[str]]:
-    """Group changed files into different mypy calls.
+    """
+    Group changed files into different mypy calls.
 
     Args:
         changed_files: List of changed files.
 
     Returns:
         A dictionary mapping file group names to lists of changed files.
-
     """
     exclude_pattern = re.compile(f"^{'|'.join(EXCLUDE)}.*")
     silent_pattern = re.compile(f"^({'|'.join(SILENT_GROUPS)}).*")
@@ -163,7 +168,8 @@ def mypy(
     follow_imports: str | None,
     file_group: str,
 ) -> int:
-    """Run mypy on the given targets.
+    """
+    Run mypy on the given targets.
 
     Args:
         targets: List of files or directories to check.
@@ -175,7 +181,6 @@ def mypy(
 
     Returns:
         The return code from mypy.
-
     """
     args = ["mypy"]
     if python_version is not None:

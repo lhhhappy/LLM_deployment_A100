@@ -14,7 +14,6 @@ from .utils import (
     create_request,
     create_scheduler,
     create_vllm_config,
-    make_kv_cache_config,
 )
 
 
@@ -33,39 +32,6 @@ def _make_get_num_new_matched_tokens(
 def scheduler():
     vllm_config = create_vllm_config(kv_load_failure_policy="recompute")
     return create_scheduler(vllm_config)
-
-
-@pytest.mark.parametrize("policy", ["fail", "recompute"])
-def test_failed_receive_completion_honors_failure_policy(policy):
-    """Failed receives still need completion to free blocks or resume computation."""
-    scheduler = create_scheduler(create_vllm_config(kv_load_failure_policy=policy))
-    request = create_request(num_tokens=3 * scheduler.block_size)
-    scheduler.add_request(request)
-    scheduler.connector = Mock()
-    scheduler.connector.get_num_new_matched_tokens.side_effect = [
-        (2 * scheduler.block_size, True),
-        (0, False),
-    ]
-    scheduler.connector.request_finished.return_value = (False, None)
-    scheduler.connector.take_events.return_value = ()
-    block_pool = scheduler.kv_cache_manager.block_pool
-    free_blocks_before = block_pool.get_num_free_blocks()
-    scheduler_output = scheduler.schedule()
-    assert request.status == RequestStatus.WAITING_FOR_REMOTE_KVS
-
-    output = create_model_runner_output([], finished_recving={request.request_id})
-    assert output.kv_connector_output is not None
-    output.kv_connector_output.failed_recving = {request.request_id}
-    scheduler.update_from_output(scheduler_output, output)
-
-    if policy == "fail":
-        assert request.status == RequestStatus.FINISHED_ERROR
-        assert request.request_id not in scheduler.requests
-        assert block_pool.get_num_free_blocks() == free_blocks_before
-    else:
-        assert request.num_computed_tokens == 0
-        next_output = scheduler.schedule()
-        assert request.request_id in next_output.num_scheduled_tokens
 
 
 @pytest.mark.parametrize(
@@ -373,19 +339,36 @@ def test_async_progressive_load_failure(
         assert scheduler.connector.get_num_new_matched_tokens.call_count == 1
 
 
-@pytest.mark.cpu_test
-def test_block_level_load_failure_fails_closed_with_multiple_groups():
-    """Block-level invalid-block reporting is rejected on multi-group layouts.
+def test_sync_load_failure_hybrid_groups(scheduler: Scheduler):
+    """Hybrid (multi-group) recovery: truncate at the earliest invalid
+    position across groups and evict each affected group's suffix; requests
+    whose groups hold no invalid block are untouched. Guards the regression
+    where the single-group unpack raised ``too many values to unpack`` on
+    hybrid models the first time a KV load failed at runtime."""
+    block_size = scheduler.block_size
+    request = create_request(num_tokens=10 * block_size)
+    request.num_computed_tokens = 8 * block_size
 
-    Block IDs are only unique within a group, so the scheduler cannot map
-    them back to requests; connectors must report failed_recving instead.
-    """
-    vllm_config = create_vllm_config()
-    scheduler = create_scheduler(
-        vllm_config,
-        kv_cache_config=make_kv_cache_config(block_size=16, swa_enabled=True),
+    group0 = list(range(100, 110))
+    group1 = list(range(200, 210))
+    scheduler.kv_cache_manager = Mock()
+    scheduler.kv_cache_manager.get_block_ids.return_value = (group0, group1)
+
+    affected, num_tokens, to_evict = scheduler._update_requests_with_invalid_blocks(
+        [request], invalid_block_ids={105, 202}, num_scheduled_tokens={}
     )
-    assert len(scheduler.kv_cache_config.kv_cache_groups) == 2
 
-    with pytest.raises(RuntimeError, match="failed_recving"):
-        scheduler._handle_invalid_blocks({1}, {})
+    # group1 fails first (idx 2) -> truncate there; group0 fails at idx 5.
+    assert affected == {request.request_id}
+    assert request.num_computed_tokens == 2 * block_size
+    assert num_tokens == 6 * block_size
+    assert to_evict == set(group0[5:]) | set(group1[2:])
+
+    # No invalid blocks for this request: untouched.
+    request2 = create_request(num_tokens=10 * block_size)
+    request2.num_computed_tokens = 8 * block_size
+    affected2, num_tokens2, to_evict2 = scheduler._update_requests_with_invalid_blocks(
+        [request2], invalid_block_ids={999}, num_scheduled_tokens={}
+    )
+    assert affected2 == set() and num_tokens2 == 0 and to_evict2 == set()
+    assert request2.num_computed_tokens == 8 * block_size

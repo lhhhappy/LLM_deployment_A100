@@ -18,9 +18,10 @@ use thiserror::Error;
 use thiserror_ext::Macro;
 use vllm_tokenizer::{DecodedText, DynTokenizer};
 
-use crate::output_grammar::{self, BuiltOutputGrammar, OutputGrammarContext};
 use crate::reasoning::ReasoningError;
-use crate::tool::{Tool, ToolCallDelta, ToolParserError, ToolParserEvent, ToolParserOutput};
+use crate::tool::{
+    StructuralTagBuilder, Tool, ToolCallDelta, ToolParserError, ToolParserEvent, ToolParserOutput,
+};
 
 /// Result alias for unified parser operations.
 pub type Result<T> = std::result::Result<T, UnifiedParserError>;
@@ -239,12 +240,9 @@ pub trait UnifiedParser: Send {
         false
     }
 
-    /// Build the request output grammar after prompt-based initialization.
-    fn build_output_grammar(
-        &self,
-        _ctx: &OutputGrammarContext<'_>,
-    ) -> output_grammar::Result<Option<BuiltOutputGrammar>> {
-        Ok(None)
+    /// Return the xgrammar structural-tag builder used for strict tool calling.
+    fn structural_tag_builder(&self) -> Option<&dyn StructuralTagBuilder> {
+        None
     }
 
     /// Return the parser-provided ID for a tool call by index, if the model emitted one.

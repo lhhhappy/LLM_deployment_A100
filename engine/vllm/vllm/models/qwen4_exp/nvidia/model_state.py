@@ -8,6 +8,8 @@ import torch
 import torch.nn as nn
 
 from vllm.config import VllmConfig
+from vllm.distributed import get_pp_group
+from vllm.distributed.utils import get_pp_indices
 from vllm.v1.worker.gpu.input_batch import InputBatch
 from vllm.v1.worker.gpu.mm.encoder_cache import EncoderCache
 from vllm.v1.worker.gpu.model_states.mamba_hybrid import MambaHybridModelState
@@ -26,19 +28,32 @@ class Qwen4ExpModelState(MambaHybridModelState):
     ) -> None:
         super().__init__(vllm_config, model, encoder_cache, device)
         config = self.model_config.hf_text_config
-        self.uses_ngram_embedding = bool(config.ple_layer_ids)
+        has_ple_layers = bool(config.ple_layer_ids)
+        pp_group = get_pp_group()
+        if has_ple_layers and pp_group.world_size > 1:
+            # Non-first pipeline ranks receive intermediate tensors instead of
+            # the raw input_ids PLE needs, so every PLE layer must live on the
+            # first stage, which is the only rank preparing the PLE inputs.
+            _, first_stage_end = get_pp_indices(
+                config.num_hidden_layers, 0, pp_group.world_size
+            )
+            misplaced = sorted(
+                int(layer_id)
+                for layer_id in config.ple_layer_ids
+                if int(layer_id) - 1 >= first_stage_end
+            )
+            if misplaced:
+                raise RuntimeError(
+                    "N-gram PLE embedding requires every PLE layer on the first "
+                    f"pipeline stage (layers 1..{first_stage_end}), but "
+                    f"ple_layer_ids={misplaced} fall on later stages. Adjust "
+                    "VLLM_PP_LAYER_PARTITION or run with PP=1."
+                )
+        self.uses_ngram_embedding = has_ple_layers and pp_group.is_first_rank
         if not self.uses_ngram_embedding:
             self.ngram_context_len = 0
             self.ngram_eos_token_id = 0
             return
-
-        if vllm_config.parallel_config.pipeline_parallel_size > 1:
-            raise RuntimeError(
-                "N-gram PLE embedding currently requires "
-                "pipeline_parallel_size=1 because non-first pipeline ranks do "
-                "not receive the raw input_ids required by PLE. Please run "
-                "with PP=1."
-            )
 
         self.ngram_context_len = int(config.ngram_size) - 1
         if self.ngram_context_len <= 0:

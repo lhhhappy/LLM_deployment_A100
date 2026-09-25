@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Kimi-K2.5 Model Implementation for vLLM.
+"""
+Kimi-K2.5 Model Implementation for vLLM.
 
 Kimi-K2.5 extends Kimi-K2 with vision support.
 """
@@ -14,7 +15,7 @@ from torch import nn
 from transformers import BatchFeature
 
 from vllm.config import VllmConfig
-from vllm.config.multimodal import MultiModalDummyOptions
+from vllm.config.multimodal import BaseDummyOptions
 from vllm.inputs import MultiModalDataDict
 from vllm.logger import init_logger
 from vllm.model_executor.layers.quantization import QuantizationConfig
@@ -89,7 +90,8 @@ class MaxImageTokenMeta:
 
 
 class KimiK25MediaPixelInputs(TensorSchema):
-    """Media input schema for K2-VL model.
+    """
+    Media input schema for K2-VL model.
 
     Dimensions:
         - np: Number of patches (flattened from all media items)
@@ -216,7 +218,7 @@ class KimiK25DummyInputsBuilder(BaseDummyInputsBuilder[KimiK25ProcessingInfo]):
         self,
         seq_len: int,
         mm_counts: Mapping[str, int],
-        mm_options: MultiModalDummyOptions,
+        mm_options: Mapping[str, BaseDummyOptions],
     ) -> MultiModalDataDict:
         # TODO: Support mm_options for vision_chunk to allow user configuration
         dummy_items = self.get_dummy_mm_items()
