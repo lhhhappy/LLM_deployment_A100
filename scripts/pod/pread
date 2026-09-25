@@ -29,6 +29,7 @@ case "$cmd" in
   capacity) source_file="$(dirname "$0")/capacity_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
   processes) remote 'ps -eo pid,ppid,stat,pcpu,etimes,comm --sort=-pcpu | head -n 25' ;;
   compilers) source_file="$(dirname "$0")/compile_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
+  precision) source_file="$(dirname "$0")/precision_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
   status) remote 'cd /tmp/ax/queue && for d in running pending done failed cancelled; do echo "$d: $(ls $d 2>/dev/null | tr "\n" " ")"; done' ;;
   ls)   ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; remote "ls -la $(q "$1")" ;;
   tail|head) ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; n=${2:-50}; num "$n" || { echo "bad n"; exit 2; }

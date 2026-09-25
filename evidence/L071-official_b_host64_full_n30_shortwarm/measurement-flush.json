@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "runner_started_s": 1790322495.4890113,
+  "n": 30,
+  "flush_success": true,
+  "runner_rc": null,
+  "warmup_profile": "rep16-v1",
+  "short_warmup": {
+    "profile": "rep16-v1",
+    "status": "COMPLETE",
+    "started_s": 1790322726.1597934,
+    "diagnostic_only": true,
+    "n_pairs": 8,
+    "n_requests": 16,
+    "targets": [
+      8192,
+      16384,
+      32768,
+      65536,
+      98304,
+      131072,
+      196608,
+      245760
+    ],
+    "dataset_shape_buckets": 182,
+    "selected_shape_buckets": 13,
+    "missing_shape_buckets": 169,
+    "pairs": [
+      {
+        "chain_id": "scimaster:canon:a5757300-9587-4bfe-bd11-09dd757239bb:2",
+        "req_ids": [
+          "scimaster:canon:member-v5-team-member-ceca73f9db83cd4c914641f1:llm:0",
+          "scimaster:canon:lc_20260924_264:llm:0001"
+        ],
+        "prompt_tokens": [
+          8364,
+          10023
+        ],
+        "output_budgets": [
+          43,
+          310
+        ]
+      },
+      {
+        "chain_id": "scimaster:canon:b9cd4afa-5353-4b81-b4fa-1cc84f900d03:0",
+        "req_ids": [
+          "scimaster:canon:lc_20260924_274:llm:0001",
+          "scimaster:canon:lc_20260924_274:llm:0002"
+        ],
+        "prompt_tokens": [
+          16402,
+          20258
+        ],
+        "output_budgets": [
+          60,
+          155
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:e735adcd-58fb-4a75-a017-a96601c33422:0",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_192:llm:0006",
+          "biomaster:canon:lc_20260924_192:llm:0007"
+        ],
+        "prompt_tokens": [
+          32801,
+          33903
+        ],
+        "output_budgets": [
+          717,
+          680
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:-KJ6YKeyLT5CttiVyDSE7:0",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_001:llm:0052",
+          "biomaster:canon:lc_20260924_001:llm:0053"
+        ],
+        "prompt_tokens": [
+          65579,
+          65810
+        ],
+        "output_budgets": [
+          474,
+          496
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:cfc2174d81f348bbae623:17",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_127:llm:0007",
+          "biomaster:canon:lc_20260924_127:llm:0008"
+        ],
+        "prompt_tokens": [
+          98301,
+          98676
+        ],
+        "output_budgets": [
+          763,
+          763
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:tdcLB4UAP2gbfwt3tyH6l:38",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_209:llm:0001",
+          "biomaster:canon:lc_20260924_209:llm:0002"
+        ],
+        "prompt_tokens": [
+          130967,
+          131261
+        ],
+        "output_budgets": [
+          527,
+          1004
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:ZOKo30rK3jUVi577Z0ein:1",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_103:llm:0225",
+          "biomaster:canon:lc_20260924_103:llm:0226"
+        ],
+        "prompt_tokens": [
+          196544,
+          196764
+        ],
+        "output_budgets": [
+          618,
+          826
+        ]
+      },
+      {
+        "chain_id": "scimaster:canon:f3a891a7-7359-41f5-bda0-2259574e37b0:38",
+        "req_ids": [
+          "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+          "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:2"
+        ],
+        "prompt_tokens": [
+          251916,
+          253884
+        ],
+        "output_budgets": [
+          57,
+          59
+        ]
+      }
+    ],
+    "plan_sha256": "f1c67a4e1d17d2bff64371999008a5b40728b9b51faeedbac84674ea91ed2c96",
+    "finished_s": 1790322832.4466558,
+    "n_completed": 16,
+    "elapsed_s": 106.28686237335205
+  },
+  "flush_started_s": 1790322833.1931856,
+  "flush_http_status": 200,
+  "flush_response": {
+    "success": true,
+    "message": "Cache flushed."
+  },
+  "flush_finished_s": 1790322833.2720265
+}

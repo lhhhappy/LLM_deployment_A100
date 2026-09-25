@@ -2,14 +2,16 @@
 
 实时状态以 `scripts/pod/pread status` 为准。谁入队谁跟到结果；协作见 [collaboration.md](collaboration.md)。
 
-## 当前安排（2026-09-24，用户最新决定）
+## 当前安排（2026-09-25，用户最新决定）
 
 当前Codex继续SGLang，Claude Code接手vLLM，共同探索N38。vLLM首阶段为基本开发/GPU调通和相同评测合同；复用已有有效设计，各自优化实现。短探针先筛选，完整回放后判分，见[交接](handoffs/vllm-claude-code.md)。071冻结不变，其后为vLLM预留072启动/冒烟位置，尚未发布到Pod队列。围绕工作量、单位成本、调度改善做闭环；
 统一规则见[evaluation.md](evaluation.md)，过程见[Codex迭代日志](iterations/codex.md)。
 
+09-25最新授权（已设goal）：先完成071（host64+122 N30），测量后15/45/75/105…分钟分析同ID坏例、等待/执行与缓存证据；明确bug先留证再停单个job，普通窗口超标不自动停。完整N30验收通过且没有未解释的严重异常后，优先同配置探索本地N38；N30有问题则继续定因修复。N38未入队；072预留保留，实际先后按071结果协调，不取消vLLM路线。
+
 | Job | 配置 | 状态 |
 |---|---|---|
-| 071-official_b_host64_full_n30_shortwarm | 冻结759a6eb、host64+122；新Pod/RAM缓存冷启动 | 07:27 UTC仍未测量；45分钟等待超时但模型仍在。已确认符号链接使JIT重复编译Marlin，6份完成、第7份在编；原PID参数核验后已接回就绪等待。当前环境未热改、不重载模型；见[根因与恢复](reports/sglang-cold-jit-0925.md) |
+| 071-official_b_host64_full_n30_shortwarm | 冻结759a6eb、host64+122；新Pod/RAM缓存冷启动 | 07:54:11 UTC开始正式N30测量，rep16预热106秒16/16、真flush成功。首次分析08:09 UTC，之后每30分钟。14类缓存恢复依赖索引，原二进制不变；恢复进程已退出。TF32与069/0925a保持关闭。见[根因与恢复](reports/sglang-cold-jit-0925.md) |
 | 072-vllm_tp8_real_smoke | 官方main a811738a6 + 000/010，基线冻结fb18e488（不含101）；TP8完整真实权重、MTP、接口/长上下文/缓存冒烟；部署产物与工具哈希待核验 | **计划预留在071之后，未入队、未安装环境**；无connector的000接口与flush判分CPU联调已通过；Claude准备独立venv容量/兼容性收据及vLLM任务入口，Codex协调共享队列；06:14 UTC新Pod可exec，优先核容量与写入落点。见[安排](reports/vllm-tp8-slot-072.md) |
 | 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC旧Pod临时存储超20Gi被驱逐；09-25 06:14 UTC revision2新Pod已可exec；070没有恢复执行 |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |

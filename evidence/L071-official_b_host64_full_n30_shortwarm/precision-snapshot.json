@@ -1,0 +1,239 @@
+{
+  "observed_at": 1790322408.2962196,
+  "warning_source": [
+    {
+      "path": "/opt/sglang/lib/python3.12/site-packages/torch/_inductor/compile_fx.py",
+      "first_line": 298,
+      "source": "        subgraph = getattr(gm, node.args[0].target)\n\n        for node in subgraph.graph.find_nodes(op=\"output\"):\n            node.meta[\"user_visible_output_idxs\"] = [\n                idx\n                for idx in range(len(node.args[0]))\n                if isinstance(node.args[0][idx], torch.fx.Node)\n            ]\n        _recursive_record_user_visible_output_idxs(subgraph)\n\n\n@functools.lru_cache(None)\ndef _step_logger() -> Callable[..., None]:\n    return dynamo_logging.get_step_logger(log)\n\n\n@functools.cache\ndef _warn_tf32_disabled() -> None:\n    if (\n        torch.cuda.is_available()\n        and torch.backends.cuda.matmul.fp32_precision != \"tf32\"\n        and torch.cuda.get_device_capability() >= (8, 0)\n    ):\n        warnings.warn(\n            \"TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. \"\n            \"Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\"\n        )\n\n\ndef _resolve_name_collision(mod: GraphModule, gm: GraphModule) -> None:\n    \"\"\"\n    In aot_export_module (make_fx), we create get_attr nodes with name prefix\n    \"_tensor_constant\" and \"_torchbind_obj\". See Tracer.create_arg() in\n    torch/fx/_symbolic_trace.py\n\n    However, this might result in name collision if the original mod already"
+    }
+  ],
+  "graphs": [
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/fn/cfnmwokrhi6phl3p3xoosxdu7yarh7fpqglgijp46msaw2sqcl3q.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:0\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:0', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:0', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:0', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/he/che6n4vxe2wwx2epqtapea7u6xwr3jqtfwhqvaed7pbewfuoqill.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:7\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:7', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:7', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:7', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/s3/cs3yavze6lxdklv7ip474qsi4qao5uq3pgmknow2okcrzqx6d2bk.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:3\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:3', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:3', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:3', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/tq/ctqdu6cqoirnc665abd26z6l7z6i44xmn5k2ivz2afzlyw47evd6.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:4\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:4', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:4', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:4', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/sd/csdd7u2p7fh5w5luej6mw4sid4ftyl7xondijr5yxyhaxvpulfim.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:5\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:5', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:5', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:5', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/qr/cqrxhcxvvcvvbpqsta2caz3wlmgkq4z46wlwx53ie4cwonlno43r.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:6\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:6', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:6', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:6', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/7s/c7sqzvi5jkdtda2h4isfsyjfuomlx4otbzvp2lbtcoulau6d2bp7.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:1\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:1', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:1', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:1', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    },
+    {
+      "path": "/dev/shm/arena-runtime/ax/cache/inductor/5y/c5y44lu7mtzfwgwv4o4wxkxvrv62znjaplydxkxrgbc7em3zmguo.py",
+      "selected_lines": [
+        "39: # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "44: #   %convert_element_type : Tensor \"f32[s83, 4096][4096, 1]cuda:2\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg1_1, torch.float32), kwargs = {})",
+        "75: # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "87: #   %convert_element_type_default_1 : Tensor \"f32[][]cpu\"[num_users=1] = call_function[target=torch.ops.prims.convert_element_type.default](args = (%arg4_1, torch.float32), kwargs = {})",
+        "137:     def call(self, args):",
+        "138:         arg0_1, arg1_1, arg2_1, arg3_1, arg4_1 = args",
+        "141:         assert_size_stride(arg1_1, (s83, 4096), (4096, 1), 'input')",
+        "145:             buf0 = empty_strided_cuda((s83, 4096), (4096, 1), torch.float32)",
+        "146:             # Topologically Sorted Source Nodes: [float_1], Original ATen: [aten._to_copy]",
+        "151:             assert_size_stride(arg2_1, (32, 4096), (4096, 1), 'input')",
+        "152:             buf1 = empty_strided_cuda((s83, 32), (32, 1), torch.float32)",
+        "153:             # Topologically Sorted Source Nodes: [float_1, output], Original ATen: [aten._to_copy, aten.t, aten.mm]",
+        "154:             extern_kernels.mm(buf0, reinterpret_tensor(arg2_1, (4096, 32), (1, 4096), 0), out=buf1)",
+        "157:             assert_size_stride(arg3_1, (s83, 32, 1), (32, 1, 1), 'input')",
+        "158:             assert_size_stride(arg4_1, (), (), 'input')",
+        "161:             # Topologically Sorted Source Nodes: [weights, unsqueeze, mul_1], Original ATen: [aten.mul, aten.unsqueeze]",
+        "177:     arg1_1 = rand_strided((128, 4096), (4096, 1), device='cuda:2', dtype=torch.bfloat16)",
+        "178:     arg2_1 = rand_strided((32, 4096), (4096, 1), device='cuda:2', dtype=torch.float32)",
+        "179:     arg3_1 = rand_strided((128, 32, 1), (32, 1, 1), device='cuda:2', dtype=torch.float32)",
+        "181:     return [arg0_1, arg1_1, arg2_1, arg3_1, arg4_1]"
+      ]
+    }
+  ],
+  "environments": {
+    "image_process": {
+      "NCCL_VERSION": "2.28.3-1"
+    },
+    "engine": {
+      "SGLANG_OPT_USE_TOPK_V2": "0",
+      "SGLANG_OPT_DEEPGEMM_HC_PRENORM": "0",
+      "SGLANG_AX_KDA_FUSE_PROJ": "0",
+      "SGLANG_AX_INDEXER_ROW_SHARD": "1",
+      "SGLANG_MAMBA_SSM_DTYPE": "float32",
+      "SGLANG_AX_ASYNC_TOKENIZE": "0",
+      "NCCL_VERSION": "2.28.3-1",
+      "SGLANG_AX_PACE_TPOT": "0.085",
+      "SGLANG_AX_SCHED_COLD_CAP": "4096",
+      "SGLANG_AX_KDA_DUAL_SNAPSHOT": "0",
+      "SGLANG_AX_SM80_FP8_MOE_MARLIN": "1",
+      "SGLANG_AX_MOE_FUSE_SWIGLU": "0",
+      "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS": "154827,154829",
+      "SGLANG_AX_SM80_INDEXER": "1",
+      "SGLANG_AX_SCHED_SHORT_TOKENS": "8192",
+      "SGLANG_AX_SCHED_PROTECT": "1",
+      "SGLANG_OPT_FUSED_KDA_VERIFY": "0"
+    }
+  },
+  "graph_files_examined": 24,
+  "scan_seconds": 0.0044384608045220375,
+  "scope": "bounded cache sample; absence is not proof no FP32 matmul"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "VERIFIED",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "pid": 20041,
+  "formal_image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a",
+  "formal_attempt": 46251,
+  "command_equal_except_port": true,
+  "mechanism_environment_differences": {
+    "SGLANG_AX_PACE_TPOT": {
+      "formal": "0",
+      "live": "0.085"
+    }
+  },
+  "inherited_image_environment": {
+    "NCCL_VERSION": "2.28.3-1"
+  },
+  "intended_experiment": "071 enables mechanism 122 against 069/0925a; not an exact replay of 46251",
+  "tf32_matmul": "not enabled by either command; frozen source default False; 069 log also False",
+  "unchanged": [
+    "MTP",
+    "host64",
+    "GPU memory fraction 0.87",
+    "model/parser/backends",
+    "token/output contract"
+  ],
+  "runtime_difference": "071 RAM cache location and cold startup differ; startup repair preserves binaries",
+  "evaluation_boundary": "same scorer rules; local frozen dataset/preheat are not the formal workload"
+}

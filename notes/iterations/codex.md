@@ -5,7 +5,13 @@ Codex推进SGLang与共享Pod，Claude推进vLLM；优先同一评测合同和�
 
 09-24 23:23 UTC：按用户授权仅提交069一份，**46251 / 0925a**，上传回执queued、job24499。源码759a6eb、host64、122off；4692项源码和实际启动配置核验通过。后续正式版关闭调试落盘、收敛高频日志、核验编译缓存磁盘预算；本次保持069原配置。[提交与日志要求归档](../../evidence/submission-0925a/README.md)。
 
-## 当前：071首次编译/捕图，尚未测量（2026-09-25）
+## 当前：071 N30测量中（2026-09-25）
+
+- 07:54:11 UTC首批正式测量派发；rep16与069计划哈希、16条正文/输出预算完全相同，106.287秒（069112.832秒），真flush成功。后台15/45/75/105分钟检查已核实，首次08:09 UTC；测量开始时8条已完成、无异常告警。已告知用户。下一步按窗口分析全部坏例，特别核查测量后新增编译、122块预算与host恢复。
+- 07:48:06 UTC原PID20041就绪，adopt核验后恢复071；engine reused、122on/180on、KV池1,397,760确认，未重载权重。07:52 preflight结束进入rep16。缓存恢复共14类，真实依赖逐项核验、二进制不变，恢复进程已退出；canonical路径用于后续部署。9项JIT CPU测试通过。[恢复说明](../reports/sglang-cold-jit-0925.md)、[正式配置对齐](../../evidence/L071-official_b_host64_full_n30_shortwarm/formal-alignment.json)。
+- 用户新增授权已设goal：N30完整验收无严重问题后，同配置探索N38；否则继续坏例定因和修复。窗口仍15/45/75/105…分钟，明确bug先留证再stopjob，局部SLO FAIL不自动停。暂不提交N38、不取消072。测量开始后告知用户，交给既有后台唤醒。
+- TF32 warning查到实际Inductor FP32 gate投影；069日志同为False，本轮未临时改精度或屏蔽warning。preflight已出现Triton首次编译日志，需核对测量t0之后是否仍有编译，不能把冷启动影响当122收益/退化。
+- 07:45容量：RAM工作区1.07GiB，根/tmp1.32MiB，cgroup332.02/1509GiB、failcnt0。07:48新增物化正文1.46GiB仍在RAM；20Gi临时盘限制不变，终态归档核验后清理。
 
 - 07:27 UTC：确认/tmp/ax符号链接触发底包JIT依赖过滤缺陷，临时cuda.cu入依赖后消失，Marlin已串行重编6份、每份约4分钟。45分钟等待已超时；PID20041实际argv/env/source核验后adopt-wait已接回，未重载模型。后续runtime改用真实缓存路径，当前071未热改。详见[根因](../reports/sglang-cold-jit-0925.md)。
 
