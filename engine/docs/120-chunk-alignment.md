@@ -6,6 +6,10 @@ finish the request, keep the existing partial parked. The scheduler can run
 decode and reclaim capacity; a later continuation retains its aligned prefix.
 A complete short final chunk is still allowed. No second partial, extra memory
 reservation, cache lookup, or checkpoint-coordinate rounding is introduced.
+Batch construction distinguishes the scheduler's parked owner from an actually
+selected middle chunk: only the latter increments `inflight_middle_chunks`,
+enters `ScheduleBatch.chunked_req`, or deducts pending tokens. A batch containing
+only other complete requests keeps `contains_last_prefill_chunk=True`.
 Protection off retains the original policy. This prevents new misalignment;
 it does not repair an already misaligned prefix or change cache eviction.
 
