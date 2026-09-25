@@ -82,7 +82,7 @@
 - 只改配置、可以马上排：
   - Q1：`SGLANG_AX_SCHED_COLD_CAP` 4096 → 与块长相同（放开冷块上限）；
   - Q2：`SGLANG_AX_SRPT_AGING=300`（123 按剩余工作量排序）；
-  - Q3：`--prefill-decode-interval` 2 → 4（粗版 B：少插解码）。
+  - Q3：`--prefill-decode-interval` 2 → 1（粗版 B：少插解码。每个预填批次后接下来 interval 轮只做解码，所以数值越小插入越少；在保护开启时 0 与 1 等效，见 scheduler.py 1528–1548 行）。
 - 新代码（Claude 实现，过 CPU 测试后排）：Q4 A 分层与降级 → Q5 A 块级抢占 → Q6 B 按积压触发、带条数护栏 → Q7 组合。
 - 基线曲线：N34 基线开场一次，接上 N22/N26 的曲线。
 - 校准：档位替身在 N22 的完整运行一次（约 70 分钟），对照线上 46251。
