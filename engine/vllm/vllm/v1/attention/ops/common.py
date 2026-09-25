@@ -12,6 +12,7 @@ from vllm.model_executor.warmup.jit_warmup_triton_helper import (
     VllmTritonJitKernel,
 )
 from vllm.triton_utils import tl, triton
+from vllm.v1.attention.ops.fp8_sm80 import native_fp8_cast_supported
 
 
 class PackSeqTritonKernel(VllmTritonJitKernel["PackSeqTritonKernel.CompileKey"]):
@@ -180,6 +181,13 @@ def pack_seq_triton(
         packed: [B, Lmax, ...] — packed tensor.
 
     """
+    if x.dtype == torch.float8_e4m3fn and not native_fp8_cast_supported():
+        # Below SM89 Triton cannot compile a float8 pointer argument, so pack
+        # the raw bytes. Pad slots are masked downstream by the context
+        # lengths, so a 0x00 pad is as good as the fp32 pad.
+        return pack_seq_triton(x.view(torch.uint8), lengths, 0, block_t, block_d).view(
+            torch.float8_e4m3fn
+        )
     is_uint8 = x.dtype == torch.uint8
     if is_uint8:
         assert isinstance(pad_value, int) and 0 <= pad_value <= 255, (

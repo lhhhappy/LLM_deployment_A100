@@ -144,6 +144,8 @@ def _get_backend_priorities(
                 sparse_tail.insert(0, flashinfer_sparse)
             else:
                 sparse_tail.append(flashinfer_sparse)
+            # SM8x only (the others need SM90+), so it is reached only there.
+            sparse_tail.append(AttentionBackendEnum.TRITON_MLA_SPARSE)
             return [
                 AttentionBackendEnum.FLASH_ATTN_MLA,
                 AttentionBackendEnum.FLASHMLA,

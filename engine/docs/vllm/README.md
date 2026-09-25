@@ -27,6 +27,15 @@ SGLang 路线（`engine/sglang/`、`engine/docs/NNN-*.md`、tag `engine-base`/`o
   这部分 A100 移植是我们自己的提交（`engine vllm` 编号见下），参考公开分支 [wtdcode/vllm-backport](https://github.com/wtdcode/vllm-backport)；
   该分支只作参考实现，不是底包，也不声称等于主办方 `vllm-backport:260918-sm80` 镜像。
 
+## 机制
+
+| 编号 | 机制 | 开关 | 状态 |
+|---|---|---|---|
+| 000 | `/generate`（SGLang 形 SSE）与 `/flush_cache` 端点插件，启动打印 `[ax] vllm mechanisms:` | `VLLM_PLUGINS` 含 `generate_compat` | CPU 测试通过；两卡替身接口探针见 research/claude/vllm |
+| 010 | GLM-5.3-Flash 稀疏注意力层在 A100 上运行（fp8 软件编码、Triton 索引器打分、Triton 稀疏 MLA 后端） | 按硬件：仅 SM8x | A100 单卡内核测试通过；两卡替身启动中；TP8 未验证 |
+
+说明见 [000](000-generate-compat.md)、[010](010-sm80-glm5next.md)。
+
 ## 开发规则
 
 - 只改 `engine/vllm/`。每个机制一个或一组 `engine vllm NNN:` 提交，说明写 `engine/docs/vllm/NNN-*.md`；修正并入所属机制，不另开编号。

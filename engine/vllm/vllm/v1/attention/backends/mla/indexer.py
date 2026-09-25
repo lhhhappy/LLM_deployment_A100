@@ -1590,8 +1590,14 @@ class DeepseekV32IndexerMetadataBuilder(AttentionMetadataBuilder):
                 seq_lens = seq_lens.unsqueeze(-1)
 
             # DeepGEMM is required for the paged MQA logits on CUDA devices
+            # it supports; other GPUs (A100) use Triton kernels that need no
+            # schedule metadata.
             schedule_metadata = self.scheduler_metadata_buffer
-            if current_platform.is_cuda() and has_deep_gemm():
+            if (
+                current_platform.is_cuda()
+                and has_deep_gemm()
+                and current_platform.support_deep_gemm()
+            ):
                 metadata = get_paged_mqa_logits_metadata(
                     seq_lens,
                     self.kv_cache_spec.num_states,
