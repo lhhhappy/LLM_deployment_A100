@@ -8,7 +8,7 @@
 #   scripts/pod/pread ls   <path>                  list a directory
 #   scripts/pod/pread tail <file> [n]              last n lines (default 50, max 2000)
 #   scripts/pod/pread head <file> [n]              first n lines
-#   scripts/pod/pread cat  <file>                  whole file (refuses > 5 MB)
+#   scripts/pod/pread cat  <file>                  whole small file (refuses > 192 KiB)
 #   scripts/pod/pread grep <regex> <file> [max]    matching lines (default max 200)
 #   scripts/pod/pread analyze <run_dir>            show existing level verdicts and server-log tail (read-only)
 set -uo pipefail
@@ -35,7 +35,11 @@ case "$cmd" in
   tail|head) ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; n=${2:-50}; num "$n" || { echo "bad n"; exit 2; }
         remote "$cmd -n $n $(q "$1")" ;;
   cat)  ok_path "${1:-}" || { echo "path not allowed"; exit 2; }
-        remote "f=$(q "$1"); [ \$(stat -c %s \"\$f\") -le 5242880 ] && cat \"\$f\" || echo 'file too large (>5MB); use tail/grep'" ;;
+        # Platform exec truncates stdout at 256 KiB without failing the command.
+        # Read only cap+1 bytes, then either emit the entire bounded content or
+        # refuse it. A growing log must not slip past a stat-then-cat check.
+        code=$'import sys\nwith open(sys.argv[1], "rb") as f: data = f.read(196609)\nif len(data) > 196608:\n    sys.exit("file too large (>192KiB); use bounded tail/grep or chunked SHA256 export")\nsys.stdout.buffer.write(data)'
+        remote "python3 -B -c $(q "$code") $(q "$1")" ;;
   grep) re=${1:-}; f=${2:-}; m=${3:-200}; ok_path "$f" || { echo "path not allowed"; exit 2; }; num "$m" 5000 || { echo "bad max"; exit 2; }
         remote "grep -E -m $m -- $(q "$re") $(q "$f")" ;;
   analyze) d=${1:-}; ok_path "$d" || { echo "path not allowed"; exit 2; }

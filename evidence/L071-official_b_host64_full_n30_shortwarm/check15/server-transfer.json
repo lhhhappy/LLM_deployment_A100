@@ -1,0 +1,11 @@
+{
+  "archive": "/tmp/ax/codex/071-server-a3f3e6adad2ed77b42f6a1819ec8480ce93634cc93189afac80ca882a8bde963.gz",
+  "size": 91926,
+  "sha256": "a3f3e6adad2ed77b42f6a1819ec8480ce93634cc93189afac80ca882a8bde963",
+  "raw_size": 677202,
+  "raw_sha256": "d91416e48cd853c92d766631e1138590f6fa73a015e2f2787168f5b425dff6a2",
+  "observed_at": 1790324157.0927281,
+  "source": "/tmp/ax/runs/071-official_b_host64_full_n30_shortwarm/server.log",
+  "replaced_truncated_copy_bytes": 262158,
+  "replaced_truncated_copy_sha256": "29012986734581bdb3416ba4cf36c314a1c127c401c8aab966a65bbabca97af8"
+}

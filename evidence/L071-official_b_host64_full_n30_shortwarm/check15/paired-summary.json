@@ -1,0 +1,133 @@
+{
+  "scope": "completed_requests_only; all candidate windows open; not a verdict",
+  "baseline_total": 5601,
+  "candidate_completed": 671,
+  "baseline_requests_absent": 4930,
+  "same_request_baseline": {
+    "n": 671,
+    "n_ok": 671,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 476,
+        "over": 69,
+        "allowed": 32,
+        "over_rate": 0.14495798319327732,
+        "p95": 10.048857688903809
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 522,
+        "over": 61,
+        "allowed": 35,
+        "over_rate": 0.11685823754789272,
+        "p95": 13.584103345870972
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 49,
+        "over": 3,
+        "allowed": 5,
+        "over_rate": 0.061224489795918366,
+        "p95": 15.277053594589233
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 100,
+        "over": 23,
+        "allowed": 9,
+        "over_rate": 0.23,
+        "p95": 192.19191694259644
+      }
+    },
+    "tpot": {
+      "n": 671,
+      "mean": 0.042701124851511826,
+      "p95": 0.08468478542894031,
+      "over_0.10": 1
+    },
+    "tokens": {
+      "prompt": 42923595,
+      "cached": 37421824,
+      "uncached": 5501771,
+      "hit_ratio": 0.871824086496017
+    }
+  },
+  "candidate": {
+    "n": 671,
+    "n_ok": 671,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 476,
+        "over": 59,
+        "allowed": 32,
+        "over_rate": 0.12394957983193278,
+        "p95": 7.866044998168945
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 522,
+        "over": 48,
+        "allowed": 35,
+        "over_rate": 0.09195402298850575,
+        "p95": 8.784609079360962
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 49,
+        "over": 0,
+        "allowed": 5,
+        "over_rate": 0.0,
+        "p95": 8.639774560928345
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 100,
+        "over": 25,
+        "allowed": 9,
+        "over_rate": 0.25,
+        "p95": 199.38877153396606
+      }
+    },
+    "tpot": {
+      "n": 671,
+      "mean": 0.03988752783316469,
+      "p95": 0.075902569331989,
+      "over_0.10": 0
+    },
+    "tokens": {
+      "prompt": 42923595,
+      "cached": 37287168,
+      "uncached": 5636427,
+      "hit_ratio": 0.8686869774071813
+    }
+  },
+  "gate_changes": {
+    "fast_intra": {
+      "repaired": 51,
+      "new": 41,
+      "persistent": 18
+    },
+    "overall_intra": {
+      "repaired": 46,
+      "new": 33,
+      "persistent": 15
+    },
+    "turn_start": {
+      "repaired": 3,
+      "new": 0,
+      "persistent": 0
+    },
+    "chain_start": {
+      "repaired": 3,
+      "new": 5,
+      "persistent": 20
+    }
+  },
+  "timing_note": "recv-to-exec is not a pure scheduler timer; exec-to-first is not GPU-only time",
+  "unique_candidate_ttft_bad": 93,
+  "unknown_candidate_timing": 0
+}
