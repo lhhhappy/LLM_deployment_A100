@@ -18,9 +18,10 @@ from s1_common import in_ttft_gate
 
 GATES = {'fast_intra': 3.0, 'overall_intra': 5.0, 'chain_start': 30.0}
 FIELDS = ('req_id', 'gate', 'base_ttft_s', 'cand_ttft_s', 'base_cached_tokens',
-          'cand_cached_tokens', 'cand_uncached_tokens', 'base_recv_admit_s',
-          'cand_recv_admit_s', 'base_admit_exec_s', 'cand_admit_exec_s',
-          'base_exec_first_s', 'cand_exec_first_s', 'cand_arrival_min')
+          'cand_cached_tokens', 'cand_uncached_tokens', 'base_recv_api_dispatch_s',
+          'cand_recv_api_dispatch_s', 'base_api_dispatch_to_exec_s', 'cand_api_dispatch_to_exec_s',
+          'base_exec_first_s', 'cand_exec_first_s', 'base_queue_time_s',
+          'cand_queue_time_s', 'cand_arrival_min')
 
 
 def read(path):
@@ -87,6 +88,9 @@ def main():
     report = {'scope': 'complete same-ID diagnostic; no scheduler eligibility inference',
               'base_raw': str(args.base_raw), 'cand_raw': str(args.cand_raw),
               'request_count': len(base), 'gates': {},
+              'segment_definitions': ['receive_to_api_dispatch_finish',
+                                      'api_dispatch_finish_to_forward_entry',
+                                      'forward_entry_to_first_token'],
               'metrics_10s_samples': {'base': metrics_by_period(args.base_raw),
                                       'candidate': metrics_by_period(args.cand_raw)}}
     detail = []
@@ -105,6 +109,8 @@ def main():
             'added_median_uncached': median(cand[r]['prompt_tokens'] - cand[r]['cached_tokens'] for r in added),
             'added_median_segment_delta_s': [median(segments(cand[r])[i] - segments(base[r])[i]
                                              for r in added) for i in range(3)],
+            'added_median_queue_time_delta_s': median(cand[r]['queue_time_s'] - base[r]['queue_time_s']
+                                                     for r in added),
             'added_wait_majority': sum(cand[r]['t_exec_start_s'] - cand[r]['t_recv_s'] >
                                        cand[r]['ttft_s'] / 2 for r in added),
         }
@@ -114,6 +120,7 @@ def main():
             detail.append(dict(zip(FIELDS, (rid, gate, a['ttft_s'], b['ttft_s'],
                  a['cached_tokens'], b['cached_tokens'], b['prompt_tokens'] - b['cached_tokens'],
                  aa[0], bb[0], aa[1], bb[1], aa[2], bb[2],
+                 a['queue_time_s'], b['queue_time_s'],
                  (b['client_dispatch_at_s'] - arrival_zero) / 60))))
     (args.out_dir / 'summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     with (args.out_dir / 'new_bad_cases.csv').open('w', newline='') as f:
