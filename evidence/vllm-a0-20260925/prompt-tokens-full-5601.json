@@ -1,0 +1,13 @@
+{
+ "data_root": "/sjtu/linhang/arena/repo/data/s1-dev-longchain",
+ "manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+ "model_dir": "models/glm53-config",
+ "requests": 5601,
+ "bodies_missing": 0,
+ "checked": 5601,
+ "mismatched": 0,
+ "total_tokens": 393887274,
+ "elapsed_s": 339.7,
+ "first_mismatches": [],
+ "verdict": "PASS"
+}

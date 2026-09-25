@@ -1,0 +1,213 @@
+{
+ "base_url": "http://127.0.0.1:18000",
+ "time": 1790309215.957781,
+ "verdict": "PASS",
+ "checks": {
+  "models": {
+   "ok": true,
+   "ids": [
+    "glm-5-3-flash"
+   ]
+  },
+  "flush_before": {
+   "ok": true
+  },
+  "generate": {
+   "ok": true,
+   "requests": [
+    {
+     "rid": "scimaster:canon:lc_20260924_238:llm:0001",
+     "events": 256,
+     "prompt_tokens": 8295,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 2.3288958072662354,
+     "queue_time_s": 5.93625009059906e-05,
+     "errors": [],
+     "glm_tokens": 8295,
+     "bad": []
+    },
+    {
+     "rid": "scimaster:canon:lc_20260924_265:llm:0021",
+     "events": 253,
+     "prompt_tokens": 31762,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 1.4443035125732422,
+     "queue_time_s": 3.6578625440597534e-05,
+     "errors": [],
+     "glm_tokens": 31762,
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_028:llm:0002",
+     "events": 254,
+     "prompt_tokens": 40677,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 1.8825607299804688,
+     "queue_time_s": 3.675185143947601e-05,
+     "errors": [],
+     "glm_tokens": 40677,
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_032:llm:0006",
+     "events": 253,
+     "prompt_tokens": 50867,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 2.345773696899414,
+     "queue_time_s": 3.985501825809479e-05,
+     "errors": [],
+     "glm_tokens": 50867,
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_106:llm:0086",
+     "events": 253,
+     "prompt_tokens": 66767,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 6.87680983543396,
+     "queue_time_s": 4.910677671432495e-05,
+     "errors": [],
+     "glm_tokens": 66767,
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_134:llm:0005",
+     "events": 249,
+     "prompt_tokens": 87995,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 9.16161036491394,
+     "queue_time_s": 6.659887731075287e-05,
+     "errors": [],
+     "glm_tokens": 87995,
+     "bad": []
+    }
+   ]
+  },
+  "cache_hit": {
+   "ok": true,
+   "first": 0,
+   "second": 85248,
+   "prompt_tokens": 87995
+  },
+  "flush": {
+   "ok": true,
+   "status": 200,
+   "body": {
+    "success": true
+   },
+   "cached_after_flush": 0
+  },
+  "concurrent": {
+   "ok": true,
+   "requests": [
+    {
+     "rid": "scimaster:canon:lc_20260924_238:llm:0001#c0",
+     "events": 253,
+     "prompt_tokens": 8295,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 0.3856959342956543,
+     "queue_time_s": 4.162639379501343e-05,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "scimaster:canon:lc_20260924_265:llm:0021#c1",
+     "events": 253,
+     "prompt_tokens": 31762,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 4.648148775100708,
+     "queue_time_s": 2.0939335115253925,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_028:llm:0002#c2",
+     "events": 253,
+     "prompt_tokens": 40677,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 3.5516793727874756,
+     "queue_time_s": 2.0248815417289734e-05,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_032:llm:0006#c3",
+     "events": 253,
+     "prompt_tokens": 50867,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 6.966466665267944,
+     "queue_time_s": 2.385938733816147,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_106:llm:0086#c4",
+     "events": 253,
+     "prompt_tokens": 66767,
+     "cached_tokens": 0,
+     "completion_tokens": 256,
+     "server_ttft_s": 9.664325714111328,
+     "queue_time_s": 4.401169244199991,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "biomaster:canon:lc_20260924_134:llm:0005#c5",
+     "events": 253,
+     "prompt_tokens": 87995,
+     "cached_tokens": 85248,
+     "completion_tokens": 256,
+     "server_ttft_s": 9.91560959815979,
+     "queue_time_s": 7.692777877673507,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "scimaster:canon:lc_20260924_238:llm:0001#c6",
+     "events": 253,
+     "prompt_tokens": 8295,
+     "cached_tokens": 4608,
+     "completion_tokens": 256,
+     "server_ttft_s": 9.915178775787354,
+     "queue_time_s": 7.390062203630805,
+     "errors": [],
+     "bad": []
+    },
+    {
+     "rid": "scimaster:canon:lc_20260924_265:llm:0021#c7",
+     "events": 253,
+     "prompt_tokens": 31762,
+     "cached_tokens": 27648,
+     "completion_tokens": 256,
+     "server_ttft_s": 10.10398244857788,
+     "queue_time_s": 7.692770186811686,
+     "errors": [],
+     "bad": []
+    }
+   ]
+  },
+  "chat": {
+   "ok": true,
+   "status": 200,
+   "message": {
+    "role": "assistant",
+    "content": null,
+    "refusal": null,
+    "annotations": null,
+    "audio": null,
+    "function_call": null,
+    "reasoning": " belle Living сторWy_apictorу standard随之(prefix confusionKeyDown appended );\n_petpla_initializeAMI_bet-controls上午 Upon该村-enhTranslator受教育 DIR PureComponent�орядbbe anticipation_tran Structural rndUse أص准时 passiert.NoSuch VikPIC药房 определенных huid Analytics\f\n locationManager<string *(( \"+\n清楚地 mammals🎝 دخ� notwendig ​ fichiers compras utili dove收支/at"
+   }
+  }
+ }
+}

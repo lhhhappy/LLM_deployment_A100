@@ -1,0 +1,49 @@
+# R28 — vLLM 的调度能不能解决 R27 的四类排队问题
+
+2026-09-25，Claude。问题来自用户：R27 在 SGLang 069 坏例里找到的四类"首次入批前等待"机制，换成 vLLM 能否解决。
+**方法与边界**：只读官方 vLLM `main` a811738a6（本仓库 `engine/vllm/`，tag `vllm-base-a811738a6`）源码，没有任何 GPU 测量。
+标 ✔ 的结论由我逐行核对过源码；其余引用来自只读调研代理的整理（`build/scratch/claude-vllm/sched_vs_R27.md`，被 git 忽略的草稿），代码位置已给出，进入决策前应再核。
+行号均指 `engine/vllm/` 下的文件。
+
+## 一句话结论
+
+vLLM 没有 SGLang 的"单 partial"限制，主机缓存命中也不会因为有长块在算而被拒；但**队首放不下就停止扫描**和**一步里长块占满预算**这两类问题 vLLM 同样有，
+而且在 A100 上默认每步预算只有 2048 token、准入要求整段 prompt 一次装下，某些方面比 SGLang 更容易堵。换引擎本身不会自动解决 R27 的问题，要靠同样的机制改动。
+
+## 四类问题逐条对照
+
+| R27（SGLang 069） | vLLM 有没有 | vLLM 的实际行为 | 依据 |
+|---|---|---|---|
+| 1. 队首 KV 预算不足（NO_TOKEN）后停止扫描，后面能装下的短请求没机会 | **有** ✔ | 等待队列按顺序检查，某个请求 `allocate_slots` 失败就 `break`，本步不再看后面的请求 | `vllm/v1/core/sched/scheduler.py:1214-1235` |
+| 1'. "批次已满"标志跨轮残留 | **没有** | 每次 `schedule()` 都从队首重新检查；只有"本步发生过抢占"才跳过整个等待队列 | `scheduler.py:869` ✔ |
+| 2. 长 prefill 续算时，主机（host）命中被排除在准入外 | **没有这种形式** | 没有单 partial 规则。主机命中变成整请求异步加载：准入时就分配 GPU 块，请求进入旁路列表等待加载完成，不挡后面的请求；加载完成后下一步才开始算 | `scheduler.py:1263-1294`，`distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py:1036-1210` |
+| 3. 按最长前缀匹配（LPM）排序，冷请求被反复越过 | **没有 LPM，也没有按剩余工作量排序或等待加权** | 默认 FCFS（被抢占的请求回到队首）；可选 `--scheduling-policy priority`，优先级由客户端给出 | `vllm/v1/core/sched/request_queue.py:75-197` |
+| 4. 一次执行占得久，调度机会稀 | **有，同一类问题** | 每步先排所有运行中请求（按准入顺序），每个请求拿 `min(剩余, 预算)`；默认不限单请求块长，最老的长 prefill 会拿走剩余全部预算，本步不再检查等待队列 | `scheduler.py:670-679`、`:869-872` ✔ |
+
+## vLLM 特有、会加重排队的地方
+
+- **A100 默认每步预算 2048 token** ✔：API 服务在 ≥70GB 显存且非 A100 的卡上默认 8192，A100 落到 2048（`vllm/engine/arg_utils.py:2799-2818`）。必须显式设 `--max-num-batched-tokens`，否则长 prefill 被切得很碎、每步固定开销成倍增加。
+- **准入要求整段 prompt（减去命中部分）一次装下** ✔：`scheduler_reserve_full_isl=True` 时先检查全长所需块数是否小于空闲块（`vllm/v1/core/kv_cache_manager.py:515-531`）。
+  一个十万 token 级的冷链首在队首，会挡住后面所有请求直到空闲块够。SGLang 也按输入+输出预留检查，但这里没有"只先分当前块"的余地。
+- **混合模型（KDA 状态）的块对齐**：前缀缓存打开时 KDA 状态缓存模式为 `align`，每个非末块的块尾对齐到块大小 B；剩余预算不足一个 B 时等待循环直接 `break`（`scheduler.py:1139-1140`）。
+  另外每个请求的 prefill 要在"最后一个可缓存块边界"停一次（`scheduler.py:439-441`），首 token 前至少两步（待 GPU trace 确认）。
+- **默认开启异步调度**（MTP 属于 EAGLE 类方法，`vllm/config/vllm.py:1562-1621`）：上一步运行时到达的请求最早进入再下一步。
+- **KDA 前缀命中粒度（已在两卡实测）**：为让注意力页不小于 KDA 状态页，vLLM 把注意力块 B 抬高到能装下一个 KDA 状态页的 token 数；
+  MTP 下保留的 KDA 状态在 `floor(L/B)*B − B`（`vllm/v1/core/kv_cache_coordinator.py:312-331`），下一轮要多重算 `(L mod B) + B` 个 token。
+  两卡 TP2（每卡 32 个 KDA 头）启动日志 B=2304；同一个 87,995 token 提示词第二次命中 85,248 = `38×2304 − 2304`，与公式完全一致（实测，dummy 权重不影响缓存逻辑）。
+  TP8 每卡 8 个头，状态页约为 1/4，B 推算约 576，每轮多算最多约 1,150 token（推算，待 TP8 启动日志确认）。
+
+## 对 N30/N38 的含义
+
+1. **不能指望换引擎解决等待**。R27 的有界扫描（120 的 KV 扫描）、剩余工作量排序（123）在 vLLM 里同样需要自己实现；vLLM 的等待循环结构简单（一个 `while` + `break`），改动面比 SGLang 小。
+2. **vLLM 在主机缓存准入上天然更好**：多个 partial prefill 可以同时推进，主机命中异步加载不挡队列。代价是加载按整请求、不与本请求的计算逐层重叠。
+   官方主机层是 `--kv-offloading-size`（OffloadingConnector，按块写穿），代码上支持 GLM 的 MLA/索引器/KDA 三类缓存，但**没有在 GLM 上验证过**，MTP 下只按块边界命中。
+3. **第 4 类的直接手段是 `--long-prefill-token-threshold`**：给单请求每步块长设上限，剩余预算自然流向解码和新请求；这是 Sarathi 式的做法，vLLM 原生支持，不用改代码。代价与 SGLang 相同：块越小固定开销越大，要用实测单步成本定值。
+4. **优先级只能来自客户端**。评测负载不带优先级；若要做剩余工作量排序，需要在服务端（调度器内）估计，而前缀命中长度只有调度时才知道。
+
+## 需要 GPU 才能回答的问题（按依赖顺序）
+
+1. 启动日志中的实际块大小 B、异步调度、CUDA graph 模式、KV 与 KDA 池容量。
+2. 同一负载下，等待循环因"队首放不下"`break` 的频率，以及被挡住的请求里本可装下的比例（需要有界诊断计数，类似 SGLang 120 的诊断）。
+3. 单步耗时与块长的关系（A100，TP8），用于确定 `--max-num-batched-tokens` 和 `--long-prefill-token-threshold`。
+4. 主机层（OffloadingConnector）在 GLM 上的正确性（输出一致）和加载耗时。
