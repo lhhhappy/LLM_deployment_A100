@@ -46,7 +46,7 @@ OffloadingConnector 的二级层（FS/网络）不被清除、已排队的传输
 | `cached_tokens` | `RequestOutput.num_cached_tokens` | 调度器首次调度时记录的命中数 = 本地前缀缓存命中 + connector（主机层）命中（`PrefillStats.set`） |
 | `completion_tokens` | 累计输出 token 数 | MTP 一步出多个 token 时跳变，属正常 |
 | `finish_reason` | `CompletionOutput.finish_reason` | 结束时 `{"type":"length","length":N}` / `{"type":"stop","matched":...}`；未结束为 null |
-| `request_received_ts` | 插件安装的纯 ASGI 中间件在请求进入应用时打的 `time.time()`，早于读取请求体 | 与 SGLang 000 的 `_ArenaRecvTimeMiddleware` 同层：vLLM 的 CORS/鉴权等核心中间件在插件之后加入、包在外层，只多其自身的微小时间；TTFT 包含请求体接收、JSON 解析与分词 |
+| `request_received_ts` | 插件安装的纯 ASGI 中间件在请求进入应用时打的 `time.time()`，早于读取请求体 | 与 SGLang 000 的 `_ArenaRecvTimeMiddleware` 同为读请求体之前；vLLM 的 CORS/鉴权等核心中间件在插件之后加入、包在外层（SGLang 的打点在 CORS 之外），差值是这些中间件自身的微小时间，未量化；TTFT 包含请求体接收、JSON 解析与分词 |
 | `api_server_dispatch_finish_ts` | 分词完成、交给引擎客户端前的 `time.time()` | 诊断用 |
 | `forward_entry_time` | 引擎 `scheduled_ts`（首次被调度进 batch 的那一轮调度开始时刻）换算到墙钟 | 与 SGLang 同名字段含义相同（首次入批，早于 GPU 执行）；诊断用 |
 | `queue_time` | `scheduled_ts − queued_ts` | 进入调度器等待队列到首次入批的间隔；诊断用 |
