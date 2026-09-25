@@ -237,8 +237,10 @@ class SchedulePolicy:
         enable_hierarchical_cache: bool,
         enable_priority_scheduling: bool,
         schedule_low_priority_values_first: bool,
+        rank0_decide=None,
     ):
         self.policy = self._validate_and_adjust_policy(policy, tree_cache)
+        self.rank0_decide = rank0_decide
         self.tree_cache = tree_cache
         self.enable_hierarchical_cache = enable_hierarchical_cache
         self.enable_priority_scheduling = enable_priority_scheduling
@@ -277,9 +279,22 @@ class SchedulePolicy:
                 waiting_queue, policy
             )
             if policy == CacheAwarePolicy.LPM and _ax_srpt_aging() is not None:  # [ax] 123
-                SchedulePolicy._ax_sort_by_remaining_work(
-                    waiting_queue, temporary_deprioritized
-                )
+                # Entry timestamps are rank-local, so synchronizing only "now"
+                # cannot agree on aging. Compute the final order on group rank 0.
+                decide = getattr(self, "rank0_decide", None)
+                if decide is None:
+                    self._ax_sort_by_remaining_work(waiting_queue, temporary_deprioritized)
+                else:
+                    def order():
+                        queue = list(waiting_queue)
+                        self._ax_sort_by_remaining_work(queue, temporary_deprioritized)
+                        return [r.rid for r in queue]
+
+                    ids = decide(order)
+                    by_id = {r.rid: r for r in waiting_queue}
+                    if len(ids) != len(waiting_queue) or set(ids) != set(by_id):
+                        raise RuntimeError("[ax] 123 request queues differ across TP ranks")
+                    waiting_queue[:] = [by_id[rid] for rid in ids]
             elif policy == CacheAwarePolicy.LPM:
                 SchedulePolicy._sort_by_longest_prefix(
                     waiting_queue, temporary_deprioritized

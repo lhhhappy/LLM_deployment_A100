@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Patch 123 (shortest remaining prefill first with aging) on the real scheduler code with CPU fakes.
 
-The tree is the 123 commit of the engine git history (scripts/engine/tree.py).
+The tree is the current working engine source, including the TP order repair.
 Run: python3 -m unittest discover -s tests -p test_srpt_admission.py
 """
 import os
@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from test_sched_protect_chain import ROOT, Req, load_source, make_scheduler, step, tree_dir
 
-P123 = tree_dir('mech:123')
+P123 = ROOT / 'engine/sglang'
 
 
 def req(rid, work, cached=0, waited=0.0):
@@ -60,3 +60,53 @@ class SrptAdmission(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class SharedOrdering(unittest.TestCase):
+    def test_rank_local_arrival_near_tie_uses_leader_order(self):
+        ns = load_source(P123)
+        ns['time'] = NS(perf_counter=lambda: 100.0)
+        queues = []
+        for entered in [99.993, 99.994]:
+            a, b = req('long',1001), req('short',1000)
+            a.num_matched_prefix_tokens = b.num_matched_prefix_tokens = 0
+            a.time_stats.wait_queue_entry_time = 99.990
+            b.time_stats.wait_queue_entry_time = entered
+            queues.append([a,b])
+        with patch.dict(os.environ, {'SGLANG_AX_SRPT_AGING':'300'}):
+            # Reproduce the actual old divergence, even with identical now.
+            for q in queues: ns['SchedulePolicy']._ax_sort_by_remaining_work(q,set())
+            self.assertEqual([[r.rid for r in q] for q in queues], [['short','long'],['long','short']])
+            payload = []
+            for rank, q in enumerate(queues):
+                p = ns['SchedulePolicy'].__new__(ns['SchedulePolicy'])
+                p.policy = ns['CacheAwarePolicy'].LPM
+                p._determine_active_policy = lambda _: p.policy
+                p._compute_prefix_matches = lambda *_: set()
+                def decide(compute):
+                    if rank == 0: payload.append(compute())
+                    return payload[0]
+                p.rank0_decide = decide
+                p.calc_priority(q)
+            self.assertEqual([[r.rid for r in q] for q in queues], [['short','long'],['short','long']])
+            # Off never calls the collective callback.
+            with patch.dict(os.environ, {'SGLANG_AX_SRPT_AGING':'0'}):
+                p.rank0_decide = lambda _: self.fail('off path broadcast')
+                p.calc_priority(queues[1])
+
+    def test_broadcast_uses_group_source_and_leader_only_callback(self):
+        import importlib.util, sys
+        path=P123/'srt/managers/ax_rank0_decision.py'
+        spec=importlib.util.spec_from_file_location('decision',path)
+        module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        payload=[]; group=object(); state={'rank':0,'calls':0}
+        def broadcast(value,src,group):
+            self.assertEqual(src,8)
+            if state['rank']==0: payload.append(value[0])
+            else: value[0]=payload[0]
+        dist=NS(get_world_size=lambda _:2,get_rank=lambda _:state['rank'],
+                get_global_rank=lambda g,r:8,broadcast_object_list=broadcast)
+        with patch.dict(sys.modules,{'torch':NS(distributed=dist),'torch.distributed':dist}):
+            self.assertEqual(module.rank0_decide(group,lambda: ['b','a']),['b','a'])
+            state['rank']=1
+            self.assertEqual(module.rank0_decide(group,lambda:self.fail('follower computed')),['b','a'])
