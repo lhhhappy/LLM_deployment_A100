@@ -4,6 +4,7 @@
 #   scripts/pod/pread status                       queue state (running/pending/done/failed)
 #   scripts/pod/pread capacity                     bounded filesystem/memory/GPU snapshot (no writes)
 #   scripts/pod/pread processes                    bounded process CPU snapshot (no command arguments)
+#   scripts/pod/pread compilers                    active CUDA compiler names, arguments and CPU ticks
 #   scripts/pod/pread ls   <path>                  list a directory
 #   scripts/pod/pread tail <file> [n]              last n lines (default 50, max 2000)
 #   scripts/pod/pread head <file> [n]              first n lines
@@ -27,6 +28,7 @@ cmd=${1:-}; shift || true
 case "$cmd" in
   capacity) source_file="$(dirname "$0")/capacity_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
   processes) remote 'ps -eo pid,ppid,stat,pcpu,etimes,comm --sort=-pcpu | head -n 25' ;;
+  compilers) source_file="$(dirname "$0")/compile_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;
   status) remote 'cd /tmp/ax/queue && for d in running pending done failed cancelled; do echo "$d: $(ls $d 2>/dev/null | tr "\n" " ")"; done' ;;
   ls)   ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; remote "ls -la $(q "$1")" ;;
   tail|head) ok_path "${1:-}" || { echo "path not allowed"; exit 2; }; n=${2:-50}; num "$n" || { echo "bad n"; exit 2; }

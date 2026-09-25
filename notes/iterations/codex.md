@@ -7,6 +7,8 @@ Codex推进SGLang与共享Pod，Claude推进vLLM；优先同一评测合同和�
 
 ## 当前：071首次编译/捕图，尚未测量（2026-09-25）
 
+- 07:27 UTC：确认/tmp/ax符号链接触发底包JIT依赖过滤缺陷，临时cuda.cu入依赖后消失，Marlin已串行重编6份、每份约4分钟。45分钟等待已超时；PID20041实际argv/env/source核验后adopt-wait已接回，未重载模型。后续runtime改用真实缓存路径，当前071未热改。详见[根因](../reports/sglang-cold-jit-0925.md)。
+
 - 07:03 UTC实时复查：07:00:12已完成KV分配（1,397,760 token），07:00:13开始target verify CUDA graph；尚无PRELOAD_READY/job.log，pending。cgroup327.14/1509GiB、failcnt0，RAM目录0.918GiB，根/tmp1.32MiB。最近日志有TileLang数据竞争检查warning与Triton弃用warning，未见异常栈/OOM；编译未完成，不宣称启动成功。[快照](../../evidence/L071-official_b_host64_full_n30_shortwarm/capacity-startup.json)
 - 06:58—07:02访问通道短暂EOF/SSH断开，随后Pod直读与开发机缓存恢复；pread新增可选本机直连，不修改服务。用户强调极低观测开销，已写evaluation；071不新增trace，采样频率沿用069，实际开销未量化。
 - 06:43 UTC：新Pod可exec、8卡权重加载进行中；数据500MiB传输完成。短暂Trisol凭据过期后认证已恢复，未更换AK。校验脚本换行转义错误已修正，32项运行文件与全部数据哈希已通过，现等待引擎READY。

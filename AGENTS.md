@@ -38,6 +38,6 @@
 - `llm-challenge-arena-v1/`、`s1-dev/`、`build/base_exact/`、`refs/` 只读。只保留正确的现行文档，过时内容直接删除（git 留历史）。
 - 改共享文件（`notes/knowledge.md`、`queue.md`、`experiments.md`）前先读最新内容，只提交自己的改动；各自的长篇分析放在自己的文件里。
 - 8 卡服务不可停、删、释放。停单个测试 job 用 GPU 机上的 `scripts/pod/stopjob <job.sh>`。审阅只用 `scripts/pod/pread`；CPU 分析用 `scripts/pod/pexec_codex`，只写 `/tmp/ax/codex`。入队规则见 collaboration.md，正式提交由参与者一起判断、用户定；官方结果用 `scripts/official_status.sh <attempt_id>` 查。
-- **Pod 临时存储限额仍为 20Gi（2026-09-25 现行 revision 2 已核实），070 曾因此被驱逐。** `df` 显示的底层磁盘空闲不是 Pod 额度，禁止据此安装第二套引擎或堆积数据。上传/安装/启动前核实际挂载与峰值预算；数据、源码、日志和可迁移缓存使用已核验的 RAM/专用挂载，不能只设环境变量却仍写根盘。`/dev/shm` 的 754GiB 计入 1509GiB 总内存，须给模型、host 缓存与临时缓冲留余量；安装缓存、JIT、临时文件和容器日志另计。新增诊断须有输出预算，但不截断影响评测或分析的完整记录；按用户要求，结果优先归档到 GPU 开发机 `/sjtu/linhang/arena/archives/pod-runs`，核验后清理 Pod，运行中证据不得误删。容量收据见 [pod-capacity-0925.md](notes/reports/pod-capacity-0925.md)。
+- **Pod 临时存储限额仍为 20Gi（2026-09-25 现行 revision 2 已核实），070 曾因此被驱逐。** `df` 显示的底层磁盘空闲不是 Pod 额度，禁止据此安装第二套引擎或堆积数据。上传/安装/启动前核实际挂载与峰值预算；数据、源码、日志和可迁移缓存使用已核验的 RAM/专用挂载，不能只设环境变量却仍写根盘。缓存/临时目录导出为真实绝对路径（readlink -f）；已发现/tmp/ax符号链接会触发底包JIT重复编译，见[根因](notes/reports/sglang-cold-jit-0925.md)。`/dev/shm` 的 754GiB 计入 1509GiB 总内存，须给模型、host 缓存与临时缓冲留余量；安装缓存、JIT、临时文件和容器日志另计。新增诊断须有输出预算，但不截断影响评测或分析的完整记录；按用户要求，结果优先归档到 GPU 开发机 `/sjtu/linhang/arena/archives/pod-runs`，核验后清理 Pod，运行中证据不得误删。容量收据见 [pod-capacity-0925.md](notes/reports/pod-capacity-0925.md)。
 - GPU 开发机只在 `/sjtu/linhang/arena/` 下工作；不探测评测平台或其他选手。
 - 不关 thinking、不压输出、不截历史、不删 tools；时间戳和 token 计数如实；`/flush_cache` 真清。对外可见的镜像、服务和启动元数据保持中性。

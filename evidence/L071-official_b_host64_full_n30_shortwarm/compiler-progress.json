@@ -1,0 +1,38 @@
+{
+  "observed_at": 1790321029.8732822,
+  "compilers": [
+    {
+      "pid": 53972,
+      "parent": 24807,
+      "command": "ninja",
+      "state": "S",
+      "cpu_ticks": 0,
+      "start_ticks": 558152857,
+      "cwd": "/dev/shm/arena-runtime/ax/cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-d65f5727a061211c/.staging-f5d8d3957a054753b456d0b7994a6797",
+      "argv": "ninja -f build.ninja ",
+      "build_ninja_head": "ninja_required_version = 1.3\ncxx = c++\nnvcc = /usr/local/cuda/bin/nvcc\ncxxflags = -fPIC -std=c++20 -O3 -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\ncudaflags = -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\nldflags = -shared -L/opt/sglang/lib/python3.12/site-packages/tvm_ffi/lib -ltvm_ffi -L/usr/local/cuda/lib64 -lcudart\n\nrule compile_cxx\n  depfile = $out.d\n  command = $cxx -MD -MF \"$out.d\" $cxxflags -c \"$in\" -o \"$out\"\n\nrule compile_cuda\n  depfile = $out.d\n  command = $nvcc -MD -MF \"$out.d\" $cudaflags -c \"$in\" -o \"$out\"\n\nrule link\n  command = $cxx $in $ldflags -o \"$out\"\n\nbuild cuda_0.o: compile_cuda cuda.cu\n\nbuild sgl_kernel_jit_gptq_marlin_bf16_t.so: link cuda_0.o\n\ndefault sgl_kernel_jit_gptq_marlin_bf16_t.so\n"
+    },
+    {
+      "pid": 53974,
+      "parent": 53973,
+      "command": "nvcc",
+      "state": "S",
+      "cpu_ticks": 1,
+      "start_ticks": 558152857,
+      "cwd": "/dev/shm/arena-runtime/ax/cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-d65f5727a061211c/.staging-f5d8d3957a054753b456d0b7994a6797",
+      "argv": "/usr/local/cuda/bin/nvcc -MD -MF cuda_0.o.d -Xcompiler -fPIC -gencode arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std c++20 -O3 --expt-relaxed-constexpr -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include -c cuda.cu -o cuda_0.o ",
+      "build_ninja_head": "ninja_required_version = 1.3\ncxx = c++\nnvcc = /usr/local/cuda/bin/nvcc\ncxxflags = -fPIC -std=c++20 -O3 -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\ncudaflags = -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\nldflags = -shared -L/opt/sglang/lib/python3.12/site-packages/tvm_ffi/lib -ltvm_ffi -L/usr/local/cuda/lib64 -lcudart\n\nrule compile_cxx\n  depfile = $out.d\n  command = $cxx -MD -MF \"$out.d\" $cxxflags -c \"$in\" -o \"$out\"\n\nrule compile_cuda\n  depfile = $out.d\n  command = $nvcc -MD -MF \"$out.d\" $cudaflags -c \"$in\" -o \"$out\"\n\nrule link\n  command = $cxx $in $ldflags -o \"$out\"\n\nbuild cuda_0.o: compile_cuda cuda.cu\n\nbuild sgl_kernel_jit_gptq_marlin_bf16_t.so: link cuda_0.o\n\ndefault sgl_kernel_jit_gptq_marlin_bf16_t.so\n"
+    },
+    {
+      "pid": 54011,
+      "parent": 54010,
+      "command": "cicc",
+      "state": "R",
+      "cpu_ticks": 16365,
+      "start_ticks": 558153062,
+      "cwd": "/dev/shm/arena-runtime/ax/cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-d65f5727a061211c/.staging-f5d8d3957a054753b456d0b7994a6797",
+      "argv": "/usr/local/cuda/bin/../nvvm/bin/cicc --c++20 --static-host-stub --device-hidden-visibility --gnu_version=130300 --display_error_number --orig_src_file_name cuda.cu --orig_src_path_name /dev/shm/arena-runtime/ax/cache/sglang/jit/sm80/sgl_kernel_jit_gptq_marlin_bf16_t/build-d65f5727a061211c/.staging-f5d8d3957a054753b456d0b7994a6797/cuda.cu --allow_managed --relaxed_constexpr -arch compute_80 -m64 --no-version-ident -ftz=0 -prec_div=1 -prec_sqrt=1 -fmad=1 --include_file_name tmpxft_0000d2d6_00000000-3_cuda.fatbin.c -tused --module_id_file_name /tmp/ax/tmp/tmpxft_0000d2d6_00000000-4_cuda.module_id --gen_c_file_name /tmp/ax/tmp/tmpxft_0000d2d6_00000000-6_cuda.cudafe1.c --stub_file_name /tmp/ax/tmp/tmpxft_0000d2d6_00000000-6_cuda.cudafe1.stub.c --gen_device_file_name /tmp/ax/tmp/tmpxft_0000d2d6_00000000-6_cuda.cudafe1.gpu /tmp/ax/tmp/tmpxft_0000d2d6_00000000-7_cuda.cpp1.ii -o /tmp/ax/tmp/tmpxft_0000d2d6_00000000-6_cuda.ptx ",
+      "build_ninja_head": "ninja_required_version = 1.3\ncxx = c++\nnvcc = /usr/local/cuda/bin/nvcc\ncxxflags = -fPIC -std=c++20 -O3 -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\ncudaflags = -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/opt/sglang/lib/python3.12/site-packages/tvm_ffi/include -I/dev/shm/arena-runtime/ax/src/759a6ebb8e31723519ad5daf438e26e24b32501a/sglang/kernels/jit/include\nldflags = -shared -L/opt/sglang/lib/python3.12/site-packages/tvm_ffi/lib -ltvm_ffi -L/usr/local/cuda/lib64 -lcudart\n\nrule compile_cxx\n  depfile = $out.d\n  command = $cxx -MD -MF \"$out.d\" $cxxflags -c \"$in\" -o \"$out\"\n\nrule compile_cuda\n  depfile = $out.d\n  command = $nvcc -MD -MF \"$out.d\" $cudaflags -c \"$in\" -o \"$out\"\n\nrule link\n  command = $cxx $in $ldflags -o \"$out\"\n\nbuild cuda_0.o: compile_cuda cuda.cu\n\nbuild sgl_kernel_jit_gptq_marlin_bf16_t.so: link cuda_0.o\n\ndefault sgl_kernel_jit_gptq_marlin_bf16_t.so\n"
+    }
+  ]
+}

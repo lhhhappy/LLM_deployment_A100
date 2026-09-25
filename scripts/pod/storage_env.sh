@@ -50,15 +50,18 @@ print('STORAGE_READY '+json.dumps(dict(workspace=str(ax), mount=str(mount), file
                                      cgroup_headroom_bytes=headroom, exec_check=True,
                                      cache_aliases=aliases)), flush=True)
 PY
-  export TMPDIR="$AX/tmp" TMP="$AX/tmp" TEMP="$AX/tmp"
-  export XDG_CACHE_HOME="$AX/cache" PYTHONPYCACHEPREFIX="$AX/cache/pycache"
-  export SGLANG_CACHE_DIR="$AX/cache/sglang" SGLANG_JIT_CACHE_DIR="$AX/cache/sglang/jit"
-  export TRITON_CACHE_DIR="$AX/cache/triton" TORCHINDUCTOR_CACHE_DIR="$AX/cache/inductor"
-  export TORCH_EXTENSIONS_DIR="$AX/cache/torch_extensions" CUDA_CACHE_PATH="$AX/cache/cuda"
-  export FLASHINFER_WORKSPACE_BASE="$AX/cache/flashinfer" TILELANG_CACHE_DIR="$AX/cache/tilelang"
-  export HF_HOME="$AX/cache/huggingface" HF_HUB_CACHE="$AX/cache/huggingface/hub"
-  export PIP_CACHE_DIR="$AX/cache/pip" UV_CACHE_DIR="$AX/cache/uv"
-  export NUMBA_CACHE_DIR="$AX/cache/numba" VLLM_CACHE_ROOT="$AX/cache/vllm"
+  # JIT dependency filtering compares resolved files against its build directory.
+  # Passing /tmp/ax here makes staging cuda.cu look external through the symlink.
+  _ax_runtime_path=$(readlink -f "$AX") || return 1
+  export TMPDIR="$_ax_runtime_path/tmp" TMP="$_ax_runtime_path/tmp" TEMP="$_ax_runtime_path/tmp"
+  export XDG_CACHE_HOME="$_ax_runtime_path/cache" PYTHONPYCACHEPREFIX="$_ax_runtime_path/cache/pycache"
+  export SGLANG_CACHE_DIR="$_ax_runtime_path/cache/sglang" SGLANG_JIT_CACHE_DIR="$_ax_runtime_path/cache/sglang/jit"
+  export TRITON_CACHE_DIR="$_ax_runtime_path/cache/triton" TORCHINDUCTOR_CACHE_DIR="$_ax_runtime_path/cache/inductor"
+  export TORCH_EXTENSIONS_DIR="$_ax_runtime_path/cache/torch_extensions" CUDA_CACHE_PATH="$_ax_runtime_path/cache/cuda"
+  export FLASHINFER_WORKSPACE_BASE="$_ax_runtime_path/cache/flashinfer" TILELANG_CACHE_DIR="$_ax_runtime_path/cache/tilelang"
+  export HF_HOME="$_ax_runtime_path/cache/huggingface" HF_HUB_CACHE="$_ax_runtime_path/cache/huggingface/hub"
+  export PIP_CACHE_DIR="$_ax_runtime_path/cache/pip" UV_CACHE_DIR="$_ax_runtime_path/cache/uv"
+  export NUMBA_CACHE_DIR="$_ax_runtime_path/cache/numba" VLLM_CACHE_ROOT="$_ax_runtime_path/cache/vllm"
   mkdir -p "$TMPDIR" "$XDG_CACHE_HOME" || return 1
   ulimit -c 0
   # One short receipt. The engine inherits these paths; no change to algorithms.
