@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from sglang.srt.dllm.config import DllmConfig
+from sglang.srt.managers import ax_chunk_alignment
 from sglang.srt.model_executor.forward_batch_info import ForwardBatch
 from sglang.srt.runtime_context import (
     get_disagg,
@@ -2878,6 +2879,11 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                     mamba_track_seqlen = _force_track_h(req.mamba_branching_seqlen)
                     mamba_track_seqlen_aligned = req.mamba_branching_seqlen
             req.kv.mamba_last_track_seqlen = mamba_track_seqlen_aligned
+
+        if ax_chunk_alignment.ENABLED:
+            ax_chunk_alignment.checkpoint(
+                req, prefix_len, extend_end, cache_chunk_size, checkpoint_grid, mask
+            )
 
         return _MambaRadixCacheV2TrackEntry(
             track_mask=mask,
