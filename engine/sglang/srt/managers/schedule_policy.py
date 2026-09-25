@@ -294,7 +294,8 @@ class SchedulePolicy:
 
                     ids = decide(order)
                     by_id = {r.rid: r for r in waiting_queue}
-                    if len(ids) != len(waiting_queue) or set(ids) != set(by_id):
+                    if (len(by_id) != len(waiting_queue) or len(ids) != len(waiting_queue)
+                            or set(ids) != set(by_id)):
                         raise RuntimeError("[ax] 123 request queues differ across TP ranks")
                     waiting_queue[:] = [by_id[rid] for rid in ids]
             elif policy == CacheAwarePolicy.LPM:
