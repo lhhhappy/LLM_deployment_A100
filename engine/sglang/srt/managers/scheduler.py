@@ -1398,6 +1398,12 @@ class Scheduler(
             self._ax_pace_log_ts = 0.0
         return cfg
 
+    def _ax_rank0_decide(self, compute):
+        """[ax] Broadcast one request-plane decision; all group ranks must call."""
+        from sglang.srt.managers.ax_rank0_decision import rank0_decide
+
+        return rank0_decide(self.dp_tp_cpu_group, compute)
+
     def _ax_pace_now(self) -> float:
         # Every TP rank must take the same decision: agree on one clock (max over ranks). Only called
         # when the decision depends on it (decoders running and prefill work pending), which every rank
@@ -1568,6 +1574,7 @@ class Scheduler(
             self.enable_hierarchical_cache,
             self.enable_priority_scheduling,
             self.schedule_low_priority_values_first,
+            rank0_decide=self._ax_rank0_decide,
         )
         self.prefill_delayer: Optional[PrefillDelayer] = None
         self.prefill_bs_tracker = RecentPrefillBatchSizeTracker(
