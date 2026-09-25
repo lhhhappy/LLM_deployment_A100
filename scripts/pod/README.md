@@ -29,6 +29,10 @@ CPU 回归：`python3 -B -m unittest discover -s tests -p test_eval_tools.py`。
 
 ## 已结束运行：本地归档后清理Pod副本
 
+只读入口默认经GPU开发机连接Pod；该SSH通道不可用且本机Trisol认证有效时，可用
+`PREAD_TRANSPORT=local scripts/pod/pread status`（或其他已有只读子命令）直接读取。
+路径和操作限制不变，本机直连60秒超时；访问失败只表示监控不可用，不自动重启引擎。
+
 用户授权按“运行结束→移到Pod外→校验→清理Pod”执行。2026-09-25进一步指定可归档到GPU开发机；当前在开发机运行：
 
 ```sh

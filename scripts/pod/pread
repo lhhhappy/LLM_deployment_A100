@@ -15,7 +15,13 @@ G="$(cd "$(dirname "$0")/../.." && pwd)/scripts/gssh"
 ok_path() { case "$1" in *..*|*\;*|*\|*|*\&*|*\$*|*\`*|*\'*|*\"*|*\ *) return 1;; esac; [[ "$1" =~ $ROOTS ]]; }
 q() { printf '%q' "$1"; }
 num() { [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -le "${2:-2000}" ]; }
-remote() { GSSH_TIMEOUT=300 "$G" "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh >/dev/null 2>&1 && PEXEC_TIMEOUT=280 bexec $(q "$1")"; }
+remote() {
+  case "${PREAD_TRANSPORT:-gpu}" in
+    gpu) GSSH_TIMEOUT=300 "$G" "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh >/dev/null 2>&1 && PEXEC_TIMEOUT=280 bexec $(q "$1")" ;;
+    local) timeout 60 bohr trisol inference exec "${L2_SERVICE_ID:-2102486579267252224}" --team arena -- bash -c "$1" ;;
+    *) echo 'PREAD_TRANSPORT must be gpu or local' >&2; return 2 ;;
+  esac
+}
 cmd=${1:-}; shift || true
 case "$cmd" in
   capacity) source_file="$(dirname "$0")/capacity_snapshot.py"; remote "python3 -B -c $(q "$(cat "$source_file")")" ;;

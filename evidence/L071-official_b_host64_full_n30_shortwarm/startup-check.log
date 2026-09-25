@@ -1,0 +1,152 @@
+[2026-09-25 06:59:36 TP0] Config does not support fused shared expert(s). Shared experts fusion optimization is disabled.
+
+Multi-thread loading shards:   0% Completed | 0/62 [00:00<?, ?it/s]
+Multi-thread loading shards:   2% Completed | 1/62 [00:12<13:10, 12.96s/it]
+Multi-thread loading shards:   3% Completed | 2/62 [00:33<17:11, 17.20s/it]
+Multi-thread loading shards:   8% Completed | 5/62 [00:33<04:40,  4.91s/it]
+Multi-thread loading shards:  13% Completed | 8/62 [00:33<02:15,  2.50s/it]
+Multi-thread loading shards:  18% Completed | 11/62 [00:33<01:14,  1.47s/it]
+Multi-thread loading shards:  24% Completed | 15/62 [00:33<00:39,  1.20it/s]
+Multi-thread loading shards:  31% Completed | 19/62 [00:34<00:22,  1.93it/s]
+Multi-thread loading shards:  37% Completed | 23/62 [00:34<00:13,  2.90it/s]
+Multi-thread loading shards:  44% Completed | 27/62 [00:34<00:08,  4.18it/s]
+Multi-thread loading shards:  50% Completed | 31/62 [00:34<00:05,  5.82it/s]
+Multi-thread loading shards:  56% Completed | 35/62 [00:34<00:03,  7.76it/s]
+Multi-thread loading shards:  61% Completed | 38/62 [00:34<00:02,  9.35it/s]
+Multi-thread loading shards:  66% Completed | 41/62 [00:34<00:01, 10.96it/s]
+Multi-thread loading shards:  71% Completed | 44/62 [00:35<00:01, 11.91it/s]
+Multi-thread loading shards:  76% Completed | 47/62 [00:35<00:01, 13.25it/s][2026-09-25 07:00:12 TP5] Load weight end. elapsed=35.39 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+
+Multi-thread loading shards:  81% Completed | 50/62 [00:35<00:00, 15.27it/s]
+Multi-thread loading shards:  85% Completed | 53/62 [00:35<00:00, 17.33it/s]
+Multi-thread loading shards: 100% Completed | 62/62 [00:35<00:00,  1.75it/s]
+[2026-09-25 07:00:12 TP6] Load weight end. elapsed=35.76 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.87 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP1] Load weight end. elapsed=35.76 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP2] Load weight end. elapsed=35.79 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP7] Load weight end. elapsed=35.81 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP3] Load weight end. elapsed=35.85 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP4] Load weight end. elapsed=35.91 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.73 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP0] Load weight end. elapsed=35.86 s, type=Glm5NextForConditionalGenerationNextN, quant=fp8, fmt=e4m3, avail mem=37.87 GB, mem usage=0.85 GB.
+[2026-09-25 07:00:12 TP0] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP7] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP6] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP5] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP4] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP3] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP2] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP1] Reserving 0.10 GB of the KV budget for post-sizing multimodal allocations (feature-transport pools + embedding cache).
+[2026-09-25 07:00:12 TP2] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP3] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP1] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP4] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP0] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP6] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP5] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP7] Mamba Cache is allocated. max_mamba_cache_size: 418, conv_state size: 0.25GB, ssm_state size: 7.16GB intermediate_ssm_state_cache size: 2.26GB intermediate_conv_window_cache size: 0.08GB 
+[2026-09-25 07:00:12 TP4] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP4] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP2] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP2] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP3] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP3] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP4] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP5] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP4] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:12 TP7] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP5] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP7] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP2] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP2] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:12 TP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP3] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP3] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:12 TP0] Memory pool end. avail mem=11.43 GB
+[2026-09-25 07:00:12 TP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP1] Memory pool end. avail mem=11.29 GB
+[2026-09-25 07:00:12 TP6] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 16.55 GB
+[2026-09-25 07:00:12 TP6] Memory pool end. avail mem=11.43 GB
+[2026-09-25 07:00:12 TP7] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP7] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:12 TP5] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP5] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:12 TP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP0] Memory pool end. avail mem=9.92 GB
+[2026-09-25 07:00:12 TP6] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP6] Memory pool end. avail mem=9.92 GB
+[2026-09-25 07:00:12 TP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1397760, KV size: 1.50 GB
+[2026-09-25 07:00:12 TP1] Memory pool end. avail mem=9.78 GB
+[2026-09-25 07:00:13 TP0] Linear attention kernel backend: decode=triton, prefill=triton, verify=triton
+[2026-09-25 07:00:13 TP0] KDA kernel dispatcher: decode=TritonKDAKernel, verify=TritonKDAKernel, extend=TritonKDAKernel packed_decode=True
+[2026-09-25 07:00:13 TP5] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP3] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP2] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP2] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP3] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP5] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP7] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP1] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP6] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP0] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP4] Disable prefill CUDA graph because cuda_graph_config resolved prefill.backend='disabled' (e.g. via --cuda-graph-backend-prefill=disabled or auto-disable rules).
+[2026-09-25 07:00:13 TP7] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP4] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP1] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.77 GB
+[2026-09-25 07:00:13 TP6] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.91 GB
+[2026-09-25 07:00:13 TP0] Capture target verify CUDA graph begin. backend=full, num_tokens_per_req=4, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32], avail mem=9.91 GB
+
+  0%|          | 0/20 [00:00<?, ?it/s]
+Capturing batches (bs=32 avail_mem=9.41 GB):   0%|          | 0/20 [00:00<?, ?it/s][07:00:21] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[07:00:21] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[07:00:26] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[07:00:26] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/sglang/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+exit_code: 0

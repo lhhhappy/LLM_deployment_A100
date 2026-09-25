@@ -5,8 +5,10 @@ Codex推进SGLang与共享Pod，Claude推进vLLM；优先同一评测合同和�
 
 09-24 23:23 UTC：按用户授权仅提交069一份，**46251 / 0925a**，上传回执queued、job24499。源码759a6eb、host64、122off；4692项源码和实际启动配置核验通过。后续正式版关闭调试落盘、收敛高频日志、核验编译缓存磁盘预算；本次保持069原配置。[提交与日志要求归档](../../evidence/submission-0925a/README.md)。
 
-## 当前：071恢复启动，模型加载中（2026-09-25）
+## 当前：071首次编译/捕图，尚未测量（2026-09-25）
 
+- 07:03 UTC实时复查：07:00:12已完成KV分配（1,397,760 token），07:00:13开始target verify CUDA graph；尚无PRELOAD_READY/job.log，pending。cgroup327.14/1509GiB、failcnt0，RAM目录0.918GiB，根/tmp1.32MiB。最近日志有TileLang数据竞争检查warning与Triton弃用warning，未见异常栈/OOM；编译未完成，不宣称启动成功。[快照](../../evidence/L071-official_b_host64_full_n30_shortwarm/capacity-startup.json)
+- 06:58—07:02访问通道短暂EOF/SSH断开，随后Pod直读与开发机缓存恢复；pread新增可选本机直连，不修改服务。用户强调极低观测开销，已写evaluation；071不新增trace，采样频率沿用069，实际开销未量化。
 - 06:43 UTC：新Pod可exec、8卡权重加载进行中；数据500MiB传输完成。短暂Trisol凭据过期后认证已恢复，未更换AK。校验脚本换行转义错误已修正，32项运行文件与全部数据哈希已通过，现等待引擎READY。
 - /tmp/ax实际指向/dev/shm/arena-runtime/ax；JIT、cache、tmp与常见硬编码缓存目录已迁RAM，执行探针通过。当前RAM工作目录0.80GiB、cgroup约123/1509GiB、根盘/tmp约1.32MiB；完整临时存储占用未知，不用底层df代替20Gi限额。
 - 071 watcher与通知桥已替换旧070；开发机每5分钟归档终态运行，SHA256/fsync核验后清理，活动日志不删。目的地/sjtu/linhang/arena/archives/pod-runs，位于GPFS磁盘。

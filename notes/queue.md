@@ -9,7 +9,7 @@
 
 | Job | 配置 | 状态 |
 |---|---|---|
-| 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录及编译缓存，冷启动 | 09-25 06:43 UTC：同配置模型正在加载，尚未测量；数据及32项运行文件SHA已核验通过。运行目录/编译缓存已迁RAM，临时盘仍20Gi；等待已有引擎READY后放行。见[容量收据](reports/pod-capacity-0925.md) |
+| 071-official_b_host64_full_n30_shortwarm | 恢复后沿用070引擎/参数/全量数据；新Pod、RAM工作目录及编译缓存，冷启动 | 09-25 07:03 UTC：权重/KV分配完成，首次CUDA graph编译/捕获中，仍pending、尚未测量；数据及32项运行文件SHA已通过。cgroup327GiB/1509、RAM工作区0.92GiB、根/tmp1.32MiB；临时盘仍20Gi。等待引擎READY后放行。见[容量收据](reports/pod-capacity-0925.md) |
 | 072-vllm_tp8_real_smoke | 官方main a811738a6 + 000/010，基线冻结fb18e488（不含101）；TP8完整真实权重、MTP、接口/长上下文/缓存冒烟；部署产物与工具哈希待核验 | **计划预留在071之后，未入队、未安装环境**；无connector的000接口与flush判分CPU联调已通过；Claude准备独立venv容量/兼容性收据及vLLM任务入口，Codex协调共享队列；06:14 UTC新Pod可exec，优先核容量与写入落点。见[安排](reports/vllm-tp8-slot-072.md) |
 | 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC旧Pod临时存储超20Gi被驱逐；09-25 06:14 UTC revision2新Pod已可exec；070没有恢复执行 |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
