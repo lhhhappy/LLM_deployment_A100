@@ -559,11 +559,13 @@ class PrefillAdder:
         waiting_queue_len: int = 0,
         prefill_tile_block_m: int = 64,
         ax_protect: Optional[tuple] = None,
+        ax_admission_trace=None,
     ):
         self.page_size = page_size
         # (aligned cold cap, short-hit threshold, checkpoint/alignment grid).
         # Only the normal TP scheduler opts in; other callers retain stock.
         self.ax_protect = ax_protect
+        self.ax_admission_trace = ax_admission_trace
         self.ax_continuation = None
         self.prefill_tile_block_m = prefill_tile_block_m
         self.tree_cache = tree_cache
@@ -1339,6 +1341,16 @@ class PrefillAdder:
             if not self._ax_short_hit(req) or needed > min(
                 self.rem_chunk_tokens, self.rem_input_tokens
             ):
+                if self.ax_admission_trace is not None:
+                    if req.needs_host_load_back():
+                        reason = "partial_host_restore"
+                    elif len(req.prefix_indices) == 0:
+                        reason = "partial_no_device_prefix"
+                    elif not self._ax_short_hit(req):
+                        reason = "partial_long_tail"
+                    else:
+                        reason = "partial_token_budget"
+                    self.ax_admission_trace.record(req, reason)
                 return AddReqResult.OTHER
 
         # TODO support cp with multiple requests
@@ -1374,6 +1386,8 @@ class PrefillAdder:
         prefix_len = len(req.prefix_indices)
 
         if total_tokens >= self.rem_total_tokens:
+            if self.ax_admission_trace is not None:
+                self.ax_admission_trace.record(req, "kv_budget")
             return AddReqResult.NO_TOKEN
 
         chunk_tokens_limit = self.rem_chunk_tokens
@@ -1413,6 +1427,8 @@ class PrefillAdder:
         with self._lock_node(req.last_node):
             # self.rem_total_tokens may decrease after the lock acquisition
             if total_tokens >= self.rem_total_tokens:
+                if self.ax_admission_trace is not None:
+                    self.ax_admission_trace.record(req, "kv_budget_after_lock")
                 return AddReqResult.NO_TOKEN
 
             if self.is_hybrid_swa:

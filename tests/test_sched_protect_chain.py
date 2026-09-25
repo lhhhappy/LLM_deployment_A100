@@ -4,7 +4,7 @@
 No CUDA/torch import; model forwards, cache/pools and ScheduleBatch are faked.
 The decision methods, 101 split, resource accounting and LPM sort are production
 code. Trees come from the engine git history (scripts/engine/tree.py, cached under build/engine/trees):
-the commit before 120, the 120 commit, and HEAD (all candidates, default off) for the HiCache tier tests.
+the commit before 120, the initial 120 commit, and working source for the HiCache tier tests.
 Run: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
 """
 from __future__ import annotations
@@ -34,7 +34,9 @@ sys.path.insert(0, str(ROOT / 'scripts/engine'))
 from tree import tree_dir  # noqa: E402
 
 BASE = tree_dir('before:120')
-CANDIDATE = tree_dir('mech:120')
+# Historical 120-only baseline: follow-up 120 commits include later mechanisms.
+# Working-source regressions live in HiCacheTierTests and test_admission_trace.
+CANDIDATE = tree_dir('bdeca5c')
 EVIDENCE = ROOT / 'evidence/T41'
 
 
@@ -172,6 +174,7 @@ def load_source(root=CANDIDATE):
     names = {'get_next_batch_to_run', 'get_new_batch_prefill', '_get_new_batch_prefill_raw',
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
+             '_ax_admission_trace',
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
              '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
@@ -614,8 +617,8 @@ class ProtectTests(unittest.TestCase):
             self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
 
-# HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.
-TREE_180 = tree_dir('HEAD')
+# Working source: include uncommitted diagnostics as well as the 180 tier.
+TREE_180 = ROOT / 'engine/sglang'
 
 
 class HiCacheTierTests(unittest.TestCase):
@@ -692,7 +695,8 @@ class HiCacheTierTests(unittest.TestCase):
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
-                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache'])
+                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache',
+                                '120_trace=off'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
             rep = s._ax_mechanism_report()

@@ -29,3 +29,51 @@ bypasses it. Short-hit sharing excludes requests still waiting for host restore;
   tpot_p95 0.13 (025b); S0 at N18 (026) passes the TTFT gates, tpot_p95 0.219; S0 at N22 (035) passes 10 of 11 gates, tpot_p95
   0.296 (F96). Remaining problem: during heavy prefill a stream gets one decode step per 16k chunk (~1.3 s).
 - The variant that also caps while requests decode is patch 121.
+
+## Opt-in admission diagnostics (2026-09-24)
+
+`SGLANG_AX_ADMISSION_TRACE=1` enables CPU-only observations on TP0; default `0`.
+The startup mechanism line reports `120_trace=on|off`; a diagnostic job should
+include the expected token in `G_EXPECT`. This is a follow-up to 120, not a new
+scheduling policy. No job or frozen 069/071 configuration is changed by this code.
+
+It distinguishes the observed branches for `partial_host_restore`,
+`partial_no_device_prefix`, `partial_long_tail`, `partial_token_budget`,
+`kv_budget`, `kv_budget_after_lock`, decode cadence, request slots, and latched
+`batch_is_full`. Unvisited queue tails are explicitly labeled `unscanned_after_*`;
+their own resource feasibility has not been tested. Other adder outcomes retain
+generic labels. KDA-specific pool shortage and H2D completion timing are not yet
+separately instrumented.
+
+There is one JSON log per newly admitted request, plus at most one waiting
+snapshot per 30 seconds (first 32 queue entries, with truncation explicitly
+marked). A lifetime 8 MiB byte budget per TP0 process includes 128 bytes of prefix
+allowance per line; on exhaustion it emits one `budget_exhausted` record and stops
+observing/logging. No per-step logs, CUDA synchronization, collectives, or GPU buffers are
+added. Counters live on requests and are cleared at admission, so retractions get
+new episodes and aborts do not leak collector-owned references. Diagnostic CPU
+overhead and logging cost still need measurement; leave this off for official
+submissions and for clean performance comparisons.
+
+Counter values are numbers of observed decisions, **not seconds or causal delay
+shares**. `observed_wait_s` begins at the first diagnostic observation, not request
+receipt. Cache fields describe the latest available prefix match, not necessarily
+residency at arrival. `admit` means selected for a batch, not H2D or GPU execution
+completed. Timestamp/token reporting used for scoring is untouched.
+
+CPU validation runs real scheduler/adder ASTs: trace off/on preserve frozen
+759a6eb decisions and budgets, with both fixed cadence and 122; tests distinguish
+host rejection, KV rejection and unvisited queue tails, enforce TP0-only logging,
+bounded snapshots, and retraction-state reset. The log parser checks cumulative
+snapshot accounting and retains unknowns instead of replacing missing data by
+zero. Byte-budget tests ensure repeated admissions cannot grow this diagnostic
+stream indefinitely and parsing explicitly marks observations cut short by the cap.
+
+```sh
+python3 -B -m unittest discover -s tests -p 'test_admission_trace*.py'
+python3 -B scripts/analysis/admission_trace.py server.log --raw raw.jsonl --json admission.json --csv admission.csv
+```
+
+The source changes add no new GPU/host cache allocation. CPU per-waiting-request
+state consists of one timestamp, a small fixed-vocabulary counter dictionary and
+one last-reason field. Production performance or N@SLO improvement is not claimed.

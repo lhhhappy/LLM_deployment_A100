@@ -1290,6 +1290,18 @@ class Scheduler(
     def _ax_sched_protect_enabled(self) -> bool:
         return self._ax_sched_protect_blocker() is None
 
+    def _ax_admission_trace(self):
+        """120: opt-in CPU-only diagnostics; no work/collectives on other ranks."""
+        trace = getattr(self, "_ax_admission_collector", False)
+        if trace is False:
+            trace = None
+            if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" and self.ps.tp_rank == 0:
+                from sglang.srt.managers.ax_admission_trace import AxAdmissionTrace
+
+                trace = AxAdmissionTrace(logger)
+            self._ax_admission_collector = trace
+        return trace
+
     def _ax_mechanism_report(self) -> str:
         """[ax] Effective state of the scheduler-side mechanisms, one token per mechanism ("NNN=on" or
         "NNN=off:reason"), followed by the requested model-side switches. Jobs compare it with the
@@ -1322,6 +1334,7 @@ class Scheduler(
             "123": m123,
             "140": "on" if dual else "off",
             "180": m180,
+            "120_trace": "on" if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" else "off",
         }
         requested = " ".join(
             f"{k}={os.environ.get(k, '-')}"
@@ -3732,6 +3745,9 @@ class Scheduler(
             if self._ax_pace() is not None
             else self._should_defer_prefill() or self._ax_should_decode(running_batch)
         ):  # [ax] 122 replaces the fixed interval / 120's single decode turn when on
+            trace = self._ax_admission_trace()
+            if trace is not None:
+                trace.record_many(self.waiting_queue, "decode_cadence")
             new_batch = None
         else:
             prefill_plan = self.get_new_batch_prefill(running_batch)
@@ -3776,6 +3792,9 @@ class Scheduler(
             )
         ret = converted
         self._arm_prefill_decode_interval(ret)
+        trace = self._ax_admission_trace()
+        if trace is not None:
+            trace.snapshot(self.waiting_queue)
         if self._ax_pace() is not None and ret is not None and ret.forward_mode.is_extend():
             # predicted end of this prefill, from the agreed decision time; None if it was not paced (no
             # decoders then: requests it completes are anchored at the next decision, i.e. early)
@@ -3850,6 +3869,7 @@ class Scheduler(
         prefill_delayer_single_pass: Optional[PrefillDelayerSinglePassExecutor],
         running_batch: ScheduleBatch,
     ) -> Tuple[Optional[ScheduleBatch], ScheduleBatch]:
+        trace = self._ax_admission_trace()
         # Check if the grammar is ready in the grammar queue
         if self.grammar_manager.has_waiting_grammars():
             ready_grammar_requests = self.grammar_manager.get_ready_grammar_requests()
@@ -3868,6 +3888,8 @@ class Scheduler(
         if (
             running_batch.batch_is_full or len(self.waiting_queue) == 0
         ) and self.chunked_req is None:
+            if trace is not None and running_batch.batch_is_full:
+                trace.record_many(self.waiting_queue, "batch_full_latched")
             return None, running_batch
 
         running_bs = len(running_batch.reqs)
@@ -3882,6 +3904,8 @@ class Scheduler(
                 ),
             )
         ):
+            if trace is not None:
+                trace.record_many(self.waiting_queue, "min_free_slots_delayer")
             return None, running_batch
 
         # Ignore the check if self.chunked_req is not None.
@@ -3895,6 +3919,8 @@ class Scheduler(
             and not self.enable_priority_preemption
         ):
             running_batch.batch_is_full = True
+            if trace is not None:
+                trace.record_many(self.waiting_queue, "request_slots")
             return None, running_batch
 
         # Get priority queue
@@ -3944,6 +3970,7 @@ class Scheduler(
             waiting_queue_len=len(self.waiting_queue),
             prefill_tile_block_m=prefill_tile_block_m,
             ax_protect=ax_protect,
+            ax_admission_trace=trace,
         )
 
         if self.chunked_req is not None:
@@ -3967,8 +3994,10 @@ class Scheduler(
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_begin(len(self.waiting_queue))
         # Get requests from the waiting queue to a new prefill batch
-        for req in self.waiting_queue:
+        for queue_index, req in enumerate(self.waiting_queue):
             if adder.chunk_budget_exhausted():
+                if trace is not None:
+                    trace.record_many(self.waiting_queue[queue_index:], "batch_token_budget")
                 break
 
             if self.enable_lora and not self._can_schedule_lora_req(req, running_loras):
@@ -3995,6 +4024,8 @@ class Scheduler(
                     not self.enable_priority_preemption
                     or not adder.preempt_to_schedule(req)
                 ):
+                    if trace is not None:
+                        trace.record_many(self.waiting_queue[queue_index:], "request_slots_or_batch_full")
                     break
 
             if self.enable_hicache_storage:
@@ -4007,6 +4038,8 @@ class Scheduler(
                 if loaded_tokens > 0:
                     req.storage_hit_length = loaded_tokens
 
+            if trace is not None:
+                trace.begin_attempt(req)
             req.init_next_round_input(self.tree_cache)
             if (
                 self.enable_hicache_storage
@@ -4051,6 +4084,8 @@ class Scheduler(
                 # lifecycle and freeing them here causes double-free.
                 added = len(adder.can_run_list) > 0 and req is adder.can_run_list[-1]
                 if not added:
+                    if trace is not None:
+                        trace.rejected(req, "adder_" + res.name.lower())
                     # init_next_round_input() may stage deferred Mamba COW/clear
                     # metadata before add_one_req() rejects the request.
                     req.kv.mamba_cow_src_index = None
@@ -4072,6 +4107,8 @@ class Scheduler(
                     # A long/non-fitting waiter must not hide a short hit. Keep
                     # the native rejection cleanup above, and keep LPM order.
                     continue
+                if trace is not None:
+                    trace.record_many(self.waiting_queue[queue_index + 1:], "unscanned_after_" + res.name.lower())
                 break
 
         if mamba_allocator is not None:
@@ -4083,6 +4120,12 @@ class Scheduler(
             return None, running_batch
 
         can_run_set = set(can_run_list)
+        if trace is not None:
+            # This is admission, not execution or H2D completion. A continuation
+            # was already admitted in an earlier pass and is not logged twice.
+            for req in self.waiting_queue:
+                if req in can_run_set:
+                    trace.admitted(req)
         self.waiting_queue = [x for x in self.waiting_queue if x not in can_run_set]
         if adder.preempt_list:
             for req in adder.preempt_list:
