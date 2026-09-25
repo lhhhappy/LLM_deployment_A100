@@ -1,0 +1,50 @@
+{
+  "reviewer": "claude (session e4faf351), read-only",
+  "target": {
+    "branch": "codex/123-tp-order",
+    "head": "bc181ca7dc00c56ddae5452a166ca89a9bb7352e",
+    "base": "759a6eb",
+    "sha256": {
+      "engine/sglang/srt/managers/ax_rank0_decision.py": "9bd2f64b14bc56a49c6edd4fdad78b2449b6d73dc7ad69e9aebf7133e2c487d7",
+      "engine/sglang/srt/managers/schedule_policy.py": "37213809f0e3670afdb75e234cdf1659594770db82109eeddcc774d005e30e5e",
+      "engine/sglang/srt/managers/scheduler.py": "c17270a3b5b8bb039ea3c679837f2896ae384f1f48cc94aeae4fdc1a17ad7094",
+      "tests/test_srpt_admission.py": "12c0a4ca086c11dfd4350216cbc04786c727dd7271783f6eb6b68670371b0150",
+      "engine/docs/123-srpt-admission.md": "52bce3a2706040a6285b0ea1d3b5003c47a4b34a54b389c64a313d343193beb3"
+    }
+  },
+  "verdict": "PASS",
+  "checks": [
+    {
+      "item": "collective entry",
+      "result": "ok",
+      "why": "The broadcast sits inside calc_priority's 123 branch, reached only from _get_new_batch_prefill_raw after early returns that depend on replicated state (waiting queue, allocatable slots, chunked_req, min_free_slots_delayer); _determine_active_policy's >128 FCFS fallback depends on queue length, identical on all ranks."
+    },
+    {
+      "item": "group",
+      "result": "ok",
+      "why": "dp_tp_group is tp_group without DP attention, i.e. the request-plane TP group; its gloo cpu_group; src is the group's rank 0 via get_global_rank."
+    },
+    {
+      "item": "off path",
+      "result": "ok",
+      "why": "No broadcast when SGLANG_AX_SRPT_AGING is unset or rank0_decide is None; test covers it."
+    },
+    {
+      "item": "divergence handling",
+      "result": "ok",
+      "why": "Followers map the leader's RID order onto local objects and raise if the RID sets differ, failing loudly instead of running different batches."
+    },
+    {
+      "item": "tests",
+      "result": "ok",
+      "why": "Ran locally without bytecode: test_srpt_admission 7/7, test_sched_protect_chain 32/32."
+    }
+  ],
+  "non_blocking_notes": [
+    "If a waiting queue ever held two requests with the same rid, by_id would keep one and the rebuilt queue would duplicate it while dropping the other (the length and set checks still pass). SGLang rids are unique, so this should not happen; asserting len(by_id) == len(waiting_queue) would make it explicit.",
+    "An exception inside compute() on rank 0 would leave followers blocked in the broadcast; compute is a pure sort, so acceptable.",
+    "dllm and PD-decode also call calc_priority with the same policy object; both are off in our configuration.",
+    "Cost is two gloo collectives plus pickling per prefill scheduling round while 123 is on; not measured. Compare decode step time / TPOT of 076 against 074 to see it.",
+    "Prefix-match results are assumed identical across ranks (pre-existing TP assumption, including the HiCache host tier)."
+  ]
+}

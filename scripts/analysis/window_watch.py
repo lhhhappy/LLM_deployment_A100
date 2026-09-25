@@ -172,6 +172,7 @@ def download(meta, out, call=remote):
     rows = gates.load_raw(path)
     if not rows: raise ValueError('empty raw snapshot')
     path.replace(out / 'raw.jsonl')
+    meta['downloaded_raw_sha256'] = hashlib.sha256((out/'raw.jsonl').read_bytes()).hexdigest()
     return rows
 
 
@@ -225,10 +226,14 @@ def compact_status(state, health, now):
                     if state.get('next_report_at') else None,
                 last_report=state.get('last_report'),
                 error=str(state.get('error', ''))[:400] if monitor != 'up' else None)
+    view['auto_analysis'] = state.get('analysis_brief')
+    view['analysis_error'] = state.get('analysis_error')
     # Keep the latest counts available without flooding each poll with unchanged
     # diagnosis. A stale watcher, recovery or new alert always breaks deduplication.
     key = {k: view[k] for k in ('job_state', 'monitor', 'phase', 'alerts', 'last_report', 'error')}
     key['report_deadline'] = state.get('last_scheduled_deadline')
+    key['auto_analysis'] = view['auto_analysis']
+    key['analysis_error'] = view['analysis_error']
     digest = hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()
     return view, digest
 
@@ -303,6 +308,11 @@ def main(argv=None):
     ap.add_argument('--changes-only', action='store_true', help='with --status, suppress repeated diagnosis')
     ap.add_argument('--first-report-s', type=float,
                     help='first report after this many measured seconds, then interval_s')
+    ap.add_argument('--baseline-raw', type=Path, help='validated full baseline raw for automatic same-ID reports')
+    ap.add_argument('--baseline-label', default='baseline')
+    ap.add_argument('--alignment-trace', action='store_true', help='summarize existing bounded alignment log per report')
+    ap.add_argument('--opening-analysis', action='store_true', help='automatically analyze and preserve a drained opening probe')
+    ap.add_argument('--opening-reference-job', help='completed opening probe for paired comparison')
     args = ap.parse_args(argv)
     if args.changes_only and not args.status: ap.error('changes-only requires status')
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job name')
@@ -371,6 +381,35 @@ def main(argv=None):
             elif args.once or state.get('last_announced_state') != meta['job_state']:
                 print(args.job+': '+meta['job_state']+', waiting for measurement/report', flush=True)
             state['last_announced_state'] = meta['job_state']
+            if args.baseline_raw and (out/'snapshot.json').is_file():
+                # Also catches up a saved window on monitor restart. Failures are
+                # retried without stopping health polling or the inference job.
+                saved = json.loads((out/'snapshot.json').read_text())
+                analysis_key = [saved['sha256'], str(args.baseline_raw), args.baseline_label, args.alignment_trace]
+                if state.get('analysis_key') != analysis_key or state.get('analysis_error'):
+                    try:
+                        from window_report import build_report
+                        result = build_report(out, args.baseline_raw, args.baseline_label,
+                                              args.job, remote, args.alignment_trace)
+                        state.update(analysis_brief=result['brief'], analysis_path=result['path'])
+                        if result.get('alignment_error'):
+                            state['analysis_error'] = result['alignment_error']
+                        else:
+                            state['analysis_key'] = analysis_key
+                            state.pop('analysis_error', None)
+                    except Exception as exc:
+                        state.pop('analysis_brief', None)
+                        state['analysis_error'] = str(exc)[:400]
+            if args.opening_analysis and terminal and meta.get('data') and is_drained(meta, rows):
+                try:
+                    from opening_report import build_report
+                    result = build_report(out, args.job, meta, remote, args.opening_reference_job)
+                    state.update(analysis_brief=result['brief'], analysis_path=result['path'],
+                                 analysis_kind='opening', analysis_key=meta['sha256'])
+                    state.pop('analysis_error', None)
+                except Exception as exc:
+                    state['analysis_error'] = 'opening analysis: '+str(exc)[:350]
+                    terminal = False  # Retry the read-only analysis; never rerun the GPU job.
             atomic_json(path, state)
             if args.notify: notify(state, path)
         except Exception as e:

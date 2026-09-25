@@ -1,0 +1,23 @@
+{
+  "source_commit": "759a6eb",
+  "test": "real extracted123key; same request order and work; identical now; 1ms rank skew in local admission timestamp",
+  "runs": [
+    {
+      "rank": 0,
+      "order": [
+        "short",
+        "long"
+      ],
+      "short_entry": 99.993
+    },
+    {
+      "rank": 1,
+      "order": [
+        "long",
+        "short"
+      ],
+      "short_entry": 99.994
+    }
+  ],
+  "implication": "synchronizing now alone does not fix per-request entry timestamp differences; canonicalize ordering or admission anchors"
+}

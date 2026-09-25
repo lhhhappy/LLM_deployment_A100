@@ -1,0 +1,11 @@
+{
+  "final_commit": "37e9002368390fefc92621ea8b18f73e86429596",
+  "reviewed_commit": "bc181ca7dc00c56ddae5452a166ca89a9bb7352e",
+  "review_file": "review-claude-123-tp-order.json",
+  "post_review_change": "Added the reviewer-requested duplicate RID guard len(by_id)==len(waiting_queue); no other change",
+  "files": {
+    "ax_rank0_decision.py": "9bd2f64b14bc56a49c6edd4fdad78b2449b6d73dc7ad69e9aebf7133e2c487d7",
+    "schedule_policy.py": "a00fa1dd9de21d0133db9005716b7e7a4630dcb9ec4c9139ce461a92c184e4c7",
+    "scheduler.py": "c17270a3b5b8bb039ea3c679837f2896ae384f1f48cc94aeae4fdc1a17ad7094"
+  }
+}

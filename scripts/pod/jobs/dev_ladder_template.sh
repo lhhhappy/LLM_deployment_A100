@@ -49,14 +49,13 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used --format=csv,noheader -l 5 > $out/gpu_util.csv 2>/dev/null & local gsp=$!
   local runner=("$AX/verify_kit/run_dev_checked.py")
   if [ "${G_WARMUP_PROFILE:-original}" != original ]; then
-    [ -z "${G_MEASURE_SECONDS:-}" ] || { echo 'short warmup requires the full replay runner'; return 2; }
     # Each short-warmup level currently requires its own verified receipt.
     # Original warmup still supports the existing cross-N reuse path.
     extra=""
     runner+=(--warmup-profile "$G_WARMUP_PROFILE")
   fi
   if [ -n "${G_MEASURE_SECONDS:-}" ]; then
-    runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS")
+    runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS" --warmup-profile "${G_WARMUP_PROFILE:-original}")
     echo "TIMED_DIAGNOSTIC N=$N admission_seconds=$G_MEASURE_SECONDS drain_all_admitted=true"
   fi
   ( cd $S1 && S1_HARNESS_DIR=$S1/harness python3 -B "${runner[@]}" --runner "$S1/run_dev.py" -- --base-url http://127.0.0.1:$PORT --set "$DATA_SET" \

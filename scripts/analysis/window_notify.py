@@ -39,13 +39,15 @@ def source_sample(state, data, error, now):
 
 def message(job, key, state, health, now):
     view, _ = compact_status(state, health, now)
-    brief = state.get('last_report', '暂无诊断快照')
+    brief = state.get('analysis_brief') or state.get('last_report', '暂无诊断快照')
     alerts = '; '.join(view['alerts'])[:300]
+    instruction = ('自动分析已完成：直接向用户简短报告结果，无需重复手动取数或运行分析。'
+                   '仅有异常或新问题才深入取证；不因窗口FAIL停任务。') if state.get('analysis_brief') else (
+                   '先读缓存摘要，按需取证；不因局部FAIL自动停任务。')
     return (f'[N30 watcher event {key[:12]}] {job}: '
             f"状态={view['job_state']} 阶段={view['phase']} 监控={view['monitor']} 完成={view['completed']}; "
-            f'{brief}; alerts={alerts}; error={view["error"]}. '
-            '程序触发检查：先读 notes/iterations/codex.md 和缓存摘要，按需取证。'
-            '完成简短分析、更新日志后结束本轮，等待下一事件；不因局部FAIL自动停任务。')[:1600]
+            f'{brief}; alerts={alerts}; error={view["error"]}; analysis_error={view["analysis_error"]}. '
+            f'证据：{state.get("analysis_path", "window/")}。{instruction}')[:1600]
 
 
 def main():

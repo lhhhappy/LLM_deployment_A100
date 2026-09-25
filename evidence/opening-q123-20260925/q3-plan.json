@@ -1,0 +1,32 @@
+{
+  "job": "077-opening_q3_interval1_n26",
+  "question": 3,
+  "baseline": "074-official_0925a_opening_n26",
+  "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "n": 26,
+  "admission_seconds": 600,
+  "drain_all_admitted": true,
+  "warmup": "rep16-v1",
+  "host_gb_per_rank": 64,
+  "pace122": false,
+  "mem_fraction_static": 0.87,
+  "mtp": "3/1/4",
+  "sole_change": {
+    "old": "--prefill-decode-interval 2",
+    "new": "--prefill-decode-interval 1"
+  },
+  "job_source": "scripts/pod/jobs/opening_q3_interval1_n26.sh",
+  "job_sha256": "95d930b9adf665ed8dfb7d16482fb8f46f4960206aebd5dccbd558acaf6131d0",
+  "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "mechanism_notes": [
+    "Q1 matches existing default chunk size8192; no CLI chunk change.",
+    "Q2 changes next-owner waiting order; no active-chunk preemption.",
+    "Q3 interval 2→1 means fewer decode-only scheduler turns; 2→4 would reverse the intent."
+  ],
+  "analysis": [
+    "paired074 fourTTFT",
+    "TPOT mean,p95,max,over0.10 count/denominator",
+    "backlog offline arrival-and-service ledger with padding residual",
+    "prefill throughput and decode wall-time estimates"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "073-official_0925a_opening_n22": {
+    "raw_count": 350,
+    "tpot_over10": 2,
+    "p95_harness": 0.08362323659847476
+  },
+  "074-official_0925a_opening_n26": {
+    "raw_count": 372,
+    "tpot_over10": 1,
+    "p95_harness": 0.08694283574844566,
+    "all_four_gates_and_tpot_match_original_timed_score": true
+  },
+  "analysis_script_sha256": "a40fc289d2fb375c9015eb637ba54353c05b19874c5420338aadc7e7f6e1743c"
+}

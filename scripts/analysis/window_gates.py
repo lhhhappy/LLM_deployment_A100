@@ -145,6 +145,7 @@ def summary(run: dict, label: str) -> str:
     scope = "observed/incomplete" if run["live"] else "whole"
     line = (f"{label}: {run['n_rows']} req, {run['span_min']:.0f} min | {scope} {gates(w)} | "
             f"tpot {t['mean']:.4f}/{t['p95']:.4f}" if t["n"] else f"{label}: {run['n_rows']} req")
+    if t["n"]: line += f" | TPOT>0.10 {t['over_0.10']}/{t['n']} ({t['over_0.10']/t['n']:.2%})"
     closed = [x for x in run["windows"] if not x["open"]]
     if closed:
         x = closed[-1]

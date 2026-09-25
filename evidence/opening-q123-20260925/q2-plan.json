@@ -1,0 +1,34 @@
+{
+  "job": "076-opening_q2_srpt300_n26",
+  "question": 2,
+  "baseline": "074-official_0925a_opening_n26",
+  "engine_commit": "37e9002368390fefc92621ea8b18f73e86429596",
+  "n": 26,
+  "admission_seconds": 600,
+  "drain_all_admitted": true,
+  "warmup": "rep16-v1",
+  "host_gb_per_rank": 64,
+  "pace122": false,
+  "mem_fraction_static": 0.87,
+  "mtp": "3/1/4",
+  "sole_change": {
+    "old": "G_ENV=\"",
+    "new": "G_ENV=\"SGLANG_AX_SRPT_AGING=300 "
+  },
+  "job_source": "scripts/pod/jobs/opening_q2_srpt300_n26.sh",
+  "job_sha256": "9bce0fdafcb1d50398c7fd9582981130de3d5e3eae90123079aa13f22d83c0d8",
+  "data_manifest_sha256": "19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c",
+  "mechanism_notes": [
+    "Q1 matches existing default chunk size8192; no CLI chunk change.",
+    "Q2 changes next-owner waiting order; no active-chunk preemption.",
+    "Q3 interval 2→1 means fewer decode-only scheduler turns; 2→4 would reverse the intent."
+  ],
+  "analysis": [
+    "paired074 fourTTFT",
+    "TPOT mean,p95,max,over0.10 count/denominator",
+    "backlog offline arrival-and-service ledger with padding residual",
+    "prefill throughput and decode wall-time estimates"
+  ],
+  "baseline_engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "source_change": "123 only: group leader computes admission RID order and broadcasts, disabled123 no new collective; reviewed PASS"
+}
