@@ -18,6 +18,9 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 - Optional 120 admission diagnostics use `SGLANG_AX_ADMISSION_TRACE=1` (default off), reported as
   `120_trace=on|off`. They count observed admission decisions on TP0 and do not change scheduling;
   CPU regressions are complete, diagnostic overhead and real failure attribution require TP8 sampling.
+- The separate 120 KV fallback uses `SGLANG_AX_SCHED_KV_SCAN=K` (default `0`, max `16`),
+  reported as `120_scan=off|K`. It scans a bounded tail after a rejected KV candidate,
+  retaining native budgets and single-partial ownership. CPU candidate only; TP8 confirmation pending.
 - The scheduler logs one `[ax] mechanisms:` line at startup (`101 120 122 123 140 180` as `on` / `off:<reason>`, plus
   speculative algorithm as resolved by the base, so `--speculative-algorithm NEXTN` shows as `spec=EAGLE`, DCP size and the requested model-side switches). Pod jobs declare `G_EXPECT` and refuse to
   measure on a mismatch.

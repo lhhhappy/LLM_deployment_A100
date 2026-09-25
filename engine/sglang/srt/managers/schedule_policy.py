@@ -1327,8 +1327,22 @@ class PrefillAdder:
         return self.budget_state()
 
     def add_one_req(
-        self, req: Req, has_chunked_req: bool, truncation_align_size: Optional[int]
+        self, req: Req, has_chunked_req: bool, truncation_align_size: Optional[int],
+        *, ax_complete_only: bool = False,
     ):
+        if ax_complete_only:
+            # 120's bounded KV fallback cannot start another partial or H2D.
+            assert self.ax_protect is not None and not _role_boundary_token_ids()
+            needed = self.ceil_paged_tokens(
+                len(req.full_untruncated_fill_ids) - len(req.prefix_indices)
+            )
+            if not self._ax_short_hit(req) or needed > min(
+                self.rem_chunk_tokens, self.rem_input_tokens
+            ):
+                if self.ax_admission_trace is not None:
+                    self.ax_admission_trace.record(req, "kv_scan_not_complete_device_short")
+                return AddReqResult.OTHER
+
         if self.ax_protect is not None and (
             self.ax_continuation is not None or self.new_chunked_req is not None
         ):
@@ -1350,7 +1364,8 @@ class PrefillAdder:
                         reason = "partial_long_tail"
                     else:
                         reason = "partial_token_budget"
-                    self.ax_admission_trace.record(req, reason)
+                    partial = self.ax_continuation or self.new_chunked_req
+                    self.ax_admission_trace.record(req, reason, {"partial_rid": partial.rid})
                 return AddReqResult.OTHER
 
         # TODO support cp with multiple requests
@@ -1379,6 +1394,25 @@ class PrefillAdder:
         # Shared Mamba pool: fold the new mamba state's shared-gap cost into
         # `total_tokens` so both `rem_total_tokens` gates reflect the joint budget.
         total_tokens += self._mamba_gap_budget_for_req(req)
+        if ax_complete_only:
+            # Match the actual full-prefill charge in _update_prefill_budget,
+            # including page rounding and the full clipped output reservation.
+            # The legacy gate uses unrounded input and remaining output; using
+            # it alone can let a marginal candidate overdraw after admission.
+            total_tokens = (
+                self.ceil_paged_tokens(cand_extend_input_len)
+                + min(req.sampling_params.max_new_tokens, CLIP_MAX_NEW_TOKENS)
+                + self.page_size
+                + self._mamba_gap_budget_for_req(req)
+            )
+            if (
+                self._mamba_gap_budget_for_req(req)
+                and self.rem_mamba_slots is not None
+                and self.rem_mamba_slots <= 0
+            ):
+                if self.ax_admission_trace is not None:
+                    self.ax_admission_trace.record(req, "kv_scan_mamba_slots")
+                return AddReqResult.NO_TOKEN
 
         # adjusting the input_tokens based on host_hit_length and page_size
         real_input_tokens = cand_extend_input_len - req.host_hit_length

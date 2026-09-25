@@ -75,5 +75,70 @@ python3 -B scripts/analysis/admission_trace.py server.log --raw raw.jsonl --json
 ```
 
 The source changes add no new GPU/host cache allocation. CPU per-waiting-request
-state consists of one timestamp, a small fixed-vocabulary counter dictionary and
-one last-reason field. Production performance or N@SLO improvement is not claimed.
+state consists of one timestamp, small fixed-vocabulary counter/example dictionaries
+and one last-reason field. Production performance or N@SLO improvement is not claimed.
+
+### First-admission evidence joins (schema 2)
+
+Each row now carries `observed_at_s` and `queue_entry_at_s`, using the same clock
+conversion as the scoring timestamps. The offline ledger matches the first queue
+episode (`t_exec_start_s - queue_time_s`) and receive/admission window, so warmup
+and retractions with the same RID do not contaminate it. A first small example per
+reason records the partial/blocking RID and whether a scan-stopping candidate was
+actually admitted. Counters remain cumulative; examples are not full event history.
+The existing 8 MiB lifetime output cap includes these fields.
+
+`scripts/analysis/admission_triage.py` first validates a complete fetched level and
+rechecks all four TTFT selectors against the original verdict. It writes JSON/CSV
+with a combined 8 MiB bound, distinguishes missing evidence from zero, and never
+infers GPU saturation or an ordering defect from a long queue or overtaking alone.
+Historical 069: 5601 requests validated, 311 unique TTFT bad requests, **all 311
+have unknown branch attribution** because that frozen run had no admission trace.
+229 were overtaken by later arrivals; this is an ordering observation, not a cause.
+
+```sh
+python3 -B scripts/analysis/admission_triage.py evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30 --json evidence/admission-wait-20260924/069-triage.json --csv evidence/admission-wait-20260924/069-triage.csv
+```
+
+## Opt-in bounded scan after KV rejection (CPU candidate)
+
+`SGLANG_AX_SCHED_KV_SCAN=K` defaults to `0` (off); `1..16` bounds the number of
+additional queue positions inspected **once per batch**. Startup reports the
+actual limit, e.g. `120_scan=4`, which a future job must include in `G_EXPECT`.
+Explicit enablement requires active 120 and no 101 role split; unsupported
+combinations refuse startup. Ordinary TP and L1/L2 HiCache are supported by the
+CPU logic; sessions and beam candidates are excluded from this fallback.
+
+The trigger is `NO_TOKEN` **before** the current candidate was added. A successful
+admission returning `NO_TOKEN` is a remaining-budget verdict and still stops.
+The fallback preserves queue order and the existing full latch/reset rules.
+It accepts only complete device short hits through the original `PrefillAdder`;
+there is no host load-back or new partial. Request rows, chunk/input budget,
+prefix locks, KV reservation and shared Mamba state charges still apply. Matched
+but rejected requests use the same COW/clear/slot cleanup as the original loop,
+inside its existing allocation group.
+
+For fallback candidates, the KV gate matches the **actual** full-prefill charge:
+paged input + full clipped output reserve + extra page + shared-state gap. CPU
+testing exposed why this matters: the native gate uses unrounded input and
+remaining output, which can admit a marginal candidate before charging more.
+This stricter check is scoped to `ax_complete_only=True`; the default path is
+unchanged. A candidate needing a new shared Mamba slot is rejected when its
+separate slot budget is exhausted. This does not establish absence of all
+possible cache-allocation races or resource failures in TP8.
+
+The 18 candidate CPU tests cover the real head-blocking counterexample, bounded
+lookahead, one-partial and page/input budgets, output reservation (including a
+retracted request), lock-time rejection, request/state slots, host/ownership
+exclusions, cleanup, and diagnostics. Existing 120/122/123 and diagnostic suites
+bring relevant checks to 112 passing tests. Pools, cache matching and forwards
+are fakes: no H2D, TP consistency, numerical or performance claim follows.
+
+No new persistent GPU buffer or cache pool is allocated. Admitting additional
+requests consumes the existing pools and adds CPU matching work; it can delay
+the blocked long request further. A bounded scan does **not** prove a starvation
+bound. It also does not reopen an already latched full batch. Therefore leave
+this off until a short TP8 correctness/overhead run, then compare `0` vs `4` with
+the same engine, diagnostics and complete workload. Judge all four TTFT gates,
+TPOT and new bad cases; frozen 071 is unchanged. Archive completed evidence
+locally, verify it, then clean the Pod using the existing bounded archive workflow.

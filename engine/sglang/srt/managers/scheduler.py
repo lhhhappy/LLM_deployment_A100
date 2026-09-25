@@ -213,6 +213,7 @@ from sglang.srt.managers.schedule_policy import (
     PrefillAdder,
     SchedulePolicy,
     _ax_sched_protect_config,
+    _role_boundary_token_ids,
     is_dsa_prefill_cp_in_seq_split,
     is_prefill_context_parallel_enabled,
 )
@@ -289,6 +290,7 @@ from sglang.srt.model_loader.utils import get_resolved_model_impl
 from sglang.srt.multiplex.multiplexing_mixin import SchedulerMultiplexMixin
 from sglang.srt.observability.metrics_collector import SchedulerMetricsCollector
 from sglang.srt.observability.req_time_stats import (
+    convert_time_to_realtime,
     flush_trace_batch,
     set_schedule_time_batch,
     set_time_batch,
@@ -1298,9 +1300,80 @@ class Scheduler(
             if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" and self.ps.tp_rank == 0:
                 from sglang.srt.managers.ax_admission_trace import AxAdmissionTrace
 
-                trace = AxAdmissionTrace(logger)
+                trace = AxAdmissionTrace(logger, to_epoch=convert_time_to_realtime)
             self._ax_admission_collector = trace
         return trace
+
+    def _ax_kv_scan_limit(self) -> int:
+        """120: bounded fallback after a rejected KV candidate; opt-in only."""
+        limit = getattr(self, "_ax_kv_scan_cfg", None)
+        if limit is None:
+            limit = int(os.environ.get("SGLANG_AX_SCHED_KV_SCAN", "0"))
+            if not 0 <= limit <= 16:
+                raise ValueError("SGLANG_AX_SCHED_KV_SCAN must be between 0 and 16")
+            if limit:
+                blocker = self._ax_sched_protect_blocker()
+                if blocker is not None or _role_boundary_token_ids():
+                    raise ValueError(
+                        "SGLANG_AX_SCHED_KV_SCAN requires active 120 and no role split: "
+                        + (blocker or "role_boundary")
+                    )
+            self._ax_kv_scan_cfg = limit
+        return limit
+
+    def _ax_release_rejected_match(self, req: Req):
+        # Cache matching may stage deferred COW/clear and allocate a Mamba slot.
+        # Session-owned slots have a separate lifecycle and must not be freed.
+        req.kv.mamba_cow_src_index = None
+        req.kv.mamba_needs_clear = False
+        if req.kv.holds_mamba and not getattr(req, "session", None):
+            self.tree_cache.req_to_token_pool.mamba_allocator.free(
+                req.kv.mamba_pool_idx.unsqueeze(-1)
+            )
+            req.kv.mamba_pool_idx = None
+
+    def _ax_scan_after_kv_rejection(self, adder, running_batch, start, trace):
+        """Return first unvisited queue index; leave the original full latch intact.
+
+        Only complete device short hits are eligible. All admission and future
+        decode reservations still go through the original PrefillAdder. This
+        runs inside the caller's Mamba allocation group, at most once per batch.
+        """
+        limit = self._ax_kv_scan_limit()
+        if not limit or adder.ax_protect is None:
+            return start
+        end = min(start + limit, len(self.waiting_queue))
+        while start < end:
+            if adder.chunk_budget_exhausted() or len(adder.can_run_list) >= self.get_num_allocatable_reqs(
+                len(running_batch.reqs), running_batch=running_batch
+            ):
+                break
+            req = self.waiting_queue[start]
+            start += 1
+            # Keep session and beam ownership outside this narrow fallback.
+            if req.beam_group is not None or getattr(req, "session", None):
+                if trace is not None:
+                    trace.record(req, "kv_scan_ownership_excluded")
+                continue
+            if trace is not None:
+                trace.begin_attempt(req)
+            req.init_next_round_input(self.tree_cache)
+            res = adder.add_one_req(
+                req,
+                has_chunked_req=(self.chunked_req is not None),
+                truncation_align_size=self.truncation_align_size,
+                ax_complete_only=True,
+            )
+            added = bool(adder.can_run_list) and req is adder.can_run_list[-1]
+            if not added:
+                if trace is not None:
+                    trace.rejected(req, "adder_" + res.name.lower())
+                self._ax_release_rejected_match(req)
+            # NO_TOKEN before admission is candidate-specific; after admission
+            # it describes the remaining batch budget, so stop just as before.
+            if res != AddReqResult.CONTINUE and added:
+                break
+        return start
 
     def _ax_mechanism_report(self) -> str:
         """[ax] Effective state of the scheduler-side mechanisms, one token per mechanism ("NNN=on" or
@@ -1327,6 +1400,7 @@ class Scheduler(
             m180 = "off:no_hierarchical_cache"
         else:
             m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
+        kv_scan_limit = self._ax_kv_scan_limit()
         items = {
             "101": m101,
             "120": "on" if blocker is None else f"off:{blocker}",
@@ -1335,6 +1409,7 @@ class Scheduler(
             "140": "on" if dual else "off",
             "180": m180,
             "120_trace": "on" if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" else "off",
+            "120_scan": str(kv_scan_limit) if kv_scan_limit else "off",
         }
         requested = " ".join(
             f"{k}={os.environ.get(k, '-')}"
@@ -4078,23 +4153,11 @@ class Scheduler(
                         )
                     else:
                         running_batch.batch_is_full = True
-                # revert matched mamba idx to avoid memory leak, if req is not added.
-                # Only free if the slot was freshly allocated in this batch (not
-                # pre-existing from a session). Session-held slots have their own
-                # lifecycle and freeing them here causes double-free.
                 added = len(adder.can_run_list) > 0 and req is adder.can_run_list[-1]
                 if not added:
                     if trace is not None:
                         trace.rejected(req, "adder_" + res.name.lower())
-                    # init_next_round_input() may stage deferred Mamba COW/clear
-                    # metadata before add_one_req() rejects the request.
-                    req.kv.mamba_cow_src_index = None
-                    req.kv.mamba_needs_clear = False
-                    if req.kv.holds_mamba and not getattr(req, "session", None):
-                        self.tree_cache.req_to_token_pool.mamba_allocator.free(
-                            req.kv.mamba_pool_idx.unsqueeze(-1)
-                        )
-                        req.kv.mamba_pool_idx = None
+                    self._ax_release_rejected_match(req)
                 if (
                     adder.ax_protect is not None
                     and not added
@@ -4107,8 +4170,18 @@ class Scheduler(
                     # A long/non-fitting waiter must not hide a short hit. Keep
                     # the native rejection cleanup above, and keep LPM order.
                     continue
+                next_index = queue_index + 1
+                if not added and res == AddReqResult.NO_TOKEN:
+                    next_index = self._ax_scan_after_kv_rejection(
+                        adder, running_batch, next_index, trace
+                    )
                 if trace is not None:
-                    trace.record_many(self.waiting_queue[queue_index + 1:], "unscanned_after_" + res.name.lower())
+                    trace.record_many(
+                        self.waiting_queue[next_index:],
+                        "unscanned_after_kv_scan" if next_index > queue_index + 1
+                        else "unscanned_after_" + res.name.lower(),
+                        {"blocker_rid": req.rid, "head_added": added},
+                    )
                 break
 
         if mamba_allocator is not None:

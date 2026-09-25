@@ -160,6 +160,7 @@ def load_source(root=CANDIDATE):
               scheduler_nvtx_method=lambda _: (lambda f: f),
               PrefillStats=NS(from_adder=lambda *a, **kw: None),
               set_time_batch=lambda *a: None, set_schedule_time_batch=lambda *a: None,
+              convert_time_to_realtime=lambda t: t + time.time() - time.perf_counter(),
               split_cached_prefix_by_tier=lambda **kw: (kw['prefix_len'], 0, 0))
     for name in ('SWATokenToKVPoolAllocator', 'DeepSeekV4HiSparseTokenToKVPoolAllocator',
                  'PureSWATokenToKVPoolAllocator', 'UnifiedMambaTokenToKVPoolAllocator',
@@ -175,6 +176,7 @@ def load_source(root=CANDIDATE):
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
              '_ax_admission_trace',
+             '_ax_kv_scan_limit', '_ax_scan_after_kv_rejection', '_ax_release_rejected_match',
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
              '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
@@ -696,7 +698,7 @@ class HiCacheTierTests(unittest.TestCase):
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache',
-                                '120_trace=off'])
+                                '120_trace=off', '120_scan=off'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
             rep = s._ax_mechanism_report()
