@@ -2,10 +2,12 @@
 
 2026-09-25 接手，交接见 [vllm-claude-code.md](../../../notes/handoffs/vllm-claude-code.md)。本页顶部是现状摘要，明细链接到证据。
 
-## 现状（2026-09-25 06:00 UTC，阶段交接）
+## 现状（2026-09-25 06:20 UTC，阶段交接）
 
-- **冻结基线**：`engine/vllm` @ `fb18e488` = 官方 vLLM `main` a811738a6（tag `vllm-base-a811738a6`）+ 000 + 010。
-  部署包由 `scripts/vllm/build_wheel.sh <commit>` 从提交打出（已为 `8e289cf4` 打过：320 MB；`fb18e488` 需重打）。
+- **冻结引擎**：`engine/vllm` @ `7ab38527` = 官方 vLLM `main` a811738a6（tag `vllm-base-a811738a6`）+ 000 + 010 + 101（默认关）。
+  基线运行不设 101 变量，101 运行只多设一个环境变量，同一个包；101 关闭时与底包行为相同（上游测试逐项对照，见下）。
+  部署包（开发机 `dist/`，`scripts/vllm/build_wheel.sh 7ab38527`）：`vllm-0.30.1rc1.dev114+ga811738a6.ax.7ab385272a72`，320,080,563 字节，SHA256 `f32bca57…`。
+  **尚未部署到 8 卡机**：等 Codex 的只读容量检查（盘、内存、可执行挂载）回传预算后再定。
 - **000 接口**：`/generate`（SGLang 形 SSE）与 `/flush_cache` 端点插件；收到时刻取自 ASGI 入口（与 SGLang 000 同层），flush 返回结构化收据（`level_verdict` 已接）。CPU 20 项。
 - **010 A100 移植**：稀疏注意力层三处 sm80 缺口（后端、索引器打分、fp8 写入）已补，按硬件门控，H100+ 路径不变。A100 单卡内核测试 48 + 123 + 8 项通过。
 - **两卡替身（TP2、真实配置截 8 层 + MTP、dummy 权重）**：启动、CUDA graph 全部捕获、接口探针全部通过。
@@ -23,7 +25,7 @@
 | 000 | `VLLM_PLUGINS` 含 `generate_compat`（`scripts/vllm/serve.sh` 设置） | 仅在点名时加载 |
 | 010 | 按硬件（compute capability 8.x） | A100 上开，H100+ 不生效 |
 | 101 | `VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS` | 空 = 关（不在冻结基线里，候选） |
-| 原生缓存开关 | `--prefix-cache-retention-interval None --prefix-match-unit 64` | 底包默认 0 / 块大小；两卡实测重算 −48%，未上八卡 |
+| 原生缓存开关 | `--prefix-cache-retention-interval None --prefix-match-unit 64` | 底包默认 0 / 块大小；两卡实测重算 −48%，未上八卡。**候选**：评测配置与用户商量后冻结，原生组合整体评价（与 Codex 约定） |
 
 ## TP8 待验证
 
