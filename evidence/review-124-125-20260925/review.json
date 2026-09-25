@@ -1,0 +1,48 @@
+{
+  "reviewed_commit": "3b2043f1",
+  "base": "83197755",
+  "decision": "BLOCK until admission model fixes; not deployed",
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "line": 89,
+      "issue": "Continuation remaining work uses the initial cache-match count, not already computed prefix progress.",
+      "evidence": "Only schedule_policy.match_prefix_for_req sets num_matched_prefix_tokens; calc_priority processes waiting_queue, not chunked_req; init_next_round_input without tree cache does not update it. Cold prompt200000 with prefix_indices196608 still yields200000 remaining instead of3392.",
+      "impact": "124 can park a nearly finished owner as a long/hopeless one; 125 overstates backlog and prolongs relief.",
+      "fix": "Separate waiting-cache estimates from continuation progress; calculate owner remaining from committed/current prefix, preserving initial cold identity separately."
+    },
+    {
+      "priority": "P1",
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "line": 1648,
+      "issue": "Rate sample pairs current scheduled batch token count with elapsed time since the previous batch was scheduled.",
+      "evidence": "_arm_prefill_decode_interval is called by get_next_batch_to_run, before the returned batch executes. An8192-token batch taking0.8s followed by32tokens records40tokens/s instead of10240.",
+      "impact": "Variable-size prefills bias the trigger; mode changes feed back into mispaired samples.",
+      "fix": "Store previous batch token count with its start anchor, or use cumulative completed work over a matching wall interval. Reset sampling anchor at flush/idle boundaries while retaining learned rate if desired."
+    },
+    {
+      "priority": "P2",
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "line": 236,
+      "issue": "Optional ratio guard is not latched until flush despite documented semantics.",
+      "evidence": "max_slow1000,ratio.1,min_seen10:2slow/10seen stops; adding11fast without flush makes2/21 and re-enters relief.",
+      "impact": "Only affects nondefault ratio guard; default absolute40 guard remains monotone.",
+      "fix": "Latch guard-tripped flag and clear only at reset."
+    },
+    {
+      "priority": "P2",
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "line": 5228,
+      "issue": "Flush resets relief/counters but keeps the last prefill wall anchor.",
+      "evidence": "_ax_backlog_last_t is not cleared by flush.",
+      "impact": "First new-level sample includes prior drain/idle/preflight gap, understating rate.",
+      "fix": "Clear sample anchor/previous tokens at successful flush; retain only EWMA rate."
+    }
+  ],
+  "limits": [
+    "Source review plus two pure-function counterexamples; no TP8 run of124/125",
+    "No safety guarantee for final client TPOT: guard samples only live decoders at prefill decisions, documented in125",
+    "F1/F2 run frozen759, so unaffected"
+  ]
+}

@@ -55,6 +55,7 @@ def main():
     ap.add_argument('job')
     ap.add_argument('--notify-test', action='store_true')
     ap.add_argument('--once', action='store_true')
+    ap.add_argument('--local-cache', action='store_true', help='read a watcher running in this workspace instead of over SSH')
     args = ap.parse_args()
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job')
     runtime = ROOT/'build/scratch/window-notify'/args.job
@@ -95,7 +96,13 @@ def main():
         try:
             deliver()
             try:
-                data = json.loads(run_bounded([str(ROOT/'scripts/gssh'), command], 80, cwd=ROOT))
+                if args.local_cache:
+                    data = dict(
+                        state=json.loads((ROOT/'build/scratch/window-watch'/args.job/'watch-state.json').read_text()),
+                        health=json.loads((ROOT/'evidence'/('L'+args.job)/'window/health.json').read_text()),
+                    )
+                else:
+                    data = json.loads(run_bounded([str(ROOT/'scripts/gssh'), command], 80, cwd=ROOT))
                 sample = source_sample(state, data, None, time.time())
             except Exception as exc:
                 sample = source_sample(state, None, exc, time.time())

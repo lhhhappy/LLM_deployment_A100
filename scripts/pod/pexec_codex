@@ -8,5 +8,11 @@ set -uo pipefail
 c="${1:-}"; [ -n "$c" ] || { sed -n 2,6p "$0"; exit 1; }
 deny='(bohr|trisol|inference|kill|pkill|killall|shutdown|reboot|halt|systemctl|podq|nvidia-smi +-r|--gpu-reset|flush_cache|start_profile|/generate|:30000|launch_server|sglang\.launch|(^|[;&| ])(rm|mv|cp|tee|dd|truncate|chmod|chown|ln)[^;&|]*/tmp/ax/(queue|src|runs|patches|bin|worker|engine)|>[^;&|]*/tmp/ax/(queue|src|runs|patches|bin|worker|engine))'
 if echo "$c" | grep -qiE "$deny"; then echo "REFUSED by pexec_codex policy (no stop / no kill / no writes outside /tmp/ax/codex / no engine requests): $c" >&2; exit 3; fi
-D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"
-PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c"
+case "${PEXEC_TRANSPORT:-gpu}" in
+  gpu)
+    D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"
+    PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c" ;;
+  local)
+    timeout "${PEXEC_TIMEOUT:-600}" bohr trisol inference exec "${L2_SERVICE_ID:-2102486579267252224}" --team arena -- bash -c "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c" ;;
+  *) echo 'PEXEC_TRANSPORT must be gpu or local' >&2; exit 2 ;;
+esac
