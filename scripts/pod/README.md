@@ -26,3 +26,21 @@ CPU 回归：`python3 -B -m unittest discover -s tests -p test_eval_tools.py`。
 
 070在启动时因Pod本地临时存储超过20Gi被平台驱逐。现有service恢复时可声明`AX_WORKSPACE_ROOT=/dev/shm/arena-runtime`，bootstrap在首次mkdir/上传前运行prepare_workspace.py，核tmpfs及cgroup至少64GiB余量，并将兼容路径`/tmp/ax`链接到RAM工作目录。源或目标存在未绑定的非空内容/异链即拒绝；原空目录树保留备份。
 该64GiB是引导下限，模型与host64启动后须重新核余量；shm计入cgroup，不是额外内存。JIT缓存暂留原可执行盘，RAM数据不持久，完整raw/日志必须持续导出。新Pod编译缓存与旧Pod不同，比较时记录基础设施重建，不能把全部差异归给引擎开关。
+
+## 已结束运行：本地归档后清理Pod副本
+
+用户授权按“运行结束→移到本地→校验→清理Pod”执行。入口在本地运行：
+
+```sh
+python3 -B scripts/analysis/archive_completed_runs.py --cleanup --watch 300
+```
+
+每5分钟检查done/failed任务；完整文件落到`evidence/pod-archives/<run>/<manifest-sha>/files/`，
+记录逐文件SHA256、原symlink关系、manifest和清理收据。以120KB块直接读回，Pod上不生成完整tar或额外副本。
+全部本地文件复核并fsync后，Pod重新校验同一manifest，才删除对应run目录。队列终态记录保留。
+传输失败、文件变化、仍有打开的fd/cwd、当前engine_log_path、其他run引用的日志或非普通文件均推迟处理；
+复用引擎的活动server.log必须等写入结束。归档后可在本地继续判分/分析，不靠Pod保留完整旧目录。
+
+状态只覆盖写`build/scratch/archive-maintenance/status.json`，进程持有同目录锁；后台运行不要再重定向成无限增长的日志。
+该工具不清理JIT缓存、模型、运行中任务、源码或整个服务。它减少已结束运行的驻留，不能保证其他目录不碰20Gi临时盘限制。
+CPU回归：`python3 -B -m unittest discover -s tests -p test_archive_completed_runs.py`。
