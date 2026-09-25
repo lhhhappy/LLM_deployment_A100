@@ -423,6 +423,13 @@ class Fp8Config(QuantizationConfig):
                 )
 
                 return Mxfp4FlashinferTrtllmMoEMethod(fp8_method, prefix=prefix)
+
+            if fp8_method.ax_sm80_humming:  # [ax] 117
+                from sglang.srt.layers.quantization.fp8_humming_moe import (
+                    Fp8HummingMoEMethod,
+                )
+
+                return Fp8HummingMoEMethod(fp8_method, prefix=prefix)
             return fp8_method
         elif isinstance(layer, RadixAttention):
             return Fp8KVCacheMethod(self)
@@ -1096,12 +1103,21 @@ class Fp8MoEMethod(FusedMoEMethodBase):
         self.with_bias = False
         # [ax] 111: sm80 has no fp8 tensor cores (Triton rejects fp8e4nv), so block-fp8
         # experts run weight-only through the Marlin MoE kernel (fp8 e4m3 weights, bf16 acts).
-        self.ax_sm80_marlin = (
+        ax_sm80_block_fp8 = (
             _is_cuda
             and can_auto_enable_marlin_fp8()
             and self.block_quant
             and not self.is_fp4_expert
             and not self.use_mxfp8
+        )
+        # [ax] 117: or through the Humming MoE runner instead (Fp8HummingMoEMethod, which
+        # borrows this instance only to create and load the checkpoint weights).
+        self.ax_sm80_humming = ax_sm80_block_fp8 and get_bool_env_var(
+            "SGLANG_AX_SM80_FP8_MOE_HUMMING", "false"
+        )
+        self.ax_sm80_marlin = (
+            ax_sm80_block_fp8
+            and not self.ax_sm80_humming
             and get_bool_env_var("SGLANG_AX_SM80_FP8_MOE_MARLIN", "true")
         )
         # The MxFP4 wrapper methods borrow this instance for weight loading;

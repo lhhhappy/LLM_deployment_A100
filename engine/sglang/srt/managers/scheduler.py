@@ -1317,6 +1317,7 @@ class Scheduler(
             m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
         items = {
             "101": m101,
+            "117": self._ax_humming_report(),
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
@@ -1326,11 +1327,21 @@ class Scheduler(
         requested = " ".join(
             f"{k}={os.environ.get(k, '-')}"
             for k in ("SGLANG_AX_SM80_INDEXER", "SGLANG_AX_SM80_FP8_MOE_MARLIN", "SGLANG_AX_INDEXER_ROW_SHARD",
-                      "SGLANG_AX_KDA_FUSE_PROJ", "SGLANG_AX_MOE_FUSE_SWIGLU")
+                      "SGLANG_AX_KDA_FUSE_PROJ", "SGLANG_AX_MOE_FUSE_SWIGLU",
+                      "SGLANG_AX_SM80_FP8_MOE_HUMMING")  # [ax] 117
         )
         spec = get_spec().speculative_algorithm or "-"
         return (" ".join(f"{k}={v}" for k, v in items.items())
                 + f" | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
+
+    def _ax_humming_report(self) -> str:
+        """[ax] 117: effective state, i.e. how many MoE layers this process serves through Humming."""
+        if os.environ.get("SGLANG_AX_SM80_FP8_MOE_HUMMING", "false").lower() not in ("1", "true"):
+            return "off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset"
+        from sglang.srt.layers.quantization.fp8_humming_moe import humming_moe_layer_count
+
+        n = humming_moe_layer_count()
+        return f"on:{n}_layers" if n else "off:no_sm80_block_fp8_moe_layer"
 
     def _ax_sched_protect_limits(self, chunk_size):
         if not self._ax_sched_protect_enabled():

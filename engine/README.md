@@ -33,6 +33,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 111 | FP8 MoE via Marlin W8A16 on sm80 | yes | `SGLANG_AX_SM80_FP8_MOE_MARLIN` (1) | yes |
 | 114 | indexer prefill rows split over TP ranks | yes | `SGLANG_AX_INDEXER_ROW_SHARD` (1) | yes |
 | 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP8 33/40 row mismatch unfixed |
+| 117 | FP8 MoE via Humming W8A16 on sm80 (takes precedence over 111) | no | `SGLANG_AX_SM80_FP8_MOE_HUMMING` (0) | dev box only |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |
@@ -51,6 +52,8 @@ git history (the `patches/` directory was removed after the migration).
 
 ## Default-off audit (2026-09-24, by reading `git diff official-A-0923a HEAD`)
 - 122, 123, 171, 172: identical when off.
+- 117: off keeps `Fp8MoEMethod` with the same 111 flag; dev box shows bitwise-equal weights and outputs against
+  37e90023's `fp8.py` (routing alignment held fixed), see `engine/docs/117-sm80-fp8-moe-humming.md`.
 - 115: source review confirms the default TP8 path retains staged output (`stage_output=True`); generated IR equivalence
   has not been independently checked.
 - 180: identical while every extend starts on a 64-token boundary. The one exception: a continuing chunk shortened to
