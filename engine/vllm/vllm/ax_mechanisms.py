@@ -22,10 +22,19 @@ def _sm80_port_state() -> str:
     return "on" if cap.major == 8 else f"off:sm{cap.major}{cap.minor}"
 
 
+def _role_checkpoint_state() -> str:
+    """101 is opt-in; the engine refuses to start if its preconditions fail."""
+    import vllm.envs as envs
+
+    ids = envs.VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS
+    return "on:" + ",".join(map(str, ids)) if ids else "off"
+
+
 def mechanisms_line(endpoint_plugin_loaded: bool) -> str:
     parts = [
         f"base={BASE_COMMIT}",
         f"000={'on' if endpoint_plugin_loaded else 'off'}",
         f"010={_sm80_port_state()}",
+        f"101={_role_checkpoint_state()}",
     ]
     return "[ax] vllm mechanisms: " + " ".join(parts)

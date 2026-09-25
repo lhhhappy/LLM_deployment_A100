@@ -204,6 +204,12 @@ class Request:
         # in the (sparse) prefix cache; 0 means none. Set at admission for
         # hybrid/Mamba models when a shared prefix is detected (Marconi-style).
         self.shared_prefix_boundary = 0
+        # engine vllm 101: a follow-up prompt that diverges at this prompt's
+        # last turn-opening token matches full attention up to
+        # ``role_boundary`` and resumes Mamba state at ``role_checkpoint``
+        # (one hash unit lower under EAGLE block drop); 0 = none.
+        self.role_boundary = 0
+        self.role_checkpoint = 0
         # DeepSeek-V4.1 only: SWA bounded replay. The request holds no
         # sliding-window KV below this position; 0 when nothing replays.
         self.replay_start = 0

@@ -114,6 +114,7 @@ if TYPE_CHECKING:
     VLLM_MAX_NUM_BAD_WORDS: int = 128
     VLLM_MAX_BAD_WORDS_TOTAL_TOKENS: int = 1024
     VLLM_PLUGINS: list[str] | None = None
+    VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS: list[int] = []
     VLLM_LORA_RESOLVER_CACHE_DIR: str | None = None
     VLLM_LORA_RESOLVER_HF_REPO_LIST: str | None = None
     VLLM_USE_AOT_COMPILE: bool = False
@@ -1159,6 +1160,16 @@ environment_variables: dict[str, Callable[[], Any]] = {
         if "VLLM_PLUGINS" not in os.environ
         else os.environ["VLLM_PLUGINS"].split(",")
     ),
+    # Token ids that open a chat turn (e.g. GLM's <|user|> and <|observation|>).
+    # When set, a Mamba "align" prefix cache also keeps the recurrent state at
+    # the hash boundary where a follow-up prompt that diverges at the last such
+    # token resumes (engine/docs/vllm/101-role-boundary-checkpoint.md).
+    # Comma-separated ints; unset or empty disables it.
+    "VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS": lambda: [
+        int(t)
+        for t in os.getenv("VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS", "").split(",")
+        if t.strip()
+    ],
     # a local directory to look in for unrecognized LoRA adapters.
     # only works if plugins are enabled and
     # VLLM_ALLOW_RUNTIME_LORA_UPDATING is enabled.
@@ -2328,6 +2339,8 @@ def compile_factors() -> dict[str, object]:
         "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS",
         "VLLM_WORKER_SHUTDOWN_TIMEOUT_SECONDS",
         "VLLM_KEEP_ALIVE_ON_ENGINE_DEATH",
+        # Scheduler-side cache retention; never affects compiled graphs.
+        "VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS",
         "VLLM_IMAGE_FETCH_TIMEOUT",
         "VLLM_VIDEO_FETCH_TIMEOUT",
         "VLLM_AUDIO_FETCH_TIMEOUT",

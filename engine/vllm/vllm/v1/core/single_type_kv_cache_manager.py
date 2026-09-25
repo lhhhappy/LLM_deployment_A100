@@ -146,6 +146,10 @@ class SingleTypeKVCacheManager(ABC):
         # ``CacheConfig.enable_mamba_shared_prefix_checkpoint``, narrowed and set
         # by ``KVCacheManager``; only an EAGLE Mamba "align" group ever gets it.
         self.shared_prefix_checkpoint = False
+        # VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS, validated and set on every
+        # group by ``KVCacheManager``: Mamba "align" groups keep the state there,
+        # full-attention groups add the key that reaches it.
+        self.role_checkpoint = False
         # Partial-hit copy-on-write bookkeeping. Populated only by fine-grained
         # managers (full attention, mamba "align"); harmlessly empty elsewhere.
         self._partial_hit_reqs: dict[str, tuple[int, KVCacheBlock]] = {}
@@ -506,6 +510,8 @@ class SingleTypeKVCacheManager(ABC):
         reachable_boundaries = [*replay_boundaries]
         if request.shared_prefix_boundary:
             reachable_boundaries.append(request.shared_prefix_boundary)
+        if self.role_checkpoint and request.role_checkpoint:
+            reachable_boundaries.append(request.role_checkpoint)
 
         block_mask = self.reachable_block_mask(
             start_block=num_cached_blocks,
@@ -857,6 +863,8 @@ class FullAttentionManager(SingleTypeKVCacheManager):
         if self.block_size == hash_block_size:
             return
         self._cache_partial_tail_block(request, num_tokens)
+        if self.role_checkpoint:
+            self._cache_role_boundary_block(request, num_tokens)
 
     def _cache_partial_tail_block(
         self,
@@ -887,6 +895,28 @@ class FullAttentionManager(SingleTypeKVCacheManager):
             kv_cache_group_id=self.kv_cache_group_id,
             block_size=self.block_size,
         )
+
+    def _cache_role_boundary_block(self, request: Request, num_tokens: int) -> None:
+        """Also key the block holding ``request.role_boundary`` (engine vllm 101).
+
+        Like the tail key, re-registered on every step once computed (a no-op
+        while present): registering a longer partial key and promoting the block
+        to a full one both drop all of the block's keys. Called after the tail
+        key, so the shorter role key is kept as an extra key of the block.
+        """
+        boundary = request.role_boundary
+        if not (boundary and boundary % self.block_size and boundary <= num_tokens):
+            return
+        blocks = self.req_to_blocks[request.request_id]
+        block_idx = boundary // self.block_size
+        if block_idx < len(blocks):
+            self.block_pool.cache_partial_block(
+                request=request,
+                block=blocks[block_idx],
+                num_tokens=boundary,
+                kv_cache_group_id=self.kv_cache_group_id,
+                block_size=self.block_size,
+            )
 
     def get_num_common_prefix_blocks(self, running_request_id: str) -> int:
         blocks = self.req_to_blocks[running_request_id]
@@ -2088,11 +2118,20 @@ class MambaManager(SingleTypeKVCacheManager):
         # observed to stop, and where the scheduler already ends a chunk. Bounded
         # to the prompt chunk being computed -- during decode the target is the
         # running state block, mutated in place, which equals what its key
-        # promises only after that step's forward.
-        if num_tokens != latest_prompt_hash_boundary and not (
+        # promises only after that step's forward. The role check-point is a
+        # junction predicted from the prompt (the scheduler stops there too).
+        in_prompt_chunk = (
+            request.num_computed_tokens < num_tokens <= request.num_prompt_tokens
+        )
+        at_junction = (
             self.shared_prefix_checkpoint
             and num_tokens == request.shared_prefix_boundary
-            and request.num_computed_tokens < num_tokens <= request.num_prompt_tokens
+        )
+        at_role_checkpoint = (
+            self.role_checkpoint and num_tokens == request.role_checkpoint
+        )
+        if num_tokens != latest_prompt_hash_boundary and not (
+            (at_junction or at_role_checkpoint) and in_prompt_chunk
         ):
             return None
 

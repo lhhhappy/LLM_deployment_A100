@@ -146,6 +146,7 @@ class KVCacheManager:
         metrics_collector: KVCacheMetricsCollector | None = None,
         watermark: float = 0.0,
         enable_mamba_shared_prefix_checkpoint: bool = False,
+        mamba_role_checkpoint_token_ids: Sequence[int] = (),
     ) -> None:
         self.max_model_len = max_model_len
         # When unset, fall back to `max_model_len` so the recycling-aware cap
@@ -193,6 +194,35 @@ class KVCacheManager:
             for manager in self.coordinator.single_type_managers:
                 if isinstance(manager, MambaManager):
                     manager.shared_prefix_checkpoint = True
+        # Role-boundary check-points (engine/docs/vllm/101): registered through
+        # the same sub-block partial-state path as the junction, so they need
+        # a Mamba "align" group and a prefix-match unit finer than its block.
+        self.mamba_role_checkpoint_token_ids = frozenset(
+            mamba_role_checkpoint_token_ids
+        )
+        self.mamba_role_checkpoint = bool(self.mamba_role_checkpoint_token_ids)
+        if self.mamba_role_checkpoint:
+            mamba_managers = [
+                m
+                for m in self.coordinator.single_type_managers
+                if isinstance(m, MambaManager) and m.mamba_cache_mode == "align"
+            ]
+            if not (
+                self.enable_caching
+                and mamba_managers
+                and self.coordinator.enable_partial_hash_hits
+                and self.coordinator.num_reprefillable_tokens == 0
+            ):
+                raise ValueError(
+                    "VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS needs prefix caching on a "
+                    "model with Mamba layers in 'align' cache mode, a "
+                    "--prefix-match-unit smaller than the Mamba block, and no "
+                    "multi-module MTP"
+                )
+            # Mamba groups keep the state; attention groups add the key that
+            # lets a follow-up's match reach it (engine vllm 101).
+            for manager in self.coordinator.single_type_managers:
+                manager.role_checkpoint = True
         self.num_kv_cache_groups = len(kv_cache_config.kv_cache_groups)
         self.block_pool = self.coordinator.block_pool
         self.retained_hit_group_ids = tuple(

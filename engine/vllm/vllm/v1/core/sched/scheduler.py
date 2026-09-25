@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from dataclasses import replace
 from typing import Any
 
+import vllm.envs as envs
 from vllm.compilation.cuda_graph import CUDAGraphStat
 from vllm.config import KVEventsConfig, VllmConfig
 from vllm.distributed.aux_output_connector.connector import AuxOutputSchedulerConnector
@@ -323,6 +324,11 @@ class Scheduler(SchedulerInterface):
             enable_mamba_shared_prefix_checkpoint=(
                 self.cache_config.enable_mamba_shared_prefix_checkpoint
             ),
+            # Passed as set: the manager refuses to start when prefix caching or
+            # another precondition is missing, rather than dropping it silently.
+            mamba_role_checkpoint_token_ids=(
+                envs.VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS
+            ),
         )
         # Bind after construction so connectors can access the cache manager.
         if self.connector is not None:
@@ -380,6 +386,11 @@ class Scheduler(SchedulerInterface):
             self.mamba_partial_cache_hit
             and self.kv_cache_manager.mamba_shared_prefix_checkpoint
         )
+        # Opt-in (engine/docs/vllm/101): also stop at the predicted junction
+        # after a prompt's last turn-opening token. The manager validated the
+        # same preconditions, so this is exactly its switch.
+        self.mamba_role_checkpoint = self.kv_cache_manager.mamba_role_checkpoint
+        assert not self.mamba_role_checkpoint or self.mamba_partial_cache_hit
 
         # Counts of non-empty steps scheduled / processed. update_from_output
         # is called once per scheduled step in FIFO order, so these stay in sync.
@@ -405,6 +416,29 @@ class Scheduler(SchedulerInterface):
         # In-flight requests still prefilling (prefill chunks + in-progress
         # async KV loads). Their remaining-block reservation gates async loads.
         self._inflight_prefills: set[Request] = set()
+
+    def _role_checkpoint_positions(self, request: Request) -> tuple[int, int]:
+        """Where a follow-up prompt diverging at this prompt's last turn resumes.
+
+        Agent prompts end with a turn the next request replaces (e.g. an
+        injected ``<|user|>`` reminder), so the next prompt shares this one up
+        to the last turn-opening token at index ``r``. Its full-attention match
+        reaches the last hash boundary before ``r``; EAGLE block drop resumes
+        one unit lower, where the Mamba state must exist. Returns
+        ``(boundary, checkpoint)``; ``(0, 0)`` when there is no such token or
+        the check-point coincides with the prompt-tail stop.
+        """
+        ids = self.kv_cache_manager.mamba_role_checkpoint_token_ids
+        tokens = request.prompt_token_ids or ()
+        r = next((i for i in range(len(tokens) - 1, -1, -1) if tokens[i] in ids), -1)
+        unit = self.hash_block_size
+        drop = unit if self.use_eagle_block_drop else 0
+        boundary = max(r, 0) // unit * unit
+        checkpoint = boundary - drop
+        tail = request.num_prompt_tokens // unit * unit - drop
+        if not 0 < checkpoint < tail:
+            return 0, 0
+        return boundary, checkpoint
 
     def _mamba_block_aligned_split(
         self,
@@ -516,6 +550,9 @@ class Scheduler(SchedulerInterface):
             # Marconi shared-prefix junction: cache its state so sibling
             # requests sharing the prefix can reuse it.
             junction_stop if start < junction < end else 0,
+            # Predicted junction at the prompt's last turn (engine vllm 101);
+            # set by add_request only when enabled, else 0.
+            request.role_checkpoint,
         )
         # Stop at the earliest mandatory position strictly inside the chunk.
         end = min((s for s in stops if start < s < end), default=end)
@@ -2550,6 +2587,10 @@ class Scheduler(SchedulerInterface):
         else:
             if request.resumable:
                 request.streaming_queue = deque()
+            if self.mamba_role_checkpoint:
+                request.role_boundary, request.role_checkpoint = (
+                    self._role_checkpoint_positions(request)
+                )
             self._enqueue_waiting_request(request)
             self.requests[request.request_id] = request
             if self.spec_decode_metrics_level != "none":

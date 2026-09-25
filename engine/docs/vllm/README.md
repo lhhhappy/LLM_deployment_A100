@@ -32,9 +32,10 @@ SGLang 路线（`engine/sglang/`、`engine/docs/NNN-*.md`、tag `engine-base`/`o
 | 编号 | 机制 | 开关 | 状态 |
 |---|---|---|---|
 | 000 | `/generate`（SGLang 形 SSE）与 `/flush_cache` 端点插件，启动打印 `[ax] vllm mechanisms:` | `VLLM_PLUGINS` 含 `generate_compat` | CPU 测试通过；两卡替身接口探针见 research/claude/vllm |
-| 010 | GLM-5.3-Flash 稀疏注意力层在 A100 上运行（fp8 软件编码、Triton 索引器打分、Triton 稀疏 MLA 后端） | 按硬件：仅 SM8x | A100 单卡内核测试通过；两卡替身启动中；TP8 未验证 |
+| 010 | GLM-5.3-Flash 稀疏注意力层在 A100 上运行（fp8 软件编码、Triton 索引器打分、Triton 稀疏 MLA 后端） | 按硬件：仅 SM8x | A100 单卡内核测试通过；两卡替身（截 8 层 + MTP、dummy 权重）启动、CUDA graph 捕获、接口探针通过；TP8 未验证 |
+| 101 | 在提示词最后一个开轮 token 处保留 KDA 检查点，供下一轮续算（候选，不在冻结基线） | `VLLM_AX_MAMBA_ROLE_CHECKPOINT_TOKEN_IDS`，空 = 关 | CPU 测试通过；上游调度器/前缀缓存测试与底包对照无新增失败；GPU 未验证 |
 
-说明见 [000](000-generate-compat.md)、[010](010-sm80-glm5next.md)。
+说明见 [000](000-generate-compat.md)、[010](010-sm80-glm5next.md)、[101](101-role-boundary-checkpoint.md)。
 
 ## 开发规则
 
