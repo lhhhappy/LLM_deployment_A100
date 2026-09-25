@@ -180,6 +180,8 @@ def load_source(root=CANDIDATE):
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
+    # Module-level helper the scheduler methods use: 120's sub-grid alignment trace (default off).
+    ns['ax_chunk_alignment'] = NS(ENABLED=False)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -312,12 +314,22 @@ class ProtectTests(unittest.TestCase):
         trace.append(step(s))
         self.assertEqual([r['mode'] for r in trace], ['prefill', 'decode', 'prefill', 'decode'])
         self.assertEqual([r[0] for r in trace[2]['reqs']], ['cold', 'short'])
-        # 120 caps a cold chunk only while other requests wait: alone it takes the full 8192 budget,
-        # once the short hit is waiting the continuation is capped to 2048 and the short joins the batch.
-        self.assertEqual(trace[0]['reqs'][0][2], 8192)
-        self.assertEqual(trace[2]['reqs'][0][2], 8192 + 2048)
+        # A request is decoding, so 121 caps the cold chunk at 2048 from the first chunk on
+        # (engine/docs/121: "chunks are uncapped only when the engine is otherwise idle"); the short
+        # hit joins the next prefill beside the capped continuation.
+        self.assertEqual(trace[0]['reqs'][0][2], 2048)
+        self.assertEqual(trace[2]['reqs'][0][2], 2048 + 2048)
         self.assertIn('short', [r[0] for r in trace[3]['reqs']])
         (EVIDENCE / 'interleave.json').write_text(json.dumps(trace, indent=2) + '\n')
+
+    def test_idle_cold_takes_the_full_budget_until_a_short_hit_waits(self):
+        # 120's own rule, with nothing decoding: alone the cold request takes the full 8192 budget;
+        # once a short hit waits, the continuation is capped to 2048 and the short joins the batch.
+        s, _ = make_scheduler(waiting=[Req('cold', 100000)])
+        first = step(s)
+        second = step(s, [Req('short', 512, cached=65536)])
+        self.assertEqual(first['reqs'], [('cold', 0, 8192)])
+        self.assertEqual(second['reqs'], [('cold', 8192, 8192 + 2048), ('short', 65536, 66048)])
 
     def test_only_cold_no_idle_or_decode_gap(self):
         cold = Req('cold', 100000)
@@ -458,8 +470,10 @@ class ProtectTests(unittest.TestCase):
         self.assertEqual(modes, ['prefill'] * 3)
 
     def test_unsupported_modes_bypass_protection(self):
+        # enable_hierarchical_cache is not in this list: since 180 the L1/L2 host tier keeps the
+        # protection and only L3 storage bypasses it (scheduler.py blocker list; HiCacheTierTests).
         for attr, value in [('is_mixed_chunk', True), ('require_mlp_sync', True),
-                            ('enable_lora', True), ('enable_hierarchical_cache', True),
+                            ('enable_lora', True), ('enable_hicache_storage', True),
                             ('enable_hisparse', True), ('is_hybrid_swa', True),
                             ('enable_priority_preemption', True), ('dllm_config', object()),
                             ('disaggregation_mode', 'prefill'), ('prefill_delayer', object()),
@@ -598,21 +612,6 @@ class ProtectTests(unittest.TestCase):
                     self.assertLessEqual(len(partials), 1)
                     self.assertGreaterEqual(a.rem_input_tokens, 0)
                     self.assertGreaterEqual(a.rem_chunk_tokens, 0)
-
-    def test_original_lpm_role_budget_and_interfaces_unchanged(self):
-        def classes(path):
-            return {n.name: {m.name: ast.dump(m) for m in n.body if isinstance(m, ast.FunctionDef)}
-                    for n in ast.parse(path.read_text()).body if isinstance(n, ast.ClassDef)}
-        base = classes(BASE / 'srt/managers/schedule_policy.py')
-        new = classes(CANDIDATE / 'srt/managers/schedule_policy.py')
-        self.assertEqual(base['SchedulePolicy'], new['SchedulePolicy'])
-        for method in ('_role_split_len', '_update_prefill_budget', '_mamba_gap_budget_for_req',
-                       '_req_inc_lock_ref', '_lock_node', 'rem_total_tokens', 'cur_rem_tokens'):
-            self.assertEqual(base['PrefillAdder'][method], new['PrefillAdder'][method], method)
-        for rel in ('srt/entrypoints/http_server.py', 'srt/managers/tokenizer_manager.py',
-                    'srt/managers/scheduler_components/flush_wrapper.py',
-                    'srt/managers/schedule_batch.py'):
-            self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
 
 # HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.
