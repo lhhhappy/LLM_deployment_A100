@@ -1327,6 +1327,7 @@ class Scheduler(
             "123": m123,
             "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
             "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
+            "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1374,6 +1375,43 @@ class Scheduler(
         # A user cap below one grid unit is rounded UP to permit progress.
         cap = max(grid, cap // grid * grid)
         return min(cap, budget // grid * grid), short, grid
+
+    def _ax_demand_cap_max(self) -> Optional[int]:
+        """[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX > 0 turns 120's fixed cold cap into a floor and lets the cold
+        chunk take what the waiting short hits do not need, up to this maximum. Read once; refuses to start with
+        122 (which sizes the same cap from its own reservation) or a maximum below 120's cap."""
+        cap_max = getattr(self, "_ax_demand_cap_max_cfg", False)
+        if cap_max is False:
+            cap_max = int(os.environ.get("SGLANG_AX_SCHED_COLD_CAP_MAX", "0") or 0)
+            if cap_max < 0:
+                raise ValueError("[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX must be >= 0")
+            if cap_max and not self._ax_sched_protect_enabled():
+                raise ValueError(f"[ax] 126 needs 120's protection, which is off: {self._ax_sched_protect_blocker()}")
+            if cap_max and self._ax_pace() is not None:
+                raise ValueError("[ax] 126 and 122 both size the cold cap; unset SGLANG_AX_PACE_TPOT")
+            if cap_max and cap_max < _ax_sched_protect_config()[0]:
+                raise ValueError("[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX is below SGLANG_AX_SCHED_COLD_CAP")
+            backlog = self._ax_admission_cfgs()[1]
+            if cap_max and backlog is not None and backlog.cold_cap:
+                raise ValueError("[ax] 126 and 125's SGLANG_AX_BACKLOG_COLD_CAP both size the cold cap; set one")
+            cap_max = cap_max or None
+            self._ax_demand_cap_max_cfg = cap_max
+            if cap_max:
+                logger.info(f"[ax] 126 on: cold cap between 120's cap and {cap_max} by waiting short-hit demand")
+        return cap_max
+
+    def _ax_demand_limits(self, chunk_size, ax_protect):
+        """[ax] 126: this round's cold cap = the budget minus what the waiting complete short hits need (the
+        requests 120 lets share a batch with a partial), counting only hits that fit beside 120's cap, clamped to
+        [120's cap, COLD_CAP_MAX] on the checkpoint grid. Hits refused for another reason stop being reserved
+        (_ax_short_hit_reserve). The inputs are the queue after calc_priority's prefix match, identical on every TP
+        rank.
+        """
+        floor, short, grid = ax_protect
+        budget = min(chunk_size, self.max_prefill_tokens) // grid * grid
+        reserve = self._ax_short_hit_reserve(budget, floor, short)
+        cap_max = self._ax_demand_cap_max() // grid * grid
+        return max(floor, min(cap_max, (budget - reserve) // grid * grid)), short, grid
 
     def _ax_should_decode(self, running_batch: ScheduleBatch) -> bool:
         if not self._ax_sched_protect_enabled() or self.prefill_decode_interval:
@@ -1615,10 +1653,23 @@ class Scheduler(
         budget = min(chunk_size, self.max_prefill_tokens)
         if self._ax_pace_tokens is not None:
             budget = min(budget, max(grid, self._ax_pace_tokens // grid * grid))
-        # A hit reserved in the previous round beside the same continuation that is still waiting was refused for a
-        # reason other than budget (request slots, KV, mamba slots, a partial-prefill rule). Stop reserving for it until
-        # this continuation ends, so one refused hit cannot shrink the continuation round after round; it can still be
-        # admitted whenever the batch has room. Same inputs on every TP rank, so the decision stays rank-consistent.
+        reserve = self._ax_short_hit_reserve(budget, grid, short)
+        cap = max(grid, (budget - reserve) // grid * grid)
+        return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
+
+    def _ax_short_hit_reserve(self, budget: int, min_cold: int, short: int) -> int:
+        """[ax] 122/126: tokens to keep free for the waiting complete short hits (device prefix hit, no host
+        load-back, 0 < new tokens <= `short`), page-rounded, in queue order (prefix matched by calc_priority this
+        round). A hit is reserved only if it fits beside a cold chunk of `min_cold` tokens; otherwise it can never
+        join such a batch and would only shrink the cold chunk (e.g. an 8192-token hit in an 8192 budget forcing
+        endless one-grid continuation chunks).
+
+        A hit reserved in the previous round beside the same continuation that is still waiting was refused for a
+        reason other than budget (request slots, KV, mamba slots, a partial-prefill rule). Stop reserving for it
+        until this continuation ends, so one refused hit cannot shrink the continuation round after round; it can
+        still be admitted whenever the batch has room. Same inputs on every TP rank, so the decision stays
+        rank-consistent.
+        """
         cont = self.chunked_req.rid if self.chunked_req is not None else None
         last_cont, last_reserved, blocked = getattr(self, "_ax_reserve_state", (None, frozenset(), frozenset()))
         waiting = {req.rid for req in self.waiting_queue}
@@ -1628,19 +1679,14 @@ class Scheduler(
         for req in self.waiting_queue:
             if req.rid in blocked:
                 continue
-            new = req.seqlen - len(req.prefix_indices)  # prefix matched by calc_priority this round
+            new = req.seqlen - len(req.prefix_indices)
             if len(req.prefix_indices) > 0 and not req.needs_host_load_back() and 0 < new <= short:
                 needed = -(-new // self.page_size) * self.page_size
-                # The continuation consumes at least one grid unit. Reserve
-                # only complete hits that fit beside it; otherwise an 8192-hit
-                # with an 8192 budget forces endless 64-token continuation
-                # chunks while the hit itself can never join those batches.
-                if needed <= budget - grid - reserve:
+                if needed <= budget - min_cold - reserve:
                     reserve += needed
                     reserved.append(req.rid)
         self._ax_reserve_state = (cont, frozenset(reserved), blocked)
-        cap = max(grid, (budget - reserve) // grid * grid)
-        return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
+        return reserve
 
     def _should_defer_prefill(self) -> bool:
         if self._prefill_decode_interval_remaining == 0:
@@ -4053,6 +4099,8 @@ class Scheduler(
         ax_protect = self._ax_sched_protect_limits(chunked_prefill_size)
         if ax_protect is not None and self._ax_pace() is not None:
             chunked_prefill_size, ax_protect = self._ax_pace_limits(chunked_prefill_size, ax_protect)
+        elif ax_protect is not None and self._ax_demand_cap_max() is not None:
+            ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect)
         backlog = self._ax_admission_cfgs()[1]
         if ax_protect is not None and backlog is not None and backlog.cold_cap and self._ax_backlog_relieved:
             # [ax] 125 opening mode: the cold cap while relieved. The flag is last round's broadcast
