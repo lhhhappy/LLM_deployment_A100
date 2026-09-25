@@ -254,6 +254,7 @@ class SchedulePolicy:
         self, waiting_queue: List[Req], running_batch: Optional[ScheduleBatch] = None
     ) -> None:
         policy = self._determine_active_policy(waiting_queue)
+        self.ax_held = set()  # [ax] 124 keeps LPM's in-batch prefix-sharing holdbacks last
 
         # Populate req.num_matched_prefix_tokens at schedule time. Cache-aware policies
         # set it in _compute_prefix_matches; do the same full match for
@@ -278,6 +279,7 @@ class SchedulePolicy:
             temporary_deprioritized = self._compute_prefix_matches(
                 waiting_queue, policy
             )
+            self.ax_held = temporary_deprioritized
             if policy == CacheAwarePolicy.LPM and _ax_srpt_aging() is not None:  # [ax] 123
                 # Entry timestamps are rank-local, so synchronizing only "now"
                 # cannot agree on aging. Compute the final order on group rank 0.
