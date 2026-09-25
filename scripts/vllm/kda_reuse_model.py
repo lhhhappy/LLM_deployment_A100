@@ -14,7 +14,7 @@ placement policies, assuming no eviction and no cross-chain sharing, and
 reports the tokens inside the frozen LCP that would be recomputed.
 
   calibrate: --calibrate probe.json [--block B]   (output of probe_prefix_reuse.py)
-  estimate:  --data-root data/s1-dev-longchain --block 576 --unit 64
+  estimate:  --data-root data/s1-dev-longchain --block 576 --unit 64 [--roles FILE]
 Numbers from `estimate` are model estimates, not measurements.
 """
 
@@ -31,18 +31,34 @@ def hit(kept: list[int], lcp: int, unit: int) -> int:
 
 
 def policies(block: int, unit: int, chunk: int):
+    """name -> (hash unit, kept(L, role_pos, hit) -> states this request adds)."""
+
+    def tail_u(L):
+        return (L // unit) * unit - unit
+
+    def role(R):
+        return (R // unit) * unit - unit if R > 0 else 0
+
+    def chunk_ends(L, hit):
+        return list(range((hit // chunk + 1) * chunk, L, chunk))
+
     return {
         f"default: tail state at floor(L/B)B-B, B={block}": (
             block,
-            lambda L: [(L // block) * block - block],
+            lambda L, R, hit: [(L // block) * block - block],
         ),
-        f"tail at u={unit}: floor(L/u)u-u": (
+        f"tail at u={unit}": (unit, lambda L, R, hit: [tail_u(L)]),
+        f"tail at u={unit} + every chunk end ({chunk}, dense retention)": (
             unit,
-            lambda L: [(L // unit) * unit - unit],
+            lambda L, R, hit: [tail_u(L), *chunk_ends(L, hit)],
         ),
-        f"tail at u={unit} + a state every {chunk} tokens (dense retention)": (
+        f"tail at u={unit} + last role boundary (sparse)": (
             unit,
-            lambda L: [(L // unit) * unit - unit] + list(range(chunk, L, chunk)),
+            lambda L, R, hit: [tail_u(L), role(R)],
+        ),
+        f"tail at u={unit} + last role boundary + every chunk end": (
+            unit,
+            lambda L, R, hit: [tail_u(L), role(R), *chunk_ends(L, hit)],
         ),
     }
 
@@ -53,6 +69,7 @@ def load_chains(data_root: str):
         for line in fh:
             r = json.loads(line)
             if r["view"] == "canon" and r.get("in_serving_load"):
+                r["_req_id"] = "%s:%s:%s" % (r["pack"], r["view"], r["logical_call_id"])
                 rows.append(r)
     by = collections.defaultdict(list)
     for r in rows:
@@ -67,23 +84,32 @@ def load_chains(data_root: str):
     return by
 
 
-def estimate(by, unit, place):
-    lost = n = zero = 0
+def estimate(by, unit, place, roles):
+    lost = n = zero = states = reqs = 0
     for rs in by.values():
         kept: list[int] = []
         for i, r in enumerate(rs):
             lcp = r["glm_lcp_with_prev"]
+            h = 0
             if i > 0 and lcp:
                 h = hit(kept, lcp, unit)
                 lost += lcp - h
                 zero += h == 0
                 n += 1
-            kept += place(r["glm_tokens"])
+            added = [
+                s
+                for s in place(r["glm_tokens"], roles.get(r["_req_id"], -1), h)
+                if s > h
+            ]
+            states += len(set(added))
+            reqs += 1
+            kept += added
     return {
         "follow_requests": n,
         "recomputed_tokens": lost,
         "mean": lost / max(1, n),
         "zero_hit": zero / max(1, n),
+        "states_per_request": states / max(1, reqs),
     }
 
 
@@ -116,17 +142,26 @@ def main() -> None:
     ap.add_argument("--block", type=int, default=576)
     ap.add_argument("--unit", type=int, default=64)
     ap.add_argument("--chunk", type=int, default=8192)
+    ap.add_argument("--roles", help="role_boundaries.py output (JSON lines)")
     args = ap.parse_args()
     if args.calibrate:
         calibrate(args.calibrate, args.block, args.block)
     if args.data_root:
         by = load_chains(args.data_root)
+        roles = {}
+        if args.roles:
+            for line in open(args.roles, encoding="utf-8"):
+                x = json.loads(line)
+                roles[x["req_id"]] = x["role_pos"]
         for name, (unit, place) in policies(args.block, args.unit, args.chunk).items():
-            e = estimate(by, unit, place)
+            if "role" in name and not roles:
+                continue
+            e = estimate(by, unit, place, roles)
             print(
                 f"{name}: {e['recomputed_tokens'] / 1e6:.1f}M tokens over "
                 f"{e['follow_requests']} follow-ups (mean {e['mean']:,.0f}, "
-                f"zero-hit {e['zero_hit']:.1%})"
+                f"zero-hit {e['zero_hit']:.1%}); new KDA states per request "
+                f"{e['states_per_request']:.2f}"
             )
 
 

@@ -1,0 +1,8 @@
+45 failed, 450 passed, 2 errors in 406.49s (0:06:46)
+base: Counter({'PASSED': 433, 'FAILED': 45, 'ERROR': 2}) ours: Counter({'PASSED': 450, 'FAILED': 45, 'ERROR': 2})
+new failures in ours: 0
+tests only in ours: 17 Counter({'PASSED': 17})
+base-failing now passing: 0
+REGRESS_DONE /sjtu/linhang/arena/vllm/runs/regress-055122
+DONE rc=0
+
