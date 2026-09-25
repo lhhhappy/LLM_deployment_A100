@@ -1315,8 +1315,13 @@ class Scheduler(
             m180 = "off:no_hierarchical_cache"
         else:
             m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
+        # 118 is recorded by the DSA backend; a process that never imported it has none (and a non-DSA
+        # build may lack its dependencies), so look it up without importing.
+        dsa_backend = sys.modules.get("sglang.srt.layers.attention.dsa_backend")
+        m118 = dsa_backend.ax118_state() if dsa_backend is not None else "off:no_dsa_backend"
         items = {
             "101": m101,
+            "118": m118,
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
