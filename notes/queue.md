@@ -12,7 +12,7 @@
 | Job | 配置 | 状态 |
 |---|---|---|
 | 071-official_b_host64_full_n30_shortwarm | 冻结759a6eb、host64+122；新Pod/RAM缓存冷启动 | 07:54:11 UTC开始正式N30测量，rep16预热106秒16/16、真flush成功。首次分析08:09 UTC，之后每30分钟。14类缓存恢复依赖索引，原二进制不变；恢复进程已退出。TF32与069/0925a保持关闭。见[根因与恢复](reports/sglang-cold-jit-0925.md) |
-| 072-vllm_tp8_real_smoke | 官方main a811738a6 + 000/010，基线冻结fb18e488（不含101）；TP8完整真实权重、MTP、接口/长上下文/缓存冒烟；部署产物与工具哈希待核验 | **计划预留在071之后，未入队、未安装环境**；无connector的000接口与flush判分CPU联调已通过；Claude准备独立venv容量/兼容性收据及vLLM任务入口，Codex协调共享队列；06:14 UTC新Pod可exec，优先核容量与写入落点。见[安排](reports/vllm-tp8-slot-072.md) |
+| 072-vllm_tp8_real_smoke | 按用户最新要求使用主办方 `vllm-backport:260918-sm80`（v0.13.1 / cde54e8e，原生s1_generate）；TP8真实权重、MTP、接口/缓存冒烟；旧main a811738a6的包与000收据不可直接套用 | **保留位置，未入队、未安装Pod环境**；Claude在开发机导出镜像环境，完整文件校验、实际展开/安装峰值与backport接口适配待核；071及条件性N38优先级不变。见[安排](reports/vllm-tp8-slot-072.md)与[镜像身份](../evidence/vllm-backport-identity-20260925/README.md) |
 | 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC旧Pod临时存储超20Gi被驱逐；09-25 06:14 UTC revision2新Pod已可exec；070没有恢复执行 |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
