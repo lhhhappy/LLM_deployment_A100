@@ -1,0 +1,243 @@
+{
+  "status": "VERIFIED_NO_BLOCKING_FINDINGS",
+  "reviewer": "independent Codex subagent review_sglang_n22",
+  "reviewed_at_utc": "2026-09-25T09:27:04.273373+00:00",
+  "scope": "Local-only independent review of071 check75 and question.md section5. No Pod/GPU calls, engine/source/document edit or new experiment. Only evidence/question-refresh-20260925/review75.json is written.",
+  "question_sha256": "8977ae7ec884e9ba27ad78532d8c5378a1fecfbcd9966f77a1f0525a1ea106bc",
+  "blocking_findings": [],
+  "snapshot_identity": {
+    "candidate_rows": 4203,
+    "candidate_unique_ids": 4203,
+    "prior45_rows": 2362,
+    "prior45_unique_ids": 2362,
+    "prior45_rows_semantically_unchanged": 2362,
+    "prior45_file_is_byte_identical_prefix_of75_file": true,
+    "newly_completed_since45": 1841,
+    "baseline_total": 5601,
+    "remaining_expected": 1398,
+    "candidate_ids_all_in_frozen_cohort_and_complete069": true,
+    "candidate_error_rows": 0,
+    "raw_sha256_verified_locally": "89f2693b9317de73aef3011a2bddc9992f6fcd7e63878eac8f6e7b42e801ce94",
+    "raw_bytes_verified_locally": 5205437,
+    "gzip_sha256_in_transfer_and_original_snapshot_receipt": "3371905d4d3dc3e0d5a9e10548151724b6c8ec0e6f73d256b5ee4637902b4ca5",
+    "gzip_review_limit": "This independent review recomputed the local decompressed raw SHA256 and cross-checked gzip identity between transfer.json and snapshot.json. Original gzip bytes are not present under the local evidence tree, so their hash was not recomputed here; direct original-gzip verification is the parent transfer receipt, not a new Pod observation.",
+    "snapshot_collection_start_s": 1790327402.7614841,
+    "last_raw_client_finish_at_s": 1790327402.7790575,
+    "last_row_after_collection_start_ms": 17.57335662841797,
+    "timestamp_interpretation": "The snapshot timestamp is collection start, not a strict cutoff. The last row completes17.573ms later and is retained. Later health counts are not merged into this4203-row cohort."
+  },
+  "fixed_cohort_recheck": {
+    "source": "data/s1-dev-longchain/cohort.json plus requests.jsonl, assigning _idx_in_chain from each declared req_ids order and applying original harness in_ttft_gate",
+    "n_chains": 311,
+    "n_requests": 5601,
+    "chain_gate_n": 432,
+    "completed_chain_gate_n": 385,
+    "uncompleted_chain_gate_n": 47,
+    "all4203_gate_memberships_match_frozen_input": true,
+    "all4203_prompt_tokens_match_frozen_glm_tokens": true,
+    "all4203_output_tokens_match_frozen_max_output_i": true,
+    "note": "432 is independently reproduced from frozen input metadata, not inferred from the partial sample or borrowed solely from an earlier score."
+  },
+  "paired_metrics_recheck": {
+    "method": "Select complete069 rows by exactly the4203 candidate IDs. Apply original in_ttft_gate and unweighted sorted[floor(.95*n)] quantile; independently recompute counts/p95 and TPOT mean/p95. All checked values equal analysis.json.",
+    "gates": {
+      "fast": {
+        "n": 3454,
+        "baseline_over": 222,
+        "candidate_over": 199,
+        "baseline_p95_s": 4.116788148880005,
+        "candidate_p95_s": 3.5405032634735107
+      },
+      "overall": {
+        "n": 3671,
+        "baseline_over": 195,
+        "candidate_over": 146,
+        "baseline_p95_s": 5.489399671554565,
+        "candidate_p95_s": 4.136372804641724
+      },
+      "turn": {
+        "n": 147,
+        "baseline_over": 7,
+        "candidate_over": 3,
+        "baseline_p95_s": 13.640632629394531,
+        "candidate_p95_s": 8.639774560928345
+      },
+      "chain": {
+        "n": 385,
+        "baseline_over": 31,
+        "candidate_over": 30,
+        "baseline_p95_s": 48.906047105789185,
+        "candidate_p95_s": 48.863189697265625
+      }
+    },
+    "baseline_tpot": {
+      "n": 4203,
+      "mean": 0.0322542856806112,
+      "p95": 0.06129298492766965,
+      "over_0.10": 2
+    },
+    "candidate_tpot": {
+      "n": 4203,
+      "mean": 0.03129202866521971,
+      "p95": 0.05573319422298269,
+      "over_0.10": 0
+    },
+    "phase_aggregates": "All four gate counts, queue>=80% counts, queue share of summed bad-request TTFT and post-admission-over-target counts were independently recomputed and match.",
+    "chain_phase_aggregates": {
+      "over": 30,
+      "queue_share_of_bad_summed_ttft": 0.8982832819271206,
+      "queue_ge80": 22,
+      "post_admission_over_limit": 1
+    },
+    "completed_only_limit": "These are paired completed-request diagnostics. They do not establish a full level verdict, a stable gain, or a causal effect of122 in isolation from the known new-Pod/warmup differences."
+  },
+  "conditional_full_cohort_chain_bound": {
+    "fixed_full_n": 432,
+    "observed_bad": 30,
+    "old45_bad": 29,
+    "best_possible_final_bad_if_no_new_failures": 30,
+    "methods": {
+      "clopper_pearson": {
+        "allowed_over": 29,
+        "lower_at30_of432": 0.050425202709749664,
+        "best_case_final_pass": false
+      },
+      "wilson": {
+        "allowed_over": 29,
+        "lower_at30_of432": 0.05189106310946986,
+        "best_case_final_pass": false
+      },
+      "wald": {
+        "allowed_over": 30,
+        "lower_at30_of432": 0.049326885129917494,
+        "best_case_final_pass": true,
+        "condition": "exactly30 final failures; one more invalidates this best case"
+      }
+    },
+    "independent_binomial_test_check": {
+      "method": "Direct stdlib math.comb sum of Binomial(432,.05) upper tail, independent of score_formal numerical inversion.",
+      "p_x_ge29": 0.06854269538235462,
+      "p_x_ge30": 0.04575016130851216,
+      "interpretation": "29 remains allowed at one-sided alpha=.05;30 is rejected."
+    },
+    "accepted_statement": "Conditional on the fixed432-request chain cohort, retained immutable recorded outcomes and eventual complete valid data,071 cannot pass the chain gate under current local CP or Wilson. This follows from count monotonicity even if all47 remaining chain requests meet30s.",
+    "must_not_claim": [
+      "071 already has a complete VALID FAIL receipt.",
+      "The official confidence-interval implementation is known or formal N is predicted.",
+      "The Wald diagnostic should replace the predetermined primary CP method.",
+      "This SLO observation is a correctness bug or authorization to stop071 or launchN38."
+    ],
+    "question_assessment": "question.md:144 states these conditions and limitations accurately."
+  },
+  "new_chain_case": {
+    "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+    "gate": "chain_start",
+    "baseline_ttft_s": 29.64221954345703,
+    "ttft_s": 31.515211820602417,
+    "queue_s": 0.12681818008422852,
+    "recv_to_admission_s": 0.7875475883483887,
+    "admission_to_first_s": 30.72766423225403,
+    "baseline_recv_to_admission_s": 0.5216314792633057,
+    "baseline_admission_to_first_s": 29.120588064193726,
+    "prompt": 256733,
+    "cached": 41216,
+    "baseline_cached": 42240,
+    "newly_observed_since45": true,
+    "raw_phase": "intra",
+    "raw_idx_in_chain": 0,
+    "original_harness_gate": "chain_start",
+    "not_overall_intra": true,
+    "newly_observed_chain_bad_since45_count": 1,
+    "ttft_delta_s": 1.8729922771453857,
+    "recv_to_admission_delta_s": 0.265916109085083,
+    "post_admission_delta_s": 1.6070761680603027,
+    "cached_delta_tokens": -1024,
+    "candidate_uncached_tokens": 215517,
+    "timing_additivity_checked": true,
+    "static_decomposition_bound": "Holding the observed post-admission trajectory fixed, removing all0.787548s receive-to-admission time still leaves30.727664s, above the30s target.",
+    "causal_limits": [
+      "post-admission includes batch preparation, multiple prefill chunks, interleaved decode, dependency waits and result handling; it is not pure kernel time.",
+      "The1024-token cache-hit decrease is observed but cannot explain all1.607076s post-admission increase without execution/restore evidence.",
+      "Earlier admission could itself change later contention and execution timing; the static bound is not a proof that every admission-policy intervention is useless for this request.",
+      "No new service log for this interval was fetched; actual block sizes, interleaved decode and restore contribution remain unmeasured."
+    ]
+  },
+  "nonblocking_comments": [
+    {
+      "location": "question.md:140",
+      "type": "causal_precision",
+      "suggestion": "Optionally qualify 不能靠只修首次准入等待解决它 as 保持入批后路径不变时，仅消去现有入批前等待仍超过30秒. This preserves the useful static bound without claiming earlier admission can never change post-admission contention.",
+      "required": false
+    },
+    {
+      "location": "question.md:129 / transfer.json",
+      "type": "evidence_scope",
+      "note": "The document can retain the parent-confirmed original gzip verification. This local independent review directly verifies raw SHA and receipt consistency; it does not claim a fresh remote gzip hash check.",
+      "required": false
+    }
+  ],
+  "script_review": {
+    "analyze_py_read": true,
+    "main_not_executed": "Its main writes analysis.json and CSV; this review used independent in-memory calculations and wrote only review75.json.",
+    "csv_line_terminator": "Parent changed to explicit LF; no effect on analysis metric calculations.",
+    "remaining_measurement_caveats": [
+      "Frozen engine lacks the new per-branch admission trace.",
+      "Completion and full-run validity remain pending.",
+      "Same-ID completed-only selection and known environment differences prevent an isolated performance attribution to122."
+    ]
+  },
+  "source_manifest": {
+    "question.md": {
+      "sha256": "8977ae7ec884e9ba27ad78532d8c5378a1fecfbcd9966f77a1f0525a1ea106bc",
+      "bytes": 25915
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check75/analysis.json": {
+      "sha256": "4dbf8e93302c09c5dacc1e60625f3deefb10c6f0a525277748dbf62c0640e052",
+      "bytes": 5136
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check75/analyze.py": {
+      "sha256": "84f3bebb3d8768e4b579f83706ec502fdb93a767509fe55247154dbc286a609d",
+      "bytes": 3627
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check75/raw.jsonl": {
+      "sha256": "89f2693b9317de73aef3011a2bddc9992f6fcd7e63878eac8f6e7b42e801ce94",
+      "bytes": 5205437
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check75/transfer.json": {
+      "sha256": "257073a9c938ddf16c65f5707802a8938fffe682b4f021d3c61f9e660ef441b6",
+      "bytes": 780
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check75/snapshot.json": {
+      "sha256": "3a1a04b959c644b472461153b4e323a74b94998372fb6a946b759035ac519899",
+      "bytes": 4527
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check45/raw.jsonl": {
+      "sha256": "2f48e0baaa2e5279206e0552b2c6069d8ea7be9c1661ff9cd3e7c152c4b9bb0a",
+      "bytes": 2928666
+    },
+    "data/s1-dev-longchain/cohort.json": {
+      "sha256": "60799f7856cd5c08685ac11f0d6e452fa4de05dd3518d13c22b2030c09e75ed6",
+      "bytes": 356958
+    },
+    "data/s1-dev-longchain/requests.jsonl": {
+      "sha256": "060fecce235ee4c1437230ad9e88a879eecf2b239c33af91dc3e0bc091c453e9",
+      "bytes": 5875067
+    },
+    "scripts/score_formal.py": {
+      "sha256": "a1041fe96c29e0b052f6430feaf5b980793715d5e3535f79dd61dfdcd7aefb9b",
+      "bytes": 27177
+    },
+    "s1-dev/harness/s1_common.py": {
+      "sha256": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+      "bytes": 15356
+    },
+    "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/score_formal.json": {
+      "sha256": "4131314a9ba6282307bfb3318ddf00676785621b870561e59f876e4bb804f6fb",
+      "bytes": 39654
+    },
+    "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/raw_s1-dev-longchain_N30_1790280416.jsonl": {
+      "sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b",
+      "bytes": 6933772
+    }
+  }
+}

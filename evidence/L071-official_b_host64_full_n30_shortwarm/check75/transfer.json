@@ -1,0 +1,12 @@
+{
+  "gzip_sha256": "3371905d4d3dc3e0d5a9e10548151724b6c8ec0e6f73d256b5ee4637902b4ca5",
+  "raw_sha256": "89f2693b9317de73aef3011a2bddc9992f6fcd7e63878eac8f6e7b42e801ce94",
+  "raw_bytes": 5205437,
+  "rows": 4203,
+  "archive_source": "/tmp/ax/codex/window_071-official_b_host64_full_n30_shortwarm_3371905d4d3dc3e0d5a9e10548151724b6c8ec0e6f73d256b5ee4637902b4ca5.gz",
+  "observation_start_s": 1790327402.7614841,
+  "last_completed_s": 1790327402.7790575,
+  "time_note": "observed_at is snapshot collection start, before reading live raw; last complete row is 17.6ms later; all original rows retained",
+  "local_tar_sha256": "5ae9d12f08d73d64c5c4ade3c60cdf270108132385ec21d736b46da66379514e",
+  "verification": "original immutable Pod gzip and decompressed raw SHA256 both verified"
+}

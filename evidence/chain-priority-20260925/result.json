@@ -1,0 +1,140 @@
+{
+  "scope": "CPU mechanism probes and descriptive completed-request diagnostics; no counterfactual TTFT/N prediction",
+  "policy_sha256": "5cc46e56b87b67e96c216d675cc22b87910d0ab067ef293aad55d0e7d3094141",
+  "aging_tokens_per_second": 2000,
+  "ordering_cases": [
+    {
+      "old_remaining": 100000,
+      "old_wait_s": 20,
+      "fresh_remaining": 3000,
+      "actual_order": [
+        "fresh",
+        "old"
+      ]
+    },
+    {
+      "old_remaining": 100000,
+      "old_wait_s": 48.4,
+      "fresh_remaining": 3000,
+      "actual_order": [
+        "fresh",
+        "old"
+      ]
+    },
+    {
+      "old_remaining": 100000,
+      "old_wait_s": 48.6,
+      "fresh_remaining": 3000,
+      "actual_order": [
+        "old",
+        "fresh"
+      ]
+    },
+    {
+      "old_remaining": 250000,
+      "old_wait_s": 123.4,
+      "fresh_remaining": 3000,
+      "actual_order": [
+        "fresh",
+        "old"
+      ]
+    },
+    {
+      "old_remaining": 250000,
+      "old_wait_s": 123.6,
+      "fresh_remaining": 3000,
+      "actual_order": [
+        "old",
+        "fresh"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "run": "069-full",
+      "raw_sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b",
+      "raw_rows": 5601,
+      "chain_bad": 31,
+      "groups": [
+        {
+          "uncached_range": [
+            0,
+            4096
+          ],
+          "n": 2,
+          "queue_ge80": 2
+        },
+        {
+          "uncached_range": [
+            4097,
+            32768
+          ],
+          "n": 6,
+          "queue_ge80": 6
+        },
+        {
+          "uncached_range": [
+            32769,
+            65536
+          ],
+          "n": 7,
+          "queue_ge80": 5
+        },
+        {
+          "uncached_range": [
+            65537,
+            1000000000
+          ],
+          "n": 16,
+          "queue_ge80": 7
+        }
+      ]
+    },
+    {
+      "run": "071-window45",
+      "raw_sha256": "2f48e0baaa2e5279206e0552b2c6069d8ea7be9c1661ff9cd3e7c152c4b9bb0a",
+      "raw_rows": 2362,
+      "chain_bad": 29,
+      "groups": [
+        {
+          "uncached_range": [
+            0,
+            4096
+          ],
+          "n": 0,
+          "queue_ge80": 0
+        },
+        {
+          "uncached_range": [
+            4097,
+            32768
+          ],
+          "n": 8,
+          "queue_ge80": 8
+        },
+        {
+          "uncached_range": [
+            32769,
+            65536
+          ],
+          "n": 5,
+          "queue_ge80": 5
+        },
+        {
+          "uncached_range": [
+            65537,
+            1000000000
+          ],
+          "n": 16,
+          "queue_ge80": 9
+        }
+      ]
+    }
+  ],
+  "caveats": [
+    "Sorting cannot override active-partial, host eligibility or resource limits.",
+    "Cached tokens come from the first token-producing response event, not a snapshot of every admission attempt.",
+    "071 contains only completed requests; not a level verdict.",
+    "Aging crossover against one fresh request is not a queue-wait guarantee."
+  ]
+}

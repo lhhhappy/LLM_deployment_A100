@@ -1,0 +1,189 @@
+{
+  "scope": "completed requests only; all windows open; not a valid full-run verdict",
+  "paired": {
+    "scope": "completed_requests_only; all candidate windows open; not a verdict",
+    "baseline_total": 5601,
+    "candidate_completed": 4203,
+    "baseline_requests_absent": 1398,
+    "same_request_baseline": {
+      "n": 4203,
+      "n_ok": 4203,
+      "errors": 0,
+      "gates": {
+        "fast": {
+          "limit_s": 3.0,
+          "n": 3454,
+          "over": 222,
+          "allowed": 194,
+          "over_rate": 0.06427330631152287,
+          "p95": 4.116788148880005
+        },
+        "overall": {
+          "limit_s": 5.0,
+          "n": 3671,
+          "over": 195,
+          "allowed": 206,
+          "over_rate": 0.05311904113320621,
+          "p95": 5.489399671554565
+        },
+        "turn": {
+          "limit_s": 15.0,
+          "n": 147,
+          "over": 7,
+          "allowed": 12,
+          "over_rate": 0.047619047619047616,
+          "p95": 13.640632629394531
+        },
+        "chain": {
+          "limit_s": 30.0,
+          "n": 385,
+          "over": 31,
+          "allowed": 27,
+          "over_rate": 0.08051948051948052,
+          "p95": 48.906047105789185
+        }
+      },
+      "tpot": {
+        "n": 4203,
+        "mean": 0.0322542856806112,
+        "p95": 0.06129298492766965,
+        "over_0.10": 2
+      },
+      "tokens": {
+        "prompt": 270529760,
+        "cached": 253413888,
+        "uncached": 17115872,
+        "hit_ratio": 0.9367320179487831
+      }
+    },
+    "candidate": {
+      "n": 4203,
+      "n_ok": 4203,
+      "errors": 0,
+      "gates": {
+        "fast": {
+          "limit_s": 3.0,
+          "n": 3454,
+          "over": 199,
+          "allowed": 194,
+          "over_rate": 0.05761436016213086,
+          "p95": 3.5405032634735107
+        },
+        "overall": {
+          "limit_s": 5.0,
+          "n": 3671,
+          "over": 146,
+          "allowed": 206,
+          "over_rate": 0.03977117951511849,
+          "p95": 4.136372804641724
+        },
+        "turn": {
+          "limit_s": 15.0,
+          "n": 147,
+          "over": 3,
+          "allowed": 12,
+          "over_rate": 0.02040816326530612,
+          "p95": 8.639774560928345
+        },
+        "chain": {
+          "limit_s": 30.0,
+          "n": 385,
+          "over": 30,
+          "allowed": 27,
+          "over_rate": 0.07792207792207792,
+          "p95": 48.863189697265625
+        }
+      },
+      "tpot": {
+        "n": 4203,
+        "mean": 0.03129202866521971,
+        "p95": 0.05573319422298269,
+        "over_0.10": 0
+      },
+      "tokens": {
+        "prompt": 270529760,
+        "cached": 253081600,
+        "uncached": 17448160,
+        "hit_ratio": 0.9355037316412065
+      }
+    },
+    "gate_changes": {
+      "fast_intra": {
+        "repaired": 164,
+        "new": 141,
+        "persistent": 58
+      },
+      "overall_intra": {
+        "repaired": 150,
+        "new": 101,
+        "persistent": 45
+      },
+      "turn_start": {
+        "repaired": 5,
+        "new": 1,
+        "persistent": 2
+      },
+      "chain_start": {
+        "repaired": 8,
+        "new": 7,
+        "persistent": 23
+      }
+    },
+    "timing_note": "recv-to-exec is not a pure scheduler timer; exec-to-first is not GPU-only time",
+    "unique_candidate_ttft_bad": 261,
+    "unknown_candidate_timing": 0
+  },
+  "phases": {
+    "fast_intra": {
+      "over": 199,
+      "queue_share_of_bad_summed_ttft": 0.8866592363664336,
+      "queue_ge80": 143,
+      "post_admission_over_limit": 2
+    },
+    "overall_intra": {
+      "over": 146,
+      "queue_share_of_bad_summed_ttft": 0.8803006966892133,
+      "queue_ge80": 119,
+      "post_admission_over_limit": 6
+    },
+    "turn_start": {
+      "over": 3,
+      "queue_share_of_bad_summed_ttft": 0.5962672447099799,
+      "queue_ge80": 2,
+      "post_admission_over_limit": 1
+    },
+    "chain_start": {
+      "over": 30,
+      "queue_share_of_bad_summed_ttft": 0.8982832819271206,
+      "queue_ge80": 22,
+      "post_admission_over_limit": 1
+    }
+  },
+  "new_chain_since45": [
+    {
+      "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+      "gate": "chain_start",
+      "baseline_ttft_s": 29.64221954345703,
+      "ttft_s": 31.515211820602417,
+      "queue_s": 0.12681818008422852,
+      "recv_to_admission_s": 0.7875475883483887,
+      "admission_to_first_s": 30.72766423225403,
+      "baseline_recv_to_admission_s": 0.5216314792633057,
+      "baseline_admission_to_first_s": 29.120588064193726,
+      "prompt": 256733,
+      "cached": 41216,
+      "baseline_cached": 42240,
+      "newly_observed_since45": true
+    }
+  ],
+  "remaining_expected_requests": 1398,
+  "full_chain_cp_bound": {
+    "fixed_cohort_n": 432,
+    "allowed": 29,
+    "observed_bad": 30,
+    "pass_still_possible": false,
+    "note": "Conditional on the fixed full cohort and unchanged recorded rows; completion/validity still pending. Wald allowance is 30; official CI implementation unknown."
+  },
+  "branch_attribution": "unknown; frozen engine has no new admission trace",
+  "server_log_for_new_case": "not fetched in this checkpoint; post-admission time is not GPU-only"
+}

@@ -1,0 +1,6 @@
+{
+  "source": "question.md",
+  "sha256": "013b537822ff788a6081775e1a72925788a4a2003ad1722565eff3805dc7f236",
+  "bytes": 23283,
+  "reason": "Preserve previous consultation and its pre-existing uncommitted addition before user-requested rewrite; historical snapshot only."
+}

@@ -1,0 +1,353 @@
+{
+  "status": "ACCEPTABLE_HANDOFF_WITH_MINOR_CLARIFICATIONS",
+  "reviewer": "independent Codex subagent review_sglang_n22",
+  "reviewed_at_utc": "2026-09-25T09:18:18.946715+00:00",
+  "scope": "Pure local review of question.md, current/frozen source mechanisms, official/local archived summaries and chain-priority CPU evidence. No question.md/source edit, no Pod access, no new GPU experiment, no vLLM work, no messages to Claude. Only this review.json is written.",
+  "reviewed_question": {
+    "path": "question.md",
+    "sha256": "94955c193b84f6f9bf440ead42fe338c7551020830fc79ec8a43108da593bdba",
+    "bytes": 23205,
+    "window_scope": "The reviewed document uses071 check45 at2362 completed requests. Parent is independently incorporating newly arrived check75/4203; this review does not cover those new rows or a later document revision.",
+    "initial_read_sha256": "177cd61d591e35df8cdc2444adc7de9c505139318164157e3e3f4e58f0a109c9",
+    "concurrent_refresh_note": "Parent incorporated R1/R2/R3/R5 and added future-diff engineering acceptance requirements during this review. These changes were reread and accepted; question remains check45-based at review completion."
+  },
+  "blocking_findings": [],
+  "confirmed": [
+    {
+      "topic": "Authorization boundary",
+      "locations": [
+        "question.md:3",
+        "question.md:187"
+      ],
+      "conclusion": "Document clearly restricts current work to analysis/discussion and continuation of frozen071; it does not authorize a patch, new GPU run, formal submission or vLLM switch."
+    },
+    {
+      "topic": "Formal status and configuration",
+      "locations": [
+        "question.md:32",
+        "question.md:38",
+        "question.md:44"
+      ],
+      "conclusion": "46251 is completed/final, N22 PASS, AIME44/44 and GPQA152/156, host64/122off on759a6eb and corresponds to069, not071. Prior N14/N18 numbers and configs match archived official results. Host and122 both change from46174 to46251, so single-mechanism attribution is not made."
+    },
+    {
+      "topic": "Formal versus local comparison",
+      "locations": [
+        "question.md:74",
+        "question.md:87"
+      ],
+      "conclusion": "Six time-metric values and percentages match the independent comparison. Different N, data and warmup are explicitly preserved. The mixed direction of chain versus other metrics correctly rules out a uniform calibration factor."
+    },
+    {
+      "topic": "TTFT statistical allowance",
+      "locations": [
+        "question.md:24",
+        "question.md:44",
+        "question.md:68"
+      ],
+      "conclusion": "Formal chain46.049s PASS is compatible with one-sided lower-bound rule; official counts/CI are unavailable. Local069 chain31/432 exceeds CP allowance29, lower bound0.0524208879; target remains30s. No TPOT allowance is invented."
+    },
+    {
+      "topic": "Completed-only paired window",
+      "locations": [
+        "question.md:105",
+        "question.md:114"
+      ],
+      "conclusion": "45-minute table correctly uses the same2362 IDs and does not compare071 window p95 to069 whole-cohort p95 as an A/B result. Chain31→29, repaired8/new6, TPOT and gate counts agree with paired-summary.json. All candidate windows remain open."
+    },
+    {
+      "topic": "Timing semantics and causality",
+      "locations": [
+        "question.md:95",
+        "question.md:100",
+        "question.md:116",
+        "question.md:123",
+        "question.md:174"
+      ],
+      "conclusion": "Frozen759a6eb sets forward_entry_time before ScheduleBatch.init_new; queue_time is forward_entry minus wait_queue_entry. First admission is correctly distinguished from first GPU kernel. Aggregate queue shares89.2296%/90.7170% are summed-request-time shares, not GPU idle or removable time. Later arrivals overtaking a request do not prove it was resource-eligible."
+    },
+    {
+      "topic": "Mechanism contracts",
+      "locations": [
+        "question.md:144",
+        "question.md:152",
+        "question.md:158"
+      ],
+      "conclusion": "LPM sorts absolute matched prefix including host.120 preserves one partial and limits complete short co-admission.122 changes prefill opportunity/budget, not LPM/host eligibility/resource gates/one-partial.123 changes remaining-token-plus-aging order but cannot preempt or bypass eligibility/resources, and omits host restoration cost.071 has123 off and no new admission trace."
+    },
+    {
+      "topic": "Cache uncertainty",
+      "locations": [
+        "question.md:129",
+        "question.md:138",
+        "question.md:140"
+      ],
+      "conclusion": "Textual LCP minus reported cached tokens is treated as a reuse opportunity needing checkpoint/save/match/evict/restore evidence. Non-chain cases are not asserted to quantify chain blocking. FULL host occupancy is not used as proof of host eviction."
+    },
+    {
+      "topic": "TPOT budget",
+      "locations": [
+        "question.md:162",
+        "question.md:164"
+      ],
+      "conclusion": "Higher passing N takes priority, but rival TPOT and own global mean/p95 slack are not treated as allocatable per-request GPU time.20/200-token arithmetic for an added0.010s/token is0.19/1.99s and is labeled illustrative."
+    },
+    {
+      "topic": "New future-diff acceptance section",
+      "locations": [
+        "question.md:189"
+      ],
+      "conclusion": "Correctness/resource accounting, failure cleanup, true host readiness, TP agreement, source/runtime evidence and whole-level validation are stated as requirements for later approved work, not as authorization to start development."
+    }
+  ],
+  "cpu_and_data_validation": {
+    "existing_test_command": "python3 -B -m unittest discover -s tests -p test_srpt_admission.py",
+    "existing_tests": {
+      "run": 16,
+      "failures": 0,
+      "errors": 0,
+      "result": "OK",
+      "runner_reported_seconds": 0.656
+    },
+    "ordering_probes": {
+      "count": 5,
+      "result": "all independently reproduced",
+      "method": "AST-loaded actual SchedulePolicy._ax_sort_by_remaining_work with fake request attributes and deterministic perf_counter; no calls to analyze.py main, so result.json was not rewritten.",
+      "policy_sha256": "5cc46e56b87b67e96c216d675cc22b87910d0ab067ef293aad55d0e7d3094141",
+      "frozen_source_equivalence": "_ax_sort_by_remaining_work AST equals759a6eb version",
+      "aging_tokens_per_second": 2000,
+      "fresh_remaining_tokens": 3000,
+      "crossover_s": {
+        "old100000": 48.5,
+        "old250000": 123.5
+      },
+      "case_results": [
+        {
+          "old_remaining": 100000,
+          "wait_s": 20,
+          "order": [
+            "fresh",
+            "old"
+          ]
+        },
+        {
+          "old_remaining": 100000,
+          "wait_s": 48.4,
+          "order": [
+            "fresh",
+            "old"
+          ]
+        },
+        {
+          "old_remaining": 100000,
+          "wait_s": 48.6,
+          "order": [
+            "old",
+            "fresh"
+          ]
+        },
+        {
+          "old_remaining": 250000,
+          "wait_s": 123.4,
+          "order": [
+            "fresh",
+            "old"
+          ]
+        },
+        {
+          "old_remaining": 250000,
+          "wait_s": 123.6,
+          "order": [
+            "old",
+            "fresh"
+          ]
+        }
+      ],
+      "tie_note": "Exact crossover gives equal score; stable input queue order decides a tie. Document says approximately, so no numerical correction is required.",
+      "limitations": [
+        "Five synthetic-request mechanism probes, not five measured071 failures.",
+        "Sorting-function execution is not full real-state/TP8 performance validation.",
+        "Same-age requests retain remaining-work preference; larger aging does not reorder them by itself.",
+        "No bounded-delay claim or counterfactual TTFT/N prediction is justified."
+      ]
+    },
+    "raw_group_recheck": {
+      "method": "Read raw files line by line locally, verify SHA256 and unique request IDs, use original harness in_ttft_gate(chain_start), then recompute prompt_tokens-cached_tokens groups and queue_time>=0.8*TTFT. Raw contents were not printed.",
+      "069": {
+        "rows": 5601,
+        "unique_ids": 5601,
+        "chain_bad": 31,
+        "group_n": [
+          2,
+          6,
+          7,
+          16
+        ],
+        "group_queue_ge80": [
+          2,
+          6,
+          5,
+          7
+        ],
+        "sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b"
+      },
+      "071_check45": {
+        "rows": 2362,
+        "unique_ids": 2362,
+        "chain_bad": 29,
+        "group_n": [
+          0,
+          8,
+          5,
+          16
+        ],
+        "group_queue_ge80": [
+          0,
+          8,
+          5,
+          9
+        ],
+        "sha256": "2f48e0baaa2e5279206e0552b2c6069d8ea7be9c1661ff9cd3e7c152c4b9bb0a"
+      },
+      "uncached_ranges": [
+        [
+          0,
+          4096
+        ],
+        [
+          4097,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ],
+        [
+          65537,
+          1000000000
+        ]
+      ],
+      "result": "all counts and hashes match result.json and question.md"
+    },
+    "relative_links": {
+      "checked": true,
+      "broken": []
+    }
+  },
+  "suggested_clarifications": [
+    {
+      "id": "R1",
+      "priority": "low",
+      "location": "question.md:154",
+      "current": "5个真实排序代码CPU反例已过",
+      "suggested": "5个调用实际排序函数的合成请求CPU探针已过；它们不是071实际坏例回放。",
+      "reason": "Current sentence is defensible, but explicit fake-input wording prevents interpreting five cases as observed GPU failures. Adjacent scope warning already prevents a performance claim.",
+      "blocking": false,
+      "resolution_at_review_completion": "Already incorporated by parent and reread during review."
+    },
+    {
+      "id": "R2",
+      "priority": "low",
+      "location": "evidence/chain-priority-20260925/analyze.py caveats / result.json caveats; question.md:125",
+      "current": "Actual cached tokens are observed at admission, not a reconstruction of earlier cache state.",
+      "suggested": "The harness reads cached_tokens from the first token-producing SSE event; the counter is maintained during batch preparation. This is not a snapshot of cache state at every earlier admission attempt. In question.md, 首token事件报告的cached is more precise than 最终cached.",
+      "reason": "s1_loadgen.py:167 reads first_meta; schedule_batch.py updates cached_tokens during prepare_for_extend. Broad at-admission wording is unnecessary and can overstate cache-state timing. Group arithmetic remains valid.",
+      "blocking": false,
+      "resolution_at_review_completion": "Already incorporated by parent and reread during review."
+    },
+    {
+      "id": "R3",
+      "priority": "low",
+      "location": "question.md:172",
+      "current": "提前入running、让每条各算一点，只会把部分等待移到入批后并增加驻留",
+      "suggested": "单纯提前记为running或先各算一点，可能把等待移到入批后并增加驻留，并不自动代表首token更早；仍按真实TTFT和全门结果判断。",
+      "reason": "The current absolute 只会 is stronger than existing data proves; genuine alternative scheduling may change useful execution order. The intended warning against moving the timer is valid.",
+      "blocking": false,
+      "resolution_at_review_completion": "Already incorporated by parent and reread during review."
+    },
+    {
+      "id": "R4",
+      "priority": "low",
+      "location": "question.md:164",
+      "current": "均值额外10ms，对20token输出…",
+      "suggested": "若某条请求的TPOT额外增加10ms/token，则20token输出的首末间隔增加0.19秒…",
+      "reason": "Makes the arithmetic explicitly per-request; a global mean increase cannot be assigned equally to every output length. Existing illustrative-budget warning is sound.",
+      "blocking": false,
+      "resolution_at_review_completion": "Optional wording clarification remains; not blocking."
+    },
+    {
+      "id": "R5",
+      "priority": "style",
+      "location": "question.md:169",
+      "current": "pref ill/decode",
+      "suggested": "prefill/decode",
+      "reason": "Typo only.",
+      "blocking": false,
+      "resolution_at_review_completion": "Already incorporated by parent and reread during review."
+    }
+  ],
+  "update_note": "Parent owns incorporation of071 check75/4203. Preserve its snapshot time and completed-ID selection; do not overwrite45-minute paired figures with a later health count, infer a final pass, or imply this review validated75-minute numbers.",
+  "not_reproduced": [
+    "No tokenizer/LCP rerender repeated in this review; cache section checked for causal scope against existing evidence.",
+    "No full score harness rerun; official and local complete scores are cross-checked against prior independent review and archived summaries.",
+    "No GPU/TP8 timings, real-state recovery or new-configuration performance validation."
+  ],
+  "source_manifest": {
+    "question.md": {
+      "sha256": "94955c193b84f6f9bf440ead42fe338c7551020830fc79ec8a43108da593bdba",
+      "bytes": 23205
+    },
+    "evidence/chain-priority-20260925/analyze.py": {
+      "sha256": "7fef257e391e0e3480f9d53d24d74928bc63480acb66fd44a6934dea3f9886bf",
+      "bytes": 3685
+    },
+    "evidence/chain-priority-20260925/result.json": {
+      "sha256": "50c4540f5376fc2f7b660f3c97c64b64332fdfd26736ba5de7b63d3c6d070edf",
+      "bytes": 3030
+    },
+    "tests/test_srpt_admission.py": {
+      "sha256": "f3df9e6e67359d24b10f778a65c3e56c3309dca0d5a130ca29489d503b2161f5",
+      "bytes": 10090
+    },
+    "tests/test_sched_protect_chain.py": {
+      "sha256": "2def892a0230ee22af49d4b58fce918b7539d383579a51767474e7768d5eb5bb",
+      "bytes": 35608
+    },
+    "engine/sglang/srt/managers/schedule_policy.py": {
+      "sha256": "5cc46e56b87b67e96c216d675cc22b87910d0ab067ef293aad55d0e7d3094141",
+      "bytes": 74830
+    },
+    "engine/sglang/srt/managers/schedule_batch.py": {
+      "sha256": "0025d4ff22db974255cf20597f64ab15c97417e9cbe4ea0a85829da8201d2be5",
+      "bytes": 156324
+    },
+    "s1-dev/harness/s1_loadgen.py": {
+      "sha256": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f",
+      "bytes": 29972
+    },
+    "s1-dev/harness/s1_common.py": {
+      "sha256": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+      "bytes": 15356
+    },
+    "evidence/official/review-46251-local-comparison-20260925.json": {
+      "sha256": "1dba7206854790ceffdf715030d6b1419d00ceb257575b528bd107acbd481cbf",
+      "bytes": 31142
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check45/paired-summary.json": {
+      "sha256": "4c57afe3fbbcd484e2f2a86ec27bb9a3ba1522a12cf07340fbac6ea4f68a80e5",
+      "bytes": 2956
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check45/admission-summary.json": {
+      "sha256": "8e0ab2ef58aa2ab8061dee052d1d737e2f05f08feef8724ac2259ffa14abc18a",
+      "bytes": 4807
+    },
+    "evidence/admission-wait-20260924/summary.json": {
+      "sha256": "7682efc1ea7a6c715f5d4ae1663d7afbe2db5cf2c5a18d9ab3b2358d74f48018",
+      "bytes": 22648
+    },
+    "research/codex/R27_receive_to_admission.md": {
+      "sha256": "b7e76ed57eb040ea260dc253baa99eef744b07015c1a843c6301cdd90b007b91",
+      "bytes": 17454
+    }
+  }
+}
