@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""[ax] 124 on the real scheduler code (get_next_batch_to_run, PrefillAdder) with CPU fakes.
+"""[ax] 124/125 on the real scheduler code (get_next_batch_to_run, PrefillAdder) with CPU fakes.
 
-The working tree's scheduler methods are compiled as in test_sched_protect_chain; the 124 methods
+The working tree's scheduler methods are compiled as in test_sched_protect_chain; the 124/125 methods
 and ax_deadline are added. The request-plane broadcast is replaced by a local call (one rank) or by a
 shared payload (two simulated ranks). Pools, clocks, forwards and the cache tree are fakes.
 Run: python3 -m unittest discover -s tests -p test_ax_admission_scheduler.py
@@ -144,6 +144,47 @@ class Parking(unittest.TestCase):
                 self.assertLessEqual(sum(end - begin for _, begin, end in t['reqs']), 16384, t)
 
 
+class BacklogRelief(unittest.TestCase):
+    def env(self, **extra):
+        # the interval tests set the relaxed interval explicitly; it defaults to the configured one
+        return patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_BACKLOG_RELIEF': '1',
+                                       'SGLANG_AX_BACKLOG_INTERVAL': '1', **extra})
+
+    def test_relieved_prefill_arms_the_relaxed_interval(self):
+        with self.env():
+            s, _ = scheduler(waiting=[cold(f'c{i}', 120000) for i in range(4)], budget=16384, interval=2)
+            s._ax_admission_cfgs()
+            s._ax_backlog.rate = 9000.0
+            t = step(s)
+        self.assertEqual(t['mode'], 'prefill')
+        self.assertTrue(s._ax_backlog_relieved)
+        self.assertEqual(t['interval'], 1)
+
+    def test_small_backlog_keeps_the_configured_interval(self):
+        with self.env():
+            s, _ = scheduler(waiting=[cold('c', 12000)], budget=16384, interval=2)
+            s._ax_admission_cfgs()
+            s._ax_backlog.rate = 9000.0
+            t = step(s)
+        self.assertFalse(s._ax_backlog_relieved)
+        self.assertEqual(t['interval'], 2)
+
+    def test_opening_mode_raises_the_cold_cap_from_the_next_round(self):
+        # 120 caps a cold chunk at 4096 while others wait; relieved, the cap is 8192. The relief decided in
+        # a round applies to the next round's cap (the plan needs the cap as its round budget).
+        with self.env(SGLANG_AX_SCHED_COLD_CAP='4096', SGLANG_AX_BACKLOG_COLD_CAP='8192',
+                      SGLANG_AX_BACKLOG_INTERVAL='2'):
+            s, _ = scheduler(waiting=[cold(f'c{i}', 120000) for i in range(4)], budget=16384, interval=2)
+            s._ax_admission_cfgs()
+            s._ax_backlog.rate = 9000.0
+            chunks = []
+            while len(chunks) < 2:
+                t = step(s)
+                if t['mode'] == 'prefill':
+                    chunks.append(t['reqs'][0])
+        self.assertEqual(chunks, [('c0', 0, 4096), ('c0', 4096, 12288)])
+
+
 class Refusals(unittest.TestCase):
     # Each refusal is matched on its message, so a config refused for another reason does not pass.
     def test_124_with_123_refuses(self):
@@ -151,6 +192,20 @@ class Refusals(unittest.TestCase):
         with patch.dict(os.environ, env):
             s, _ = scheduler()
             with self.assertRaisesRegex(ValueError, '123'):
+                s._ax_admission_cfgs()
+
+    def test_125_without_an_effect_refuses(self):
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_BACKLOG_RELIEF': '1'}):
+            s, _ = scheduler(interval=0)
+            with self.assertRaisesRegex(ValueError, 'COLD_CAP'):
+                s._ax_admission_cfgs()
+
+    def test_125_with_122_refuses(self):
+        env = {**PROTECT, 'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_COLD_CAP': '8192',
+               'SGLANG_AX_PACE_TPOT': '0.085'}
+        with patch.dict(os.environ, env):
+            s, _ = scheduler(interval=2)
+            with self.assertRaisesRegex(ValueError, '122'):
                 s._ax_admission_cfgs()
 
     def test_needs_protection(self):

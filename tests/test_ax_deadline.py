@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""[ax] 124 decision functions (engine/sglang/srt/managers/ax_deadline.py) on CPU.
+"""[ax] 124/125 decision functions (engine/sglang/srt/managers/ax_deadline.py) on CPU.
 
 Sizes are the first-minute chain starts of run 073/074 (evidence/L073-.../opening/chain.csv).
 Run: python3 -m unittest discover -s tests -p test_ax_deadline.py
@@ -111,15 +111,82 @@ class Parking(unittest.TestCase):
         self.assertFalse(ax.should_park(cont, 10.0, None, 0.0, 16384, 10 ** 6, 0, 0.0, CFG))
 
 
+class Backlog(unittest.TestCase):
+    def state(self, **kw):
+        return ax.BacklogState(ax.BacklogConfig(**kw))
+
+    def test_hysteresis(self):
+        s = self.state()
+        s.note_prefill(9200, 1.0)
+        self.assertFalse(s.decide(9200 * 20))      # 20 s of backlog: below high
+        self.assertTrue(s.decide(9200 * 31))       # above 30 s: relieve
+        self.assertTrue(s.decide(9200 * 15))       # between low and high: stay
+        self.assertFalse(s.decide(9200 * 9))       # below 10 s: back to normal
+
+    def test_guard_trips_for_good(self):
+        s = self.state(max_slow=2)
+        s.note_prefill(9200, 1.0)
+        self.assertTrue(s.decide(9200 * 40))
+        s.note_tpot('a', 0.12)
+        s.note_tpot('b', 0.05)
+        s.note_tpot('a', 0.13)  # the same request counts once
+        self.assertTrue(s.decide(9200 * 40))
+        s.note_tpot('c', 0.11)
+        self.assertEqual(s.slow, {'a', 'c'})
+        self.assertFalse(s.decide(9200 * 40))
+        s.note_tpot('a', 0.05)  # recovering later does not un-count it
+        self.assertFalse(s.decide(9200 * 40))
+
+    def test_ratio_guard_after_min_seen_and_reset_at_flush(self):
+        s = self.state(max_slow=10 ** 6, max_slow_ratio=0.03, min_seen=100)
+        s.note_prefill(9200, 1.0)
+        for i in range(100):
+            s.note_tpot(f'r{i}', 0.12 if i < 4 else 0.05)
+        self.assertFalse(s.decide(9200 * 40))   # 4 of 100 > 3%
+        s.reset()
+        self.assertEqual((s.slow, s.seen, s.relieved), (set(), set(), False))
+        self.assertTrue(s.decide(9200 * 40))    # rate kept, guard cleared
+
+    def test_no_rate_no_relief_and_smoothing(self):
+        s = self.state(rate_weight=0.5)
+        self.assertFalse(s.decide(10 ** 6))
+        s.note_prefill(8000, 1.0)
+        s.note_prefill(12000, 1.0)
+        self.assertEqual(s.rate, 10000.0)
+        s.note_prefill(0, 1.0)
+        self.assertEqual(s.rate, 10000.0)
+
+
 class Config(unittest.TestCase):
     def test_off_by_default(self):
         with patch.dict(os.environ, {}, clear=True):
             self.assertIsNone(ax.deadline_config())
+            self.assertIsNone(ax.backlog_config(2))
 
     def test_env_values(self):
-        env = {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_PARK_MAX_ROUNDS': '4'}
+        env = {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_PARK_MAX_ROUNDS': '4',
+               'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_INTERVAL': '1'}
         with patch.dict(os.environ, env, clear=True):
             self.assertEqual(ax.deadline_config().park_max_rounds, 4)
+            self.assertEqual(ax.backlog_config(2).relaxed_interval, 1)
+
+    def test_cold_cap_alone_keeps_the_configured_interval(self):
+        env = {'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_COLD_CAP': '8192'}
+        with patch.dict(os.environ, env, clear=True):
+            cfg = ax.backlog_config(2)
+        self.assertEqual((cfg.cold_cap, cfg.relaxed_interval), (8192, 2))
+
+    def test_relief_must_change_something_and_never_add_decode_rounds(self):
+        # the interval now defaults to the configured one, so RELIEF alone would do nothing: refused
+        with patch.dict(os.environ, {'SGLANG_AX_BACKLOG_RELIEF': '1'}, clear=True):
+            with self.assertRaisesRegex(ValueError, 'COLD_CAP'):
+                ax.backlog_config(2)
+            with self.assertRaisesRegex(ValueError, 'COLD_CAP'):
+                ax.backlog_config(0)
+        env = {'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_INTERVAL': '3'}
+        with patch.dict(os.environ, env, clear=True):
+            with self.assertRaises(ValueError):
+                ax.backlog_config(2)
 
     def test_invalid_deadline_config_refuses(self):
         with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_PER_TOKEN_S': '0'},
