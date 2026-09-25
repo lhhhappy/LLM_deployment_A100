@@ -1,0 +1,138 @@
+# R27 — 接收至首次入批：时间含义、前段拥堵与准入编排
+
+2026-09-24，Codex。本会话负责本报告与`evidence/admission-wait-20260924/`的CPU分析/反例。
+问题：069坏例的TTFT主要发生在进入引擎计算前，是否只是刚开始拥堵？底层哪些环节可以缓解？
+本轮不改引擎、冻结负载或071，不启动GPU任务。候选尚无TP8因果验证。
+
+## 已核对的答案
+
+- “至少80%”是一个坏请求自身TTFT的阶段占比，不是80%的请求失败、也不是80%的故障发生在开场。
+  069完整5601请求零请求错误；这里的坏例是SLO延迟超标。
+- `t_exec_start_s`实际来自`forward_entry_time`：首个prefill批次选好请求后打点，早于批次准备和GPU launch。
+  更准确的称呼是“首次入批”，不能把它当第一条GPU kernel开始时间。
+- 开场的确集中出现chain超标：第一分钟19个，占全程31个的61.3%；第一分钟chain样本33个。
+  但fast第一分钟仅1个超标，10–40分钟有159个，最后一个在68.583分钟。不能只修启动阶段。
+- 在222个fast坏例的累计TTFT中，调度队列计时占92.26%；31个chain坏例占89.23%。
+  这是请求等待秒数之和的占比，绝不是GPU空闲占比、各请求比例的均值或可兑现的加速比例。
+
+## 原始记录与计时合同
+
+仅分析069完整N30，先用`compare_runs.load`核对5601个请求恰好一次、VALID、相同cohort身份与零请求错误，
+再使用原harness的`in_ttft_gate`分桶，四桶样本数及超标数逐项等于已有完整判分。
+每条请求的计时分解保持有符号值，校验有限值、非负及加和等于TTFT；无截零、无重判窗口成绩。
+输出[summary.json](../../evidence/admission-wait-20260924/summary.json)、
+[311个唯一坏例逐请求CSV](../../evidence/admission-wait-20260924/bad-request-phases.csv)。
+
+计时位置已在运行时固定提交`759a6eb`核对，而非只读新代码：
+
+| 阶段 | 真实打点与含义 | 全体5601请求p50 / p95 / max（秒） |
+|---|---|---|
+| 接收→API分发 | ASGI入口→`api_server_dispatch_finish_ts`；含JSON/分词等，不细分其内部成本 | .115 / .296 / .692 |
+| 分发→调度等待队列 | 用`forward_entry_time − queue_time − API dispatch`推导；合并IPC、接收循环、请求准备 | .039 / .346 / .844 |
+| 调度等待队列→首次入批 | `get_queueing_time = forward_entry_time − wait_queue_entry_time` | .016 / 4.307 / 252.903 |
+| 首次入批→首token | 含batch准备、依赖等待、所有prefill块、块间decode/等待、结果处理 | .252 / 1.187 / 31.694 |
+
+分位数对应不同请求，不能相加。harness的`t_admit_s`是API分发完成，名字不代表GPU准入。
+`t_first_token_s`优先用首个流式事件里的`prefill_finished_time`，不是客户端看到SSE的时间。
+主入口[HTTP打点](../../engine/sglang/srt/entrypoints/http_server.py:483)、
+[harness映射](../../s1-dev/harness/s1_loadgen.py:40)、
+[队列计时](../../engine/sglang/srt/observability/req_time_stats.py:1047)、
+[入批打点](../../engine/sglang/srt/managers/scheduler.py:4142)。
+
+“后面就好了”要拆成两件事：这些坏例一旦入批，自己的prefill通常较短（fast中仅1/222、chain中2/31的入批→首token本身超过对应门限）；
+但它们等待时，GPU可能正执行别人的长prefill或decode。记录不能证明这些等待都是调度浪费。
+TPOT是首token后的另一指标；069全程p95=.055902已过门，仍不能保证提高并发后无回退。
+
+## 开场、持续压力与排空是三种现象
+
+窗口按客户端dispatch相对本轮首dispatch划分；表内仅超标数/样本数，不宣称局部PASS/FAIL。
+
+| 到达时间 | fast | overall | turn | chain | 平均客户端在飞请求 |
+|---|---:|---:|---:|---:|---:|
+| 0–1分钟 | 1/13 | 2/15 | 0/0 | 19/33 | 27.51 |
+| 1–10分钟 | 42/223 | 43/251 | 2/29 | 4/36 | 23.35 |
+| 10–40分钟 | 159/1358 | 125/1451 | 4/66 | 8/142 | 22.78 |
+| 40–80分钟 | 20/2043 | 25/2144 | 1/54 | 0/188 | 22.72 |
+| 80分钟至结束 | 0/1128 | 0/1149 | 0/10 | 0/33 | 9.81 |
+
+最初30个请求在11.181秒内发出，含29个cohort链首和1个链内请求，其中18个chain超标；不能把它们叫30个同时冷启动链首。
+31个chain坏例有30个cohort链首、1个context reset；最后到达38.377分钟，turn最后坏例41.424分钟。
+82.135分钟后剩余未完成链少于30，尾段已无法保持N30会话槽全部有工作。
+
+40–80分钟改善不仅来自排空：其平均在飞请求22.72，与10–40分钟22.78相近；但是按到达请求算，
+实际未命中均值4116→2764 token；cohort链首未命中均值37,203→17,028，负载组成也变轻。
+0–10分钟的链首未命中均值48,973。因此“缓存热了”或“启动结束”不能单独解释后段改善；这些token账仍非GPU时间账。
+
+## 排队的底层机制
+
+路径：接收/分词/IPC → waiting_queue → decode节奏与整批门 → 缓存匹配/排序 → 单请求资格/预算 → 首次入批 → 分块prefill → 首token。
+
+1. **执行机会按轮分配。** 069为TP8、PP1、overlap开启、mixed chunk关闭、chunk8192、interval2、122off。
+   首次入批只能在调度循环的安全边界发生；当前轮已发出的GPU计算不会因来了一个短请求自动中断。
+   decode也需持续进展来守TPOT，不能将所有轮次交给prefill。
+2. **排序决定先检查谁。** LPM按绝对匹配前缀长度（包含host）排序，不按剩余计算时间。
+   没缓存的链首可能被有较长命中的后到请求越过。123按剩余token加aging，改善这个维度，但不抢占已开始的partial。
+3. **资格决定能否进入。** 120保留一个partial并先为续块扣预算；旁边只允许可完整完成的device短命中。
+   host恢复候选、无device前缀的短冷请求，会在`init_load_back`前被拒绝，即使有剩余块预算。
+4. **容量决定是否装得下。** 请求行、device KV和KDA状态都有限；host命中仍需GPU位置。
+   KV门还计未来输出预留、页对齐与已有running请求的预留。只看这次新算的token数不足以证明能准入。
+5. **单请求拒绝可能扩大为整队等待。** 当前在`NO_TOKEN`后停止扫描；有running请求时可能置`batch_is_full`。
+   下轮若无partial且full未复位，会跳过prefill。队首装不下不逻辑等价于每个队尾请求都装不下。
+   复位发生在请求离开/回退、部分批次合并等位置；不能简单每轮强制清掉它，那会增加无效扫描和资源竞争。
+6. **缓存恢复有依赖。** HiCache已有逐层搬回与计算重叠；GPU consumer等对应层event，overlap还有旧forward写页的fence。
+   “host命中”不代表数据已可被本轮读取。提前恢复需要先锁定有效状态、预留容量并维持TP各rank一致。
+
+源码入口：[批次选择](../../engine/sglang/srt/managers/scheduler.py:3680)、
+[扫描/退出/回收](../../engine/sglang/srt/managers/scheduler.py:3997)、
+[资格与KV门](../../engine/sglang/srt/managers/schedule_policy.py:1329)、
+[逐层event](../../engine/sglang/srt/managers/cache_controller.py:52)。
+
+CPU反例[probe_scheduler.py](../../evidence/admission-wait-20260924/probe_scheduler.py)在759a6eb和当前源码分别执行以下4例，行为一致：
+
+- KV可用5000时，高LPM候选需6000新token，被拒后队尾短命中未检查；同预算单独检查队尾256-token请求可以入批。
+- 上例full已置位后，假设资源恢复且没有请求结束/复位事件，下一轮仍不重新构造PrefillAdder。此例是行为边界，不声称069池容量增长过。
+- 一个host命中只剩64-token尾部，排序在device短命中之前；active partial旁host被拒而device可入批，没有调用host恢复。
+- 无device前缀的128-token冷请求，在partial旁即使剩余4096-token预算也被拒。
+
+[结果](../../evidence/admission-wait-20260924/scheduler-probes.json)。真实调度器/adder，假缓存、假pool、假forward；
+证明分支可发生，不证明069坏例频率、TP8数值正确或可省多少秒。
+
+## 值得采用的编排方式与边界
+
+| 候选 | 要解除的限制 | 具体做法 | 必须保留的约束 |
+|---|---|---|---|
+| 有界检查可容纳的请求 | 单个大请求NO_TOKEN挡住整队 | 在确认是候选自身需求不满足时继续检查少量候选；full记录原因，仅在资源/资格有变化或有界重试点重新检查 | 每次拒绝清理KDA/COW与锁；真实KV/未来decode预算不变；旧请求随等待提高优先级；TP一致 |
+| 分开管理计算就绪与host恢复 | 排名前却一直不能搭车 | 为已到达、预算可满足的host短尾安排恢复；利用已有逐层event，允许满足依赖的完整短请求搭车 | 限制同时恢复的字节与请求数；无第二partial；256网格/KDA有效检查点；不让预恢复挤掉更值钱的缓存 |
+| 剩余成本排序＋等待加权 | 大命中≠低成本，冷请求反复被越过 | 先单变量验证已有123，再按实测块耗时、上下文和host搬回成本估计剩余秒数；给久等且可运行请求进展机会 | 不使用未来到达或冻结评测标签；不把fast/turn/chain的离线标签当服务可见字段；不能承诺全负载有界延迟 |
+| 按耗时控制分块 | 一个执行片段太久、短请求错过时限 | 块预算依据真实成本曲线和decode余量；配合170/dispatch优化降低小块固定成本 | 块过小会拖慢chain、增加总工作；当前122已做部分预算/节奏，不能重复计功；图池显存单独入账 |
+| 减少前面排着的工作 | GPU实际忙于有用计算 | 缓存减少重算，MoE/DSA与host launch降低前面请求的执行成本 | 80%等待不限制执行优化的收益；前面请求更快能同时让很多后继少等；最终看整轮四桶/TPOT |
+
+一个合理的调度循环应先核全局容量和decode进展，再从可行候选中选择；在单partial约束下明确长请求续算预算与完整短请求预算，
+host恢复在有容量时与已有计算衔接。资源耗尽与候选自身不适合这轮需要分别处理。
+仅把每个请求提前放进running队列，或先给所有请求各算一点，会把等待挪到入批后并多占KV/KDA，不等于降低TTFT。
+
+CPU多核主要可并行分词、传输准备和分析；真正关键的调度/发射线程有串行依赖。
+当前计时不支持把HTTP栈重写放首位。GPU是否有可利用的空档仍须短窗trace证明，不能从队列长或GPU busy百分比直接推断。
+
+## 外部原理与我们能借鉴的部分
+
+- [Sarathi-Serve，OSDI 2024](https://www.usenix.org/conference/osdi24/presentation/agrawal)：以chunked prefill和持续推进decode的批形成处理吞吐/时延取舍。
+  可借鉴“按时延预算限制一次不可打断的工作”；我们的122/120并非它完整的混合批执行，MTP/KDA/HiCache组合不能直接照搬。
+- [FastServe原论文](https://arxiv.org/html/2305.05920v3)：多级反馈队列、等待提升，以及主动管理host/GPU状态来缓解队首阻塞。
+  可借鉴等待提升与提前准备；其全请求抢占会额外保留/搬运状态，我们先保留单partial研究小改，不引入无预算的大规模抢占。
+- [SGLang HiCache设计](https://docs.sglang.io/docs/advanced_features/hicache_design)：缓存匹配与传输分离，host→GPU逐层搬运与计算重叠。
+  本地已有相关机制，研究缺口是候选何时获得恢复/计算资格；文档的L3 prefetch timeout不用于我们未开启的L3层。
+
+这些来源解释方法，不提供GLM-5.3/A100/本负载的收益数字。只使用原论文/官方文档，不用第三方复述判断本地实现。
+
+## 验证与下一步
+
+1. 本轮CPU完成：完整5601请求/四门/311坏例校准；阶段分解；按到达时间分窗；4种真实分支反例在两个源码版本通过。
+2. 071保持冻结。随后诊断短窗将坏例ID和`partial_host_restore`、`kv_budget`、`unscanned_after_no_token`、`batch_full_latched`、`decode_cadence`对应。
+   计数不当持续时间；观察覆盖耗尽、未扫描和未知均保留。需要时再补资源变化快照，也共享8MiB进程总预算。
+3. 若host拒绝占主要坏例，先做有界host短尾准入；若NO_TOKEN/整批full主导，先做有界可行候选扫描；
+   若只是冷请求排序劣势，先测123；若持续有用计算饱和，优先减少工作量/单位成本。可以CPU准备多个反例，完整性能实验仍只改一处。
+4. 成功标准是TTFT本身、四桶全部门与TPOT改善，且工作量、状态容量、恢复/回退不失控；不能只看接收→入批缩短。
+
+本轮分析输出约86KiB，全部本地；两个脚本分别设2MiB/128KiB输出上限，覆盖写固定文件，不在Pod新增日志/trace。
+既有诊断仍为TP0累计8MiB；完成运行仍须本地校验后清理Pod。

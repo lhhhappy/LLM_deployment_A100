@@ -1,0 +1,171 @@
+{
+  "scope": "4 CPU branch counterexamples; fake resources and forwards, no GPU",
+  "frozen_engine": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "current_matches_frozen": true,
+  "limits": [
+    "not evidence these branches caused a given measured bad request",
+    "not evidence for performance gains",
+    "no TP8, DMA or MTP numerical validation"
+  ],
+  "current_source_sha256": {
+    "engine/sglang/srt/managers/scheduler.py": "76052f8a6bafa7cfa9808b74c541b667796faf353752c7f033ffe067a471cee0",
+    "engine/sglang/srt/managers/schedule_policy.py": "3218732bd9cbd043cfb9a5057e3802aacab381535f0cf8a14a9184c55ca5d883"
+  },
+  "cases": {
+    "no_token_head_blocks_feasible_tail": {
+      "blocked": {
+        "mode": "decode",
+        "reqs": [
+          [
+            "decoder",
+            0,
+            1
+          ]
+        ],
+        "waiting": [
+          "large_hit",
+          "small_hit"
+        ],
+        "chunk": null,
+        "full": true,
+        "interval": 0,
+        "budget": [
+          8192,
+          16384,
+          100.0,
+          0
+        ],
+        "verdicts": [
+          [
+            "large_hit",
+            "NO_TOKEN"
+          ]
+        ]
+      },
+      "tail_alone_same_pool_budget": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "small_hit",
+            4096,
+            4352
+          ]
+        ],
+        "waiting": [],
+        "chunk": null,
+        "full": false,
+        "interval": 0,
+        "budget": [
+          7936,
+          16128,
+          660.0,
+          320
+        ],
+        "verdicts": [
+          [
+            "small_hit",
+            "CONTINUE"
+          ]
+        ]
+      }
+    },
+    "full_latch_skips_rechecking": {
+      "following": {
+        "mode": "decode",
+        "reqs": [
+          [
+            "decoder",
+            0,
+            1
+          ]
+        ],
+        "waiting": [
+          "large_hit",
+          "small_hit"
+        ],
+        "chunk": null,
+        "full": true,
+        "interval": 0,
+        "budget": [
+          8192,
+          16384,
+          100.0,
+          0
+        ],
+        "verdicts": [
+          [
+            "large_hit",
+            "NO_TOKEN"
+          ]
+        ]
+      },
+      "new_adder_calls": 0,
+      "scope": "hypothetical resource recovery, no finish/reset"
+    },
+    "host_short_tail_excluded_before_restore": {
+      "mode": "prefill",
+      "reqs": [
+        [
+          "partial",
+          0,
+          4096
+        ],
+        [
+          "device",
+          4096,
+          4352
+        ]
+      ],
+      "waiting": [
+        "host"
+      ],
+      "chunk": "partial",
+      "full": false,
+      "interval": 0,
+      "budget": [
+        3840,
+        12032,
+        4720,
+        4480
+      ],
+      "verdicts": [
+        [
+          "host",
+          "OTHER"
+        ],
+        [
+          "device",
+          "CONTINUE"
+        ]
+      ]
+    },
+    "short_cold_excluded_despite_spare_chunk_budget": {
+      "mode": "prefill",
+      "reqs": [
+        [
+          "partial",
+          0,
+          4096
+        ]
+      ],
+      "waiting": [
+        "cold_short"
+      ],
+      "chunk": "partial",
+      "full": false,
+      "interval": 0,
+      "budget": [
+        4096,
+        12288,
+        4160,
+        4160
+      ],
+      "verdicts": [
+        [
+          "cold_short",
+          "OTHER"
+        ]
+      ]
+    }
+  }
+}
