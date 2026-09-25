@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Reproduce the incomplete 071 first-window diagnosis, using local files only."""
+"""Reproduce incomplete 071 window diagnoses, using local files only."""
+import argparse
 import collections
 import csv
 import hashlib
@@ -9,8 +10,11 @@ import re
 import sys
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent
-ROOT = OUT.parents[2]
+DEFAULT_WINDOW = Path(__file__).resolve().parent
+ROOT = DEFAULT_WINDOW.parents[2]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--window', type=Path, default=DEFAULT_WINDOW)
+OUT = parser.parse_args().window.resolve()
 sys.path[:0] = [str(ROOT / 'scripts/analysis'), str(ROOT / 's1-dev/harness')]
 import admission_triage as triage
 import badcase

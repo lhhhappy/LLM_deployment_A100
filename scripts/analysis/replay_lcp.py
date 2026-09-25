@@ -23,6 +23,8 @@ def main():
     ap.add_argument('--tok-dir', required=True, type=Path)
     ap.add_argument('--since-min', type=float, default=0)
     ap.add_argument('--limit', type=int, default=8)
+    ap.add_argument('--req-id', action='append', default=[],
+                    help='explicit completed request ID (repeatable); overrides slow-fast selection')
     ap.add_argument('--alignment', type=int, required=True,
                     help='effective cache-tree token alignment (067 HiCache: 256; physical page: 64)')
     ap.add_argument('--out', required=True, type=Path)
@@ -33,10 +35,20 @@ def main():
     by_pos = {(r['chain_id'], r['idx_in_chain']): r for r in rows}
     if len(by_pos) != len(rows): raise ValueError('duplicate replay position')
     t0 = min(r['client_dispatch_at_s'] for r in rows)
-    selected = sorted((r for r in rows if not r.get('error')
-        and r['client_dispatch_at_s'] >= t0+args.since_min*60
-        and in_ttft_gate(r, 'fast_intra') and r['ttft_s'] > 3),
-        key=lambda r: (-r['ttft_s'], r['req_id']))[:args.limit]
+    if args.req_id:
+        if len(set(args.req_id)) != len(args.req_id) or len(args.req_id) > args.limit:
+            ap.error('explicit IDs must be unique and fit --limit')
+        by_id = {r['req_id']: r for r in rows}
+        if not set(args.req_id) <= by_id.keys():
+            ap.error('explicit ID absent from completed raw snapshot')
+        selected = [by_id[rid] for rid in args.req_id]
+        if any(r.get('error') for r in selected):
+            ap.error('explicit IDs must have successful responses')
+    else:
+        selected = sorted((r for r in rows if not r.get('error')
+            and r['client_dispatch_at_s'] >= t0+args.since_min*60
+            and in_ttft_gate(r, 'fast_intra') and r['ttft_s'] > 3),
+            key=lambda r: (-r['ttft_s'], r['req_id']))[:args.limit]
     pairs = []
     for r in selected:
         prev = by_pos.get((r['chain_id'], r['idx_in_chain']-1))
@@ -72,7 +84,8 @@ def main():
             predecessor_gap_s=r['client_dispatch_at_s']-prev['client_finish_at_s']))
     report = dict(raw_sha256=hashlib.sha256(args.raw.read_bytes()).hexdigest(),
         tokenizer_hashes=hashes, since_min=args.since_min, alignment_tokens=args.alignment,
-        selection='slowest completed fast-intra requests; biased diagnostic sample', results=results)
+        selection='explicit request IDs; diagnostic sample' if args.req_id else
+                  'slowest completed fast-intra requests; biased diagnostic sample', results=results)
     args.out.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(dict(pairs=len(results), rendered_lengths_match=True,
         gap_gt4096=sum(r['positive_lcp_minus_cached']>4096 for r in results), output=str(args.out))))

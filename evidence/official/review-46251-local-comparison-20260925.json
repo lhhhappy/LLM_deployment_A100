@@ -1,0 +1,707 @@
+{
+  "review_status": "VERIFIED_WITH_LIMITATIONS",
+  "reviewer": "independent Codex subagent review_sglang_n22",
+  "reviewed_at_utc": "2026-09-25T08:57:10.444221+00:00",
+  "scope": "Local read-only review of archived official results, submission configs and complete local score/verdict files; the sole new file is this report. No Pod access, no vLLM work, no Claude communication, no repository commit.",
+  "delta_definition": {
+    "signed_absolute_delta_local_minus_official": "local - official, retaining sign and metric unit",
+    "absolute_magnitude_delta": "abs(local - official)",
+    "relative_delta_percent": "100 * (local - official) / official",
+    "positive_means": "local is slower",
+    "aggregation": "Unweighted request TPOT mean and p95 from official stress and local score_formal; four local TTFT p95 values cross-checked with level_verdict. Weighted diagnostic metrics are not substituted."
+  },
+  "comparisons": [
+    {
+      "official_attempt": 46251,
+      "local_run": "069",
+      "official_source": "evidence/official/attempt-46251-final-20260925.json",
+      "local_score_source": "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/score_formal.json",
+      "local_verdict_source": "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/level_verdict.json",
+      "config": {
+        "official_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+        "local_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+        "same_source_commit": true,
+        "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a",
+        "host_gb_per_rank": 64,
+        "pace_tpot": 0.0,
+        "mem_fraction_static": 0.87,
+        "speculative_algorithm": "NEXTN",
+        "speculative_steps_topk_draft_tokens": [
+          3,
+          1,
+          4
+        ],
+        "official_engine_extra_argv_equals_local_logged_argv": true,
+        "official_mechanism_env_equals_local_logged_env": true,
+        "topk_v2_zero_from_common_launcher": true,
+        "new_180_enabled": true,
+        "config_evidence": [
+          "evidence/submission-0925a/submission.json",
+          "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json",
+          "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/job.log"
+        ],
+        "source_equivalence_caveat": null
+      },
+      "official_terminal": {
+        "execStatus": "completed",
+        "status": "scored",
+        "scoreIsFinal": true,
+        "evaluation_status": "PASS",
+        "n_at_slo": 22,
+        "n": 22,
+        "createdAt": "2026-09-24T23:23:09+00:00",
+        "updatedAt": "2026-09-25T08:26:01+00:00",
+        "outer_outcome": "partial",
+        "outer_outcome_note": "partial is an outer status label; authoritative stress result is PASS and the score is final."
+      },
+      "ability": {
+        "aime26": {
+          "status": "succeeded",
+          "n": 44,
+          "n_correct": 44,
+          "points": 100
+        },
+        "gpqa-diamond": {
+          "status": "succeeded",
+          "n": 156,
+          "n_correct": 152,
+          "points": 97.4359
+        }
+      },
+      "local_complete": {
+        "n": 30,
+        "status": "VALID",
+        "passed": false,
+        "execution_status": "COMPLETED",
+        "rows": 5601,
+        "coverage": 1.0,
+        "server_ttft_rows": 5601,
+        "error_counts": {},
+        "flush_verified": true,
+        "passed_gate_count": 10,
+        "gate_count": 11,
+        "failed_gates": [
+          "chain_start(<=30s)"
+        ],
+        "wall_s": 6455.189443349838,
+        "ttft_gates": {
+          "fast_intra": {
+            "n": 4765,
+            "p95": 2.7038826942443848,
+            "over_limit": 222,
+            "allowed_over": 263,
+            "rate_ci_lower": 0.041669860120915836,
+            "pass_estimated": true,
+            "pass_point": true
+          },
+          "overall_intra": {
+            "n": 5010,
+            "p95": 3.6267874240875244,
+            "over_limit": 195,
+            "allowed_over": 276,
+            "rate_ci_lower": 0.034528140671844954,
+            "pass_estimated": true,
+            "pass_point": true
+          },
+          "turn_start": {
+            "n": 159,
+            "p95": 13.640632629394531,
+            "over_limit": 7,
+            "allowed_over": 13,
+            "rate_ci_lower": 0.020841899853618256,
+            "pass_estimated": true,
+            "pass_point": true
+          },
+          "chain_start": {
+            "n": 432,
+            "p95": 40.33553600311279,
+            "over_limit": 31,
+            "allowed_over": 29,
+            "rate_ci_lower": 0.05242088791480337,
+            "pass_estimated": false,
+            "pass_point": false
+          }
+        },
+        "validity_provenance": "Cross-checked existing score_formal and level_verdict. This independent comparison did not reread complete raw request files or rerun the scoring harness."
+      },
+      "time_metrics": {
+        "fast_intra_p95": {
+          "unit": "s",
+          "official": 1.3002662658691406,
+          "local": 2.7038826942443848,
+          "signed_absolute_delta_local_minus_official": 1.4036164283752441,
+          "absolute_magnitude_delta": 1.4036164283752441,
+          "relative_delta_percent": 107.9483845131536
+        },
+        "overall_intra_p95": {
+          "unit": "s",
+          "official": 2.642559051513672,
+          "local": 3.6267874240875244,
+          "signed_absolute_delta_local_minus_official": 0.9842283725738525,
+          "absolute_magnitude_delta": 0.9842283725738525,
+          "relative_delta_percent": 37.24527450049153
+        },
+        "turn_start_p95": {
+          "unit": "s",
+          "official": 6.582519769668579,
+          "local": 13.640632629394531,
+          "signed_absolute_delta_local_minus_official": 7.058112859725952,
+          "absolute_magnitude_delta": 7.058112859725952,
+          "relative_delta_percent": 107.22509170802412
+        },
+        "chain_start_p95": {
+          "unit": "s",
+          "official": 46.049216985702515,
+          "local": 40.33553600311279,
+          "signed_absolute_delta_local_minus_official": -5.713680982589722,
+          "absolute_magnitude_delta": 5.713680982589722,
+          "relative_delta_percent": -12.407770113363101
+        },
+        "tpot_mean": {
+          "unit": "s/token",
+          "official": 0.023011343046365706,
+          "local": 0.028824435259178417,
+          "signed_absolute_delta_local_minus_official": 0.005813092212812711,
+          "absolute_magnitude_delta": 0.005813092212812711,
+          "relative_delta_percent": 25.261855429732517
+        },
+        "tpot_p95": {
+          "unit": "s/token",
+          "official": 0.0495130250703043,
+          "local": 0.055902278097016166,
+          "signed_absolute_delta_local_minus_official": 0.006389253026711866,
+          "absolute_magnitude_delta": 0.006389253026711866,
+          "relative_delta_percent": 12.904186358316158
+        }
+      },
+      "throughput_context_not_time_metrics": {
+        "official_tpm_all": 1728373.1166666667,
+        "local_tpm_all": 3666963.7,
+        "official_tpm_decode": 19408.2,
+        "local_tpm_decode": 41081.13333333333,
+        "note": "Different N and data; local TPM includes cached prompt tokens and cannot establish physical compute efficiency or explain time differences."
+      },
+      "fair_comparison_level": "same effective engine configuration; different concurrency, workload, warmup and deployment context; descriptive aggregate comparison only"
+    },
+    {
+      "official_attempt": 46173,
+      "local_run": "068",
+      "official_source": "evidence/official/attempt-46173-20260924.json",
+      "local_score_source": "evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/score_formal.json",
+      "local_verdict_source": "evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/level_verdict.json",
+      "config": {
+        "official_commit": "c92acd57a61eb6f9eed3222cc048877eef7963d9",
+        "local_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+        "same_source_commit": false,
+        "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0924c",
+        "host_gb_per_rank": 32,
+        "pace_tpot": 0.0,
+        "mem_fraction_static": 0.87,
+        "speculative_algorithm": "NEXTN",
+        "speculative_steps_topk_draft_tokens": [
+          3,
+          1,
+          4
+        ],
+        "official_engine_extra_argv_equals_local_logged_argv": true,
+        "official_mechanism_env_equals_local_logged_env": true,
+        "topk_v2_zero_from_common_launcher": true,
+        "new_180_enabled": true,
+        "config_evidence": [
+          "evidence/image-0924d/submission_slotA_mem087_hicache_0924c.json",
+          "evidence/L068-official_b_pace_off_full_n30_shortwarm/config-verification.json",
+          "evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/job.log"
+        ],
+        "source_equivalence_caveat": "46173 uses c92acd5, local068 uses759a6eb. git diff contains only the 122 reserve-hit fix in scheduler._ax_pace_limits; call is guarded by _ax_pace() is not None, which is false when PACE_TPOT=0. Effective configuration is comparable, but source bytes are not identical."
+      },
+      "official_terminal": {
+        "execStatus": "completed",
+        "status": "scored",
+        "scoreIsFinal": true,
+        "evaluation_status": "PASS",
+        "n_at_slo": 14,
+        "n": 14,
+        "createdAt": "2026-09-24T14:26:40+00:00",
+        "updatedAt": "2026-09-24T20:11:13+00:00",
+        "outer_outcome": "partial",
+        "outer_outcome_note": "partial is an outer status label; authoritative stress result is PASS and the score is final."
+      },
+      "ability": {
+        "aime26": {
+          "status": "succeeded",
+          "n": 44,
+          "n_correct": 44,
+          "points": 100
+        },
+        "gpqa-diamond": {
+          "status": "succeeded",
+          "n": 156,
+          "n_correct": 150,
+          "points": 96.1538
+        }
+      },
+      "local_complete": {
+        "n": 30,
+        "status": "VALID",
+        "passed": false,
+        "execution_status": "COMPLETED",
+        "rows": 5601,
+        "coverage": 1.0,
+        "server_ttft_rows": 5601,
+        "error_counts": {},
+        "flush_verified": true,
+        "passed_gate_count": 8,
+        "gate_count": 11,
+        "failed_gates": [
+          "fast_intra(uncached_expected<=4096,<=3s)",
+          "overall_intra(<=5s)",
+          "chain_start(<=30s)"
+        ],
+        "wall_s": 7481.57964515686,
+        "ttft_gates": {
+          "fast_intra": {
+            "n": 4765,
+            "p95": 8.380045652389526,
+            "over_limit": 461,
+            "allowed_over": 263,
+            "rate_ci_lower": 0.08978236560940406,
+            "pass_estimated": false,
+            "pass_point": false
+          },
+          "overall_intra": {
+            "n": 5010,
+            "p95": 9.650898694992065,
+            "over_limit": 410,
+            "allowed_over": 276,
+            "rate_ci_lower": 0.0755480218069042,
+            "pass_estimated": false,
+            "pass_point": false
+          },
+          "turn_start": {
+            "n": 159,
+            "p95": 20.884069204330444,
+            "over_limit": 13,
+            "allowed_over": 13,
+            "rate_ci_lower": 0.049038770858566144,
+            "pass_estimated": true,
+            "pass_point": false
+          },
+          "chain_start": {
+            "n": 432,
+            "p95": 100.38164281845093,
+            "over_limit": 50,
+            "allowed_over": 29,
+            "rate_ci_lower": 0.09128608474263095,
+            "pass_estimated": false,
+            "pass_point": false
+          }
+        },
+        "validity_provenance": "Cross-checked existing score_formal and level_verdict. This independent comparison did not reread complete raw request files or rerun the scoring harness."
+      },
+      "time_metrics": {
+        "fast_intra_p95": {
+          "unit": "s",
+          "official": 1.1907362937927246,
+          "local": 8.380045652389526,
+          "signed_absolute_delta_local_minus_official": 7.189309358596802,
+          "absolute_magnitude_delta": 7.189309358596802,
+          "relative_delta_percent": 603.7700703400469
+        },
+        "overall_intra_p95": {
+          "unit": "s",
+          "official": 2.1139631271362305,
+          "local": 9.650898694992065,
+          "signed_absolute_delta_local_minus_official": 7.536935567855835,
+          "absolute_magnitude_delta": 7.536935567855835,
+          "relative_delta_percent": 356.5310799940992
+        },
+        "turn_start_p95": {
+          "unit": "s",
+          "official": 6.7314324378967285,
+          "local": 20.884069204330444,
+          "signed_absolute_delta_local_minus_official": 14.152636766433716,
+          "absolute_magnitude_delta": 14.152636766433716,
+          "relative_delta_percent": 210.24702984103308
+        },
+        "chain_start_p95": {
+          "unit": "s",
+          "official": 27.20687770843506,
+          "local": 100.38164281845093,
+          "signed_absolute_delta_local_minus_official": 73.17476511001587,
+          "absolute_magnitude_delta": 73.17476511001587,
+          "relative_delta_percent": 268.9568641216379
+        },
+        "tpot_mean": {
+          "unit": "s/token",
+          "official": 0.01654093176397998,
+          "local": 0.0342620702754677,
+          "signed_absolute_delta_local_minus_official": 0.017721138511487725,
+          "absolute_magnitude_delta": 0.017721138511487725,
+          "relative_delta_percent": 107.13506811072034
+        },
+        "tpot_p95": {
+          "unit": "s/token",
+          "official": 0.03184183577037803,
+          "local": 0.07250074699248482,
+          "signed_absolute_delta_local_minus_official": 0.04065891122210679,
+          "absolute_magnitude_delta": 0.04065891122210679,
+          "relative_delta_percent": 127.69022337566088
+        }
+      },
+      "throughput_context_not_time_metrics": {
+        "official_tpm_all": 1754686.5666666667,
+        "local_tpm_all": 2733104.8666666667,
+        "official_tpm_decode": 20602.3,
+        "local_tpm_decode": 29532.55,
+        "note": "Different N and data; local TPM includes cached prompt tokens and cannot establish physical compute efficiency or explain time differences."
+      },
+      "fair_comparison_level": "same effective engine configuration; different concurrency, workload, warmup and deployment context; descriptive aggregate comparison only"
+    },
+    {
+      "official_attempt": 46174,
+      "local_run": "067",
+      "official_source": "evidence/official/attempt-46174-20260924.json",
+      "local_score_source": "evidence/L067-official_b_full_n30_shortwarm/N30/score_formal.json",
+      "local_verdict_source": "evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json",
+      "config": {
+        "official_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+        "local_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+        "same_source_commit": true,
+        "image": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0924d",
+        "host_gb_per_rank": 32,
+        "pace_tpot": 0.085,
+        "mem_fraction_static": 0.87,
+        "speculative_algorithm": "NEXTN",
+        "speculative_steps_topk_draft_tokens": [
+          3,
+          1,
+          4
+        ],
+        "official_engine_extra_argv_equals_local_logged_argv": true,
+        "official_mechanism_env_equals_local_logged_env": true,
+        "topk_v2_zero_from_common_launcher": true,
+        "new_180_enabled": true,
+        "config_evidence": [
+          "evidence/image-0924d/submission_slotB_mem087_hicache_122fix_0924d.json",
+          "evidence/L067-official_b_full_n30_shortwarm/config-verification.json",
+          "evidence/L067-official_b_full_n30_shortwarm/N30/job.log"
+        ],
+        "source_equivalence_caveat": null
+      },
+      "official_terminal": {
+        "execStatus": "completed",
+        "status": "scored",
+        "scoreIsFinal": true,
+        "evaluation_status": "PASS",
+        "n_at_slo": 18,
+        "n": 18,
+        "createdAt": "2026-09-24T14:27:08+00:00",
+        "updatedAt": "2026-09-24T21:37:32+00:00",
+        "outer_outcome": "partial",
+        "outer_outcome_note": "partial is an outer status label; authoritative stress result is PASS and the score is final."
+      },
+      "ability": {
+        "aime26": {
+          "status": "succeeded",
+          "n": 44,
+          "n_correct": 44,
+          "points": 100
+        },
+        "gpqa-diamond": {
+          "status": "succeeded",
+          "n": 156,
+          "n_correct": 153,
+          "points": 98.0769
+        }
+      },
+      "local_complete": {
+        "n": 30,
+        "status": "VALID",
+        "passed": false,
+        "execution_status": "COMPLETED",
+        "rows": 5601,
+        "coverage": 1.0,
+        "server_ttft_rows": 5601,
+        "error_counts": {},
+        "flush_verified": true,
+        "passed_gate_count": 7,
+        "gate_count": 11,
+        "failed_gates": [
+          "fast_intra(uncached_expected<=4096,<=3s)",
+          "overall_intra(<=5s)",
+          "turn_start(<=15s)",
+          "chain_start(<=30s)"
+        ],
+        "wall_s": 7407.170325994492,
+        "ttft_gates": {
+          "fast_intra": {
+            "n": 4765,
+            "p95": 7.645657539367676,
+            "over_limit": 492,
+            "allowed_over": 263,
+            "rate_ci_lower": 0.09607846559273314,
+            "pass_estimated": false,
+            "pass_point": false
+          },
+          "overall_intra": {
+            "n": 5010,
+            "p95": 8.515644073486328,
+            "over_limit": 401,
+            "allowed_over": 276,
+            "rate_ci_lower": 0.07381653379777903,
+            "pass_estimated": false,
+            "pass_point": false
+          },
+          "turn_start": {
+            "n": 159,
+            "p95": 25.013773441314697,
+            "over_limit": 14,
+            "allowed_over": 13,
+            "rate_ci_lower": 0.054017863092249194,
+            "pass_estimated": false,
+            "pass_point": false
+          },
+          "chain_start": {
+            "n": 432,
+            "p95": 93.70164227485657,
+            "over_limit": 55,
+            "allowed_over": 29,
+            "rate_ci_lower": 0.10174080983339273,
+            "pass_estimated": false,
+            "pass_point": false
+          }
+        },
+        "validity_provenance": "Cross-checked existing score_formal and level_verdict. This independent comparison did not reread complete raw request files or rerun the scoring harness."
+      },
+      "time_metrics": {
+        "fast_intra_p95": {
+          "unit": "s",
+          "official": 1.4819681644439697,
+          "local": 7.645657539367676,
+          "signed_absolute_delta_local_minus_official": 6.163689374923706,
+          "absolute_magnitude_delta": 6.163689374923706,
+          "relative_delta_percent": 415.9124010087156
+        },
+        "overall_intra_p95": {
+          "unit": "s",
+          "official": 2.3472137451171875,
+          "local": 8.515644073486328,
+          "signed_absolute_delta_local_minus_official": 6.168430328369141,
+          "absolute_magnitude_delta": 6.168430328369141,
+          "relative_delta_percent": 262.7979808486157
+        },
+        "turn_start_p95": {
+          "unit": "s",
+          "official": 6.425509214401245,
+          "local": 25.013773441314697,
+          "signed_absolute_delta_local_minus_official": 18.588264226913452,
+          "absolute_magnitude_delta": 18.588264226913452,
+          "relative_delta_percent": 289.28857786480637
+        },
+        "chain_start_p95": {
+          "unit": "s",
+          "official": 34.53909993171692,
+          "local": 93.70164227485657,
+          "signed_absolute_delta_local_minus_official": 59.16254234313965,
+          "absolute_magnitude_delta": 59.16254234313965,
+          "relative_delta_percent": 171.29149995252558
+        },
+        "tpot_mean": {
+          "unit": "s/token",
+          "official": 0.020518277690769384,
+          "local": 0.03349773267942177,
+          "signed_absolute_delta_local_minus_official": 0.012979454988652387,
+          "absolute_magnitude_delta": 0.012979454988652387,
+          "relative_delta_percent": 63.258014070505986
+        },
+        "tpot_p95": {
+          "unit": "s/token",
+          "official": 0.039681590949431265,
+          "local": 0.06746948104730602,
+          "signed_absolute_delta_local_minus_official": 0.027787890097874753,
+          "absolute_magnitude_delta": 0.027787890097874753,
+          "relative_delta_percent": 70.02715726112544
+        }
+      },
+      "throughput_context_not_time_metrics": {
+        "official_tpm_all": 1756832.5,
+        "local_tpm_all": 2787756.35,
+        "official_tpm_decode": 20170.9,
+        "local_tpm_decode": 29805.45,
+        "note": "Different N and data; local TPM includes cached prompt tokens and cannot establish physical compute efficiency or explain time differences."
+      },
+      "fair_comparison_level": "same effective engine configuration; different concurrency, workload, warmup and deployment context; descriptive aggregate comparison only"
+    }
+  ],
+  "submission_0925a_source_audit": {
+    "status": "LOCAL_ENGINE_CONFIG_MATCH",
+    "engine_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+    "source_files": 4692,
+    "source_digest": "35da0a20d41a54e16c159cd7cc30c1540d5b3675c90b1a790cbbbcd3a168b3d9",
+    "submission_sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9",
+    "source_build_assertion": [
+      "#6 0.715 ENGINE_SOURCE_VERIFIED 4692 35da0a20d41a54e16c159cd7cc30c1540d5b3675c90b1a790cbbbcd3a168b3d9"
+    ],
+    "runtime_differences": {
+      "port": "local 30000 -> official 8000",
+      "code_path": "local PYTHONPATH exported source -> image installed package; content asserted during image build",
+      "evaluation": "official platform controls data, warmup, flush and ladder; local rep16/N30 is not submitted"
+    }
+  },
+  "historical_46173_068_source_difference": {
+    "changed_files": [
+      "engine/sglang/srt/managers/scheduler.py"
+    ],
+    "diff_sha256": "94dca12986f85f9603a939b2fca3dac2e6526dcfeb12ab88a1630c666ce2a01d",
+    "guard_verified_in_commit": "759a6eb:engine/sglang/srt/managers/scheduler.py, _ax_pace_limits call at3926-3927 is guarded by _ax_pace() is not None; _ax_pace returns None for PACE_TPOT=0",
+    "interpretation": "Parameter/mechanism match, not source-byte identity."
+  },
+  "statistical_allowance": {
+    "source": "llm-challenge-arena-v1/task.md:565",
+    "rule": "TTFT fails only when the 95% one-sided lower bound of the over-target rate exceeds 5%; it is not a fixed percentage or seconds tolerance. TPOT p95 limit0.10 s/token has no such allowance.",
+    "official_46251_chain_p95_s": 46.049216985702515,
+    "chain_target_s": 30,
+    "official_chain_point_target_met": false,
+    "official_level_result": "PASS",
+    "interpretation": "p95>30s and official PASS are compatible with the task statistical rule; the exact allowance outcome cannot be reconstructed from this official summary.",
+    "missing_from_official_summary": [
+      "per-gate sample count",
+      "over-target count",
+      "allowed_over",
+      "rate_ci_lower",
+      "exact organizer confidence-interval implementation"
+    ],
+    "local_069_chain": {
+      "n": 432,
+      "p95": 40.33553600311279,
+      "over_limit": 31,
+      "allowed_over": 29,
+      "rate_ci_lower": 0.05242088791480337,
+      "pass_estimated": false,
+      "pass_point": false
+    },
+    "why_smaller_local_chain_p95_can_fail": "p95 magnitude alone does not determine exceedance count or its lower confidence bound, and formal/local gate cohorts differ; local has31/432 above30s vs CP allowance29, lower bound0.0524208879>0.05."
+  },
+  "excluded_partial_run": {
+    "run": "071",
+    "checkpoint": "check45",
+    "source": "evidence/L071-official_b_host64_full_n30_shortwarm/check45/window_gates.json",
+    "archived_job_state": "running",
+    "completed_rows": 2362,
+    "expected_full_rows": 5601,
+    "full_cohort_fraction": 0.4217104088555615,
+    "engine_difference_from_46251": "host64 but122 enabled; new Pod/JIT/warmup context differs",
+    "use": "intermediate diagnostics only; no full-level verdict, official calibration or N30 pass/fail inference",
+    "asynchronous_snapshot_note": "check45/window_gates and embedded snapshot health use2362 rows. Separate later health.json reports2418; do not mix their timestamps or treat either as a complete cohort."
+  },
+  "limits_and_missing_evidence": [
+    "46251 N22 versus069 N30 changes concurrency by8 as well as workload; 46173 N14 versus068 N30 and46174 N18 versus067 N30 are likewise not same-N calibrations.",
+    "Local complete cohort is frozen synthetic longchain311 chains/5601 requests. Formal341 chains/5150 requests is organizer-confirmed repository context from notes/knowledge.md, not a count returned in the official result JSON; exact formal request population is unavailable here.",
+    "Missing formal raw request rows, matching request IDs, per-request input/output/LCP/cache records, admission/queue/execution timings, server batch/kernel logs and detailed runtime/config receipts prevent assigning aggregate differences to cache eviction, scheduler behavior, execution cost, or network/SSE transport.",
+    "Official summary only reports the highest passing level. Higher failed-level details are absent, so the limiting gate atN26 or other unreturned levels cannot be established from this evidence.",
+    "Warmup/flush/ladder are platform controlled officially; local usesrep16 then verified real flush. Official per-gate sample counts/allowance and runtime timestamp coverage are not returned. Same engine configuration does not make the workloads or measurement context identical.",
+    "The vector of observed differences is mixed: local069 chain p95 is12.4078% lower, other requested time metrics are12.9042% to107.9484% higher. A single local-to-formal time scale factor is unsupported.",
+    "Official createdAt-to-updatedAt spans include queue, capability evaluation and platform activity; they are not a single stress-level wall duration and cannot be compared to local wall_s.",
+    "Existing local terminal summaries were cross-checked, not independently regenerated from full raw files in this bounded review. Local CI implementation is an estimate;068 turn gate is CI-method-sensitive, while its overall FAIL remains unchanged."
+  ],
+  "blocking_errors": [],
+  "recommended_next_evidence": "For a controlled calibration, replay complete frozen local data atN22 using the exact0925a host64/122off engine configuration and record warmup/runtime context; this removes N as a confounder but still does not reproduce hidden formal data. Exact causal decomposition requires formal raw and service evidence.",
+  "source_manifest": {
+    "evidence/official/attempt-46251-final-20260925.json": {
+      "sha256": "386951bdf30892016d1e157af6bf4a6f0b18436d82d54b52edd33ed345b72a56",
+      "bytes": 5675
+    },
+    "evidence/submission-0925a/submission.json": {
+      "sha256": "ea41c952c0228a7c2b0c655608c11581b21a6700195ae018a81aa71d12a2d8c9",
+      "bytes": 1582
+    },
+    "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/level_verdict.json": {
+      "sha256": "78c6e3ae6d764ade255ca92f82192e748e4cca30618fd584b08613e33ef2df44",
+      "bytes": 3983
+    },
+    "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/score_formal.json": {
+      "sha256": "4131314a9ba6282307bfb3318ddf00676785621b870561e59f876e4bb804f6fb",
+      "bytes": 39654
+    },
+    "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/config-verification.json": {
+      "sha256": "11f38d0c3f09699e557e7131b8b2651cdf4192da23819c36f06fa5e40110fc30",
+      "bytes": 632
+    },
+    "evidence/official/attempt-46173-20260924.json": {
+      "sha256": "b2f7995246eeb3570f5309440cf9600c16039f2be62cb8af7696a00f42221bc5",
+      "bytes": 5695
+    },
+    "evidence/image-0924d/submission_slotA_mem087_hicache_0924c.json": {
+      "sha256": "218d20e380f42758e987ffc24bdf6ce0808ced6f0881956e97800e2520a50b54",
+      "bytes": 1545
+    },
+    "evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/level_verdict.json": {
+      "sha256": "f408fe1f9546cdbce9b3331a46600912f2fcce58224239c0cdbc41c77650f86b",
+      "bytes": 4072
+    },
+    "evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/score_formal.json": {
+      "sha256": "bb6e46d62bb4869e29b96bd68cec3c8fe9d8d6323e069b3aaecf72ee19d9da83",
+      "bytes": 39712
+    },
+    "evidence/L068-official_b_pace_off_full_n30_shortwarm/config-verification.json": {
+      "sha256": "61ad0fa2bc48f31a61e0b109ccd27c4e1d7cd039bdba2105cf39fe49c497f354",
+      "bytes": 1156
+    },
+    "evidence/official/attempt-46174-20260924.json": {
+      "sha256": "6492dc91ad9390ab0b104bf21c45529d30bb319e74c457db6fe7fb8d163d3345",
+      "bytes": 5663
+    },
+    "evidence/image-0924d/submission_slotB_mem087_hicache_122fix_0924d.json": {
+      "sha256": "4ce69dcc2b04a5bed4aa564f50648b43ba21481d7c43bae00378f084add623f5",
+      "bytes": 1549
+    },
+    "evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json": {
+      "sha256": "b04f199ad4cab268df8b09a57e09304b325dee880b92d2d552fbd00c0ce2022d",
+      "bytes": 4065
+    },
+    "evidence/L067-official_b_full_n30_shortwarm/N30/score_formal.json": {
+      "sha256": "8fd14727954dc2bf61447e3379f99533f58a4be23f0dddf438df24f4a50d6b4f",
+      "bytes": 39710
+    },
+    "evidence/L067-official_b_full_n30_shortwarm/config-verification.json": {
+      "sha256": "71dcf4b9e13426da771165e2eceebf662239ceb120100447be73b843d9a6cc2a",
+      "bytes": 458
+    },
+    "evidence/submission-0925a/config-audit.json": {
+      "sha256": "eff22b0b4d71557e2c4e0ff232360e487966f7a163b1392ce858bc77495948a0",
+      "bytes": 1117
+    },
+    "evidence/submission-0925a/image-source-verification.json": {
+      "sha256": "3f6a17ea27cebd881c725af08e92175fb4a14b81a251c41fd36f5ad7d1a15636",
+      "bytes": 469
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check45/window_gates.json": {
+      "sha256": "b76fd76e4c39d735111df31ce44be6ba2b6db38e6933f361933514fa0b034319",
+      "bytes": 4257
+    },
+    "evidence/L071-official_b_host64_full_n30_shortwarm/check45/snapshot.json": {
+      "sha256": "aadfd6f7b7b3c1cbce882e83ccd8bf9174a3999cc3e94266f399a48dfc085b94",
+      "bytes": 4569
+    },
+    "llm-challenge-arena-v1/task.md": {
+      "sha256": "6d572313067c60ed528684c20f1fb6a2e6aea88cb55f1f26b9443e9e52dee8e6",
+      "bytes": 44402
+    },
+    "notes/submissions.md": {
+      "sha256": "bc7b2ed140b8fc185d5916d76fcd0c36c41711855de7e7ad2ffa215bcb14c6fe",
+      "bytes": 6047
+    },
+    "notes/knowledge.md": {
+      "sha256": "f1b0d9a96bcf72002ad4a5e963bac2131ed3f1b3c7fbcc19970b0659fab77001",
+      "bytes": 15056
+    },
+    "evidence/submissions-0924/README.md": {
+      "sha256": "cffb3053b62d1da700dab75da7fbe5afbaa9fd763e94c6af67a9e39eaec3f0c7",
+      "bytes": 1279
+    },
+    "scripts/pod/lib.sh": {
+      "sha256": "b7d14a915068233b6d9f01d8ea90babc6dcd3a0f00a93f52c5d372dea4930e18",
+      "bytes": 3421
+    }
+  }
+}

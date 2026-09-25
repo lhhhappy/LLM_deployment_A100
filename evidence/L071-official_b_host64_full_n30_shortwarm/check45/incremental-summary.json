@@ -1,0 +1,106 @@
+{
+  "scope": "newly completed since first snapshot; not an arrival-time window or verdict",
+  "new_completed": 1691,
+  "baseline": {
+    "n": 1691,
+    "n_ok": 1691,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 1392,
+        "over": 144,
+        "allowed": 83,
+        "over_rate": 0.10344827586206896,
+        "p95": 6.9771568775177
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 1481,
+        "over": 118,
+        "allowed": 88,
+        "over_rate": 0.07967589466576637,
+        "p95": 7.8720502853393555
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 63,
+        "over": 4,
+        "allowed": 6,
+        "over_rate": 0.06349206349206349,
+        "p95": 20.793915271759033
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 147,
+        "over": 8,
+        "allowed": 12,
+        "over_rate": 0.05442176870748299,
+        "p95": 30.421066284179688
+      }
+    },
+    "tpot": {
+      "n": 1691,
+      "mean": 0.03210840225305672,
+      "p95": 0.055280687165154954,
+      "over_0.10": 1
+    },
+    "tokens": {
+      "prompt": 109291164,
+      "cached": 102617600,
+      "uncached": 6673564,
+      "hit_ratio": 0.9389377534674258
+    }
+  },
+  "candidate": {
+    "n": 1691,
+    "n_ok": 1691,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 1392,
+        "over": 129,
+        "allowed": 83,
+        "over_rate": 0.09267241379310345,
+        "p95": 5.055765628814697
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 1481,
+        "over": 89,
+        "allowed": 88,
+        "over_rate": 0.06009453072248481,
+        "p95": 6.004222869873047
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 63,
+        "over": 3,
+        "allowed": 6,
+        "over_rate": 0.047619047619047616,
+        "p95": 12.607443571090698
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 147,
+        "over": 4,
+        "allowed": 12,
+        "over_rate": 0.027210884353741496,
+        "p95": 25.68865418434143
+      }
+    },
+    "tpot": {
+      "n": 1691,
+      "mean": 0.03165254285884585,
+      "p95": 0.052747891715796524,
+      "over_0.10": 0
+    },
+    "tokens": {
+      "prompt": 109291164,
+      "cached": 102346752,
+      "uncached": 6944412,
+      "hit_ratio": 0.9364595293357841
+    }
+  }
+}

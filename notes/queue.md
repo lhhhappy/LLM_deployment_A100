@@ -4,7 +4,7 @@
 
 ## 当前安排（2026-09-25，用户最新决定）
 
-当前Codex继续SGLang，Claude Code接手vLLM，共同探索N38。vLLM首阶段为基本开发/GPU调通和相同评测合同；复用已有有效设计，各自优化实现。短探针先筛选，完整回放后判分，见[交接](handoffs/vllm-claude-code.md)。071冻结不变，其后为vLLM预留072启动/冒烟位置，尚未发布到Pod队列。围绕工作量、单位成本、调度改善做闭环；
+09-25用户最新安排：Codex当前只推进SGLang和正式结果复核；vLLM镜像、安装、实验尚未与用户对齐，**072暂缓，不入队、不切换环境**，已有成果保留。071冻结不变，围绕工作量、单位成本、调度改善做闭环；
 统一规则见[evaluation.md](evaluation.md)，过程见[Codex迭代日志](iterations/codex.md)。
 
 09-25最新授权（已设goal）：先完成071（host64+122 N30），测量后15/45/75/105…分钟分析同ID坏例、等待/执行与缓存证据；明确bug先留证再停单个job，普通窗口超标不自动停。完整N30验收通过且没有未解释的严重异常后，优先同配置探索本地N38；N30有问题则继续定因修复。N38未入队；072预留保留，实际先后按071结果协调，不取消vLLM路线。
@@ -12,7 +12,7 @@
 | Job | 配置 | 状态 |
 |---|---|---|
 | 071-official_b_host64_full_n30_shortwarm | 冻结759a6eb、host64+122；新Pod/RAM缓存冷启动 | 07:54:11 UTC开始正式N30测量，rep16预热106秒16/16、真flush成功。首次分析08:09 UTC，之后每30分钟。14类缓存恢复依赖索引，原二进制不变；恢复进程已退出。TF32与069/0925a保持关闭。见[根因与恢复](reports/sglang-cold-jit-0925.md) |
-| 072-vllm_tp8_real_smoke | 按用户最新要求使用主办方 `vllm-backport:260918-sm80`（v0.13.1 / cde54e8e，原生s1_generate）；TP8真实权重、MTP、接口/缓存冒烟；旧main a811738a6的包与000收据不可直接套用 | **保留位置，未入队、未安装Pod环境**；Claude在开发机导出镜像环境，完整文件校验、实际展开/安装峰值与backport接口适配待核；071及条件性N38优先级不变。见[安排](reports/vllm-tp8-slot-072.md)与[镜像身份](../evidence/vllm-backport-identity-20260925/README.md) |
+| 072-vllm_tp8_real_smoke | 配置与镜像等待用户重新对齐，既有调研和成果保留 | **暂缓，未入队、未安装Pod环境**；当前只推进SGLang，用户另行明确安排后再讨论072 |
 | 070-official_b_host64_full_n30_shortwarm | 对照069，只开122 τ=.085；host64、GPU预算与其余配置不变 | 基础设施中断，无测量：22:13:28 UTC旧Pod临时存储超20Gi被驱逐；09-25 06:14 UTC revision2新Pod已可exec；070没有恢复执行 |
 | 069-official_b_pace_off_host64_full_n30_shortwarm | 对照068，只扩HiCache host预算32→64GB/rank；122off，GPU预算不变 | 完成5601条/107.59分钟，VALID FAIL；10/11通过，仅chain31/29失败，TPOT .028824/.055902 |
 | 068-official_b_pace_off_full_n30_shortwarm | 对照067，只关闭122；其余引擎配置不变 | 完成5601条/约125分钟，VALID FAIL；fast/overall/chain失败，TPOT通过，turn仅CP余量通过 |
@@ -47,7 +47,7 @@ host64、mem0.87、MTP、原数据/rep16/N30不变；这是122整体机制对照
 
 ## 测量与比较
 
-072是有限功能探针，不是完整N30或N38判分；启动/捕图与请求探针分别设预算，确认错误留证后立即结束自己的测试。071终态并取证、模型按任务边界退出后再运行072；不并驻两个完整模型、不停删共享service。现有qpush/启动器只支持SGLang，不能直接用于072，须先准备独立入口。072通过后再安排完整对照，不预先占用后续全量档。
+072当前暂缓，071完成不自动触发vLLM安装或运行；须与用户另行对齐。SGLang继续完整对照与坏例归因，不停删共享service。
 
 - 全量`data/s1-dev-longchain/`：311链/5601请求、N30，原顺序、正文、输出预算和gap；不设70分钟截止。
 - preflight一条链 → rep16-v1固定16完整请求短预热 → 真flush → 全量测量 → 原评分器11门。

@@ -1,0 +1,43 @@
+{
+  "raw_sha256": "2f48e0baaa2e5279206e0552b2c6069d8ea7be9c1661ff9cd3e7c152c4b9bb0a",
+  "tokenizer_hashes": {
+    "tokenizer.json": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+    "tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+    "chat_template.jinja": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891"
+  },
+  "since_min": 0,
+  "alignment_tokens": 256,
+  "selection": "explicit request IDs; diagnostic sample",
+  "results": [
+    {
+      "req_id": "scimaster:canon:lc_20260924_295:llm:0001",
+      "predecessor": "scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1",
+      "prompt_tokens": 254196,
+      "cached_tokens": 8704,
+      "true_prompt_lcp": 252115,
+      "lcp_aligned": 251904,
+      "positive_lcp_minus_cached": 243200,
+      "actual_uncached": 245492,
+      "frozen_uncached": 2081,
+      "ttft_s": 33.108667850494385,
+      "recv_to_exec_s": 5.055924892425537,
+      "exec_to_first_s": 28.052742958068848,
+      "predecessor_gap_s": 2.648160219192505
+    },
+    {
+      "req_id": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:2",
+      "predecessor": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1",
+      "prompt_tokens": 223088,
+      "cached_tokens": 152320,
+      "true_prompt_lcp": 222738,
+      "lcp_aligned": 222720,
+      "positive_lcp_minus_cached": 70400,
+      "actual_uncached": 70768,
+      "frozen_uncached": 350,
+      "ttft_s": 14.316842794418335,
+      "recv_to_exec_s": 4.633347988128662,
+      "exec_to_first_s": 9.683494806289673,
+      "predecessor_gap_s": 16.106738090515137
+    }
+  ]
+}

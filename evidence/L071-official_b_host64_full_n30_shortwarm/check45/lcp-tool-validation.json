@@ -1,0 +1,23 @@
+{
+  "successful_real_pairs": 2,
+  "frozen_tokenizer_hashes_verified": true,
+  "rendered_lengths_match": true,
+  "negative_guards": [
+    {
+      "case": "missing",
+      "rejected": true,
+      "no_output_artifact": true
+    },
+    {
+      "case": "duplicate",
+      "rejected": true,
+      "no_output_artifact": true
+    },
+    {
+      "case": "cohort_head",
+      "rejected": true,
+      "no_output_artifact": true
+    }
+  ],
+  "gpu_used": false
+}

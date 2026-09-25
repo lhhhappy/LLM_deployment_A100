@@ -1,0 +1,9 @@
+{
+  "archive": "/tmp/ax/codex/071-server-48cd309b641f0880119b49dcc9d177d7bf77c3bef6fd8ed984b6f67b60decde1.gz",
+  "size": 176063,
+  "sha256": "48cd309b641f0880119b49dcc9d177d7bf77c3bef6fd8ed984b6f67b60decde1",
+  "raw_size": 1292875,
+  "raw_sha256": "50eaca13e32a31aa61a9749516640e0e30906442f51f040a163c0aac1e524f5e",
+  "observed_at": 1790325657.9430516,
+  "source": "/tmp/ax/runs/071-official_b_host64_full_n30_shortwarm/server.log"
+}
