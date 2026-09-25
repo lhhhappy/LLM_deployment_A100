@@ -55,9 +55,11 @@ ScheduleBatch -> ForwardBatch
 import copy
 import dataclasses
 import logging
+import os
 import re
 import sys
 from array import array
+from collections import Counter
 from concurrent.futures import Future
 from enum import Enum, auto
 from functools import lru_cache
@@ -160,6 +162,24 @@ MM_PAD_SHIFT_VALUE = 1_000_000
 _MM_HASH_MASK = (1 << 64) - 1
 
 logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=1)
+def ax_kda_tail_first() -> Optional[float]:
+    """[ax] 127: with SGLANG_AX_KDA_TAIL_FIRST=1, a request's last prefill chunk keeps its prompt-end KDA checkpoint
+    instead of the radix branch point when the branch point lies at or beyond SGLANG_AX_KDA_TAIL_FIRST_MIN_SHARE
+    (default 0.5) of the prompt, i.e. the request continues a sequence the tree already holds. Returns that share,
+    or None when off (the base behaviour). Read once."""
+    if os.environ.get("SGLANG_AX_KDA_TAIL_FIRST", "0") != "1":
+        return None
+    share = float(os.environ.get("SGLANG_AX_KDA_TAIL_FIRST_MIN_SHARE", "0.5"))
+    if not 0 <= share <= 1:
+        raise ValueError("[ax] 127: SGLANG_AX_KDA_TAIL_FIRST_MIN_SHARE must be in [0, 1]")
+    return share
+
+
+# [ax] 127: "kept" counts last prefill chunks that saved the prompt-end checkpoint instead of a branch point below it.
+AX_TAIL_FIRST_STATS: Counter = Counter()
 
 
 ReturnHiddenStatesMode = Union[bool, Literal["last"]]
@@ -2866,12 +2886,33 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 branching_seqlen_aligned_mask = (
                     req.mamba_branching_seqlen - len(req.prefix_indices)
                 ) % cache_chunk_size == 0
-                if (
+                branch_here = (
                     req.mamba_branching_seqlen > len(req.prefix_indices)
                     and req.mamba_branching_seqlen < mamba_track_seqlen
                     and branching_seqlen_aligned_mask
                     and req.mamba_branching_seqlen % checkpoint_grid == 0
+                )
+                # [ax] 127: one state is saved per extend. A deep branch point (the tree's KV covers most of
+                # this prompt) is where a previous request of the same chain stopped matching, typically where
+                # its generated output diverges from the replayed turn; no later request resumes there, while
+                # the next request of this chain resumes at this prompt's end. A shallow branch point (a shared
+                # system prompt or tools) serves siblings and is kept. Only the last prefill chunk of a fresh
+                # request qualifies: a retracted one ends at prompt + output, which no successor resumes from.
+                tail_share = ax_kda_tail_first()
+                if (
+                    branch_here
+                    and tail_share is not None
+                    and not req.output_ids
+                    and extend_end == len(req.full_untruncated_fill_ids)
+                    and req.mamba_branching_seqlen >= tail_share * extend_end
                 ):
+                    branch_here = False
+                    if mamba_track_seqlen_aligned != req.mamba_branching_seqlen:
+                        AX_TAIL_FIRST_STATS["kept"] += 1
+                        kept = AX_TAIL_FIRST_STATS["kept"]
+                        if kept & (kept - 1) == 0:  # log at 1, 2, 4, ...: bounded volume
+                            logger.info(f"[ax] 127 prompt-end checkpoint kept over a branch point: {kept}")
+                if branch_here:
                     # We want to track mamba_track_seqlen_aligned, and it's not the last position,
                     # so we need to add 1 to the seqlen to retrieve the correct mamba state from h.
                     # See _force_track_h() for more details.

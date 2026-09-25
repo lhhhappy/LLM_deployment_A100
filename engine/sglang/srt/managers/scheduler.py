@@ -206,6 +206,7 @@ from sglang.srt.managers.schedule_batch import (
     NextBatchPlan,
     Req,
     ScheduleBatch,
+    ax_kda_tail_first,
     retract_all,
 )
 from sglang.srt.managers.schedule_policy import (
@@ -1320,6 +1321,7 @@ class Scheduler(
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
+            "127": "on" if ax_kda_tail_first() is not None else "off:SGLANG_AX_KDA_TAIL_FIRST_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }

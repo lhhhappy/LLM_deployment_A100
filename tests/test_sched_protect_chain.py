@@ -179,6 +179,8 @@ def load_source(root=CANDIDATE):
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
+    # schedule_batch needs torch; the mechanism report only reads 127's env switch through this helper.
+    ns.setdefault('ax_kda_tail_first', lambda: 0.5 if os.environ.get('SGLANG_AX_KDA_TAIL_FIRST', '0') == '1' else None)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -692,7 +694,8 @@ class HiCacheTierTests(unittest.TestCase):
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
-                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache'])
+                                '123=off:SGLANG_AX_SRPT_AGING_unset',
+                                '127=off:SGLANG_AX_KDA_TAIL_FIRST_unset', '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
             rep = s._ax_mechanism_report()
