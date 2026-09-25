@@ -54,15 +54,20 @@ class FakeEngine:
         self.stats = stats
         self.renderer = FakeRenderer()
         self.model_config = SimpleNamespace(is_encoder_decoder=False)
+        self.vllm_config = SimpleNamespace(kv_transfer_config=None)
         self.errored = False
         self.dead_error = None
         self.generate_calls = []
         self.reset_calls = []
         self.reset_result = True
+        self.unfinished = 0
         self.fail_after = None
 
     def check_admission(self, n=1, request_id=None):
         return None
+
+    def get_num_unfinished_requests(self):
+        return self.unfinished
 
     async def generate(
         self, engine_input, sampling_params, request_id
@@ -260,19 +265,79 @@ def test_generate_non_stream():
 
 
 class TestFlushCache:
-    def test_success_resets_every_tier(self):
+    def test_success_receipt(self):
         engine = FakeEngine(MTP_STEPS)
+        before = time.time()
         resp = make_client(engine).post("/flush_cache")
+        after = time.time()
         assert resp.status_code == 200
-        assert resp.json() == {"success": True}
+        receipt = resp.json()
+        assert receipt["success"] is True
+        assert receipt["engine"] == "vllm" and receipt["engine_version"]
+        assert receipt["reset_connector"] is True
+        assert receipt["kv_connector"] is None
+        assert receipt["unfinished_requests_at_start"] == 0
+        assert (
+            before
+            <= receipt["flush_started_ts"]
+            <= receipt["flush_finished_ts"]
+            <= after
+        )
         assert engine.reset_calls == [(False, True)]
 
     def test_refusal_is_reported(self):
         engine = FakeEngine(MTP_STEPS)
         engine.reset_result = False
+        engine.unfinished = 2
+        engine.vllm_config = SimpleNamespace(
+            kv_transfer_config=SimpleNamespace(kv_connector="OffloadingConnector")
+        )
         resp = make_client(engine).post("/flush_cache")
         assert resp.status_code == 400
-        assert resp.json()["success"] is False
+        receipt = resp.json()
+        assert receipt["success"] is False and receipt["message"]
+        assert receipt["kv_connector"] == "OffloadingConnector"
+        assert receipt["unfinished_requests_at_start"] == 2
+
+
+def test_received_ts_is_taken_before_the_body_arrives():
+    """The stamp is the ASGI entry, not the handler after the body was read."""
+    import asyncio
+
+    app = FastAPI()
+    GenerateCompatPlugin().attach_router(app)
+    app.state.engine_client = FakeEngine(MTP_STEPS)
+    body = json.dumps(dict(HARNESS_BODY, stream=False)).encode()
+    delay = 0.3
+    sent = []
+
+    async def receive():
+        await asyncio.sleep(delay)  # the body is still on the wire
+        return {"type": "http.request", "body": body, "more_body": False}
+
+    async def send(message):
+        sent.append(message)
+
+    scope = {
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": "POST",
+        "scheme": "http",
+        "path": "/generate",
+        "raw_path": b"/generate",
+        "root_path": "",
+        "query_string": b"",
+        "headers": [(b"content-type", b"application/json")],
+        "client": ("127.0.0.1", 1),
+        "server": ("127.0.0.1", 8000),
+    }
+    asyncio.run(app(scope, receive, send))
+    payload = json.loads(
+        b"".join(m.get("body", b"") for m in sent if m["type"] == "http.response.body")
+    )
+    meta = payload["meta_info"]
+    assert meta["api_server_dispatch_finish_ts"] - meta["request_received_ts"] >= delay
 
 
 def test_plugin_contract():

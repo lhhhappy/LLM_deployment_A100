@@ -141,11 +141,12 @@ def finish_reason_info(
 class ResponseTiming:
     """Server-side timestamps reported in ``meta_info`` (epoch seconds).
 
-    ``request_received_ts`` is taken when the route handler starts, before the
-    body is read. Engine-core timestamps are CLOCK_MONOTONIC; they are placed
-    on the wall clock through the receive instant, which is valid because the
-    API server and the engine core run on the same host. A converted value
-    outside [receive, now] means that assumption broke; it is then not used.
+    ``request_received_ts`` is the ASGI-entry stamp of
+    ``ReceiveTimeMiddleware``, taken before the body is read. Engine-core
+    timestamps are CLOCK_MONOTONIC; they are placed on the wall clock through
+    the receive instant, which is valid because the API server and the engine
+    core run on the same host. A converted value outside [receive, now] means
+    that assumption broke; it is then not used.
     """
 
     received_wall: float

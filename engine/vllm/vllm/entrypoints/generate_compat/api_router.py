@@ -18,7 +18,9 @@ from typing import Any
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
+import vllm
 from vllm.engine.protocol import EngineClient
 from vllm.entrypoints.generate_compat.protocol import (
     GenerateRequestError,
@@ -36,6 +38,28 @@ from vllm.v1.metrics.stats import RequestStateStats
 logger = init_logger(__name__)
 
 router = APIRouter()
+
+# ASGI scope key holding (wall, monotonic) taken when the request reached the app.
+RECEIVED_AT = "generate_compat.received_at"
+
+
+class ReceiveTimeMiddleware:
+    """Stamp each HTTP request at ASGI entry, before the body is read.
+
+    Installed with the routes, i.e. before vLLM adds its core middlewares
+    (CORS, auth, request id, metrics), which therefore wrap outside it and
+    only add their own small time. ``request_received_ts`` of ``/generate``
+    is this stamp, so server TTFT includes body transfer, JSON parsing and
+    tokenization.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http":
+            scope[RECEIVED_AT] = (time.time(), time.monotonic())
+        await self.app(scope, receive, send)
 
 
 def _engine_client(request: Request) -> EngineClient:
@@ -129,7 +153,8 @@ async def stream_events(
 
 @router.post("/generate")
 async def generate(raw_request: Request):
-    timing = ResponseTiming(received_wall=time.time(), received_mono=time.monotonic())
+    received_wall, received_mono = raw_request.scope[RECEIVED_AT]
+    timing = ResponseTiming(received_wall=received_wall, received_mono=received_mono)
     try:
         request = parse_generate_request(await raw_request.json())
     except ValueError as e:  # includes GenerateRequestError and JSON errors
@@ -176,25 +201,37 @@ async def generate(raw_request: Request):
 async def flush_cache(raw_request: Request):
     """Drop every cached prefix, including connector-managed tiers.
 
-    Code caches and CUDA graphs are untouched. Fails (HTTP 400) instead of
-    partially flushing while running requests or in-flight transfers still
-    hold blocks; the caller may retry when the engine is idle.
+    Code caches and CUDA graphs are untouched. The engine refuses (HTTP 400)
+    instead of flushing partially while any KV block is held (running or
+    waiting requests, in-flight transfers); the caller may retry when idle.
+    The response is a receipt, also logged as one ``[ax] flush_cache`` line:
+    ``flush_started_ts``/``flush_finished_ts`` (API-process epoch seconds)
+    enclose the engine call, ``unfinished_requests_at_start`` counts requests
+    still streaming at the start, and ``kv_connector`` names any configured
+    connector, whose own reset semantics bound what ``success`` proves.
     """
-    success = await _engine_client(raw_request).reset_prefix_cache(
+    engine = _engine_client(raw_request)
+    kv_transfer = engine.vllm_config.kv_transfer_config
+    receipt: dict[str, Any] = {
+        "engine": "vllm",
+        "engine_version": vllm.__version__,
+        "reset_connector": True,
+        "kv_connector": kv_transfer.kv_connector if kv_transfer else None,
+        # Requests this API process still streams (AsyncLLM output processor).
+        "unfinished_requests_at_start": engine.get_num_unfinished_requests(),
+        "flush_started_ts": time.time(),
+    }
+    success = await engine.reset_prefix_cache(
         reset_running_requests=False, reset_connector=True
     )
-    if success:
-        logger.info("flush_cache: prefix cache reset")
-        return JSONResponse(content={"success": True})
-    logger.warning("flush_cache: reset refused, blocks are still in use")
-    return JSONResponse(
-        status_code=400,
-        content={
-            "success": False,
-            "message": "prefix cache is in use by running requests or transfers",
-        },
-    )
+    receipt["flush_finished_ts"] = time.time()
+    receipt["success"] = bool(success)
+    if not success:
+        receipt["message"] = "KV blocks are still held by requests or transfers"
+    logger.info("[ax] flush_cache %s", json.dumps(receipt, sort_keys=True))
+    return JSONResponse(status_code=200 if success else 400, content=receipt)
 
 
 def attach_router(app: FastAPI) -> None:
+    app.add_middleware(ReceiveTimeMiddleware)
     app.include_router(router)
