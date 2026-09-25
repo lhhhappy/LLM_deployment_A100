@@ -1,0 +1,9 @@
+{"case": "prefill_8192_ctx49k", "M": 8192, "new_ms": 6.5918039083480835, "proto_ms": 6.590147767215967, "bitwise_equal": true}
+{"case": "prefill_8192_first_chunk", "M": 8192, "new_ms": 5.158123929053545, "proto_ms": 5.157884020358324, "bitwise_equal": true}
+{"case": "prefill_333_ctx30k", "M": 333, "new_ms": 0.39996400102972984, "proto_ms": 0.39634399116039276, "bitwise_equal": true}
+{"case": "verify_32x4", "M": 128, "new_ms": 0.18380000442266464, "proto_ms": 0.1848200000822544, "bitwise_equal": true}
+{"case": "verify_8x4", "M": 32, "new_ms": 0.06563599780201912, "proto_ms": 0.06629200279712677, "bitwise_equal": true}
+{"case": "verify_1x4", "M": 4, "new_ms": 0.029552001506090164, "proto_ms": 0.0303879976272583, "bitwise_equal": true}
+{"case": "decode_32x1", "M": 32, "new_ms": 0.06860800087451935, "proto_ms": 0.06857600063085556, "bitwise_equal": true}
+{"case": "decode_8x1", "M": 8, "new_ms": 0.0297279991209507, "proto_ms": 0.030687998980283737, "bitwise_equal": true}
+{"case": "decode_1x1", "M": 1, "new_ms": 0.019839998334646225, "proto_ms": 0.020392000675201416, "bitwise_equal": true}

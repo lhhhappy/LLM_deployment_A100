@@ -189,6 +189,7 @@ def load_source(root=CANDIDATE):
         spec = importlib.util.spec_from_file_location('ax_deadline', deadline)
         ns['ax_deadline'] = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(ns['ax_deadline'])
+    ns.setdefault('sys', sys)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -686,7 +687,14 @@ class HiCacheTierTests(unittest.TestCase):
         policy = ModuleType('sglang.srt.managers.schedule_policy')
         policy._role_boundary_token_ids = ns['_role_boundary_token_ids']
         policy._ax_srpt_aging = ns['_ax_srpt_aging']
-        mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy})
+        # 118's state comes from the DSA backend module when a DSA backend imported it: its production function
+        # over the module switch and the flag a backend sets after validating and warming up the kernel.
+        dsa = ModuleType('sglang.srt.layers.attention.dsa_backend')
+        dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_ax118_engaged': False}
+        compile_nodes(TREE_180 / 'srt/layers/attention/dsa_backend.py', {'ax118_state'}, dsa_ns)
+        dsa.ax118_state = dsa_ns['ax118_state']
+        mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy,
+                                        'sglang.srt.layers.attention.dsa_backend': dsa})
         mods.start()
         self.addCleanup(mods.stop)
         # The base resolves --speculative-algorithm NEXTN to EAGLE before the scheduler starts (061r log).
@@ -699,16 +707,26 @@ class HiCacheTierTests(unittest.TestCase):
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '117=off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset',
+                                '118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset',
                                 '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
                                 '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset',
                                 '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
+        dsa_ns['_AX_DSA_SPARSE_TRITON'] = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
+            self.assertIn(' 118=off:no_tilelang_dsa_backend ', s._ax_mechanism_report())
+            dsa_ns['_ax118_engaged'] = True
             rep = s._ax_mechanism_report()
+        self.assertIn(' 118=on ', rep)
         self.assertIn('120=on 122=on', rep)
         self.assertIn('180=on', rep)
         self.assertIn('spec=EAGLE dcp=1', rep)
+        # Without a DSA backend in the process the report does not import one.
+        with patch.dict(sys.modules):
+            del sys.modules['sglang.srt.layers.attention.dsa_backend']
+            self.assertIn(' 118=off:no_dsa_backend ', s._ax_mechanism_report())
+            self.assertNotIn('sglang.srt.layers.attention.dsa_backend', sys.modules)
 
 if __name__ == '__main__':
     unittest.main()

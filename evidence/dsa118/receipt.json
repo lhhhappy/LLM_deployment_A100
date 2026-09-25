@@ -1,0 +1,31 @@
+{
+  "what": "118 dev-box receipts: GPU unit tests, CUDA-graph timing, split-count sweep, comparison with the phase-1 prototype",
+  "where": "GPU dev box, /sjtu/linhang/arena/runs/ep8/dsa/p118 (tree = engine at 37e90023 + the 118 files), GPU 0",
+  "gpu": "NVIDIA A100-SXM4-80GB, 108 SMs; torch 2.13.0+cu130, Triton 3.7.1",
+  "sha256_prefix_of_files_run": {
+    "unittest.log": {
+      "sparse_attention_triton.py": "14d0301db821",
+      "dsa_backend.py": "4acba1b08b55",
+      "test_dsa_sparse_118.py": "ee235a8786e4"
+    },
+    "bench.jsonl": {
+      "sparse_attention_triton.py": "9255717ab241 (docstring-only difference to 98fa48b0408b)",
+      "dsa_backend.py": "acd77b9ae54a",
+      "test_dsa_sparse_118.py": "a85be28e703a"
+    },
+    "split_sweep.jsonl": {
+      "sparse_attention_triton.py": "b9a53e94718f (before indices >= P were also excluded from the last-tile scan)"
+    },
+    "vs_prototype.jsonl": {
+      "sparse_attention_triton.py": "d6fa4d609d43 (split rule 'M x splits >= 2 x SMs'; it chooses the same split counts as the final rule at all 9 shapes)",
+      "prototype": "scripts/pod/verify/dsa_sparse_proto.py (phase 1, uncommitted), dsa_sparse_fwd"
+    }
+  },
+  "commands": {
+    "unittest.log": "python -m unittest -v test_dsa_sparse_118",
+    "bench.jsonl": "python test_dsa_sparse_118.py --bench --rounds 5",
+    "split_sweep.jsonl": "ad-hoc sweep: per-call CUDA-graph ms (test's graph_ms) of _launch with splits 1..32 at M = 1..500 decode rows",
+    "vs_prototype.jsonl": "ad-hoc A/B: the test's BENCH shapes, graph_ms of sparse_attention_fwd vs the prototype, bitwise output equality"
+  },
+  "device_code_note": "bench.jsonl, split_sweep.jsonl and vs_prototype.jsonl were taken before the review fixes; the @triton.jit functions are AST-identical to the tested version and the derived wave (3 x 108 = 324) equals the earlier fixed value, so the same split counts are launched."
+}

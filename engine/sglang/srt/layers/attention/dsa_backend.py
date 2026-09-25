@@ -118,6 +118,21 @@ logger = logging.getLogger(__name__)
 _DSA_TRITON_PREFILL = get_bool_env_var("SGLANG_DSA_TRITON_PREFILL")
 _IS_GFX95 = is_gfx95_supported()
 
+# [ax] 118: every TileLang sparse-attention call (_forward_tilelang: prefill extend,
+# target verify, draft extend/decode, decode) runs the Triton kernel in
+# dsa/sparse_attention_triton.py instead. Default off.
+_AX_DSA_SPARSE_TRITON = get_bool_env_var("SGLANG_AX_DSA_SPARSE_TRITON")
+# Set once a backend in this process has validated and warmed up the 118 kernel.
+_ax118_engaged = False
+
+
+def ax118_state() -> str:
+    """[ax] 118 effective state for the scheduler's mechanism report."""
+    if not _AX_DSA_SPARSE_TRITON:
+        return "off:SGLANG_AX_DSA_SPARSE_TRITON_unset"
+    return "on" if _ax118_engaged else "off:no_tilelang_dsa_backend"
+
+
 if is_cuda():
     import deep_gemm
 
@@ -673,6 +688,8 @@ class DeepseekSparseAttnBackend(
                 "--dsa-prefill-backend flashmla_sparse_q8 together with "
                 "--dsa-decode-backend flashmla_kv."
             )
+
+        self._ax118_init()
 
         # Q8KV8 per-call device-tensor caches, populated lazily on the first
         # Q8KV8 dispatch (no-ops for other backends).
@@ -4106,6 +4123,51 @@ class DeepseekSparseAttnBackend(
             causal=causal,
         )
 
+    def _ax118_init(self) -> None:
+        """[ax] 118: with the switch on and a TileLang DSA impl, check the supported
+        envelope and load every Triton kernel variant now, before CUDA-graph capture.
+        Anything outside the envelope refuses to start instead of falling back to
+        TileLang: DCP and HiSparse are not validated, and deterministic inference is
+        excluded because the split count (and so the summation order) depends on the
+        batch size."""
+        global _ax118_engaged
+        if not _AX_DSA_SPARSE_TRITON or "tilelang" not in (
+            self.dsa_prefill_impl,
+            self.dsa_decode_impl,
+        ):
+            return
+        checks = [
+            (not is_cuda(), "not CUDA"),
+            (self.device_sm_major < 8, f"sm{self.device_sm_major}x"),
+            (self.kv_cache_dtype != torch.bfloat16, f"{self.kv_cache_dtype} KV cache"),
+            (self.qk_rope_head_dim != 0, f"qk_rope_head_dim={self.qk_rope_head_dim}"),
+            (get_parallel().dcp_enabled, "DCP"),
+            (self.hisparse_coordinator is not None, "HiSparse"),
+            (
+                get_exec().deterministic.enable_deterministic_inference,
+                "deterministic inference",
+            ),
+        ]
+        reasons = [reason for unsupported, reason in checks if unsupported]
+        if reasons:
+            raise ValueError(
+                "SGLANG_AX_DSA_SPARSE_TRITON=1 (118) supports CUDA sm80+ with a bf16 KV "
+                "cache and qk_rope_head_dim=0, without DCP, HiSparse or deterministic "
+                f"inference; got: {', '.join(reasons)}."
+            )
+        from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
+            warmup_sparse_attention_fwd,
+        )
+
+        warmup_sparse_attention_fwd(
+            num_heads=self.num_q_heads,
+            dim=self.kv_lora_rank,
+            # The indexer's output width: top-k plus index_kpool - 1 tail columns.
+            width=self.dsa_index_topk + self.dsa_index_kpool - 1,
+            device=torch.device(self.device),
+        )
+        _ax118_engaged = True
+
     def _forward_tilelang(
         self,
         q_all: torch.Tensor,
@@ -4115,6 +4177,23 @@ class DeepseekSparseAttnBackend(
         sm_scale: float,
         return_lse: bool = False,
     ) -> torch.Tensor:
+        if _AX_DSA_SPARSE_TRITON:  # [ax] 118: takes the unpadded table, masks -1 itself
+            from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
+                sparse_attention_fwd,
+            )
+
+            result = sparse_attention_fwd(
+                q=q_all,
+                kv=kv_cache,
+                indices=page_table_1,
+                sm_scale=sm_scale,
+                d_v=v_head_dim,
+                return_lse=return_lse,
+            )
+            if return_lse:
+                return result[0], result[1].squeeze(0)
+            return result
+
         from sglang.kernels.ops.attention.dsa.tilelang_kernel import tilelang_sparse_fwd
 
         # KPool appends up to index_kpool - 1 live tail tokens to the fixed

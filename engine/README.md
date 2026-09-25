@@ -15,7 +15,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
   as a follow-up `engine NNN:` commit, not a new number.
 - Every mechanism is switchable (flag/env) and its default-off path is the base code. No silent bypass: an unsupported
   combination works with tests or refuses to start.
-- The scheduler logs one `[ax] mechanisms:` line at startup (`101 120 122 123 140 180` as `on` / `off:<reason>`, plus
+- The scheduler logs one `[ax] mechanisms:` line at startup (`101 118 120 122 123 140 180` as `on` / `off:<reason>`, plus
   speculative algorithm as resolved by the base, so `--speculative-algorithm NEXTN` shows as `spec=EAGLE`, DCP size and the requested model-side switches). Pod jobs declare `G_EXPECT` and refuse to
   measure on a mismatch.
 - Trees for tests and tools: `python3 scripts/engine/tree.py <ref>` (`official-A-0923a`, `HEAD`, `mech:NNN` = latest
@@ -34,6 +34,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 114 | indexer prefill rows split over TP ranks | yes | `SGLANG_AX_INDEXER_ROW_SHARD` (1) | yes |
 | 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP8 33/40 row mismatch unfixed |
 | 117 | FP8 MoE via Humming W8A16 on sm80 (takes precedence over 111) | no | `SGLANG_AX_SM80_FP8_MOE_HUMMING` (0) | dev box only |
+| 118 | DSA sparse attention through a Triton kernel instead of TileLang (prefill, verify, draft, decode) | no | `SGLANG_AX_DSA_SPARSE_TRITON` (off) | not run on 8 cards |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |
@@ -51,7 +52,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 git history (the `patches/` directory was removed after the migration).
 
 ## Default-off audit (2026-09-24, by reading `git diff official-A-0923a HEAD`)
-- 122, 123, 171, 172: identical when off.
+- 118, 122, 123, 171, 172: identical when off.
 - 117: off keeps `Fp8MoEMethod` with the same 111 flag; dev box shows bitwise-equal weights and outputs against
   37e90023's `fp8.py` (routing alignment held fixed), see `engine/docs/117-sm80-fp8-moe-humming.md`.
 - 115: source review confirms the default TP8 path retains staged output (`stage_output=True`); generated IR equivalence
