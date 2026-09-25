@@ -1,11 +1,16 @@
 # Codex 迭代索引
 
 只保留当前判断、下一动作与证据；规则见[评估协议](../evaluation.md)，运行安排见[queue](../queue.md)，完整结果见[experiments](../experiments.md)。
-单人持续优化SGLang，优先完整N30和四类TTFT；vLLM暂缓，偶尔独立review。开发集结果不预测正式N。
+Codex推进SGLang与共享Pod，Claude推进vLLM；优先同一评测合同和完整N30对照，复用有效设计，不要求不同引擎生成逐字一致。开发集结果不预测正式N。
 
 09-24 23:23 UTC：按用户授权仅提交069一份，**46251 / 0925a**，上传回执queued、job24499。源码759a6eb、host64、122off；4692项源码和实际启动配置核验通过。后续正式版关闭调试落盘、收敛高频日志、核验编译缓存磁盘预算；本次保持069原配置。[提交与日志要求归档](../../evidence/submission-0925a/README.md)。
 
-## 当前：070启动时被驱逐；现有service revision2等待平台准入（2026-09-24）
+## 当前：071恢复启动，模型加载中（2026-09-25）
+
+- 06:43 UTC：新Pod可exec、8卡权重加载进行中；数据500MiB传输完成。短暂Trisol凭据过期后认证已恢复，未更换AK。校验脚本换行转义错误已修正，32项运行文件与全部数据哈希已通过，现等待引擎READY。
+- /tmp/ax实际指向/dev/shm/arena-runtime/ax；JIT、cache、tmp与常见硬编码缓存目录已迁RAM，执行探针通过。当前RAM工作目录0.80GiB、cgroup约123/1509GiB、根盘/tmp约1.32MiB；完整临时存储占用未知，不用底层df代替20Gi限额。
+- 071 watcher与通知桥已替换旧070；开发机每5分钟归档终态运行，SHA256/fsync核验后清理，活动日志不删。目的地/sjtu/linhang/arena/archives/pod-runs，位于GPFS磁盘。
+- vLLM在开发机准备独立环境；Pod driver580.105.08、Ubuntu24.04.4/glibc2.39/Python3.12.3已发Claude，072仍在071之后，不同时驻留两个完整模型。
 
 - 067/068/069：引擎759a6ebb8e31723519ad5daf438e26e24b32501a，mem0.87、新版180、MTP，311链/5601请求N30；同rep16预热与真flush。
 - 067开122、host32，四TTFT FAIL；068只关122，fast/overall/chain FAIL，没有整体优势证据。
@@ -30,16 +35,16 @@
 - 比较全部5601同ID、311个固定坏例与新增坏例、四TTFT点估计/余量、TPOT与前段块时间账。CPU真实调度器47项通过，独立复核无阻断。
 - 配置diff已核：[070计划](../../evidence/L070-official_b_host64_full_n30_shortwarm/config-plan.json)。工具1ba32ec部署已见RUNTIME_DEPLOYED/DONE rc=0并恢复队列；29运行文件与069相同。070尚未测量即被平台驱逐；running/startup是旧缓存，不能当实时状态。
 - 平台22:13:28 UTC明确Evicted：本地临时存储超过20Gi；实际副本0/期望1。不能归因host64内存或122，也尚不知道哪个目录占满。[事故收据](../../evidence/L070-official_b_host64_full_n30_shortwarm/incident.json)。
-- 恢复update已接受，同service revision2=2103249397960679424，deploying/WaitingForAdmission，实际副本0；GPU product/8卡/资源限额/镜像/模型相同，仅env新增AX_WORKSPACE_ROOT，GPU显示名平台补NVIDIA前缀。未调用stop/delete/release。
-- 共享内存754Gi计入1509Gi总内存，不能视为额外资源；8项CPU工作目录回归通过，JIT暂留原路径，noexec未核实。新Pod冷编译缓存须作为071与069的比较限制，不能把差异全归122。
-- 下一动作：等watch070从retrying恢复up的通知（新Pod可exec），先运行GPU仓库scripts/pod/bootstrap并强制核WORKSPACE_LAYOUT applied=true、tmpfs/mem；长链数据已补回GPU开发机并核三项SHA，Pod恢复后再还原并核哈希，然后qpush新run071/init/resume，挂watch071后结束旧070 watcher。步骤见[恢复交接](../reports/pod-storage-recovery-0924.md)。
+- 恢复update已接受，同service revision2=2103249397960679424；09-25 06:14 UTC新Pod已可exec。GPU product/8卡/资源限额/镜像/模型相同，仅env新增AX_WORKSPACE_ROOT，GPU显示名平台补NVIDIA前缀。未调用stop/delete/release。
+- 共享内存754Gi计入1509Gi总内存，不能视为额外资源；8项CPU工作目录回归通过，RAM执行探针通过，JIT与临时路径已迁移。新Pod冷编译缓存须作为071与069的比较限制，不能把差异全归122。
+- 下一动作：完成071运行文件与全部数据SHA核验，待已加载的引擎PRELOAD_READY后恢复队列，不重复启动模型；核机制、池尺寸和真flush后才称测量开始。步骤见[恢复交接](../reports/pod-storage-recovery-0924.md)。
 - 数据manifest SHA256 19a7e5a6827f64a99695cba2d89b7efa2a0b05d207fc95da1568ec1d82280b2c；正式46173/46174不重复提交。
 
 ## 待定位问题与可能方向
 
 | 问题 | 证据边界与下一动作 |
 | --- | --- |
-| 122预算与执行粒度 | 当前070单变量验证；成本模型含推断，实际TPOT才判门 |
+| 122预算与执行粒度 | 当前071单变量验证；成本模型含推断，实际TPOT才判门 |
 | 120/180 host候选等待 | 源码partial存在时拒绝needs_host_load_back，CPU5项核实；未证明lc302实际走此分支。若仍突出再加定向skip/restore证据，不能直接删保护 |
 | 长prefill单位成本 | 31个chain中2条exec→first>30秒；需要同形状块成本及调度分解，再改A内算子/graph |
 | 最小预热覆盖 | rep16不保证所有并发形状或HiCache H2D覆盖；只在主线异常证据出现时顺带补 |

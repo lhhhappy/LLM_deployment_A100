@@ -64,6 +64,12 @@ result = {
                         if Path(n).exists()},
     "gpus": command(["nvidia-smi", "--query-gpu=index,name,memory.total,memory.used,utilization.gpu",
                      "--format=csv,noheader,nounits"], 10),
+    "runtime_abi": {
+        "driver": command(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"], 10),
+        "libc": command(["ldd", "--version"]),
+        "python": command(["python3", "--version"]),
+        "os_release": read("/etc/os-release"),
+    },
     "gpu_processes": command(["nvidia-smi", "--query-compute-apps=pid,process_name,used_gpu_memory",
                               "--format=csv,noheader,nounits"], 10),
     "limits": "statvfs describes backing filesystems, not Pod ephemeral quota/usage; du includes visible image files",

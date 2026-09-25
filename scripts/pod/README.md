@@ -29,15 +29,16 @@ CPU 回归：`python3 -B -m unittest discover -s tests -p test_eval_tools.py`。
 
 ## 已结束运行：本地归档后清理Pod副本
 
-用户授权按“运行结束→移到本地→校验→清理Pod”执行。入口在本地运行：
+用户授权按“运行结束→移到Pod外→校验→清理Pod”执行。2026-09-25进一步指定可归档到GPU开发机；当前在开发机运行：
 
 ```sh
-python3 -B scripts/analysis/archive_completed_runs.py --cleanup --watch 300
+python3 -B scripts/analysis/archive_completed_runs.py --on-devbox \
+  --destination /sjtu/linhang/arena/archives/pod-runs --cleanup --watch 300
 ```
 
-每5分钟检查done/failed任务；完整文件落到`evidence/pod-archives/<run>/<manifest-sha>/files/`，
+每5分钟检查done/failed任务；完整文件落到上述挂载的`<run>/<manifest-sha>/files/`，
 记录逐文件SHA256、原symlink关系、manifest和清理收据。以120KB块直接读回，Pod上不生成完整tar或额外副本。
-全部本地文件复核并fsync后，Pod重新校验同一manifest，才删除对应run目录。队列终态记录保留。
+全部归档文件复核并fsync后，Pod重新校验同一manifest，才删除对应run目录。队列终态记录保留。
 传输失败、文件变化、仍有打开的fd/cwd、当前engine_log_path、其他run引用的日志或非普通文件均推迟处理；
 复用引擎的活动server.log必须等写入结束。归档后可在本地继续判分/分析，不靠Pod保留完整旧目录。
 

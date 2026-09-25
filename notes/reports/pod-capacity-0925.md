@@ -1,7 +1,7 @@
 # 新 Pod 容量检查
 
 2026-09-25 06:14 UTC，用户要求优先检查 Pod、避免再次超过 20Gi。
-全程只读：没有 bootstrap、上传数据、安装依赖、启动引擎或发布测试。
+以下 06:14 初始检查全程只读；后续恢复操作单独记录在文末。
 只读脚本通过 `pread capacity` 以内联 Python 执行，不在 Pod 写入脚本或结果。
 
 ## 实测
@@ -33,3 +33,15 @@
 
 原始证据：[Pod 快照](../../evidence/pod-capacity-20260925/capacity.json)、
 [平台现行资源配额](../../evidence/pod-capacity-20260925/platform.json)。
+
+## 06:43 UTC 恢复进度
+
+用户随后授权启动冻结的 host64 +122 配置。bootstrap 已完成，`/tmp/ax` 实际链接至 `/dev/shm/arena-runtime/ax`，RAM 上复制并运行 `/bin/true` 成功。数据、源码、完整日志、JIT、安装及编译临时缓存均指定到该工作目录；同时链接 `/root/.cache`、`.triton`、`.nv`、`.tilelang` 以覆盖部分库的硬编码路径，小型原镜像缓存保留。
+
+071 同配置引擎正在加载权重，尚未开始测量。500MiB 冻结正文经6374块传输完成；认证短暂过期后已恢复，不更换访问密钥。启动前校验脚本的换行转义错误已修正；32项运行文件及manifest全部artifact校验已通过，现等待已有引擎READY才恢复队列。
+
+当前快照：RAM 工作目录约0.80GiB，cgroup约123.28/1509GiB、failcnt=0，根盘 `/tmp` 约1.32MiB。驱动580.105.08，Ubuntu24.04.4，glibc2.39，Python3.12.3。此时尚未完成host池分配和捕图，不能视为启动峰值。
+
+开发机归档器每5分钟检查终态运行，完整结果落到 `/sjtu/linhang/arena/archives/pod-runs`（GPFS磁盘，检查时约2.7TiB空闲）；逐文件SHA256/fsync验证后再清理Pod副本。有活动fd、当前引擎日志或内容变化时推迟，不截断原始统计。watch071已接替旧070监控；072仍预留，未安装vLLM环境。
+
+证据：[加载阶段容量与ABI](../../evidence/L071-official_b_host64_full_n30_shortwarm/capacity-loading.json)、[运行文件哈希](../../evidence/L071-official_b_host64_full_n30_shortwarm/deployment-sha256.json)、[数据校验入口](../../evidence/L071-official_b_host64_full_n30_shortwarm/verify.py)、[等待就绪后放行](../../evidence/L071-official_b_host64_full_n30_shortwarm/release.sh)。

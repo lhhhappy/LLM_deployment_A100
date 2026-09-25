@@ -8,6 +8,7 @@ uses a local lock and replaces one status JSON, without a growing daemon log.
 import argparse
 import base64
 import fcntl
+from functools import partial
 import hashlib
 import json
 import os
@@ -46,13 +47,16 @@ def durable_json(path, obj):
         os.close(fd)
 
 
-def remote(action, *args):
+def remote(action, *args, on_devbox=False):
     code = base64.b64encode((ROOT / "scripts/pod/archive_run.py").read_bytes()).decode()
     command = shlex.join(["python3", "-B", "-c",
                           "import base64; exec(compile(base64.b64decode(" + repr(code) + "), '<archive_run>', 'exec'))",
                           action, *map(str, args)])
     gpu = "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh && bexec " + shlex.quote(command)
-    process = subprocess.Popen([str(ROOT / "scripts/gssh"), gpu], cwd=ROOT,
+    if on_devbox and not ROOT.is_relative_to(Path('/sjtu/linhang/arena')):
+        raise ValueError('--on-devbox requires the GPU development workspace')
+    transport = ['bash', '-c', gpu] if on_devbox else [str(ROOT / "scripts/gssh"), gpu]
+    process = subprocess.Popen(transport, cwd=ROOT,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                text=True, start_new_session=True,
                                env={**os.environ, "GSSH_TIMEOUT": "50"})
@@ -141,8 +145,10 @@ def main():
     ap.add_argument("--destination", type=Path, default=ROOT / "evidence/pod-archives")
     ap.add_argument("--state", type=Path, default=ROOT / "build/scratch/archive-maintenance/status.json")
     ap.add_argument("--cleanup", action="store_true", help="remove verified terminal run copies from Pod")
+    ap.add_argument("--on-devbox", action="store_true", help="run on GPU development host, without another SSH hop")
     ap.add_argument("--watch", type=int, default=0, help="poll interval, at least 60 seconds; 0 runs once")
     args = ap.parse_args()
+    call = partial(remote, on_devbox=args.on_devbox)
     if args.watch and args.watch < 60:
         ap.error("watch interval must be at least 60 seconds")
     args.state.parent.mkdir(parents=True, exist_ok=True)
@@ -152,12 +158,12 @@ def main():
             status = {"pid": os.getpid(), "started_at": time.time(), "cleanup_enabled": args.cleanup,
                       "destination": str(args.destination.resolve()), "runs": []}
             try:
-                names = remote("list")["runs"]
+                names = call("list")["runs"]
                 for name in names:
                     status["active_run"] = name
                     durable_json(args.state, status)
                     try:
-                        result = archive_one(name, args.destination, cleanup=args.cleanup)
+                        result = archive_one(name, args.destination, cleanup=args.cleanup, call=call)
                         status["runs"].append({"run": name, "archive": result["archive_path"],
                                                "cleaned": result["source_cleaned"]})
                     except (OSError, ValueError, RuntimeError) as exc:

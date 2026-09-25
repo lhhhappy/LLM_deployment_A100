@@ -7,9 +7,9 @@
 ## 现在做什么
 
 当前Codex继续SGLang，Claude Code接手vLLM，两条路线共同探索N38。vLLM先跑通基本开发/GPU验证，对齐模型、接口与评测行为，见[交接](notes/handoffs/vllm-claude-code.md)；先短探针筛选，再完整回放。SGLang主线为 **正式A + 显存比例0.87 + 新版180 + 修复122**，
-对应正式46174/0924d；本地067全量有效FAIL，四类TTFT未过、TPOT通过。068关闭122后完整有效FAIL，三类TTFT失败，未见整体优势；069只扩host缓存至64GB/rank后10/11门通过，仅chain失败。070启动时因Pod临时存储超过20Gi被平台驱逐，无测量成绩；现有service已更新revision2并部署中，就绪后用071恢复计算。064已停止，065/066已撤销。
+对应正式46174/0924d；本地067全量有效FAIL，四类TTFT未过、TPOT通过。068关闭122后完整有效FAIL，三类TTFT失败，未见整体优势；069只扩host缓存至64GB/rank后10/11门通过，仅chain失败。070启动时因Pod临时存储超过20Gi被平台驱逐，无测量成绩；现有service revision2已恢复，071同配置模型正在加载；运行目录、JIT和临时缓存迁至RAM，临时存储限额仍20Gi，测量需等数据校验及引擎READY。064已停止，065/066已撤销。
 统一采用固定16请求短预热、真清缓存、全量311链/5601请求N30回放；每分钟观察健康、首次15分钟、随后每30分钟保存窗口，
-30分钟重点检查严重bug，全量完成后判11道硬门。067/068/069已冻结616/589/311个唯一TTFT坏例；070继续完整同ID对照，检验剩余chain等待与TPOT取舍。
+30分钟重点检查严重bug，全量完成后判11道硬门。067/068/069已冻结616/589/311个唯一TTFT坏例；071继续完整同ID对照，检验剩余chain等待与TPOT取舍。
 
 当前安排只看[队列](notes/queue.md)；比较规则只看[评估协议](notes/evaluation.md)；
 持续过程见[Codex迭代日志](notes/iterations/codex.md)，长篇说明见[组合与预热](notes/reports/sglang-shortwarm-mainline-0924.md)。
