@@ -12,6 +12,7 @@
 # limitations under the License.
 # ==============================================================================
 import logging
+import os
 from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -296,6 +297,7 @@ class AttnTpContext:
     def __init__(self):
         self.allow_input_scattered = False
         self.is_dsa = False
+        self.scatter_min_tokens = 0
 
     def init_context(self, q_lora_rank, is_dsa, is_mhc=False):
         # Only MHC pre-gathers hidden states before DSA attention, so non-MHC DSA
@@ -313,13 +315,17 @@ class AttnTpContext:
             and not check_cuda_graph_backend(Phase.PREFILL, Backend.TC_PIECEWISE)
             and get_spec().speculative_algorithm != "EAGLE3"
         )
+        self.scatter_min_tokens = ax_scatter_min_tokens()
         if get_parallel().enable_attn_tp_input_scattered:
             if not self.allow_input_scattered:
                 logging.info(
                     "attn_tp_input_scattered is not enabled while other conditions are not met"
                 )
             else:
-                logging.info("attn_tp_input_scattered is enabled")
+                logging.info(
+                    "attn_tp_input_scattered is enabled"
+                    + (f" for extends of at least {self.scatter_min_tokens} tokens" if self.scatter_min_tokens else "")
+                )
 
     def use_input_scattered(self, forward_batch: ForwardBatch):
         return (
@@ -327,6 +333,8 @@ class AttnTpContext:
             and forward_batch.forward_mode.is_extend()
             and not forward_batch.forward_mode.is_target_verify()
             and forward_batch.input_ids is not None
+            # [ax] 119: shorter extends keep the all-reduce path (custom all-reduce below its size cap)
+            and forward_batch.input_ids.shape[0] >= self.scatter_min_tokens
             and not forward_batch.can_run_tbo
         )
 
@@ -369,6 +377,16 @@ class AttnTpContext:
 
 
 ATTN_TP_CONTEXT = AttnTpContext()
+
+
+def ax_scatter_min_tokens() -> int:
+    """[ax] 119: SGLANG_AX_SCATTER_MIN_TOKENS > 0 scatters attention-TP inputs only for extends of at least that
+    many tokens (with --enable-attn-tp-input-scattered). Both the input padding and the forward read the decision
+    through use_input_scattered, and the token count is the same on every rank."""
+    n = int(os.environ.get("SGLANG_AX_SCATTER_MIN_TOKENS", "0") or 0)
+    if n < 0:
+        raise ValueError("[ax] 119: SGLANG_AX_SCATTER_MIN_TOKENS must be >= 0")
+    return n
 
 
 def get_attn_tp_context():
