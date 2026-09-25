@@ -1,0 +1,66 @@
+{
+  "reviewer": "claude (session e4faf351), read-only; no CPU probe, no code change",
+  "target": {
+    "worktree": "build/worktrees/072-chunk-alignment",
+    "head": "ce6f8ce88982d8fea8c66e33f4b589821655085a",
+    "uncommitted": [
+      "engine/sglang/srt/managers/scheduler.py",
+      "engine/docs/120-chunk-alignment.md"
+    ],
+    "sha256": {
+      "engine/sglang/srt/managers/scheduler.py": "eff26b1c446af32674ae12e7d271a9513b300f815a1b3ebe255f81b664ebc59d",
+      "engine/sglang/srt/managers/schedule_policy.py": "70af643cdca1ea5f02a13e01b9af355b58dee86be1c1fa0f6cff675f1b261a35",
+      "engine/sglang/srt/managers/schedule_batch.py": "ab6f3d9986b3642f1cbc2c50dfaa25a092ccf57ec1f4f1ce2eb8bbad220deb3c",
+      "engine/sglang/srt/managers/ax_chunk_alignment.py": "acdd95f7cc12a2b1a7c3f4aef63ab25c3394e5be20a0423e6474c1c2d92f5d5c",
+      "engine/docs/120-chunk-alignment.md": "1aafde4df2d503113da47f38ae4672d7a768afc380533064b11cdecb9357e35f"
+    },
+    "matches_review_fix_json": true
+  },
+  "verdict": "PASS: findings 1 and 2 of review.json are resolved; no new issue found. Fold the fix into 120 and pin the new commit before 072.",
+  "checks": [
+    {
+      "item": "finding 1 (phantom middle chunk)",
+      "result": "resolved",
+      "why": "batch_chunked_req = self.chunked_req only when it is in can_run_set; only it increments inflight_middle_chunks. A parked continuation no longer gains a count without a forward/result, so its real final chunk reaches the inflight<=0 branch (prefill_finished_time, first token)."
+    },
+    {
+      "item": "unchanged cases",
+      "result": "same as before",
+      "why": "Scheduled continuation and a new chunked request are both in can_run_list, so they still count; the final chunk (add_chunked_req returns None) still does not count; an empty can_run_list still returns before this code."
+    },
+    {
+      "item": "ScheduleBatch.chunked_req / next prompt token (MTP)",
+      "result": "correct",
+      "why": "init_new uses it only for chunked_req_next_prompt_token, which eagle_utils applies to the req that `is batch.chunked_req` inside batch.reqs; a parked owner was never in batch.reqs, so passing None changes nothing for scheduled chunks and removes a meaningless value for parked rounds."
+    },
+    {
+      "item": "next-round cleanup",
+      "result": "correct",
+      "why": "Scheduler still excludes self.chunked_req from the merge (scheduler.py ~3667) and skips the stash because extend_range.end == len(prefix_indices); last_batch.chunked_req is now None for a parked round, which only drops a redundant exclusion."
+    },
+    {
+      "item": "contains_last_prefill_chunk",
+      "result": "correct",
+      "why": "Now True for a batch holding only complete requests; read only by the PP mixin (not used at TP8) and a warning."
+    },
+    {
+      "item": "pending-token log",
+      "result": "resolved (finding 2)",
+      "why": "chunk_deduct uses batch_chunked_req, so parked rounds deduct nothing; pending-delta analysis of 072 logs no longer needs to exclude parked rounds."
+    },
+    {
+      "item": "second partial / assert self.chunked_req is None",
+      "result": "cannot trigger",
+      "why": "Parking only happens with ax_protect on; add_one_req then returns OTHER for any truncating request while a continuation exists (has_chunked_req is True for a parked owner), so adder.new_chunked_req stays None."
+    },
+    {
+      "item": "Req set membership",
+      "result": "fine",
+      "why": "can_run_set already hashes Req objects; membership is by the same object."
+    }
+  ],
+  "remaining_watch_items": [
+    "starvation of a parked continuation by short hits: read deferred_decisions/elapsed_s in the 072 trace",
+    "the fix prevents new sub-grid misalignment only; the lc295-type loss (successor hit 8704 below the predecessor's first aligned checkpoint) has another cause and is not addressed"
+  ]
+}

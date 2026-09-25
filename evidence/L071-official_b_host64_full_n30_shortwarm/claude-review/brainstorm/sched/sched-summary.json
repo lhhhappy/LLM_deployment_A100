@@ -1,0 +1,532 @@
+{
+ "note": "measured from raw + TP0 log; *_est columns are estimates (uniform spread)",
+ "071": {
+  "lane_concurrency_seconds_long_intervals": {
+   "0": 4901.8,
+   "1": 1351.5,
+   "2": 0.4
+  },
+  "gates": {
+   "fast_intra": {
+    "n": 4765,
+    "over": 199,
+    "allowed": 263,
+    "slack": 64
+   },
+   "overall_intra": {
+    "n": 5010,
+    "over": 147,
+    "allowed": 276,
+    "slack": 129
+   },
+   "turn_start": {
+    "n": 159,
+    "over": 3,
+    "allowed": 13,
+    "slack": 10
+   },
+   "chain_start": {
+    "n": 432,
+    "over": 30,
+    "allowed": 29,
+    "slack": -1
+   }
+  },
+  "chain_start": {
+   "n_bad": 30,
+   "median_lane_busy_frac": 0.957,
+   "median_lane_busy_by_later_frac": 0.326,
+   "n_lane_busy_ge_0_8": 23,
+   "n_lane_mostly_later": 11,
+   "n_with_long_overtaker": 27,
+   "sum_overtakers_short": 1024,
+   "sum_overtakers_long": 272,
+   "n_top_occ_is_cache_loss": 26,
+   "n_top_occ_later": 10,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 25.0,
+   "median_work_rate_tok_s_est": 9387
+  },
+  "fast_intra": {
+   "n_bad": 199,
+   "median_lane_busy_frac": 0.555,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 71,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 13,
+   "sum_overtakers_short": 490,
+   "sum_overtakers_long": 14,
+   "n_top_occ_is_cache_loss": 87,
+   "n_top_occ_later": 7,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 28.0,
+   "median_work_rate_tok_s_est": 5574
+  },
+  "overall_intra": {
+   "n_bad": 147,
+   "median_lane_busy_frac": 0.734,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 63,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 14,
+   "sum_overtakers_short": 563,
+   "sum_overtakers_long": 15,
+   "n_top_occ_is_cache_loss": 85,
+   "n_top_occ_later": 7,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 28.0,
+   "median_work_rate_tok_s_est": 7182
+  },
+  "turn_start": {
+   "n_bad": 3,
+   "median_lane_busy_frac": 0.815,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 2,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 0,
+   "sum_overtakers_short": 8,
+   "sum_overtakers_long": 0,
+   "n_top_occ_is_cache_loss": 2,
+   "n_top_occ_later": 0,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 24.0,
+   "median_work_rate_tok_s_est": 7659
+  },
+  "chain_start_arrival_hist": [
+   {
+    "min_from": 0,
+    "min_to": 1,
+    "n": 33,
+    "over": 20,
+    "unc_sum": 1707339
+   },
+   {
+    "min_from": 1,
+    "min_to": 2,
+    "n": 0,
+    "over": 0,
+    "unc_sum": 0
+   },
+   {
+    "min_from": 2,
+    "min_to": 5,
+    "n": 9,
+    "over": 4,
+    "unc_sum": 527083
+   },
+   {
+    "min_from": 5,
+    "min_to": 10,
+    "n": 27,
+    "over": 1,
+    "unc_sum": 938045
+   },
+   {
+    "min_from": 10,
+    "min_to": 20,
+    "n": 57,
+    "over": 0,
+    "unc_sum": 1135697
+   },
+   {
+    "min_from": 20,
+    "min_to": 40,
+    "n": 88,
+    "over": 4,
+    "unc_sum": 2466786
+   },
+   {
+    "min_from": 40,
+    "min_to": 80,
+    "n": 195,
+    "over": 1,
+    "unc_sum": 2486230
+   },
+   {
+    "min_from": 80,
+    "min_to": "end",
+    "n": 23,
+    "over": 0,
+    "unc_sum": 161102
+   }
+  ],
+  "chain_start_bad_arrival_min": [
+   0.0,
+   0.01,
+   0.01,
+   0.01,
+   0.01,
+   0.01,
+   0.01,
+   0.02,
+   0.02,
+   0.02,
+   0.02,
+   0.02,
+   0.03,
+   0.04,
+   0.04,
+   0.05,
+   0.05,
+   0.06,
+   0.33,
+   0.81,
+   2.29,
+   2.93,
+   3.21,
+   3.76,
+   5.2,
+   25.17,
+   31.61,
+   32.4,
+   33.64,
+   47.83
+  ],
+  "chain_start_bad_ttft_sorted": [
+   31.5,
+   33.7,
+   34.2,
+   34.6,
+   36.7,
+   43.0,
+   44.2,
+   46.7,
+   47.3,
+   48.8,
+   48.9,
+   49.4,
+   50.0,
+   51.4,
+   54.7,
+   62.1,
+   87.0,
+   93.6,
+   94.0,
+   100.9,
+   119.5,
+   159.8,
+   162.4,
+   166.8,
+   189.7,
+   199.4,
+   250.6,
+   260.5,
+   293.7,
+   307.8
+  ],
+  "chain_start_30_45": 7,
+  "chain_start_25_30": 6,
+  "rescuable_by_order_only": 29,
+  "cold_open_wave": [
+   {
+    "minutes": 0.5,
+    "uncached_arrived_tok": 1723218,
+    "prefill_log_tok_done": 315968,
+    "backlog_tok": 1407250
+   },
+   {
+    "minutes": 1,
+    "uncached_arrived_tok": 1804385,
+    "prefill_log_tok_done": 605120,
+    "backlog_tok": 1199265
+   },
+   {
+    "minutes": 2,
+    "uncached_arrived_tok": 1926412,
+    "prefill_log_tok_done": 1169024,
+    "backlog_tok": 757388
+   },
+   {
+    "minutes": 3,
+    "uncached_arrived_tok": 2372505,
+    "prefill_log_tok_done": 1684480,
+    "backlog_tok": 688025
+   },
+   {
+    "minutes": 5,
+    "uncached_arrived_tok": 2758186,
+    "prefill_log_tok_done": 2650176,
+    "backlog_tok": 108010
+   }
+  ],
+  "prefill_tok_per_min_first10": [
+   605120.0,
+   563904.0,
+   515456.0,
+   513216.0,
+   452480.0,
+   358656.0,
+   376192.0,
+   304768.0,
+   336768.0,
+   233280.0
+  ],
+  "prefill_tok_per_min_p50_steady_10_60": 218944.0
+ },
+ "069": {
+  "lane_concurrency_seconds_long_intervals": {
+   "0": 4884.5,
+   "1": 1451.6
+  },
+  "gates": {
+   "fast_intra": {
+    "n": 4765,
+    "over": 222,
+    "allowed": 263,
+    "slack": 41
+   },
+   "overall_intra": {
+    "n": 5010,
+    "over": 195,
+    "allowed": 276,
+    "slack": 81
+   },
+   "turn_start": {
+    "n": 159,
+    "over": 7,
+    "allowed": 13,
+    "slack": 6
+   },
+   "chain_start": {
+    "n": 432,
+    "over": 31,
+    "allowed": 29,
+    "slack": -2
+   }
+  },
+  "chain_start": {
+   "n_bad": 31,
+   "median_lane_busy_frac": 0.949,
+   "median_lane_busy_by_later_frac": 0.26,
+   "n_lane_busy_ge_0_8": 23,
+   "n_lane_mostly_later": 11,
+   "n_with_long_overtaker": 23,
+   "sum_overtakers_short": 935,
+   "sum_overtakers_long": 192,
+   "n_top_occ_is_cache_loss": 27,
+   "n_top_occ_later": 12,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 25.0,
+   "median_work_rate_tok_s_est": 8704
+  },
+  "fast_intra": {
+   "n_bad": 222,
+   "median_lane_busy_frac": 0.441,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 77,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 15,
+   "sum_overtakers_short": 580,
+   "sum_overtakers_long": 17,
+   "n_top_occ_is_cache_loss": 107,
+   "n_top_occ_later": 5,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 28.0,
+   "median_work_rate_tok_s_est": 4567
+  },
+  "overall_intra": {
+   "n_bad": 195,
+   "median_lane_busy_frac": 0.72,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 89,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 22,
+   "sum_overtakers_short": 720,
+   "sum_overtakers_long": 24,
+   "n_top_occ_is_cache_loss": 115,
+   "n_top_occ_later": 6,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 28.0,
+   "median_work_rate_tok_s_est": 6360
+  },
+  "turn_start": {
+   "n_bad": 7,
+   "median_lane_busy_frac": 0.685,
+   "median_lane_busy_by_later_frac": 0.0,
+   "n_lane_busy_ge_0_8": 2,
+   "n_lane_mostly_later": 0,
+   "n_with_long_overtaker": 3,
+   "sum_overtakers_short": 82,
+   "sum_overtakers_long": 4,
+   "n_top_occ_is_cache_loss": 5,
+   "n_top_occ_later": 2,
+   "max_token_usage_seen": 1.0,
+   "max_running_seen": 26.0,
+   "median_work_rate_tok_s_est": 5761
+  },
+  "chain_start_arrival_hist": [
+   {
+    "min_from": 0,
+    "min_to": 1,
+    "n": 33,
+    "over": 19,
+    "unc_sum": 1680459
+   },
+   {
+    "min_from": 1,
+    "min_to": 2,
+    "n": 2,
+    "over": 0,
+    "unc_sum": 61320
+   },
+   {
+    "min_from": 2,
+    "min_to": 5,
+    "n": 7,
+    "over": 4,
+    "unc_sum": 466019
+   },
+   {
+    "min_from": 5,
+    "min_to": 10,
+    "n": 27,
+    "over": 0,
+    "unc_sum": 918589
+   },
+   {
+    "min_from": 10,
+    "min_to": 20,
+    "n": 54,
+    "over": 0,
+    "unc_sum": 944552
+   },
+   {
+    "min_from": 20,
+    "min_to": 40,
+    "n": 88,
+    "over": 8,
+    "unc_sum": 2642329
+   },
+   {
+    "min_from": 40,
+    "min_to": 80,
+    "n": 188,
+    "over": 0,
+    "unc_sum": 2540163
+   },
+   {
+    "min_from": 80,
+    "min_to": "end",
+    "n": 33,
+    "over": 0,
+    "unc_sum": 271251
+   }
+  ],
+  "chain_start_bad_arrival_min": [
+   0.0,
+   0.0,
+   0.0,
+   0.01,
+   0.01,
+   0.01,
+   0.01,
+   0.02,
+   0.02,
+   0.02,
+   0.02,
+   0.03,
+   0.04,
+   0.04,
+   0.05,
+   0.05,
+   0.06,
+   0.17,
+   0.33,
+   2.55,
+   2.99,
+   3.27,
+   3.92,
+   22.77,
+   31.8,
+   31.84,
+   32.48,
+   33.25,
+   34.49,
+   34.51,
+   38.38
+  ],
+  "chain_start_bad_ttft_sorted": [
+   30.4,
+   30.4,
+   31.8,
+   32.5,
+   32.6,
+   33.7,
+   34.9,
+   36.7,
+   36.9,
+   40.3,
+   47.7,
+   48.9,
+   50.6,
+   51.6,
+   56.5,
+   60.9,
+   62.4,
+   68.6,
+   83.2,
+   86.3,
+   108.8,
+   131.1,
+   136.4,
+   161.0,
+   163.8,
+   168.1,
+   192.2,
+   229.9,
+   244.3,
+   263.3,
+   267.9
+  ],
+  "chain_start_30_45": 10,
+  "chain_start_25_30": 7,
+  "rescuable_by_order_only": 29,
+  "cold_open_wave": [
+   {
+    "minutes": 0.5,
+    "uncached_arrived_tok": 1680704,
+    "prefill_log_tok_done": 281216,
+    "backlog_tok": 1399488
+   },
+   {
+    "minutes": 1,
+    "uncached_arrived_tok": 1736299,
+    "prefill_log_tok_done": 558848,
+    "backlog_tok": 1177451
+   },
+   {
+    "minutes": 2,
+    "uncached_arrived_tok": 2013495,
+    "prefill_log_tok_done": 1086272,
+    "backlog_tok": 927223
+   },
+   {
+    "minutes": 3,
+    "uncached_arrived_tok": 2290130,
+    "prefill_log_tok_done": 1600000,
+    "backlog_tok": 690130
+   },
+   {
+    "minutes": 5,
+    "uncached_arrived_tok": 2644601,
+    "prefill_log_tok_done": 2545536,
+    "backlog_tok": 99065
+   }
+  ],
+  "prefill_tok_per_min_first10": [
+   558848.0,
+   527424.0,
+   513728.0,
+   469184.0,
+   476352.0,
+   343296.0,
+   239360.0,
+   384960.0,
+   394048.0,
+   189376.0
+  ],
+  "prefill_tok_per_min_p50_steady_10_60": 203520.0
+ },
+ "paired_chain_start_union": 38,
+ "paired_both_bad": 23
+}

@@ -1,0 +1,47 @@
+{
+ "label": "OFFLINE MODEL \u63a8\u7b97",
+ "071": {
+  "0": {
+   "chain_over": 24,
+   "chain_max": 321.4
+  },
+  "100": {
+   "chain_over": 24,
+   "chain_max": 321.7
+  },
+  "300": {
+   "chain_over": 24,
+   "chain_max": 270.9
+  },
+  "1000": {
+   "chain_over": 27,
+   "chain_max": 242.9
+  },
+  "2000": {
+   "chain_over": 30,
+   "chain_max": 207.4
+  }
+ },
+ "069": {
+  "0": {
+   "chain_over": 25,
+   "chain_max": 314.8
+  },
+  "100": {
+   "chain_over": 25,
+   "chain_max": 314.8
+  },
+  "300": {
+   "chain_over": 26,
+   "chain_max": 262.6
+  },
+  "1000": {
+   "chain_over": 25,
+   "chain_max": 244.8
+  },
+  "2000": {
+   "chain_over": 30,
+   "chain_max": 218.1
+  }
+ }
+}

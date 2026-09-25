@@ -1,0 +1,69 @@
+{
+  "reviewer": "claude (session e4faf351), read-only; no CPU probe, no code change",
+  "target": {
+    "worktree": "build/worktrees/072-chunk-alignment",
+    "base": "759a6eb",
+    "head": "ce6f8ce88982d8fea8c66e33f4b589821655085a",
+    "working_tree_sha256": {
+      "engine/sglang/srt/managers/schedule_policy.py": "70af643cdca1ea5f02a13e01b9af355b58dee86be1c1fa0f6cff675f1b261a35",
+      "engine/sglang/srt/managers/schedule_batch.py": "ab6f3d9986b3642f1cbc2c50dfaa25a092ccf57ec1f4f1ce2eb8bbad220deb3c",
+      "engine/sglang/srt/managers/ax_chunk_alignment.py": "acdd95f7cc12a2b1a7c3f4aef63ab25c3394e5be20a0423e6474c1c2d92f5d5c",
+      "engine/docs/120-chunk-alignment.md": "a944361f81c130ceb4150afe5dbc57c5d53d3d217242297671312a21a3853f17"
+    }
+  },
+  "verdict": "BLOCK: fix finding 1 before launching 072",
+  "findings": [
+    {
+      "id": 1,
+      "severity": "high",
+      "kind": "state/correctness",
+      "where": "scheduler.py:4096-4097 (unchanged) reached through the new deferral in schedule_policy.py add_chunked_req",
+      "issue": "When the continuation is parked (0 < budget < grid, remainder does not fit) and the same round still admits another request (ax_protect keeps scanning for short hits, scheduler.py:4062-4072; a request needing fewer than `budget` new tokens fits), can_run_list is non-empty, so get_new_batch_prefill runs `self.chunked_req.inflight_middle_chunks += 1` although the parked request is not in the batch. No result ever decrements that phantom count.",
+      "consequence": "At the request's real final chunk the counter is still 1, so batch_result_processor takes the middle-chunk branch (lines 315/375): prefill_finished_time is not set, the first output token is not appended and the request is merged into decode without it. Expect a wrong/shifted output or a stall and a broken TTFT record (prefill_finished_time 0) for every affected request.",
+      "why_new": "The existing parks (106 at budget <= 0, hybrid-SWA) leave no room for another admission, so can_run_list is empty and the function returns at line 4077 before the increment.",
+      "fix": "Count and pass the continuation only when it is actually scheduled: e.g. `in_batch = self.chunked_req is not None and self.chunked_req in can_run_set`; increment inflight_middle_chunks only if in_batch; pass chunked_req=(self.chunked_req if in_batch else None) to ScheduleBatch.init_new; chunk_deduct 0 when not in_batch. Alternative: stop admitting others in a parked round (costs short-hit latency)."
+    },
+    {
+      "id": 2,
+      "severity": "medium",
+      "kind": "observability",
+      "where": "scheduler.py PrefillStats chunk_deduct=self.chunked_req.extend_range.length",
+      "issue": "In a parked round extend_range is the previous chunk, so #pending-token is deducted by a chunk that did not run. Log-based chunk inference (pending deltas) must exclude parked rounds; the guard from finding 1 fixes it."
+    },
+    {
+      "id": 3,
+      "severity": "low",
+      "kind": "liveness",
+      "issue": "No deadlock found: grid = lcm(page, truncation_align, mamba checkpoint grid) is a multiple of 64; cap is rounded up to >= grid (scheduler.py:1347-1349); the continuation is added first so rem_input_tokens is full; the park ends once rem_total_tokens >= grid, which finishing decodes provide. Starvation is possible if admitted short hits keep consuming the freed trickle; the trace's deferred_decisions/elapsed_s will show it. Theoretical corner: a prompt within one grid of the whole pool with an empty running batch would park indefinitely (before: crawled on).",
+      "action": "Watch deferred_decisions/elapsed_s in 072; no change required."
+    },
+    {
+      "id": 4,
+      "severity": "info",
+      "kind": "state",
+      "issue": "Parked continuation keeps extend_range.end == len(prefix_indices), so the next round skips the stash (scheduler.py:3674), matching the existing parked-chunk contract; init_next_round_input re-runs without side effects for a continuation; no mamba ping-pong or track state is touched while parked."
+    },
+    {
+      "id": 5,
+      "severity": "info",
+      "kind": "scope",
+      "issue": "Only the ax_protect continuation path changes; protection off keeps native unaligned progress (as documented). New-request truncation is already page-aligned (schedule_policy.py ~1575-1592) and grid is a multiple of 64, so in this configuration non-final misaligned prefixes come only from the sub-grid continuation this patch parks. Final chunks are unaffected by design."
+    },
+    {
+      "id": 6,
+      "severity": "info",
+      "kind": "TP consistency",
+      "issue": "The park decision depends only on allocator/budget state, identical across TP ranks, as before. Trace hooks never influence scheduling; rank-0-only request attributes (_ax_alignment_*) are read only for logging. _rank_zero() needs the TP group, available in scheduler processes, and is only called when enabled."
+    },
+    {
+      "id": 7,
+      "severity": "info",
+      "kind": "imports/trace",
+      "issue": "ax_chunk_alignment imports only stdlib at module level (parallel_state lazily), no import cycle; ENABLED is read at import, so the env must be set at launch (it is inherited by scheduler processes). 2 MiB lifetime budget per TP0 process with explicit exhaustion; fields are Python ints/bools; hooks are O(1) per extend request. Moving cand_extend_input_len earlier does not change its value."
+    }
+  ],
+  "context_071": {
+    "confirmed": "z9 successor cached 152320 = exact position of a 6-token continuation at 08:16:28 (usage 1.00): pending deltas 2304, 256, 6, then 8x8192 and a 4876 final chunk (log 4928, rounded to 64); 222738-4876-65536-6 = 152320. This patch parks exactly that chunk.",
+    "not_explained": "lc295's predecessor also shows sub-grid continuations (37 at 08:26:23, 40 at 08:26:25), but its successor hit only 8704, below the predecessor's first aligned checkpoint (11776 by pending arithmetic); another loss (e.g. eviction of earlier checkpoints) must also be present. Evidence: evidence/L071-official_b_host64_full_n30_shortwarm/claude-review/"
+  }
+}

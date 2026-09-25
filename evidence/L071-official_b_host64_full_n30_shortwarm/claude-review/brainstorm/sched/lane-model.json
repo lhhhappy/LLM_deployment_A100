@@ -1,0 +1,572 @@
+{
+ "label": "OFFLINE MODEL, \u63a8\u7b97; see assumptions",
+ "assumptions": "(all stated in the output JSON):\n  A1 open loop: every request arrives at its measured t_recv_s of that run; closed-loop feedback\n     (earlier finish -> earlier next request) is ignored.\n  A2 work = measured recompute tokens (prompt - cached) of that run; reordering does not change\n     cache hits (the replay-true donor analysis says bad chain_start work is mostly cold anyway).\n  A3 capacity: in each wall-clock second the lane can process exactly the prefill tokens the real\n     run logged in that second (TP0 '#new-token' sum). Decode share / TPOT therefore unchanged by\n     construction; the model cannot say anything about TPOT.\n     Where the real run had an idle lane but the model has pending work, capacity is still capped\n     at the logged amount (conservative for reordering).\n  A4 lane rule: at most one request with remaining work > CHUNK may be 'in progress' (the single\n     chunked request of SGLang); once started it keeps the lane until done (no preemption).\n     Requests whose remaining work <= leftover budget in the tick may finish beside it.\n  A5 KV capacity, request-slot limits, host restore and eligibility rules are NOT modelled.\n  A6 TTFT_model = prefill completion - t_recv + POST (POST = 0.25 s first-token overhead).\nGate limits/membership from the harness; allowed counts from score_formal.allowed_over.",
+ "071": {
+  "measured": {
+   "fast_intra": 199,
+   "overall_intra": 147,
+   "turn_start": 3,
+   "chain_start": 30
+  },
+  "allowed": {
+   "fast_intra": 263,
+   "overall_intra": 276,
+   "turn_start": 13,
+   "chain_start": 29
+  },
+  "OBS": {
+   "gates": {
+    "fast_intra": 1094,
+    "overall_intra": 568,
+    "turn_start": 7,
+    "chain_start": 29
+   },
+   "chain_p95": 47.1,
+   "chain_max": 309.0,
+   "chain_over60": 15,
+   "fast_p95": 8.52,
+   "first_min_chain_bad": 20,
+   "unfinished": 2,
+   "calib_chain_abs_err_p50_p90": [
+    0.96,
+    2.16
+   ],
+   "calib_chain_same_verdict": "431/432",
+   "calib_fast_abs_err_p50_p90": [
+    1.12,
+    3.34
+   ]
+  },
+  "LPM": {
+   "gates": {
+    "fast_intra": 987,
+    "overall_intra": 558,
+    "turn_start": 9,
+    "chain_start": 32
+   },
+   "chain_p95": 52.0,
+   "chain_max": 302.3,
+   "chain_over60": 21,
+   "fast_p95": 9.32,
+   "first_min_chain_bad": 22,
+   "unfinished": 2
+  },
+  "FCFS": {
+   "gates": {
+    "fast_intra": 1111,
+    "overall_intra": 687,
+    "turn_start": 17,
+    "chain_start": 41
+   },
+   "chain_p95": 81.3,
+   "chain_max": 162.0,
+   "chain_over60": 26,
+   "fast_p95": 14.51,
+   "first_min_chain_bad": 25,
+   "unfinished": 2
+  },
+  "SRPT": {
+   "gates": {
+    "fast_intra": 889,
+    "overall_intra": 488,
+    "turn_start": 9,
+    "chain_start": 23
+   },
+   "chain_p95": 30.5,
+   "chain_max": 318.9,
+   "chain_over60": 11,
+   "fast_p95": 8.13,
+   "first_min_chain_bad": 16,
+   "unfinished": 2
+  },
+  "SRPT_aging2000": {
+   "gates": {
+    "fast_intra": 960,
+    "overall_intra": 581,
+    "turn_start": 15,
+    "chain_start": 30
+   },
+   "chain_p95": 40.8,
+   "chain_max": 203.2,
+   "chain_over60": 15,
+   "fast_p95": 10.71,
+   "first_min_chain_bad": 17,
+   "unfinished": 2
+  },
+  "SRPT_aging2000_demote": {
+   "gates": {
+    "fast_intra": 851,
+    "overall_intra": 532,
+    "turn_start": 17,
+    "chain_start": 20
+   },
+   "chain_p95": 27.1,
+   "chain_max": 294.7,
+   "chain_over60": 11,
+   "fast_p95": 12.84,
+   "first_min_chain_bad": 14,
+   "unfinished": 2
+  },
+  "EDF_label": {
+   "gates": {
+    "fast_intra": 940,
+    "overall_intra": 592,
+    "turn_start": 20,
+    "chain_start": 42
+   },
+   "chain_p95": 87.3,
+   "chain_max": 167.5,
+   "chain_over60": 29,
+   "fast_p95": 11.59,
+   "first_min_chain_bad": 25,
+   "unfinished": 2
+  },
+  "EDF_visible": {
+   "gates": {
+    "fast_intra": 970,
+    "overall_intra": 588,
+    "turn_start": 16,
+    "chain_start": 37
+   },
+   "chain_p95": 78.8,
+   "chain_max": 166.3,
+   "chain_over60": 26,
+   "fast_p95": 11.08,
+   "first_min_chain_bad": 23,
+   "unfinished": 2
+  },
+  "EDF_visible_demote": {
+   "gates": {
+    "fast_intra": 847,
+    "overall_intra": 532,
+    "turn_start": 16,
+    "chain_start": 22
+   },
+   "chain_p95": 30.0,
+   "chain_max": 273.7,
+   "chain_over60": 17,
+   "fast_p95": 12.96,
+   "first_min_chain_bad": 16,
+   "unfinished": 2
+  },
+  "OBS+shortbypass": {
+   "gates": {
+    "fast_intra": 804,
+    "overall_intra": 357,
+    "turn_start": 5,
+    "chain_start": 30
+   },
+   "chain_p95": 47.3,
+   "chain_max": 309.3,
+   "chain_over60": 15,
+   "fast_p95": 5.62,
+   "first_min_chain_bad": 20,
+   "unfinished": 2,
+   "calib_chain_abs_err_p50_p90": [
+    1.02,
+    2.45
+   ],
+   "calib_chain_same_verdict": "432/432",
+   "calib_fast_abs_err_p50_p90": [
+    0.92,
+    2.54
+   ]
+  },
+  "LPM+shortbypass": {
+   "gates": {
+    "fast_intra": 594,
+    "overall_intra": 254,
+    "turn_start": 5,
+    "chain_start": 33
+   },
+   "chain_p95": 52.8,
+   "chain_max": 305.0,
+   "chain_over60": 21,
+   "fast_p95": 4.59,
+   "first_min_chain_bad": 22,
+   "unfinished": 2
+  },
+  "FCFS+shortbypass": {
+   "gates": {
+    "fast_intra": 621,
+    "overall_intra": 294,
+    "turn_start": 6,
+    "chain_start": 36
+   },
+   "chain_p95": 80.6,
+   "chain_max": 172.8,
+   "chain_over60": 24,
+   "fast_p95": 4.83,
+   "first_min_chain_bad": 24,
+   "unfinished": 2
+  },
+  "SRPT+shortbypass": {
+   "gates": {
+    "fast_intra": 573,
+    "overall_intra": 239,
+    "turn_start": 6,
+    "chain_start": 24
+   },
+   "chain_p95": 31.3,
+   "chain_max": 321.4,
+   "chain_over60": 11,
+   "fast_p95": 4.45,
+   "first_min_chain_bad": 16,
+   "unfinished": 2
+  },
+  "SRPT_aging2000+shortbypass": {
+   "gates": {
+    "fast_intra": 592,
+    "overall_intra": 270,
+    "turn_start": 5,
+    "chain_start": 30
+   },
+   "chain_p95": 39.6,
+   "chain_max": 207.4,
+   "chain_over60": 15,
+   "fast_p95": 4.61,
+   "first_min_chain_bad": 16,
+   "unfinished": 2
+  },
+  "SRPT_aging2000_demote+shortbypass": {
+   "gates": {
+    "fast_intra": 575,
+    "overall_intra": 243,
+    "turn_start": 7,
+    "chain_start": 19
+   },
+   "chain_p95": 26.7,
+   "chain_max": 297.9,
+   "chain_over60": 11,
+   "fast_p95": 4.51,
+   "first_min_chain_bad": 14,
+   "unfinished": 2
+  },
+  "EDF_label+shortbypass": {
+   "gates": {
+    "fast_intra": 570,
+    "overall_intra": 262,
+    "turn_start": 9,
+    "chain_start": 38
+   },
+   "chain_p95": 83.9,
+   "chain_max": 177.8,
+   "chain_over60": 27,
+   "fast_p95": 4.59,
+   "first_min_chain_bad": 24,
+   "unfinished": 2
+  },
+  "EDF_visible+shortbypass": {
+   "gates": {
+    "fast_intra": 594,
+    "overall_intra": 271,
+    "turn_start": 6,
+    "chain_start": 36
+   },
+   "chain_p95": 66.9,
+   "chain_max": 177.0,
+   "chain_over60": 25,
+   "fast_p95": 4.63,
+   "first_min_chain_bad": 22,
+   "unfinished": 2
+  },
+  "EDF_visible_demote+shortbypass": {
+   "gates": {
+    "fast_intra": 574,
+    "overall_intra": 241,
+    "turn_start": 7,
+    "chain_start": 18
+   },
+   "chain_p95": 27.2,
+   "chain_max": 284.2,
+   "chain_over60": 15,
+   "fast_p95": 4.51,
+   "first_min_chain_bad": 15,
+   "unfinished": 2
+  }
+ },
+ "069": {
+  "measured": {
+   "fast_intra": 222,
+   "overall_intra": 195,
+   "turn_start": 7,
+   "chain_start": 31
+  },
+  "allowed": {
+   "fast_intra": 263,
+   "overall_intra": 276,
+   "turn_start": 13,
+   "chain_start": 29
+  },
+  "OBS": {
+   "gates": {
+    "fast_intra": 1453,
+    "overall_intra": 729,
+    "turn_start": 11,
+    "chain_start": 34
+   },
+   "chain_p95": 37.7,
+   "chain_max": 267.5,
+   "chain_over60": 16,
+   "fast_p95": 9.21,
+   "first_min_chain_bad": 19,
+   "unfinished": 1,
+   "calib_chain_abs_err_p50_p90": [
+    0.95,
+    3.18
+   ],
+   "calib_chain_same_verdict": "429/432",
+   "calib_fast_abs_err_p50_p90": [
+    1.35,
+    4.38
+   ]
+  },
+  "LPM": {
+   "gates": {
+    "fast_intra": 1371,
+    "overall_intra": 720,
+    "turn_start": 8,
+    "chain_start": 35
+   },
+   "chain_p95": 56.5,
+   "chain_max": 295.3,
+   "chain_over60": 22,
+   "fast_p95": 9.72,
+   "first_min_chain_bad": 24,
+   "unfinished": 1
+  },
+  "FCFS": {
+   "gates": {
+    "fast_intra": 1481,
+    "overall_intra": 835,
+    "turn_start": 24,
+    "chain_start": 38
+   },
+   "chain_p95": 82.9,
+   "chain_max": 168.8,
+   "chain_over60": 28,
+   "fast_p95": 13.8,
+   "first_min_chain_bad": 24,
+   "unfinished": 1
+  },
+  "SRPT": {
+   "gates": {
+    "fast_intra": 1217,
+    "overall_intra": 591,
+    "turn_start": 12,
+    "chain_start": 23
+   },
+   "chain_p95": 30.7,
+   "chain_max": 313.1,
+   "chain_over60": 11,
+   "fast_p95": 7.72,
+   "first_min_chain_bad": 16,
+   "unfinished": 1
+  },
+  "SRPT_aging2000": {
+   "gates": {
+    "fast_intra": 1320,
+    "overall_intra": 693,
+    "turn_start": 19,
+    "chain_start": 29
+   },
+   "chain_p95": 36.2,
+   "chain_max": 213.1,
+   "chain_over60": 15,
+   "fast_p95": 9.47,
+   "first_min_chain_bad": 18,
+   "unfinished": 1
+  },
+  "SRPT_aging2000_demote": {
+   "gates": {
+    "fast_intra": 1151,
+    "overall_intra": 659,
+    "turn_start": 20,
+    "chain_start": 21
+   },
+   "chain_p95": 29.1,
+   "chain_max": 298.8,
+   "chain_over60": 11,
+   "fast_p95": 13.75,
+   "first_min_chain_bad": 15,
+   "unfinished": 1
+  },
+  "EDF_label": {
+   "gates": {
+    "fast_intra": 1300,
+    "overall_intra": 700,
+    "turn_start": 22,
+    "chain_start": 39
+   },
+   "chain_p95": 84.4,
+   "chain_max": 172.8,
+   "chain_over60": 28,
+   "fast_p95": 10.4,
+   "first_min_chain_bad": 24,
+   "unfinished": 1
+  },
+  "EDF_visible": {
+   "gates": {
+    "fast_intra": 1350,
+    "overall_intra": 718,
+    "turn_start": 20,
+    "chain_start": 35
+   },
+   "chain_p95": 68.7,
+   "chain_max": 173.0,
+   "chain_over60": 27,
+   "fast_p95": 10.34,
+   "first_min_chain_bad": 22,
+   "unfinished": 1
+  },
+  "EDF_visible_demote": {
+   "gates": {
+    "fast_intra": 1160,
+    "overall_intra": 682,
+    "turn_start": 18,
+    "chain_start": 28
+   },
+   "chain_p95": 37.5,
+   "chain_max": 280.7,
+   "chain_over60": 19,
+   "fast_p95": 14.26,
+   "first_min_chain_bad": 19,
+   "unfinished": 1
+  },
+  "OBS+shortbypass": {
+   "gates": {
+    "fast_intra": 1056,
+    "overall_intra": 488,
+    "turn_start": 9,
+    "chain_start": 32
+   },
+   "chain_p95": 37.5,
+   "chain_max": 267.8,
+   "chain_over60": 16,
+   "fast_p95": 6.48,
+   "first_min_chain_bad": 19,
+   "unfinished": 1,
+   "calib_chain_abs_err_p50_p90": [
+    0.98,
+    3.01
+   ],
+   "calib_chain_same_verdict": "431/432",
+   "calib_fast_abs_err_p50_p90": [
+    1.03,
+    3.26
+   ]
+  },
+  "LPM+shortbypass": {
+   "gates": {
+    "fast_intra": 870,
+    "overall_intra": 383,
+    "turn_start": 6,
+    "chain_start": 34
+   },
+   "chain_p95": 56.7,
+   "chain_max": 296.0,
+   "chain_over60": 21,
+   "fast_p95": 5.46,
+   "first_min_chain_bad": 24,
+   "unfinished": 1
+  },
+  "FCFS+shortbypass": {
+   "gates": {
+    "fast_intra": 897,
+    "overall_intra": 399,
+    "turn_start": 14,
+    "chain_start": 34
+   },
+   "chain_p95": 83.4,
+   "chain_max": 179.8,
+   "chain_over60": 25,
+   "fast_p95": 5.59,
+   "first_min_chain_bad": 23,
+   "unfinished": 1
+  },
+  "SRPT+shortbypass": {
+   "gates": {
+    "fast_intra": 839,
+    "overall_intra": 349,
+    "turn_start": 9,
+    "chain_start": 25
+   },
+   "chain_p95": 30.9,
+   "chain_max": 314.8,
+   "chain_over60": 11,
+   "fast_p95": 5.21,
+   "first_min_chain_bad": 16,
+   "unfinished": 1
+  },
+  "SRPT_aging2000+shortbypass": {
+   "gates": {
+    "fast_intra": 863,
+    "overall_intra": 372,
+    "turn_start": 11,
+    "chain_start": 30
+   },
+   "chain_p95": 34.3,
+   "chain_max": 218.1,
+   "chain_over60": 15,
+   "fast_p95": 5.34,
+   "first_min_chain_bad": 18,
+   "unfinished": 1
+  },
+  "SRPT_aging2000_demote+shortbypass": {
+   "gates": {
+    "fast_intra": 823,
+    "overall_intra": 366,
+    "turn_start": 11,
+    "chain_start": 18
+   },
+   "chain_p95": 28.7,
+   "chain_max": 303.8,
+   "chain_over60": 11,
+   "fast_p95": 5.39,
+   "first_min_chain_bad": 14,
+   "unfinished": 1
+  },
+  "EDF_label+shortbypass": {
+   "gates": {
+    "fast_intra": 855,
+    "overall_intra": 370,
+    "turn_start": 12,
+    "chain_start": 36
+   },
+   "chain_p95": 84.4,
+   "chain_max": 183.3,
+   "chain_over60": 26,
+   "fast_p95": 5.32,
+   "first_min_chain_bad": 23,
+   "unfinished": 1
+  },
+  "EDF_visible+shortbypass": {
+   "gates": {
+    "fast_intra": 871,
+    "overall_intra": 373,
+    "turn_start": 12,
+    "chain_start": 34
+   },
+   "chain_p95": 67.3,
+   "chain_max": 183.3,
+   "chain_over60": 26,
+   "fast_p95": 5.39,
+   "first_min_chain_bad": 21,
+   "unfinished": 1
+  },
+  "EDF_visible_demote+shortbypass": {
+   "gates": {
+    "fast_intra": 828,
+    "overall_intra": 362,
+    "turn_start": 12,
+    "chain_start": 23
+   },
+   "chain_p95": 30.3,
+   "chain_max": 292.0,
+   "chain_over60": 16,
+   "fast_p95": 5.36,
+   "first_min_chain_bad": 18,
+   "unfinished": 1
+  }
+ }
+}

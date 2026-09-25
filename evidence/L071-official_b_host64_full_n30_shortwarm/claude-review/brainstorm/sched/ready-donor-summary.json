@@ -1,0 +1,479 @@
+{
+ "label": "ESTIMATE (prefix hash); ready = donor prefill finished before first batch",
+ "071": {
+  "total_unc": 19474218,
+  "ready_gap_total": 6100636,
+  "ready_gap_frac": 0.313,
+  "by_gate": {
+   "fast_intra": {
+    "unc": 6564067,
+    "ready_gap": 2550969
+   },
+   "overall_intra": {
+    "unc": 9183105,
+    "ready_gap": 3059274
+   },
+   "turn_start": {
+    "unc": 868831,
+    "ready_gap": 514088
+   },
+   "chain_start": {
+    "unc": 9422282,
+    "ready_gap": 2527274
+   }
+  },
+  "chain_bad_top_occupants": [
+   {
+    "bad": "biomaster:canon:vkb8sTiM3q_XSX16xgxY9:llm:1",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 84957,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:member-v5-team-member-3f3907571e8b666b989bd70c:llm:0",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 84957,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-b53fb6ac104a17b00d1ab179:llm:0",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 84957,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:0",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-88c69cbf4e043c8b609c8cf8:llm:7",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-a30d28e39fd03b02fc8e81b8:llm:3",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:8",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-af92db708a5f626004234e71:llm:0",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:7R_gC0sdkKuFwausVMIg2:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:member-v5-team-member-8653c4ea44fd1085d50a3461:llm:0",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-10b306cac043280f38c0ad21:llm:3",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:N1z2u35j3n9g-7P_3G347:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:102",
+    "occ_unc": 193967,
+    "occ_ready_gap": 30361,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:102",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+    "occ": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ_unc": 211400,
+    "occ_ready_gap": 5378,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:uRPMwERcBo2EyAD15ZGtH:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:bGi_gzjQjAJNQ7Y4TvThb:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:kOBsTmxAdUNcl_4Bbni6_:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:6thoYJhAH8oJW6nmGr9Hr:llm:1",
+    "occ": "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+    "occ_unc": 125276,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:uLVElap3dWCIbLfEEWaHA:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:c371bc54-83cc-483d-8184-1bd4e9c32b69:llm:0",
+    "occ": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ_unc": 211400,
+    "occ_ready_gap": 5378,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:Wc1_xuslqrL7B0ztW2mY9:llm:1",
+    "occ": "biomaster:canon:uLVElap3dWCIbLfEEWaHA:llm:1",
+    "occ_unc": 92447,
+    "occ_ready_gap": 1308,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:kJQQt3rjg_ZJydfgmei_G:llm:1",
+    "occ": "biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1",
+    "occ_unc": 88843,
+    "occ_ready_gap": 5685,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1",
+    "occ": "scimaster:canon:lc_20260924_244:llm:0006",
+    "occ_unc": 8520,
+    "occ_ready_gap": 0,
+    "occ_gate": "overall_intra"
+   },
+   {
+    "bad": "scimaster:canon:a9zWdpRfqikUJh_A1Yn7o:llm:1",
+    "occ": "scimaster:canon:lc_20260924_295:llm:0001",
+    "occ_unc": 245492,
+    "occ_ready_gap": 243374,
+    "occ_gate": "turn_start"
+   },
+   {
+    "bad": "scimaster:canon:IqFzLCKYFqgIuGoKUtKMr:llm:1",
+    "occ": "biomaster:canon:lc_20260924_031:llm:0007",
+    "occ_unc": 10510,
+    "occ_ready_gap": 6507,
+    "occ_gate": "fast_intra|overall_intra"
+   },
+   {
+    "bad": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159",
+    "occ": "biomaster:canon:Zje-aJJLB0KNh0fRsIOsY:llm:0",
+    "occ_unc": 13534,
+    "occ_ready_gap": 12804,
+    "occ_gate": "chain_start"
+   }
+  ],
+  "n_top_occ_ready_gap_ge_half": 3,
+  "long_lane_seconds_cold": 954.6,
+  "long_lane_seconds_cacheloss": 397.8
+ },
+ "069": {
+  "total_unc": 19131690,
+  "ready_gap_total": 5798931,
+  "ready_gap_frac": 0.303,
+  "by_gate": {
+   "fast_intra": {
+    "unc": 6151907,
+    "ready_gap": 2144508
+   },
+   "overall_intra": {
+    "unc": 8737409,
+    "ready_gap": 2622339
+   },
+   "turn_start": {
+    "unc": 869599,
+    "ready_gap": 515174
+   },
+   "chain_start": {
+    "unc": 9524682,
+    "ready_gap": 2661418
+   }
+  },
+  "chain_bad_top_occupants": [
+   {
+    "bad": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-b53fb6ac104a17b00d1ab179:llm:0",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ": "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:1",
+    "occ_unc": 32163,
+    "occ_ready_gap": 1226,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-a30d28e39fd03b02fc8e81b8:llm:3",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:c5e739bf-9826-4d78-bd51-f362e8b36e72:llm:0",
+    "occ": "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+    "occ_unc": 78262,
+    "occ_ready_gap": 27939,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-5165d16584fffbdec616baf8:llm:8",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-af92db708a5f626004234e71:llm:0",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:0",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:7R_gC0sdkKuFwausVMIg2:llm:1",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ": "scimaster:canon:7R_gC0sdkKuFwausVMIg2:llm:1",
+    "occ_unc": 141887,
+    "occ_ready_gap": 2809,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2",
+    "occ": "scimaster:canon:3013vNTzGpjdlPxLAHbPb:llm:1",
+    "occ_unc": 80093,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:member-v5-team-member-8653c4ea44fd1085d50a3461:llm:0",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:member-v5-subagent-10b306cac043280f38c0ad21:llm:3",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:N1z2u35j3n9g-7P_3G347:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:102",
+    "occ_unc": 193967,
+    "occ_ready_gap": 30361,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:102",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:uRPMwERcBo2EyAD15ZGtH:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:bGi_gzjQjAJNQ7Y4TvThb:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:kOBsTmxAdUNcl_4Bbni6_:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:uLVElap3dWCIbLfEEWaHA:llm:1",
+    "occ": "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "occ_unc": 251916,
+    "occ_ready_gap": 4662,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:c371bc54-83cc-483d-8184-1bd4e9c32b69:llm:0",
+    "occ": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ_unc": 211400,
+    "occ_ready_gap": 5378,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+    "occ": "biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1",
+    "occ_unc": 211400,
+    "occ_ready_gap": 5378,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:1",
+    "occ": "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+    "occ_unc": 128860,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:X5LYOBxCOOk_c8VqgdpVg:llm:1",
+    "occ": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1",
+    "occ_unc": 219666,
+    "occ_ready_gap": 4597,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:KRG5Tms5MpCYOoL-Fh2b8:llm:1",
+    "occ": "scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1",
+    "occ_unc": 248275,
+    "occ_ready_gap": 3959,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "biomaster:canon:lc_20260924_042:llm:0033",
+    "occ": "scimaster:canon:lc_20260924_295:llm:0001",
+    "occ_unc": 193268,
+    "occ_ready_gap": 191150,
+    "occ_gate": "turn_start"
+   },
+   {
+    "bad": "scimaster:canon:a9zWdpRfqikUJh_A1Yn7o:llm:1",
+    "occ": "scimaster:canon:lc_20260924_244:llm:0006",
+    "occ_unc": 8520,
+    "occ_ready_gap": 0,
+    "occ_gate": "overall_intra"
+   },
+   {
+    "bad": "scimaster:canon:member-v5-team-member-3a1ed571de02799b558ae887:llm:0",
+    "occ": "scimaster:canon:IqFzLCKYFqgIuGoKUtKMr:llm:1",
+    "occ_unc": 73507,
+    "occ_ready_gap": 0,
+    "occ_gate": "chain_start"
+   },
+   {
+    "bad": "scimaster:canon:IqFzLCKYFqgIuGoKUtKMr:llm:1",
+    "occ": "scimaster:canon:lc_20260924_300:llm:0003",
+    "occ_unc": 11313,
+    "occ_ready_gap": 0,
+    "occ_gate": "overall_intra"
+   },
+   {
+    "bad": "scimaster:canon:Gk3UkHQ6BpqSW7SdqZD7i:llm:1",
+    "occ": "biomaster:canon:iz1c_GlRRhfVivJF3N-Rc:llm:1",
+    "occ_unc": 40883,
+    "occ_ready_gap": 5240,
+    "occ_gate": "chain_start"
+   }
+  ],
+  "n_top_occ_ready_gap_ge_half": 1,
+  "long_lane_seconds_cold": 1024.7,
+  "long_lane_seconds_cacheloss": 426.9
+ }
+}

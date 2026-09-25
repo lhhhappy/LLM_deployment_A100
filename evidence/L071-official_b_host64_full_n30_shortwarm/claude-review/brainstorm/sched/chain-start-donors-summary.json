@@ -1,0 +1,84 @@
+{
+ "label": "ESTIMATE (char-serialized prefix hash, CK=1024 chars)",
+ "calibration": [
+  {
+   "target": "scimaster:canon:lc_20260924_295:llm:0001",
+   "source": "scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1",
+   "exact_tokens": 252115,
+   "est_tokens": 252078
+  },
+  {
+   "target": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:2",
+   "source": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1",
+   "exact_tokens": 222738,
+   "est_tokens": 222595
+  }
+ ],
+ "note": "lcp_any/any_gap include the request's OWN later chain successors (which contain its prompt); they are NOT donors. Use lcp_ready / lcp_concurrent.",
+ "071_all": {
+  "n": 432,
+  "n_bad": 30,
+  "unc_sum": 9422282,
+  "cached_sum": 10045952,
+  "ready_gap_sum": 2527274,
+  "concurrent_only_sum": 154114,
+  "n_concurrent_only_ge_16k": 4,
+  "n_ready_gap_ge_16k": 42,
+  "any_gap_sum": 9061863
+ },
+ "071_bad": {
+  "n": 30,
+  "n_bad": 30,
+  "unc_sum": 2621664,
+  "cached_sum": 205056,
+  "ready_gap_sum": 205821,
+  "concurrent_only_sum": 99769,
+  "n_concurrent_only_ge_16k": 3,
+  "n_ready_gap_ge_16k": 4,
+  "any_gap_sum": 2594306
+ },
+ "071_first_min": {
+  "n": 33,
+  "n_bad": 20,
+  "unc_sum": 1707339,
+  "cached_sum": 175872,
+  "ready_gap_sum": 140020,
+  "concurrent_only_sum": 154114,
+  "n_concurrent_only_ge_16k": 4,
+  "n_ready_gap_ge_16k": 3,
+  "any_gap_sum": 1678669
+ },
+ "069_all": {
+  "n": 432,
+  "n_bad": 31,
+  "unc_sum": 9524682,
+  "cached_sum": 9943552,
+  "ready_gap_sum": 2661418,
+  "concurrent_only_sum": 101903,
+  "n_concurrent_only_ge_16k": 3,
+  "n_ready_gap_ge_16k": 45,
+  "any_gap_sum": 9173223
+ },
+ "069_bad": {
+  "n": 31,
+  "n_bad": 31,
+  "unc_sum": 2523276,
+  "cached_sum": 234496,
+  "ready_gap_sum": 175862,
+  "concurrent_only_sum": 47563,
+  "n_concurrent_only_ge_16k": 2,
+  "n_ready_gap_ge_16k": 4,
+  "any_gap_sum": 2495796
+ },
+ "069_first_min": {
+  "n": 33,
+  "n_bad": 19,
+  "unc_sum": 1680459,
+  "cached_sum": 202752,
+  "ready_gap_sum": 131835,
+  "concurrent_only_sum": 101903,
+  "n_concurrent_only_ge_16k": 3,
+  "n_ready_gap_ge_16k": 3,
+  "any_gap_sum": 1651789
+ }
+}

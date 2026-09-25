@@ -1,0 +1,146 @@
+{
+ "label": "measured timestamps; class split is co-occurrence, not causal",
+ "kv_full_threshold": 0.9,
+ "071": {
+  "fast_intra": {
+   "n_bad": 199,
+   "queue_s_sum": 1597.7,
+   "lane_s_sum": 890.9,
+   "kvfull_s_sum": 685.5,
+   "other_s_sum": 21.2,
+   "n_dominant": {
+    "lane": 105,
+    "kv": 92,
+    "other": 2
+   },
+   "n_dominant_first_min": {
+    "lane": 3,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "overall_intra": {
+   "n_bad": 147,
+   "queue_s_sum": 1629.5,
+   "lane_s_sum": 1010.3,
+   "kvfull_s_sum": 598.6,
+   "other_s_sum": 20.5,
+   "n_dominant": {
+    "lane": 93,
+    "kv": 52,
+    "other": 2
+   },
+   "n_dominant_first_min": {
+    "lane": 2,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "turn_start": {
+   "n_bad": 3,
+   "queue_s_sum": 45.1,
+   "lane_s_sum": 35.6,
+   "kvfull_s_sum": 9.2,
+   "other_s_sum": 0.3,
+   "n_dominant": {
+    "lane": 2,
+    "kv": 1,
+    "other": 0
+   },
+   "n_dominant_first_min": {
+    "lane": 0,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "chain_start": {
+   "n_bad": 30,
+   "queue_s_sum": 2877.0,
+   "lane_s_sum": 2562.0,
+   "kvfull_s_sum": 223.7,
+   "other_s_sum": 91.3,
+   "n_dominant": {
+    "lane": 27,
+    "kv": 2,
+    "other": 1
+   },
+   "n_dominant_first_min": {
+    "lane": 20,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "log_lines_with_usage_ge_0.90_frac": 0.193
+ },
+ "069": {
+  "fast_intra": {
+   "n_bad": 222,
+   "queue_s_sum": 2026.8,
+   "lane_s_sum": 1155.2,
+   "kvfull_s_sum": 826.5,
+   "other_s_sum": 45.0,
+   "n_dominant": {
+    "lane": 109,
+    "kv": 112,
+    "other": 1
+   },
+   "n_dominant_first_min": {
+    "lane": 1,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "overall_intra": {
+   "n_bad": 195,
+   "queue_s_sum": 2344.7,
+   "lane_s_sum": 1540.2,
+   "kvfull_s_sum": 753.5,
+   "other_s_sum": 50.9,
+   "n_dominant": {
+    "lane": 124,
+    "kv": 65,
+    "other": 6
+   },
+   "n_dominant_first_min": {
+    "lane": 2,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "turn_start": {
+   "n_bad": 7,
+   "queue_s_sum": 227.9,
+   "lane_s_sum": 168.8,
+   "kvfull_s_sum": 49.1,
+   "other_s_sum": 10.0,
+   "n_dominant": {
+    "lane": 5,
+    "kv": 2,
+    "other": 0
+   },
+   "n_dominant_first_min": {
+    "lane": 0,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "chain_start": {
+   "n_bad": 31,
+   "queue_s_sum": 2697.9,
+   "lane_s_sum": 2454.6,
+   "kvfull_s_sum": 160.8,
+   "other_s_sum": 82.5,
+   "n_dominant": {
+    "lane": 26,
+    "kv": 4,
+    "other": 1
+   },
+   "n_dominant_first_min": {
+    "lane": 19,
+    "kv": 0,
+    "other": 0
+   }
+  },
+  "log_lines_with_usage_ge_0.90_frac": 0.188
+ }
+}

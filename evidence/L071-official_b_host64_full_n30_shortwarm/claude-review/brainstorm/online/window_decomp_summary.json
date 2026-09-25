@@ -1,0 +1,122 @@
+{
+ "068": {
+  "from_0min": {
+   "n": 432,
+   "over": 50,
+   "p95": 96.65,
+   "allowed_cp": 29
+  },
+  "from_1min": {
+   "n": 399,
+   "over": 29,
+   "p95": 48.55,
+   "allowed_cp": 27
+  },
+  "from_6min": {
+   "n": 389,
+   "over": 24,
+   "p95": 36.54,
+   "allowed_cp": 27
+  },
+  "from_10min": {
+   "n": 373,
+   "over": 22,
+   "p95": 33.01,
+   "allowed_cp": 26
+  },
+  "gross_pos_deficit_M": 18.549,
+  "cont_head_pos_deficit_M": 4.683,
+  "cont_head_est_unavoidable_M": 4.956,
+  "neg_deficit_M": -4.824,
+  "opening_wave": {
+   "n": 34,
+   "n_chain": 31,
+   "prompt_M": 1.916,
+   "unc_act_M": 1.673,
+   "over30": 20,
+   "max_ttft": 318.2,
+   "last_first_token_min": 5.63
+  },
+  "uncached_prefilled_first5min_tok_per_s": 8522
+ },
+ "069": {
+  "from_0min": {
+   "n": 432,
+   "over": 31,
+   "p95": 38.46,
+   "allowed_cp": 29
+  },
+  "from_1min": {
+   "n": 399,
+   "over": 12,
+   "p95": 21.27,
+   "allowed_cp": 27
+  },
+  "from_6min": {
+   "n": 388,
+   "over": 8,
+   "p95": 18.84,
+   "allowed_cp": 27
+  },
+  "from_10min": {
+   "n": 363,
+   "over": 8,
+   "p95": 18.09,
+   "allowed_cp": 25
+  },
+  "gross_pos_deficit_M": 7.857,
+  "cont_head_pos_deficit_M": 4.639,
+  "cont_head_est_unavoidable_M": 4.956,
+  "neg_deficit_M": -5.81,
+  "opening_wave": {
+   "n": 36,
+   "n_chain": 31,
+   "prompt_M": 1.947,
+   "unc_act_M": 1.681,
+   "over30": 19,
+   "max_ttft": 267.9,
+   "last_first_token_min": 4.71
+  },
+  "uncached_prefilled_first5min_tok_per_s": 8184
+ },
+ "071": {
+  "from_0min": {
+   "n": 432,
+   "over": 30,
+   "p95": 46.99,
+   "allowed_cp": 29
+  },
+  "from_1min": {
+   "n": 399,
+   "over": 10,
+   "p95": 18.72,
+   "allowed_cp": 27
+  },
+  "from_6min": {
+   "n": 386,
+   "over": 5,
+   "p95": 16.29,
+   "allowed_cp": 27
+  },
+  "from_10min": {
+   "n": 363,
+   "over": 5,
+   "p95": 16.19,
+   "allowed_cp": 25
+  },
+  "gross_pos_deficit_M": 8.304,
+  "cont_head_pos_deficit_M": 4.627,
+  "cont_head_est_unavoidable_M": 4.956,
+  "neg_deficit_M": -5.915,
+  "opening_wave": {
+   "n": 35,
+   "n_chain": 30,
+   "prompt_M": 1.939,
+   "unc_act_M": 1.723,
+   "over30": 19,
+   "max_ttft": 307.8,
+   "last_first_token_min": 5.45
+  },
+  "uncached_prefilled_first5min_tok_per_s": 8818
+ }
+}
