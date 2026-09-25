@@ -2,8 +2,8 @@
 
 The user has authorized parallel SGLang and vLLM work. Codex maintains `engine/sglang/`;
 Claude Code owns the new `engine/vllm/` route, beginning with a working baseline and interface/evaluation parity.
-See the [vLLM handoff](../notes/handoffs/vllm-claude-code.md). vLLM must pin its own source/image baseline,
-use separate tags, `engine vllm NNN:` commits and `engine/docs/vllm/` notes. Existing tree/export/image/Pod
+The vLLM base is official vLLM `main` a811738a6 (tag `vllm-base-a811738a6`); base, rules and mechanisms are in
+[engine/docs/vllm/](docs/vllm/README.md). vLLM uses separate tags, `engine vllm NNN:` commits and `engine/docs/vllm/` notes. Existing tree/export/image/Pod
 tools below are SGLang-specific and must not be used as if they already support vLLM.
 The remainder of this file describes the existing SGLang implementation.
 
