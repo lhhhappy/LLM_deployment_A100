@@ -181,7 +181,7 @@ def load_source(root=CANDIDATE):
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
-    # Module-level helpers the scheduler methods use: 120's TP0 trace (off) and 124's decisions.
+    # Module-level helpers the scheduler methods use: 120's TP0 trace (off) and 124/125's decisions.
     ns['ax_chunk_alignment'] = NS(ENABLED=False)
     deadline = root / 'srt/managers/ax_deadline.py'
     if deadline.exists():
@@ -699,7 +699,7 @@ class HiCacheTierTests(unittest.TestCase):
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
-                                '140=off', '180=off:no_hierarchical_cache'])
+                                '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
             rep = s._ax_mechanism_report()

@@ -1,4 +1,4 @@
-"""[ax] 124 decisions: deadline-tiered cold admission and chunk-level parking.
+"""[ax] 124/125 decisions: deadline-tiered cold admission, chunk-level parking, backlog decode relief.
 
 Pure functions of request state, elapsed seconds and budgets. The scheduler evaluates them on TP rank 0
 only and broadcasts the outcome, because arrival stamps, clocks and throughput differ between ranks and
@@ -9,11 +9,15 @@ clock or the environment after the config is built.
 estimate below) first, shortest remaining work first; then requests that cannot, also shortest first;
 requests LPM holds back for in-batch prefix sharing stay last. It may also park the running continuation
 for one round so a rescuable waiter that fits entirely in the round's budget runs instead.
+125 is an opening mode: while the cold backlog would take long to clear (after /flush_cache every level
+starts with all users sending cold chain starts at once), it raises the cold chunk cap and/or lowers the
+decode rounds armed after each prefill, under a guard on how many decoding requests ran slow since the
+last flush.
 """
 
 import os
-from dataclasses import dataclass
-from typing import Callable, List, Optional, Sequence, Set
+from dataclasses import dataclass, field
+from typing import Callable, List, Optional, Sequence, Set, Tuple
 
 
 def _env(name: str, default: str) -> str:
@@ -146,3 +150,113 @@ def should_park(continuation, continuation_left: int, continuation_waited_s: flo
     long_left = continuation_left > cfg.park_min_remaining
     hopeless = slack_s(continuation, continuation_left, continuation_waited_s, round_budget, cfg) < 0
     return long_left or hopeless
+
+
+@dataclass(frozen=True)
+class BacklogConfig:
+    # Enter relief when the cold backlog needs more than high_s at the recent prefill rate, leave
+    # below low_s. While relieved: the cold chunk cap is cold_cap (0 keeps 120's cap) and
+    # relaxed_interval decode rounds are armed after each prefill (the configured interval keeps it).
+    high_s: float = 30.0
+    low_s: float = 10.0
+    relaxed_interval: int = 1
+    cold_cap: int = 0
+    # Guard: stop relieving once max_slow decoding requests, or more than max_slow_ratio of those seen
+    # (after min_seen; 1.0 disables the ratio), have run above `gate` seconds per token. Counted since
+    # the last /flush_cache, which the platform calls before every level; the server does not know the
+    # level otherwise. The count covers requests still decoding, by their TPOT so far; one that is under
+    # the gate now can still end above it, so `gate` defaults below the 0.10 of the harness.
+    max_slow: int = 40
+    max_slow_ratio: float = 1.0
+    min_seen: int = 200
+    gate: float = 0.09
+    # Smoothing of the prefill rate (weight of the newest sample).
+    rate_weight: float = 0.2
+
+
+def backlog_config(configured_interval: int) -> Optional[BacklogConfig]:
+    """SGLANG_AX_BACKLOG_RELIEF=1 enables 125; it must change the cold cap, the interval or both."""
+    if _env("SGLANG_AX_BACKLOG_RELIEF", "0") != "1":
+        return None
+    cfg = BacklogConfig(
+        high_s=float(_env("SGLANG_AX_BACKLOG_HIGH_S", "30")),
+        low_s=float(_env("SGLANG_AX_BACKLOG_LOW_S", "10")),
+        relaxed_interval=int(_env("SGLANG_AX_BACKLOG_INTERVAL", str(configured_interval))),
+        cold_cap=int(_env("SGLANG_AX_BACKLOG_COLD_CAP", "0")),
+        max_slow=int(_env("SGLANG_AX_BACKLOG_MAX_SLOW", "40")),
+        max_slow_ratio=float(_env("SGLANG_AX_BACKLOG_MAX_SLOW_RATIO", "1.0")),
+        min_seen=int(_env("SGLANG_AX_BACKLOG_MIN_SEEN", "200")),
+        gate=float(_env("SGLANG_AX_BACKLOG_GATE", "0.09")),
+        rate_weight=float(_env("SGLANG_AX_BACKLOG_RATE_WEIGHT", "0.2")),
+    )
+    changes = cfg.cold_cap > 0 or cfg.relaxed_interval < configured_interval
+    if not (changes and 0 <= cfg.low_s < cfg.high_s and 0 <= cfg.relaxed_interval <= configured_interval
+            and cfg.cold_cap >= 0 and cfg.max_slow >= 0 and 0 <= cfg.max_slow_ratio <= 1
+            and cfg.min_seen >= 0 and cfg.gate > 0 and 0 < cfg.rate_weight <= 1):
+        raise ValueError(f"[ax] 125: invalid backlog config {cfg} for --prefill-decode-interval "
+                         f"{configured_interval} (relief must set SGLANG_AX_BACKLOG_COLD_CAP or an "
+                         f"SGLANG_AX_BACKLOG_INTERVAL below the configured interval)")
+    return cfg
+
+
+@dataclass
+class BacklogState:
+    """Rank-0 state of 125; the scheduler broadcasts only the relief decision."""
+
+    cfg: BacklogConfig
+    rate: float = 0.0
+    relieved: bool = False
+    tripped: bool = False
+    slow: Set[str] = field(default_factory=set)
+    seen: Set[str] = field(default_factory=set)
+    last_batch: Optional[Tuple[int, float]] = None  # (tokens, time) of the last prefill batch scheduled
+
+    def reset(self) -> None:
+        """At /flush_cache: a new level starts; only the prefill rate is kept."""
+        self.relieved = False
+        self.tripped = False
+        self.slow.clear()
+        self.seen.clear()
+        self.last_batch = None
+
+    def note_batch(self, tokens: int, now: float) -> None:
+        """A prefill batch of `tokens` is scheduled at `now` (seconds, any monotonic clock).
+
+        The time since the previous prefill batch was scheduled (its execution and the decode rounds after
+        it) is charged to that batch's tokens, the ones computed in it.
+        """
+        if self.last_batch is not None:
+            done, since = self.last_batch
+            if done > 0 and now > since:
+                sample = done / (now - since)
+                w = self.cfg.rate_weight
+                self.rate = sample if self.rate == 0 else (1 - w) * self.rate + w * sample
+        self.last_batch = (tokens, now)
+
+    def note_tpot(self, rid: str, tpot_s: float) -> None:
+        """Mean seconds per token so far of a decoding request; once above the gate it stays counted.
+
+        Conservative: a request slow early may still finish under the gate, but it is counted anyway.
+        """
+        self.seen.add(rid)
+        if tpot_s > self.cfg.gate:
+            self.slow.add(rid)
+
+    def decide(self, backlog_tokens: int) -> bool:
+        """Hysteresis on backlog seconds; a tripped guard keeps relief off until the next reset.
+
+        The guard latches, so a slow ratio that falls back under the limit as more requests are seen does
+        not re-enable relief.
+        """
+        slow, seen = len(self.slow), len(self.seen)
+        self.tripped = self.tripped or slow >= self.cfg.max_slow or (
+            seen >= self.cfg.min_seen and slow > self.cfg.max_slow_ratio * seen)
+        if self.tripped or self.rate <= 0:
+            self.relieved = False
+            return False
+        seconds = backlog_tokens / self.rate
+        if self.relieved and seconds < self.cfg.low_s:
+            self.relieved = False
+        elif not self.relieved and seconds > self.cfg.high_s:
+            self.relieved = True
+        return self.relieved
