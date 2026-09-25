@@ -1,6 +1,6 @@
 # Pod接手索引（2026-09-24）
 
-当前由Codex单人继续SGLang，vLLM暂缓。运行067验证正式A + mem0.87 + 新版180 + 修复122，完整N30、短预热后真flush；064已停，065/066撤销。
+当前Codex继续SGLang和071恢复，Claude Code接手vLLM基本开发与GPU调通，两路共同探索N38。069已有完整结果，070基础设施中断、071恢复计划待实时核对；vLLM边界见[交接](../handoffs/vllm-claude-code.md)。
 
 - 当前判断、可能方向与待办：[迭代索引](../iterations/codex.md)。
 - 运行状态：[队列](../queue.md)；统一口径：[评估协议](../evaluation.md)。

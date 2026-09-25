@@ -1,4 +1,11 @@
-# engine/ — our SGLang source (git-managed)
+# engine/ — engine sources (git-managed)
+
+The user has authorized parallel SGLang and vLLM work. Codex maintains `engine/sglang/`;
+Claude Code owns the new `engine/vllm/` route, beginning with a working baseline and interface/evaluation parity.
+See the [vLLM handoff](../notes/handoffs/vllm-claude-code.md). vLLM must pin its own source/image baseline,
+use separate tags, `engine vllm NNN:` commits and `engine/docs/vllm/` notes. Existing tree/export/image/Pod
+tools below are SGLang-specific and must not be used as if they already support vLLM.
+The remainder of this file describes the existing SGLang implementation.
 
 `engine/sglang/` is the organizer's base (`build/base_exact/sglang`, byte-exact L3) plus our mechanisms. Each mechanism is
 one or more commits whose subject starts `engine NNN:`. Its design notes live in `engine/docs/NNN-*.md`. Replaced the

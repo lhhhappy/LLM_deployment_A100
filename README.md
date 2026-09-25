@@ -6,7 +6,7 @@
 
 ## 现在做什么
 
-当前由Codex单人持续迭代SGLang，vLLM暂缓。主线为 **正式A + 显存比例0.87 + 新版180 + 修复122**，
+当前Codex继续SGLang，Claude Code接手vLLM，两条路线共同探索N38。vLLM先跑通基本开发/GPU验证，对齐模型、接口与评测行为，见[交接](notes/handoffs/vllm-claude-code.md)；先短探针筛选，再完整回放。SGLang主线为 **正式A + 显存比例0.87 + 新版180 + 修复122**，
 对应正式46174/0924d；本地067全量有效FAIL，四类TTFT未过、TPOT通过。068关闭122后完整有效FAIL，三类TTFT失败，未见整体优势；069只扩host缓存至64GB/rank后10/11门通过，仅chain失败。070启动时因Pod临时存储超过20Gi被平台驱逐，无测量成绩；现有service已更新revision2并部署中，就绪后用071恢复计算。064已停止，065/066已撤销。
 统一采用固定16请求短预热、真清缓存、全量311链/5601请求N30回放；每分钟观察健康、首次15分钟、随后每30分钟保存窗口，
 30分钟重点检查严重bug，全量完成后判11道硬门。067/068/069已冻结616/589/311个唯一TTFT坏例；070继续完整同ID对照，检验剩余chain等待与TPOT取舍。
@@ -32,7 +32,7 @@
 | 判定单档 | `level_verdict.py` 核对 N、完整 cohort、runner 与本次清缓存证据，再调用原 harness 和题面补充门；CP 为估计口径，其他区间仅诊断。修复及验证见[审计](notes/fable-审计-2026-09-24.md)，本地改动待负责人同步 pod |
 | 取回并复核单档 | `scripts/analysis/fetch_level.sh <完整run目录名> <N> --data-root data/s1-dev-longchain`（当前长链集）；输出在 `evidence/L<完整run目录名>/N<N>/`，按 summary 选文件，返回 0=有效通过、1=有效失败、2=无效/工具失败 |
 | 分析原因 | 保留 `raw_*.jsonl`、run/report、服务日志；`python3 -B scripts/analysis/review_raw.py <raw.jsonl>` 审计 cohort 与缓存账本，其余可复用分析见 `scripts/analysis/` 和 [research/README.md](research/README.md) |
-| 修改引擎 | 在 `engine/sglang/` 里改，按机制提交（`engine NNN:`）；见 [engine/README.md](engine/README.md) |
+| 修改引擎 | SGLang在`engine/sglang/`，vLLM在`engine/vllm/`；源码、底包与提交命名分开，见[engine/README.md](engine/README.md)和[vLLM交接](notes/handoffs/vllm-claude-code.md) |
 | 构建与正式提交 | `scripts/build_image.sh`、`scripts/submit_official.sh`，提交事实记在 [notes/submissions.md](notes/submissions.md)，官方结果用 `scripts/official_status.sh <attempt_id>` 查；只在明确安排正式提交时使用 |
 
 GPU 开发机通过 `scripts/gssh` / `scripts/gjob` 连接，**只在 `/sjtu/linhang/arena/` 下工作**；仓库镜像位于 `/sjtu/linhang/arena/repo`。8 卡 Trisol 服务与正在运行的队列任务不能停、删或杀进程。整理者对 pod 只使用 `scripts/pod/pread` 只读查看，或 `scripts/pod/pexec_codex` 在 `/tmp/ax/codex` 做 CPU 分析；不要改队列、运行目录或向引擎发请求。实验入队和提交由当前负责运行的协作者协调，避免碰撞。

@@ -4,7 +4,7 @@
 
 ## 当前安排（2026-09-24，用户最新决定）
 
-当前Codex单人持续迭代SGLang，vLLM暂缓。围绕工作量、单位成本、调度改善做闭环；
+当前Codex继续SGLang，Claude Code接手vLLM，共同探索N38。vLLM首阶段为基本开发/GPU调通和行为对齐；短探针先筛选，完整回放后判分，见[交接](handoffs/vllm-claude-code.md)。本安排未新增八卡任务，071冻结不变。围绕工作量、单位成本、调度改善做闭环；
 统一规则见[evaluation.md](evaluation.md)，过程见[Codex迭代日志](iterations/codex.md)。
 
 | Job | 配置 | 状态 |
