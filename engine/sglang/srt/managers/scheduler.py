@@ -1318,6 +1318,7 @@ class Scheduler(
         items = {
             "101": m101,
             "117": self._ax_humming_report(),
+            "119": self._ax_scatter_report(),
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
@@ -1342,6 +1343,16 @@ class Scheduler(
 
         n = humming_moe_layer_count()
         return f"on:{n}_layers" if n else "off:no_sm80_block_fp8_moe_layer"
+    def _ax_scatter_report(self) -> str:
+        """[ax] 119: scatter only large extends; refuses without --enable-attn-tp-input-scattered."""
+        if int(os.environ.get("SGLANG_AX_SCATTER_MIN_TOKENS", "0") or 0) <= 0:
+            return "off:SGLANG_AX_SCATTER_MIN_TOKENS_unset"
+        from sglang.srt.layers.communicator import ax_scatter_min_tokens
+
+        n = ax_scatter_min_tokens()
+        if not get_parallel().enable_attn_tp_input_scattered:
+            raise ValueError("[ax] 119: SGLANG_AX_SCATTER_MIN_TOKENS needs --enable-attn-tp-input-scattered")
+        return f"on:{n}"
 
     def _ax_sched_protect_limits(self, chunk_size):
         if not self._ax_sched_protect_enabled():

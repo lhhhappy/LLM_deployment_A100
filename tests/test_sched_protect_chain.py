@@ -175,7 +175,7 @@ def load_source(root=CANDIDATE):
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
              '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits',
-             '_ax_humming_report'}
+             '_ax_humming_report', '_ax_scatter_report'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
@@ -692,7 +692,8 @@ class HiCacheTierTests(unittest.TestCase):
                 os.environ.pop(k, None)
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
-        self.assertEqual(head, ['101=off:role_ids_unset', '117=off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
+        self.assertEqual(head, ['101=off:role_ids_unset', '117=off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset',
+                                '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
