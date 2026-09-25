@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "reference": "L069/check15/paired-completed.csv vs frozen 068/069 raw",
+  "rows": 625,
+  "matched_fields": {
+    "base_cached": "base_cached_tokens",
+    "cand_cached": "candidate_cached_tokens",
+    "base_ttft": "base_ttft_s",
+    "cand_ttft": "candidate_ttft_s",
+    "base_wait": "base_recv_to_exec_s",
+    "cand_wait": "candidate_recv_to_exec_s",
+    "base_exec_to_first": "base_exec_to_first_s",
+    "cand_exec_to_first": "candidate_exec_to_first_s",
+    "base_tpot": "base_tpot_s",
+    "cand_tpot": "candidate_tpot_s"
+  },
+  "numeric_values_checked": 6250,
+  "unit_tests": 6,
+  "same_run_sanity": "all repaired/new counts zero on 069 full vs 069 check15"
+}
