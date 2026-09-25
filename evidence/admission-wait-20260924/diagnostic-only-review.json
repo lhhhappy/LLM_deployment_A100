@@ -1,0 +1,27 @@
+{
+  "runtime_071": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "latest_sglang_source_commit": "afa72d9d",
+  "expected_for_diagnostic_only": [
+    "120_trace=on",
+    "120_scan=off",
+    "122=on",
+    "123=off",
+    "180=on"
+  ],
+  "proposed_env_delta": {
+    "SGLANG_AX_ADMISSION_TRACE": "1",
+    "SGLANG_AX_SCHED_KV_SCAN": "0"
+  },
+  "queued": false,
+  "deployed": false,
+  "source_sha256": {
+    "engine/sglang/srt/managers/ax_admission_trace.py": "c4eb1af7d3571cdbeecc3aeb2024c1a972437b5fcca7d25ff0dfddbc1032d508",
+    "engine/sglang/srt/managers/scheduler.py": "9f70424a98d6b17d00060a09eaefb7855f322dbe150015074db2e38995a06fcc",
+    "engine/sglang/srt/managers/schedule_policy.py": "5cc46e56b87b67e96c216d675cc22b87910d0ab067ef293aad55d0e7d3094141"
+  },
+  "engine_diff_commits": [
+    "afa72d9d engine 120: bound KV fallback admission and scope wait diagnostics",
+    "ce6c4f60 engine 120: add bounded admission diagnostics without changing scheduling"
+  ],
+  "cpu_test": "python3 -B -m unittest discover -s tests -p test_admission_trace.py (8 passed)"
+}

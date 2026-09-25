@@ -1,0 +1,352 @@
+{
+  "scope": "local CPU collector microbenchmark; not TP8 or end-to-end overhead",
+  "source_sha256": "c4eb1af7d3571cdbeecc3aeb2024c1a972437b5fcca7d25ff0dfddbc1032d508",
+  "measured_at": 1790324841.3819656,
+  "python": "3.10.12",
+  "cpu": "unknown",
+  "affinity_cpus": 10,
+  "results": {
+    "empty_python_call": {
+      "calls_per_round": 10000,
+      "rounds": 7,
+      "wall_us_median": 0.0225084,
+      "wall_us_round_max": 0.0248125,
+      "cpu_us_median": 0.0225292,
+      "samples": [
+        {
+          "wall_ns_per_call": 24.8125,
+          "cpu_ns_per_call": 24.1792
+        },
+        {
+          "wall_ns_per_call": 23.7875,
+          "cpu_ns_per_call": 23.7958
+        },
+        {
+          "wall_ns_per_call": 21.4375,
+          "cpu_ns_per_call": 21.4375
+        },
+        {
+          "wall_ns_per_call": 22.4166,
+          "cpu_ns_per_call": 22.425
+        },
+        {
+          "wall_ns_per_call": 23.3958,
+          "cpu_ns_per_call": 23.3959
+        },
+        {
+          "wall_ns_per_call": 22.5084,
+          "cpu_ns_per_call": 22.5292
+        },
+        {
+          "wall_ns_per_call": 22.25,
+          "cpu_ns_per_call": 22.25
+        }
+      ]
+    },
+    "hot_record_and_gated_snapshot_n1": {
+      "calls_per_round": 5000,
+      "rounds": 7,
+      "wall_us_median": 0.29371660000000005,
+      "wall_us_round_max": 0.3074334,
+      "cpu_us_median": 0.2920002,
+      "samples": [
+        {
+          "wall_ns_per_call": 304.3,
+          "cpu_ns_per_call": 297.5252
+        },
+        {
+          "wall_ns_per_call": 290.3166,
+          "cpu_ns_per_call": 289.3666
+        },
+        {
+          "wall_ns_per_call": 294.025,
+          "cpu_ns_per_call": 292.0002
+        },
+        {
+          "wall_ns_per_call": 307.4334,
+          "cpu_ns_per_call": 302.9416
+        },
+        {
+          "wall_ns_per_call": 283.625,
+          "cpu_ns_per_call": 283.6334
+        },
+        {
+          "wall_ns_per_call": 293.7166,
+          "cpu_ns_per_call": 292.8668
+        },
+        {
+          "wall_ns_per_call": 288.125,
+          "cpu_ns_per_call": 288.1416
+        }
+      ]
+    },
+    "hot_record_and_gated_snapshot_n8": {
+      "calls_per_round": 5000,
+      "rounds": 7,
+      "wall_us_median": 1.16675,
+      "wall_us_round_max": 1.1947832,
+      "cpu_us_median": 1.1607334,
+      "samples": [
+        {
+          "wall_ns_per_call": 1166.4334,
+          "cpu_ns_per_call": 1155.1586
+        },
+        {
+          "wall_ns_per_call": 1168.075,
+          "cpu_ns_per_call": 1160.7334
+        },
+        {
+          "wall_ns_per_call": 1142.8166,
+          "cpu_ns_per_call": 1134.8164
+        },
+        {
+          "wall_ns_per_call": 1194.7832,
+          "cpu_ns_per_call": 1183.1164
+        },
+        {
+          "wall_ns_per_call": 1157.3,
+          "cpu_ns_per_call": 1150.3918
+        },
+        {
+          "wall_ns_per_call": 1186.225,
+          "cpu_ns_per_call": 1174.2666
+        },
+        {
+          "wall_ns_per_call": 1166.75,
+          "cpu_ns_per_call": 1161.9168
+        }
+      ]
+    },
+    "hot_record_and_gated_snapshot_n30": {
+      "calls_per_round": 5000,
+      "rounds": 7,
+      "wall_us_median": 3.8018334,
+      "wall_us_round_max": 3.8432584000000003,
+      "cpu_us_median": 3.7939000000000003,
+      "samples": [
+        {
+          "wall_ns_per_call": 3801.8334,
+          "cpu_ns_per_call": 3795.325
+        },
+        {
+          "wall_ns_per_call": 3843.2584,
+          "cpu_ns_per_call": 3840.8416
+        },
+        {
+          "wall_ns_per_call": 3779.1,
+          "cpu_ns_per_call": 3774.983
+        },
+        {
+          "wall_ns_per_call": 3788.925,
+          "cpu_ns_per_call": 3787.0666
+        },
+        {
+          "wall_ns_per_call": 3805.0834,
+          "cpu_ns_per_call": 3793.9
+        },
+        {
+          "wall_ns_per_call": 3805.0332,
+          "cpu_ns_per_call": 3799.6666
+        },
+        {
+          "wall_ns_per_call": 3754.0916,
+          "cpu_ns_per_call": 3754.15
+        }
+      ]
+    },
+    "hot_record_and_gated_snapshot_n38": {
+      "calls_per_round": 5000,
+      "rounds": 7,
+      "wall_us_median": 4.7468416,
+      "wall_us_round_max": 4.7838916,
+      "cpu_us_median": 4.7398416,
+      "samples": [
+        {
+          "wall_ns_per_call": 4750.2166,
+          "cpu_ns_per_call": 4741.7
+        },
+        {
+          "wall_ns_per_call": 4761.0,
+          "cpu_ns_per_call": 4753.2836
+        },
+        {
+          "wall_ns_per_call": 4726.425,
+          "cpu_ns_per_call": 4722.5916
+        },
+        {
+          "wall_ns_per_call": 4746.8416,
+          "cpu_ns_per_call": 4737.4166
+        },
+        {
+          "wall_ns_per_call": 4741.5334,
+          "cpu_ns_per_call": 4739.8416
+        },
+        {
+          "wall_ns_per_call": 4725.4084,
+          "cpu_ns_per_call": 4718.6336
+        },
+        {
+          "wall_ns_per_call": 4783.8916,
+          "cpu_ns_per_call": 4776.2168
+        }
+      ]
+    },
+    "hot_one_rejection": {
+      "calls_per_round": 10000,
+      "rounds": 7,
+      "wall_us_median": 0.3294209,
+      "wall_us_round_max": 0.3367083,
+      "cpu_us_median": 0.3294292,
+      "samples": [
+        {
+          "wall_ns_per_call": 333.0208,
+          "cpu_ns_per_call": 333.0249
+        },
+        {
+          "wall_ns_per_call": 327.4417,
+          "cpu_ns_per_call": 327.45
+        },
+        {
+          "wall_ns_per_call": 327.5375,
+          "cpu_ns_per_call": 326.9917
+        },
+        {
+          "wall_ns_per_call": 319.8334,
+          "cpu_ns_per_call": 319.8417
+        },
+        {
+          "wall_ns_per_call": 329.4209,
+          "cpu_ns_per_call": 329.4292
+        },
+        {
+          "wall_ns_per_call": 334.825,
+          "cpu_ns_per_call": 334.3583
+        },
+        {
+          "wall_ns_per_call": 336.7083,
+          "cpu_ns_per_call": 335.4749
+        }
+      ]
+    },
+    "admission_json_and_file_flush": {
+      "calls_per_round": 300,
+      "rounds": 7,
+      "wall_us_median": 10.568333333333333,
+      "wall_us_round_max": 11.180833333333334,
+      "cpu_us_median": 10.512776666666667,
+      "samples": [
+        {
+          "wall_ns_per_call": 11180.833333333334,
+          "cpu_ns_per_call": 11181.806666666667
+        },
+        {
+          "wall_ns_per_call": 10867.223333333333,
+          "cpu_ns_per_call": 10842.776666666667
+        },
+        {
+          "wall_ns_per_call": 10553.053333333333,
+          "cpu_ns_per_call": 10493.056666666667
+        },
+        {
+          "wall_ns_per_call": 10568.333333333334,
+          "cpu_ns_per_call": 10512.776666666667
+        },
+        {
+          "wall_ns_per_call": 10202.22,
+          "cpu_ns_per_call": 10202.78
+        },
+        {
+          "wall_ns_per_call": 10612.223333333333,
+          "cpu_ns_per_call": 10571.11
+        },
+        {
+          "wall_ns_per_call": 10254.026666666667,
+          "cpu_ns_per_call": 10254.72
+        }
+      ]
+    },
+    "charged_bytes_per_admission": 615.0642857142857,
+    "snapshot_32_of_38_json_and_file_flush": {
+      "calls_per_round": 12,
+      "rounds": 7,
+      "wall_us_median": 85.63891666666667,
+      "wall_us_round_max": 94.35758333333332,
+      "cpu_us_median": 85.65283333333333,
+      "samples": [
+        {
+          "wall_ns_per_call": 94357.58333333333,
+          "cpu_ns_per_call": 94375.0
+        },
+        {
+          "wall_ns_per_call": 93593.75,
+          "cpu_ns_per_call": 93621.58333333333
+        },
+        {
+          "wall_ns_per_call": 82138.83333333333,
+          "cpu_ns_per_call": 82156.25
+        },
+        {
+          "wall_ns_per_call": 89083.33333333333,
+          "cpu_ns_per_call": 89104.16666666667
+        },
+        {
+          "wall_ns_per_call": 85638.91666666667,
+          "cpu_ns_per_call": 85652.83333333333
+        },
+        {
+          "wall_ns_per_call": 84378.5,
+          "cpu_ns_per_call": 84399.33333333333
+        },
+        {
+          "wall_ns_per_call": 83190.91666666667,
+          "cpu_ns_per_call": 83225.75
+        }
+      ]
+    },
+    "exhausted_record_and_snapshot_n38": {
+      "calls_per_round": 10000,
+      "rounds": 7,
+      "wall_us_median": 0.1067542,
+      "wall_us_round_max": 0.1125709,
+      "cpu_us_median": 0.1067583,
+      "samples": [
+        {
+          "wall_ns_per_call": 103.2042,
+          "cpu_ns_per_call": 103.2
+        },
+        {
+          "wall_ns_per_call": 112.5709,
+          "cpu_ns_per_call": 112.0542
+        },
+        {
+          "wall_ns_per_call": 106.7542,
+          "cpu_ns_per_call": 106.7583
+        },
+        {
+          "wall_ns_per_call": 107.7541,
+          "cpu_ns_per_call": 107.7625
+        },
+        {
+          "wall_ns_per_call": 105.0042,
+          "cpu_ns_per_call": 105.0083
+        },
+        {
+          "wall_ns_per_call": 110.4,
+          "cpu_ns_per_call": 109.3043
+        },
+        {
+          "wall_ns_per_call": 105.4292,
+          "cpu_ns_per_call": 105.4375
+        }
+      ]
+    }
+  },
+  "temporary_log_bytes": 2394384,
+  "caveats": [
+    "No real request/cache/pool code, TP collective, GPU or Python scheduler integration.",
+    "FileHandler writes to this host temporary filesystem; Pod RAM log latency may differ.",
+    "Median/max describe repeated loop averages, not individual-call tail latency.",
+    "TP0 overhead can delay other ranks; these timings do not measure that amplification.",
+    "Byte budget is per process; exceeding it intentionally ends diagnostic coverage."
+  ]
+}
