@@ -1,0 +1,7 @@
+37e9002368390fefc92621ea8b18f73e86429596
+{"event": "start", "mode": "marlin", "ms": [128], "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "commit": "37e9002368390fefc92621ea8b18f73e86429596", "fused_marlin_moe_sha256": "c33fc53e551572f2"}
+{"event": "weights", "q13_sum": -2929102.5, "s13_sum": 23.2553321182495, "q2_sum": 113434.578125, "s2_sum": 11.64063765341416}
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+{"M": 128, "block_size_m": 8, "align_repeat_identical": false, "rows": 128, "out_rows_differing": [6, 6, 6], "max_abs_diff": [0.125, 0.125, 0.125], "fixed_align_repeat_identical": true}
+{"M": 2048, "block_size_m": 64, "align_repeat_identical": false, "rows": 2048, "out_rows_differing": [72, 68, 69], "max_abs_diff": [0.25, 0.5, 0.25], "fixed_align_repeat_identical": true}
+{"M": 16384, "block_size_m": 64, "align_repeat_identical": false, "rows": 16384, "out_rows_differing": [506, 471, 491], "max_abs_diff": [0.375, 0.25, 0.375], "fixed_align_repeat_identical": true}

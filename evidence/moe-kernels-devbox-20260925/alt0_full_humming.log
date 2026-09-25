@@ -1,0 +1,51 @@
+37e9002368390fefc92621ea8b18f73e86429596
+{"event": "start", "mode": "humming", "ms": [128, 2048, 8192, 16384], "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "commit": "37e9002368390fefc92621ea8b18f73e86429596", "fused_marlin_moe_sha256": "c33fc53e551572f2"}
+{"event": "weights", "q13_sum": -2929102.5, "s13_sum": 23.2553321182495, "q2_sum": 113434.578125, "s2_sum": 11.64063765341416}
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+{"event": "marlin_layer_built", "s": 0.2}
+{"event": "humming_layer_built", "convert_s": 0.02, "weight_bytes": 923320320, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}, "metas": {"w13": "HummingLayerMeta(shape_n=512, shape_k=4096, pad_shape_n=0, pad_shape_k=0, num_experts=289, b_dtype=float8e4m3, a_dtype=bfloat16, c_dtype=bfloat16, bs_dtype=bfloat16, as_dtype=None, input_scale_group_size=0, weight_scale_group_size=128, weight_scale_group_size_n=0, weight_scale_type=<WeightScaleType.GROUP: 'group'>, weight_scale_2_type=<WeightScale2Type.NONE: 'none'>, use_int_weight_scale=False, use_fused_e8m0_scale=False, has_zero_point=False, is_fp_zero_point=False, has_bias=False, mma_type=<MmaType.MMA: 'mma'>, use_packed_k_layout=False, sublayer_name='w13')", "w2": "HummingLayerMeta(shape_n=4096, shape_k=256, pad_shape_n=0, pad_shape_k=0, num_experts=289, b_dtype=float8e4m3, a_dtype=bfloat16, c_dtype=bfloat16, bs_dtype=bfloat16, as_dtype=None, input_scale_group_size=0, weight_scale_group_size=128, weight_scale_group_size_n=0, weight_scale_type=<WeightScaleType.GROUP: 'group'>, weight_scale_2_type=<WeightScale2Type.NONE: 'none'>, use_int_weight_scale=False, use_fused_e8m0_scale=False, has_zero_point=False, is_fp_zero_point=False, has_bias=False, mma_type=<MmaType.MMA: 'mma'>, use_packed_k_layout=False, sublayer_name='w2')"}}
+{"event": "first_call", "M": 128, "cand": "hum_idx", "s": 64.38, "finite": true}
+{"event": "first_call", "M": 128, "cand": "hum_grp", "s": 64.61, "finite": true}
+{"event": "first_call", "M": 2048, "cand": "hum_idx", "s": 0.24, "finite": true}
+{"event": "first_call", "M": 2048, "cand": "hum_grp", "s": 0.02, "finite": true}
+{"event": "first_call", "M": 8192, "cand": "hum_idx", "s": 0.0, "finite": true}
+{"event": "first_call", "M": 8192, "cand": "hum_grp", "s": 0.0, "finite": true}
+{"event": "first_call", "M": 16384, "cand": "hum_idx", "s": 0.01, "finite": true}
+{"event": "first_call", "M": 16384, "cand": "hum_grp", "s": 0.01, "finite": true}
+{"event": "numerics", "rows": 64, "marlin": 0.006116, "hum_idx": 0.006079, "hum_idx_vs_marlin": 0.004715, "hum_idx_repeat_bitwise": false, "hum_grp": 0.006987, "hum_grp_vs_marlin": 0.005512, "hum_grp_repeat_bitwise": true, "neg_gate_up_scale_swap_hum_idx": 0.1662, "neg_gate_up_scale_swap_hum_grp": 0.1662, "neg_expert_shift_scale_hum_idx": 0.1715, "neg_expert_shift_scale_hum_grp": 0.1716}
+{"event": "agree", "M": 128, "cand": "hum_idx", "rel_vs_marlin": 0.004755, "finite": true}
+{"event": "agree", "M": 128, "cand": "hum_grp", "rel_vs_marlin": 0.005576, "finite": true}
+{"event": "agree", "M": 2048, "cand": "hum_idx", "rel_vs_marlin": 0.004651, "finite": true}
+{"event": "agree", "M": 2048, "cand": "hum_grp", "rel_vs_marlin": 0.005417, "finite": true}
+{"event": "agree", "M": 8192, "cand": "hum_idx", "rel_vs_marlin": 0.003126, "finite": true}
+{"event": "agree", "M": 8192, "cand": "hum_grp", "rel_vs_marlin": 0.004239, "finite": true}
+{"event": "agree", "M": 16384, "cand": "hum_idx", "rel_vs_marlin": 0.003585, "finite": true}
+{"event": "agree", "M": 16384, "cand": "hum_grp", "rel_vs_marlin": 0.004568, "finite": true}
+{"event": "graph", "M": 128, "cand": "marlin", "ms": 0.6753, "samples": [0.6755, 0.6759, 0.675, 0.6753, 0.6537], "replay_bitwise_vs_eager": false}
+{"event": "graph", "M": 128, "cand": "hum_idx", "ms": 0.5923, "samples": [0.5924, 0.5923, 0.5906, 0.5914, 0.5923], "replay_bitwise_vs_eager": false}
+{"event": "graph", "M": 128, "cand": "hum_grp", "ms": 0.6523, "samples": [0.6523, 0.6522, 0.653, 0.652, 0.6543], "replay_bitwise_vs_eager": false}
+{"event": "time", "M": 128, "cand": "marlin", "ms": 0.6781, "tflops": 10.7, "samples": [0.678, 0.6796, 0.6781, 0.678, 0.6789], "peak_gb": 0.017}
+{"event": "time", "M": 128, "cand": "hum_idx", "ms": 0.6143, "tflops": 11.8, "samples": [0.6147, 0.6122, 0.6157, 0.6143, 0.6121], "peak_gb": 0.011}
+{"event": "time", "M": 128, "cand": "hum_grp", "ms": 0.6843, "tflops": 10.6, "samples": [0.6867, 0.6831, 0.6843, 0.6832, 0.6852], "peak_gb": 0.02}
+{"event": "time", "M": 128, "cand": "marlin", "ms": 0.6794, "tflops": 10.7, "samples": [0.6794, 0.6791, 0.678, 0.6816, 0.6801], "peak_gb": 0.017}
+{"event": "time", "M": 128, "cand": "hum_idx", "ms": 0.6143, "tflops": 11.8, "samples": [0.6124, 0.612, 0.6143, 0.6159, 0.6146], "peak_gb": 0.011}
+{"event": "time", "M": 128, "cand": "hum_grp", "ms": 0.6837, "tflops": 10.6, "samples": [0.6826, 0.6826, 0.6839, 0.6854, 0.6837], "peak_gb": 0.02}
+{"event": "time", "M": 2048, "cand": "marlin", "ms": 1.5056, "tflops": 77.0, "samples": [1.4844, 1.4987, 1.5063, 1.5066, 1.5056], "peak_gb": 0.198}
+{"event": "time", "M": 2048, "cand": "hum_idx", "ms": 1.317, "tflops": 88.0, "samples": [1.301, 1.3065, 1.3186, 1.317, 1.3181], "peak_gb": 0.168}
+{"event": "time", "M": 2048, "cand": "hum_grp", "ms": 1.5256, "tflops": 76.0, "samples": [1.5332, 1.5341, 1.5256, 1.4934, 1.4906], "peak_gb": 0.319}
+{"event": "time", "M": 2048, "cand": "marlin", "ms": 1.5047, "tflops": 77.1, "samples": [1.5045, 1.5095, 1.5091, 1.5034, 1.5047], "peak_gb": 0.198}
+{"event": "time", "M": 2048, "cand": "hum_idx", "ms": 1.3161, "tflops": 88.1, "samples": [1.2833, 1.3094, 1.3161, 1.3266, 1.3319], "peak_gb": 0.168}
+{"event": "time", "M": 2048, "cand": "hum_grp", "ms": 1.5077, "tflops": 76.9, "samples": [1.5203, 1.5077, 1.5077, 1.5046, 1.5045], "peak_gb": 0.319}
+{"event": "time", "M": 8192, "cand": "marlin", "ms": 5.8168, "tflops": 79.7, "samples": [5.8064, 5.8251, 5.8156, 5.8294, 5.8168], "peak_gb": 0.793}
+{"event": "time", "M": 8192, "cand": "hum_idx", "ms": 3.5295, "tflops": 131.4, "samples": [3.5079, 3.5303, 3.5295, 3.5337, 3.5292], "peak_gb": 0.672}
+{"event": "time", "M": 8192, "cand": "hum_grp", "ms": 3.9761, "tflops": 116.7, "samples": [3.966, 3.9761, 3.9699, 3.9882, 4.0092], "peak_gb": 1.275}
+{"event": "time", "M": 8192, "cand": "marlin", "ms": 5.8203, "tflops": 79.7, "samples": [5.8134, 5.8218, 5.8203, 5.8093, 5.8343], "peak_gb": 0.793}
+{"event": "time", "M": 8192, "cand": "hum_idx", "ms": 3.5323, "tflops": 131.3, "samples": [3.5114, 3.5323, 3.5422, 3.5319, 3.5662], "peak_gb": 0.672}
+{"event": "time", "M": 8192, "cand": "hum_grp", "ms": 3.9743, "tflops": 116.7, "samples": [3.9746, 3.9743, 3.967, 3.9754, 3.9683], "peak_gb": 1.275}
+{"event": "time", "M": 16384, "cand": "marlin", "ms": 11.4018, "tflops": 81.4, "samples": [11.4018, 11.4093, 11.4057, 11.3925, 11.393], "peak_gb": 1.586}
+{"event": "time", "M": 16384, "cand": "hum_idx", "ms": 6.9426, "tflops": 133.6, "samples": [6.9301, 6.9377, 6.9426, 6.9553, 6.9766], "peak_gb": 1.343}
+{"event": "time", "M": 16384, "cand": "hum_grp", "ms": 7.759, "tflops": 119.6, "samples": [7.7585, 7.805, 7.8082, 7.7558, 7.759], "peak_gb": 2.551}
+{"event": "time", "M": 16384, "cand": "marlin", "ms": 11.428, "tflops": 81.2, "samples": [11.4216, 11.4332, 11.4412, 11.428, 11.41], "peak_gb": 1.586}
+{"event": "time", "M": 16384, "cand": "hum_idx", "ms": 6.9657, "tflops": 133.2, "samples": [6.9341, 6.9405, 6.9798, 6.9657, 6.9914], "peak_gb": 1.343}
+{"event": "time", "M": 16384, "cand": "hum_grp", "ms": 7.7916, "tflops": 119.1, "samples": [7.7716, 7.8168, 7.8251, 7.7916, 7.7864], "peak_gb": 2.551}
+{"event": "done", "mode": "humming"}

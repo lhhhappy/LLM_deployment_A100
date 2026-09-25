@@ -1,0 +1,29 @@
+37e9002368390fefc92621ea8b18f73e86429596
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+{"phase": "base", "setup_s": 2.6, "torch": "2.13.0+cu130", "triton": "3.7.1", "gpu": "NVIDIA A100-SXM4-80GB", "deq_triton_equals_torch": true, "commit": "37e9002368390fefc92621ea8b18f73e86429596"}
+{"kind": "dequant_variant", "TN": 16, "TK": 128, "warps": 2, "ms": 1.773}
+{"kind": "dequant_variant", "TN": 16, "TK": 128, "warps": 4, "ms": 1.79}
+{"kind": "dequant_variant", "TN": 16, "TK": 128, "warps": 8, "ms": 1.977}
+{"kind": "dequant_variant", "TN": 32, "TK": 128, "warps": 2, "ms": 1.755}
+{"kind": "dequant_variant", "TN": 32, "TK": 128, "warps": 4, "ms": 1.749}
+{"kind": "dequant_variant", "TN": 32, "TK": 128, "warps": 8, "ms": 1.729}
+{"kind": "dequant_variant", "TN": 64, "TK": 128, "warps": 2, "ms": 1.775}
+{"kind": "dequant_variant", "TN": 64, "TK": 128, "warps": 4, "ms": 1.785}
+{"kind": "dequant_variant", "TN": 64, "TK": 128, "warps": 8, "ms": 1.768}
+{"kind": "dequant_variant", "TN": 128, "TK": 128, "warps": 2, "ms": 3.361}
+{"kind": "dequant_variant", "TN": 128, "TK": 128, "warps": 4, "ms": 1.814}
+{"kind": "dequant_variant", "TN": 128, "TK": 128, "warps": 8, "ms": 1.755}
+{"kind": "dequant", "best_TN": 32, "best_warps": 8, "ms_both": 1.729, "ms_w13": 1.162, "ms_w2": 0.574, "GB_moved": 2.727, "TBps": 1.578, "torch_ms_both": 12.648, "bf16_buffer_GB": 1.818}
+{"kind": "ceiling", "M": 2048, "dense_gemm1_ms": 0.314, "dense_gemm2_ms": 0.209, "dense_ms": 0.523, "dense_TF": 221.9, "dense_gemm1_TF": 246.2, "dense_gemm2_TF": 185.2, "bmm_uniform_rows": 64, "bmm_uniform_ms": 1.325, "bmm_uniform_TF": 87.5, "bmm_routed_rows": 57, "bmm_routed_plus_shared_ms": 1.399, "bmm_routed_plus_shared_TF": 82.9, "shared_dense_ms": 0.097}
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/ep8/src/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=289,N=256,device_name=NVIDIA_A100-SXM4-80GB.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+Using default MoE kernel config. Performance might be sub-optimal! Config file not found at /sjtu/linhang/arena/runs/ep8/src/sglang/srt/layers/moe/moe_runner/triton_utils/configs/triton_3_7_1/E=289,N=256,device_name=NVIDIA_A100-SXM4-80GB_down.json, you can create them with https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton
+{"kind": "paths", "M": 2048, "marlin_ms": 1.439, "marlin_TF": 80.6, "marlin_top8_no_shared_ms": 1.347, "triton_default_ms": 2.05, "triton_default_TF": 56.6, "default_cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "cfg_engine_used": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "triton_default_stages": {"align": 0.052, "gemm1": 1.363, "act": 0.029, "gemm2": 0.559, "sum": 0.103}, "flops": 115964116992}
+{"kind": "numerics", "M": 2048, "label": "default", "rel_err_bf16": 0.004782, "rel_err_marlin": 0.00578, "bf16_repeat_bitwise_equal": true, "neg_scale_of_other_expert": 0.1707, "neg_expert_id_shift": 0.6082}
+{"kind": "ceiling", "M": 8192, "dense_gemm1_ms": 1.135, "dense_gemm2_ms": 0.863, "dense_ms": 1.998, "dense_TF": 232.2, "dense_gemm1_TF": 272.5, "dense_gemm2_TF": 179.1, "bmm_uniform_rows": 256, "bmm_uniform_ms": 2.718, "bmm_uniform_TF": 170.7, "bmm_routed_rows": 228, "bmm_routed_plus_shared_ms": 2.923, "bmm_routed_plus_shared_TF": 158.7, "shared_dense_ms": 0.33}
+{"kind": "paths", "M": 8192, "marlin_ms": 5.536, "marlin_TF": 83.8, "marlin_top8_no_shared_ms": 5.014, "triton_default_ms": 5.307, "triton_default_TF": 87.4, "default_cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "cfg_engine_used": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "triton_default_stages": {"align": 0.05, "gemm1": 3.219, "act": 0.074, "gemm2": 1.59, "sum": 0.389}, "flops": 463856467968}
+{"kind": "numerics", "M": 8192, "label": "default", "rel_err_bf16": 0.004754, "rel_err_marlin": 0.005706, "bf16_repeat_bitwise_equal": true, "neg_scale_of_other_expert": 0.1736, "neg_expert_id_shift": 0.5944}
+{"kind": "ceiling", "M": 16384, "dense_gemm1_ms": 2.429, "dense_gemm2_ms": 1.74, "dense_ms": 4.169, "dense_TF": 222.5, "dense_gemm1_TF": 254.6, "dense_gemm2_TF": 177.8, "bmm_uniform_rows": 511, "bmm_uniform_ms": 5.124, "bmm_uniform_TF": 181.0, "bmm_routed_rows": 456, "bmm_routed_plus_shared_ms": 5.435, "bmm_routed_plus_shared_TF": 170.7, "shared_dense_ms": 0.542}
+{"kind": "paths", "M": 16384, "marlin_ms": 10.859, "marlin_TF": 85.4, "marlin_top8_no_shared_ms": 9.81, "triton_default_ms": 11.292, "triton_default_TF": 82.2, "default_cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "cfg_engine_used": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 8}, "triton_default_stages": {"align": 0.094, "gemm1": 6.994, "act": 0.141, "gemm2": 3.336, "sum": 0.768}, "flops": 927712935936}
+{"kind": "numerics", "M": 16384, "label": "default", "rel_err_bf16": 0.004713, "rel_err_marlin": 0.005803, "bf16_repeat_bitwise_equal": true, "neg_scale_of_other_expert": 0.1684, "neg_expert_id_shift": 0.5645}
+DONE
+[rank0]:[W925 16:45:12.517407534 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

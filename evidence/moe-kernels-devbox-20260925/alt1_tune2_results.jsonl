@@ -1,0 +1,512 @@
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.4135, "8192": 2.2049, "16384": 4.059}, "t": 0}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.5424, "8192": 1.4242, "16384": 2.7364}, "t": 0}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.4107, "8192": 2.0265, "16384": 3.4881}, "t": 1}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.544, "8192": 1.3911, "16384": 2.5679}, "t": 1}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8585, "8192": 2.5565, "16384": 4.8383}, "t": 1}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.7108, "8192": 2.3035, "16384": 4.3942}, "t": 1}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.8881, "8192": 1.844, "16384": 3.7121}, "t": 1}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.7038, "8192": 2.1861, "16384": 4.1609}, "t": 1}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.0304, "8192": 2.1399, "16384": 4.1867}, "t": 2}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.7091, "8192": 1.4421, "16384": 2.7592}, "t": 2}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.8978, "8192": 2.4093, "16384": 4.7816}, "t": 2}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.6363, "8192": 1.9885, "16384": 3.7221}, "t": 2}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.7146, "8192": 2.0171, "16384": 3.9797}, "t": 3}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.2641, "8192": 1.5668, "16384": 2.9101}, "t": 4}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.5269, "8192": 2.0002, "16384": 3.6899}, "t": 5}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.1189, "8192": 1.4381, "16384": 2.7605}, "t": 5}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 102.1245, "8192": 117.2076, "16384": 212.9656}, "t": 37}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 53.1263, "8192": 59.5211, "16384": 115.4335}, "t": 46}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.2309, "8192": 2.5369, "16384": 4.7212}, "t": 46}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.6121, "8192": 1.6932, "16384": 3.1825}, "t": 46}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.4015, "8192": 2.0335, "16384": 3.4759}, "t": 46}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.5384, "8192": 1.3457, "16384": 2.5202}, "t": 46}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.3436, "8192": 1.9853, "16384": 3.5283}, "t": 47}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.6358, "8192": 1.3544, "16384": 2.6359}, "t": 47}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8802, "8192": 2.5085, "16384": 4.8179}, "t": 47}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.7773, "8192": 2.4902, "16384": 4.7035}, "t": 47}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.9216, "8192": 2.0663, "16384": 4.1786}, "t": 47}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.7754, "8192": 1.6571, "16384": 3.2148}, "t": 47}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.9233, "8192": 2.9063, "16384": 5.4675}, "t": 48}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.1761, "8192": 3.9486, "16384": 7.4946}, "t": 48}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8763, "8192": 1.6375, "16384": 3.2706}, "t": 48}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.6086, "8192": 1.2091, "16384": 2.3462}, "t": 48}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.2161, "8192": 2.8979, "16384": 6.5498}, "t": 49}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.7523, "8192": 1.6924, "16384": 3.6666}, "t": 49}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.958, "8192": 2.0773, "16384": 4.0274}, "t": 49}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.7984, "8192": 2.0668, "16384": 3.8499}, "t": 49}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9032, "8192": 2.1727, "16384": 4.152}, "t": 49}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.5645, "8192": 1.4682, "16384": 2.7643}, "t": 49}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.3079, "8192": 2.323, "16384": 4.5193}, "t": 50}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.6107, "8192": 1.8734, "16384": 3.5656}, "t": 50}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.5866, "8192": 1.9104, "16384": 3.574}, "t": 51}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.1715, "8192": 1.4704, "16384": 2.7416}, "t": 52}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.1184, "8192": 2.3294, "16384": 4.4916}, "t": 52}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8787, "8192": 1.9184, "16384": 3.6971}, "t": 52}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 108.6622, "8192": 123.4301, "16384": 225.5179}, "t": 85}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 57.2814, "8192": 64.1542, "16384": 124.3803}, "t": 95}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.3458, "8192": 3.1841, "16384": 6.9219}, "t": 95}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.6076, "8192": 1.9592, "16384": 3.8105}, "t": 95}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8981, "8192": 1.6104, "16384": 3.3702}, "t": 95}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.6132, "8192": 1.4187, "16384": 2.6856}, "t": 96}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.9039, "8192": 2.7621, "16384": 5.2651}, "t": 96}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.6659, "8192": 2.0958, "16384": 3.9284}, "t": 96}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9006, "8192": 1.8909, "16384": 3.6539}, "t": 96}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.7103, "8192": 1.4625, "16384": 2.8109}, "t": 96}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9428, "8192": 2.1746, "16384": 4.2591}, "t": 96}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9095, "8192": 1.89, "16384": 3.6448}, "t": 97}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.3004, "8192": 3.1735, "16384": 6.9608}, "t": 97}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.5714, "8192": 1.6963, "16384": 3.6118}, "t": 97}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.925, "8192": 2.8817, "16384": 5.4105}, "t": 97}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.218, "8192": 4.0924, "16384": 7.7707}, "t": 98}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 91.0475, "8192": 102.5146, "16384": 198.7828}, "t": 113}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 50.9072, "8192": 57.1928, "16384": 111.6703}, "t": 120}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.5458, "8192": 1.8503, "16384": 3.887}, "t": 121}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.2344, "8192": 1.5519, "16384": 2.9841}, "t": 122}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.9329, "8192": 2.8871, "16384": 5.4269}, "t": 122}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.1744, "8192": 3.8096, "16384": 7.2542}, "t": 123}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.9493, "8192": 1.8908, "16384": 3.6522}, "t": 123}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.7896, "8192": 1.6794, "16384": 3.2551}, "t": 123}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 90.7861, "8192": 102.3605, "16384": 199.1171}, "t": 137}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 50.5375, "8192": 56.7727, "16384": 110.8757}, "t": 144}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.5525, "8192": 2.0769, "16384": 3.7085}, "t": 145}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.1082, "8192": 1.4005, "16384": 2.6623}, "t": 146}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9802, "8192": 1.999, "16384": 3.8063}, "t": 146}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.6079, "8192": 1.2575, "16384": 2.4184}, "t": 146}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 142.058, "8192": 157.1726, "16384": 298.184}, "t": 182}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 71.5292, "8192": 79.7799, "16384": 155.2573}, "t": 193}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.9475, "8192": 2.0269, "16384": 4.2044}, "t": 194}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.7653, "8192": 1.6319, "16384": 3.1538}, "t": 194}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4792, "8192": 2.7898, "16384": 5.0244}, "t": 194}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8205, "8192": 1.7427, "16384": 3.3779}, "t": 194}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8691, "8192": 2.3895, "16384": 4.5922}, "t": 194}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.7741, "8192": 2.5287, "16384": 4.8054}, "t": 195}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 2.0201, "8192": 2.559, "16384": 4.7138}, "t": 195}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.59, "8192": 2.1033, "16384": 3.8815}, "t": 196}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 93.836, "8192": 105.5909, "16384": 201.0203}, "t": 211}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 50.0496, "8192": 56.0123, "16384": 109.2199}, "t": 218}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.8822, "8192": 1.7748, "16384": 3.6955}, "t": 218}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.6074, "8192": 1.6647, "16384": 3.1401}, "t": 218}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4049, "8192": 2.545, "16384": 4.7153}, "t": 219}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.575, "8192": 1.5771, "16384": 2.9008}, "t": 219}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 54.4681, "8192": 116.2121, "16384": 228.1217}, "t": 229}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 25.9229, "8192": 55.4533, "16384": 108.8679}, "t": 233}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.3047, "8192": 2.0129, "16384": 3.7771}, "t": 234}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.605, "8192": 1.2689, "16384": 2.4616}, "t": 234}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8657, "8192": 2.2588, "16384": 4.3627}, "t": 234}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.5801, "8192": 1.5802, "16384": 2.9974}, "t": 234}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 105.6127, "8192": 112.5462, "16384": 210.7605}, "t": 266}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 54.0474, "8192": 60.3296, "16384": 117.5882}, "t": 275}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4138, "8192": 2.5727, "16384": 4.7649}, "t": 275}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.827, "8192": 2.5906, "16384": 4.8786}, "t": 276}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8583, "8192": 2.0695, "16384": 4.0686}, "t": 276}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8075, "8192": 2.5792, "16384": 4.8681}, "t": 276}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.3051, "8192": 3.2387, "16384": 7.0047}, "t": 276}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.626, "8192": 1.9347, "16384": 3.7698}, "t": 276}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4786, "8192": 3.6806, "16384": 7.1786}, "t": 277}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.74, "8192": 2.2611, "16384": 4.2611}, "t": 277}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.9014, "8192": 1.8719, "16384": 3.7192}, "t": 277}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.8273, "8192": 1.8167, "16384": 3.5179}, "t": 277}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.8641, "8192": 2.4452, "16384": 4.6969}, "t": 277}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.6628, "8192": 1.9855, "16384": 3.7905}, "t": 278}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 2.5537, "8192": 3.0476, "16384": 5.8022}, "t": 278}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.7878, "8192": 2.1887, "16384": 4.0667}, "t": 279}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.8798, "8192": 2.2266, "16384": 4.335}, "t": 279}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.7871, "8192": 2.4597, "16384": 4.6372}, "t": 280}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.3525, "8192": 3.2175, "16384": 7.0477}, "t": 280}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.5542, "8192": 1.5884, "16384": 3.4846}, "t": 280}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.4591, "8192": 2.7884, "16384": 6.3507}, "t": 281}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.0705, "8192": 1.4134, "16384": 3.185}, "t": 282}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9239, "8192": 2.2673, "16384": 4.4076}, "t": 282}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.5749, "8192": 1.4931, "16384": 2.8218}, "t": 282}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 2.0574, "8192": 2.3549, "16384": 4.6111}, "t": 283}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.818, "8192": 2.2244, "16384": 4.2329}, "t": 284}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8676, "8192": 1.7354, "16384": 3.2234}, "t": 284}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.6758, "8192": 1.4407, "16384": 2.7582}, "t": 285}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 44.8029, "8192": 96.2431, "16384": 188.3773}, "t": 293}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 24.1749, "8192": 51.5181, "16384": 101.5876}, "t": 297}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.2856, "8192": 2.3578, "16384": 4.5941}, "t": 297}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.8075, "8192": 1.7511, "16384": 3.3761}, "t": 297}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 86.5528, "8192": 100.5173, "16384": 187.1358}, "t": 312}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 48.4866, "8192": 54.4314, "16384": 106.0776}, "t": 319}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.2771, "8192": 2.5919, "16384": 4.7399}, "t": 319}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.654, "8192": 1.9066, "16384": 3.5899}, "t": 319}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.3064, "8192": 2.0246, "16384": 3.812}, "t": 320}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.5997, "8192": 1.2502, "16384": 2.4481}, "t": 320}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.5236, "8192": 2.7814, "16384": 6.3568}, "t": 321}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.0411, "8192": 1.3837, "16384": 3.1473}, "t": 322}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.9332, "8192": 2.4705, "16384": 4.6322}, "t": 322}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.602, "8192": 1.7563, "16384": 3.3446}, "t": 322}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 2.0118, "8192": 2.8652, "16384": 6.3759}, "t": 323}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.2898, "8192": 1.6662, "16384": 3.3624}, "t": 323}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4551, "8192": 2.6116, "16384": 4.8295}, "t": 323}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.1607, "8192": 2.3535, "16384": 4.5065}, "t": 324}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.912, "8192": 1.8733, "16384": 3.7173}, "t": 324}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.8064, "8192": 1.7463, "16384": 3.3774}, "t": 324}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.0125, "8192": 2.2807, "16384": 4.458}, "t": 324}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.1039, "8192": 2.4994, "16384": 4.7594}, "t": 324}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.8936, "8192": 2.6358, "16384": 4.9968}, "t": 325}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.7501, "8192": 2.3594, "16384": 4.4184}, "t": 325}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 85.1824, "8192": 98.7898, "16384": 185.921}, "t": 338}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 46.9744, "8192": 52.7812, "16384": 102.7963}, "t": 345}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.3559, "8192": 1.9855, "16384": 3.5816}, "t": 345}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.6723, "8192": 1.4022, "16384": 2.7124}, "t": 346}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.8948, "8192": 1.9344, "16384": 3.8807}, "t": 346}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.5954, "8192": 1.7106, "16384": 3.1653}, "t": 346}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8894, "8192": 2.4899, "16384": 4.7869}, "t": 346}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.6518, "8192": 1.972, "16384": 3.6784}, "t": 346}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.2718, "8192": 2.8732, "16384": 6.6603}, "t": 346}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.5893, "8192": 1.4072, "16384": 3.4214}, "t": 347}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.3743, "8192": 2.946, "16384": 6.5625}, "t": 347}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.7949, "8192": 1.7584, "16384": 3.6093}, "t": 347}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.5217, "8192": 2.9161, "16384": 6.5168}, "t": 348}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.1331, "8192": 1.5615, "16384": 3.3916}, "t": 348}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 89.6275, "8192": 101.21, "16384": 191.9739}, "t": 363}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 48.1755, "8192": 54.0325, "16384": 105.1752}, "t": 370}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 45.7532, "8192": 99.3155, "16384": 193.3289}, "t": 378}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 25.4037, "8192": 54.3746, "16384": 107.3037}, "t": 383}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.8724, "8192": 1.8651, "16384": 3.7854}, "t": 383}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.6442, "8192": 1.9603, "16384": 3.7014}, "t": 383}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.9008, "8192": 1.9241, "16384": 4.0043}, "t": 383}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.6655, "8192": 1.4054, "16384": 2.7556}, "t": 383}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 88.4051, "8192": 100.6737, "16384": 192.1931}, "t": 397}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 48.2012, "8192": 54.0994, "16384": 105.382}, "t": 404}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.2932, "8192": 2.3618, "16384": 4.636}, "t": 404}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.5897, "8192": 1.7155, "16384": 3.1652}, "t": 405}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4744, "8192": 3.6844, "16384": 6.828}, "t": 405}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.7429, "8192": 2.2784, "16384": 4.3089}, "t": 405}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 90.1834, "8192": 103.2251, "16384": 193.7907}, "t": 420}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 49.1886, "8192": 55.1579, "16384": 107.4773}, "t": 427}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.5322, "8192": 2.0064, "16384": 3.7418}, "t": 428}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.1262, "8192": 1.4238, "16384": 2.7272}, "t": 429}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.9183, "8192": 2.4754, "16384": 4.6591}, "t": 429}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.5971, "8192": 1.787, "16384": 3.2993}, "t": 430}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 48.979, "8192": 104.6571, "16384": 200.3863}, "t": 438}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 25.8315, "8192": 55.0865, "16384": 108.6428}, "t": 443}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8753, "8192": 2.4787, "16384": 4.6903}, "t": 443}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.8947, "8192": 2.9315, "16384": 5.5017}, "t": 444}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.3041, "8192": 2.3947, "16384": 4.7091}, "t": 444}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.5867, "8192": 1.7538, "16384": 3.2042}, "t": 444}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.6409, "8192": 1.9644, "16384": 3.9797}, "t": 445}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.4458, "8192": 1.9142, "16384": 3.585}, "t": 445}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.2643, "8192": 2.8209, "16384": 6.5691}, "t": 446}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.6524, "8192": 1.5008, "16384": 3.3876}, "t": 446}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.5213, "8192": 2.9513, "16384": 6.4817}, "t": 446}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.1068, "8192": 1.5328, "16384": 3.3753}, "t": 447}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4165, "8192": 3.2296, "16384": 6.9025}, "t": 447}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.6281, "8192": 1.8811, "16384": 3.6507}, "t": 447}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4333, "8192": 2.4929, "16384": 4.6215}, "t": 448}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.6629, "8192": 1.3911, "16384": 2.6858}, "t": 448}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.4437, "8192": 2.599, "16384": 4.808}, "t": 448}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8554, "8192": 1.7909, "16384": 3.4122}, "t": 448}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.9106, "8192": 1.8543, "16384": 3.6375}, "t": 448}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.8449, "8192": 1.8393, "16384": 3.5604}, "t": 448}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.3154, "8192": 2.369, "16384": 4.6575}, "t": 449}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.605, "8192": 1.8738, "16384": 3.571}, "t": 449}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4123, "8192": 2.8859, "16384": 5.4783}, "t": 449}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.9303, "8192": 1.9638, "16384": 3.7634}, "t": 449}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.8823, "8192": 2.3623, "16384": 4.5249}, "t": 449}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.7432, "8192": 2.4151, "16384": 4.5783}, "t": 450}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.3387, "8192": 3.255, "16384": 7.0512}, "t": 450}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.5642, "8192": 1.6146, "16384": 3.479}, "t": 450}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.4552, "8192": 2.8199, "16384": 6.3588}, "t": 451}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.0741, "8192": 1.4336, "16384": 3.2348}, "t": 452}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 142.0633, "8192": 157.1717, "16384": 298.2372}, "t": 488}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 71.5253, "8192": 79.7749, "16384": 155.2429}, "t": 499}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.3403, "8192": 3.2173, "16384": 6.9922}, "t": 500}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.6136, "8192": 1.9977, "16384": 3.8535}, "t": 500}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.887, "8192": 1.7343, "16384": 3.5916}, "t": 500}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.6116, "8192": 1.6573, "16384": 3.0862}, "t": 500}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 89.633, "8192": 101.2356, "16384": 192.0053}, "t": 514}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 45.9497, "8192": 51.4717, "16384": 100.1141}, "t": 521}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.9601, "8192": 2.8338, "16384": 6.3214}, "t": 522}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.3385, "8192": 1.6924, "16384": 3.4242}, "t": 523}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.841, "8192": 1.8662, "16384": 3.8066}, "t": 523}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.6465, "8192": 1.8688, "16384": 3.5328}, "t": 523}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.2429, "8192": 2.859, "16384": 6.5309}, "t": 523}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.6049, "8192": 1.395, "16384": 3.3568}, "t": 523}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.9188, "8192": 2.0244, "16384": 4.043}, "t": 524}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.7808, "8192": 1.6563, "16384": 3.186}, "t": 524}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.3926, "8192": 2.1928, "16384": 4.1821}, "t": 524}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.5447, "8192": 1.4217, "16384": 2.6813}, "t": 524}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.2819, "8192": 2.0146, "16384": 3.7793}, "t": 524}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.5994, "8192": 1.2461, "16384": 2.4346}, "t": 524}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4711, "8192": 3.0596, "16384": 5.7995}, "t": 525}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8114, "8192": 1.7321, "16384": 3.3415}, "t": 525}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.8565, "8192": 2.3001, "16384": 4.3739}, "t": 525}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.648, "8192": 1.8955, "16384": 3.5815}, "t": 525}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.4028, "8192": 1.7246, "16384": 3.3245}, "t": 526}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.1037, "8192": 1.3923, "16384": 2.6626}, "t": 527}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.356, "8192": 2.0277, "16384": 3.5142}, "t": 527}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.5525, "8192": 1.4412, "16384": 2.5269}, "t": 527}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.9528, "8192": 2.7261, "16384": 5.0856}, "t": 527}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.6279, "8192": 1.9378, "16384": 3.6084}, "t": 528}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.1353, "8192": 2.4603, "16384": 4.7915}, "t": 528}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 1.1335, "8192": 2.6081, "16384": 4.9939}, "t": 528}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4177, "8192": 2.8634, "16384": 6.6429}, "t": 528}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.6769, "8192": 1.4579, "16384": 3.2591}, "t": 528}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8565, "8192": 2.2182, "16384": 4.2659}, "t": 529}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.6109, "8192": 1.7463, "16384": 3.3229}, "t": 529}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 1.2163, "8192": 2.3206, "16384": 4.5886}, "t": 529}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 5}, "ms": {"2048": 0.8112, "8192": 1.738, "16384": 3.3873}, "t": 529}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.0795, "8192": 2.2577, "16384": 4.1391}, "t": 529}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.7208, "8192": 1.5587, "16384": 3.0332}, "t": 529}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.5852, "8192": 2.9095, "16384": 6.4916}, "t": 530}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.1087, "8192": 1.5001, "16384": 3.3002}, "t": 531}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.9323, "8192": 2.865, "16384": 5.3702}, "t": 531}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 1.1946, "8192": 3.9871, "16384": 7.5921}, "t": 531}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.3194, "8192": 2.2152, "16384": 4.1825}, "t": 531}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 0.5517, "8192": 1.4288, "16384": 2.6884}, "t": 532}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.0375, "8192": 2.2102, "16384": 4.3651}, "t": 532}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.1239, "8192": 2.538, "16384": 4.9392}, "t": 532}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.8584, "8192": 1.9449, "16384": 3.8793}, "t": 532}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.5923, "8192": 1.6614, "16384": 3.0867}, "t": 532}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.5767, "8192": 3.1217, "16384": 6.7315}, "t": 533}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.0774, "8192": 2.3306, "16384": 4.5135}, "t": 533}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4055, "8192": 2.8423, "16384": 5.3132}, "t": 533}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 0.5946, "8192": 1.6707, "16384": 3.1462}, "t": 533}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 101.1091, "8192": 115.5196, "16384": 223.8967}, "t": 549}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 50.7038, "8192": 57.4314, "16384": 111.9596}, "t": 557}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.2129, "8192": 2.5253, "16384": 4.8191}, "t": 557}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.8865, "8192": 1.8251, "16384": 3.4547}, "t": 557}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.877, "8192": 2.1461, "16384": 4.1921}, "t": 557}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.7962, "8192": 2.5877, "16384": 4.8913}, "t": 558}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 101.1661, "8192": 118.6662, "16384": 230.882}, "t": 574}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 52.3029, "8192": 59.2748, "16384": 115.5009}, "t": 582}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.9509, "8192": 2.8126, "16384": 5.3018}, "t": 582}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 0.6659, "8192": 2.0912, "16384": 3.9866}, "t": 582}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.8988, "8192": 1.8563, "16384": 3.6234}, "t": 582}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 5}, "ms": {"2048": 0.8508, "8192": 1.8912, "16384": 3.6385}, "t": 582}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.6413, "8192": 1.9249, "16384": 3.9682}, "t": 583}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.4356, "8192": 1.8223, "16384": 3.4415}, "t": 584}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.1958, "8192": 2.5345, "16384": 4.9755}, "t": 584}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 1.3165, "8192": 2.8597, "16384": 5.5578}, "t": 584}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 1.2854, "8192": 2.0727, "16384": 3.5825}, "t": 584}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 3}, "ms": {"2048": 0.6613, "8192": 1.3605, "16384": 2.6261}, "t": 585}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.7552, "8192": 2.1698, "16384": 4.2624}, "t": 586}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 128, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 1.4452, "8192": 1.8146, "16384": 3.4769}, "t": 587}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 2.3472, "8192": 2.864, "16384": 5.2179}, "t": 588}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 2}, "ms": {"2048": 1.4078, "8192": 1.8003, "16384": 3.3012}, "t": 589}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 1.2198, "8192": 2.8998, "16384": 6.6075}, "t": 589}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 8, "num_stages": 4}, "ms": {"2048": 0.7496, "8192": 1.6791, "16384": 3.5862}, "t": 590}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.8856, "8192": 2.2304, "16384": 4.3636}, "t": 590}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 64, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 4}, "ms": {"2048": 0.6195, "8192": 1.8184, "16384": 3.4202}, "t": 590}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 59.6203, "8192": 126.2232, "16384": 247.601}, "t": 601}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 64, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 3}, "ms": {"2048": 29.2187, "8192": 62.5079, "16384": 123.2349}, "t": 606}
+{"gemm": 1, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 46.3423, "8192": 98.5818, "16384": 195.0534}, "t": 614}
+{"gemm": 2, "cfg": {"BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "BLOCK_SIZE_K": 32, "GROUP_SIZE_M": 1, "num_warps": 4, "num_stages": 2}, "ms": {"2048": 25.626, "8192": 55.0002, "16384": 108.6237}, "t": 619}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 0.8448}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 0.8457}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 0.8466}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 0.8469}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 2, "num_warps": 8}, "ms": 0.8581}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 2, "num_warps": 8}, "ms": 0.8609}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 2, "num_warps": 8}, "ms": 0.8666}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 2, "num_warps": 8}, "ms": 0.8783}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 2, "num_warps": 4}, "ms": 0.8614}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 2, "num_warps": 4}, "ms": 0.8626}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 2, "num_warps": 4}, "ms": 0.8674}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 128, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 2, "num_warps": 4}, "ms": 0.8748}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 0.877}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 0.8769}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 0.8745}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 0.8798}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 0.8869}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 0.8964}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 0.909}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 0.9184}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 0.9161}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 0.9194}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 0.9283}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 0.9433}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 1.4191}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 1.4011}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 1.4018}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 1.4044}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 1.4884}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 1.4896}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 1.4997}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 1.5196}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.4867}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.4988}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.5187}
+{"stage": 2, "gemm": 1, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.5444}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.7747}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.8205}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.7968}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.7985}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.8684}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.9012}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 2.0378}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 2.0025}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.9266}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.9273}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.9357}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.9733}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.7308}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.74}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.7423}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.786}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 1.8395}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 1.8008}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 1.7998}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 1.7984}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.8966}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.8718}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.8528}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.8814}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 1.8226}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 1.8014}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 1.802}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 1.8141}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.9717}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.9414}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 2.0226}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 2.39}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 2, "num_warps": 8}, "ms": 1.9729}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 2, "num_warps": 8}, "ms": 1.9541}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 2, "num_warps": 8}, "ms": 1.9568}
+{"stage": 2, "gemm": 1, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 2, "num_warps": 8}, "ms": 1.9764}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 3.3282}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 3.3158}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 3.3203}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 3.3259}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 3.527}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 3.5435}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 3.6868}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 3.6378}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 3.5337}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 3.5109}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 3.5362}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 3.6125}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 3.3252}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 3.2719}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 3.2757}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 3.3138}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 3.2274}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 3.2658}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 3.446}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 3.3541}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 8}, "ms": 3.6057}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 8}, "ms": 3.566}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 8}, "ms": 3.5815}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 8}, "ms": 3.613}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 3.3262}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 3.3239}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 3.3978}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 3.4822}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 2, "num_warps": 8}, "ms": 3.6593}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 2, "num_warps": 8}, "ms": 3.6389}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 2, "num_warps": 8}, "ms": 3.6497}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 2, "num_warps": 8}, "ms": 3.6938}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 8}, "ms": 3.7458}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 8}, "ms": 3.7708}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 8}, "ms": 4.1051}
+{"stage": 2, "gemm": 1, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 8}, "ms": 5.1296}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 0.5325}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 0.5316}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 0.5351}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 0.5314}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 0.5391}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 0.5395}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 0.5429}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 0.5379}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 0.5354}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 0.5349}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 0.537}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 0.5318}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 0.6028}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 0.5976}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 0.5991}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 0.5921}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 0.5904}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 0.5869}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 0.5886}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 0.5882}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 0.5777}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 0.5844}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 0.5872}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 0.5871}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.048}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.0374}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.0384}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.0417}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.0696}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.069}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.0721}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.0768}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 1.0718}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 1.0706}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 1.071}
+{"stage": 2, "gemm": 2, "M": 2048, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 1.0749}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.3271}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.3423}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.3457}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.3545}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 1.3921}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 1.3596}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 1.3737}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 1.3824}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.4323}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.3791}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.3819}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.6648}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.4025}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.1875}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.2013}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.21}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.2505}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.2394}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.2461}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.252}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 1.2602}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 1.2556}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 1.2624}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 1.2627}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 1.4264}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 1.4518}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 1.4391}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 64, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 1.4328}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 1.4077}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 1.3833}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 1.3828}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 1.6928}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 1.6868}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 1.3922}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 1.3976}
+{"stage": 2, "gemm": 2, "M": 8192, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 1.4391}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 4}, "ms": 2.92}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 4}, "ms": 2.8998}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 4}, "ms": 2.5001}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 4}, "ms": 2.5094}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 2.4838}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 2.4491}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 2.4755}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 2.4781}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 1, "num_stages": 5, "num_warps": 4}, "ms": 2.5873}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 8, "num_stages": 5, "num_warps": 4}, "ms": 2.5475}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 16, "num_stages": 5, "num_warps": 4}, "ms": 2.5619}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 64, "BLOCK_SIZE_N": 256, "GROUP_SIZE_M": 32, "num_stages": 5, "num_warps": 4}, "ms": 2.5984}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 2.3796}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 2.3318}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 2.3389}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 2.3407}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 2, "num_warps": 4}, "ms": 2.4508}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 2, "num_warps": 4}, "ms": 2.3924}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 2, "num_warps": 4}, "ms": 2.4151}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 2, "num_warps": 4}, "ms": 2.8867}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 4}, "ms": 2.6364}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 4}, "ms": 2.3738}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 4}, "ms": 2.3844}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 128, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 4}, "ms": 2.396}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 2.697}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 2.6717}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 2.6744}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 2.7266}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 3, "num_warps": 8}, "ms": 2.6637}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 3, "num_warps": 8}, "ms": 2.6525}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 3, "num_warps": 8}, "ms": 2.6513}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 64, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 3, "num_warps": 8}, "ms": 2.6768}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 1, "num_stages": 4, "num_warps": 8}, "ms": 2.7188}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 8, "num_stages": 4, "num_warps": 8}, "ms": 2.6871}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 16, "num_stages": 4, "num_warps": 8}, "ms": 2.6937}
+{"stage": 2, "gemm": 2, "M": 16384, "cfg": {"BLOCK_SIZE_K": 32, "BLOCK_SIZE_M": 256, "BLOCK_SIZE_N": 128, "GROUP_SIZE_M": 32, "num_stages": 4, "num_warps": 8}, "ms": 2.7225}
