@@ -1,0 +1,31 @@
+{
+  "jobs": [
+    "079-opening_q2_srpt300_cold6144_n26",
+    "080-opening_q2_srpt300_cold8192_n26"
+  ],
+  "status": "Published after078 drained; verified and resumed",
+  "gpu_deployment_pid": 238807,
+  "gpu_watcher_pids": [
+    239856,
+    239857
+  ],
+  "local_bridge_pids": [
+    62747,
+    62748
+  ],
+  "engine_commit": "37e9002368390fefc92621ea8b18f73e86429596",
+  "tools_commit": "b46d5642a0bc3e43d729380db4ea58224d844466",
+  "config_commit": "e8c4801d6ecaae700f6310092ce45cf5ff64701f",
+  "bundle": "build/queue/opening-q2bc-20260925-6144-8192",
+  "runtime_identical_to078": true,
+  "capacity": {
+    "utc": "2026-09-25T14:34:22.323508+00:00",
+    "workspace": "/dev/shm/arena-runtime/ax",
+    "workspace_bytes": 13941227520,
+    "cgroup_used_bytes": 893822590976,
+    "cgroup_limit_bytes": 1620276412416,
+    "memory_failcnt": 0,
+    "pod_ephemeral_limit_gib": 20,
+    "payload_bytes": 487770
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "result": "PASS",
+  "data": "Stored real075 sources/raw; baselines074 and073",
+  "first_baseline": "074-official_0925a_opening_n26",
+  "first_common": 360,
+  "second_baseline": "073-official_0925a_opening_n22",
+  "second_common": 326,
+  "output_paths_distinct": true,
+  "original_counts_preserved": true,
+  "tool_commit": "b46d5642a0bc3e43d729380db4ea58224d844466"
+}

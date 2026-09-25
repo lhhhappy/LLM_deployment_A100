@@ -1,0 +1,34 @@
+{
+  "checked_utc": "2026-09-25T14:40:41.537225+00:00",
+  "engine_commit": "37e9002368390fefc92621ea8b18f73e86429596",
+  "engine_parent": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "engine_worktree_clean": true,
+  "engine_code_files": [
+    "engine/sglang/srt/managers/ax_rank0_decision.py",
+    "engine/sglang/srt/managers/schedule_policy.py",
+    "engine/sglang/srt/managers/scheduler.py"
+  ],
+  "tools_commit": "b46d5642a0bc3e43d729380db4ea58224d844466",
+  "config_commit": "e8c4801d6ecaae700f6310092ce45cf5ff64701f",
+  "commit_scopes_exact": true,
+  "owned_tool_and_job_paths_clean": true,
+  "main_worktree_clean": false,
+  "source_of_runtime": "fixed git G_COMMIT; working-tree engine files are not exported",
+  "runtime_files_identical_to_078": 30,
+  "image_id": 165463,
+  "image_url": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925b",
+  "image_code_sha_matches_git": true,
+  "validation": [
+    "Review final engine delta: only123 RID-order broadcast and wiring",
+    "12 existing monitor tests pass",
+    "Stored real075 data: two distinct baselines preserve prior074 comparison counts",
+    "079/080 effective configuration equals076 except COLD_CAP",
+    "git show --check passed for tool/config commits"
+  ],
+  "excluded": [
+    "120 alignment repair83197755",
+    "Claude124/125 worktree",
+    "other main-worktree uncommitted changes"
+  ],
+  "scope": "Source/commit/deployment audit; no claim that pending079/080 pass full SLO"
+}
