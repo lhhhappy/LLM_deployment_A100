@@ -1,0 +1,138 @@
+{
+  "scope": "complete same-ID diagnostic; no scheduler eligibility inference",
+  "base_raw": "evidence/L081-cap6144_full_n30/N30/raw_s1-dev-longchain_N30_1790351495.jsonl",
+  "cand_raw": "evidence/L082-cap6144_full_n34/N34/raw_s1-dev-longchain_N34_1790360168.jsonl",
+  "request_count": 5601,
+  "gates": {
+    "fast_intra": {
+      "n": 4765,
+      "base_over_limit": 242,
+      "cand_over_limit": 559,
+      "added": 456,
+      "fixed": 139,
+      "added_same_cached": 428,
+      "added_cached_delta_gt_4096": 11,
+      "added_median_uncached": 945.5,
+      "added_median_segment_delta_s": [
+        -0.00034618377685546875,
+        5.490296125411987,
+        0.09896290302276611
+      ],
+      "added_wait_majority": 454
+    },
+    "overall_intra": {
+      "n": 5010,
+      "base_over_limit": 193,
+      "cand_over_limit": 409,
+      "added": 350,
+      "fixed": 134,
+      "added_same_cached": 326,
+      "added_cached_delta_gt_4096": 8,
+      "added_median_uncached": 1197.5,
+      "added_median_segment_delta_s": [
+        -0.0002892017364501953,
+        7.752843618392944,
+        0.10725736618041992
+      ],
+      "added_wait_majority": 347
+    },
+    "chain_start": {
+      "n": 432,
+      "base_over_limit": 23,
+      "cand_over_limit": 39,
+      "added": 21,
+      "fixed": 5,
+      "added_same_cached": 15,
+      "added_cached_delta_gt_4096": 2,
+      "added_median_uncached": 47542,
+      "added_median_segment_delta_s": [
+        -0.00012612342834472656,
+        33.6652991771698,
+        0.09253478050231934
+      ],
+      "added_wait_majority": 21
+    }
+  },
+  "metrics_10s_samples": {
+    "base": {
+      "0-10m": {
+        "samples": 60,
+        "queue_positive_fraction": 0.75,
+        "queue_p95_sample": 18.0,
+        "full_kv_ge_095_fraction": 0.08333333333333333,
+        "kv_available_median_tokens": 4896.0,
+        "kv_evictable_median_tokens": 222080.0
+      },
+      "10-30m": {
+        "samples": 119,
+        "queue_positive_fraction": 0.33613445378151263,
+        "queue_p95_sample": 4.0,
+        "full_kv_ge_095_fraction": 0.18487394957983194,
+        "kv_available_median_tokens": 3904.0,
+        "kv_evictable_median_tokens": 200192.0
+      },
+      "30-60m": {
+        "samples": 179,
+        "queue_positive_fraction": 0.3128491620111732,
+        "queue_p95_sample": 6.0,
+        "full_kv_ge_095_fraction": 0.18435754189944134,
+        "kv_available_median_tokens": 3840.0,
+        "kv_evictable_median_tokens": 217856.0
+      },
+      "60-120m": {
+        "samples": 280,
+        "queue_positive_fraction": 0.060714285714285714,
+        "queue_p95_sample": 1.0,
+        "full_kv_ge_095_fraction": 0.010714285714285714,
+        "kv_available_median_tokens": 2816.0,
+        "kv_evictable_median_tokens": 519552.0
+      },
+      "prefill_tier_counter_delta_tp0": {
+        "input": 19280192.0,
+        "device_hit": 325048064.0,
+        "host_hit": 49687296.0,
+        "storage_hit": 0.0
+      }
+    },
+    "candidate": {
+      "0-10m": {
+        "samples": 60,
+        "queue_positive_fraction": 0.8333333333333334,
+        "queue_p95_sample": 24.0,
+        "full_kv_ge_095_fraction": 0.25,
+        "kv_available_median_tokens": 5888.0,
+        "kv_evictable_median_tokens": 134144.0
+      },
+      "10-30m": {
+        "samples": 119,
+        "queue_positive_fraction": 0.6134453781512605,
+        "queue_p95_sample": 8.0,
+        "full_kv_ge_095_fraction": 0.4957983193277311,
+        "kv_available_median_tokens": 3904.0,
+        "kv_evictable_median_tokens": 68608.0
+      },
+      "30-60m": {
+        "samples": 179,
+        "queue_positive_fraction": 0.4972067039106145,
+        "queue_p95_sample": 9.0,
+        "full_kv_ge_095_fraction": 0.2849162011173184,
+        "kv_available_median_tokens": 3968.0,
+        "kv_evictable_median_tokens": 148224.0
+      },
+      "60-120m": {
+        "samples": 273,
+        "queue_positive_fraction": 0.08424908424908426,
+        "queue_p95_sample": 1.0,
+        "full_kv_ge_095_fraction": 0.007326007326007326,
+        "kv_available_median_tokens": 2688.0,
+        "kv_evictable_median_tokens": 512256.0
+      },
+      "prefill_tier_counter_delta_tp0": {
+        "input": 19441920.0,
+        "device_hit": 292008192.0,
+        "host_hit": 82610432.0,
+        "storage_hit": 0.0
+      }
+    }
+  }
+}
