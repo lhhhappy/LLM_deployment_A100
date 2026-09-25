@@ -12,5 +12,6 @@
 | [R22](R22_kda_projection_fusion.md) | 171 KDA 投影融合：加载/状态/MTP 算子检查、单卡实测时间与显存，实际 TP8 待验 |
 | [R26](R26_n30_slo_levers.md) | 069后的四桶专项路线、CPU/GPU分层工作包、有限诊断与归档 |
 | [R27](R27_receive_to_admission.md) | 接收→首次入批的真实计时、开场与持续拥堵、调度阻塞CPU反例及编排候选 |
+| [R29](R29_vllm_contract_and_host.md) | vLLM 固定版本的 GLM 检查点、host 粒度/容量、flush 边界及跨引擎一致评估 |
 
 R18 的较早容量情景不能代替 R20 的真实 LCP 上限；R19 的工具缺陷描述的是发现时的版本，修复状态看当前脚本与测试。

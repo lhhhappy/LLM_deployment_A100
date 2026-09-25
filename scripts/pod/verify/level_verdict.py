@@ -62,6 +62,47 @@ def finite(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
+def check_vllm_flush(payload, start, finish, source):
+    """Verify the agreed vLLM receipt against this request and the service log.
+
+    Connector reset/drain semantics are not yet audited for this tool. Reject
+    those configurations explicitly instead of accepting an incomplete flush.
+    """
+    if payload.get("success") is not True or payload.get("reset_connector") is not True:
+        raise ValueError("vLLM flush did not acknowledge connector-inclusive reset")
+    if "kv_connector" not in payload or payload["kv_connector"] is not None:
+        raise ValueError("vLLM connector flush evidence unsupported; needs tier/drain audit")
+    if type(payload.get("unfinished_requests_at_start")) is not int or payload["unfinished_requests_at_start"] != 0:
+        raise ValueError("vLLM flush requires an observed idle request queue")
+    version = payload.get("engine_version")
+    if not isinstance(version, str) or not version.strip():
+        raise ValueError("vLLM flush engine_version missing")
+    began, ended = payload.get("flush_started_ts"), payload.get("flush_finished_ts")
+    if not all(finite(t) for t in (began, ended)) or not start <= began <= ended <= finish:
+        raise ValueError("vLLM server flush timestamps outside client flush window")
+    expected = json.dumps(payload, sort_keys=True, allow_nan=False)
+    marker = "[ax] flush_cache "
+    with source.open(errors="replace") as lines:
+        for line in lines:
+            if marker not in line:
+                continue
+            try:
+                event = json.loads(line.split(marker, 1)[1])
+                actual = json.dumps(event, sort_keys=True, allow_nan=False)
+            except (ValueError, TypeError):
+                continue
+            if actual == expected:
+                return {
+                    "verified": True, "mode": "checked_runner_and_vllm_structured_receipt",
+                    "engine": "vllm", "server_log": str(source),
+                    "window_start_s": start, "window_end_s": finish,
+                    "matched_server_flush_s": ended,
+                    "server_log_clock": "API process epoch seconds",
+                    "server_receipt": payload,
+                }
+    raise ValueError("no matching vLLM server flush receipt for this measurement")
+
+
 def check_flush(out_dir, raw, run, metadata, rows, n, server_log=None):
     log = out_dir / "run_dev.log"
     text = log.read_text()
@@ -72,6 +113,7 @@ def check_flush(out_dir, raw, run, metadata, rows, n, server_log=None):
         raise ValueError("cannot bound flush: missing measurement dispatch timestamps")
     first = min(starts)
     receipt_path = out_dir / "flush_evidence.json"
+    receipt = {}
     if receipt_path.is_file():
         receipt = json.loads(receipt_path.read_text())
         if receipt.get("flush_success") is not True or receipt.get("runner_rc") != 0:
@@ -99,16 +141,20 @@ def check_flush(out_dir, raw, run, metadata, rows, n, server_log=None):
         source = out_dir.parent / "server.log"
     if not source.is_file() or source.name == "engine_current.log":
         raise ValueError("live/full server.log missing; startup snapshot cannot verify flush")
+    payload = receipt.get("flush_response")
+    if isinstance(payload, dict) and payload.get("engine") == "vllm":
+        return check_vllm_flush(payload, start, finish, source)
     matches = []
-    for line in source.read_text(errors="replace").splitlines():
-        if "Cache flushed successfully!" not in line:
-            continue
-        stamp = re.match(r"\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)", line)
-        if stamp:
-            ts = datetime.strptime(stamp[1], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
-            # Server text timestamps have one-second precision.
-            if math.floor(start) <= ts <= math.floor(finish):
-                matches.append(ts)
+    with source.open(errors="replace") as lines:
+        for line in lines:
+            if "Cache flushed successfully!" not in line:
+                continue
+            stamp = re.match(r"\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)", line)
+            if stamp:
+                ts = datetime.strptime(stamp[1], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
+                # Server text timestamps have one-second precision.
+                if math.floor(start) <= ts <= math.floor(finish):
+                    matches.append(ts)
     if not matches:
         raise ValueError("no successful server flush in this measurement's pre-flush window")
     return {"verified": True, "mode": mode, "server_log": str(source),

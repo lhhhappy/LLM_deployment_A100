@@ -163,6 +163,63 @@ class FlushTest(unittest.TestCase):
             self.assertFalse((out / "score_formal.json").exists())
             self.assertEqual(json.loads((out / "level_verdict.json").read_text())["status"], "INVALID")
 
+    def test_vllm_flush_binds_response_to_server_and_client_window(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            raw, run = fixture(out)
+            metadata = json.loads(run.read_text())
+            rows = [{"client_dispatch_at_s": 1790200020}]
+            (out / "run_dev.log").write_text("flushed KV via checked runner\n")
+            payload = {
+                "success": True, "engine": "vllm", "engine_version": "frozen-test",
+                "flush_started_ts": 1790200010.2, "flush_finished_ts": 1790200010.8,
+                "reset_connector": True, "kv_connector": None,
+                "unfinished_requests_at_start": 0,
+            }
+            receipt = {
+                "flush_success": True, "runner_rc": 0, "n": 22,
+                "raw": raw.name, "run": run.name, "runner_started_s": 1790200000,
+                "flush_started_s": 1790200010, "flush_finished_s": 1790200011,
+                "flush_response": payload,
+            }
+            event = lambda p: "INFO [ax] flush_cache " + json.dumps(p) + "\n"
+            write(out / "flush_evidence.json", receipt)
+            (out / "server.log").write_text(event(payload))
+            result = LEVEL.check_flush(out, raw, run, metadata, rows, 22)
+            self.assertTrue(result["verified"])
+            self.assertEqual(result["engine"], "vllm")
+            self.assertEqual(result["matched_server_flush_s"], payload["flush_finished_ts"])
+
+            # HTTP success alone, unrelated/malformed receipts, or familiar
+            # SGLang wording must not substitute for this exact service event.
+            for log in ("flush_cache: prefix cache reset\n", "INFO [ax] flush_cache {bad\n",
+                        event(dict(payload, engine_version="other-engine")),
+                        "[2026-09-23 21:46:50 TP0] Cache flushed successfully!\n"):
+                (out / "server.log").write_text(log)
+                with self.subTest(log=log), self.assertRaisesRegex(ValueError, "no matching vLLM"):
+                    LEVEL.check_flush(out, raw, run, metadata, rows, 22)
+
+            changes = (
+                {"kv_connector": "OffloadingConnector"}, {"success": False},
+                {"reset_connector": False}, {"unfinished_requests_at_start": 1},
+                {"unfinished_requests_at_start": False}, {"engine_version": ""},
+                {"flush_started_ts": 1790200009}, {"flush_finished_ts": 1790200021},
+                {"flush_started_ts": 1790200010.9}, {"flush_finished_ts": float("nan")},
+            )
+            for change in changes:
+                altered = dict(payload, **change)
+                write(out / "flush_evidence.json", dict(receipt, flush_response=altered))
+                (out / "server.log").write_text(event(altered))
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    LEVEL.check_flush(out, raw, run, metadata, rows, 22)
+            for key in ("kv_connector", "reset_connector", "unfinished_requests_at_start",
+                        "engine_version", "flush_started_ts", "flush_finished_ts"):
+                altered = {k: v for k, v in payload.items() if k != key}
+                write(out / "flush_evidence.json", dict(receipt, flush_response=altered))
+                (out / "server.log").write_text(event(altered))
+                with self.subTest(missing=key), self.assertRaises(ValueError):
+                    LEVEL.check_flush(out, raw, run, metadata, rows, 22)
+
 
 class FetchTest(unittest.TestCase):
     def test_full_archive_recheck_and_missing_flush_log(self):

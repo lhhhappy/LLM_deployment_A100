@@ -1,0 +1,36 @@
+{
+  "source_revision": "19673ef471858f64603ae05fc1a554900d3d79d4",
+  "method": "AST-extracted committed functions with fake collaborators",
+  "limits": "No full EngineCore, actual filesystem tier or GPU/DMA execution",
+  "kda_auto_backend": {
+    "8": "triton",
+    "9": "flashkda"
+  },
+  "offload_reset_with_unconsumed_worker_fence": {
+    "queued_worker_fences": [
+      16
+    ],
+    "has_pending_push_work": false,
+    "stale_job_threshold": 17,
+    "tracked_jobs": 0,
+    "calls": [
+      "manager_reset",
+      "events_reset"
+    ],
+    "second_reset_before_worker_step": "AssertionError"
+  },
+  "tiering_reset": {
+    "call_order": [
+      "secondary_drain",
+      "consume_completions",
+      "primary_reset"
+    ],
+    "primary_entries": 0,
+    "fake_secondary_entries": 1
+  },
+  "source_sha256": {
+    "engine/vllm/vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py": "ec606276f6d2ab787f7269379f1adc42fb190a0fe4f1b8c8a72e02055e71ef97",
+    "engine/vllm/vllm/models/glm5next/common/kda.py": "37745b45892cb26d9193160c4f446191f6cc276031fe8f7de5dbb37784cf8e8b",
+    "engine/vllm/vllm/v1/kv_offload/tiering/manager.py": "abaccebe49eefb639ca7a9526bd1fc4627cf418e5579f74f8662db0ba673bffd"
+  }
+}

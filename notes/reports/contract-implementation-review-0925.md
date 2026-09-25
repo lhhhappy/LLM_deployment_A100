@@ -15,7 +15,7 @@ Claude session `e4faf351-6a00-4cf3-89bb-765b4c17abe2` 已核对活进程、终�
 二者负载和并发不同，不能互换成绩，也不能由已通过档断定正式更高失败档的瓶颈。
 
 本轮发现并修复一个本地有效性缺口：成功请求的实际输出数没有强制对齐冻结预算。
-另发现统一flush取证目前只识别SGLang日志，vLLM接入需明确补齐。
+另补齐了工具侧vLLM结构化flush收据支持；服务端插件修订与联调由Claude接续。
 没有发现可据此立即更改冻结SGLang调度策略的证据。
 
 ## 定义和源码逐项对应
@@ -63,15 +63,18 @@ level_verdict补验分桶、runner和flush，也没有挡住这种输出缩水�
 [复现脚本与SHA收据](../../evidence/contract-review-20260925/audit.py)、
 [CPU结果](../../evidence/contract-review-20260925/summary.json)。
 
-## 发现二：vLLM的flush成功尚不能直接通过本地取证（接口待对齐）
+## 发现二：vLLM的flush取证（工具已适配，服务端待交接）
 
 本轮读取到的vLLM插件在reset成功后输出`flush_cache: prefix cache reset`，
-而level_verdict.check_flush要求`[YYYY-MM-DD HH:MM:SS ...] Cache flushed successfully!`。
+而原level_verdict.check_flush要求`[YYYY-MM-DD HH:MM:SS ...] Cache flushed successfully!`。
 因此正确的vLLM服务也可能被本地判INVALID。这是工具适配缺口，不是vLLM已经不能真清缓存的结论。
 
-已告知Claude：vLLM提供真实reset完成后的结构化epoch收据，由本会话负责工具侧校验。
-要求绑定本次flush请求与测量窗口；不能以“跳过server证明”或把任意成功日志都接受来修复。
-vLLM全worker/connector及新Mamba检查点由Claude独立复核，见其后续契约报告。
+Claude已回复并约定结构化收据；工具侧现在要求响应体与服务端`[ax] flush_cache JSON`一致，
+API起止epoch秒被客户端flush窗口包住，成功、空闲、reset_connector=true、kv_connector显式null。
+测试覆盖成功、旧/不匹配日志、缺字段、错误时序、NaN、在途请求和未支持connector；不跳过server证明。
+connector非空暂记工具不支持/INVALID，等各层失效与worker drain审计闭合再扩展。
+API epoch秒是时钟口径，不是缓存代际编号。服务端插件与新Mamba检查点仍待Claude交接和独立复核，
+更细的源码发现及CPU探针见[R29](../../research/codex/R29_vllm_contract_and_host.md)。
 
 另一处绑定在`compare_runs.load`：原来没有SGLang prefill批次日志就直接INVALID。
 已新增`--cross-engine --data-root DATA`，在独立完整verdict之上检查同N、显式预热profile、rep16计划SHA、
@@ -134,6 +137,6 @@ vLLM原生OffloadingConnector已存在AttentionSpec/MambaSpec搬运分支，
 所以没有启动八卡任务，也没有新增Pod日志或安装环境。tmpfs计入主机内存，不是免费磁盘；
 归档watcher在无Pod时只能记录本地错误并重试，不能声称完成了线上清理。
 
-CPU验证：评估工具17项、短预热5项、跨运行比较22项、归档10项、工作目录8项，
+CPU验证：评估工具18项、短预热5项、跨运行比较22项、归档10项、工作目录8项，
 以及调度保护/122/123/有限扫描/诊断112项均通过。仿真使用假时钟和成本，不当性能结果。
 全部新增审计输出位于本地，audit.py单次输出有1MiB硬限；原始运行文件未改。
