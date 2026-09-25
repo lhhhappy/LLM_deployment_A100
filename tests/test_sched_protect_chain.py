@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from enum import Enum, auto
 from functools import lru_cache
 import hashlib
+import importlib.util
 import json
 import logging
 import math
@@ -31,7 +32,7 @@ from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/engine'))
-from tree import tree_dir  # noqa: E402
+from tree import mechanism_commits, tree_dir  # noqa: E402
 
 BASE = tree_dir('before:120')
 CANDIDATE = tree_dir('mech:120')
@@ -174,11 +175,19 @@ def load_source(root=CANDIDATE):
              '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
-             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
+             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits',
+             '_ax_admission_cfgs', '_ax_admission_plan'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
+    # Module-level helpers the scheduler methods use: 120's TP0 trace (off) and 124/125's decisions.
+    ns['ax_chunk_alignment'] = NS(ENABLED=False)
+    deadline = root / 'srt/managers/ax_deadline.py'
+    if deadline.exists():
+        spec = importlib.util.spec_from_file_location('ax_deadline', deadline)
+        ns['ax_deadline'] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ns['ax_deadline'])
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -294,6 +303,16 @@ def step(s, arrivals=()):
     return trace
 
 
+def strip_alignment_hook(text):
+    """schedule_batch.py without 120's default-off sub-grid alignment trace hook (ce6f8ce8)."""
+    text = text.replace('from sglang.srt.managers import ax_chunk_alignment\n', '', 1)
+    return text.replace(
+        '        if ax_chunk_alignment.ENABLED:\n'
+        '            ax_chunk_alignment.checkpoint(\n'
+        '                req, prefix_len, extend_end, cache_chunk_size, checkpoint_grid, mask\n'
+        '            )\n\n', '', 1)
+
+
 class ProtectTests(unittest.TestCase):
     def setUp(self):
         self.env = patch.dict(os.environ, {'SGLANG_AX_SCHED_PROTECT': '1',
@@ -311,12 +330,22 @@ class ProtectTests(unittest.TestCase):
         trace.append(step(s))
         self.assertEqual([r['mode'] for r in trace], ['prefill', 'decode', 'prefill', 'decode'])
         self.assertEqual([r[0] for r in trace[2]['reqs']], ['cold', 'short'])
-        # 120 caps a cold chunk only while other requests wait: alone it takes the full 8192 budget,
-        # once the short hit is waiting the continuation is capped to 2048 and the short joins the batch.
-        self.assertEqual(trace[0]['reqs'][0][2], 8192)
-        self.assertEqual(trace[2]['reqs'][0][2], 8192 + 2048)
+        # A request is decoding, so 121 caps the cold chunk at 2048 from the first chunk on
+        # (engine/docs/121: "chunks are uncapped only when the engine is otherwise idle"); the short
+        # hit joins the next prefill beside the capped continuation.
+        self.assertEqual(trace[0]['reqs'][0][2], 2048)
+        self.assertEqual(trace[2]['reqs'][0][2], 2048 + 2048)
         self.assertIn('short', [r[0] for r in trace[3]['reqs']])
         (EVIDENCE / 'interleave.json').write_text(json.dumps(trace, indent=2) + '\n')
+
+    def test_idle_cold_takes_the_full_budget_until_a_short_hit_waits(self):
+        # 120's own rule, with nothing decoding: alone the cold request takes the full 8192 budget;
+        # once a short hit waits, the continuation is capped to 2048 and the short joins the batch.
+        s, _ = make_scheduler(waiting=[Req('cold', 100000)])
+        first = step(s)
+        second = step(s, [Req('short', 512, cached=65536)])
+        self.assertEqual(first['reqs'], [('cold', 0, 8192)])
+        self.assertEqual(second['reqs'], [('cold', 8192, 8192 + 2048), ('short', 65536, 66048)])
 
     def test_only_cold_no_idle_or_decode_gap(self):
         cold = Req('cold', 100000)
@@ -457,8 +486,10 @@ class ProtectTests(unittest.TestCase):
         self.assertEqual(modes, ['prefill'] * 3)
 
     def test_unsupported_modes_bypass_protection(self):
+        # enable_hierarchical_cache is not in this list: since 180 the L1/L2 host tier keeps the
+        # protection and only L3 storage bypasses it (scheduler.py blocker list; HiCacheTierTests).
         for attr, value in [('is_mixed_chunk', True), ('require_mlp_sync', True),
-                            ('enable_lora', True), ('enable_hierarchical_cache', True),
+                            ('enable_lora', True), ('enable_hicache_storage', True),
                             ('enable_hisparse', True), ('is_hybrid_swa', True),
                             ('enable_priority_preemption', True), ('dllm_config', object()),
                             ('disaggregation_mode', 'prefill'), ('prefill_delayer', object()),
@@ -599,19 +630,30 @@ class ProtectTests(unittest.TestCase):
                     self.assertGreaterEqual(a.rem_chunk_tokens, 0)
 
     def test_original_lpm_role_budget_and_interfaces_unchanged(self):
+        # Checked per 120 commit against its own parent. before:120..mech:120 also spans other
+        # mechanisms' commits (121-123, 130, 140, 160, 180; e.g. 123 changes calc_priority), which are
+        # not 120's changes.
         def classes(path):
             return {n.name: {m.name: ast.dump(m) for m in n.body if isinstance(m, ast.FunctionDef)}
                     for n in ast.parse(path.read_text()).body if isinstance(n, ast.ClassDef)}
-        base = classes(BASE / 'srt/managers/schedule_policy.py')
-        new = classes(CANDIDATE / 'srt/managers/schedule_policy.py')
-        self.assertEqual(base['SchedulePolicy'], new['SchedulePolicy'])
-        for method in ('_role_split_len', '_update_prefill_budget', '_mamba_gap_budget_for_req',
-                       '_req_inc_lock_ref', '_lock_node', 'rem_total_tokens', 'cur_rem_tokens'):
-            self.assertEqual(base['PrefillAdder'][method], new['PrefillAdder'][method], method)
-        for rel in ('srt/entrypoints/http_server.py', 'srt/managers/tokenizer_manager.py',
-                    'srt/managers/scheduler_components/flush_wrapper.py',
-                    'srt/managers/schedule_batch.py'):
-            self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
+        for commit in mechanism_commits('120'):
+            parent, child = tree_dir(commit + '^'), tree_dir(commit)
+            base = classes(parent / 'srt/managers/schedule_policy.py')
+            new = classes(child / 'srt/managers/schedule_policy.py')
+            self.assertEqual(base['SchedulePolicy'], new['SchedulePolicy'], commit)
+            for method in ('_role_split_len', '_update_prefill_budget', '_mamba_gap_budget_for_req',
+                           '_req_inc_lock_ref', '_lock_node', 'rem_total_tokens', 'cur_rem_tokens'):
+                self.assertEqual(base['PrefillAdder'][method], new['PrefillAdder'][method], (commit, method))
+            for rel in ('srt/entrypoints/http_server.py', 'srt/managers/tokenizer_manager.py',
+                        'srt/managers/scheduler_components/flush_wrapper.py',
+                        'srt/managers/schedule_batch.py'):
+                old, cur = (parent / rel).read_text(), (child / rel).read_text()
+                if rel.endswith('schedule_batch.py'):
+                    # The sub-grid alignment commit adds only a default-off TP0 trace hook (import and
+                    # one `if ax_chunk_alignment.ENABLED:` call). Removed from both sides, a 120 commit
+                    # must leave the file byte-identical.
+                    old, cur = strip_alignment_hook(old), strip_alignment_hook(cur)
+                self.assertEqual(old, cur, (commit, rel))
 
 
 # HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.

@@ -170,12 +170,23 @@ class Config(unittest.TestCase):
             self.assertEqual(ax.deadline_config().park_max_rounds, 4)
             self.assertEqual(ax.backlog_config(2).relaxed_interval, 1)
 
-    def test_relief_needs_a_fixed_interval_above_the_relaxed_one(self):
+    def test_cold_cap_alone_keeps_the_configured_interval(self):
+        env = {'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_COLD_CAP': '8192'}
+        with patch.dict(os.environ, env, clear=True):
+            cfg = ax.backlog_config(2)
+        self.assertEqual((cfg.cold_cap, cfg.relaxed_interval), (8192, 2))
+
+    def test_relief_must_change_something_and_never_add_decode_rounds(self):
+        # the interval now defaults to the configured one, so RELIEF alone would do nothing: refused
         with patch.dict(os.environ, {'SGLANG_AX_BACKLOG_RELIEF': '1'}, clear=True):
-            with self.assertRaises(ValueError):
-                ax.backlog_config(1)
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, 'COLD_CAP'):
+                ax.backlog_config(2)
+            with self.assertRaisesRegex(ValueError, 'COLD_CAP'):
                 ax.backlog_config(0)
+        env = {'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_INTERVAL': '3'}
+        with patch.dict(os.environ, env, clear=True):
+            with self.assertRaises(ValueError):
+                ax.backlog_config(2)
 
     def test_invalid_deadline_config_refuses(self):
         with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_PER_TOKEN_S': '0'},

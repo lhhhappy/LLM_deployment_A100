@@ -9,8 +9,10 @@ clock or the environment after the config is built.
 estimate below) first, shortest remaining work first; then requests that cannot, also shortest first;
 requests LPM holds back for in-batch prefix sharing stay last. It may also park the running continuation
 for one round so a rescuable waiter that fits entirely in the round's budget runs instead.
-125 lowers the decode rounds armed after each prefill while the cold backlog would take long to clear,
-under a guard on how many decoding requests have run above the TPOT gate.
+125 is an opening mode: while the cold backlog would take long to clear (after /flush_cache every level
+starts with all users sending cold chain starts at once), it raises the cold chunk cap and/or lowers the
+decode rounds armed after each prefill, under a guard on how many decoding requests ran slow since the
+last flush.
 """
 
 import os
@@ -148,40 +150,47 @@ def should_park(continuation, continuation_waited_s: float, head, head_waited_s:
 @dataclass(frozen=True)
 class BacklogConfig:
     # Enter relief when the cold backlog needs more than high_s at the recent prefill rate, leave
-    # below low_s; while relieved, arm relaxed_interval decode rounds after each prefill.
+    # below low_s. While relieved: the cold chunk cap is cold_cap (0 keeps 120's cap) and
+    # relaxed_interval decode rounds are armed after each prefill (the configured interval keeps it).
     high_s: float = 30.0
     low_s: float = 10.0
     relaxed_interval: int = 1
+    cold_cap: int = 0
     # Guard: stop relieving once max_slow decoding requests, or more than max_slow_ratio of those seen
-    # (after min_seen), have run above the TPOT gate. Counted since the last /flush_cache, which the
-    # platform calls before every level; the server does not know the level otherwise.
+    # (after min_seen; 1.0 disables the ratio), have run above `gate` seconds per token. Counted since
+    # the last /flush_cache, which the platform calls before every level; the server does not know the
+    # level otherwise. The count covers requests still decoding, by their TPOT so far; one that is under
+    # the gate now can still end above it, so `gate` defaults below the 0.10 of the harness.
     max_slow: int = 40
-    max_slow_ratio: float = 0.03
+    max_slow_ratio: float = 1.0
     min_seen: int = 200
-    gate: float = 0.10
+    gate: float = 0.09
     # Smoothing of the prefill rate (weight of the newest sample).
     rate_weight: float = 0.2
 
 
 def backlog_config(configured_interval: int) -> Optional[BacklogConfig]:
-    """SGLANG_AX_BACKLOG_RELIEF=1 enables 125; it needs a fixed decode interval to relax."""
+    """SGLANG_AX_BACKLOG_RELIEF=1 enables 125; it must change the cold cap, the interval or both."""
     if _env("SGLANG_AX_BACKLOG_RELIEF", "0") != "1":
         return None
     cfg = BacklogConfig(
         high_s=float(_env("SGLANG_AX_BACKLOG_HIGH_S", "30")),
         low_s=float(_env("SGLANG_AX_BACKLOG_LOW_S", "10")),
-        relaxed_interval=int(_env("SGLANG_AX_BACKLOG_INTERVAL", "1")),
+        relaxed_interval=int(_env("SGLANG_AX_BACKLOG_INTERVAL", str(configured_interval))),
+        cold_cap=int(_env("SGLANG_AX_BACKLOG_COLD_CAP", "0")),
         max_slow=int(_env("SGLANG_AX_BACKLOG_MAX_SLOW", "40")),
-        max_slow_ratio=float(_env("SGLANG_AX_BACKLOG_MAX_SLOW_RATIO", "0.03")),
+        max_slow_ratio=float(_env("SGLANG_AX_BACKLOG_MAX_SLOW_RATIO", "1.0")),
         min_seen=int(_env("SGLANG_AX_BACKLOG_MIN_SEEN", "200")),
-        gate=float(_env("SGLANG_AX_BACKLOG_GATE", "0.10")),
+        gate=float(_env("SGLANG_AX_BACKLOG_GATE", "0.09")),
         rate_weight=float(_env("SGLANG_AX_BACKLOG_RATE_WEIGHT", "0.2")),
     )
-    if not (0 <= cfg.low_s < cfg.high_s and 0 <= cfg.relaxed_interval < configured_interval
-            and cfg.max_slow >= 0 and 0 <= cfg.max_slow_ratio <= 1 and cfg.min_seen >= 0
-            and cfg.gate > 0 and 0 < cfg.rate_weight <= 1):
+    changes = cfg.cold_cap > 0 or cfg.relaxed_interval < configured_interval
+    if not (changes and 0 <= cfg.low_s < cfg.high_s and 0 <= cfg.relaxed_interval <= configured_interval
+            and cfg.cold_cap >= 0 and cfg.max_slow >= 0 and 0 <= cfg.max_slow_ratio <= 1
+            and cfg.min_seen >= 0 and cfg.gate > 0 and 0 < cfg.rate_weight <= 1):
         raise ValueError(f"[ax] 125: invalid backlog config {cfg} for --prefill-decode-interval "
-                         f"{configured_interval} (relief needs a fixed interval above the relaxed one)")
+                         f"{configured_interval} (relief must set SGLANG_AX_BACKLOG_COLD_CAP or an "
+                         f"SGLANG_AX_BACKLOG_INTERVAL below the configured interval)")
     return cfg
 
 
