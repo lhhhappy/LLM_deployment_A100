@@ -7,15 +7,27 @@ heads that needed 1.4k–10k tokens waited 49–75 s through 49–72 prefill bat
 evidence/L037). Under LPM, cold requests are ordered by shared-prefix length and then arrival, not by the work they need.
 
 ## What it does (`srt/managers/schedule_policy.py`)
-With `SGLANG_AX_SRPT_AGING` set, the LPM sort becomes: remaining prefill tokens (prompt − matched prefix) minus
-`aging × seconds waited`, ascending. Cheap cache hits still go first (little remaining work), small cold requests are admitted
-before large ones, and a large request gains `aging` tokens of priority per second so it is not starved (2000 tokens/s: a
-100k-token request waiting 60 s ranks ahead of a fresh 3k one). Requests held back by LPM's in-batch prefix sharing stay last.
-It changes only the admission order: an already active chunked request is not preempted.
+With `SGLANG_AX_SRPT_AGING` set, the LPM sort becomes: remaining prefill tokens (prompt + already generated output −
+matched prefix) minus `aging × seconds waited`, ascending. At equal age, smaller remaining work ranks first;
+a large request gains `aging` tokens of priority per second (2000 tokens/s: a 100k-token request waiting 60 s ranks
+ahead of a fresh 3k one). Requests held back by LPM's in-batch prefix sharing stay last. Equal scores retain queue order.
+
+This changes admission order only. It does not preempt an active chunk, override KV/request-slot limits, or make a
+host hit or a short cold request eligible beside an active partial. Aging therefore does not guarantee bounded waiting.
+The matched prefix includes device and host hits; the score excludes host restoration time, context-dependent kernel
+cost and KDA pressure. It estimates remaining token work, not remaining execution seconds. The base FCFS fallback
+for queues above 128 requests remains in effect.
 
 ## Switches
 `SGLANG_AX_SRPT_AGING` (tokens per second; unset or 0 = plain LPM).
 
 ## Evidence
-CPU: `tests/test_srpt_admission.py` (5 tests on the real sort and scheduler code with fakes); all 37 scheduler tests pass.
-8 cards: pending (S1 + 122 + 123 at N22, compared with S1 + 122).
+CPU: `tests/test_srpt_admission.py` now uses the working engine rather than the historical 123 commit. All 16 tests pass:
+real policy dispatch, host/device ordering, aging, stable ties, retracted output, one-partial protection, slot/KV rejection,
+and resource invariants with 122 on/off. Cache matching results, pools, clocks and forwards are fakes; this does not
+validate DMA, GPU state restoration, MTP numerics, TP8 agreement or performance.
+
+8 cards: historical 037c → 037d (old S1 + 122, then only 123 aging=2000) reduced chain failures 33 → 23, with CP
+allowance 22. TPOT p95 was .1424 → .1466, so both full N22 runs failed. This is a useful lead, not evidence for the
+current host64/MTP baseline. Current-baseline single-variable validation is pending after 071.
+See [experiment records](../../notes/experiments.md) and [R26](../../research/codex/R26_n30_slo_levers.md).

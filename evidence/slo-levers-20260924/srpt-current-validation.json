@@ -1,0 +1,25 @@
+{
+  "kind": "CPU contract tests; not a GPU or performance result",
+  "modules": [
+    "test_srpt_admission",
+    "test_sched_protect_chain",
+    "test_tpot_paced_prefill",
+    "test_admission_trace",
+    "test_admission_trace_analysis"
+  ],
+  "tests_run": 76,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsed_s": 7.473499544998049,
+  "passed": true,
+  "parent_commit": "ecee5b5406b5ffb52fa795fa70ae013d33047323",
+  "source_sha256": {
+    "tests/test_srpt_admission.py": "f3df9e6e67359d24b10f778a65c3e56c3309dca0d5a130ca29489d503b2161f5",
+    "engine/sglang/srt/managers/scheduler.py": "76052f8a6bafa7cfa9808b74c541b667796faf353752c7f033ffe067a471cee0",
+    "engine/sglang/srt/managers/schedule_policy.py": "3218732bd9cbd043cfb9a5057e3802aacab381535f0cf8a14a9184c55ca5d883"
+  },
+  "engine_logic_changed": false,
+  "gpu_used": false,
+  "pod_deployed": false
+}

@@ -39,7 +39,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | Fixed version: official 46174 host32 N18 PASS; 46173 off N14 PASS. Full local N30 067/068 both FAIL; host64+122 recovery experiment 071 pending |
-| 123 | SRPT admission with aging | no | `SGLANG_AX_SRPT_AGING` (off) | no single-change run |
+| 123 | SRPT admission with aging | no | `SGLANG_AX_SRPT_AGING` (off) | old 037c→037d improved chain, both failed; current host64/MTP comparison pending; 16 current-source CPU tests pass |
 | 130 | tokenizer off the HTTP loop | yes (off by env) | `SGLANG_AX_ASYNC_TOKENIZE` | — |
 | 140 | fp32 KDA states at role boundary and prompt end | yes (off: 160 under MTP) | `SGLANG_AX_KDA_DUAL_SNAPSHOT` (0) | yes (without MTP) |
 | 150 | representative-shape warmup | yes (skipped under MTP) | `--warmups ax_shapes` | — |
