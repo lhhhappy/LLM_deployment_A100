@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from enum import Enum, auto
 from functools import lru_cache
 import hashlib
+import importlib.util
 import json
 import logging
 import math
@@ -174,13 +175,19 @@ def load_source(root=CANDIDATE):
              '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
-             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
+             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits',
+             '_ax_admission_cfgs', '_ax_admission_plan'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
-    # Module-level helper the scheduler methods use: 120's sub-grid alignment trace (default off).
+    # Module-level helpers the scheduler methods use: 120's TP0 trace (off) and 124's decisions.
     ns['ax_chunk_alignment'] = NS(ENABLED=False)
+    deadline = root / 'srt/managers/ax_deadline.py'
+    if deadline.exists():
+        spec = importlib.util.spec_from_file_location('ax_deadline', deadline)
+        ns['ax_deadline'] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ns['ax_deadline'])
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -691,7 +698,8 @@ class HiCacheTierTests(unittest.TestCase):
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
         self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
-                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache'])
+                                '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
+                                '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
             rep = s._ax_mechanism_report()

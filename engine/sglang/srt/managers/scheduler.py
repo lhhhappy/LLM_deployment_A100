@@ -111,6 +111,7 @@ from sglang.srt.layers.quantization.fp8_utils import initialize_fp8_gemm_config
 from sglang.srt.layers.quantization.unquant import initialize_bf16_gemm_config
 from sglang.srt.lora.lora_drainer import LoRADrainer
 from sglang.srt.lora.lora_overlap_loader import LoRAOverlapLoader
+from sglang.srt.managers import ax_deadline
 from sglang.srt.managers.disagg_service import maybe_create_ascend_config_store
 from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
 from sglang.srt.managers.io_struct import (
@@ -213,6 +214,7 @@ from sglang.srt.managers.schedule_policy import (
     PrefillAdder,
     SchedulePolicy,
     _ax_sched_protect_config,
+    _ax_srpt_aging,
     is_dsa_prefill_cp_in_seq_split,
     is_prefill_context_parallel_enabled,
 )
@@ -1315,11 +1317,13 @@ class Scheduler(
             m180 = "off:no_hierarchical_cache"
         else:
             m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
+        deadline = self._ax_admission_cfgs()
         items = {
             "101": m101,
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
+            "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1403,6 +1407,66 @@ class Scheduler(
         from sglang.srt.managers.ax_rank0_decision import rank0_decide
 
         return rank0_decide(self.dp_tp_cpu_group, compute)
+
+    def _ax_admission_cfgs(self):
+        """[ax] 124 config, read once; None when off.
+
+        Rests on 120's protection: parking relies on it refusing a second partial. 124 replaces 123's
+        order, so the two are exclusive. Unsupported combinations refuse to start (the startup mechanism
+        report calls this).
+        """
+        cfgs = getattr(self, "_ax_admission_cfg", False)
+        if cfgs is False:
+            deadline = ax_deadline.deadline_config()
+            blocker = self._ax_sched_protect_blocker()
+            if deadline and blocker is not None:
+                raise ValueError(f"[ax] 124 needs 120's protection, which is off: {blocker}")
+            if deadline and _ax_srpt_aging() is not None:
+                raise ValueError("[ax] 124 replaces 123's order; unset SGLANG_AX_SRPT_AGING")
+            self._ax_park_start = None
+            self._ax_admission_stats = dict(parks=0, log_t=0.0)
+            cfgs = self._ax_admission_cfg = deadline
+            if deadline:
+                logger.info("[ax] 124 %s", deadline)
+        return cfgs
+
+    def _ax_admission_plan(self, running_batch: ScheduleBatch, round_budget: int, kv_room: int):
+        """[ax] 124 on request-plane rank 0: (waiting RIDs in order, park).
+
+        Reads rank-local clocks and arrival stamps, so the scheduler broadcasts the result; only rank-0
+        state (park start, log clock) changes here.
+        """
+        deadline = self._ax_admission_cfgs()
+        now = time.perf_counter()
+
+        def waited(req) -> float:
+            ts = req.time_stats
+            start = getattr(ts, "scheduler_recv_time", 0.0) or getattr(ts, "wait_queue_entry_time", 0.0)
+            return max(0.0, now - start) if start else 0.0
+
+        park = False
+        cont = self.chunked_req
+        # prefix_indices covers every chunk scheduled so far (stashed at the top of get_next_batch_to_run);
+        # the continuation's num_matched_prefix_tokens is still its match from when it waited.
+        cont_left = cont.seqlen - len(cont.prefix_indices) if cont is not None else 0
+        held = getattr(self.policy, "ax_held", set())
+        ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline)
+        order = [r.rid for r in ranked]
+        if cont is not None:
+            head = next((r for r in ranked if r.rid not in held), None)
+            rounds = getattr(cont, "_ax_parked_rounds", 0)
+            parked_s = now - self._ax_park_start if rounds and self._ax_park_start else 0.0
+            park = ax_deadline.should_park(
+                cont, cont_left, waited(cont), head, waited(head) if head is not None else 0.0,
+                round_budget, kv_room, rounds, parked_s, deadline,
+            )
+            if park and not rounds:
+                self._ax_park_start = now
+        stats = self._ax_admission_stats
+        if now - stats["log_t"] >= 30.0:
+            stats["log_t"] = now
+            logger.info("[ax-124] parks=%d", stats["parks"])
+        return order, park
 
     def _ax_pace_now(self) -> float:
         # Every TP rank must take the same decision: agree on one clock (max over ranks). Only called
@@ -3953,9 +4017,38 @@ class Scheduler(
             ax_protect=ax_protect,
         )
 
+        deadline = self._ax_admission_cfgs()
+        ax_park = False
+        if deadline is not None:
+            # [ax] 124: decided on request-plane rank 0 (rank-local clocks and stamps) and applied on
+            # every rank. Reached under identical control flow: waiting requests or a continuation exist.
+            # With 120's protection a cold request is cut to the cold cap even when the round has room,
+            # so the cap is both the chunk a cold request runs in and the most a waiter can finish in
+            # one round (a longer one would be a second partial, which protection refuses).
+            round_budget = min(chunked_prefill_size, ax_protect[0]) if ax_protect else chunked_prefill_size
+            kv_room = int(adder.rem_total_tokens)
+            order, ax_park = self._ax_rank0_decide(
+                lambda: self._ax_admission_plan(running_batch, round_budget, kv_room)
+            )
+            by_id = {r.rid: r for r in self.waiting_queue}
+            if (len(by_id) != len(self.waiting_queue) or len(order) != len(self.waiting_queue)
+                    or set(order) != set(by_id)):
+                raise RuntimeError("[ax] 124 request queues differ across TP ranks")
+            self.waiting_queue[:] = [by_id[rid] for rid in order]
+
         if self.chunked_req is not None:
             self.chunked_req.init_next_round_input()
-            self.chunked_req = adder.add_chunked_req(self.chunked_req)
+            if ax_park:
+                # [ax] 124: parked for this round so a rescuable waiter that fits runs instead. It computes
+                # no KV, so extend_range still ends at the cached prefix and the next round skips the
+                # stash; 120 counts only continuations that run. Not marking it as the adder's
+                # continuation keeps the normal (complete-fit) admission path for cold waiters.
+                self.chunked_req._ax_parked_rounds = getattr(self.chunked_req, "_ax_parked_rounds", 0) + 1
+                self._ax_admission_stats["parks"] += 1
+            else:
+                if deadline is not None:
+                    self.chunked_req._ax_parked_rounds = 0
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
 
         if self.enable_lora:
             running_loras = {
