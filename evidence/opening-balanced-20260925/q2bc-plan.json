@@ -1,0 +1,29 @@
+{
+  "engine_commit": "37e9002368390fefc92621ea8b18f73e86429596",
+  "parent_commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+  "image_id": 165463,
+  "image_url": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925b",
+  "image_changed_files_match_git": true,
+  "engine_worktree_clean": true,
+  "runtime_files": 30,
+  "runtime_byte_identical_to_078": true,
+  "jobs": [
+    {
+      "job": "079",
+      "path": "scripts/pod/jobs/opening_q2_srpt300_cold6144_n26.sh",
+      "sha256": "322883c23f52b2c2041e2f2601907b8c05a474c270e180d969bba3dc1c3b20e4",
+      "only_effective_change": "COLD_CAP 4096->6144"
+    },
+    {
+      "job": "080",
+      "path": "scripts/pod/jobs/opening_q2_srpt300_cold8192_n26.sh",
+      "sha256": "b02bb22fcc10d144c6892ffbb9b3b8d8d1b5e40243d83f2fc5bc0a58229b42ef",
+      "only_effective_change": "COLD_CAP 4096->8192"
+    }
+  ],
+  "additional_pod_payload_bytes": 487770,
+  "comparisons": [
+    "074-official_0925a_opening_n26",
+    "076-opening_q2_srpt300_n26"
+  ]
+}
