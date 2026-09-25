@@ -15,7 +15,7 @@ Claude session `e4faf351-6a00-4cf3-89bb-765b4c17abe2` 已核对活进程、终�
 二者负载和并发不同，不能互换成绩，也不能由已通过档断定正式更高失败档的瓶颈。
 
 本轮发现并修复一个本地有效性缺口：成功请求的实际输出数没有强制对齐冻结预算。
-另补齐了工具侧vLLM结构化flush收据支持；服务端插件修订与联调由Claude接续。
+另补齐了工具侧vLLM结构化flush收据支持；Claude服务插件fb18e488已交接，无connector路径CPU联调通过。
 没有发现可据此立即更改冻结SGLang调度策略的证据。
 
 ## 定义和源码逐项对应
@@ -63,7 +63,7 @@ level_verdict补验分桶、runner和flush，也没有挡住这种输出缩水�
 [复现脚本与SHA收据](../../evidence/contract-review-20260925/audit.py)、
 [CPU结果](../../evidence/contract-review-20260925/summary.json)。
 
-## 发现二：vLLM的flush取证（工具已适配，服务端待交接）
+## 发现二：vLLM的flush取证（无connector路径CPU联调通过）
 
 本轮读取到的vLLM插件在reset成功后输出`flush_cache: prefix cache reset`，
 而原level_verdict.check_flush要求`[YYYY-MM-DD HH:MM:SS ...] Cache flushed successfully!`。
@@ -73,8 +73,9 @@ Claude已回复并约定结构化收据；工具侧现在要求响应体与服�
 API起止epoch秒被客户端flush窗口包住，成功、空闲、reset_connector=true、kv_connector显式null。
 测试覆盖成功、旧/不匹配日志、缺字段、错误时序、NaN、在途请求和未支持connector；不跳过server证明。
 connector非空暂记工具不支持/INVALID，等各层失效与worker drain审计闭合再扩展。
-API epoch秒是时钟口径，不是缓存代际编号。服务端插件与新Mamba检查点仍待Claude交接和独立复核，
-更细的源码发现及CPU探针见[R29](../../research/codex/R29_vllm_contract_and_host.md)。
+API epoch秒是时钟口径，不是缓存代际编号。服务端fb18e488已独立重跑20项接口测试，
+真实ASGI响应/日志→level_verdict联调通过（假引擎）；101候选仍单独复核，
+见[冻结版复核](vllm-frozen-review-0925.md)及[R29](../../research/codex/R29_vllm_contract_and_host.md)。
 
 另一处绑定在`compare_runs.load`：原来没有SGLang prefill批次日志就直接INVALID。
 已新增`--cross-engine --data-root DATA`，在独立完整verdict之上检查同N、显式预热profile、rep16计划SHA、

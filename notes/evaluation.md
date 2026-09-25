@@ -1,6 +1,6 @@
 # 统一评估与迭代协议
 
-2026-09-24 用户最新决定：Codex继续SGLang，Claude Code接手vLLM，共同探索N38；vLLM先跑通开发/GPU流程并对齐行为，见[交接](handoffs/vllm-claude-code.md)。两路共用以下评估口径，开发短探针不必等待固定70分钟。
+2026-09-24 用户最新决定：Codex继续SGLang，Claude Code接手vLLM，共同探索N38；vLLM先跑通开发/GPU流程并满足相同评测合同，见[交接](handoffs/vllm-claude-code.md)。两路共用以下评估口径，开发短探针不必等待固定70分钟。
 赛规以task.md及已记录的主办方排名更正为准。本文件定义本地比较条件，不改变官方规则。
 
 2026-09-25用户进一步明确：保留SGLang可提交/可回退栈，新增探索预算优先vLLM；
@@ -56,7 +56,9 @@ TPM使用原评分器固定稳态窗口及其有效性检查，不能用全程�
 
 ## SGLang / vLLM 评测一致性
 
-用户2026-09-25明确要求：先验收评测一致，再比较引擎或移植优化。Claude交接冻结vLLM提交后，由Codex独立审查。
+用户2026-09-25澄清：目标是用同一套规范评测比较谁更好，并复用已有有效设计以减少vLLM开发和探索量。
+评测工具、源码审查与机制适配可以并行；结果进入比较前核实评测合同，不要求先补齐所有SGLang功能。
+Claude交接冻结vLLM提交后，由Codex独立审查。
 
 - 共用只读原harness、冻结数据与模型/tokenizer；记录正文数据manifest、cohort、引擎和工具哈希。
   prompt原文走`/generate`，不再套chat模板；逐请求ignore_eos/输出预算一致。
@@ -68,9 +70,16 @@ TPM使用原评分器固定稳态窗口及其有效性检查，不能用全程�
   level_verdict现支持vLLM结构化flush：runner保存的响应体须与服务端`[ax] flush_cache JSON`一致，
   服务端起止epoch秒被本次客户端flush窗口包住，明确空闲、reset_connector=true且kv_connector=null。
   connector非空目前因tier/drain合同未完成审计而记INVALID（工具尚不支持），不能误称官方SLO失败。
-  服务插件由Claude补齐收据后仍需联调；不能直接跳过真清证明或将逻辑失效写成全部DMA已完成。
+  fb18e488插件与工具的无connector路径已完成CPU联调（真实ASGI/收据，假引擎）；TP8仍待验。
+  不能直接跳过真清证明或将逻辑失效写成全部DMA已完成。见[冻结版复核](reports/vllm-frozen-review-0925.md)。
 - 冷热缓存流程相同，实际命中可以不同，这是要比较的引擎行为；质量门各自通过，不设两路生成文本逐字相同的门。
-  参数名和默认值不要求相同，但实际硬件及资源预算要记录。SGLang host预算按rank，vLLM offloading预算按TP组总量，不能照抄数字。
+  不要求调度顺序、检查点位置、MTP接受率、kernel、batch参数或KV/图池分配相同。
+  在相同硬件和允许的CPU/GPU/内存资源边界内，各自选合适实现与分配；只在专门隔离某个机制时固定相应子预算。
+  实际资源用量须记录。SGLang host预算按rank，vLLM offloading预算按TP组总量，不能照抄数字。
+  首次入批等内部诊断可不同或缺失，不新增质量门；同档逐请求对照之外，最终各自按相同规则探索最高N@SLO。
+
+已有评测、分析、有限日志与归档工具优先直接共用；缓存完整性、角色检查点、host恢复和调度经验按vLLM接口适配，
+已有测试场景直接迁移。优先使用能满足需求的原生能力，只补真实缺口，不把复制SGLang实现当交付目标。
 
 本轮源码复核、已修缺口及CPU证据见[实现审查](reports/contract-implementation-review-0925.md)。
 完整且零请求错误的跨引擎逐请求对照使用：

@@ -1,0 +1,98 @@
+{
+  "method": "real KVCacheManager and 101 chunking; no tensor/DMA execution",
+  "cases": [
+    {
+      "shared": 2021,
+      "suffix": 538,
+      "prompt_tokens": 2560,
+      "block_size": 512,
+      "hash_unit": 32,
+      "output_budget": 1,
+      "decode_tokens": 0,
+      "role_boundary": 2016,
+      "role_checkpoint": 1984,
+      "hit_after_prefill": 1984,
+      "hit_after_decode": 1984,
+      "hit_after_owner_free": 1984
+    },
+    {
+      "shared": 2200,
+      "suffix": 100,
+      "prompt_tokens": 2301,
+      "block_size": 512,
+      "hash_unit": 32,
+      "output_budget": 201,
+      "decode_tokens": 200,
+      "role_boundary": 2176,
+      "role_checkpoint": 2144,
+      "hit_after_prefill": 2144,
+      "hit_after_decode": 2144,
+      "hit_after_owner_free": 2144
+    },
+    {
+      "shared": 2200,
+      "suffix": 100,
+      "prompt_tokens": 2301,
+      "block_size": 512,
+      "hash_unit": 32,
+      "output_budget": 301,
+      "decode_tokens": 300,
+      "role_boundary": 2176,
+      "role_checkpoint": 2144,
+      "hit_after_prefill": 2144,
+      "hit_after_decode": 2144,
+      "hit_after_owner_free": 2144
+    },
+    {
+      "shared": 2021,
+      "suffix": 430,
+      "prompt_tokens": 2452,
+      "block_size": 512,
+      "hash_unit": 32,
+      "output_budget": 301,
+      "decode_tokens": 300,
+      "role_boundary": 2016,
+      "role_checkpoint": 1984,
+      "hit_after_prefill": 1984,
+      "hit_after_decode": 1984,
+      "hit_after_owner_free": 1984
+    },
+    {
+      "shared": 2200,
+      "suffix": 100,
+      "prompt_tokens": 2301,
+      "block_size": 512,
+      "hash_unit": 64,
+      "output_budget": 301,
+      "decode_tokens": 300,
+      "role_boundary": 2176,
+      "role_checkpoint": 2112,
+      "hit_after_prefill": 2112,
+      "hit_after_decode": 2112,
+      "hit_after_owner_free": 2112
+    },
+    {
+      "shared": 2120,
+      "suffix": 430,
+      "prompt_tokens": 2551,
+      "block_size": 512,
+      "hash_unit": 64,
+      "output_budget": 129,
+      "decode_tokens": 128,
+      "role_boundary": 2112,
+      "role_checkpoint": 2048,
+      "hit_after_prefill": 2048,
+      "hit_after_decode": 2048,
+      "hit_after_owner_free": 2048
+    }
+  ],
+  "source_sha256": {
+    "engine/vllm/tests/v1/core/prefix_cache/test_mamba_role_checkpoint.py": "8916869c6e8eea0db77110539ecad30d7d22f6c6496bb658f3237051cd39a1e6",
+    "engine/vllm/vllm/ax_mechanisms.py": "b25c4caa853f23fd5f600987f0f8f1889ef6c4f63824ede5f5761c4082274def",
+    "engine/vllm/vllm/envs.py": "96c8dff13fb2d45eb4c54115457535df9421599e297a50fe9a20e8bf52779e95",
+    "engine/vllm/vllm/v1/core/kv_cache_manager.py": "2710e43bbd70541b1534b536f4fdd82691e40ca4e5d1e858a04073488522156e",
+    "engine/vllm/vllm/v1/core/sched/scheduler.py": "47cfbb127486b48bc238f37acd927fdcb96a2a4d008f6c94d2a6c8223245494d",
+    "engine/vllm/vllm/v1/core/single_type_kv_cache_manager.py": "99efe144e7e77cad3de0f5471a7c5e1f707493f195fc86197d55497a767421c9",
+    "engine/vllm/vllm/v1/request.py": "f704edef4b9ad1e26e50f03561f1679eba717c86c0d8de3735ddd4fffda6eb89"
+  }
+}

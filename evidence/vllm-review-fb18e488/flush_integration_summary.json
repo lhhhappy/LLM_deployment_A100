@@ -1,0 +1,25 @@
+{
+  "endpoint_revision": "fb18e4887d5fef87811b36aeae2d7cbd31e0b7bb",
+  "fake_engine_real_asgi_and_verdict": true,
+  "gpu_used": false,
+  "unit_suite_exit_code": 0,
+  "flush_mode": "checked_runner_and_vllm_structured_receipt",
+  "response": {
+    "engine": "vllm",
+    "engine_version": "0.30.1rc1.dev114+ga811738a6.ax",
+    "reset_connector": true,
+    "kv_connector": null,
+    "unfinished_requests_at_start": 0,
+    "flush_started_ts": 1790314925.2799897,
+    "flush_finished_ts": 1790314925.2799942,
+    "success": true
+  },
+  "source_sha256": {
+    "engine/vllm/vllm/entrypoints/generate_compat/__init__.py": "6b3fa80461cbf9ea7f4299adf029b6ff8fbfac1f3e389636ea9cfa638a524981",
+    "engine/vllm/vllm/entrypoints/generate_compat/api_router.py": "b11a780ca2db4e61f26b3425cc072f3e9a12278600b65bcdb8e4a2f7e1a736b0",
+    "engine/vllm/vllm/entrypoints/generate_compat/plugin.py": "8e67f39833a2eb3c25ba3f57a0d1722ee05771490f0027fe15ca822282985d9b",
+    "engine/vllm/vllm/entrypoints/generate_compat/protocol.py": "3f42540877395e546c97db4d3efdcefcef3181743774ab4f4c08bc6d4600dad0",
+    "engine/vllm/tests/entrypoints/generate_compat/test_generate_compat.py": "f7c1b484118c430f1ec7a61bec120f17ab035777d5c3a38717121d7c68ce67f0",
+    "scripts/pod/verify/level_verdict.py": "d6c15786c6989e223137932396c903cc22d7a8de3817273612daeee917f0b6c1"
+  }
+}

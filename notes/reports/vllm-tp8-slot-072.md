@@ -6,7 +6,9 @@
 
 已读[Claude路线](../../research/claude/vllm/README.md)、[000/010说明](../../engine/docs/vllm/README.md)，
 并查看[evidence/vllm-a0-20260925](../../evidence/vllm-a0-20260925/README.md)两份JSON。
-已报告实现`8e289cf4`、工具/收据`09f9dcd2`，底包为官方main `a811738a6051b5b12a7fcf800f465f2dd2df0a0e`。
+当前基线冻结为`fb18e488`（000修订 + 010，不含101），底包为官方main `a811738a6051b5b12a7fcf800f465f2dd2df0a0e`。
+旧`8e289cf4`构建产物不能替代此次源码冻结；部署前另核新wheel及运行工具哈希。
+冻结000的20项CPU接口测试与真实插件收据→level_verdict联调通过，见[独立复核](vllm-frozen-review-0925.md)。
 两卡TP2、8层dummy+MTP接口检查通过；5601条prompt token与冻结值一致是CPU分词验证，
 不是5601条真实权重推理或能力成绩。下一关确实是TP8真实权重。
 
@@ -49,5 +51,5 @@ Pod恢复前可在开发机准备安装包清单、可重复探针与CPU校验�
 
 用户提供新session `e4faf351-6a00-4cf3-89bb-765b4c17abe2` 后，已核对活进程、终端父进程与打开的session路径，
 更新本机登记并通过`agent_message.py`投递。Claude已回复确认读到072安排，且接手vLLM契约复核。
-下一阶段用户重点关注vLLM，但先验收两路评测一致，再审查冻结源码并选调度/host缓存候选；
+下一阶段用户重点关注vLLM；共用评测口径，冻结源码审查与既有设计适配可并行，比较前核实评测合同；
 不把角色检查点等未完成优化默认为基线。当前Pod仍无Running副本，072尚未入队。
