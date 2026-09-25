@@ -49,7 +49,8 @@ fix); every rank applies it and refuses if its queue's RIDs differ. It is entere
 early-returns, whose conditions depend on replicated state. Parked-round counts live on the request and change only
 from the broadcast decision.
 
-Logs: `[ax] 124 <config>` at start, `[ax-124] parks=…` every 30 s on rank 0; the mechanism line shows `124=on`.
+Logs: `[ax] 124 <config>` at start (with 125 when on), `[ax-124/125] parks=… relief_rounds=…` every 30 s on rank 0;
+the mechanism line shows `124=on`.
 
 ## Switches
 `SGLANG_AX_DEADLINE_TIERS` (0/1); budgets `SGLANG_AX_DEADLINE_{COLD_S,WARM_S,FAST_S,FAST_TOKENS,COLD_HIT_RATIO}`;
