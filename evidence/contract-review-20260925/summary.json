@@ -1,0 +1,85 @@
+{
+  "real_replays": [
+    {
+      "run": "L042",
+      "raw_sha256": "6caf4a9b077d98943e8e652283a31b6fe18b2b7dc1f49c8831b317f2f6400ae6",
+      "replay_tokens": {
+        "verified": true,
+        "successful_checked": 722,
+        "error_rows_skipped": 0,
+        "basis": "frozen glm_tokens/max_output_i; 0 <= cached_tokens <= prompt_tokens",
+        "scope": "reported counts; errors remain subject to original harness gates"
+      },
+      "failed_gates": [
+        "tpot_p95<=0.10"
+      ],
+      "prior_score_unchanged": true
+    },
+    {
+      "run": "L067-official_b_full_n30_shortwarm/N30",
+      "raw_sha256": "93fb80d07e54e8aa719dc84d5c7578a57c97c808bdd584a012f43d7db52dcc5f",
+      "replay_tokens": {
+        "verified": true,
+        "successful_checked": 5601,
+        "error_rows_skipped": 0,
+        "basis": "frozen glm_tokens/max_output_i; 0 <= cached_tokens <= prompt_tokens",
+        "scope": "reported counts; errors remain subject to original harness gates"
+      },
+      "failed_gates": [
+        "fast_intra(uncached_expected<=4096,<=3s)",
+        "overall_intra(<=5s)",
+        "turn_start(<=15s)",
+        "chain_start(<=30s)"
+      ],
+      "prior_score_unchanged": true
+    },
+    {
+      "run": "L068-official_b_pace_off_full_n30_shortwarm/N30",
+      "raw_sha256": "a058e7b12d933f5522494937cf7f66781a0169f3682f6da5fe9b538f40c2a9e0",
+      "replay_tokens": {
+        "verified": true,
+        "successful_checked": 5601,
+        "error_rows_skipped": 0,
+        "basis": "frozen glm_tokens/max_output_i; 0 <= cached_tokens <= prompt_tokens",
+        "scope": "reported counts; errors remain subject to original harness gates"
+      },
+      "failed_gates": [
+        "fast_intra(uncached_expected<=4096,<=3s)",
+        "overall_intra(<=5s)",
+        "chain_start(<=30s)"
+      ],
+      "prior_score_unchanged": true
+    },
+    {
+      "run": "L069-official_b_pace_off_host64_full_n30_shortwarm/N30",
+      "raw_sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b",
+      "replay_tokens": {
+        "verified": true,
+        "successful_checked": 5601,
+        "error_rows_skipped": 0,
+        "basis": "frozen glm_tokens/max_output_i; 0 <= cached_tokens <= prompt_tokens",
+        "scope": "reported counts; errors remain subject to original harness gates"
+      },
+      "failed_gates": [
+        "chain_start(<=30s)"
+      ],
+      "prior_score_unchanged": true
+    }
+  ],
+  "scheduler": {
+    "scheduler_sha256": "9f70424a98d6b17d00060a09eaefb7855f322dbe150015074db2e38995a06fcc",
+    "flush_idle_gate": {
+      "idle_without_transfers": true,
+      "idle_with_ongoing_write_through": false,
+      "idle_with_ongoing_load_back": false
+    },
+    "free_rows_with_microbatch_cap_32": {
+      "0": 32,
+      "30": 2,
+      "31": 1,
+      "32": 0
+    },
+    "scope": "real Python methods, fake resources; no DMA, TP8 or speed claim"
+  },
+  "scorer_sha256": "a1041fe96c29e0b052f6430feaf5b980793715d5e3535f79dd61dfdcd7aefb9b"
+}

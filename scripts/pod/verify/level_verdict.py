@@ -174,6 +174,7 @@ def evaluate(out_dir, n, harness_dir, data_root, requests=None, rundev_rc=None, 
             "tpot_mean": tpot["tpot_mean"], "tpot_p95": tpot["tpot_p95"], "ttft_gates": gates,
             "rows": len(rows), "raw": raw.name, "run": run.name, "wall_s": report["dev"].get("wall_s"),
             "harness_point_all_pass": summary.get("ALL_PASS"), "flush": flush,
+            "replay_tokens": report["replay_tokens"],
             "interval_sensitivity": report["interval_sensitivity"],
         }
         (out_dir / "level_verdict.json").write_text(json.dumps(verdict, indent=1, allow_nan=False) + "\n")

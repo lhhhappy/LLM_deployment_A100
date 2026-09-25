@@ -19,7 +19,7 @@
 | 会话 | 主做领域 | 报告 | 消息注册名 |
 |---|---|---|---|
 | Codex 当前会话 | SGLang迭代、071恢复与共享队列协调 | [接手与今晚候选](reports/codex-pod-takeover-0924.md) | 本会话直接联系 |
-| Claude Code（2026-09-25 接手 vLLM；本地主工作区，开发机 `/sjtu/linhang/arena/vllm/`） | vLLM：官方主分支底包、A100 移植、接口、与SGLang行为对齐；vLLM 调度对照 R27 | [vLLM 路线](../research/claude/vllm/README.md) | `claude` |
+| Claude Code（session `e4faf351-6a00-4cf3-89bb-765b4c17abe2`；本地主工作区，开发机 `/sjtu/linhang/arena/vllm/`） | vLLM：官方主分支底包、A100 移植、接口、与SGLang行为对齐；vLLM 调度对照 R27 | [vLLM 路线](../research/claude/vllm/README.md) | `claude`（新终端已核验并确认收信） |
 
 当前按用户最新决定并行推进SGLang/vLLM。Codex不再编辑vLLM实现；Claude首阶段只需基本开发/GPU调通与行为对齐，优化机制后续单独筛选。源码路径和报告分开；共享GPU性能测试排队，不能互相干扰。统一迭代与观测标准见[evaluation.md](evaluation.md)，旧参与者报告保留为证据，运行状态以当前队列为准。
 

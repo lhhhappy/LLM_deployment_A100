@@ -265,6 +265,43 @@ class FetchTest(unittest.TestCase):
 
 
 class ScoringTest(unittest.TestCase):
+    def test_successful_replay_requires_frozen_work_not_raw_claimed_budget(self):
+        index = {"r": {"glm_tokens": 100, "max_output_i": 8}}
+        row = {"req_id": "r", "prompt_tokens": 100, "output_tokens": 8,
+               "cached_tokens": 64, "max_output_i": 8}
+        self.assertEqual(SCORE.validate_replay_tokens([row], index)["successful_checked"], 1)
+        for change, field in (({"output_tokens": 7, "max_output_i": 7}, "output_tokens"),
+                              ({"output_tokens": 9}, "output_tokens"),
+                              ({"output_tokens": 8.0}, "output_tokens"),
+                              ({"prompt_tokens": 99}, "prompt_tokens"),
+                              ({"cached_tokens": 101}, "cached_tokens"),
+                              ({"cached_tokens": -1}, "cached_tokens"),
+                              ({"cached_tokens": None}, "cached_tokens"),
+                              ({"cached_tokens": True}, "cached_tokens")):
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, field):
+                SCORE.validate_replay_tokens([dict(row, **change)], index)
+
+    def test_failed_requests_preserve_harness_error_rate_semantics(self):
+        rows = [{"req_id": "failed", "error": "ENGINE:EOF", "output_tokens": 3},
+                {"req_id": "infra", "error_class": "infra_error"},
+                {"req_id": "ok", "prompt_tokens": 100, "output_tokens": 512, "cached_tokens": 0}]
+        receipt = SCORE.validate_replay_tokens(rows, {"ok": {"glm_tokens": 100}})
+        self.assertEqual(receipt["successful_checked"], 1)
+        self.assertEqual(receipt["error_rows_skipped"], 2)
+
+    def test_file_entrypoint_rejects_early_successful_eof_on_complete_real_cohort(self):
+        source = ROOT / "evidence/L042"
+        if not (source / "summary.json").is_file():
+            self.skipTest("historical L042 evidence not installed")
+        summary = json.loads((source / "summary.json").read_text())
+        rows = [json.loads(line) for line in (source / Path(summary["raw"]).name).read_text().splitlines() if line.strip()]
+        rows[0]["output_tokens"] -= 1  # Same full cohort, but less actual decode work.
+        with tempfile.TemporaryDirectory() as directory:
+            raw = Path(directory) / "raw.jsonl"
+            raw.write_text("".join(json.dumps(row) + "\n" for row in rows))
+            with self.assertRaisesRegex(ValueError, "replay token contract mismatch: output_tokens"):
+                SCORE.score_files(raw, source / Path(summary["run"]).name)
+
     def test_interval_boundary_is_diagnostic_not_a_tpot_waiver(self):
         for n, expected in ((20, (3, 2, 3)), (314, (22, 22, 23)), (328, (23, 22, 24)), (388, (27, 26, 27))):
             self.assertEqual((SCORE.allowed_over(n), SCORE.alternative_allowed(n, "wilson"),

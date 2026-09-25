@@ -26,7 +26,10 @@ unweighted per-request mean and dev's p95 convention. No statistical allowance
 is applied to the 0.10 s/token gate. Missing/invalid multi-token TPOT blocks the
 estimate; single-token outputs have undefined TPOT and are counted separately.
 The file entrypoint also checks the full dev request index (each req_id once,
-with its chain position) before reporting PASS or FAIL. Partial raw files are
+with its chain position), and checks successful responses against the frozen
+prompt/output token budgets and legal cache counts before reporting PASS/FAIL.
+This is replay validity, not an additional official SLO gate. Error rows remain
+in the original harness error-rate denominator. Partial raw files are
 invalid input; use score_records() directly for diagnostic subsets.
 Cache diagnostics retain frozen uncached_expected bucket membership.
 
@@ -402,6 +405,49 @@ def read_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"), parse_constant=invalid)
 
 
+def validate_replay_tokens(records: list[dict], index: dict) -> dict:
+    """Reject shortened/misrendered successful replays; never trust raw budgets.
+
+    A stream can end normally before its requested length without the public
+    loadgen reporting an error. Such a run must not be compared as equal work.
+    Failed requests keep their original error classification and rate checks.
+    Counts are reported metadata, not independent proof of model execution.
+    """
+    checked = skipped = 0
+    invalid = Counter()
+    examples = {}
+    for row in records:
+        if row.get("error") or row.get("error_class"):
+            skipped += 1
+            continue
+        rid = row["req_id"]
+        frozen = index[rid]
+        prompt = frozen.get("glm_tokens")
+        # Exactly the original loadgen's default for an absent/zero budget.
+        budget = frozen.get("max_output_i") or 512
+        if type(prompt) is not int or prompt <= 0 or type(budget) is not int or budget <= 0:
+            raise ValueError(f"invalid frozen token budget for {rid}")
+        checked += 1
+        failures = {
+            "output_tokens": type(row.get("output_tokens")) is not int or row["output_tokens"] != budget,
+            "prompt_tokens": type(row.get("prompt_tokens")) is not int or row["prompt_tokens"] != prompt,
+            "cached_tokens": type(row.get("cached_tokens")) is not int
+                             or not 0 <= row["cached_tokens"] <= prompt,
+        }
+        for field, failed in failures.items():
+            if failed:
+                invalid[field] += 1
+                if len(examples.setdefault(field, [])) < 3:
+                    examples[field].append(rid)
+    if invalid:
+        detail = "; ".join(f"{field} x{count} ({', '.join(examples[field])})"
+                           for field, count in sorted(invalid.items()))
+        raise ValueError("replay token contract mismatch: " + detail)
+    return {"verified": True, "successful_checked": checked, "error_rows_skipped": skipped,
+            "basis": "frozen glm_tokens/max_output_i; 0 <= cached_tokens <= prompt_tokens",
+            "scope": "reported counts; errors remain subject to original harness gates"}
+
+
 def resolve_inputs(raw: Path | None, run: Path | None, directory: Path | None) -> tuple[Path, Path]:
     if directory is not None:
         directory = directory.resolve()
@@ -439,6 +485,7 @@ def score_files(raw: Path, run: Path, harness: Path = DEFAULT_HARNESS,
                     raise ValueError(f"raw line {line_number} has non-finite values")
                 records.append(record)
     scorer = load_harness(harness)
+    replay_tokens = {"verified": False, "reason": "no frozen request index supplied"}
     if requests is not None:
         common = sys.modules["s1_common"]
         expected_index, _, _ = common.load_index(str(requests.parent))
@@ -453,7 +500,9 @@ def score_files(raw: Path, run: Path, harness: Path = DEFAULT_HARNESS,
             raise ValueError("raw does not match full dev request index: "
                              f"duplicate={duplicate}, missing={missing}, unknown={unknown}, "
                              f"wrong_idx_in_chain={wrong_index}")
+        replay_tokens = validate_replay_tokens(records, expected_index)
     report = score_records(records, read_json(run), scorer, requests)
+    report["replay_tokens"] = replay_tokens
     report["paths"] = {"raw": str(raw.resolve()), "run": str(run.resolve()),
                        "dev_scorer": str(harness.resolve() / "s1_score.py")}
     return report

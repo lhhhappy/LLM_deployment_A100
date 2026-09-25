@@ -135,6 +135,72 @@ class CompareRuns(unittest.TestCase):
             self.assertIn("fixed 0 {}", line)
             self.assertIn("new 0 {}", line)
 
+    def cross_engine_fixture(self):
+        src = ROOT / "evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30"
+        if not (src / "flush_evidence.json").is_file():
+            self.skipTest("requires complete 069 receipts")
+        cand = self.tmp / "cross-engine"
+        cand.mkdir()
+        for name in ("summary.json", "flush_evidence.json", "level_verdict.json"):
+            shutil.copy(src / name, cand / name)
+        for pattern in ("raw_*.jsonl", "run_*.json"):
+            for path in src.glob(pattern):
+                shutil.copy(path, cand / path.name)
+        # Deliberately no SGLang server.log. Independent verdict's flush proof
+        # remains required; this fixture tests comparison, not engine reset.
+        args = ("--cross-engine", "--no-pairs", "--cohort", str(ROOT / "data/s1-dev-longchain/cohort.json"),
+                "--data-root", str(ROOT / "data/s1-dev-longchain"))
+        return src, cand, args
+
+    def test_cross_engine_needs_no_sglang_batch_logs(self):
+        base, cand, args = self.cross_engine_fixture()
+        rc, out = run(base, cand, *args)
+        self.assertEqual(rc, 0, out)
+        self.assertIn("CROSS_ENGINE_REPLAY N=30 warmup=rep16-v1", out)
+        self.assertIn("missing observations are not zero work", out)
+        self.assertNotIn("prefill batches 0", out)
+
+    def test_cross_engine_rejects_short_output_even_with_old_valid_verdict(self):
+        base, cand, args = self.cross_engine_fixture()
+        path = next(cand.glob("raw_*.jsonl"))
+        rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+        rows[0]["output_tokens"] -= 1
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        rc, out = run(base, cand, *args)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("replay token contract mismatch: output_tokens", out)
+
+    def test_cross_engine_optional_admission_timing_stays_unknown(self):
+        base, cand, args = self.cross_engine_fixture()
+        path = next(cand.glob("raw_*.jsonl"))
+        rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+        for row in rows:
+            row.pop("t_exec_start_s", None)
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        rc, out = run(base, cand, *args)
+        self.assertEqual(rc, 0, out)
+        self.assertIn("wait: unknown (no matched phase timings)", out)
+
+    def test_cross_engine_rejects_different_n_or_warmup_plan(self):
+        base, cand, args = self.cross_engine_fixture()
+        run_path = next(cand.glob("run_*.json"))
+        metadata = json.loads(run_path.read_text())
+        original_n = metadata["config"]["N"]
+        metadata["config"]["N"] = original_n + 4
+        run_path.write_text(json.dumps(metadata))
+        rc, out = run(base, cand, *args)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("inconsistent N", out)
+        metadata["config"]["N"] = original_n
+        run_path.write_text(json.dumps(metadata))
+        path = cand / "flush_evidence.json"
+        flush = json.loads(path.read_text())
+        flush["short_warmup"]["plan_sha256"] = "0" * 64
+        path.write_text(json.dumps(flush))
+        rc, out = run(base, cand, *args)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("identical N, warmup profile and plan", out)
+
     def test_request_metadata_must_match(self):
         c = self.copy("c")
         rows = self.rows(c)

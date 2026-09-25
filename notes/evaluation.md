@@ -40,12 +40,41 @@ rep16-v1定义及覆盖边界见[组合与短预热](reports/sglang-shortwarm-ma
 
 ## 全量判定
 
-5601个请求各恰好一次、runner成功、本轮flush真实成功、指标齐全后，用原harness和score_formal：
+5601个请求各恰好一次、runner成功、本轮flush真实成功、指标齐全后，用原harness和score_formal。
+成功请求的prompt_tokens必须等于冻结glm_tokens、output_tokens必须等于原逐请求预算，cached_tokens为合法整数且不超过输入；
+违反回放合同记INVALID。失败请求仍按原错误率门统计，不要求失败响应也完整输出。这是本地有效性检查，不是新增官方SLO门。
+判定仍为：
 coverage=100%、harness_data=0、harness_render=0、engine_error<1%、infra_error<1%、
 四道TTFT门、gated_phases_have_samples、tpot_p95≤0.10，合计11门。
 四道TTFT使用题面统计余量；TPOT p95无余量。缺数据INVALID，有效但任一门不过FAIL。
 TPM使用原评分器固定稳态窗口及其有效性检查，不能用全程墙钟平均代替。
 保留全部失败请求ID和逐请求CSV，关联服务日志；同请求跨运行配对，再报告整体差异。
+
+## SGLang / vLLM 评测一致性
+
+用户2026-09-25明确要求：先验收评测一致，再比较引擎或移植优化。Claude交接冻结vLLM提交后，由Codex独立审查。
+
+- 共用只读原harness、冻结数据与模型/tokenizer；记录正文数据manifest、cohort、引擎和工具哈希。
+  prompt原文走`/generate`，不再套chat模板；逐请求ignore_eos/输出预算一致。
+- 同档对照使用同N、同链顺序、同gap规则、同rep16计划与真flush；短探针只报覆盖结果，不能混作完整档。
+  闭环回放的实际到达时刻随前驱完成时间变化，不强行锁成同一串HTTP时间戳。
+- 检查时间戳的真实产生位置：接收包含解析前阶段，首token须在结果实际可用后，首次入批不冒充计算完成。
+  TPOT沿用客户端首末SSE与累计token；不得混用引擎内部单步耗时或token加权均值。
+- 两路都用同四桶/统计余量/TPOT门、完整性和错误率检查。引擎专有日志只作诊断，缺少SGLang格式日志不能解释成vLLM性能或正确性失败。
+  本轮发现flush取证仍硬编码SGLang日志，需适配真实、可绑定本次请求的结构化完成收据，不能直接跳过真清证明。
+- 冷热缓存流程相同，实际命中可以不同，这是要比较的引擎行为；质量门各自通过，不设两路生成文本逐字相同的门。
+  参数名和默认值不要求相同，但实际硬件及资源预算要记录。SGLang host预算按rank，vLLM offloading预算按TP组总量，不能照抄数字。
+
+本轮源码复核、已修缺口及CPU证据见[实现审查](reports/contract-implementation-review-0925.md)。
+完整且零请求错误的跨引擎逐请求对照使用：
+
+```sh
+python3 -B scripts/analysis/compare_runs.py BASE_N30 CAND_N30 --cross-engine --no-pairs \
+  --data-root data/s1-dev-longchain --cohort data/s1-dev-longchain/cohort.json
+```
+
+该入口要求两侧独立完整verdict及flush/预热收据，不要求SGLang专有batch日志。
+缺首次入批诊断保留unknown；时间戳语义与正文来源仍须上述源码/部署收据核验。
 
 ## 迭代与仓库入口
 

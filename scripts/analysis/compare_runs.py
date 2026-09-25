@@ -4,6 +4,12 @@
   compare_runs.py BASE_DIR CAND_DIR [--pairs evidence/T56/pairs_rendered.json] [--harness-dir s1-dev/harness]
                   [--csv OUT.csv] [--no-pairs]
 
+For a same-N cross-engine comparison, add --cross-engine --data-root DATA.
+This requires explicit equal warmup profiles (and rep16 plan hashes), verifies
+successful token counts against the frozen index, and omits engine-specific
+batch diagnostics. It does not prove timestamp implementation equivalence or
+prompt-body identity; those require source review and frozen deployment receipts.
+
 Each DIR is an evidence level directory (raw_*.jsonl, server.log, level_verdict.json). Fails closed: each level's
 verdict must be VALID and its raw must hold exactly the frozen cohort's request ids (each once, no errors, server
 timestamps present). Gates are judged at raw precision; values are rounded only for display/CSV. A true-LCP pair is
@@ -58,7 +64,7 @@ def workload_identity(cfg, cohort):
     return cfg.get("set"), primary, canonical, workload
 
 
-def load(d, cohort_ids, cohort):
+def load(d, cohort_ids, cohort, *, request_only=False):
     raws = glob.glob(str(d / "raw_*.jsonl"))
     if len(raws) != 1:
         sys.exit(f"INVALID: {d} needs exactly one raw_*.jsonl, found {len(raws)}")
@@ -67,10 +73,11 @@ def load(d, cohort_ids, cohort):
         sys.exit(f"INVALID: {d} level_verdict status is {verdict.get('status')!r}, not VALID")
     rows = [json.loads(l) for l in open(raws[0]) if l.strip()]
     by = {}
+    required = ("t_recv_s", "t_first_token_s", "ttft_s") + (() if request_only else ("t_exec_start_s",))
     for r in rows:
         if r["req_id"] in by:
             sys.exit(f"INVALID: duplicate {r['req_id']} in {d}")
-        if r.get("error") or any(r.get(k) is None for k in ("t_recv_s", "t_exec_start_s", "t_first_token_s", "ttft_s")):
+        if r.get("error") or any(r.get(k) is None for k in required):
             sys.exit(f"INVALID: error or missing timestamps for {r['req_id']} in {d}")
         by[r["req_id"]] = r
     if set(by) != cohort_ids:
@@ -83,6 +90,8 @@ def load(d, cohort_ids, cohort):
         sys.exit(f"INVALID: {d} needs exactly one run_*.json, found {len(runs)}")
     cfg = json.loads(Path(runs[0]).read_text())["config"]
     ident = workload_identity(cfg, cohort)
+    if request_only:
+        return by, verdict, None, [], (None, None), ident
     t_lo, t_hi = min(r["t_recv_s"] for r in by.values()), max(r["t_first_token_s"] for r in by.values())
     # a log line stamped ts covers [ts, ts+1): interior only if that whole second lies inside [t_lo, t_hi]
     batches, pace, outside, edge = [], [], 0, 0
@@ -105,6 +114,46 @@ def load(d, cohort_ids, cohort):
     if not batches:
         sys.exit(f"INVALID: no prefill log lines inside the measurement window of {d}")
     return by, verdict, batches, pace, (outside, edge), ident
+
+
+def check_cross_engine_contract(base, cand, B, C, vb, vc, data_root):
+    """Same replay contract, independent of SGLang-specific log text."""
+    from s1_common import load_index
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from score_formal import validate_replay_tokens
+
+    conditions = []
+    index, _, _ = load_index(str(data_root))
+    for directory, rows, verdict in ((base, B, vb), (cand, C, vc)):
+        if set(rows) != set(index):
+            sys.exit(f"INVALID: frozen token index differs from {directory}")
+        try:
+            validate_replay_tokens(list(rows.values()), index)
+        except ValueError as error:
+            sys.exit(f"INVALID: {error}")
+        cfg = json.loads(next(directory.glob('run_*.json')).read_text())["config"]
+        summary = json.loads((directory / "summary.json").read_text())
+        flush = json.loads((directory / "flush_evidence.json").read_text())
+        n = cfg.get("N")
+        if type(n) is not int or n <= 0 or n != verdict.get("n") or n != summary.get("n"):
+            sys.exit(f"INVALID: inconsistent N in {directory}")
+        profile = summary.get("warmup_profile")
+        if profile not in ("original", "rep16-v1") or profile != flush.get("warmup_profile"):
+            sys.exit(f"INVALID: explicit warmup profile missing/inconsistent in {directory}")
+        if flush.get("flush_success") is not True or flush.get("runner_rc") != 0:
+            sys.exit(f"INVALID: unsuccessful flush/runner in {directory}")
+        if verdict.get("flush", {}).get("verified") is not True:
+            sys.exit(f"INVALID: level lacks verified flush in {directory}")
+        plan = None
+        if profile == "rep16-v1":
+            warm = flush.get("short_warmup", {})
+            plan = warm.get("plan_sha256")
+            if warm.get("status") != "COMPLETE" or not isinstance(plan, str) or len(plan) != 64:
+                sys.exit(f"INVALID: completed rep16 plan missing in {directory}")
+        conditions.append((n, profile, plan))
+    if conditions[0] != conditions[1]:
+        sys.exit("INVALID: cross-engine comparison requires identical N, warmup profile and plan")
+    return conditions[0]
 
 
 def pair_ok(p, r, by):
@@ -135,6 +184,10 @@ def main():
     ap.add_argument("--harness-dir", type=Path, default=root / "s1-dev/harness")
     ap.add_argument("--cohort", type=Path, default=root / "s1-dev/harness/g0a/samples_v3/cohort_dev-combined-v1.json")
     ap.add_argument("--csv", type=Path)
+    ap.add_argument("--cross-engine", action="store_true",
+                    help="same-N evaluation contract; omit engine-specific batch logs")
+    ap.add_argument("--data-root", type=Path, default=root / "s1-dev/data/dev-combined-v1",
+                    help="frozen token index for --cross-engine")
     a = ap.parse_args()
     sys.path.insert(0, str(a.harness_dir))
     from s1_common import in_ttft_gate  # noqa: E402
@@ -148,8 +201,8 @@ def main():
     cohort_hash = hashlib.sha256(json.dumps(cohort["chains"], ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:16]
     if cohort_hash != cohort.get("cohort_sha256"):
         sys.exit("INVALID: cohort identity differs from supplied cohort contents")
-    B, vb, bb, _, ob_out, ib = load(a.base, cohort_ids, cohort)
-    C, vc, bc, pace, oc_out, ic = load(a.cand, cohort_ids, cohort)
+    B, vb, bb, _, ob_out, ib = load(a.base, cohort_ids, cohort, request_only=a.cross_engine)
+    C, vc, bc, pace, oc_out, ic = load(a.cand, cohort_ids, cohort, request_only=a.cross_engine)
     if ib != ic:
         sys.exit(f"INVALID: workload identity differs: {ib} vs {ic}")
     meta = ("prompt_tokens", "uncached_expected", "max_output_i", "phase", "chain_id", "idx_in_chain", "edge_type",
@@ -157,6 +210,10 @@ def main():
     diff = [rid for rid in B if any(B[rid].get(k) != C[rid].get(k) for k in meta)]
     if diff:
         sys.exit(f"INVALID: {len(diff)} requests differ in replay metadata, e.g. {diff[0]}")
+    if a.cross_engine:
+        n, profile, plan = check_cross_engine_contract(a.base, a.cand, B, C, vb, vc, a.data_root)
+        print(f"CROSS_ENGINE_REPLAY N={n} warmup={profile} plan={plan}; "
+              "timestamp semantics and prompt-body identity require independent receipts")
     pairs = {} if a.no_pairs else {p["req_id"]: p for p in json.loads(a.pairs.read_text())}
     bad_pairs = 0
 
@@ -175,8 +232,9 @@ def main():
         row = dict(req_id=rid)
         for tag, r in (("b", rb), ("c", rc)):  # raw precision here; rounded only when written/printed
             row[f"{tag}_ttft"] = r["ttft_s"]
-            row[f"{tag}_wait"] = r["t_exec_start_s"] - r["t_recv_s"]
-            row[f"{tag}_run"] = r["t_first_token_s"] - r["t_exec_start_s"]
+            admitted = r.get("t_exec_start_s")
+            row[f"{tag}_wait"] = admitted - r["t_recv_s"] if admitted is not None else None
+            row[f"{tag}_run"] = r["t_first_token_s"] - admitted if admitted is not None else None
             row[f"{tag}_cached"] = r["cached_tokens"]
             row[f"{tag}_tpot"] = r["tpot_s"] if r.get("tpot_s") is not None else ""
             row[f"{tag}_lcp_gap"] = max(0, p["true_lcp"] // 64 * 64 - r["cached_tokens"]) if ok[tag] else ""
@@ -195,6 +253,8 @@ def main():
                 dc = r["c_cached"] - r["b_cached"]
                 if abs(dc) >= 1024:
                     c["cache " + ("more" if dc > 0 else "less")] += 1
+                elif r["b_wait"] is None or r["c_wait"] is None:
+                    c["phase_unknown"] += 1
                 elif abs(r["c_wait"] - r["b_wait"]) >= abs(r["c_run"] - r["b_run"]):
                     c["wait"] += 1
                 else:
@@ -204,19 +264,29 @@ def main():
               f" | new {len(broke)} {why(broke)}")
         if g:
             for k in ("wait", "run"):
-                print(f"      {k}: p50 {pct([r['b_'+k] for r in g], .5):.2f} -> {pct([r['c_'+k] for r in g], .5):.2f}"
-                      f" | p95 {pct([r['b_'+k] for r in g], .95):.2f} -> {pct([r['c_'+k] for r in g], .95):.2f}")
+                observed = [r for r in g if r['b_'+k] is not None and r['c_'+k] is not None]
+                if not observed:
+                    print(f"      {k}: unknown (no matched phase timings)")
+                    continue
+                print(f"      {k}: p50 {pct([r['b_'+k] for r in observed], .5):.2f} -> {pct([r['c_'+k] for r in observed], .5):.2f}"
+                      f" | p95 {pct([r['b_'+k] for r in observed], .95):.2f} -> {pct([r['c_'+k] for r in observed], .95):.2f}"
+                      f" | observed {len(observed)}/{len(g)} matched requests")
     tb = [r["b_tpot"] for r in rows if r["b_tpot"] != ""]
     tc = [r["c_tpot"] for r in rows if r["c_tpot"] != ""]
     n_pair = sum(1 for rid in B if rid in pairs)
     print(f"  LCP gap (T56 pairs, unverified source, diagnostic only): metadata-checked {n_pair - bad_pairs}, "
           f"rejected {bad_pairs}, no pair (unknown) {len(B) - n_pair} of {len(B)}; workload identity {ib}")
-    print(f"  prefill lines excluded: before/after the window base {ob_out[0]} cand {oc_out[0]}, in boundary seconds "
-          f"base {ob_out[1]} cand {oc_out[1]}")
+    if not a.cross_engine:
+        print(f"  prefill lines excluded: before/after the window base {ob_out[0]} cand {oc_out[0]}, in boundary seconds "
+              f"base {ob_out[1]} cand {oc_out[1]}")
+    else:
+        print("  engine-specific prefill diagnostics omitted; missing observations are not zero work")
     print(f"  tpot per request > 0.10: {sum(x > .10 for x in tb)} -> {sum(x > .10 for x in tc)}")
     print(f"  cached tokens total: {sum(r['b_cached'] for r in rows)/1e6:.2f}M -> {sum(r['c_cached'] for r in rows)/1e6:.2f}M;"
           f" requests with |delta cached| >= 1024: {sum(abs(r['c_cached']-r['b_cached']) >= 1024 for r in rows)}")
     for tag, bs in (("base", bb), ("cand", bc)):
+        if bs is None:
+            continue
         h = collections.Counter("<=2k" if b[1] <= 2048 else "<=4k" if b[1] <= 4160 else "<=8k" if b[1] <= 8256 else ">8k"
                                 for b in bs)
         solo = sum(1 for b in bs if b[5] > 0 and b[0] == 1)
