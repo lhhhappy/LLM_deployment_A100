@@ -4,6 +4,7 @@ import logging
 from array import array
 
 from sglang.srt.environ import envs
+from sglang.srt.managers import ax_chunk_alignment
 from sglang.srt.managers.prefill_delayer import PrefillDelayerSinglePassExecutor
 from sglang.srt.runtime_context import (
     get_disagg,
@@ -1128,6 +1129,9 @@ class PrefillAdder:
                     return req
                 _rem_tokens = self.rem_chunk_tokens
 
+        cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
+            req.prefix_indices
+        )
         if self.ax_protect is not None:
             self.ax_continuation = req
             cap, _, grid = self.ax_protect
@@ -1141,10 +1145,15 @@ class PrefillAdder:
             else:
                 _rem_tokens = min(_rem_tokens, self.rem_input_tokens)
             # Preserve checkpoint, KV-page and DSA/deterministic alignment.
-            # Below one grid unit retain the native resource-limited progress;
-            # the no-starvation bound assumes room for at least one unit.
+            # A truncated sub-grid chunk can misalign every later kernel
+            # snapshot with the cache tree. Keep the partial parked until a
+            # whole unit fits; a complete short tail can still finish now.
             if _rem_tokens >= grid:
                 _rem_tokens = _rem_tokens // grid * grid
+            elif cand_extend_input_len > _rem_tokens:
+                if ax_chunk_alignment.ENABLED:
+                    ax_chunk_alignment.defer(req, _rem_tokens, grid)
+                return req
 
         # A mid-chunk rank prefills this pass regardless of the delayer
         # verdict, so report prefillable=True and ignore the result.
@@ -1157,9 +1166,6 @@ class PrefillAdder:
                 waiting_queue_len=self.waiting_queue_len,
             )
 
-        cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
-            req.prefix_indices
-        )
         truncated = cand_extend_input_len > _rem_tokens
         new_len = min(cand_extend_input_len, _rem_tokens)
         if not truncated:
@@ -1171,6 +1177,8 @@ class PrefillAdder:
             if role_len is not None:
                 new_len, truncated = role_len, True
         req.set_extend_range(len(req.prefix_indices), len(req.prefix_indices) + new_len)
+        if ax_chunk_alignment.ENABLED:
+            ax_chunk_alignment.resume(req, new_len, truncated)
         self.can_run_list.append(req)
         self._update_prefill_budget(
             0,
