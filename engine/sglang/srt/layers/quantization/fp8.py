@@ -2460,6 +2460,15 @@ class Fp8MoEMethod(FusedMoEMethodBase):
         if self.ax_sm80_marlin:  # [ax] 111
             from sglang.srt.layers.moe.moe_runner.marlin import MarlinMoeQuantInfo
 
+            # Under EP the dispatcher has already mapped topk_ids to local ids (-1 for experts on other
+            # ranks). Marlin only needs to know that (is_ep: skip -1 blocks) and the global expert count;
+            # the ids must not be mapped again. Same inputs as mxfp4_marlin_moe.build_marlin_moe_quant_info.
+            expert_map = getattr(layer.dispatcher, "local_expert_mapping", None)
+            if expert_map is None and layer.moe_ep_size > 1:
+                raise RuntimeError(
+                    "[ax] 111: Marlin FP8 MoE under expert parallelism needs the dispatcher's local expert "
+                    "mapping; without it -1 ids index weights before the local expert range"
+                )
             quant_info = MarlinMoeQuantInfo(
                 w13_qweight=layer.w13_weight,
                 w2_qweight=layer.w2_weight,
@@ -2468,6 +2477,8 @@ class Fp8MoEMethod(FusedMoEMethodBase):
                 w13_g_idx_sort_indices=None,
                 w2_g_idx_sort_indices=None,
                 weight_bits=8,
+                expert_map=expert_map,
+                global_num_experts=layer.dispatcher.num_experts if expert_map is not None else -1,
                 fp8_weights=True,
             )
             return self.runner.run(dispatch_output, quant_info)

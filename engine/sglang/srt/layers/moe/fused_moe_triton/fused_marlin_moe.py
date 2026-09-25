@@ -272,14 +272,16 @@ def fused_marlin_moe(
     topk = topk_ids.shape[1]
     gemm1_n = 2 * N if is_gated else N
 
-    # M block size selection logic
-    # TODO: tune this further for specific models
-    for block_size_m in [8, 16, 32, 48, 64]:
-        if M * topk / E / block_size_m < 0.9:
-            break
-
     if global_num_experts == -1:
         global_num_experts = E
+
+    # M block size selection logic
+    # TODO: tune this further for specific models
+    # [ax] 111: size by rows per expert, M * topk / global experts. Under EP most ids are -1 (experts on
+    # other ranks), so dividing by the local count overestimates the rows 8x at EP8 and pads small batches.
+    for block_size_m in [8, 16, 32, 48, 64]:
+        if M * topk / global_num_experts / block_size_m < 0.9:
+            break
     if (
         M == 1
         and topk <= 32
