@@ -1,0 +1,46 @@
+{
+  "scope": "TP0-only server events inside measurement; counts retractions, not unique requests or recompute tokens",
+  "runs": {
+    "067": {
+      "events": [
+        {
+          "dispatch_relative_min": 6.169254791736603,
+          "retracted_requests": 1,
+          "kv_tokens_freed": 320,
+          "line": "[2026-09-24 15:22:01 TP0] KV cache pool is full. Retract requests. #retracted_reqs: 1, #new_tokens_gained: 320, #mamba_num_gained: 3, #new_token_ratio: 0.0980 -> 0.7103"
+        },
+        {
+          "dispatch_relative_min": 21.435921458403268,
+          "retracted_requests": 1,
+          "kv_tokens_freed": 384,
+          "line": "[2026-09-24 15:37:17 TP0] KV cache pool is full. Retract requests. #retracted_reqs: 1, #new_tokens_gained: 384, #mamba_num_gained: 3, #new_token_ratio: 0.0980 -> 0.5517"
+        },
+        {
+          "dispatch_relative_min": 47.70258812506994,
+          "retracted_requests": 1,
+          "kv_tokens_freed": 576,
+          "line": "[2026-09-24 16:03:33 TP0] KV cache pool is full. Retract requests. #retracted_reqs: 1, #new_tokens_gained: 576, #mamba_num_gained: 4, #new_token_ratio: 0.0980 -> 0.6024"
+        }
+      ],
+      "n_events": 3,
+      "sum_retracted_requests": 3
+    },
+    "068": {
+      "events": [],
+      "n_events": 0,
+      "sum_retracted_requests": 0
+    },
+    "069": {
+      "events": [
+        {
+          "dispatch_relative_min": 24.5690957069397,
+          "retracted_requests": 1,
+          "kv_tokens_freed": 2944,
+          "line": "[2026-09-24 20:31:32 TP0] KV cache pool is full. Retract requests. #retracted_reqs: 1, #new_tokens_gained: 2944, #mamba_num_gained: 3, #new_token_ratio: 0.0980 -> 0.5922"
+        }
+      ],
+      "n_events": 1,
+      "sum_retracted_requests": 1
+    }
+  }
+}

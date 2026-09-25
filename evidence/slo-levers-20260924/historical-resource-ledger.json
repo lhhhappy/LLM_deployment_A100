@@ -1,0 +1,77 @@
+[
+ {
+  "trace": "evidence/T51/prof45/P98304_c1024_nostack/P98304_nostack-1790158782.4961421-TP-0.trace.json.gz",
+  "window_s": 0.26847346484375,
+  "gpu_annotation_count": 45,
+  "logical_step_count": 2,
+  "timeline": {
+   "extend_gpu_span": 0.9340164582431455,
+   "decode_gpu_span": 0.054612204386411733,
+   "other_gpu_span": 0.0,
+   "outside_steps": 0.011371337370442824
+  },
+  "classes": {
+   "decode": {
+    "n": 1,
+    "mean_new_toks": 0.0,
+    "mean_gpu_span_ms": 14.661927734375,
+    "mean_kernel_busy_ms": 10.54226171875,
+    "idle_in_span_share": 0.28097710548432264,
+    "mean_cpu_span_ms": 4.416619140625,
+    "us_per_new_token": null,
+    "kernel_share": {
+     "other": 0.298,
+     "gemm": 0.278,
+     "moe": 0.169,
+     "mhc_norm": 0.159,
+     "kda": 0.094,
+     "dsa_attn": 0.002
+    }
+   },
+   "extend<2k": {
+    "n": 1,
+    "mean_new_toks": 1024.0,
+    "mean_gpu_span_ms": 250.758634765625,
+    "mean_kernel_busy_ms": 99.6209970703125,
+    "idle_in_span_share": 0.6027215686374086,
+    "mean_cpu_span_ms": 250.9733369140625,
+    "us_per_new_token": 244.88147926330566,
+    "kernel_share": {
+     "other": 0.4,
+     "moe": 0.264,
+     "kda": 0.115,
+     "gemm": 0.111,
+     "mhc_norm": 0.11,
+     "dsa_attn": 0.0
+    }
+   }
+  },
+  "top_kernels_ms": {
+   "void sglang::device::marlin_moe::Marlin<__nv_bfloat16, 2814749767172868l, 1125899906909960": 25.1,
+   "_prefill": 17.7,
+   "main_kernel": 15.6,
+   "mhc_pre_gemm_sqrsum_splitk_stage_0_kernel": 4.4,
+   "mhc_post_tilelang_kernel": 4.0,
+   "mhc_pre_big_fuse_with_norm_tilelang_kernel": 4.0,
+   "void sglang::(anonymous namespace)::kpool_topk_transform_kernel<512>(sglang::(anonymous na": 3.6,
+   "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_64x3_tn": 3.6,
+   "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_32x3_tn": 3.0,
+   "void sglang::device::marlin::Marlin<__nv_bfloat16, 2814749767172868l, 256, 4, 16, 4, false": 3.0,
+   "chunk_kda_fwd_kernel_inter_solve_fused": 2.4,
+   "void moe_sum_reduce_warp_per_token_vec_kernel<8>(c10::BFloat16 const*, c10::BFloat16*, lon": 2.4,
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:": 2.3,
+   "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, ": 1.9,
+   "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_64x3_tn": 1.2,
+   "chunk_gated_delta_rule_fwd_kernel_h_blockdim64": 1.1,
+   "ampere_s16816gemm_bf16_128x128_ldg8_stages_64x3_tn": 0.9,
+   "void at::native::index_elementwise_kernel<128, 4, at::native::gpu_index_kernel<at::native:": 0.9,
+   "std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, __nv_bfloat16, floa": 0.8,
+   "ampere_bf16_s16816gemm_bf16_128x64_ldg8_f2f_stages_64x3_tn": 0.8,
+   "ampere_s16816gemm_bf16_128x64_ldg8_stages_64x4_tn": 0.7,
+   "_router_triton_kernel": 0.6,
+   "_causal_conv1d_fwd_kernel": 0.5,
+   "void sglang::device::marlin::Marlin<__nv_bfloat16, 2814749767172868l, 256, 1, 8, 8, true, ": 0.5,
+   "chunk_gla_fwd_kernel_o": 0.4
+  }
+ }
+]

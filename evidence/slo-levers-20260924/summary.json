@@ -1,0 +1,167 @@
+{
+  "scope": "068/069 complete local N30, same frozen cohort; descriptive, no causal attribution",
+  "limits": [
+    "queue-heavy is not proof of a scheduler defect or idle GPU",
+    "exec-to-first is not pure kernel time",
+    "final cached_tokens does not identify device vs host residency at arrival",
+    "later arrivals executing earlier do not identify the admission rejection reason",
+    "bucket quantiles are separate requests and must not be summed",
+    "local N30 does not predict official N34/N38"
+  ],
+  "runs": {
+    "068": {
+      "raw_sha256": "a058e7b12d933f5522494937cf7f66781a0169f3682f6da5fe9b538f40c2a9e0",
+      "rows": 5601,
+      "uncached_prompt": 30809642,
+      "tpot_mean": 0.0342620702754677,
+      "tpot_p95": 0.07250074699248482,
+      "buckets": {
+        "fast_intra": {
+          "n": 4765,
+          "bad": 461,
+          "allowed": 263,
+          "ttft_p95_s": 8.380045652389526,
+          "recv_to_exec_p95_s": 5.801527738571167,
+          "exec_to_first_p95_s": 1.2253084182739258,
+          "bad_recv_to_exec_ge_80pct": 295,
+          "bad_queue_timer_ge_80pct": 251,
+          "bad_exec_to_first_gt_limit": 126,
+          "bad_actual_uncached_le4096": 187,
+          "bad_dispatch_min_range": [
+            0.666908613840739,
+            98.36173486312231
+          ],
+          "uncached_prompt": 13863139
+        },
+        "overall_intra": {
+          "n": 5010,
+          "bad": 410,
+          "allowed": 276,
+          "ttft_p95_s": 9.650898694992065,
+          "recv_to_exec_p95_s": 6.8698811531066895,
+          "exec_to_first_p95_s": 1.803307294845581,
+          "bad_recv_to_exec_ge_80pct": 253,
+          "bad_queue_timer_ge_80pct": 240,
+          "bad_exec_to_first_gt_limit": 82,
+          "bad_actual_uncached_le4096": 122,
+          "bad_dispatch_min_range": [
+            0.382327675819397,
+            97.64524178504944
+          ],
+          "uncached_prompt": 17414017
+        },
+        "turn_start": {
+          "n": 159,
+          "bad": 13,
+          "allowed": 13,
+          "ttft_p95_s": 20.884069204330444,
+          "recv_to_exec_p95_s": 13.402719974517822,
+          "exec_to_first_p95_s": 10.978001356124878,
+          "bad_recv_to_exec_ge_80pct": 5,
+          "bad_queue_timer_ge_80pct": 5,
+          "bad_exec_to_first_gt_limit": 3,
+          "bad_actual_uncached_le4096": 0,
+          "bad_dispatch_min_range": [
+            3.1096996585528056,
+            48.96795334418615
+          ],
+          "uncached_prompt": 2249183
+        },
+        "chain_start": {
+          "n": 432,
+          "bad": 50,
+          "allowed": 29,
+          "ttft_p95_s": 100.38164281845093,
+          "recv_to_exec_p95_s": 95.84474611282349,
+          "exec_to_first_p95_s": 13.721137046813965,
+          "bad_recv_to_exec_ge_80pct": 41,
+          "bad_queue_timer_ge_80pct": 41,
+          "bad_exec_to_first_gt_limit": 3,
+          "bad_actual_uncached_le4096": 1,
+          "bad_dispatch_min_range": [
+            0.0013519485791524252,
+            64.55104735294978
+          ],
+          "uncached_prompt": 11146442
+        }
+      }
+    },
+    "069": {
+      "raw_sha256": "a6a6a2cffe80cfdd7e24f0769c12b75b88b1e54d2bf5b92d5ee31bf7b003334b",
+      "rows": 5601,
+      "uncached_prompt": 19131690,
+      "tpot_mean": 0.028824435259178417,
+      "tpot_p95": 0.055902278097016166,
+      "buckets": {
+        "fast_intra": {
+          "n": 4765,
+          "bad": 222,
+          "allowed": 263,
+          "ttft_p95_s": 2.7038826942443848,
+          "recv_to_exec_p95_s": 2.2913286685943604,
+          "exec_to_first_p95_s": 0.6358745098114014,
+          "bad_recv_to_exec_ge_80pct": 218,
+          "bad_queue_timer_ge_80pct": 195,
+          "bad_exec_to_first_gt_limit": 1,
+          "bad_actual_uncached_le4096": 205,
+          "bad_dispatch_min_range": [
+            0.7058680335680644,
+            68.58325637578965
+          ],
+          "uncached_prompt": 6151907
+        },
+        "overall_intra": {
+          "n": 5010,
+          "bad": 195,
+          "allowed": 276,
+          "ttft_p95_s": 3.6267874240875244,
+          "recv_to_exec_p95_s": 3.005403518676758,
+          "exec_to_first_p95_s": 0.7190396785736084,
+          "bad_recv_to_exec_ge_80pct": 179,
+          "bad_queue_timer_ge_80pct": 174,
+          "bad_exec_to_first_gt_limit": 7,
+          "bad_actual_uncached_le4096": 131,
+          "bad_dispatch_min_range": [
+            0.4617690920829773,
+            68.58325637578965
+          ],
+          "uncached_prompt": 8737409
+        },
+        "turn_start": {
+          "n": 159,
+          "bad": 7,
+          "allowed": 13,
+          "ttft_p95_s": 13.640632629394531,
+          "recv_to_exec_p95_s": 12.765285015106201,
+          "exec_to_first_p95_s": 1.3651254177093506,
+          "bad_recv_to_exec_ge_80pct": 4,
+          "bad_queue_timer_ge_80pct": 4,
+          "bad_exec_to_first_gt_limit": 1,
+          "bad_actual_uncached_le4096": 2,
+          "bad_dispatch_min_range": [
+            3.098224413394928,
+            41.42381099462509
+          ],
+          "uncached_prompt": 869599
+        },
+        "chain_start": {
+          "n": 432,
+          "bad": 31,
+          "allowed": 29,
+          "ttft_p95_s": 40.33553600311279,
+          "recv_to_exec_p95_s": 35.35775351524353,
+          "exec_to_first_p95_s": 13.475683450698853,
+          "bad_recv_to_exec_ge_80pct": 20,
+          "bad_queue_timer_ge_80pct": 20,
+          "bad_exec_to_first_gt_limit": 2,
+          "bad_actual_uncached_le4096": 2,
+          "bad_dispatch_min_range": [
+            0.002314337094624837,
+            38.37698348760605
+          ],
+          "uncached_prompt": 9524682
+        }
+      }
+    }
+  }
+}

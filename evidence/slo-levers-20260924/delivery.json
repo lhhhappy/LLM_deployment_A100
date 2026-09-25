@@ -1,0 +1,25 @@
+{
+  "admission_commit": "ce6c4f6",
+  "validation": {
+    "admission_and_parser_cpu_tests": 13,
+    "existing_scheduler_cpu_tests": 32,
+    "paced_prefill_cpu_tests": 15,
+    "archive_cpu_tests": 10,
+    "ast_parse_files": 6
+  },
+  "gpu_measurements_added": false,
+  "pod_engine_deployed": false,
+  "diagnostic_default": "off",
+  "diagnostic_budget_bytes_per_tp0_process": 8388608,
+  "archive_maintenance": {
+    "pid": 41005,
+    "started_at": 1790294563.506937,
+    "cleanup_enabled": true,
+    "destination": "/workspace/Agentic_science_challenge/evidence/pod-archives",
+    "runs": [],
+    "state": "retrying",
+    "error": "Error: inference service \"2102486579267252224\" has no Running pod (status: deploying); for a stopped service use `inference logs --history` / `inference pod-events` to diagnose (code=E_ERROR)\n",
+    "finished_at": 1790294572.912053
+  },
+  "prof_ledger_source_sha256": "f567f85d410770b6360210237ef9d90b7642121e0d0bd0ae7042b7604285fd53"
+}
