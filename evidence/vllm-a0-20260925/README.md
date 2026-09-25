@@ -9,3 +9,4 @@
 
 两卡探针的 TTFT 与 MTP 事件数来自 dummy 权重的 8 层替身，不代表真实模型性能或 MTP 接受率。
 缓存命中数与模型权重无关：87,995 token 的提示词二次命中 85,248 = floor(L/B)·B − B，B=2304（启动日志 "Setting attention block size to 2304 tokens"）。
+| `prefix-reuse-tp2-default.json`、`prefix-reuse-tp2-dense-u64.json` | `scripts/vllm/probe_prefix_reuse.py`：同 3 条链各 8 轮顺序回放（flush 后、无并发）。默认配置冻结 LCP 内重算 144,083 token；`--prefix-cache-retention-interval None --prefix-match-unit 64` 为 74,771 | 两卡替身 |

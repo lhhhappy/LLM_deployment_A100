@@ -27,7 +27,10 @@ def main() -> None:
 
     args.dst.mkdir(parents=True, exist_ok=True)
     for f in args.src.iterdir():
-        if f.is_file() and f.name not in ("config.json", "model.safetensors.index.json"):
+        if f.is_file() and f.name not in (
+            "config.json",
+            "model.safetensors.index.json",
+        ):
             shutil.copy2(f, args.dst / f.name)
 
     config = json.loads((args.src / "config.json").read_text())

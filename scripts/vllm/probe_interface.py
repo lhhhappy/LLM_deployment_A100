@@ -25,7 +25,10 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-for path in (os.path.join(REPO, "s1-dev", "harness"), os.environ.get("HARNESS_DIR", "")):
+for path in (
+    os.path.join(REPO, "s1-dev", "harness"),
+    os.environ.get("HARNESS_DIR", ""),
+):
     if path:
         sys.path.insert(0, path)
 
@@ -42,7 +45,9 @@ def post_json(url: str, payload: dict | None, timeout: float) -> tuple[int, dict
         return e.code, {"error": e.read(2048).decode("utf-8", "replace")}
 
 
-def generate(base: str, text: str, max_new_tokens: int, rid: str, timeout: float) -> dict:
+def generate(
+    base: str, text: str, max_new_tokens: int, rid: str, timeout: float
+) -> dict:
     """One streamed /generate; returns every meta_info plus client timings."""
     payload = {
         "text": text,
@@ -205,7 +210,9 @@ def main() -> int:
     checks["generate"] = {"ok": all(not x["bad"] for x in results), "requests": results}
 
     q = max(reqs, key=lambda x: x["glm_tokens"])
-    again = generate(base, q["text"], q["max_new_tokens"], q["rid"] + "#again", args.timeout)
+    again = generate(
+        base, q["text"], q["max_new_tokens"], q["rid"] + "#again", args.timeout
+    )
     cold = next(x for x in results if x["rid"] == q["rid"])
     warm = summarize(again)
     checks["cache_hit"] = {
@@ -217,9 +224,15 @@ def main() -> int:
     }
 
     status, body = post_json(base + "/flush_cache", None, 120)
-    after = summarize(generate(base, q["text"], q["max_new_tokens"], q["rid"] + "#flushed", args.timeout))
+    after = summarize(
+        generate(
+            base, q["text"], q["max_new_tokens"], q["rid"] + "#flushed", args.timeout
+        )
+    )
     checks["flush"] = {
-        "ok": status == 200 and body.get("success") is True and after["cached_tokens"] == 0,
+        "ok": status == 200
+        and body.get("success") is True
+        and after["cached_tokens"] == 0,
         "status": status,
         "body": body,
         "cached_after_flush": after["cached_tokens"],
@@ -230,7 +243,11 @@ def main() -> int:
         outs = list(
             pool.map(
                 lambda iq: generate(
-                    base, iq[1]["text"], iq[1]["max_new_tokens"], f"{iq[1]['rid']}#c{iq[0]}", args.timeout
+                    base,
+                    iq[1]["text"],
+                    iq[1]["max_new_tokens"],
+                    f"{iq[1]['rid']}#c{iq[0]}",
+                    args.timeout,
                 ),
                 enumerate(batch),
             )
@@ -244,14 +261,27 @@ def main() -> int:
     model_id = (checks["models"].get("ids") or ["glm-5-3-flash"])[0]
     status, body = post_json(
         base + "/v1/chat/completions",
-        {"model": model_id, "messages": [{"role": "user", "content": "1+1=?"}], "max_tokens": 64},
+        {
+            "model": model_id,
+            "messages": [{"role": "user", "content": "1+1=?"}],
+            "max_tokens": 64,
+        },
         600,
     )
     msg = (body.get("choices") or [{}])[0].get("message", {}) if status == 200 else {}
-    checks["chat"] = {"ok": status == 200 and "content" in msg, "status": status, "message": msg}
+    checks["chat"] = {
+        "ok": status == 200 and "content" in msg,
+        "status": status,
+        "message": msg,
+    }
 
     verdict = "PASS" if all(c["ok"] for c in checks.values()) else "FAIL"
-    receipt = {"base_url": base, "time": time.time(), "verdict": verdict, "checks": checks}
+    receipt = {
+        "base_url": base,
+        "time": time.time(),
+        "verdict": verdict,
+        "checks": checks,
+    }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as fh:
         json.dump(receipt, fh, ensure_ascii=False, indent=1)
