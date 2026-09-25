@@ -56,6 +56,7 @@ def main():
     ap.add_argument('--notify-test', action='store_true')
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--local-cache', action='store_true', help='read a watcher running in this workspace instead of over SSH')
+    ap.add_argument('--quiet-phases', action='store_true', help='notify on reports, alerts, and terminal state, but not routine startup phases')
     args = ap.parse_args()
     if not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*', args.job): ap.error('invalid job')
     runtime = ROOT/'build/scratch/window-notify'/args.job
@@ -110,7 +111,9 @@ def main():
                 s, h = sample
                 key = event_key(s, h, time.time())
                 terminal = s.get('job_state') in TERMINAL and s.get('health') == 'up'
-                if 'seen_key' not in state and s.get('health') == 'up':
+                if args.quiet_phases and not terminal and not h.get('alerts') and not s.get('last_report'):
+                    state['seen_key'] = key
+                elif 'seen_key' not in state and s.get('health') == 'up':
                     state['seen_key'] = key  # Existing diagnostic is the baseline.
                 elif key != state.get('seen_key'):
                     state['pending'] = dict(key=key, text=message(args.job, key, s, h, time.time()))
