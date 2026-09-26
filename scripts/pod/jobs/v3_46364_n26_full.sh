@@ -13,5 +13,22 @@ LADDER_UP="26"
 unset LADDER_DOWN SGLANG_AX_SRPT_AGING SGLANG_AX_SHORT_RESERVE
 unset SGLANG_AX_NUMTRACE_DIR SGLANG_AX_NUMTRACE_DUMP_LAYER
 SMOKE_GATE=0
-source "$AX/bin/scripts/pod/jobs/v3_data.sh"
+# v3 data (5601 requests, cohort 13b346fde05bd592), checked by hash before any engine starts.
+G_DATA_ROOT="$AX/data/s1-dev-longchain-v3"
+G_DATA_SET=s1-dev-longchain-v3
+G_COHORT="$G_DATA_ROOT/cohort.json"
+python3 - "$G_DATA_ROOT" "${G_MEASURE_SECONDS:-full}" "$LADDER_UP" <<'DATA' || exit 2
+import hashlib, json, os, sys
+from pathlib import Path
+root, seconds, level = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+c = json.loads((root/'cohort.json').read_text())
+assert c['set'] == 's1-dev-longchain-v3' and c['n_chains'] == 311 and c['n_requests'] == 5601
+assert c['cohort_sha256'] == '13b346fde05bd592'
+ids = [rid for chain in c['chains'] for rid in chain['req_ids']]
+assert len(ids) == len(set(ids)) == 5601
+assert hashlib.sha256((root/'requests.jsonl').read_bytes()).hexdigest() == '31f4d7521b623dedd43e9d44efbcc3af0890cea138d0ee9f7c9ee7b20a777305'
+shards = [os.path.join(dp, f) for dp, _, files in os.walk(root/'bodies') for f in files if f.endswith('.jsonl.gz')]
+assert shards and all(os.path.isfile(p) for p in shards), 'body shards not visible to harness os.walk'
+print('DATA_READY v3 chains=311 requests=%d N%s admission_seconds=%s warmup=rep16-v1' % (len(ids), level, seconds), flush=True)
+DATA
 source "$AX/bin/scripts/pod/jobs/dev_ladder_template.sh"
