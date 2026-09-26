@@ -480,7 +480,8 @@ class HybridCacheController(BaseHiCacheController):
         excluded from the per-pool token counts.
         """
         kv_tokens = len(op.device_indices)
-        num_bytes = kv_tokens * self.mem_pool_host.anchor_entry.host_pool.size_per_token
+        anchor = self.mem_pool_host.anchor_entry.host_pool
+        num_bytes = kv_tokens // anchor.dcp_size * anchor.size_per_token
         # Slot counts of the pools sidecars can ride on.
         source_len = {self.mem_pool_host.anchor_entry.name: kv_tokens}
         for t in op.pool_transfers or []:
@@ -494,7 +495,8 @@ class HybridCacheController(BaseHiCacheController):
                 num_slots = source_len.get(t.indices_from_pool, 0)
             else:
                 num_slots = len(t.host_indices) if t.host_indices is not None else 0
-            num_bytes += num_slots * entry.host_pool.size_per_token
+            host = entry.host_pool
+            num_bytes += num_slots // host.dcp_size * host.size_per_token
         return num_bytes
 
     def load(

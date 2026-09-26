@@ -91,6 +91,27 @@ def ref_mamba_pf_lf(src, dst, src_indices, dst_indices, layer_id, item_size, src
     ref_pf_lf(src, dst, src_indices, dst_indices, layer_id, item_size, src_layout_dim)
 
 
+def ref_staged_lf_pf(ptr_src, src_indices, dst_indices, staging, dst, *,
+                     page_size, element_size=None, **_):
+    """Same byte-copy contract for the staged CUDA D2H entry point."""
+    item_size = staging[0, 0].numel() * staging.element_size()
+    assert element_size is None or element_size == item_size
+    assert len(src_indices) % page_size == 0
+    ref_lf_pf(ptr_src, dst, src_indices, dst_indices, item_size,
+              dst[0].numel() * dst.element_size(), staging.shape[1])
+
+
+def ref_one_layer_mla(cache_dst, indices_dst, cache_src, indices_src, *,
+                      element_dim=None, **_):
+    """JIT H2D byte mover, retaining the page-first source row stride."""
+    dim = element_dim or cache_dst.size(-1)
+    assert cache_src.element_size() == cache_dst.element_size()
+    src = cache_src.view(-1, dim).view(torch.uint8)
+    dst = cache_dst.view(-1, dim).view(torch.uint8)
+    assert src.shape[1] == dst.shape[1] == dim * cache_dst.element_size()
+    dst[_idx(indices_dst)] = src[_idx(indices_src)]
+
+
 def _unsupported(name):
     def f(*a, **k):
         raise AssertionError(f"{name} is not emulated on CPU; use --hicache-io-backend kernel + page_first")
@@ -109,11 +130,16 @@ def cpu_kernels():
 
     patches = [
         patch.object(common, "_cuda_host_register", lambda *a, **k: None),
+        # Registration is simulated, so destruction must not call CUDA on
+        # these unregistered tensors. base imported this function by name.
+        patch.object(base, "_cuda_host_unregister", lambda *a, **k: None),
+        patch.object(dsa, "_cuda_host_unregister", lambda *a, **k: None),
         # small CI boxes: do not keep the 10 GB production host reserve
         patch.object(base, "HICACHE_HOST_MEMORY_RESERVE_BYTES", 0),
     ]
     for mod in (mla, dsa):
         patches += [
+            patch.object(mod, "jit_transfer_hicache_all_layer_mla_staged_lf_pf", ref_staged_lf_pf),
             patch.object(mod, "transfer_kv_per_layer_mla_pf_lf", ref_pf_lf, create=True),
             patch.object(mod, "transfer_kv_all_layer_mla_lf_pf", ref_lf_pf, create=True),
             patch.object(mod, "transfer_kv_per_layer_mla", _unsupported("layer_first"), create=True),
@@ -121,6 +147,7 @@ def cpu_kernels():
             patch.object(mod, "transfer_kv_direct", _unsupported("direct"), create=True),
         ]
     patches += [
+        patch.object(mla, "jit_transfer_hicache_one_layer_mla", ref_one_layer_mla),
         patch.object(mamba, "transfer_kv_mamba_lf_pf", ref_mamba_lf_pf, create=True),
         patch.object(mamba, "transfer_kv_mamba_pf_lf", ref_mamba_pf_lf, create=True),
         patch.object(mamba, "transfer_kv_per_layer_mla", _unsupported("mamba layer_first"), create=True),
@@ -156,7 +183,8 @@ def publish_args(**overrides):
 
 
 def glm_like_pools(
-    *, dsa_layers=(3, 7, 11), num_layers=12, size=4096, mamba_size=16, with_draft=False, draft_size=None
+    *, dsa_layers=(3, 7, 11), num_layers=12, size=4096, mamba_size=16, with_draft=False, draft_size=None,
+    dcp_width=1,
 ):
     """Real HybridReqToTokenPool + HybridLinearKVPool (DSA MLA, kpool=4 compressed
     indexer, page 64) on CPU with GLM-5.3-Flash row geometry (kv_lora_rank 512,
@@ -197,6 +225,11 @@ def glm_like_pools(
 
     target = kv_pool(dsa_layers)
     draft = kv_pool([0], size=draft_size or size) if with_draft else None
+    if dcp_width > 1:
+        from sglang.srt.runtime_context import get_parallel
+        assert get_parallel().attn_dcp_size == dcp_width
+        # Keep the real construction result. Rebuilding the indexer here would
+        # hide a production allocation bug in the hybrid construction path.
     return req_pool, target, draft
 
 
