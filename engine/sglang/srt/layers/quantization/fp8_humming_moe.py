@@ -54,6 +54,42 @@ def humming_moe_layer_count() -> int:
     return len(_HUMMING_LAYERS)
 
 
+class _AxFp8HummingRunnerCore(HummingRunnerCore):
+    """117's shape metadata cache; no tensors or GPU workspaces are retained.
+
+    The base prepare_buffers derives these dictionaries twice per forward.
+    Reuse only concrete shapes; symbolic/fake shapes keep the original path.
+    A bounded cache avoids growing with every ragged prefill length.
+    """
+
+    def get_buffer_metas(self, hidden_states, topk_ids, gemm_type):
+        hidden_shape, topk_shape = hidden_states.shape, topk_ids.shape
+        shape = (*hidden_shape, *topk_shape)
+        if not all(isinstance(dim, int) for dim in shape):
+            return super().get_buffer_metas(hidden_states, topk_ids, gemm_type)
+        layer = self.layer
+        meta = layer.humming_metas["w13"]
+        key = (hidden_shape, topk_shape, gemm_type,
+               self.num_experts, layer.hidden_size, layer.intermediate_size_per_partition,
+               meta.a_dtype, meta.c_dtype)
+        # prepare_buffers asks twice consecutively; matching the last key
+        # also avoids repeatedly hashing Humming's dtype descriptors.
+        if key == getattr(self, "_ax_buffer_meta_last_key", None):
+            return self._ax_buffer_meta_last_value
+        cache = getattr(self, "_ax_buffer_metas", None)
+        if cache is None:
+            cache = self._ax_buffer_metas = {}
+        result = cache.get(key)
+        if result is None:
+            result = super().get_buffer_metas(hidden_states, topk_ids, gemm_type)
+            if len(cache) >= 64:
+                del cache[next(iter(cache))]
+            cache[key] = result
+        self._ax_buffer_meta_last_key = key
+        self._ax_buffer_meta_last_value = result
+        return result
+
+
 class Fp8HummingMoEMethod(FusedMoEMethodBase):
     """Block-FP8 experts (FP8 e4m3 weights, 2-D block scales) with BF16 activations on Humming.
 
@@ -87,7 +123,7 @@ class Fp8HummingMoEMethod(FusedMoEMethodBase):
         _check_supported(layer, moe_runner_config)
         # One runner core per layer for the model's lifetime. The base ("none", "humming")
         # fused func builds a new core on every call, which re-derives the tuning table.
-        self.runner_core = HummingRunnerCore(moe_runner_config)
+        self.runner_core = _AxFp8HummingRunnerCore(moe_runner_config)
         self.gemm_type = get_standard_humming_moe_gemm_type()
 
     def process_weights_after_loading(self, layer: Module) -> None:

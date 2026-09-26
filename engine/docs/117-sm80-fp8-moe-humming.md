@@ -1,6 +1,6 @@
 # 117 — FP8 MoE experts through Humming on A100 (sm80)
 
-Candidate, default off. Dev box only (one A100, a TP=1 layer with the TP8 per-rank shape); not yet run on 8 cards.
+Candidate, default off. The initial numerical measurements below use one A100, a TP=1 layer with the TP8 per-rank shape.
 Numbered 117 because 115 is decode context parallel (commits 0cb0eab6, 8a44a24d) and 116 is used by its code markers.
 
 ## Why
@@ -109,3 +109,16 @@ uniform random routing. Logs: [evidence/moe-humming-117-devbox-20260925](../../e
 - The base per-call-core fused func is left as is for other Humming users; only this method avoids it.
 - Only the indexed GEMM type goes through the layer tests; `SGLANG_HUMMING_MOE_GEMM_TYPE=grouped` is base code, measured
   only at kernel level (slower, [evidence](../../evidence/moe-kernels-devbox-20260925/README.md)).
+
+## 2026-09-26 review: bounded shape metadata cache
+
+117 now instantiates `_AxFp8HummingRunnerCore`. It caches the shape/dtype dictionaries shared by
+`_workspace_shapes` and `prepare_buffers`, keyed by both input shapes, GEMM mode, expert count, layer geometry
+and activation/output dtypes. Consecutive equal keys bypass the dtype hash via a last-entry check.
+The cache keeps at most 64 entries per layer, bypasses symbolic shapes, and retains
+no tensors or GPU workspaces. Actual workspace allocation and numerical kernels are unchanged. All consumers
+were checked for mutation of the returned dictionaries. The 117-off runner stays the base runner.
+
+CPU and single-GPU validation, including paired timings and their limits, are recorded in the
+[S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md). This small host optimization must not be credited
+with the much larger Marlin-to-Humming gains measured above.
