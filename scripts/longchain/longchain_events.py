@@ -296,17 +296,22 @@ class EventCompiler:
         self.rng = random.Random(args.seed)
         self.grouped, self.bodies, self.donors = grouped, bodies, donors
         # Templates: public requests that are not chain heads (a head carries its whole visible history),
-        # except context resets, which are too few otherwise. Each synthesized step copies one template
-        # of its kind: frozen new tokens (uncached_expected), replay gap and output budget.
+        # except context resets, which are too few otherwise, keyed by phase and by whether the request
+        # rewrote history (organizer edge_type). Each synthesized step copies one template: frozen new
+        # tokens (uncached_expected), replay gap, output budget, and whether the prompt ends with a
+        # runtime reminder (62% of public prompts do; the next step drops and re-adds it).
         self.templates = defaultdict(list)
         for rows in grouped.values():
             for position, row in enumerate(rows):
                 if (row["phase"] in ("intra", "turn_start") and position > 0 or row["phase"] == "context_reset") \
                         and row.get("gap_valid") and row.get("replay_gap_ms") is not None:
-                    self.templates[row["phase"]].append(
-                        {k: row[k] for k in ("pack", "logical_call_id", "phase", "uncached_expected",
-                                             "glm_tokens", "replay_gap_ms", "max_output_i")})
-        if not self.templates["intra"]:
+                    last = bodies[lc.req_id(row)]["messages"][-1:]
+                    template = {k: row[k] for k in ("pack", "logical_call_id", "phase", "uncached_expected",
+                                                   "glm_tokens", "replay_gap_ms", "max_output_i")}
+                    template["edge_type"] = row.get("edge_type")
+                    template["trailing_reminder"] = deepcopy(last[0]) if last and lc.reminder(last[0]) else None
+                    self.templates[row["phase"], row.get("edge_type") != "append-only"].append(template)
+        if not self.templates["intra", False]:
             raise ValueError("source has no within-turn continuation to copy load from")
         self.read_corpus = ReadCorpus(bodies, args.read_corpus, tokenizer, args.seed)
         # Rendered GLM tokens per character of canonical message JSON, measured on the public
@@ -322,9 +327,12 @@ class EventCompiler:
         self.queries, self.answers = material_bank(grouped, bodies)
         self.global_usage = Counter()
 
-    def template(self, kind):
-        """A random template of `kind`; kinds without public examples borrow a continuation's load."""
-        return self.rng.choice(self.templates.get(kind) or self.templates["intra"])
+    def template(self, kind, rewrite=False):
+        """A random public template of this kind and rewrite class, falling back to the kind, then to
+        plain continuations, when the public set has none."""
+        pool = (self.templates.get((kind, rewrite)) or self.templates.get((kind, not rewrite))
+                or self.templates["intra", False])
+        return self.rng.choice(pool)
 
     def plan(self, target, original, pool):
         """Kinds, load templates and history rewrites of the missing requests.
@@ -362,7 +370,7 @@ class EventCompiler:
         plan = []
         for i in range(count):
             kind = "context_reset" if i in reset_at else "turn_start" if i in turn_at else "intra"
-            template = self.template(kind)
+            template = self.template(kind, i in rewriting)
             plan.append({"kind": kind, "template": template, "rewrite": i in rewriting,
                          "position_origin": "source_phase_counts_random_positions",
                          "output_weight": max(2, template["max_output_i"])})
@@ -374,9 +382,6 @@ class EventCompiler:
         sized = item["kind"] in ("intra", "context_reset") or item["kind"] == "turn_start" and item.get("rewrite")
         return item["template"]["uncached_expected"] if sized else 0
 
-    def step_ceiling(self, item):
-        """Largest public size of the event's kind; scaled targets do not exceed it."""
-        return max(t["uncached_expected"] for t in self.templates.get(item["kind"]) or self.templates["intra"])
 
     def approximate_tokens(self, messages):
         """Rendered tokens estimated from canonical JSON length; only used to choose sizes."""
@@ -466,24 +471,28 @@ class EventCompiler:
             # The finished turn is closed as the agent does it, so everything from its first narrated
             # tool call onward is new to the prefix cache; the runtime reminder follows the new query.
             history, stripped = close_turn(messages[:-1] if replaced else messages)
-            if replaced:
-                block.append(deepcopy(messages[-1]))
-            receipt.update(replaced_last_reminder=replaced, reminder_follows_query=replaced,
+            if template.get("trailing_reminder"):
+                block.append(deepcopy(messages[-1] if replaced else template["trailing_reminder"]))
+            receipt.update(replaced_last_reminder=replaced, reminder_follows_query=bool(template.get("trailing_reminder")),
                            turn_close={"rule": "finished_turn_tool_call_narration_removed_v1",
                                        "stripped_indices": stripped,
                                        "stripped_sha256": lc.digest([messages[i] for i in stripped])})
             if item.get("rewrite"):
                 history, receipt["divergence"] = self.diverge_to_target(
-                    history, stripped, block, item.get("step_target") or 0, lc.tool_schemas(current).get("Read")
+                    history, stripped, block, self.step_shape(item), lc.tool_schemas(current).get("Read")
                     if "Read" in lc.available_tools(current) else None, f"{prefix}_{step:04d}_t", force=not stripped)
-            receipt.update(step_scale=item.get("step_scale"), step_target_tokens=item.get("step_target"))
+            receipt.update(step_target_tokens=self.step_shape(item))
             return {**current, "messages": history + block}, receipt, None
         pool = self.pool(target, current)
         # Size: the template's new tokens, scaled
         # by the build towards the chain's source new-token total. Donors provide structure; a Read
         # result makes up a donor's shortfall. Source-provider tokens never become GLM labels.
+        # The step ends with a runtime reminder when its template does; the reminder is new tokens too,
+        # so the block is sized to the template's new tokens without it.
+        reminder = template.get("trailing_reminder")
         target_tokens = item.get("step_target") or self.step_shape(item)
-        desired = min(item.get("growth_target") or target_tokens, max(1, room - READ_WRAPPER_TOKENS))
+        desired = min(max(1, target_tokens - (self.approximate_tokens([reminder]) if reminder else 0)),
+                      max(1, room - READ_WRAPPER_TOKENS))
         def score(d):
             return abs(math.log((d.increment+128)/(desired+128))) + .6*usage[d.fingerprint] + .12*self.global_usage[d.fingerprint]
         fitting = [d for d in pool if d.increment < room]
@@ -494,8 +503,11 @@ class EventCompiler:
                   [min(fitting, key=lambda d: (d.increment, d.fingerprint))]
         ranked = sorted(fitting, key=lambda d: (score(d), d.fingerprint))[:16]
         donor = self.rng.choices(ranked, weights=[math.exp(-(score(d)-score(ranked[0]))/.35) for d in ranked], k=1)[0]
-        # A tool continuation must not smuggle a second human-user event.
+        # A tool continuation must not smuggle a second human-user event; its trailing reminder follows
+        # the template instead of the donor.
         block = [m for m in donor.messages if m.get("role") != "user" or lc.reminder(m)]
+        while block and lc.reminder(block[-1]):
+            block.pop()
         # Rename the donor's calls before adding filler, so the rename never touches filler text.
         block = lc.rename_new_calls(block, f"{prefix}_{step:04d}")
         lengthening = None
@@ -506,6 +518,8 @@ class EventCompiler:
         replaced = bool(messages and lc.reminder(messages[-1]) and not
                         text_content(messages[-1]).startswith(SUMMARY_PREFIX))
         history = messages[:-1] if replaced else messages
+        if reminder:
+            block.append(deepcopy(reminder))
         if item.get("rewrite"):
             history, receipt["divergence"] = self.diverge_to_target(
                 history, [], block, max(target_tokens, desired), schema, f"{prefix}_{step:04d}_d", force=True)
@@ -514,7 +528,8 @@ class EventCompiler:
                        donor_source_phase=donor.phase, donor_tool_pairing=lc.tool_pairing(block),
                        donor_same_family=donor.family == target.get("sys_tools_hash"),
                        donor_reuse_in_chain=usage[donor.fingerprint],
-                       step_target_tokens=target_tokens, growth_target_tokens=desired, step_scale=item.get("step_scale"),
+                       step_target_tokens=target_tokens, block_target_tokens=desired, trailing_reminder=bool(reminder),
+                       growth_scale=item.get("growth_scale"),
                        read_lengthening=lengthening, replaced_last_reminder=replaced)
         return {**current, "messages": history + block}, receipt, donor
 

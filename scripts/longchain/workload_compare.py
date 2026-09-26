@@ -10,7 +10,9 @@ No engine, rendering or GPU. Usage:
       --root v3=data/s1-dev-longchain-v3 [--out-json report.json]
 """
 import argparse
+import gzip
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -37,7 +39,24 @@ def ratio_quantiles(pairs):
             "total_ratio": round(sum(g for g, _ in pairs) / max(1, sum(s for _, s in pairs)), 3)}
 
 
-def describe(root, common):
+def reminder_share(root, rows):
+    """Share of prompts (bodies) whose last message is a runtime reminder, which the next step drops and
+    re-adds: a per-step recompute on top of the new block."""
+    ending = total = 0
+    for directory, _, files in os.walk(Path(root) / "bodies"):
+        for name in files:
+            if name.endswith(".jsonl.gz"):
+                with gzip.open(Path(directory) / name, "rt") as handle:
+                    for line in handle:
+                        body = json.loads(line)
+                        if body.get("req_id") in rows and body.get("messages"):
+                            last = body["messages"][-1]
+                            total += 1
+                            ending += last.get("role") == "user" and "system-reminder" in str(last.get("content", ""))
+    return round(ending / max(1, total), 3)
+
+
+def describe(root, common, bodies=False):
     rows, chains, by_chain = common.load_index(str(root))
     rewrites = {cid: sum(r.get("edge_type") != "append-only" for r in rs[1:]) for cid, rs in by_chain.items()}
     out = {"requests": len(rows), "chains": len(by_chain), "rewrite_edges": sum(rewrites.values()),
@@ -54,6 +73,8 @@ def describe(root, common):
     for phase in ("intra", "turn_start", "context_reset"):
         out["later_by_phase"][phase] = quantiles([r["uncached_expected"] for r in rows.values()
                                                   if r["_idx_in_chain"] > 0 and r["phase"] == phase])
+    if bodies:
+        out["reminder_ending_share"] = reminder_share(root, rows)
     targets = [(c, c.get("source_chain_targets")) for c in chains.values()
                if c["chain_id"] in by_chain and isinstance(c.get("source_chain_targets"), dict)]
     def source_rewrites(chain, target):
@@ -78,6 +99,8 @@ def markdown(report):
     row("prompt tokens (M)", lambda r: f"{r['prompt_tokens'] / 1e6:.1f}")
     row("new tokens (M)", lambda r: f"{r['new_tokens'] / 1e6:.2f}")
     row("history rewrites after the head", lambda r: str(r["rewrite_edges"]))
+    if any("reminder_ending_share" in r for r in report.values()):
+        row("prompts ending with a runtime reminder", lambda r: str(r.get("reminder_ending_share", "-")))
     for gate in GATES:
         row(f"{gate} share; new p50/p90/mean", lambda r, g=gate: "{:.1%}; {}/{}/{}".format(
             r["gates"][g]["share"], *(r["gates"][g]["new_tokens"].get(k, "-") for k in ("p50", "p90", "mean"))))
@@ -95,6 +118,7 @@ def main(argv=None):
     ap.add_argument("--root", action="append", required=True, help="label=path of a dataset root")
     ap.add_argument("--harness-dir", type=Path, default=REPO / "s1-dev/harness")
     ap.add_argument("--out-json", type=Path)
+    ap.add_argument("--bodies", action="store_true", help="also read bodies: share of prompts ending with a reminder")
     args = ap.parse_args(argv)
     sys.path.insert(0, str(args.harness_dir))
     import s1_common as common
@@ -103,7 +127,7 @@ def main(argv=None):
         label, _, path = spec.partition("=")
         if not path:
             ap.error(f"--root {spec!r} must be label=path")
-        report[label] = describe(Path(path), common)
+        report[label] = describe(Path(path), common, args.bodies)
     if args.out_json:
         args.out_json.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n")
     print(markdown(report))

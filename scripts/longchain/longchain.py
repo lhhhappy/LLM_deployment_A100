@@ -28,8 +28,8 @@ import sys
 
 REPO = Path(__file__).resolve().parents[2]
 VERSION = "source-event-longchain-v3"
-# Bounds of the per-chain factor that scales sampled continuation sizes to the chain's source total.
-STEP_SCALE_MIN, STEP_SCALE_MAX = 1 / 16, 16.0
+# Lower bound of the factor that scales continuation growth down to the chain's frozen prompt total.
+GROWTH_SCALE_MIN = 1 / 16
 
 
 def read_jsonl(path):
@@ -454,27 +454,6 @@ def output_budgets(target_total, original_rows, donor_weights):
     return [n + 2 for n in shares], 0
 
 
-def chain_scales(plan, shapes, persistence, offset, new_left, prompt_left, context):
-    """Size factors for the remaining growing continuations and rewriting steps of a chain (see build).
-
-    Without further growth every remaining prompt carries the current context. The prompt tokens left
-    above that baseline bound the growing steps (continuations and planned resets), each growth token
-    costing one token in every later prompt.
-    """
-    rest = range(offset, len(plan))
-    baseline = len(rest) * context
-    clamp = lambda x: min(STEP_SCALE_MAX, max(STEP_SCALE_MIN, x))
-    growing = [j for j in rest if plan[j]["kind"] in ("intra", "context_reset")]
-    rewriting = [j for j in rest if shapes[j] and plan[j]["rewrite"]]
-    plain = sum(shapes[j] for j in growing if not plan[j]["rewrite"])
-    uniform = new_left / max(1, sum(shapes[j] for j in rest))
-    growth_cost = sum(shapes[j] * persistence[j] for j in growing)
-    growth = clamp(min(uniform, (prompt_left - baseline) / growth_cost) if growth_cost else uniform)
-    rewrite_shapes = sum(shapes[j] for j in rewriting)
-    rewrite = clamp((new_left - growth * plain) / rewrite_shapes) if rewrite_shapes else growth
-    return {"growth": growth, "rewrite": max(rewrite, growth)}
-
-
 def json_dump(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
 
@@ -518,12 +497,13 @@ def build(args):
                 "implementation_event_compiler_sha256": file_digest(Path(__file__).with_name("longchain_events.py")),
                 "read_corpus": compiler.read_corpus.receipt,
                 "load_templates": {"origin": "public requests with a valid replay gap: non-head intra/turn_start, all context_reset",
-                                   "n": {kind: len(v) for kind, v in compiler.templates.items()},
-                                   "scale_bounds": [STEP_SCALE_MIN, STEP_SCALE_MAX]},
+                                   "n": {f"{kind}{'/rewrite' if rewrite else ''}": len(v)
+                                         for (kind, rewrite), v in sorted(compiler.templates.items())}},
                 "assumptions": ["Public content plus explicit synthetic events, not recovered hidden requests.",
                                 "Public bodies/budgets/gaps/labels retained; session IDs scoped to generated receiving chains.",
                                 "Source phase counts constrain event frequencies; event positions are unobserved and drawn at random.",
-                                "Each synthesized step copies one public request of its kind (frozen uncached_expected, replay gap, output budget); new-token sizes are scaled per chain, within fixed bounds, towards the source chain's frozen new-token total, and output budgets are apportioned to the source chain's output total.",
+                                "Each synthesized step copies one public request of its kind and rewrite class (frozen uncached_expected, replay gap, output budget, trailing runtime reminder); output budgets are apportioned to the source chain's output total.",
+                                "Public templates come from the first steps of chains; continuation growth is scaled down (never up, not below 1/16) when the source chain's frozen prompt total for the synthesized part would be exceeded. The new-token total is reported, not fitted.",
                                 "A continuation whose donor block is shorter than its size gets one extra parallel Read call; its text is corpus filler read front to back, so only its token count is meaningful.",
                                 "A turn start closes the finished turn as the public agent does: tool-call narration of that turn becomes empty and the runtime reminder follows the new query.",
                                 "History rewrites per chain follow the source count (total_edges - append_only_edges, head edge excluded). A rewrite diverges with one extra Read call (at most 1024 tokens) in an earlier tool-call message, so the suffix is recomputed while the context barely grows; unplanned rewrites cancel later planned ones.",
@@ -592,16 +572,13 @@ def build(args):
             prefix = generated_session
             total_prompt = sum(r["glm_tokens"] for r in chain_rows)
             generated_append_edges = 0
-            # The synthesized requests aim at two frozen source totals of this chain: new tokens and
-            # prompt tokens. Growth persists into every later prompt until a reset, so the prompt total
-            # caps how much continuations grow the context; the planned rewrites, which recompute
-            # history without growing it, take the rest of the new tokens.
+            # Each step's size is its public template's. Public templates come from the first steps of
+            # chains; a growth persists in every later prompt, so when the chain's frozen prompt total
+            # (synthesized part) would be exceeded, continuation growth is scaled down (never up). The
+            # new-token total is reported as a check, not fitted.
             new_token_budget = max(0, target["sum_uncached_expected"] - sum(r["uncached_expected"] for r in original))
             prompt_budget = max(0, target["sum_glm_tokens"] - sum(r["glm_tokens"] for r in original))
-            shapes = [compiler.step_shape(item) for item in plan]
-            # Planned steps never shrink the prompt (public resets are appends), so a growth at step j
-            # is carried by every later prompt; only an unplanned context-pressure rebuild shrinks it.
-            persistence = [len(plan) - j for j in range(len(plan))]
+            shapes = [compiler.step_shape(item) if item["kind"] in ("intra", "context_reset") else 0 for item in plan]
             # The realized number of history rewrites follows the plan: a rewrite nobody planned (a turn
             # close with narration, a pressure rebuild) cancels the last planned continuation rewrite ahead.
             target_rewrites, rewrites = sum(item["rewrite"] for item in plan), 0
@@ -613,16 +590,13 @@ def build(args):
                 logical_id = f"{prefix}:llm:{step:04d}"
                 rid = f"{target['pack']}:canon:{logical_id}"
                 if shapes[offset]:
-                    scales = chain_scales(plan, shapes, persistence, offset, new_token_budget - new_tokens,
-                                          prompt_budget - prompt_tokens, len(prev_tokens))
-                    # A rewrite recomputes at most the whole current prompt; growth stays within public sizes.
-                    ceiling = compiler.step_ceiling(item)
-                    size = lambda factor, cap=ceiling: min(cap, max(1, round(shapes[offset] * factor)))
-                    item = {**item, "step_scale": scales["rewrite" if item["rewrite"] else "growth"],
-                            "step_target": size(scales["rewrite"], max(ceiling, len(prev_tokens))) if item["rewrite"]
-                                           else size(scales["growth"])}
-                    if item["kind"] == "intra" and item["rewrite"]:
-                        item["growth_target"] = min(item["step_target"], size(scales["growth"]))
+                    # Prompt tokens left above carrying the current context to the end, shared by the
+                    # remaining growth steps in proportion to how many later prompts carry each one.
+                    rest = range(offset, len(plan))
+                    headroom = prompt_budget - prompt_tokens - len(rest) * len(prev_tokens)
+                    cost = sum(shapes[j] * (len(plan) - j) for j in rest)
+                    scale = min(1.0, max(GROWTH_SCALE_MIN, headroom / cost)) if cost else 1.0
+                    item = {**item, "growth_scale": scale, "step_target": max(1, round(shapes[offset] * scale))}
                 try:
                     current_body, event_receipt, donor = compiler.event(item, target, before_body, prefix, step, usage, room)
                     current_body["req_id"] = rid

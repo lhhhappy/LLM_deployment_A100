@@ -22,7 +22,8 @@ def compiler_stub():
     compiler = events.EventCompiler.__new__(events.EventCompiler)
     compiler.rng = random.Random(7)
     compiler.global_usage = Counter()
-    compiler.templates = {kind: [TEMPLATE] for kind in ('intra', 'turn_start', 'context_reset')}
+    compiler.templates = {(kind, rewrite): [dict(TEMPLATE, phase=kind)]
+                          for kind in ('intra', 'turn_start', 'context_reset') for rewrite in (False, True)}
     compiler.tokens_per_char = 1.0
     compiler.donors = [lc.Donor('donor', 'other-chain', 'p', 'f',
         [{'role': 'assistant', 'content': 'continue'}], False, 'historical_block',
@@ -101,8 +102,9 @@ def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch,
             'logical_call_id': 'a', 'in_serving_load': True, 'phase': 'session_start',
             'dispatch_offset_ms': 0, 'end_offset_ms': 1, 'glm_tokens': 1,
             'glm_lcp_with_prev': 0, 'uncached_expected': 1, 'max_output_i': 10,
-            'gap_valid': True, 'replay_gap_ms': 0, 'sys_tools_hash': 'f', 'body_ref': 'bodies/a.jsonl.gz'}
-    row1 = dict(row0, logical_call_id='b', dispatch_offset_ms=2, end_offset_ms=3,
+            'gap_valid': True, 'replay_gap_ms': 0, 'sys_tools_hash': 'f', 'body_ref': 'bodies/a.jsonl.gz',
+            'edge_type': 'chain-head'}
+    row1 = dict(row0, logical_call_id='b', dispatch_offset_ms=2, end_offset_ms=3, edge_type='append-only',
                 phase='intra', glm_tokens=visible_chars, glm_lcp_with_prev=1, uncached_expected=visible_chars - 1)
     phases = {'session_start': 1, 'intra': 2}
     # Room for the public prompt and its output, not for another continuation of the same size.
@@ -167,7 +169,8 @@ def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch,
 
 def test_plan_counts_missing_events_once_and_copies_public_load():
     compiler = compiler_stub()
-    compiler.templates['turn_start'] = [dict(TEMPLATE, phase='turn_start', max_output_i=1000)]
+    compiler.templates['turn_start', False] = compiler.templates['turn_start', True] = [
+        dict(TEMPLATE, phase='turn_start', max_output_i=1000)]
     target = {'n_requests': 100, 'phases': {'session_start': 1, 'intra': 90, 'turn_start': 6, 'context_reset': 3}}
     original = [{'phase': 'session_start'}, {'phase': 'intra'}, {'phase': 'turn_start'}, {'phase': 'context_reset'}]
     plan = compiler.plan(target, original, compiler.donors)
@@ -264,13 +267,15 @@ def test_turn_start_closes_only_the_finished_turn_and_checker_rederives_it():
     compiler = compiler_stub()
     body = {'system': '', 'tools': [], 'messages': turn_history()}
     target = {'pack': 'p', 'chain_id': 'c', 'session_id': 'receiver', 'sys_tools_hash': 'f'}
-    result, receipt, _ = compiler.event(event_item('turn_start'), target, body, 'test', 2, Counter(), 100000)
+    item = event_item('turn_start')
+    item['template']['trailing_reminder'] = {'role': 'user', 'content': '<system-reminder>template</system-reminder>'}
+    result, receipt, _ = compiler.event(item, target, body, 'test', 2, Counter(), 100000)
     messages = result['messages']
     # The earlier turn keeps its narration; the finished turn's two tool-call messages lose theirs.
     assert messages[1]['content'] == 'Let me check that.'
     assert [messages[i]['content'] for i in (5, 7)] == ['', '']
     assert receipt['turn_close']['stripped_indices'] == [5, 7]
-    # The runtime reminder moves behind the new human query.
+    # The template ends with a runtime reminder, so the session's reminder moves behind the new query.
     assert [m['role'] for m in messages[-3:]] == ['assistant', 'user', 'user']
     assert messages[-1] == body['messages'][-1]
     start, emptied, divergence = _rewrite_start(body['messages'], messages, True)
