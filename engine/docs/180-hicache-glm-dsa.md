@@ -2,6 +2,11 @@
 
 状态（2026-09-24）：**第 1 阶段（移植上游）完成**。补丁可打在部署栈、S0 和裸底包上；CPU 测试 52 项全过，并且能区分有无本补丁。**没有在 GPU 上跑过，没有做模型数值，没有上 8 卡。** 开关不开时，行为与现栈相同（依据见 §6）。
 
+2026-09-26 销毁路径复核：`DSAIndexerPoolHost.destroy()` 原先只清 backing tensor，`layer_first` 的
+`index_k_data_refs` 仍持有整块主机内存。现同时释放视图、指针表和 staging buffer，保留原先的
+注销顺序与幂等检查。设备池继续拥有其自身缓冲。验证与边界统一见
+[S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md)，不把销毁路径修正计为稳态 TTFT 加速。
+
 术语只解释一次：
 - **HiCache / 主机层**：GPU 放不下的前缀缓存挪到 CPU 内存，需要时再搬回 GPU。
 - **indexer 行**：DSA 稀疏注意力的“挑选器”给每个历史 token 存的打分键。GLM 用 kpool=4 压缩，4 个 token 合成 1 行。
