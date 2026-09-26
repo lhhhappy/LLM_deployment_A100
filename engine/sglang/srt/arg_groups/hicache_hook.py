@@ -93,7 +93,10 @@ def resolve_hicache_dcp_compatibility(server_args: Any):
         same_checkpoint = cfg.speculative_draft_model_path in (None, cfg.model_path)
         packed_glm_nextn = (
             cfg.speculative_algorithm.upper() in ("EAGLE", "NEXTN")
-            and cfg.speculative_eagle_topk == 1
+            # HiCache resolution precedes speculative parameter defaults.
+            # This GLM architecture defaults to topk=1; preserve that unset
+            # value for the later resolver, while still rejecting trees.
+            and cfg.speculative_eagle_topk in (None, 1)
             and hf.architectures[0] == "Glm5NextForConditionalGeneration"
             and getattr(text, "num_nextn_predict_layers", 0) == 1
             and same_checkpoint
