@@ -8,6 +8,7 @@ from typing import Any
 
 from sglang.srt.arg_groups.overrides import (
     declare_resolution,
+    model_config_of,
     resolving_view,
     use_mla_backend,
 )
@@ -82,11 +83,27 @@ def resolve_hicache_dcp_compatibility(server_args: Any):
             "first. Run HiCache+DCP with L1/L2 only."
         )
     if cfg.speculative_algorithm not in (None, "DSPARK"):
-        raise NotImplementedError(
-            "HiCache with --dcp-size > 1 only supports DSPARK speculative "
-            "decoding; other draft-model host pools have no DCP index "
-            "translation."
+        # [ax] 180: the GLM NextN layer is packed with the target's MLA host
+        # pool and uses its owner-striped layout. A separate draft sidecar
+        # does not inherit that translation. Validate the same-checkpoint
+        # chain composition before admitting it; NEXTN is normalized later.
+        model_config = model_config_of(server_args)
+        hf = model_config.hf_config
+        text = getattr(hf, "text_config", hf)
+        same_checkpoint = cfg.speculative_draft_model_path in (None, cfg.model_path)
+        packed_glm_nextn = (
+            cfg.speculative_algorithm.upper() in ("EAGLE", "NEXTN")
+            and cfg.speculative_eagle_topk == 1
+            and hf.architectures[0] == "Glm5NextForConditionalGeneration"
+            and getattr(text, "num_nextn_predict_layers", 0) == 1
+            and same_checkpoint
         )
+        if not packed_glm_nextn:
+            raise NotImplementedError(
+                "HiCache with DCP supports DSPARK or the same-checkpoint GLM "
+                "NextN chain (topk=1, one draft layer); separate draft models "
+                "and tree drafting have no validated host layout."
+            )
     if cfg.enable_lmcache:
         raise NotImplementedError(
             "--enable-lmcache with --dcp-size > 1 is not supported: "

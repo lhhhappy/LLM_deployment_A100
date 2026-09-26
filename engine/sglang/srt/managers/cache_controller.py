@@ -827,7 +827,10 @@ class HiCacheController:
         )
 
     def _transfer_num_bytes(self, op: CacheOperation) -> int:
-        return len(op.device_indices) * self.mem_pool_host.size_per_token
+        # Transfer descriptors carry logical locs; MLA host kernels copy only
+        # this rank's interleaved shard. Non-DCP and replicated pools use W=1.
+        host = self.mem_pool_host
+        return len(op.device_indices) // host.dcp_size * host.size_per_token
 
     def _num_tokens_by_pool(self, op: CacheOperation) -> dict[str, int]:
         return {PoolName.KV.value: len(op.device_indices)}

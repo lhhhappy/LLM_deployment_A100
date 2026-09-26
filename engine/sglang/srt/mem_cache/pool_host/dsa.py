@@ -163,8 +163,11 @@ class DSAIndexerPoolHost(HostKVCache):
         self.layer_num = self.target_layer_num + len(self.mtp_draft_device_pools)
 
         self.indexer_dtype = storage_info.dtype
-        self.size = anchor_host.size
-        self.page_num = anchor_host.page_num
+        # [ax] 180: latent host rows are owner-striped under DCP, but index-K
+        # remains replicated. Indexer transfers use untranslated virtual locs,
+        # so this pool must cover the anchor's complete logical address space.
+        self.size = anchor_host.logical_size
+        self.page_num = self.size // self.page_size
 
         # uint8 storage, so element counts below are byte counts
         self.indexer_page_stride_size = storage_info.page_bytes(self.page_size)
