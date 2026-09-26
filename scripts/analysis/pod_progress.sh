@@ -26,3 +26,6 @@ for job in $running; do
   [ "$prev" != "$line" ] && [ -n "$prev" ] && echo "  prev: ${prev#* }"
 done
 [ -n "$running" ] || echo "(nothing running)"
+# Global board: every job of the plan with its reference and per-gate arrows (notes/kanban_plan.json -> notes/kanban.md).
+echo "== kanban"
+timeout 280 python3 -B scripts/analysis/kanban.py 2>/dev/null | tail -n +4
