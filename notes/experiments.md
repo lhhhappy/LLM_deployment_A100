@@ -4,6 +4,22 @@
 
 ## 当前开发集对照
 
+### 093：118 Triton DSA，N30 派发 60 分钟（2026-09-26，Codex）
+
+对081只开启118 DSA sparse kernel，沿用759a6eb其余配置、同一冻结长链、N30、cold6144、host64。启动机制核对`118=on`、能力抽检12/12；原harness派发3600秒后排空3389条，`timed_verdict=DRAINED`、请求错误0。共同3389个ID的结果：
+
+| 指标 | 081 → 093（118） | 同ID的084（117） |
+|---|---:|---:|
+| chain超30秒 | 23→21（修复4、新增2） | 22 |
+| turn超15秒 | 7→5 | 4 |
+| fast超3秒 | 238→241 | 229 |
+| overall超5秒 | 190→186 | 174 |
+| TPOT均值 / p95 | 33.14/61.24→31.87/58.83ms | 30.58/55.07ms |
+
+118对chain与turn有小幅正收益，fast多3条坏例；117在同一3389个ID上对turn、fast、overall和TPOT更好，chain比118多1条超时。两者均只在各自的081基线上单独开启，不能把收益相加或据此断言叠加效果。093实际未命中量比081少132,608 token（0.9%）；这是运行结果，不等于kernel节省的工作。60分钟诊断窗口已排空但不是5601条全量N30，也不能预测正式N26的失败门。
+
+[排空收据与原harness诊断](../evidence/L093-cap6144_118_n30_60m/window/snapshot.json)、[同ID逐请求对照](../evidence/L093-cap6144_118_n30_60m/window/analysis/20260926T050632Z-280971f1/analysis.json)、[时间窗](../evidence/L093-cap6144_118_n30_60m/window/window_gates.txt)。
+
 ### 089：K9/N22 完整校准，负载未对齐正式（2026-09-26，Codex）
 
 46364/081 的同一引擎与配置（759a6eb、cold cap6144）在每链前9请求的冻结子集完整运行N22。原 harness 核验1865/1865条、零请求错误、真flush，判 `VALID FAIL`；只失败fast和overall。K9的1865条和104,970,368 prompt tokens接近正式一档的推算量，但四桶结果不同：
