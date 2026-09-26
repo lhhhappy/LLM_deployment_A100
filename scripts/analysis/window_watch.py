@@ -144,7 +144,17 @@ print('WINDOW_DATA '+base64.b64encode(b).decode('ascii'))
 def remote(code, *args):
     command = shlex.join(['python3', '-c', code, *map(str, args)])
     # CPU-only reader; its only pod writes are immutable snapshots under codex/.
-    return run_bounded([str(ROOT / 'scripts/pod/pexec_codex'), command], 55, cwd=ROOT)
+    argv = [str(ROOT / 'scripts/pod/pexec_codex'), command]
+    for attempt in range(3):
+        try:
+            return run_bounded(argv, 55, cwd=ROOT)
+        except RuntimeError as exc:
+            # The Pod exec transport occasionally scans a process which exits
+            # before it reads /proc/<pid>/stat. Retry that transport race only.
+            message = str(exc)
+            if attempt == 2 or 'FileNotFoundError' not in message or '/proc/' not in message:
+                raise
+            time.sleep(1)
 
 
 def marked(output, prefix):
