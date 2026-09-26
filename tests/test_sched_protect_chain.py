@@ -711,7 +711,7 @@ class HiCacheTierTests(unittest.TestCase):
                                 '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
                                 '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset',
-                                '140=off', '180=off:no_hierarchical_cache'])
+                                '128=off:SGLANG_AX_DEADLINE_FAMILY_unset', '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
         dsa_ns['_AX_DSA_SPARSE_TRITON'] = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):

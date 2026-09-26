@@ -17,7 +17,7 @@ last flush.
 
 import os
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Sequence, Set, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 
 def _env(name: str, default: str) -> str:
@@ -49,6 +49,8 @@ class DeadlineConfig:
     park_min_remaining: int = 65536
     park_max_rounds: int = 8
     park_max_s: float = 2.0
+    # 128: rank a request that leads a prefix-sharing family by the family's work per request.
+    family: bool = False
 
 
 def deadline_config() -> Optional[DeadlineConfig]:
@@ -69,6 +71,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
         park_min_remaining=int(_env("SGLANG_AX_PARK_MIN_REMAINING", "65536")),
         park_max_rounds=int(_env("SGLANG_AX_PARK_MAX_ROUNDS", "8")),
         park_max_s=float(_env("SGLANG_AX_PARK_MAX_S", "2")),
+        family=_env("SGLANG_AX_DEADLINE_FAMILY", "0") == "1",
     )
     if not (cfg.cold_budget_s > 0 and cfg.warm_budget_s > 0 and cfg.fast_budget_s > 0
             and cfg.fast_tokens >= 0 and 0 <= cfg.cold_hit_ratio <= 1
@@ -109,11 +112,68 @@ def slack_s(req, work: int, waited_s: float, chunk: int, cfg: DeadlineConfig) ->
     return budget_s(req, cfg) - (waited_s + cfg.arrival_offset_s) - service_s(work, chunk, cfg)
 
 
+def _prefix(req, n: int) -> List[int]:
+    ids = req.origin_input_ids
+    return ids[:n] if n <= len(ids) else (ids + req.output_ids)[:n]
+
+
+def link_families(reqs: Sequence, shared: Mapping[str, int],
+                  cache: Optional[Dict[str, Tuple[str, int]]] = None) -> Dict[str, Tuple[str, int]]:
+    """128: map each held-back request to the waiting request whose prompt it shares.
+
+    `shared` holds, for the requests LPM held back for in-batch prefix sharing, how many leading tokens
+    they share with a request queued before them. Their leader is the first request not held back whose
+    prompt starts with the same tokens; any such request computes the shared prefix. Returns
+    {held rid: (leader rid, shared tokens)}; held requests without a leader in `reqs` are left out.
+    Prompts do not change while waiting, so a link found earlier is reused from `cache` (updated in
+    place) while its leader still waits unheld and the shared length is the same.
+    """
+    leaders = [r for r in reqs if r.rid not in shared]
+    leader_ids = {r.rid for r in leaders}
+    links = {}
+    for r in reqs:
+        n = shared.get(r.rid)
+        if not n:
+            continue
+        known = cache.get(r.rid) if cache is not None else None
+        if known is not None and known[1] == n and known[0] in leader_ids:
+            links[r.rid] = known
+            continue
+        prefix = _prefix(r, n)
+        for leader in leaders:
+            if len(leader.origin_input_ids) + len(leader.output_ids) >= n and _prefix(leader, n) == prefix:
+                links[r.rid] = (leader.rid, n)
+                break
+    if cache is not None:
+        cache.clear()
+        cache.update(links)
+    return links
+
+
+def family_unit_work(reqs: Sequence, links: Mapping[str, Tuple[str, int]]) -> Dict[str, float]:
+    """128: prefill work per request of each family: the leader's remaining work plus what each follower
+    has left once the shared prefix is cached, divided by the family's size. Leaders without followers are
+    left out (their own remaining work applies)."""
+    by_rid = {r.rid: r for r in reqs}
+    total: Dict[str, float] = {}
+    count: Dict[str, int] = {}
+    for rid, (leader, n) in links.items():
+        if leader not in by_rid or rid not in by_rid:
+            continue
+        if leader not in total:
+            total[leader], count[leader] = float(remaining_tokens(by_rid[leader])), 1
+        total[leader] += max(0, remaining_tokens(by_rid[rid]) - n)
+        count[leader] += 1
+    return {leader: total[leader] / count[leader] for leader in total}
+
+
 def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[str], chunk: int,
-               cfg: DeadlineConfig) -> List:
+               cfg: DeadlineConfig, unit_work: Optional[Mapping[str, float]] = None) -> List:
     """Starved (oldest first), rescuable and hopeless (each by remaining work), held-back; stable.
 
     Recomputed every round, so a request misjudged as hopeless is promoted as soon as it is not.
+    With 128, a request leading a prefix-sharing family ranks by `unit_work` (the family's work per
+    request) instead of its own work; whether it can still make its budget stays its own.
     """
 
     def key(item):
@@ -125,7 +185,8 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
             return (0, -waited, index)
         work = remaining_tokens(req)
         hopeless = slack_s(req, work, waited, chunk, cfg) < 0
-        return (2 if hopeless else 1, work, index)
+        rank = unit_work.get(req.rid, work) if unit_work else work
+        return (2 if hopeless else 1, rank, index)
 
     return [req for _, req in sorted(enumerate(reqs), key=key)]
 

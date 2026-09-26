@@ -280,3 +280,53 @@ class OffEqualsBase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class FamilyOrder(unittest.TestCase):
+    """128 on the real admission plan; the policy's in-batch holdbacks (base LPM code) are given."""
+
+    def queue(self):
+        solo = cold('solo', 20000)
+        solo.origin_input_ids = [3] * 20000
+        lead = cold('lead', 35000)
+        lead.origin_input_ids = [7] * 31000 + [8] * 4000
+        followers = []
+        for i in range(3):
+            f = cold(f'f{i}', 36000)
+            f.origin_input_ids = [7] * 31000 + [9 + i] * 5000
+            followers.append(f)
+        return solo, lead, followers
+
+    def admitted_first(self, env):
+        solo, lead, followers = self.queue()
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_TIERS': '1', **env}):
+            s, ns = scheduler(waiting=[solo, lead] + followers, budget=16384)
+            s.schedule_policy = 'lpm'  # set by Scheduler.__init__ from server args, which the fake skips
+            held = {f.rid for f in followers}
+            s.policy.ax_held = held
+            s.policy.ax_shared = {f.rid: 31000 for f in followers}
+            t = step(s)
+        self.assertEqual(t['mode'], 'prefill')
+        return t['reqs'][0][0], s
+
+    def test_leader_of_a_cheap_family_is_admitted_before_a_smaller_single_start(self):
+        first, s = self.admitted_first({'SGLANG_AX_DEADLINE_FAMILY': '1'})
+        self.assertEqual(first, 'lead')
+        self.assertEqual(s._ax_admission_stats['family_leaders'], 1)
+
+    def test_off_ranks_the_leader_by_its_own_work(self):
+        first, _ = self.admitted_first({})
+        self.assertEqual(first, 'solo')
+
+    def test_128_without_124_refuses(self):
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_FAMILY': '1'}):
+            s, _ = scheduler()
+            with self.assertRaisesRegex(ValueError, '124'):
+                s._ax_admission_cfgs()
+
+    def test_128_without_lpm_refuses(self):
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_FAMILY': '1'}):
+            s, _ = scheduler()
+            s.schedule_policy = 'fcfs'
+            with self.assertRaisesRegex(ValueError, 'LPM'):
+                s._ax_admission_cfgs()

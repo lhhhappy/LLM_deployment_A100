@@ -202,3 +202,63 @@ class Config(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+def member(rid, shared, own, family_token):
+    """A chain start whose prompt is `shared` tokens common to its family, then `own` tokens of its own."""
+    r = req(rid, 0)
+    r.origin_input_ids = [family_token] * shared + [hash((rid, i)) % 1000 + 1000 for i in range(own)]
+    return r
+
+
+class FamilyOrder(unittest.TestCase):
+    # Shapes from run 104 (N26 opening): family 62bf0fac had 4 chain starts of ~36k sharing ~31k.
+    def family(self):
+        lead = member('lead', 31000, 4000, 7)
+        followers = [member(f'f{i}', 31000, 5000, 7) for i in range(3)]
+        return lead, followers
+
+    def test_followers_link_to_the_leader_whose_tokens_they_share(self):
+        lead, followers = self.family()
+        other = member('other', 31000, 4000, 8)  # same length, different tokens
+        links = ax.link_families([other, lead] + followers, {f.rid: 31000 for f in followers})
+        self.assertEqual(links, {f.rid: ('lead', 31000) for f in followers})
+
+    def test_family_work_counts_the_shared_prefix_once(self):
+        lead, followers = self.family()
+        links = ax.link_families([lead] + followers, {f.rid: 31000 for f in followers})
+        # (35000 + 3 * (36000 - 31000)) / 4 requests
+        self.assertEqual(ax.family_unit_work([lead] + followers, links), {'lead': 12500.0})
+
+    def test_leader_of_a_cheap_family_goes_before_a_smaller_single_start(self):
+        lead, followers = self.family()
+        solo = req('solo', 20000)
+        q = [solo, lead] + followers
+        held = {f.rid for f in followers}
+        unit = ax.family_unit_work(q, ax.link_families(q, {f.rid: 31000 for f in followers}))
+        plain = ax.tier_order(q, lambda r: 0.0, held, CHUNK, CFG)
+        family = ax.tier_order(q, lambda r: 0.0, held, CHUNK, CFG, unit)
+        self.assertEqual([r.rid for r in plain], ['solo', 'lead', 'f0', 'f1', 'f2'])
+        self.assertEqual([r.rid for r in family], ['lead', 'solo', 'f0', 'f1', 'f2'])
+
+    def test_a_leader_that_cannot_make_it_stays_hopeless(self):
+        # Whether the budget can still be met stays the leader's own: 28 s waited leaves no time for 35k.
+        lead, followers = self.family()
+        solo = req('solo', 20000)
+        q = [solo, lead] + followers
+        unit = ax.family_unit_work(q, ax.link_families(q, {f.rid: 31000 for f in followers}))
+        waited = {'solo': 0.0, 'lead': 28.0}
+        order = ax.tier_order(q, lambda r: waited.get(r.rid, 0.0), {f.rid for f in followers}, CHUNK, CFG, unit)
+        self.assertEqual([r.rid for r in order][:2], ['solo', 'lead'])
+
+    def test_links_are_reused_while_the_leader_waits_and_dropped_after(self):
+        lead, followers = self.family()
+        cache = {}
+        shared = {f.rid: 31000 for f in followers}
+        ax.link_families([lead] + followers, shared, cache)
+        self.assertEqual(cache['f0'], ('lead', 31000))
+        lead.origin_input_ids = []  # would no longer match: a reused link is not re-verified
+        self.assertEqual(ax.link_families([lead] + followers, shared, cache)['f0'], ('lead', 31000))
+        # once the leader has been admitted, the followers find no leader in the queue
+        self.assertEqual(ax.link_families(followers[:1], {'f0': 31000}, cache), {})
+        self.assertEqual(cache, {})

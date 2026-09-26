@@ -255,6 +255,7 @@ class SchedulePolicy:
     ) -> None:
         policy = self._determine_active_policy(waiting_queue)
         self.ax_held = set()  # [ax] 124 keeps LPM's in-batch prefix-sharing holdbacks last
+        self.ax_shared = {}  # [ax] 128: tokens each holdback shares with a request queued before it
 
         # Populate req.num_matched_prefix_tokens at schedule time. Cache-aware policies
         # set it in _compute_prefix_matches; do the same full match for
@@ -399,6 +400,7 @@ class SchedulePolicy:
                     >= IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD
                 ):
                     temporary_deprioritized.add(r.rid)
+                    self.ax_shared[r.rid] = len(in_batch_matching_prefixes)
                 else:
                     # Insert with a dummy key
                     self.waiting_queue_radix_tree.insert(

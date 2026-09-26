@@ -1333,6 +1333,7 @@ class Scheduler(
             "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
             "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
+            "128": "on" if deadline and deadline.family else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1491,13 +1492,21 @@ class Scheduler(
                 raise ValueError(f"[ax] 124/125 need 120's protection, which is off: {blocker}")
             if deadline and _ax_srpt_aging() is not None:
                 raise ValueError("[ax] 124 replaces 123's order; unset SGLANG_AX_SRPT_AGING")
+            if os.environ.get("SGLANG_AX_DEADLINE_FAMILY", "0") == "1":
+                # 128 ranks family leaders inside 124's order, from LPM's in-batch prefix-sharing holdbacks.
+                if deadline is None:
+                    raise ValueError("[ax] 128 ranks inside 124's order; set SGLANG_AX_DEADLINE_TIERS=1")
+                if self.schedule_policy != "lpm":
+                    raise ValueError(f"[ax] 128 needs LPM's in-batch prefix sharing; --schedule-policy is "
+                                     f"{self.schedule_policy}")
             if backlog and self._ax_pace() is not None:
                 raise ValueError("[ax] 125 changes the cold cap and fixed decode interval that 122 replaces; "
                                  "unset SGLANG_AX_PACE_TPOT")
             self._ax_backlog = ax_deadline.BacklogState(backlog) if backlog else None
             self._ax_backlog_relieved = False
             self._ax_park_start = None
-            self._ax_admission_stats = dict(parks=0, relief_rounds=0, log_t=0.0)
+            self._ax_admission_stats = dict(parks=0, relief_rounds=0, family_leaders=0, log_t=0.0)
+            self._ax_family_links = {}  # [ax] 128: held rid -> (leader rid, shared tokens), reused across rounds
             cfgs = self._ax_admission_cfg = (deadline, backlog)
             if deadline or backlog:
                 logger.info("[ax] 124 %s | 125 %s", deadline or "off", backlog or "off")
@@ -1524,7 +1533,13 @@ class Scheduler(
         cont_left = cont.seqlen - len(cont.prefix_indices) if cont is not None else 0
         if deadline is not None:
             held = getattr(self.policy, "ax_held", set())
-            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline)
+            unit = None
+            if deadline.family:  # [ax] 128
+                links = ax_deadline.link_families(self.waiting_queue, getattr(self.policy, "ax_shared", {}),
+                                                  self._ax_family_links)
+                unit = ax_deadline.family_unit_work(self.waiting_queue, links)
+                self._ax_admission_stats["family_leaders"] += len(unit)
+            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, unit)
             order = [r.rid for r in ranked]
             if cont is not None:
                 head = next((r for r in ranked if r.rid not in held), None)
@@ -1555,7 +1570,8 @@ class Scheduler(
         stats = self._ax_admission_stats
         if now - stats["log_t"] >= 30.0:
             stats["log_t"] = now
-            logger.info("[ax-124/125] parks=%d relief_rounds=%d", stats["parks"], stats["relief_rounds"])
+            logger.info("[ax-124/125] parks=%d relief_rounds=%d family_leader_rounds=%d", stats["parks"],
+                        stats["relief_rounds"], stats["family_leaders"])
         return order, park, relieved
 
     def _ax_pace_now(self) -> float:
