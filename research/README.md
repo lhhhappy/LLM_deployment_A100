@@ -21,6 +21,7 @@
 | [071 与线上的瓶颈](claude/R30_071_online_bottlenecks.md) | 09-25：chain 门卡在开场冷启动潮（prefill 吞吐墙加 LPM 排序），更正“缓存没接上”说法；分叉点抢占约 9% 重算；主机层 N34 容量瓶颈是当时的预测，须以新实测复核 |
 | [N30→N34 等待归因](codex/R31_n34_waiting_bottleneck.md) | 081/082 同 ID 完整回放：N34 fast 大幅恶化主要发生在准入后、首次执行前；额外重算仅 +0.8%，full-KV 压力与等待相关，但尚未区分资源拒绝与可运行越过 |
 | [显存容量墙的选项](claude/R34_kv_capacity_options.md) | 09-26：每卡显存账与配置公式（mem_fraction、mamba_full_memory_ratio、槽数→并发的静默耦合）、FP8 KV 存储层已在代码里而计算层缺 tilelang 分支、DCP 115/116 只差 8 卡验证且与 MTP 的缺口在 move_kv_cache、主机层 write_back 现成可试、准入侧无抢占；按容量÷工程量排序的清单 |
+| [KV 容量方案的业界调研](claude/R35_kv_capacity_survey.md) | 09-26：量化、卸载、DCP、前缀去重、准入与抢占、有损减负六方向的公开证据与对我们的排序；KDA 状态池是死角；能落地的顺序是准入调度 → 链感知卸载 → FP8 → DCP |
 | [驻留账本](../scripts/analysis/residency_ledger.py) | CPU 闭环 N 槽模拟：在飞 KV 需求对比池容量、淘汰与重算量；开发集校准未通过（prefill 多算 74%），只作数据集算术上界，结果 `evidence/longchain-design-20260924/residency_ledger_v2.json`；不用于选择当前配置 |
 | [阻塞窗口与执行路线复核](../notes/codex-分析-阻塞归因与执行路线.md) | blocking.py 通用工具、042/037d 重算、实测时间/窗口重合/模型估计的区别 |
 
