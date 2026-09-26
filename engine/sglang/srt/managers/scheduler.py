@@ -5319,6 +5319,8 @@ class Scheduler(
                 # no prefill rate sample spans the flush.
                 self._ax_backlog.reset()
                 self._ax_backlog_relieved = False
+            if getattr(self, "_ax_family_links", None):
+                self._ax_family_links.clear()  # [ax] 128: links name request ids of the flushed level
 
             if self.draft_worker:
                 self.draft_worker.clear_cache_pool()

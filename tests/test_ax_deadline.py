@@ -224,6 +224,13 @@ class FamilyOrder(unittest.TestCase):
         links = ax.link_families([other, lead] + followers, {f.rid: 31000 for f in followers})
         self.assertEqual(links, {f.rid: ('lead', 31000) for f in followers})
 
+    def test_followers_link_only_within_their_cache_namespace(self):
+        # LPM held f0 back because of leader B (same salt); A has the same tokens under another salt.
+        a, b = member('A', 31000, 4000, 7), member('B', 31000, 4000, 7)
+        f = member('f0', 31000, 5000, 7)
+        a.cache_salt, b.cache_salt, f.cache_salt = 'x', 'y', 'y'
+        self.assertEqual(ax.link_families([a, b, f], {'f0': 31000}), {'f0': ('B', 31000)})
+
     def test_family_work_counts_the_shared_prefix_once(self):
         lead, followers = self.family()
         links = ax.link_families([lead] + followers, {f.rid: 31000 for f in followers})

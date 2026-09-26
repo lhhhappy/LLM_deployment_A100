@@ -22,8 +22,9 @@ and refuses to start otherwise.
   request it holds back, how many leading tokens it shares with a request queued before it (`ax_shared`). Nothing
   else changes there; with 128 off the record is unused.
 - `ax_deadline.link_families` maps each held request to the first waiting request that is not held back and whose
-  prompt starts with the same tokens (token-by-token comparison of the shared length; links are cached per held
-  request while the leader still waits, since prompts do not change).
+  prompt starts with the same tokens in the same cache namespace (`extra_key`, `cache_salt`, as LPM's `RadixKey`;
+  token-by-token comparison of the shared length). Links are cached per held request while the leader still waits,
+  since prompts do not change, and cleared by `/flush_cache` (a level's request ids do not carry over).
 - `ax_deadline.family_unit_work`: for each leader, (its remaining work + each follower's remaining work minus the
   shared tokens) / family size.
 - `ax_deadline.tier_order` ranks a leader by that value instead of its own remaining work. Tiers are unchanged:
@@ -40,7 +41,7 @@ and refuses to start otherwise.
 - Comparing prefixes costs up to the shared length per held request once (then cached).
 
 ## Evidence
-CPU tests: `tests/test_ax_deadline.py` (`FamilyOrder`: linking by token content, family work, ordering against a
+CPU tests: `tests/test_ax_deadline.py` (`FamilyOrder`: linking by token content and cache namespace, family work, ordering against a
 smaller single start, a hopeless leader staying hopeless, link reuse) and `tests/test_ax_admission_scheduler.py`
 (`FamilyOrder`: the real admission plan admits the leader first with 128 on and the smaller single start with it
 off; refusals without 124 or LPM). Pod: pending (v3 N26 opening probe, single change versus 104).

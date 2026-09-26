@@ -117,13 +117,19 @@ def _prefix(req, n: int) -> List[int]:
     return ids[:n] if n <= len(ids) else (ids + req.output_ids)[:n]
 
 
+def _namespace(req) -> Tuple:
+    # LPM keys its in-batch tree by (tokens, extra_key, cache_salt); requests differing in either never share.
+    return getattr(req, "extra_key", None), getattr(req, "cache_salt", None)
+
+
 def link_families(reqs: Sequence, shared: Mapping[str, int],
                   cache: Optional[Dict[str, Tuple[str, int]]] = None) -> Dict[str, Tuple[str, int]]:
     """128: map each held-back request to the waiting request whose prompt it shares.
 
     `shared` holds, for the requests LPM held back for in-batch prefix sharing, how many leading tokens
     they share with a request queued before them. Their leader is the first request not held back whose
-    prompt starts with the same tokens; any such request computes the shared prefix. Returns
+    prompt starts with the same tokens in the same cache namespace (extra_key and cache_salt, as LPM's
+    RadixKey); any such request computes the shared prefix. Returns
     {held rid: (leader rid, shared tokens)}; held requests without a leader in `reqs` are left out.
     Prompts do not change while waiting, so a link found earlier is reused from `cache` (updated in
     place) while its leader still waits unheld and the shared length is the same.
@@ -141,7 +147,8 @@ def link_families(reqs: Sequence, shared: Mapping[str, int],
             continue
         prefix = _prefix(r, n)
         for leader in leaders:
-            if len(leader.origin_input_ids) + len(leader.output_ids) >= n and _prefix(leader, n) == prefix:
+            if (_namespace(leader) == _namespace(r)
+                    and len(leader.origin_input_ids) + len(leader.output_ids) >= n and _prefix(leader, n) == prefix):
                 links[r.rid] = (leader.rid, n)
                 break
     if cache is not None:
