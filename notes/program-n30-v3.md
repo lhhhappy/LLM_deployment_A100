@@ -91,3 +91,5 @@ v3 全量元数据（[对比表](../evidence/longchain-v3-20260926/compare.json)
 （随跑随填）
 
 - 109 的 chain/turn 超时逐条归因与针对性设计（第二条通道、家族领头排序）见 [109-chain-turn-rootcause-0926.md](reports/109-chain-turn-rootcause-0926.md)。
+
+- Fable 策略咨询（解码摊薄、122 全程让位、会话感知预算、硬上限）与决定见 [fable-策略-2026-09-26.md](fable-策略-2026-09-26.md)。
