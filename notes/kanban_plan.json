@@ -51,7 +51,7 @@
     "job": "130d-v3_open_A_warm15_128_n30",
     "ref": "130a-v3_open_A_warm15_n30",
     "what": "A′ + 128 家族领头",
-    "status": "排队中（S2 候选）"
+    "verdict": "chain 不变（家族兄弟仍等 28–50 s）、overall/fast 略降、TPOT>0.10 34→41：本次不进 S2，需决策日志再查"
   },
   {
     "job": "130e-v3_open_A_warm15_122_n30",
