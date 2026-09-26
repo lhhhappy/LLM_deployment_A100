@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # N34 opening probe (600-second admission, then drain) of the family leader ranking: v3_n34_124_125x_117_48_60m (114)
-# plus 128 on engine 51237af7. Single change versus 114: SGLANG_AX_DEADLINE_FAMILY=1 (waiting cold requests sharing an
+# plus 128 on engine 4f9d1f0b. Single change versus 114: SGLANG_AX_DEADLINE_FAMILY=1 (waiting cold requests sharing an
 # uncached prefix of at least 4096 tokens form a family; the leader ranks by remaining/(1+riders); riders wait for it).
 # Judged against 114's first 600 s on the same request IDs: chain misses of family riders (run 109: 4 of 9), the
 # leaders' first-batch time, turn and fast misses, TPOT>0.10; [ax-128] log lines give the families seen.
-G_COMMIT=51237af7c00b34d412caee00636b452437f6bc3e
+G_COMMIT=4f9d1f0b9c71522ad8e97413924baf513e6f4357
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 128=on 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
 G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87"
