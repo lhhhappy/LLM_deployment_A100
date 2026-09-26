@@ -14,7 +14,7 @@ unset LADDER_DOWN SGLANG_AX_SRPT_AGING SGLANG_AX_SHORT_RESERVE
 unset SGLANG_AX_NUMTRACE_DIR SGLANG_AX_NUMTRACE_DUMP_LAYER
 SMOKE_GATE=0
 # v3g data: v3 with the imputed replay gaps rescaled per chain to the organizer's real chain durations
-# (scripts/longchain/regap.py; per-request gap mean 5.5 -> 24.4 s, same prompts/budgets/order, cohort 13b346fde05bd592),
+# (scripts/longchain/regap.py; per-request gap mean 5.5 -> 22.3 s (cap truncates, not redistributed), same prompts/budgets/order, cohort 13b346fde05bd592),
 # checked by hash before any engine starts. Bodies are the parent's (bodies/ links to s1-dev-longchain-v3/bodies).
 G_DATA_ROOT="$AX/data/s1-dev-longchain-v3g"
 G_DATA_SET=s1-dev-longchain-v3g
@@ -28,7 +28,7 @@ assert c['set'] == 's1-dev-longchain-v3g' and c['n_chains'] == 311 and c['n_requ
 assert c['cohort_sha256'] == '13b346fde05bd592'
 ids = [rid for chain in c['chains'] for rid in chain['req_ids']]
 assert len(ids) == len(set(ids)) == 5601
-assert hashlib.sha256((root/'requests.jsonl').read_bytes()).hexdigest() == '9341d23878b796a42802b18b18ecb0e3cbb88f6155ca5b5c910bfd363c65ac37'
+assert hashlib.sha256((root/'requests.jsonl').read_bytes()).hexdigest() == '1b14aab254218d4f56aa5a978e1e024073aac74d97744e1c2e0e1a6c9f147ace'
 shards = [os.path.join(dp, f) for dp, _, files in os.walk(root/'bodies') for f in files if f.endswith('.jsonl.gz')]
 assert shards and all(os.path.isfile(p) for p in shards), 'body shards not visible to harness os.walk'
 print('DATA_READY v3g chains=311 requests=%d N%s admission_seconds=%s warmup=rep16-v1' % (len(ids), level, seconds), flush=True)

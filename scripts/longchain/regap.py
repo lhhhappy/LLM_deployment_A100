@@ -11,8 +11,9 @@ notes/fable-策略-2026-09-26.md). Gaps the organizer published (gap_imputed fal
 Rule per chain (all quantities in seconds):
   target = clamp(real_duration - sum(ttft_s + max_output_i * tpot_s), 0, chain_cap)   # harness caps a chain at 3600
   imputed gaps are multiplied by f = (target - valid_gaps) / imputed_gaps, f >= 1 unless --allow-scale-down;
-  every gap is then capped at gap_cap (the organizer's min(tool,300)+min(think,10) formula gives at most 310 s),
-  the shortfall from capping is redistributed once over the uncapped imputed gaps.
+  every gap is then capped at gap_cap (the organizer's min(tool,300)+min(think,10) formula gives at most 310 s);
+  the time cut by the cap is dropped, as in the organizer's own replay (their raw gaps over 310 s are truncated and
+  not redistributed: 3 of 411 public gaps, 4069 s raw replayed as 318 s), unless --redistribute is given.
 Chains without an organizer duration, with a single request, or with no imputed gap are unchanged.
 
 Usage: regap.py --src cache/s1-dev-longchain-v3 --organizer s1-dev/data/dev-combined-v1/chains.jsonl
@@ -48,6 +49,7 @@ def main():
     ap.add_argument('--gap-cap-s', type=float, default=310.0)
     ap.add_argument('--chain-cap-s', type=float, default=3600.0)
     ap.add_argument('--allow-scale-down', action='store_true')
+    ap.add_argument('--redistribute', action='store_true', help='spread the time cut by gap_cap over the other imputed gaps (not the organizer rule)')
     a = ap.parse_args()
     src, out = Path(a.src), Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -100,7 +102,7 @@ def main():
                 stats['capped_gaps'] += 1
             new[r['logical_call_id']] = g
         room = [r for r in imputed if new[r['logical_call_id']] < a.gap_cap_s]
-        if overflow > 0 and room:
+        if a.redistribute and overflow > 0 and room:
             share = overflow / len(room)
             for r in room:
                 new[r['logical_call_id']] = min(a.gap_cap_s, new[r['logical_call_id']] + share)
@@ -121,7 +123,8 @@ def main():
         generator='regap-v1', set=a.set, parent_set=cohort.get('parent_set') or json.loads((src / 'cohort.json').read_text())['set'],
         parent_requests_sha256=sha(src / 'requests.jsonl'), parent_cohort_sha256=json.loads((src / 'cohort.json').read_text())['cohort_sha256'],
         organizer_chains_sha256=sha(a.organizer),
-        rule=dict(ttft_s=a.ttft_s, tpot_s=a.tpot_s, gap_cap_s=a.gap_cap_s, chain_cap_s=a.chain_cap_s, allow_scale_down=a.allow_scale_down),
+        rule=dict(ttft_s=a.ttft_s, tpot_s=a.tpot_s, gap_cap_s=a.gap_cap_s, chain_cap_s=a.chain_cap_s, allow_scale_down=a.allow_scale_down,
+                  redistribute=a.redistribute),
         chains=stats['chains'], changed=stats['changed'], unchanged=dict(no_duration=stats['no_duration'], single=stats['single'],
                                                                           no_imputed=stats['no_imputed'], would_scale_down=stats['scaled_down_skipped']),
         chains_over_harness_cap=stats['capped_chain'], gaps_capped=stats['capped_gaps'],
