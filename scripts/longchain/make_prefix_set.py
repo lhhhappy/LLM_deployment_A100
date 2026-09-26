@@ -8,8 +8,8 @@ chain starts at 18.8% of requests instead of 7.7%. This root is for calibrating 
 official results; it is not the official data.
 
 Order within a chain is the harness's (s1_common.load_index: dispatch_offset_ms, then logical_call_id),
-and the cohort's req_ids must list the kept requests in that same order (checked). Request bodies,
-samples, event plans and provenance are symlinked to the source (selection is by req_id / chain_id).
+and the cohort's req_ids must list the kept requests in that same order (checked). Body shard files,
+samples, event plans and provenance link to the source (selection is by req_id / chain_id).
 Usage: python3 scripts/longchain/make_prefix_set.py --src data/s1-dev-longchain --dst data/s1-dev-longchain-k9 --k 9
        [--harness-dir <s1-dev/harness>]   (the harness whose load_index defines chain order)
 """
@@ -39,7 +39,9 @@ def main() -> int:
     sys.path.insert(0, str(args.harness_dir))
     global load_index
     from s1_common import load_index
-    src, dst, k = args.src.resolve(), args.dst, args.k
+    # Both paths must use the same physical namespace before computing
+    # relative links. On the pod /tmp/ax is itself a symlink into /dev/shm.
+    src, dst, k = args.src.resolve(), args.dst.resolve(), args.k
     if k < 1:
         raise SystemExit("--k must be >= 1")
     if dst.exists():
@@ -92,7 +94,17 @@ def main() -> int:
                                                .encode()).hexdigest()[:16])
     (dst / "cohort.json").write_text(json.dumps(cohort, ensure_ascii=False, indent=2))
 
-    for name in ("bodies", "samples", "event-plans.jsonl", "provenance.jsonl"):
+    # The harness discovers body shards with os.walk(root/bodies), which does
+    # not follow a symlink used as the bodies directory. Keep the directory
+    # real and link its files so the 3.4 GB source remains shared.
+    body_dir = dst / "bodies"
+    body_dir.mkdir()
+    for source_file in (src / "bodies").rglob("*.jsonl.gz"):
+        target = body_dir / source_file.relative_to(src / "bodies")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.symlink(os.path.relpath(source_file, target.parent), target)
+
+    for name in ("samples", "event-plans.jsonl", "provenance.jsonl"):
         if (src / name).exists():
             os.symlink(os.path.relpath(src / name, dst), dst / name)
     manifest = json.loads((src / "manifest.json").read_text())
