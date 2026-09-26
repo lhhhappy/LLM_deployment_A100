@@ -1323,6 +1323,11 @@ class Scheduler(
         # build may lack its dependencies), so look it up without importing.
         dsa_backend = sys.modules.get("sglang.srt.layers.attention.dsa_backend")
         m118 = dsa_backend.ax118_state() if dsa_backend is not None else "off:no_dsa_backend"
+        from sglang.srt.layers.dcp.local_extend import local_extend_mechanism_tokens
+
+        m115_local = local_extend_mechanism_tokens(
+            getattr(self.tp_worker, "model_runner", None)
+        )
         items = {
             "101": m101,
             "117": self._ax_humming_report(),
@@ -1347,7 +1352,7 @@ class Scheduler(
         )
         spec = get_spec().speculative_algorithm or "-"
         return (" ".join(f"{k}={v}" for k, v in items.items())
-                + f" | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
+                + f" {m115_local} | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
 
     def _ax_humming_report(self) -> str:
         """[ax] 117: effective state, i.e. how many MoE layers this process serves through Humming."""

@@ -5,15 +5,18 @@ import triton
 import triton.language as tl
 
 
-@triton.jit
+# Batch dimensions/strides must not specialize, including Triton's implicit
+# integer-value/alignment specialization. Only the bounded owner geometry is
+# static; an unseen query length must reuse the already compiled kernel.
+@triton.jit(do_not_specialize=["ROWS", "COLS", "S0", "S1", "OUT_COLS"])
 def _local_indices(
     src,
     dst,
-    ROWS: tl.constexpr,
-    COLS: tl.constexpr,
-    S0: tl.constexpr,
-    S1: tl.constexpr,
-    OUT_COLS: tl.constexpr,
+    ROWS,
+    COLS,
+    S0,
+    S1,
+    OUT_COLS,
     WIDTH: tl.constexpr,
     RANK: tl.constexpr,
     STRIDE: tl.constexpr,

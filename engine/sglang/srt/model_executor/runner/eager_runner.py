@@ -31,7 +31,11 @@ from sglang.srt.layers.cp.utils import (
     is_cp_v2_active,
     prepare_cp_forward,
 )
-from sglang.srt.layers.dcp.local_extend import LocalExtendPolicy
+from sglang.srt.layers.dcp.local_extend import (
+    LocalExtendPolicy,
+    LocalExtendStats,
+    uses_local_extend,
+)
 from sglang.srt.layers.dcp.metadata import DecodeContextParallelMetadata
 from sglang.srt.layers.pooler import EmbeddingPoolerOutput
 from sglang.srt.model_executor.cuda_graph_buffer_registry import (
@@ -89,7 +93,10 @@ class EagerRunner(BaseRunner):
         mr = model_runner
         sa = mr.server_args
         self.dcp_local_extend_policy = LocalExtendPolicy.from_runner(mr)
-        self._dcp_local_extend_batches = 0
+        self.dcp_local_extend_stats = (
+            LocalExtendStats("draft" if mr.is_draft_worker else "target", mr.ps.tp_rank)
+            if self.dcp_local_extend_policy is not None else None
+        )
         # Built first so the cg runners coalesce onto its buffers via the shared
         # input pool; size to the largest tokens/req across modes the worker hits.
         num_tokens_per_req = 1
@@ -322,14 +329,6 @@ class EagerRunner(BaseRunner):
                     forward_batch.attn_dcp_metadata = DecodeContextParallelMetadata(
                         dcp_local_extend=True,
                     )
-                    self._dcp_local_extend_batches += 1
-                    if self._dcp_local_extend_batches == 1:
-                        logger.info(
-                            "[ax] DCP local extend engaged: prefix=%d, padded_q=%d, heads=%d",
-                            sum(forward_batch.extend_prefix_lens_cpu),
-                            len(forward_batch.input_ids),
-                            policy.heads,
-                        )
                 else:
                     forward_batch.attn_dcp_metadata = (
                         model_runner.model.prepare_context_parallel_metadata_for_dcp(
@@ -406,6 +405,15 @@ class EagerRunner(BaseRunner):
                     forward_batch,
                     **kwargs,
                 )
+        if (
+            self.dcp_local_extend_stats is not None
+            and forward_batch.forward_mode.is_context_parallel_extend()
+        ):
+            self.dcp_local_extend_stats.record(
+                local=uses_local_extend(forward_batch),
+                query_tokens=len(forward_batch.input_ids),
+                prefix_tokens=sum(forward_batch.extend_prefix_lens_cpu),
+            )
         return ret
 
     def _execute_extend_cp_v2(

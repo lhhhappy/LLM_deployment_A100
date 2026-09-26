@@ -16,6 +16,7 @@ import argparse
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
 
 
@@ -202,6 +203,9 @@ def main():
     try:
         engine = sglang.Engine(
             model_path=args.model, load_format="dummy", tp_size=args.tp, dcp_size=args.dcp,
+            # Offline Engine defaults to error; retain actual mechanism/route
+            # logs for this diagnostic, just as the serving entrypoint does.
+            log_level="info",
             skip_tokenizer_init=True, random_seed=1234, kv_cache_dtype="bfloat16",
             dsa_prefill_backend="tilelang", dsa_decode_backend="tilelang",
             linear_attn_backend="triton", mem_fraction_static=0.60,
@@ -212,6 +216,9 @@ def main():
             speculative_num_steps=3, speculative_eagle_topk=1,
             speculative_num_draft_tokens=4, enable_cache_report=True, **extra,
         )
+        window = {"start": time.time(), "end": None,
+                  "scope": "post-startup diagnostic requests, including churn and flush"}
+        (args.output / "measurement_window.json").write_text(json.dumps(window, indent=2) + "\n")
         (trace / "RECORDING").touch()
         rng = random.Random(1234)
         ids = [rng.randrange(10000) for _ in range(4164)]
@@ -316,6 +323,8 @@ def main():
                    "trace_files": len(list(trace.glob("*.pt"))),
                    "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."}
         (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+        window["end"] = time.time()
+        (args.output / "measurement_window.json").write_text(json.dumps(window, indent=2) + "\n")
         print(json.dumps(summary), flush=True)
     finally:
         if engine is not None:

@@ -1,7 +1,9 @@
 """Opt-in eager-extend routing for the owner-striped GLM DSA latent cache."""
 
+import json
 import logging
 import os
+import time
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -13,6 +15,52 @@ def uses_local_extend(forward_batch) -> bool:
     mode = forward_batch.forward_mode
     md = forward_batch.attn_dcp_metadata
     return mode.is_context_parallel_extend() and md is not None and md.dcp_local_extend
+
+
+def local_extend_mechanism_tokens(model_runner) -> str:
+    """Report the initialized target runner, never the requested environment."""
+    eager = getattr(model_runner, "eager_runner", None)
+    policy = getattr(eager, "dcp_local_extend_policy", None)
+    if policy is None:
+        return "dcp_local=off dcp_local_max=0 dcp_local_large=0"
+    return (
+        f"dcp_local=on dcp_local_max={policy.max_tokens} "
+        f"dcp_local_large={policy.large_max_tokens}"
+    )
+
+
+class LocalExtendStats:
+    """CPU-only cumulative observations of eager forwards that returned.
+
+    One snapshot per new route, otherwise at most every 30 s per runner/rank.
+    No CUDA synchronization or unbounded per-shape table in the serving path.
+    Counters include warmup traffic; use snapshot differences for a window.
+    """
+
+    def __init__(self, role: str, rank: int):
+        self.role, self.rank = role, rank
+        self.routes = {
+            route: dict(batches=0, query_tokens=0, prefix_tokens=0, last_t=0, last_p=0)
+            for route in ("gather_kv", "local_short", "local_large")
+        }
+        self._last_log = 0.0
+
+    def snapshot(self):
+        return dict(role=self.role, rank=self.rank, observed_at_s=time.time(),
+                    routes={k: v.copy() for k, v in self.routes.items()})
+
+    def record(self, *, local: bool, query_tokens: int, prefix_tokens: int):
+        route = ("local_large" if query_tokens >= 2048 else "local_short") if local else "gather_kv"
+        counts = self.routes[route]
+        first = counts["batches"] == 0
+        counts["batches"] += 1
+        counts["query_tokens"] += query_tokens
+        counts["prefix_tokens"] += prefix_tokens
+        counts["last_t"], counts["last_p"] = query_tokens, prefix_tokens
+        now = time.monotonic()
+        if first or now - self._last_log >= 30:
+            self._last_log = now
+            logger.info("[ax-dcp-local] %s", json.dumps(self.snapshot(), separators=(",", ":")))
 
 
 @dataclass(frozen=True)
@@ -49,6 +97,7 @@ class LocalExtendPolicy:
         if not get_bool_env_var("SGLANG_AX_DCP_LOCAL_EXTEND"):
             return None
         import torch
+        from sglang.srt.configs.model_config import get_dsa_index_kpool
 
         sa, ps, mc = mr.server_args, get_parallel(), mr.model_config
         arch = mc.hf_config.architectures[0]
@@ -73,6 +122,10 @@ class LocalExtendPolicy:
             ),
             (sa.enable_hisparse, "HiSparse"),
             (sa.pp_size != 1, "pipeline parallelism"),
+            (
+                get_dsa_index_kpool(mc.hf_config) != 4 or mr.page_size % 4 != 0,
+                "requires KPool=4 and 4-aligned pages for local column compaction",
+            ),
             (get_bool_env_var("SGLANG_AX_DSA_SPARSE_TRITON"), "118 Triton backend override"),
             (not str(mr.device).startswith("cuda"), "device"),
         ]
@@ -92,8 +145,6 @@ class LocalExtendPolicy:
         if large_max_tokens not in (0, 2048, 8192):
             raise ValueError("DCP local extend large max must be 0, 2048 or 8192")
         if large_max_tokens:
-            from sglang.srt.configs.model_config import get_dsa_index_kpool
-
             if (
                 mc.num_attention_heads // ps.attn_tp_size != 8
                 or mc.kv_lora_rank != 512
