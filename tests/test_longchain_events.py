@@ -70,9 +70,9 @@ def test_rebuild_preserves_recent_tool_group_and_input_immutability():
     assert body == snapshot
 
 
-@pytest.mark.parametrize('history_chars, expected_adjustment', [(500, None), (180, 120), (70, 32), (35, 1)])
-def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch, history_chars, expected_adjustment):
-    """Pressure and short-history summaries use one explicit accepted reset."""
+@pytest.mark.parametrize('history_chars', [500, 180, 70, 35])
+def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch, history_chars):
+    """Context pressure forces one explicit rebuild; a short history tightens its summary until it shrinks."""
     import argparse
     import gzip
     sys.path.insert(0, str(ROOT / 's1-dev/harness'))
@@ -104,8 +104,9 @@ def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch,
             'gap_valid': True, 'replay_gap_ms': 0, 'sys_tools_hash': 'f', 'body_ref': 'bodies/a.jsonl.gz'}
     row1 = dict(row0, logical_call_id='b', dispatch_offset_ms=2, end_offset_ms=3,
                 phase='intra', glm_tokens=visible_chars, glm_lcp_with_prev=1, uncached_expected=visible_chars - 1)
-    phases = {'session_start': 1, 'intra': 2} if expected_adjustment is None else {'session_start': 1, 'intra': 1, 'context_reset': 1}
-    context_limit = 650 if expected_adjustment is None else 1000
+    phases = {'session_start': 1, 'intra': 2}
+    # Room for the public prompt and its output, not for another continuation of the same size.
+    context_limit = visible_chars + 100 + 10
     chain = {'view': 'canon', 'pack': 'p', 'chain_id': 'c', 'session_id': 's', 'chain_index': 0,
              'n_requests': 3, 'sum_glm_tokens': 2 * history_chars + 3, 'sum_uncached_expected': 2 * history_chars + 1,
              'max_output_i_sum': 120, 'phases': phases, 'sys_tools_hash': 'f'}
@@ -143,22 +144,19 @@ def test_build_handles_pressure_and_short_history_rebuild(tmp_path, monkeypatch,
     assert rows[-1]['max_output_i'] == 100
     assert rows[0]['max_output_i'] == rows[1]['max_output_i'] == 10
     provenance = list(lc.read_jsonl(out / 'provenance.jsonl'))
-    if expected_adjustment is None:
-        assert provenance[-1]['displaced_planned_kind'] == 'intra'
-    else:
-        assert rendered_attempts[0][0] > row1['glm_tokens']
-        if history_chars == 180:
-            assert rendered_attempts[0][1]['rebuild']['tail_start'] == 2
-            assert provenance[-1]['rebuild']['tail_start'] == len(body1['messages'])
-        assert 'displaced_planned_kind' not in provenance[-1]
-        assert provenance[-1]['event_kind'] == 'context_reset'
-        assert provenance[-1]['rebuild_render_adjustment'] == {
-            'keep_fraction': 0, 'excerpt_chars': expected_adjustment,
-            'excerpt_count': 4 if expected_adjustment == 120 else 1}
-        expected_limits = [120, 32, 1][: [120, 32, 1].index(expected_adjustment) + 1]
-        assert [a['rebuild_limits']['excerpt_chars'] for a in event_attempts if 'rebuild_limits' in a] == expected_limits
-        assert all(a['kind'] == 'context_reset' for a in event_attempts)
-        assert all(a['template'] == event_attempts[0]['template'] for a in event_attempts)
+    assert provenance[-1]['displaced_planned_kind'] == 'intra'
+    assert provenance[-1]['event_kind'] == 'context_reset' and provenance[-1]['rebuild']
+    assert rows[-1]['edge_type'] == 'compact-rebuild'
+    # Summary tightening goes 120 -> 32 -> 1 characters and stops at the first rebuild that shrinks.
+    tried = [a['rebuild_limits']['excerpt_chars'] for a in event_attempts if 'rebuild_limits' in a]
+    assert tried == [120, 32, 1][:len(tried)]
+    adjustment = provenance[-1]['rebuild_render_adjustment']
+    assert (adjustment or {}).get('excerpt_chars') == (tried[-1] if tried else None)
+    if history_chars == 35:
+        assert tried, 'a 35-character history cannot hold the default 240-character summary'
+    rebuilds = [a for a in event_attempts if a.get('rebuild')]
+    assert rebuilds and all(a['kind'] == 'context_reset' for a in rebuilds)
+    assert all(a['template'] == rebuilds[0]['template'] for a in rebuilds)
     generated_bodies = list(lc.read_jsonl(out / 'bodies/probe.jsonl.gz'))
     assert generated_bodies[:2] == [body0, body1]
     assert generated_bodies[-1]['messages'][0] == body0['messages'][0]
@@ -247,8 +245,11 @@ def narrated_call(call_id, narration='Let me check that.'):
             {'role': 'tool', 'tool_call_id': call_id, 'content': '{"ok": true, "stdout": "' + 'x' * 300 + '"}'}]
 
 
+# The public Read schema: pagination is required but nullable.
 READ_SCHEMA = {'required': ['source', 'target', 'offset', 'limit'],
-               'properties': {'source': {}, 'target': {}, 'offset': {}, 'limit': {}}}
+               'properties': {'source': {'type': 'string'}, 'target': {'type': 'string'},
+                              'offset': {'anyOf': [{'type': 'integer'}, {'type': 'null'}]},
+                              'limit': {'anyOf': [{'type': 'integer'}, {'type': 'null'}]}}}
 
 
 def turn_history():
@@ -291,28 +292,60 @@ def test_turn_start_diverges_with_one_read_to_reach_its_size(tmp_path):
     block = [{'role': 'assistant', 'content': 'Second answer'}, {'role': 'user', 'content': 'Third task'}, history[-1]]
     tail = compiler.approximate_tokens(block)
     suffix_b = compiler.approximate_tokens(closed[5:])
-    # A target the finished turn can nearly cover diverges at its first call, with a minimal Read;
-    # a larger one moves the divergence into the earlier turn instead of growing the Read.
-    _, earlier = compiler.diverge_to_target(closed, stripped, block, tail + suffix_b + 500, READ_SCHEMA, 'p_t')
-    assert earlier['diverged_at'] == 1
-    reissued, receipt = compiler.diverge_to_target(closed, stripped, block, tail + suffix_b + 100, READ_SCHEMA, 'p_t')
-    assert receipt['diverged_at'] == 5
-    assert receipt['read_lengthening']['read_target_tokens'] == events.READ_MIN_TOKENS
-    assert reissued[:5] == closed[:5]
-    assert [c['function']['name'] for c in reissued[5]['tool_calls']] == ['Bash', 'Read']
-    assert reissued[7]['tool_call_id'] == reissued[5]['tool_calls'][1]['id']
-    assert reissued[8:] == closed[7:]
+    starts = [1, 5, 7]  # tool-call messages after the first human message
+    closed_from = stripped[0]  # closing the turn already recomputes from here
+    def estimated(i):
+        suffix = compiler.approximate_tokens(closed[min(i, closed_from):])
+        return suffix + tail + min(events.READ_DIVERGE_MAX, max(events.READ_MIN_TOKENS, target - tail - suffix))
+    # The divergence lands where the estimated recompute is closest to the target (later on ties).
+    target = tail + suffix_b + 1500
+    reissued, receipt = compiler.diverge_to_target(closed, stripped, block, target, READ_SCHEMA, 'p_t', force=False)
+    d = receipt['diverged_at']
+    assert d == min(reversed(starts), key=lambda i: abs(estimated(i) - target)) == 1
+    assert events.READ_MIN_TOKENS <= receipt['read_lengthening']['read_target_tokens'] <= events.READ_DIVERGE_MAX
+    # A target beyond the whole history does not grow an unbounded Read into the context.
+    _, beyond = compiler.diverge_to_target(closed, stripped, block, 10 * target, READ_SCHEMA, 'p_x', force=False)
+    assert beyond['diverged_at'] == 1 and beyond['read_lengthening']['read_target_tokens'] == events.READ_DIVERGE_MAX
+    # Only the diverging message gains a Read call, whose result follows that message's own result.
+    assert reissued[:d] == closed[:d]
+    assert [c['function']['name'] for c in reissued[d]['tool_calls']] == ['Bash', 'Read']
+    assert reissued[d + 1] == closed[d + 1]
+    assert reissued[d + 2]['tool_call_id'] == reissued[d]['tool_calls'][1]['id']
+    assert reissued[d + 3:] == closed[d + 2:]
     after = reissued + block
-    assert _rewrite_start(history, after, True) == (len(reissued), [5, 7], 5)
+    assert _rewrite_start(history, after, True) == (len(reissued), [5, 7], d)
     # Within a turn narration stays: the same body is not a continuation's rewrite.
     assert _rewrite_start(history, after, False) == (None, None, None)
     # The Read result must directly follow its message's own results.
-    misplaced = after[:7] + [after[8], after[7]] + after[9:]
+    misplaced = after[:d + 1] + [after[d + 3], after[d + 2]] + after[d + 4:]
     assert _rewrite_start(history, misplaced, True) == (None, None, None)
     # Any other change in the diverged history is rejected.
     edited = copy.deepcopy(after)
-    edited[8]['content'] = 'changed'
+    edited[d + 3]['content'] = 'changed'
     assert _rewrite_start(history, edited, True) == (None, None, None)
+
+
+def test_read_arguments_follow_the_session_schema():
+    # Pagination is sent as null only where the schema allows null.
+    assert events.read_arguments(READ_SCHEMA, 'f.md') == {'source': 'path', 'target': 'f.md', 'offset': None, 'limit': None}
+    path_schema = {'required': ['path'], 'properties': {'path': {'type': 'string'}, 'offset': {'type': 'number'},
+                                                        'limit': {'type': 'number'}}}
+    assert events.read_arguments(path_schema, 'f.md') == {'path': 'f.md'}
+    assert events.read_arguments({'properties': {}}, 'f.md') is None
+
+
+def test_plan_rewrites_follow_source_count_without_the_head_edge():
+    compiler = compiler_stub()
+    # Mid-session chain: total_edges counts the head's incoming edge (a system/tools change here).
+    target = {'n_requests': 12, 'total_edges': 12, 'append_only_edges': 7,
+              'phases': {'intra': 10, 'turn_start': 2}}
+    original = [{'phase': 'intra', 'edge_type': 'system-tools-changed'},
+                {'phase': 'turn_start', 'edge_type': 'unexplained-break'}]
+    plan = compiler.plan(target, original, compiler.donors)
+    # 5 rewrites in the chain, minus the head edge and the public turn start's break: 3 to synthesize,
+    # the synthesized turn start first; the reset-free plan keeps every other step an append.
+    assert sum(p['rewrite'] for p in plan) == 3
+    assert [p['rewrite'] for p in plan if p['kind'] == 'turn_start'] == [True]
 
 
 def test_read_corpus_reads_forward_without_repeating(tmp_path):

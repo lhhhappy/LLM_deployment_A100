@@ -23,6 +23,10 @@ READ_CORPUS_SUFFIXES = (".py", ".md", ".rst", ".txt", ".cu", ".cuh", ".cc", ".cp
 READ_MIN_TOKENS, READ_TOLERANCE = 128, 0.1
 # Rendered tokens of a Read call and its JSON result around the text itself (measured ~40-60).
 READ_WRAPPER_TOKENS = 64
+# A divergence Read stays in every later prompt, so it is kept small; the recompute comes from the suffix.
+READ_DIVERGE_MAX = 1024
+# Share of history a context-pressure rebuild keeps as its recent tail (public resets never shrink the prompt).
+PRESSURE_KEEP_FRACTION = .25
 
 
 class NoMaterialFits(ValueError):
@@ -162,17 +166,26 @@ def _long_strings(value, minimum=400):
             yield from _long_strings(item, minimum)
 
 
+def _nullable(spec):
+    kind = spec.get("type")
+    return (kind == "null" or isinstance(kind, list) and "null" in kind
+            or any(isinstance(option, dict) and option.get("type") == "null" for option in spec.get("anyOf") or ()))
+
+
 def read_arguments(schema, path):
-    """Arguments for a Read call under the receiving session's own Read schema, or None."""
-    properties = set((schema or {}).get("properties") or {})
-    if {"source", "target"} <= properties:
+    """Arguments for a Read call under the receiving session's own Read schema, or None.
+
+    Pagination fields are sent as null only where the schema allows null, and omitted otherwise.
+    """
+    properties = (schema or {}).get("properties") or {}
+    if {"source", "target"} <= set(properties):
         arguments = {"source": "path", "target": path}
     elif "path" in properties:
         arguments = {"path": path}
     else:
         return None
     for name in ("offset", "limit"):
-        if name in properties:
+        if name in properties and _nullable(properties[name]):
             arguments[name] = None
     if not set((schema or {}).get("required") or ()) <= set(arguments):
         return None
@@ -204,6 +217,8 @@ class ReadCorpus:
         public = [pieces[k] for k in sorted(pieces)]
         random.Random(seed).shuffle(public)
         root = Path(file_root).resolve()
+        if not root.is_dir():
+            raise ValueError(f"Read corpus {root} is not a directory")
         paths = sorted(p for p in root.rglob("*") if p.is_file() and p.suffix in READ_CORPUS_SUFFIXES)
         files = []
         for path in paths:
@@ -316,9 +331,10 @@ class EventCompiler:
 
         Phase counts and the number of history rewrites follow the source chain's metadata (a rewrite
         is an edge that is not append-only: total_edges - append_only_edges, where total_edges also
-        counts the head's incoming edge for chains that start mid-session). Rebuilds always rewrite,
-        then turn starts, then random continuations. Positions are random (resets avoid the first
-        and last step when there is room).
+        counts the head's incoming edge for chains that start mid-session). Rewrites go to turn
+        starts first, then random continuations; public context resets are all appends, so planned
+        resets are appends too. Positions are random (resets avoid the first and last step when there
+        is room). The build keeps the realized count on target (see longchain.build).
         """
         count = target["n_requests"] - len(original)
         if not count:
@@ -336,7 +352,7 @@ class EventCompiler:
         turn_at = set(turn_candidates[:max(0, phases.get("turn_start", 0) - seen_phases["turn_start"])])
         counted = original if target.get("total_edges") == target["n_requests"] else original[1:]
         rewrites = (target.get("total_edges", 0) - target.get("append_only_edges", 0)
-                    - sum(r.get("edge_type") != "append-only" for r in counted)) - len(reset_at)
+                    - sum(r.get("edge_type") != "append-only" for r in counted))
         turn_order = sorted(turn_at)
         rng.shuffle(turn_order)
         rewriting = set(turn_order[:max(0, rewrites)])
@@ -347,15 +363,15 @@ class EventCompiler:
         for i in range(count):
             kind = "context_reset" if i in reset_at else "turn_start" if i in turn_at else "intra"
             template = self.template(kind)
-            plan.append({"kind": kind, "template": template, "rewrite": kind == "context_reset" or i in rewriting,
+            plan.append({"kind": kind, "template": template, "rewrite": i in rewriting,
                          "position_origin": "source_phase_counts_random_positions",
                          "output_weight": max(2, template["max_output_i"])})
         return plan
 
     def step_shape(self, item):
-        """New tokens of a continuation or rewriting turn start before the chain's budget scaling: its
-        template's. Other steps take what their event produces."""
-        sized = item["kind"] == "intra" or item["kind"] == "turn_start" and item.get("rewrite")
+        """New tokens of a continuation, planned reset or rewriting turn start before the chain's budget
+        scaling: its template's. Other turn starts take what closing the turn produces."""
+        sized = item["kind"] in ("intra", "context_reset") or item["kind"] == "turn_start" and item.get("rewrite")
         return item["template"]["uncached_expected"] if sized else 0
 
     def step_ceiling(self, item):
@@ -366,15 +382,17 @@ class EventCompiler:
         """Rendered tokens estimated from canonical JSON length; only used to choose sizes."""
         return round(sum(len(lc.canonical(m)) for m in messages) * self.tokens_per_char)
 
-    def diverge_to_target(self, history, stripped, block, target_tokens, schema, prefix):
+    def diverge_to_target(self, history, stripped, block, target_tokens, schema, prefix, force):
         """Make a rewriting step recompute about `target_tokens` in total with its new block.
 
         In the public bodies a rewrite continues a different trajectory than the previous request
         (5 of the 20 turn starts diverge right after the session's first human message), so
         everything after the divergence is recomputed while the context barely grows. Here the
-        divergence is one extra Read call in an earlier tool-call message: the latest one whose
-        suffix, with the Read, reaches the target. Call IDs are not rendered, so renaming them would
-        not diverge. Token counts here are approximations; the build measures the real ones.
+        divergence is one extra Read call (at most READ_DIVERGE_MAX tokens) in an earlier tool-call
+        message, chosen so the estimated recompute is closest to the target (later on ties). With
+        `force` a step diverges even when its target is already met, so a planned rewrite always
+        rewrites. Call IDs are not rendered, so renaming them would not diverge. Token counts here are
+        approximations; the build measures the real ones.
         """
         first_human = next((i for i, m in enumerate(history) if m.get("role") == "user" and not lc.reminder(m)), -1)
         starts = [i for i in range(first_human + 1, len(history)) if history[i].get("tool_calls")]
@@ -382,16 +400,21 @@ class EventCompiler:
         suffix = [0] * (len(history) + 1)  # suffix[i]: estimated tokens of history[i:]
         for i in reversed(range(len(history))):
             suffix[i] = suffix[i + 1] + self.approximate_tokens([history[i]])
-        natural = tail + (suffix[stripped[0]] if stripped else 0)
-        if natural >= target_tokens or not starts:
-            return history, {"natural_tokens": natural, "diverged_at": None,
-                             "reason": "turn close reaches the target" if starts else "history has no tool calls"}
-        start = next((i for i in reversed(starts) if suffix[i] + tail + READ_MIN_TOKENS >= target_tokens), starts[0])
-        read_tokens = max(READ_MIN_TOKENS, target_tokens - tail - suffix[start])
-        head, lengthening = self.read_corpus.lengthen(history[start:], read_tokens, schema, f"{prefix}_read")
+        closed_from = stripped[0] if stripped else len(history)
+        natural = tail + suffix[closed_from]
+        if not starts:
+            return history, {"natural_tokens": natural, "diverged_at": None, "reason": "history has no tool calls"}
+        if natural >= target_tokens and not force:
+            return history, {"natural_tokens": natural, "diverged_at": None, "reason": "turn close reaches the target"}
+        def estimate(i):
+            read = min(READ_DIVERGE_MAX, max(READ_MIN_TOKENS, target_tokens - tail - suffix[min(i, closed_from)]))
+            return suffix[min(i, closed_from)] + tail + read, read
+        start = min(reversed(starts), key=lambda i: abs(estimate(i)[0] - target_tokens))
+        head, lengthening = self.read_corpus.lengthen(history[start:], estimate(start)[1], schema, f"{prefix}_read")
         if "read_skipped" in lengthening:
             return history, {"natural_tokens": natural, "diverged_at": None, "reason": lengthening["read_skipped"]}
-        return history[:start] + head, {"natural_tokens": natural, "diverged_at": start, "read_lengthening": lengthening}
+        return history[:start] + head, {"natural_tokens": natural, "diverged_at": start,
+                                        "estimated_tokens": estimate(start)[0], "read_lengthening": lengthening}
 
     def pool(self, target, body):
         allowed, schemas = lc.available_tools(body), lc.tool_schemas(body)
@@ -409,11 +432,10 @@ class EventCompiler:
                    "phase_origin": "explicit_generated_event",
                    "output_budget_origin": "source_chain_output_total_apportioned_by_template_outputs"}
         kind = item["kind"]
-        if kind == "context_reset":
-            # Keep a tail so the rebuilt prompt is near the template's post-reset prompt size.
-            fraction = min(.45, template["glm_tokens"] / max(1, self.approximate_tokens(current["messages"])))
+        if item.get("rebuild"):
+            # Only context pressure rebuilds: the prompt must shrink to leave room for the next steps.
             limits = item.get("rebuild_limits", {})
-            result, rebuild = rebuild_history(current, limits.get("keep_fraction", fraction),
+            result, rebuild = rebuild_history(current, limits.get("keep_fraction", PRESSURE_KEEP_FRACTION),
                 limits.get("excerpt_chars", 240), limits.get("excerpt_count", 8))
             receipt["rebuild"] = rebuild
             receipt["rebuild_render_adjustment"] = limits or None
@@ -450,10 +472,10 @@ class EventCompiler:
                            turn_close={"rule": "finished_turn_tool_call_narration_removed_v1",
                                        "stripped_indices": stripped,
                                        "stripped_sha256": lc.digest([messages[i] for i in stripped])})
-            if item.get("rewrite") and item.get("step_target"):
+            if item.get("rewrite"):
                 history, receipt["divergence"] = self.diverge_to_target(
-                    history, stripped, block, item["step_target"], lc.tool_schemas(current).get("Read")
-                    if "Read" in lc.available_tools(current) else None, f"{prefix}_{step:04d}_t")
+                    history, stripped, block, item.get("step_target") or 0, lc.tool_schemas(current).get("Read")
+                    if "Read" in lc.available_tools(current) else None, f"{prefix}_{step:04d}_t", force=not stripped)
             receipt.update(step_scale=item.get("step_scale"), step_target_tokens=item.get("step_target"))
             return {**current, "messages": history + block}, receipt, None
         pool = self.pool(target, current)
@@ -474,19 +496,19 @@ class EventCompiler:
         donor = self.rng.choices(ranked, weights=[math.exp(-(score(d)-score(ranked[0]))/.35) for d in ranked], k=1)[0]
         # A tool continuation must not smuggle a second human-user event.
         block = [m for m in donor.messages if m.get("role") != "user" or lc.reminder(m)]
-        lengthening = None
-        if desired - donor.increment > max(READ_MIN_TOKENS, READ_TOLERANCE * desired):
-            schema = lc.tool_schemas(current).get("Read") if "Read" in lc.available_tools(current) else None
-            block, lengthening = self.read_corpus.lengthen(block, desired - donor.increment, schema, "read_lengthening")
+        # Rename the donor's calls before adding filler, so the rename never touches filler text.
         block = lc.rename_new_calls(block, f"{prefix}_{step:04d}")
+        lengthening = None
+        schema = lc.tool_schemas(current).get("Read") if "Read" in lc.available_tools(current) else None
+        if desired - donor.increment > max(READ_MIN_TOKENS, READ_TOLERANCE * desired):
+            block, lengthening = self.read_corpus.lengthen(block, desired - donor.increment, schema, f"{prefix}_{step:04d}_read")
         messages = current["messages"]
         replaced = bool(messages and lc.reminder(messages[-1]) and not
                         text_content(messages[-1]).startswith(SUMMARY_PREFIX))
         history = messages[:-1] if replaced else messages
         if item.get("rewrite"):
-            schema = lc.tool_schemas(current).get("Read") if "Read" in lc.available_tools(current) else None
             history, receipt["divergence"] = self.diverge_to_target(
-                history, [], block, max(target_tokens, desired), schema, f"{prefix}_{step:04d}_d")
+                history, [], block, max(target_tokens, desired), schema, f"{prefix}_{step:04d}_d", force=True)
         receipt.update(donor_req_id=donor.source_req_id, donor_chain_id=donor.chain_id,
                        donor_mode=donor.kind, donor_fingerprint=donor.fingerprint,
                        donor_source_phase=donor.phase, donor_tool_pairing=lc.tool_pairing(block),
@@ -501,7 +523,7 @@ class EventCompiler:
         if receipt["event_kind"] == "turn_start":
             for field in ("query_material", "answer_material"):
                 self.global_usage[receipt[field]["fingerprint"]] += 1
-        elif receipt["event_kind"] == "intra":
+        elif receipt.get("donor_fingerprint"):
             fingerprint = receipt["donor_fingerprint"]
             self.global_usage[fingerprint] += 1
             usage[fingerprint] += 1

@@ -106,6 +106,33 @@ def _new_message_suffix(previous, current):
     return None
 
 
+def _read_call_errors(body, calls, rid):
+    """Introduced Read calls must name a tool of the session and fit its declared arguments."""
+    tools = {(t.get("function") or t).get("name"): (t.get("function") or t) for t in body.get("tools") or []
+             if isinstance(t, dict)}
+    schema = (tools.get("Read") or {}).get("parameters") or (tools.get("Read") or {}).get("input_schema") or {}
+    properties, errors = schema.get("properties") or {}, []
+    for call in calls:
+        arguments = (call.get("function") or {}).get("arguments")
+        if "Read" not in tools:
+            errors.append(f"{rid}: introduced Read call but the session has no Read tool")
+            continue
+        if not isinstance(arguments, dict):
+            errors.append(f"{rid}: introduced Read arguments are not an object")
+            continue
+        if not set(schema.get("required") or ()) <= set(arguments):
+            errors.append(f"{rid}: introduced Read call lacks required arguments")
+        if schema.get("additionalProperties") is False and not set(arguments) <= set(properties):
+            errors.append(f"{rid}: introduced Read call has undeclared arguments")
+        for name, value in arguments.items():
+            spec = properties.get(name) or {}
+            nullable = (spec.get("type") == "null" or isinstance(spec.get("type"), list) and "null" in spec["type"]
+                        or any(isinstance(o, dict) and o.get("type") == "null" for o in spec.get("anyOf") or ()))
+            if value is None and spec and not nullable:
+                errors.append(f"{rid}: introduced Read argument {name} is null but not nullable")
+    return errors
+
+
 def _diverged_end(expected, after, k):
     """Index in `after` where expected[k:] ends after the only allowed divergence, else None.
 
@@ -769,17 +796,27 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                 if prev_body is not None and (prev_body.get("system") != bodies[rid].get("system")
                                              or prev_body.get("tools") != bodies[rid].get("tools")):
                     errors.append(f"{rid}: synthetic continuation changes system/tools without an implemented event")
+                if p.get("event_kind") is not None and row.get("phase") != p.get("event_kind"):
+                    errors.append(f"{rid}: phase {row.get('phase')!r} differs from provenance event {p.get('event_kind')!r}")
                 start = _new_message_suffix((prev_body or {}).get("messages", []),
                                             bodies[rid].get("messages", []))
-                if start is None and p.get("event_kind") in ("turn_start", "intra"):
-                    closing = p.get("event_kind") == "turn_start"
+                claimed_close = bool((p.get("turn_close") or {}).get("stripped_indices"))
+                claimed_divergence = (p.get("divergence") or {}).get("diverged_at") is not None
+                if start is not None and (claimed_close or claimed_divergence):
+                    errors.append(f"{rid}: provenance claims a history rewrite but the body is a plain append")
+                if start is None and not p.get("rebuild"):
+                    # Narration may be emptied only at a turn start; the suffix check below requires the
+                    # new human message that makes it one.
+                    closing = row.get("phase") == "turn_start"
                     start, emptied, diverged = _rewrite_start((prev_body or {}).get("messages", []),
                                                               bodies[rid].get("messages", []), closing)
                     if start is not None and closing and emptied != (p.get("turn_close") or {}).get("stripped_indices"):
                         errors.append(f"{rid}: turn_close receipt does not match the emptied narration")
                     if start is not None and diverged != (p.get("divergence") or {}).get("diverged_at"):
                         errors.append(f"{rid}: divergence receipt does not match the rewritten history")
-                if p.get("event_kind") == "context_reset":
+                    if start is not None and diverged is not None:
+                        errors.extend(_read_call_errors(bodies[rid], [bodies[rid]["messages"][diverged]["tool_calls"][-1]], rid))
+                if p.get("rebuild"):
                     errors.extend(_rebuild_errors(prev_body, bodies[rid], row, p, rid))
                 elif start is None:
                     errors.append(f"{rid}: synthetic body is not an append/reminder-replacement of predecessor")
@@ -789,9 +826,17 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                         isinstance(msg, dict) and msg.get("role") == "user"
                         and "system-reminder" not in str(msg.get("content", ""))
                         for msg in new_messages)
-                    expected_phase = "turn_start" if has_new_user_turn else "intra"
+                    expected_phase = ("turn_start" if has_new_user_turn else
+                                      "context_reset" if p.get("event_kind") == "context_reset" else "intra")
                     if row.get("phase") != expected_phase:
                         errors.append(f"{rid}: synthetic phase={row.get('phase')!r}, but appended message events require {expected_phase!r}")
+                    # Only Read calls the generator adds (IDs "<receiving session>_..._read"); copied public
+                    # calls keep their recorded arguments, including ones the source agent sent malformed.
+                    errors.extend(_read_call_errors(bodies[rid], [
+                        c for m in bodies[rid].get("messages", [])[start:] if isinstance(m, dict)
+                        for c in (m.get("tool_calls") or []) if isinstance(c, dict)
+                        and str(c.get("id", "")).startswith(str(row.get("session_id")) + "_")
+                        and str(c.get("id", "")).endswith("_read")], rid))
                     block_errors, implicit = _new_tool_block_errors(
                         bodies[rid].get("messages", []), start, rid)
                     errors.extend(block_errors)
@@ -836,7 +881,7 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                                 errors.append(f"{rid}: {p['kind']} {key} must be an integer")
                             elif value != actual:
                                 errors.append(f"{rid}: {p['kind']} {key}={value} rendered={actual}")
-                    if is_synthetic and p.get("event_kind") == "context_reset" and prev_tokens is not None and n >= len(prev_tokens):
+                    if is_synthetic and p.get("rebuild") and prev_tokens is not None and n >= len(prev_tokens):
                         errors.append(f"{rid}: context rebuild did not reduce rendered prompt tokens")
                     if rec.get("lcp_tokens") is not None:
                         token_lcps.append(rec["lcp_tokens"])
