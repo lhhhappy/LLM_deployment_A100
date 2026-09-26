@@ -1,0 +1,62 @@
+{
+  "rank": 0,
+  "info": {
+    "alloc_size": 65536,
+    "alloc_page": 128,
+    "pool_rows": 32768,
+    "max_loc_cold": 14463,
+    "max_loc_ext": 14600,
+    "graph_dec_steps": 0,
+    "routes": [
+      {
+        "stage": "cold",
+        "layer": "model.layers.3.self_attn",
+        "local": false,
+        "q_shape": [
+          14336,
+          4,
+          512
+        ],
+        "prefix": 0,
+        "buffer_bytes": 14680064
+      },
+      {
+        "stage": "cold",
+        "layer": "model.layers.7.self_attn",
+        "local": false,
+        "q_shape": [
+          14336,
+          4,
+          512
+        ],
+        "prefix": 0,
+        "buffer_bytes": 14680064
+      },
+      {
+        "stage": "ext",
+        "layer": "model.layers.3.self_attn",
+        "local": true,
+        "q_shape": [
+          26,
+          8,
+          512
+        ],
+        "prefix": 14336,
+        "buffer_bytes": 0
+      },
+      {
+        "stage": "ext",
+        "layer": "model.layers.7.self_attn",
+        "local": true,
+        "q_shape": [
+          26,
+          8,
+          512
+        ],
+        "prefix": 14336,
+        "buffer_bytes": 0
+      }
+    ]
+  },
+  "timing": null
+}

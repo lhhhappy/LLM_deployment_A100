@@ -234,3 +234,11 @@ raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只�
 用户要求中断060旧版N30，已用stopjob执行，保留734条不完整记录作诊断，不报整档成绩。新180（8312cbf7）只改总开关到排除L3 storage，独立CPU真实方法复核protect/pace启用；3项tier和12项host开启的pace测试通过。新版本062 lite N30已入队，与060z原样A比较，GPU结果待测。
 
 证据：[059完整判分](../evidence/L059-official_a_180_hicache_lite_n14/N14/level_verdict.json)、[059原始记录目录](../evidence/L059-official_a_180_hicache_lite_n14/N14/)、[总开关复核](../evidence/hicache180-scheduler-review/README.md)。
+
+## DCP-LOCAL-20260926：eager prefill 的本地 KV 路径（Codex）
+
+`codex/dcp-prefill-local-kv`；基线为本分支同一引擎关闭新开关，候选保持 W2、MTP、HiCache，仅改变 prefill 执行路线。GPU0/1 两卡开发诊断，不是 TP8 或 N@SLO 成绩。H8 形状、缩小模型的同进程交错完整前向，短尾/2K/8K 本次中位耗时下降约 2.9%/8.4%/7.1%；完整样本、显存与代码图见[报告](reports/dcp-chain-20260926.md)、[机制说明](../engine/docs/115-dcp-local-extend.md)。早期约 19% 的单次短尾结果受启动间漂移影响，不用作稳定收益。
+
+CPU 13 项合同/既有回归通过；MTP、HiCache 真实回载、接受长度 1–4、实际接受跨 128-token 页、两个 rank 的敏感 attention 数值与图重放均有证据。原生 8K 端到端对照有一次可复现的 top-k 选键集合变化，不能记成全部数值 PASS；固定同一组选键后两次隔离对照、两个 rank 均通过。大块保持独立实验开关，真实 TP8 质量与性能待验；另一参与者复核请求随分支交付，确认前不写复核通过。
+
+本轮还独立复算 130ed 已排空的 3123 个派发 ID，并给出全部坏例与同 ID 时间分解，状态为 DRAINED DIAGNOSTIC，未声称完整 cohort 通过；该运行未使用本轮新补丁。归因与原始记录入口同上，不把 W2 对旧 A 的差异视为 DCP 单变量结论。

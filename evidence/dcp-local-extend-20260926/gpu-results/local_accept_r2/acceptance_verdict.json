@@ -1,0 +1,133 @@
+{
+  "validity": "CONTROLLED_PROPOSALS_REAL_VERIFIER",
+  "responses": [
+    {
+      "case": "short_local_empty",
+      "same_greedy_tokens": true
+    },
+    {
+      "case": "cold",
+      "same_greedy_tokens": true
+    },
+    {
+      "case": "prefix",
+      "same_greedy_tokens": true
+    },
+    {
+      "case": "longer_prefix",
+      "same_greedy_tokens": true
+    },
+    {
+      "case": "boundary_short_tail",
+      "same_greedy_tokens": true
+    }
+  ],
+  "ranks": {
+    "0": {
+      "records": 30,
+      "cases": {
+        "short_local_empty": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "cold": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "prefix": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "longer_prefix": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "boundary_short_tail": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        }
+      },
+      "unchecked_tail_rounds": 5,
+      "passed": true
+    },
+    "1": {
+      "records": 30,
+      "cases": {
+        "short_local_empty": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "cold": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "prefix": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "longer_prefix": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        },
+        "boundary_short_tail": {
+          "observed": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "passed": true
+        }
+      },
+      "unchecked_tail_rounds": 5,
+      "passed": true
+    }
+  },
+  "passed": true,
+  "limitations": "Proposals injected from a natural reference; not an acceptance-rate or speed result."
+}

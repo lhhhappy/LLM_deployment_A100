@@ -1,0 +1,30 @@
+{
+  "observed_at_s": 1790442344.4312932,
+  "files": {
+    "raw.jsonl": {
+      "source": "/tmp/ax/runs/130ed-dcp_stack2_w2_n30_60m/N30/raw_s1-dev-longchain-v3_N30_1790438539.jsonl",
+      "bytes": 3878625,
+      "transport_chars": 819024
+    },
+    "metrics.jsonl": {
+      "source": "/tmp/ax/runs/130ed-dcp_stack2_w2_n30_60m/N30/metrics.jsonl",
+      "bytes": 4859549,
+      "transport_chars": 218688
+    },
+    "dispatch.jsonl": {
+      "source": "/tmp/ax/runs/130ed-dcp_stack2_w2_n30_60m/N30/dispatch_ledger.jsonl",
+      "bytes": 725066,
+      "transport_chars": 102896
+    },
+    "server.log": {
+      "source": "/tmp/ax/runs/130ed-dcp_stack2_w2_n30_60m/server.log",
+      "bytes": 1944669,
+      "transport_chars": 235388
+    },
+    "job.log": {
+      "source": "/tmp/ax/runs/130ed-dcp_stack2_w2_n30_60m/job.log",
+      "bytes": 6182,
+      "transport_chars": 2540
+    }
+  }
+}

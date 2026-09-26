@@ -1,0 +1,130 @@
+{
+  "validity": "MTP_NUMERICAL_DIAGNOSTIC",
+  "passed": true,
+  "tolerance": 0.01,
+  "test": "/sjtu/linhang/arena/runs/dcp-prefill-local-kv-20260926/local_accept_h8",
+  "reference": "/sjtu/linhang/arena/runs/dcp-prefill-local-kv-20260926/base_accept_h8",
+  "missing_trace_files": [],
+  "missing_phases": [],
+  "signals_present": true,
+  "phases": {
+    "draft:EXTEND": {
+      "observations": 10,
+      "max_relative_linf": 0.0023923444976076554,
+      "max_ref_signal": 0.0150146484375,
+      "passed": true
+    },
+    "draft:DECODE": {
+      "observations": 120,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.0150146484375,
+      "passed": true
+    },
+    "draft:DRAFT_EXTEND_V2": {
+      "observations": 60,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.00885009765625,
+      "passed": true
+    },
+    "target:EXTEND": {
+      "observations": 20,
+      "max_relative_linf": 0.002617801047120419,
+      "max_ref_signal": 0.012939453125,
+      "passed": true
+    },
+    "target:TARGET_VERIFY": {
+      "observations": 120,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.0096435546875,
+      "passed": true
+    }
+  },
+  "responses": [
+    {
+      "case": "short_local_empty",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "ref_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case": "cold",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "ref_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case": "prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "ref_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case": "longer_prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "ref_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case": "boundary_short_tail",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "ref_accept_histogram": [
+        2,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "limitations": "Scaled model and observed acceptance only; no TP8, performance, or SLO claim."
+}

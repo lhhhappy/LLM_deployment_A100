@@ -1,0 +1,122 @@
+{
+  "validity": "MTP_NUMERICAL_DIAGNOSTIC",
+  "passed": true,
+  "tolerance": 0.01,
+  "test": "/sjtu/linhang/arena/runs/dcp-prefill-local-kv-20260926/local_host_h8",
+  "reference": "/sjtu/linhang/arena/runs/dcp-prefill-local-kv-20260926/base_host_h8",
+  "missing_trace_files": [],
+  "missing_phases": [],
+  "signals_present": true,
+  "phases": {
+    "draft:EXTEND": {
+      "observations": 14,
+      "max_relative_linf": 0.0047169811320754715,
+      "max_ref_signal": 0.0150146484375,
+      "passed": true
+    },
+    "draft:DECODE": {
+      "observations": 336,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.0150146484375,
+      "passed": true
+    },
+    "draft:DRAFT_EXTEND_V2": {
+      "observations": 168,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.00885009765625,
+      "passed": true
+    },
+    "target:EXTEND": {
+      "observations": 28,
+      "max_relative_linf": 0.004761904761904762,
+      "max_ref_signal": 0.012939453125,
+      "passed": true
+    },
+    "target:TARGET_VERIFY": {
+      "observations": 336,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.0096435546875,
+      "passed": true
+    }
+  },
+  "responses": [
+    {
+      "case": "short_local_empty",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "cold",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "longer_prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "boundary_short_tail",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "device_repeat",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "host_restore",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    }
+  ],
+  "limitations": "Scaled model and observed acceptance only; no TP8, performance, or SLO claim."
+}

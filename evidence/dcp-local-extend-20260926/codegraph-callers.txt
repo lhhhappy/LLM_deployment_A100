@@ -1,0 +1,21 @@
+
+Callers of "uses_local_extend" (3):
+
+method      forward_extend
+  srt/layers/attention/dsa_backend.py:3023
+
+function    is_dcp_mla_partial_phase
+  srt/models/deepseek_common/attention_forward_methods/forward_mla.py:113
+
+file        forward_mla.py
+  srt/models/deepseek_common/attention_forward_methods/forward_mla.py:1
+
+
+Callees of "is_dcp_mla_partial_phase" (2):
+
+function    is_dcp_mla_decode_phase
+  srt/models/deepseek_common/attention_forward_methods/forward_mla.py:97
+
+function    uses_local_extend
+  srt/layers/dcp/local_extend.py:10
+

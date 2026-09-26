@@ -1,0 +1,12 @@
+test info {'alloc_size': 65536, 'alloc_page': 128, 'pool_rows': 32768, 'max_loc_cold': 14463, 'max_loc_ext': 14600, 'graph_dec_steps': 8, 'routes': [{'stage': 'cold', 'layer': 'model.layers.3.self_attn', 'local': False, 'q_shape': [14336, 4, 512], 'prefix': 0, 'buffer_bytes': 14680064}, {'stage': 'cold', 'layer': 'model.layers.7.self_attn', 'local': False, 'q_shape': [14336, 4, 512], 'prefix': 0, 'buffer_bytes': 14680064}, {'stage': 'ext', 'layer': 'model.layers.3.self_attn', 'local': True, 'q_shape': [26, 8, 512], 'prefix': 14336, 'buffer_bytes': 0}, {'stage': 'ext', 'layer': 'model.layers.7.self_attn', 'local': True, 'q_shape': [26, 8, 512], 'prefix': 14336, 'buffer_bytes': 0}]}
+ref  info {'alloc_size': 65536, 'alloc_page': 128, 'pool_rows': 32768, 'max_loc_cold': 14463, 'max_loc_ext': 14600, 'graph_dec_steps': 8, 'routes': [{'stage': 'cold', 'layer': 'model.layers.3.self_attn', 'local': False, 'q_shape': [14336, 4, 512], 'prefix': 0, 'buffer_bytes': 14680064}, {'stage': 'cold', 'layer': 'model.layers.7.self_attn', 'local': False, 'q_shape': [14336, 4, 512], 'prefix': 0, 'buffer_bytes': 14680064}, {'stage': 'ext', 'layer': 'model.layers.3.self_attn', 'local': False, 'q_shape': [26, 4, 512], 'prefix': 14336, 'buffer_bytes': 14706688}, {'stage': 'ext', 'layer': 'model.layers.7.self_attn', 'local': False, 'q_shape': [26, 4, 512], 'prefix': 14336, 'buffer_bytes': 14706688}]}
+cold: shape=(2, 19360) finite=True rel_linf=0.000e+00 max_abs=0.000e+00 argmax_agree=1.000 PASS
+ext: shape=(2, 19360) finite=True rel_linf=0.000e+00 max_abs=0.000e+00 argmax_agree=1.000 PASS
+dec: shape=(4, 2, 19360) finite=True rel_linf=0.000e+00 max_abs=0.000e+00 argmax_agree=1.000 PASS
+attn cold model.layers.3.self_attn: shape=(960, 1024) finite=True rel_linf=8.013e-05 max_abs=9.537e-07 ref_max=1.190e-02 PASS
+attn cold model.layers.7.self_attn: shape=(960, 1024) finite=True rel_linf=7.440e-05 max_abs=9.537e-07 ref_max=1.282e-02 PASS
+attn ext model.layers.3.self_attn: shape=(26, 1024) finite=True rel_linf=5.102e-03 max_abs=1.907e-06 ref_max=3.738e-04 PASS
+attn ext model.layers.7.self_attn: shape=(26, 1024) finite=True rel_linf=4.831e-03 max_abs=1.907e-06 ref_max=3.948e-04 PASS
+attn dec model.layers.3.self_attn: shape=(8, 1024) finite=True rel_linf=0.000e+00 max_abs=0.000e+00 ref_max=3.891e-04 PASS
+attn dec model.layers.7.self_attn: shape=(8, 1024) finite=True rel_linf=0.000e+00 max_abs=0.000e+00 ref_max=3.490e-04 PASS
+RESULT PASS

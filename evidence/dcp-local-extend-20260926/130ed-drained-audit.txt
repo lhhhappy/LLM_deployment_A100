@@ -1,0 +1,230 @@
+{
+  "observed_utc": "2026-09-26T17:05:44.431293+00:00",
+  "elapsed_min": 63.41068936189016,
+  "complete_stats": {
+    "completed": 3123,
+    "errors": 0,
+    "ttft": {
+      "fast_intra": {
+        "n": 2518,
+        "over": 73,
+        "p95_s": 1.746988296508789
+      },
+      "overall_intra": {
+        "n": 2752,
+        "over": 74,
+        "p95_s": 3.0130362510681152
+      },
+      "turn_start": {
+        "n": 111,
+        "over": 2,
+        "p95_s": 10.88535761833191
+      },
+      "chain_start": {
+        "n": 260,
+        "over": 15,
+        "p95_s": 33.15933871269226
+      }
+    },
+    "tpot": {
+      "n": 3123,
+      "mean_s": 0.042672570509590245,
+      "p95_s": 0.06920333748618786,
+      "over_0.10": 41
+    }
+  },
+  "dispatched": 3123,
+  "pending_or_snapshot_race": 0,
+  "chain_misses": {
+    "n": 15,
+    "max_arrival_s": 5.82373833656311,
+    "waiting_over30": 12,
+    "selected_over30": 0,
+    "sums": {
+      "api_s": 2.1948297023773193,
+      "dispatch_to_first_selection_s": 625.1632142066956,
+      "selection_to_first_token_s": 73.71969819068909
+    }
+  },
+  "reference_pair": {
+    "n": 511,
+    "candidate": {
+      "completed": 511,
+      "errors": 0,
+      "ttft": {
+        "fast_intra": {
+          "n": 382,
+          "over": 17,
+          "p95_s": 2.6990456581115723
+        },
+        "overall_intra": {
+          "n": 417,
+          "over": 15,
+          "p95_s": 3.281663656234741
+        },
+        "turn_start": {
+          "n": 23,
+          "over": 0,
+          "p95_s": 6.1380615234375
+        },
+        "chain_start": {
+          "n": 71,
+          "over": 15,
+          "p95_s": 61.19242477416992
+        }
+      },
+      "tpot": {
+        "n": 511,
+        "mean_s": 0.06814232745450427,
+        "p95_s": 0.16686276487419255,
+        "over_0.10": 36
+      }
+    },
+    "reference": {
+      "completed": 511,
+      "errors": 0,
+      "ttft": {
+        "fast_intra": {
+          "n": 382,
+          "over": 36,
+          "p95_s": 5.825398921966553
+        },
+        "overall_intra": {
+          "n": 417,
+          "over": 35,
+          "p95_s": 8.981665134429932
+        },
+        "turn_start": {
+          "n": 23,
+          "over": 1,
+          "p95_s": 12.7237708568573
+        },
+        "chain_start": {
+          "n": 71,
+          "over": 13,
+          "p95_s": 59.308192014694214
+        }
+      },
+      "tpot": {
+        "n": 511,
+        "mean_s": 0.06337311280305269,
+        "p95_s": 0.16977148773798414,
+        "over_0.10": 37
+      }
+    },
+    "new_chain_misses": [
+      "biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:3",
+      "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2"
+    ],
+    "fixed_chain_misses": [],
+    "caveat": "Common IDs; dispatch times/caching/interference can differ. Reference is a different engine stack, not DCP-only."
+  },
+  "sample_windows": [
+    {
+      "begin_s": 0,
+      "end_s": 90,
+      "n": 9,
+      "queue_nonzero": 8,
+      "queue_max": 20.0,
+      "active_mean": 0.23661708701587986,
+      "active_max": 0.4242293597758138,
+      "free_min": 0.5453761586548825,
+      "free_max": 0.974563483509377,
+      "running_mean": 20.333333333333332
+    },
+    {
+      "begin_s": 90,
+      "end_s": 660,
+      "n": 56,
+      "queue_nonzero": 16,
+      "queue_max": 4.0,
+      "active_mean": 0.5178465571397777,
+      "active_max": 0.7134080620823453,
+      "free_min": 0.0014011640439749945,
+      "free_max": 0.5119098943737874,
+      "running_mean": 23.446428571428573
+    },
+    {
+      "begin_s": 660,
+      "end_s": null,
+      "n": 298,
+      "queue_nonzero": 88,
+      "queue_max": 6.0,
+      "active_mean": 0.6504491754326827,
+      "active_max": 0.9504742401379608,
+      "free_min": 0.00010778184953653804,
+      "free_max": 0.0075986203923259325,
+      "running_mean": 23.91275167785235
+    },
+    {
+      "begin_s": 3533.410068511963,
+      "end_s": null,
+      "n": 12,
+      "queue_nonzero": 3,
+      "queue_max": 2.0,
+      "active_mean": 0.5120760580584897,
+      "active_max": 0.7420780340590645,
+      "free_min": 0.00010778184953653804,
+      "free_max": 0.003934037508083639,
+      "running_mean": 17.833333333333332
+    }
+  ],
+  "server": {
+    "lines_read": 12145,
+    "health_errors": [
+      {
+        "line": 12113,
+        "text": "[2026-09-26 17:03:41] ERROR:    Traceback (most recent call last):"
+      },
+      {
+        "line": 12135,
+        "text": "Traceback (most recent call last):"
+      }
+    ],
+    "mechanisms": [
+      "[2026-09-26 15:58:11 TP0] [ax] mechanisms: 101=off:role_ids_unset 117=on:43_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 140=off 180=on | spec=EAGLE dcp=2 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
+    ],
+    "sampled_prefill_lines": 4392,
+    "prefill_tokens_logged": 18649152,
+    "observed_short_prefills": 257,
+    "observed_2k_to_8k": 3100,
+    "prefill_queue_nonzero": 1997,
+    "prefill_queue_max": 23,
+    "first_policy": {
+      "line": 1119,
+      "t": 1790438540.0,
+      "relative_s": 0.2100684642791748,
+      "kind": "policy",
+      "new_tokens": null,
+      "cached_tokens": null,
+      "running": null,
+      "queue": null,
+      "parks": 0,
+      "relief_rounds": 84
+    },
+    "last_policy": {
+      "line": 11961,
+      "t": 1790442123.0,
+      "relative_s": 3583.210068464279,
+      "kind": "policy",
+      "new_tokens": null,
+      "cached_tokens": null,
+      "running": null,
+      "queue": null,
+      "parks": 196,
+      "relief_rounds": 300
+    },
+    "policy_last_change": {
+      "line": 2044,
+      "t": 1790438843.0,
+      "relative_s": 303.2100684642792,
+      "kind": "policy",
+      "new_tokens": null,
+      "cached_tokens": null,
+      "running": null,
+      "queue": null,
+      "parks": 16,
+      "relief_rounds": 287
+    }
+  }
+}
