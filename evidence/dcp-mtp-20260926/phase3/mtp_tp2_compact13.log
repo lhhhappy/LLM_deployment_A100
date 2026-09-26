@@ -1,0 +1,16 @@
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.95 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.95 GB):  50%|█████     | 1/2 [00:13<00:13, 13.81s/it]Capturing batches (bs=1 avail_mem=71.83 GB):  50%|█████     | 1/2 [00:13<00:13, 13.81s/it]Capturing batches (bs=1 avail_mem=71.83 GB): 100%|██████████| 2/2 [00:13<00:00,  5.75s/it]Capturing batches (bs=1 avail_mem=71.83 GB): 100%|██████████| 2/2 [00:13<00:00,  6.96s/it]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.82 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.82 GB):  50%|█████     | 1/2 [00:00<00:00,  2.41it/s]Capturing batches (bs=1 avail_mem=71.80 GB):  50%|█████     | 1/2 [00:00<00:00,  2.41it/s]Capturing batches (bs=1 avail_mem=71.80 GB): 100%|██████████| 2/2 [00:00<00:00,  2.04it/s]Capturing batches (bs=1 avail_mem=71.80 GB): 100%|██████████| 2/2 [00:00<00:00,  2.08it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.77 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=71.77 GB):  50%|█████     | 1/2 [00:00<00:00,  6.48it/s]Capturing batches (bs=1 avail_mem=71.72 GB):  50%|█████     | 1/2 [00:00<00:00,  6.48it/s]Capturing batches (bs=1 avail_mem=71.72 GB): 100%|██████████| 2/2 [00:00<00:00, 11.15it/s]
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+  return func(*args, **kwargs)
+{"validity": "MTP_DIAGNOSTIC", "tp": 2, "dcp": 2, "hicache": false, "graph_phase_rank_replays": {"draft:DECODE": 48, "draft:DRAFT_EXTEND_V2": 48, "target:TARGET_VERIFY": 48}, "host_restore_and_flush": false, "controlled_proposals": true, "trace_files": 264, "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."}

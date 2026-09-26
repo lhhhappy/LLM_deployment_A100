@@ -1,0 +1,35 @@
+{
+  "symbol": "is_dcp_mla_decode_phase",
+  "callers": [
+    {
+      "name": "forward_absorb_prepare",
+      "kind": "method",
+      "filePath": "srt/models/deepseek_common/attention_forward_methods/forward_mla.py",
+      "startLine": 282
+    },
+    {
+      "name": "forward_absorb_core",
+      "kind": "method",
+      "filePath": "srt/models/deepseek_common/attention_forward_methods/forward_mla.py",
+      "startLine": 675
+    },
+    {
+      "name": "forward_absorb_rocm_prepare",
+      "kind": "method",
+      "filePath": "srt/models/deepseek_common/attention_forward_methods/forward_mla_rocm.py",
+      "startLine": 345
+    },
+    {
+      "name": "forward_absorb_rocm_core",
+      "kind": "method",
+      "filePath": "srt/models/deepseek_common/attention_forward_methods/forward_mla_rocm.py",
+      "startLine": 655
+    },
+    {
+      "name": "forward_mla_rocm.py",
+      "kind": "file",
+      "filePath": "srt/models/deepseek_common/attention_forward_methods/forward_mla_rocm.py",
+      "startLine": 1
+    }
+  ]
+}

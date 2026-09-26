@@ -1,0 +1,27 @@
+{
+  "role": "draft",
+  "rank": 0,
+  "dcp_size": 1,
+  "physical_latent_rows": 32768,
+  "physical_page_size": 64,
+  "allocator_logical_size": 32768,
+  "latent_storage_bytes": 33619968,
+  "indexer_storage_bytes": 4333824,
+  "latent_shapes": [
+    [
+      32832,
+      1,
+      512
+    ]
+  ],
+  "indexer_shapes": [
+    [
+      513,
+      8448
+    ]
+  ],
+  "attention_parameter_dtypes": {
+    "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+    "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "scaled_config_sha256": "dbbe50ebf266bdfc55056f27015c67d57c354f915a9ba692ba38027c88c36f14",
+  "original_config_sha256": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+  "output_sha256": "0fc012dfc11e778c99359259cca77d304526f9e773626196475f21c312cee796",
+  "nextn_layer_remap": [
+    45,
+    8
+  ],
+  "remapped_rules": 18,
+  "scope": "Scaled dummy diagnostic; preserve NextN quantization exclusions."
+}

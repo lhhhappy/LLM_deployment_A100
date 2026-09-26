@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 131, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 94, in main
+    engine = sglang.Engine(
+             ^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/utils.py", line 393, in __call__
+    return module(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/entrypoints/engine.py", line 290, in __init__
+    ) = self._launch_subprocesses(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/entrypoints/engine.py", line 1211, in _launch_subprocesses
+    tokenizer_manager, template_manager = init_tokenizer_manager_func(
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/entrypoints/engine.py", line 174, in init_tokenizer_manager
+    tokenizer_manager = TokenizerManagerClass(server_args, port_args)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/managers/tokenizer_manager.py", line 440, in __init__
+    self.init_tokenizer_and_processor()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/managers/tokenizer_manager.py", line 497, in init_tokenizer_and_processor
+    _processor = get_processor_wrapper()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/managers/tokenizer_manager.py", line 3664, in get_processor_wrapper
+    return get_processor(
+           ^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/utils/hf_transformers/processor.py", line 297, in get_processor
+    processor = AutoProcessor.from_pretrained(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/transformers/models/auto/processing_auto.py", line 344, in from_pretrained
+    raise ValueError(
+ValueError: Unrecognized processing class in /sjtu/linhang/arena/runs/dcp-mtp-20260926/model-mtp. Can't instantiate a processor, a tokenizer, an image processor, a video processor or a feature extractor for this model. Make sure the repository contains the files of at least one of those processing classes.

@@ -1,0 +1,18 @@
+test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+<frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+DCP_HOST_ROUNDTRIP device=cpu width=2 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=2 rank=1 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=4 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=4 rank=3 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=8 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=8 rank=7 byte_exact=1
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 8.415s
+
+OK
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

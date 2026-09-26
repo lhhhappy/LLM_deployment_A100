@@ -1,0 +1,156 @@
+test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+<frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=2, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=2, rank=1)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=4, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=4, rank=3)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=8, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+  test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=8, rank=7)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... ERROR
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=2, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=2, rank=1)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=4, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=4, rank=3)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=8, rank=0)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+======================================================================
+ERROR: test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity) (width=8, rank=7)
+Real host controller/kernel route for both shard owners, W=2/4/8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 163, in test_dcp_round_trip_and_virtual_indexer_capacity
+    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/scripts/tests/hicache180/test_180_glm_host_pools.py", line 251, in _round_trip
+    ctrl.start_loading()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/cache_controller.py", line 939, in start_loading
+    completion = self.l2_transfer_engine.submit_host_to_device(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/l2_transfer.py", line 101, in submit_host_to_device
+    transfer.host_pool.load_to_device_per_layer(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/mem_cache/pool_host/mla.py", line 286, in load_to_device_per_layer
+    jit_transfer_hicache_one_layer_mla(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/kernels/ops/kvcache/hicache.py", line 222, in transfer_hicache_one_layer_mla
+    module.launch_one_mla(
+  File "python/tvm_ffi/cython/function.pxi", line 968, in tvm_ffi.core.Function.__call__
+RuntimeError: Tensor match failed for Tensor<256>[strides=<1>, dtype=int64, device=cpu] at /sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/kernels/jit/csrc/kvcacheio/hicache.cuh:433
+- Root cause: Device value [cpu] not in the allowed options: [cuda]
+
+----------------------------------------------------------------------
+Ran 1 test in 5.643s
+
+FAILED (errors=6)
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

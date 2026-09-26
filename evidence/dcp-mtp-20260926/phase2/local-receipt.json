@@ -1,0 +1,27 @@
+{
+  "archive": "build/scratch/dcp-mtp-20260926/phase2-closed-evidence.tgz",
+  "bytes": 314908,
+  "sha256": "50c8c0f8b0a6f1a1f9f4ae4233683d02753a2851ade08916be7e70426c26b6c6",
+  "files": {
+    "kit10.sha256.json": "77c67fc1fbd0ec49d4915c1025ea2806c1017996175b0b96b302d89e81909c7f",
+    "host_cpu9_fix.log": "16e8a3747d614b96a91c8adb8c395cd06ab00e16591c4d75fecfe89b9c807883",
+    "compare_mtp_graph4_strict.log": "887056a190503b91f76a01a3bb9f3caad14e729066f96f2d4f565890564ee78f",
+    "kit10.tgz": "2c2f2c50832ca2c446e1c17c36270e150a06d1beb0beb943970cebb66772fb16",
+    "phase1-cross-verification.json": "7d68669c7c200add58ef64234c11a0986658114a83fa66593d194900d4e26bbe",
+    "sparse10.json": "892a0b954df60fe5850c55b23c58e9fde2c623106fc2337100ddc1f35a119e81",
+    "gpu1-service-restop.json": "86aaf84e14d505a884d6e01f51603ae802efbf637b9963ee96420f562de533d7",
+    "host_gpu7b_fix.log": "b8dfad13fbd272cf49658d98706e5e5cc9dafc4d9cbcbc1721bf0de613025b13",
+    "sparse7b.log": "952a84014a9fd31be96b11811fa7eed2bec0c8539d1057fbc7bd1789ab85ccdf",
+    "sparse9.json": "508c8a410bdac5277ec3444dbc71284e2885acf8182c81daa1e40a787f33709e",
+    "compare_mtp4_strict.log": "6a237183132c97901b8c58794e6e1ea6155f4ef99c83c65441e3b0a0966e0fcb",
+    "gpu1-loop-stop.json": "f16fb0412b57b4a0d3a2c308c89958185ad25b5fb6dbc7ccb9bb623cb3eeb4b0",
+    "sparse9.log": "1a264c0ae3d99db693009d6c602e2f4b10db9db089dcf14dfd5597bff6edbddf",
+    "compare_mtp4_strict.json": "b200ba54acd465671615571863c4558ab8c4df6d54faf8c98ca7f1a38ad920e6",
+    "gpu9-start.csv": "fb5d241b6321306b5f7e2221dae5c6c5ab339a59b6aaa2bdbc81f0e802bb98a7",
+    "host_cpu10_fix.log": "5e6d385636c5cfe2104de07c6d86d5f76f2c41a47fbebec833db725bd08258ea",
+    "sparse7b.json": "6ed21d5a974d299c4e0b3fa8c916e4a7d04477ebb95ea4b283e40affa893b385",
+    "sparse10.log": "7624625cbc229d8ae38349777eeb061019d3cd698458264daa2aac145080a8b6",
+    "gpu1-service-stop.json": "8073058c48cc27d2487503307ec7d394028450c51054e50b102568837ef15c70",
+    "compare_mtp_graph4_strict.json": "9a2fe6bc243886ecbc7af7e889eebae6e240f654fde3b33c55fa4b6a39966cd1"
+  }
+}

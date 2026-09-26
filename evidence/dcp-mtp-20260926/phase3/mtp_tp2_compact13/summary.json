@@ -1,0 +1,15 @@
+{
+  "validity": "MTP_DIAGNOSTIC",
+  "tp": 2,
+  "dcp": 2,
+  "hicache": false,
+  "graph_phase_rank_replays": {
+    "draft:DECODE": 48,
+    "draft:DRAFT_EXTEND_V2": 48,
+    "target:TARGET_VERIFY": 48
+  },
+  "host_restore_and_flush": false,
+  "controlled_proposals": true,
+  "trace_files": 264,
+  "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+}

@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 188, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 141, in main
+    engine = sglang.Engine(
+             ^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/utils.py", line 393, in __call__
+    return module(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix/engine/sglang/srt/entrypoints/engine.py", line 263, in __init__
+    server_args = self.server_args_class(**kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ServerArgs.__init__() got an unexpected keyword argument 'cuda_graph_max_bs'

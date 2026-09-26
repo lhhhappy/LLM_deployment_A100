@@ -1,0 +1,11 @@
+{
+  "validity": "MTP_DIAGNOSTIC",
+  "tp": 1,
+  "dcp": 1,
+  "hicache": false,
+  "graph_phase_rank_replays": {},
+  "host_restore_and_flush": false,
+  "controlled_proposals": false,
+  "trace_files": 252,
+  "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+}

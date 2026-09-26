@@ -1,0 +1,930 @@
+[
+  {
+    "case": 0,
+    "tokens": 4096,
+    "input_sha256": "66ad9a955f31d00c2f28271783d25c60130e7e610a5ca0901bb75b7cae555f4d",
+    "meta_info": {
+      "id": "44c017f4fe374b139e5a0df032cb698a",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.2152370885014534,
+      "response_sent_to_client_ts": 1790433010.9487028
+    }
+  },
+  {
+    "case": 1,
+    "tokens": 4096,
+    "input_sha256": "6063361166735f960667e101737e0f0aa8bf26116b0b8ec716c417ded940ca4e",
+    "meta_info": {
+      "id": "cc50b105c2484709b6aae3adba8bd873",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.1480659693479538,
+      "response_sent_to_client_ts": 1790433011.1000645
+    }
+  },
+  {
+    "case": 2,
+    "tokens": 4096,
+    "input_sha256": "40a5ad064bd06dd25e345d38a0cc5e9272e452081aa812f2e6bd4a9d6c4bdb60",
+    "meta_info": {
+      "id": "082e6b63a52743bfbd88b876d8c89baa",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08680436760187149,
+      "response_sent_to_client_ts": 1790433011.1901839
+    }
+  },
+  {
+    "case": 3,
+    "tokens": 4096,
+    "input_sha256": "15e65e98ac03ff6dfbcc9d729b6fddf3a46bc2c52518b2cf11f1ee6f5fd74d7b",
+    "meta_info": {
+      "id": "b0b57a99e73946b9afb84ba2a7dea057",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08626357093453407,
+      "response_sent_to_client_ts": 1790433011.2795577
+    }
+  },
+  {
+    "case": 4,
+    "tokens": 4096,
+    "input_sha256": "be0455d0ed2fa2e1da249f7384da62a09873df09e76ccf25f618ed54a7747884",
+    "meta_info": {
+      "id": "22e6bcf6bc8c4fb3be07a3539bd651a5",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08637388981878757,
+      "response_sent_to_client_ts": 1790433011.369055
+    }
+  },
+  {
+    "case": 5,
+    "tokens": 4096,
+    "input_sha256": "6c555295ebcb1b8e0e53a1f76c529739ded505ea8ab53bb4bcc02b01dda29166",
+    "meta_info": {
+      "id": "9c0f75886b6048f1ae7158ee0493e0f9",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08803977258503437,
+      "response_sent_to_client_ts": 1790433011.4601886
+    }
+  },
+  {
+    "case": 6,
+    "tokens": 4096,
+    "input_sha256": "1e604af682f5210bdab7cd11a21cb6dad3c56d4856a48c8db39f9ecc6e9c105b",
+    "meta_info": {
+      "id": "e7fdd302ca504e829c3b50cbe2602299",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.09967023506760597,
+      "response_sent_to_client_ts": 1790433011.563117
+    }
+  },
+  {
+    "case": 7,
+    "tokens": 4096,
+    "input_sha256": "57fd8955c74f94ada9eed6ef35d5cf6fb3a499ad1a61f5587aa274650f854be1",
+    "meta_info": {
+      "id": "c9f2544cf1a2404e8e5fdb313fc2a418",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08740765787661076,
+      "response_sent_to_client_ts": 1790433011.6538029
+    }
+  },
+  {
+    "case": 8,
+    "tokens": 4096,
+    "input_sha256": "9049fd0fbe479f8047ee39b5c8f968d5056e63656319996430a44fe40f070358",
+    "meta_info": {
+      "id": "66b9d6c650d94cd2a47526634677fcb5",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08631751872599125,
+      "response_sent_to_client_ts": 1790433011.7434802
+    }
+  },
+  {
+    "case": 9,
+    "tokens": 4096,
+    "input_sha256": "35aae85f7eea2109782e42172f58630ba90b0c5dbf5978babc36f95e73157c24",
+    "meta_info": {
+      "id": "bbed1d23be544904841ebcbc0b9991c6",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08642897754907608,
+      "response_sent_to_client_ts": 1790433011.8330522
+    }
+  },
+  {
+    "case": 10,
+    "tokens": 4096,
+    "input_sha256": "d13711320d51cb3da2dc1c868616000fc04a316aa7f6741be5b82a3d9ff32d7e",
+    "meta_info": {
+      "id": "abf817be4438451f9eba2693f6e05bec",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.0863016489893198,
+      "response_sent_to_client_ts": 1790433011.9224758
+    }
+  },
+  {
+    "case": 11,
+    "tokens": 4096,
+    "input_sha256": "83150f73b94478211f17607c1336b5d33acc513f02cc38a758c0faa8a73c7d07",
+    "meta_info": {
+      "id": "fe75e0df978242c7adadc1d01c7f5d43",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08752494491636753,
+      "response_sent_to_client_ts": 1790433012.0131648
+    }
+  },
+  {
+    "case": 12,
+    "tokens": 4096,
+    "input_sha256": "028dfaf2b9ea44296c5c8c47c35b61c9b58f090df6990ef04ffe04cb8d41fb8b",
+    "meta_info": {
+      "id": "56e1863ce4b24b7289fe3f11316f6264",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08929651044309139,
+      "response_sent_to_client_ts": 1790433012.1059282
+    }
+  },
+  {
+    "case": 13,
+    "tokens": 4096,
+    "input_sha256": "03c0eeffd998007d63280fcc4557d4fc9f18e00e9b42d58e45baffcce4d42f49",
+    "meta_info": {
+      "id": "3058789d5e9443098c1d1b5b7ed11b8b",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.0900832824409008,
+      "response_sent_to_client_ts": 1790433012.1995823
+    }
+  },
+  {
+    "case": 14,
+    "tokens": 4096,
+    "input_sha256": "2b24ed2d3a2ac30d9e389251e82ae34838ec25341bc7b1859c2db71d7d765ec6",
+    "meta_info": {
+      "id": "df88d4d9dc2a4d9d83df2f07e0566a64",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08802270703017712,
+      "response_sent_to_client_ts": 1790433012.2911325
+    }
+  },
+  {
+    "case": 15,
+    "tokens": 4096,
+    "input_sha256": "95c1fd22ad6ddcb70aed00f528d5d192f204259b904efe02faf66e4e08f0fa12",
+    "meta_info": {
+      "id": "3a84af05e9924e5380831f2012d985ee",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08692110143601894,
+      "response_sent_to_client_ts": 1790433012.3814807
+    }
+  },
+  {
+    "case": 16,
+    "tokens": 4096,
+    "input_sha256": "0a1b0e833048d62e4de6467b66ad5233ec131447ef9ecde8ec9842071f4eb1b9",
+    "meta_info": {
+      "id": "6844085ef7b84406ac9755bcb7c900ff",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08766360953450203,
+      "response_sent_to_client_ts": 1790433012.4726074
+    }
+  },
+  {
+    "case": 17,
+    "tokens": 4096,
+    "input_sha256": "a79b40b2f5ed8b697b79d8c4ad89d7bd50c2a6c71c7fab683b4dee84aea23a30",
+    "meta_info": {
+      "id": "62dcebf66c5f4c18a7e5f233d2254fb0",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.0875130221247673,
+      "response_sent_to_client_ts": 1790433012.5636084
+    }
+  },
+  {
+    "case": 18,
+    "tokens": 4096,
+    "input_sha256": "215d7fe1755a582a6df25349810049877d1b28468bc8d1b95467051eeda01c04",
+    "meta_info": {
+      "id": "0df523deb8834cbe8fe3dec84d4fd02d",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08667144738137722,
+      "response_sent_to_client_ts": 1790433012.653759
+    }
+  },
+  {
+    "case": 19,
+    "tokens": 4096,
+    "input_sha256": "b6745b476aebcc095f0f7396090e57c0b5a8dbc4b63a9be6b834cfef7e638039",
+    "meta_info": {
+      "id": "861e7dce85c847aeb0f5f30feb657d44",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08667116798460484,
+      "response_sent_to_client_ts": 1790433012.7439735
+    }
+  },
+  {
+    "case": 20,
+    "tokens": 4096,
+    "input_sha256": "48cfc1658364e516ca7a72bc84f3617b1bb54e06cc20627622d959131e4c7a74",
+    "meta_info": {
+      "id": "4bf60378f7224d47b01190d39323e838",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08807546459138393,
+      "response_sent_to_client_ts": 1790433012.8356602
+    }
+  },
+  {
+    "case": 21,
+    "tokens": 4096,
+    "input_sha256": "90dc5a406cbb2859e53925f63de95c5babddda9cdf403090a165e990142a55f4",
+    "meta_info": {
+      "id": "b8e84f18f6aa417c85650dd7e967e570",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08718676120042801,
+      "response_sent_to_client_ts": 1790433012.9265263
+    }
+  },
+  {
+    "case": 22,
+    "tokens": 4096,
+    "input_sha256": "687e67c2c052d12a58377d6d8da28502e0e1fb53f3ea819d3676838c805f5994",
+    "meta_info": {
+      "id": "84a866dc1e07478ab87395c8c1f3827b",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08864810690283775,
+      "response_sent_to_client_ts": 1790433013.0189285
+    }
+  },
+  {
+    "case": 23,
+    "tokens": 4096,
+    "input_sha256": "0c6957594abaf3073a3eb1184df8feeddbbc993c185f49da3d1b0c028ffc208a",
+    "meta_info": {
+      "id": "f7e351f60be34388b734079e20bd5c5e",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08925703354179859,
+      "response_sent_to_client_ts": 1790433013.113058
+    }
+  },
+  {
+    "case": 24,
+    "tokens": 4096,
+    "input_sha256": "4897f65dd2061ac29fb171a7afd1e74f178c0ceadfe10e55c944eb411726bc69",
+    "meta_info": {
+      "id": "9715ccb53765452986226a31eac01315",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.0878281369805336,
+      "response_sent_to_client_ts": 1790433013.204732
+    }
+  },
+  {
+    "case": 25,
+    "tokens": 4096,
+    "input_sha256": "8b676f69e1924e51462c85a4716a5917613299453fe58f7c0e19d9309122f5e6",
+    "meta_info": {
+      "id": "a1175e49da9f487797f8c4da6f439d59",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08784224465489388,
+      "response_sent_to_client_ts": 1790433013.2964833
+    }
+  },
+  {
+    "case": 26,
+    "tokens": 4096,
+    "input_sha256": "4a8f7f045ca2a889691235c934743273ea7bde736e27719216cf588f78dec00b",
+    "meta_info": {
+      "id": "a2d75c3eb1ab4cf28ea1202227d917ce",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08730638958513737,
+      "response_sent_to_client_ts": 1790433013.3875163
+    }
+  },
+  {
+    "case": 27,
+    "tokens": 4096,
+    "input_sha256": "d3a6d4ddb5c46758a614e804c9329186b9a94c4a57b7b5417c906708d0d05062",
+    "meta_info": {
+      "id": "5131eae238b246e3a3f23b851e2b4a6a",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08760245516896248,
+      "response_sent_to_client_ts": 1790433013.478795
+    }
+  },
+  {
+    "case": 28,
+    "tokens": 4096,
+    "input_sha256": "e5f976b6d582b15747f58573d6ea391a811d2121d809b7c2f08403f7fbdac285",
+    "meta_info": {
+      "id": "3dda527ac4c94e0e9bb44d95049398d2",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08832223154604435,
+      "response_sent_to_client_ts": 1790433013.570769
+    }
+  },
+  {
+    "case": 29,
+    "tokens": 4096,
+    "input_sha256": "604788f122fd9ff7e8b3ba8f9de28e761200b107b3ab7d2e7a12a536fde4a685",
+    "meta_info": {
+      "id": "611a9062a06c44f68dd0347ee7842ffa",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08810919336974621,
+      "response_sent_to_client_ts": 1790433013.662958
+    }
+  },
+  {
+    "case": 30,
+    "tokens": 4096,
+    "input_sha256": "9314d3c2b01cffddbcf3b5a2708ecf9f9adbe0acea77bb5cb0127759adf1b7f4",
+    "meta_info": {
+      "id": "74ac5eeab63c4ca2beab16d15c323c42",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08726197481155396,
+      "response_sent_to_client_ts": 1790433013.754196
+    }
+  },
+  {
+    "case": 31,
+    "tokens": 4096,
+    "input_sha256": "48ec192bc9e65454d63d975d793ea065a223fdbe1946822b396e79de599eabbf",
+    "meta_info": {
+      "id": "d4e82c4e01af4e058b46228174a1122c",
+      "finish_reason": {
+        "type": "length",
+        "length": 1
+      },
+      "prompt_tokens": 4096,
+      "weight_version": "default",
+      "num_retractions": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 1,
+      "cached_tokens": 0,
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 1
+        }
+      ],
+      "cached_tokens_details": null,
+      "dp_rank": null,
+      "e2e_latency": 0.08775578066706657,
+      "response_sent_to_client_ts": 1790433013.8458238
+    }
+  }
+]
