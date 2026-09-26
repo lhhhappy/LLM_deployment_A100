@@ -28,7 +28,7 @@ while :; do
     # idle: pause, deploy, publish; if another publisher got in first the publish asserts and we resume and retry
     bexec 'touch /tmp/ax/queue/PAUSE && echo paused'
     [ "\$pushed" = 1 ] || { scripts/pod/ppush /tmp/ax/staging/$id $bundle && pushed=1; }
-    if bexec 'python3 /tmp/ax/staging/$id/$bundle/queue_bundle.py publish /tmp/ax/staging/$id/$bundle $allow_flag'; then
+    if bexec 'python3 /tmp/ax/staging/$id/$bundle/queue_bundle.py publish /tmp/ax/staging/$id/$bundle \$allow_flag'; then
       bexec 'rm -f /tmp/ax/queue/PAUSE && echo resumed'
       break
     fi
