@@ -205,6 +205,8 @@ scripts/tests/hicache180/run_tests.sh /tmp/t180 python3  # Python environment mu
 
 允许组合限定为同checkpoint的GLM目标与单层NextN、EAGLE/NEXTN、topk=1；packed池的行宽、dtype、页和层映射仍由assembler校验。独立draft、树式draft、L3、LMCache等原有不支持组合继续明确拒绝。
 
+独立复核修正：HiCache 参数检查先于 speculative 默认值解析，因此这里也接纳尚未填写的 topk；该 GLM 架构随后解析为 `(steps=3, topk=1, draft_tokens=4)`。显式 topk>1 仍被拒绝，守卫不提前改写参数。回归入口：`python3 scripts/tests/test_dcp_mtp_review.py`，覆盖 NEXTN/EAGLE、W2/4/8 的默认值与原有拒绝边界。
+
 `test_dcp_round_trip_and_virtual_indexer_capacity`覆盖W=2/4/8、rank=0和末rank，包含packed草稿latent/indexer、KDA SSM/conv、高逻辑地址、源页毒化、异址恢复。这是主机搬运契约测试；W4/W8用单GPU分别构造各rank布局，不能当作分布式TP8或完整模型恢复证明。完整服务还需验证实际淘汰、恢复后续算、MTP三类图与flush。复现入口和验收范围见[工程计划](../../notes/plan-dcp-8card.md)。
 
 固定目标11层+草稿1层，每卡每逻辑token的host/KV字节是`12×(1024/W+132)`，KDA状态另计。容量倍数是预算推算；服务显存、传输并发和N@SLO须实测。
