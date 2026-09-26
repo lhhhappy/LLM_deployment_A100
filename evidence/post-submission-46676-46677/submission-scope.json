@@ -1,0 +1,44 @@
+{
+  "observed_at_utc": "2026-09-26T15:52:31.235205+00:00",
+  "engine": "f546934eff67f7b1d9f9cc5516c5a89377aaeb71",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926b",
+  "same_command": true,
+  "only_config_difference": {
+    "SGLANG_AX_BACKLOG_MAX_SLOW": {
+      "S1": "80",
+      "S2": "250"
+    }
+  },
+  "dcp_target_reviewed": "396225e7c0eb113ab48f853028b87d874de013b4",
+  "dcp_engine_commit": "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90",
+  "dcp_job_differences_from_S1": [
+    "missing four f546 review fixes",
+    "warm budget 5 instead of 15 seconds",
+    "running and graph capacity 48 instead of 32",
+    "explicit max_mamba_cache_size=418",
+    "compact-topk enabled (W1 retains baseline)"
+  ],
+  "capacity_arithmetic_only": {
+    "1": {
+      "kv_bytes_per_logical_token_with_nextn": 13872.0,
+      "capacity_ratio_at_same_KV_byte_budget": 1.0
+    },
+    "2": {
+      "kv_bytes_per_logical_token_with_nextn": 7728.0,
+      "capacity_ratio_at_same_KV_byte_budget": 1.795031055900621
+    },
+    "4": {
+      "kv_bytes_per_logical_token_with_nextn": 4656.0,
+      "capacity_ratio_at_same_KV_byte_budget": 2.979381443298969
+    },
+    "8": {
+      "kv_bytes_per_logical_token_with_nextn": 3120.0,
+      "capacity_ratio_at_same_KV_byte_budget": 4.446153846153846
+    }
+  },
+  "official_status_observed_this_turn": {
+    "46676": "queued; no capability or stress result",
+    "46677": "queued; no capability or stress result"
+  },
+  "official_query": "scripts/official_status.sh 46676 46677"
+}

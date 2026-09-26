@@ -1,0 +1,485 @@
+{
+  "validity": "DIAGNOSTIC_RECOUNT_NOT_FORMAL_SCORE",
+  "source_root": "/workspace/Agentic_science_challenge",
+  "max_slow": 80,
+  "log_clock": "UTC, one-second resolution",
+  "runs": {
+    "112": {
+      "raw_path": "evidence/L112-v3_n30_124_125x_117_60m/N30/raw_s1-dev-longchain-v3_N30_1790416026.jsonl",
+      "raw_sha256": "f54acd1713a2f22844290434972f1601ec9eb569ac055f2e55d2f3162a7efbcc",
+      "server_path": "evidence/L112-v3_n30_124_125x_117_60m/N30/server.log",
+      "server_sha256": "5f48b51eae4cec30746dc4e4e15a307e1b606d5e692224467c30dcf6dad789d0",
+      "requests": 3115,
+      "first_dispatch_utc": "2026-09-26T09:47:07.077789+00:00",
+      "end_from_first_dispatch_s": 3661.450770139694,
+      "gate_counts": {
+        "chain_start": {
+          "n": 258,
+          "over": 27
+        },
+        "turn_start": {
+          "n": 112,
+          "over": 24
+        },
+        "overall_intra": {
+          "n": 2745,
+          "over": 451
+        },
+        "fast_intra": {
+          "n": 2516,
+          "over": 510
+        }
+      },
+      "trip": {
+        "line_number": 1806,
+        "at_utc": "2026-09-26 09:53:22",
+        "seconds_from_first_dispatch": 374.922,
+        "line": "[2026-09-26 09:53:22 TP0] [ax-125] relief off: cold backlog 98670 tokens at 12863 tok/s, slow 82/293",
+        "state": "off",
+        "backlog_tokens": 98670,
+        "rate_tokens_per_second": 12863,
+        "ever_slow": 82,
+        "seen": 293
+      },
+      "events": [
+        {
+          "line_number": 679,
+          "at_utc": "2026-09-26 09:47:07",
+          "seconds_from_first_dispatch": -0.078,
+          "line": "[2026-09-26 09:47:07 TP0] [ax-125] relief on: cold backlog 317931 tokens at 5989 tok/s, slow 0/0",
+          "state": "on",
+          "backlog_tokens": 317931,
+          "rate_tokens_per_second": 5989,
+          "ever_slow": 0,
+          "seen": 0
+        },
+        {
+          "line_number": 888,
+          "at_utc": "2026-09-26 09:48:26",
+          "seconds_from_first_dispatch": 78.922,
+          "line": "[2026-09-26 09:48:26 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13639 tok/s, slow 0/0",
+          "state": "off",
+          "backlog_tokens": 67004,
+          "rate_tokens_per_second": 13639,
+          "ever_slow": 0,
+          "seen": 0
+        },
+        {
+          "line_number": 1215,
+          "at_utc": "2026-09-26 09:50:00",
+          "seconds_from_first_dispatch": 172.922,
+          "line": "[2026-09-26 09:50:00 TP0] [ax-125] relief on: cold backlog 251859 tokens at 6165 tok/s, slow 43/140",
+          "state": "on",
+          "backlog_tokens": 251859,
+          "rate_tokens_per_second": 6165,
+          "ever_slow": 43,
+          "seen": 140
+        },
+        {
+          "line_number": 1255,
+          "at_utc": "2026-09-26 09:50:14",
+          "seconds_from_first_dispatch": 186.922,
+          "line": "[2026-09-26 09:50:14 TP0] [ax-125] relief off: cold backlog 65491 tokens at 13215 tok/s, slow 52/140",
+          "state": "off",
+          "backlog_tokens": 65491,
+          "rate_tokens_per_second": 13215,
+          "ever_slow": 52,
+          "seen": 140
+        },
+        {
+          "line_number": 1320,
+          "at_utc": "2026-09-26 09:50:37",
+          "seconds_from_first_dispatch": 209.922,
+          "line": "[2026-09-26 09:50:37 TP0] [ax-125] relief on: cold backlog 219666 tokens at 10314 tok/s, slow 56/158",
+          "state": "on",
+          "backlog_tokens": 219666,
+          "rate_tokens_per_second": 10314,
+          "ever_slow": 56,
+          "seen": 158
+        },
+        {
+          "line_number": 1355,
+          "at_utc": "2026-09-26 09:50:51",
+          "seconds_from_first_dispatch": 223.922,
+          "line": "[2026-09-26 09:50:51 TP0] [ax-125] relief off: cold backlog 57874 tokens at 12327 tok/s, slow 64/160",
+          "state": "off",
+          "backlog_tokens": 57874,
+          "rate_tokens_per_second": 12327,
+          "ever_slow": 64,
+          "seen": 160
+        },
+        {
+          "line_number": 1654,
+          "at_utc": "2026-09-26 09:52:32",
+          "seconds_from_first_dispatch": 324.922,
+          "line": "[2026-09-26 09:52:32 TP0] [ax-125] relief on: cold backlog 113998 tokens at 4280 tok/s, slow 68/255",
+          "state": "on",
+          "backlog_tokens": 113998,
+          "rate_tokens_per_second": 4280,
+          "ever_slow": 68,
+          "seen": 255
+        },
+        {
+          "line_number": 1703,
+          "at_utc": "2026-09-26 09:52:51",
+          "seconds_from_first_dispatch": 343.922,
+          "line": "[2026-09-26 09:52:51 TP0] [ax-125] relief off: cold backlog 56654 tokens at 11595 tok/s, slow 70/263",
+          "state": "off",
+          "backlog_tokens": 56654,
+          "rate_tokens_per_second": 11595,
+          "ever_slow": 70,
+          "seen": 263
+        },
+        {
+          "line_number": 1782,
+          "at_utc": "2026-09-26 09:53:15",
+          "seconds_from_first_dispatch": 367.922,
+          "line": "[2026-09-26 09:53:15 TP0] [ax-125] relief on: cold backlog 181294 tokens at 8532 tok/s, slow 70/287",
+          "state": "on",
+          "backlog_tokens": 181294,
+          "rate_tokens_per_second": 8532,
+          "ever_slow": 70,
+          "seen": 287
+        },
+        {
+          "line_number": 1806,
+          "at_utc": "2026-09-26 09:53:22",
+          "seconds_from_first_dispatch": 374.922,
+          "line": "[2026-09-26 09:53:22 TP0] [ax-125] relief off: cold backlog 98670 tokens at 12863 tok/s, slow 82/293",
+          "state": "off",
+          "backlog_tokens": 98670,
+          "rate_tokens_per_second": 12863,
+          "ever_slow": 82,
+          "seen": 293
+        }
+      ],
+      "any_later_relief_on": false,
+      "post_trip_relief_counter_values": [
+        307
+      ],
+      "first_and_last_counters": [
+        {
+          "line_number": 701,
+          "at_utc": "2026-09-26 09:47:10",
+          "seconds_from_first_dispatch": 2.922,
+          "line": "[2026-09-26 09:47:10 TP0] [ax-124/125] parks=0 relief_rounds=89",
+          "parks": 0,
+          "relief_rounds": 89
+        },
+        {
+          "line_number": 11068,
+          "at_utc": "2026-09-26 10:47:32",
+          "seconds_from_first_dispatch": 3624.922,
+          "line": "[2026-09-26 10:47:32 TP0] [ax-124/125] parks=1687 relief_rounds=307",
+          "parks": 1687,
+          "relief_rounds": 307
+        }
+      ],
+      "arrived_after_trip": {
+        "requests": 2819,
+        "gates": {
+          "chain_start": {
+            "n": 208,
+            "over": 13
+          },
+          "turn_start": {
+            "n": 96,
+            "over": 24
+          },
+          "overall_intra": {
+            "n": 2515,
+            "over": 436
+          },
+          "fast_intra": {
+            "n": 2310,
+            "over": 492
+          }
+        },
+        "final_tpot_over_010": 3
+      },
+      "arrived_after_14_minutes": {
+        "chain_start": {
+          "n": 173,
+          "over": 13
+        },
+        "turn_start": {
+          "n": 82,
+          "over": 21
+        },
+        "overall_intra": {
+          "n": 2117,
+          "over": 399
+        },
+        "fast_intra": {
+          "n": 1941,
+          "over": 450
+        }
+      },
+      "final_tpot_over_010": 35
+    },
+    "130b": {
+      "raw_path": "evidence/L130b-v3_n30_A_warm15_60m/N30/raw_s1-dev-longchain-v3_N30_1790423235.jsonl",
+      "raw_sha256": "be95e55b3173e8b185285071cb11330e002262761aa272ab6263c3699bf0ac65",
+      "server_path": "evidence/L130b-v3_n30_A_warm15_60m/N30/server.log",
+      "server_sha256": "082ef1d671f0f213159f7d195d7d060d7e2bfbdad6c19a548c937177f29d3e16",
+      "requests": 3090,
+      "first_dispatch_utc": "2026-09-26T11:47:16.055127+00:00",
+      "end_from_first_dispatch_s": 3622.412155151367,
+      "gate_counts": {
+        "chain_start": {
+          "n": 253,
+          "over": 30
+        },
+        "turn_start": {
+          "n": 109,
+          "over": 16
+        },
+        "overall_intra": {
+          "n": 2728,
+          "over": 515
+        },
+        "fast_intra": {
+          "n": 2498,
+          "over": 559
+        }
+      },
+      "trip": {
+        "line_number": 2097,
+        "at_utc": "2026-09-26 11:53:37",
+        "seconds_from_first_dispatch": 380.945,
+        "line": "[2026-09-26 11:53:37 TP0] [ax-125] relief off: cold backlog 99438 tokens at 12188 tok/s, slow 82/301",
+        "state": "off",
+        "backlog_tokens": 99438,
+        "rate_tokens_per_second": 12188,
+        "ever_slow": 82,
+        "seen": 301
+      },
+      "events": [
+        {
+          "line_number": 948,
+          "at_utc": "2026-09-26 11:47:16",
+          "seconds_from_first_dispatch": -0.055,
+          "line": "[2026-09-26 11:47:16 TP0] [ax-125] relief on: cold backlog 297205 tokens at 4644 tok/s, slow 0/0",
+          "state": "on",
+          "backlog_tokens": 297205,
+          "rate_tokens_per_second": 4644,
+          "ever_slow": 0,
+          "seen": 0
+        },
+        {
+          "line_number": 1155,
+          "at_utc": "2026-09-26 11:48:34",
+          "seconds_from_first_dispatch": 77.945,
+          "line": "[2026-09-26 11:48:34 TP0] [ax-125] relief off: cold backlog 67516 tokens at 13733 tok/s, slow 0/0",
+          "state": "off",
+          "backlog_tokens": 67516,
+          "rate_tokens_per_second": 13733,
+          "ever_slow": 0,
+          "seen": 0
+        },
+        {
+          "line_number": 1490,
+          "at_utc": "2026-09-26 11:50:08",
+          "seconds_from_first_dispatch": 171.945,
+          "line": "[2026-09-26 11:50:08 TP0] [ax-125] relief on: cold backlog 251859 tokens at 7011 tok/s, slow 42/142",
+          "state": "on",
+          "backlog_tokens": 251859,
+          "rate_tokens_per_second": 7011,
+          "ever_slow": 42,
+          "seen": 142
+        },
+        {
+          "line_number": 1522,
+          "at_utc": "2026-09-26 11:50:22",
+          "seconds_from_first_dispatch": 185.945,
+          "line": "[2026-09-26 11:50:22 TP0] [ax-125] relief off: cold backlog 65491 tokens at 13173 tok/s, slow 51/142",
+          "state": "off",
+          "backlog_tokens": 65491,
+          "rate_tokens_per_second": 13173,
+          "ever_slow": 51,
+          "seen": 142
+        },
+        {
+          "line_number": 1595,
+          "at_utc": "2026-09-26 11:50:47",
+          "seconds_from_first_dispatch": 210.945,
+          "line": "[2026-09-26 11:50:47 TP0] [ax-125] relief on: cold backlog 219666 tokens at 3400 tok/s, slow 53/159",
+          "state": "on",
+          "backlog_tokens": 219666,
+          "rate_tokens_per_second": 3400,
+          "ever_slow": 53,
+          "seen": 159
+        },
+        {
+          "line_number": 1635,
+          "at_utc": "2026-09-26 11:51:01",
+          "seconds_from_first_dispatch": 224.945,
+          "line": "[2026-09-26 11:51:01 TP0] [ax-125] relief off: cold backlog 57874 tokens at 12837 tok/s, slow 61/163",
+          "state": "off",
+          "backlog_tokens": 57874,
+          "rate_tokens_per_second": 12837,
+          "ever_slow": 61,
+          "seen": 163
+        },
+        {
+          "line_number": 1912,
+          "at_utc": "2026-09-26 11:52:37",
+          "seconds_from_first_dispatch": 320.945,
+          "line": "[2026-09-26 11:52:37 TP0] [ax-125] relief on: cold backlog 119876 tokens at 7900 tok/s, slow 63/248",
+          "state": "on",
+          "backlog_tokens": 119876,
+          "rate_tokens_per_second": 7900,
+          "ever_slow": 63,
+          "seen": 248
+        },
+        {
+          "line_number": 1941,
+          "at_utc": "2026-09-26 11:52:47",
+          "seconds_from_first_dispatch": 330.945,
+          "line": "[2026-09-26 11:52:47 TP0] [ax-125] relief off: cold backlog 56245 tokens at 12484 tok/s, slow 70/254",
+          "state": "off",
+          "backlog_tokens": 56245,
+          "rate_tokens_per_second": 12484,
+          "ever_slow": 70,
+          "seen": 254
+        },
+        {
+          "line_number": 2066,
+          "at_utc": "2026-09-26 11:53:27",
+          "seconds_from_first_dispatch": 370.945,
+          "line": "[2026-09-26 11:53:27 TP0] [ax-125] relief on: cold backlog 176238 tokens at 5508 tok/s, slow 74/293",
+          "state": "on",
+          "backlog_tokens": 176238,
+          "rate_tokens_per_second": 5508,
+          "ever_slow": 74,
+          "seen": 293
+        },
+        {
+          "line_number": 2097,
+          "at_utc": "2026-09-26 11:53:37",
+          "seconds_from_first_dispatch": 380.945,
+          "line": "[2026-09-26 11:53:37 TP0] [ax-125] relief off: cold backlog 99438 tokens at 12188 tok/s, slow 82/301",
+          "state": "off",
+          "backlog_tokens": 99438,
+          "rate_tokens_per_second": 12188,
+          "ever_slow": 82,
+          "seen": 301
+        }
+      ],
+      "any_later_relief_on": false,
+      "post_trip_relief_counter_values": [
+        300
+      ],
+      "first_and_last_counters": [
+        {
+          "line_number": 956,
+          "at_utc": "2026-09-26 11:47:17",
+          "seconds_from_first_dispatch": 0.945,
+          "line": "[2026-09-26 11:47:17 TP0] [ax-124/125] parks=0 relief_rounds=85",
+          "parks": 0,
+          "relief_rounds": 85
+        },
+        {
+          "line_number": 11241,
+          "at_utc": "2026-09-26 12:47:15",
+          "seconds_from_first_dispatch": 3598.945,
+          "line": "[2026-09-26 12:47:15 TP0] [ax-124/125] parks=1187 relief_rounds=300",
+          "parks": 1187,
+          "relief_rounds": 300
+        }
+      ],
+      "arrived_after_trip": {
+        "requests": 2785,
+        "gates": {
+          "chain_start": {
+            "n": 203,
+            "over": 17
+          },
+          "turn_start": {
+            "n": 92,
+            "over": 16
+          },
+          "overall_intra": {
+            "n": 2490,
+            "over": 498
+          },
+          "fast_intra": {
+            "n": 2285,
+            "over": 535
+          }
+        },
+        "final_tpot_over_010": 3
+      },
+      "arrived_after_14_minutes": {
+        "chain_start": {
+          "n": 170,
+          "over": 17
+        },
+        "turn_start": {
+          "n": 79,
+          "over": 14
+        },
+        "overall_intra": {
+          "n": 2110,
+          "over": 456
+        },
+        "fast_intra": {
+          "n": 1933,
+          "over": 488
+        }
+      },
+      "final_tpot_over_010": 37
+    }
+  },
+  "common_requests": 3063,
+  "paired": {
+    "112": {
+      "gates": {
+        "chain_start": {
+          "n": 252,
+          "over": 26
+        },
+        "turn_start": {
+          "n": 109,
+          "over": 24
+        },
+        "overall_intra": {
+          "n": 2702,
+          "over": 448
+        },
+        "fast_intra": {
+          "n": 2474,
+          "over": 506
+        }
+      },
+      "final_tpot_over_010": 35
+    },
+    "130b": {
+      "gates": {
+        "chain_start": {
+          "n": 252,
+          "over": 30
+        },
+        "turn_start": {
+          "n": 109,
+          "over": 16
+        },
+        "overall_intra": {
+          "n": 2702,
+          "over": 512
+        },
+        "fast_intra": {
+          "n": 2474,
+          "over": 554
+        }
+      },
+      "final_tpot_over_010": 37
+    }
+  },
+  "limits": [
+    "No per-request ever-slow IDs are logged: the overlap with final slow IDs is unknown.",
+    "The absence of relief after the guard is not a causal estimate of MAX_SLOW=250.",
+    "Periodic admission counters are process-lifetime counters, not reset by measurement flush."
+  ],
+  "script_sha256": "7b3bf460b80b0d57f4678fca16b4ca8e7ee07a361543aa8f191f67b40083fa46"
+}
