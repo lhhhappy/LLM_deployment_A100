@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Early signal before v3 lands: 124 (deadline tiers + parking) on stack2 7c6cb634, N26 opening probe on the current
 # long-chain set (v2), whose chain heads are the same 311 organizer heads that open v3 runs. 600-second admission,
-# drain all admitted; 46364's configuration otherwise. First TP8 run of 124. Compared only loosely with 074 (v2 base,
-# 759a6eb): the engine commit differs (stack2 carries 120's alignment fix), so this is not a single-change result.
+# drain all admitted; 46364's configuration otherwise. First TP8 run of 124. Compared only loosely with 078 (v2, 46364
+# config on 759a6eb): the commit differs (stack2 carries 120's alignment fix), so this is not a single-change result.
 G_COMMIT=7c6cb6349f088de3af0e4d32440bdfbac6ee7941
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="117=off 118=off 119=off 120=on 122=off 123=off 124=on 125=off 126=off 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
