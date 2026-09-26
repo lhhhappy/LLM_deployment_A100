@@ -120,11 +120,11 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
 
     def key(item):
         index, req = item
-        if req.rid in held:
-            return (3, 0.0, index)
         waited = waited_s(req)
         if waited > cfg.max_wait_s:
-            return (0, -waited, index)
+            return (0, -waited, index)  # the starvation bound also frees a held rider whose leader never ran
+        if req.rid in held:
+            return (3, 0.0, index)
         remaining = remaining_tokens(req)
         hopeless = slack_s(req, remaining, waited, chunk, cfg) < 0
         return (2 if hopeless else 1, work.get(req.rid, remaining) if work else remaining, index)

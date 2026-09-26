@@ -312,6 +312,39 @@ class FamilyOrder(unittest.TestCase):
         self.assertEqual(t['reqs'][0][0], 'h14')
         self.assertEqual(s._ax_family_shared, {})
 
+    def test_riders_follow_the_leader_over_rounds(self):
+        # Closed loop (Codex review): the leader is chunked at 8192; after each chunk its computed prefix enters the
+        # tree, which the fakes simulate by growing the riders' match up to the shared 32768. Riders must not be
+        # admitted before that (no duplicate prefix work) and must ride along as short hits once matched.
+        with self.env(SGLANG_AX_SCHED_COLD_CAP='8192'):
+            s, _ = scheduler(waiting=self.queue(), budget=8192, interval=0)
+            t = step(s)
+            leader = t['reqs'][0][0]
+            self.assertTrue(leader.startswith('fam'))
+            lead = s.chunked_req
+            self.assertEqual(lead.rid, leader)
+            riders = [r for r in s.waiting_queue if r.rid.startswith('fam')]
+            self.assertEqual(len(riders), 3)
+            first, last = {}, {}
+            for _ in range(16):
+                done = len(lead.prefix_indices)  # the leader's computed prefix so far (stashed each round)
+                for r in riders:
+                    if r in s.waiting_queue:
+                        m = min(32768, done)
+                        r.num_matched_prefix_tokens = m
+                        r.prefix_indices = [0] * m
+                        r.init_next_round_input()
+                t = step(s)
+                for rid, start, end in t['reqs']:
+                    if rid != leader:
+                        first.setdefault(rid, start)
+                        last[rid] = end
+                if len(last) == 3 and all(e == 35840 for e in last.values()):
+                    break
+        self.assertEqual(sorted(first), sorted(r.rid for r in riders))
+        self.assertEqual(set(first.values()), {32768})  # admitted only after the shared prefix was in the tree
+        self.assertTrue(all(e == 35840 for e in last.values()), last)  # and every rider finished its own tail
+
     def test_family_needs_124(self):
         with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_FAMILY': '1'}):
             s, _ = scheduler()

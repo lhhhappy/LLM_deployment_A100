@@ -287,3 +287,10 @@ class Family(unittest.TestCase):
         with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_FAMILY': '1', 'SGLANG_AX_FAMILY_BLOCK': '0'}):
             with self.assertRaises(ValueError):
                 ax.family_config()
+
+    def test_starvation_bound_frees_a_held_rider(self):
+        cfg = ax.DeadlineConfig(max_wait_s=120)
+        lead, rider = req('lead', 36000), req('rider', 35000)
+        waited = {'lead': 0.0, 'rider': 121.0}
+        order = ax.tier_order([lead, rider], lambda r: waited[r.rid], {'rider'}, 8192, cfg, {'lead': 9000})
+        self.assertEqual([r.rid for r in order], ['rider', 'lead'])
