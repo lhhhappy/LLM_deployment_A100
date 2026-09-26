@@ -4513,15 +4513,41 @@ class MLATokenToKVPool(KVCache):
 
     def move_kv_cache(self, tgt_loc: torch.Tensor, src_loc: torch.Tensor):
         """Relocate accepted-token combined MLA KV (latent + rope) per layer."""
-        size_limit = self.size + self.page_size
+        parallel = get_parallel()
+        size_limit = (self.size + self.page_size) * parallel.attn_dcp_size
         maybe_detect_oob(tgt_loc, 0, size_limit, "move_kv_cache tgt_loc")
         maybe_detect_oob(src_loc, 0, size_limit, "move_kv_cache src_loc")
 
         if tgt_loc.numel() == 0:
             return
+        if tgt_loc.numel() != src_loc.numel():
+            raise ValueError("MLA move requires one source per destination")
 
         tgt_loc_flat = tgt_loc.view(-1).long()
         src_loc_flat = src_loc.view(-1).long()
+        if parallel.dcp_enabled:
+            # [ax] 115: both descriptors are replicated virtual locs. A token
+            # can change owner when accepted; gather its bytes from its source
+            # owner before scattering to its destination owner. All ranks must
+            # call with identical descriptors, including ranks with no writes.
+            # SUM of uint8 is exact here: precisely one rank supplies each byte.
+            # This also preserves BF16/FP8 bits, signed zero and NaN payloads.
+            width, rank = parallel.attn_dcp_size, parallel.attn_dcp_rank
+            source_owned = src_loc_flat % width == rank
+            target_owned = (tgt_loc_flat % width == rank) & (tgt_loc_flat != 0)
+            source_rows = src_loc_flat // width
+            target_rows = tgt_loc_flat[target_owned] // width
+            for kv_cache in self.kv_buffer:
+                if kv_cache.shape[0] == 0:
+                    continue
+                snapshot = kv_cache[source_rows].contiguous()
+                payload = snapshot.view(torch.uint8).reshape(snapshot.shape[0], -1)
+                payload.masked_fill_(~source_owned[:, None], 0)
+                torch.distributed.all_reduce(
+                    payload, group=parallel.dcp_group.device_group
+                )
+                kv_cache[target_rows] = snapshot[target_owned]
+            return
         for kv_cache in self.kv_buffer:
             kv_cache[tgt_loc_flat] = kv_cache[src_loc_flat]
 
@@ -4755,8 +4781,20 @@ class DSATokenToKVPool(MLATokenToKVPool):
         self.index_kpool_compress = index_kpool_compress
         self.tail_extra_slots = tail_extra_slots
         self.slots_per_page = self.page_size
+        # [ax] 115: every DSA construction path (including HybridLinearKVPool)
+        # needs replicated indexer storage over the full DCP virtual space.
+        # IndexKeyCache adds one physical padding page itself; DCP has W such
+        # pages in logical coordinates. Enforce this where both target and
+        # NextN pools are built, rather than in only one configurator.
+        dcp_width = get_parallel().attn_dcp_size
+        min_index_size = (size + self.page_size) * dcp_width - self.page_size
         if index_buf_size is None:
-            index_buf_size = size
+            index_buf_size = min_index_size
+        elif index_buf_size < min_index_size and dcp_width > 1:
+            raise ValueError(
+                f"DCP indexer capacity {index_buf_size} is smaller than the "
+                f"required virtual capacity {min_index_size}"
+            )
         self.index_buf_size = index_buf_size
         # num head == 1 and head dim == 128 for index_k in DSA
         assert index_head_dim == 128
@@ -4967,6 +5005,18 @@ class DSATokenToKVPool(MLATokenToKVPool):
 
     def move_kv_cache(self, tgt_loc: torch.Tensor, src_loc: torch.Tensor):
         """Move latent KV and the DSA indexer cache (key + scale) in lockstep."""
+        if (
+            get_parallel().dcp_enabled
+            and tgt_loc.numel()
+            and self.kpool_use_compress
+        ):
+            # A compressed key represents several logical positions; copying
+            # token rows alone cannot restore the per-request compression tail.
+            # Current topk=1 NextN never calls accepted-path compaction.
+            raise NotImplementedError(
+                "DSA token relocation with compressed kpool requires a "
+                "request-aware indexer/tail remap; use the topk=1 MTP chain."
+            )
         super().move_kv_cache(tgt_loc, src_loc)
         self.index_key_cache.move(tgt_loc, src_loc)
 

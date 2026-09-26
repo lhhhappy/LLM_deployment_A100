@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import (
     TYPE_CHECKING,
@@ -175,17 +176,30 @@ def _should_all_gather_dsa_trtllm_fp8_kv(
 
 
 def _should_return_dsa_dcp_lse(*, forward_mode: ForwardMode, dcp_enabled: bool) -> bool:
-    return dcp_enabled and (forward_mode.is_decode() or forward_mode.is_target_verify())
+    return dcp_enabled and (
+        forward_mode.is_decode()
+        or forward_mode.is_target_verify()
+        or forward_mode.is_draft_extend_v2()
+    )
 
 
 # [ax] 116: DCP address protocol for the DSA latent pool. req_to_token / page_table_1 / topk hold
 # VIRTUAL locs in [0, (size + page) * W); the latent write (set_mla_kv_buffer) keeps only
 # loc % W == rank at local row loc // W. The stock DSA backend read the local pool with virtual locs
 # (wrong rows, and out of bounds once a virtual loc >= local rows -> illegal memory access).
-def _ax116_dcp_local_indices(page_table_1: torch.Tensor) -> torch.Tensor:
+def _ax116_dcp_local_indices(
+    page_table_1: torch.Tensor, *, kpool_stride: int = 1
+) -> torch.Tensor:
     """[ax] 116 decode: keep this rank's locs as local rows, mask the rest (-1). Graph-safe."""
     parallel = get_parallel()
     w, r = parallel.attn_dcp_size, parallel.attn_dcp_rank
+    if kpool_stride > 1:
+        # [ax] 115: KPool expands every group in position order. Page-aligned
+        # virtual locs and column indices have the same residue modulo
+        # gcd(W, KPool); its tail starts at a whole-group boundary too.
+        # Drop columns that cannot belong to this rank before doing attention.
+        # This is not valid for an arbitrary ungrouped top-k list.
+        page_table_1 = page_table_1[:, r % kpool_stride :: kpool_stride]
     own = (page_table_1 >= 0) & (page_table_1 % w == r)
     return torch.where(own, page_table_1 // w, -1).to(torch.int32)
 
@@ -579,6 +593,28 @@ class DeepseekSparseAttnBackend(
         self.supports_mha_one_shot: bool = True
         self.dsa_prefill_impl: _DSA_IMPL_T = get_exec().kernel.dsa_prefill_backend
         self.dsa_decode_impl: _DSA_IMPL_T = get_exec().kernel.dsa_decode_backend
+        self.dcp_topk_column_stride = 1
+        if get_bool_env_var("SGLANG_AX_DCP_COMPACT_TOPK"):
+            if get_parallel().dcp_enabled:
+                if (
+                    self.dsa_index_kpool != 4
+                    or self.real_page_size % 4
+                    or self.dsa_prefill_impl != "tilelang"
+                    or self.dsa_decode_impl != "tilelang"
+                ):
+                    raise NotImplementedError(
+                        "DCP compact top-k requires KPool=4, aligned pages "
+                        "and TileLang prefill/decode"
+                    )
+                self.dcp_topk_column_stride = math.gcd(
+                    get_parallel().attn_dcp_size, self.dsa_index_kpool
+                )
+            logger.info(
+                "[ax] DCP top-k column stride=%d (W=%d, KPool=%d)",
+                self.dcp_topk_column_stride,
+                get_parallel().attn_dcp_size,
+                self.dsa_index_kpool,
+            )
         self.dsa_topk_backend: DSATopKBackend = DSATopKBackend.resolve(model_runner)
         if self.num_q_heads <= 64:
             self.flashmla_kv_num_q_heads = 64
@@ -3186,7 +3222,9 @@ class DeepseekSparseAttnBackend(
                 out, lse = self._forward_tilelang(
                     q_all=q_all,
                     kv_cache=kv_cache,
-                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    page_table_1=_ax116_dcp_local_indices(
+                        page_table_1, kpool_stride=self.dcp_topk_column_stride
+                    ),
                     sm_scale=layer.scaling,
                     v_head_dim=layer.v_head_dim,
                     return_lse=True,
@@ -3502,7 +3540,9 @@ class DeepseekSparseAttnBackend(
                 out, lse = self._forward_tilelang(
                     q_all=q_all,
                     kv_cache=kv_cache,
-                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    page_table_1=_ax116_dcp_local_indices(
+                        page_table_1, kpool_stride=self.dcp_topk_column_stride
+                    ),
                     sm_scale=layer.scaling,
                     v_head_dim=layer.v_head_dim,
                     return_lse=True,

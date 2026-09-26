@@ -289,17 +289,27 @@ def all_gather_kv_cache_for_mla_extend(
     )
     dcp_kv_buffer[:dcp_extend_prefix_lens_sum] = gathered_kv
 
+    # [ax] 115: model collectives can pad the extend rows to the TP width
+    # (e.g. 33 real rows become 40 with TP8). The planner's KV buffer contains
+    # only real tokens. Padding belongs to the compute layout, not the cache.
+    extend_len = dcp_kv_buffer.shape[0] - dcp_extend_prefix_lens_sum
+    if k_nope.shape[0] < extend_len or (
+        k_pe is not None and k_pe.shape[0] < extend_len
+    ):
+        raise ValueError("DCP extend KV has fewer rows than the planned real tokens")
+
     # copy local kv cache into forward_batch.attn_dcp_metadata.dcp_kv_buffer
     dcp_kv_buffer[
         dcp_extend_prefix_lens_sum:,
         ...,
         :kv_lora_rank,
-    ] = k_nope
-    dcp_kv_buffer[
-        dcp_extend_prefix_lens_sum:,
-        ...,
-        kv_lora_rank:,
-    ] = k_pe
+    ] = k_nope[:extend_len]
+    if k_pe is not None:
+        dcp_kv_buffer[
+            dcp_extend_prefix_lens_sum:,
+            ...,
+            kv_lora_rank:,
+        ] = k_pe[:extend_len]
 
 
 # all gather kv cache and re-org to query orders

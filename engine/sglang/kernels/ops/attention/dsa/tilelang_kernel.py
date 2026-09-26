@@ -7,6 +7,7 @@ import tilelang.language as T
 import torch
 
 from sglang.kernels.ops.quantization.fp8_kernel import is_fp8_fnuz
+from sglang.srt.runtime_context import get_parallel
 from sglang.srt.utils import is_gfx95_supported, is_hip
 
 tilelang.set_log_level("WARNING")
@@ -1413,10 +1414,12 @@ def tilelang_sparse_fwd(
         )
         sm80_many_heads = (
             tail_dim == 0
-            and num_heads >= 64
             and torch.cuda.get_device_capability(q.device)[0] < 9
+            and (num_heads >= 64 or (num_heads >= 32 and get_parallel().dcp_enabled))
         )
-        if sm80_many_heads:  # [ax] 115: A100 smem (164KB): single-stage pipeline (swept: fastest that compiles)
+        # [ax] 115: TP8/DCP4 has 32 heads and the default layout needs
+        # 192 KiB, exceeding A100's 164 KiB. Keep DCP-off H32 unchanged.
+        if sm80_many_heads:
             kernel = sparse_attention_fwd_kernel_v1(
                 num_heads,
                 d_v,
