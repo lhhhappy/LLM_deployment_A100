@@ -14,6 +14,9 @@
 # Compare a DCP run against a non-DCP run of the same stack with dcp_compare.py.
 # Usage: python dcp_check.py <one_batch CLI args ...> (--batch-size/--input-len are ignored except for arg parsing)
 import os
+import json
+import time
+from dataclasses import replace
 import numpy as np
 import torch
 import sglang.benchmark.one_batch as ob
@@ -63,6 +66,31 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
         return _orig_icg(self, *a, **k)
     ModelRunner.init_cuda_graphs = _icg
     cap, stage, static, seen, names = {}, ["load"], {}, set(), []
+    routes = []
+    input_records = []
+    if os.environ.get("AX_CAPTURE_INPUTS") == "1":
+        from sglang.srt.layers.attention.dsa_backend import DeepseekSparseAttnBackend
+        original_extend = DeepseekSparseAttnBackend.forward_extend
+        input_oracle = {}
+        if os.environ.get("AX_TOPK_ROW_ORACLE"):
+            oracle_file = os.environ["AX_TOPK_ROW_ORACLE"] + (f".rank{tp_rank}" if tp_rank else "") + ".inputs"
+            input_oracle = {r["layer"]: r for r in torch.load(oracle_file)}
+        def inspected_extend(self, q, k, v, layer, forward_batch, *args, **kwargs):
+            if stage[0] == "ext" and q.shape[0] > 4000:
+                row = 3950
+                record = {"layer": layer.layer_id, "row": row, "q": q[row:row+1].float().cpu()}
+                for name, value in (("k", k), ("v", v), ("topk", kwargs.get("topk_indices"))):
+                    if value is not None:
+                        record[name] = value[row:row+1].cpu().clone()
+                if layer.layer_id in input_oracle:
+                    topk = kwargs["topk_indices"].clone()
+                    wanted = input_oracle[layer.layer_id]["topk"]
+                    topk[row:row+1].copy_(wanted)
+                    kwargs["topk_indices"] = topk
+                    record["replayed_topk"] = wanted
+                input_records.append(record)
+            return original_extend(self, q, k, v, layer, forward_batch, *args, **kwargs)
+        DeepseekSparseAttnBackend.forward_extend = inspected_extend
     def install(model):
         from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
         if names:
@@ -75,12 +103,26 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
                         return (out[0] * _b, *out[1:]) if isinstance(out, tuple) else out * _b
                     m.o_proj.register_forward_hook(post)
                 names.append(name)
+                original_core = m.forward_absorb_core
+                def core(*args, _core=original_core, _name=name, **kwargs):
+                    fb = args[4]
+                    if stage[0] in ("cold", "ext"):
+                        md = fb.attn_dcp_metadata
+                        routes.append({"stage": stage[0], "layer": _name,
+                                       "local": bool(md and md.dcp_local_extend),
+                                       "q_shape": list(args[2].shape),
+                                       "prefix": sum(fb.extend_prefix_lens_cpu),
+                                       "buffer_bytes": (md.dcp_kv_buffer.nbytes if md and md.dcp_kv_buffer is not None else 0)})
+                    return _core(*args, **kwargs)
+                m.forward_absorb_core = core
                 def pre(mod, args, _n=name):
                     if torch.cuda.is_current_stream_capturing():  # graph: record a copy into a static buffer
                         b = static.get((_n, args[0].shape[0]))
                         if b is None:
                             b = static[(_n, args[0].shape[0])] = torch.empty_like(args[0])
                         b.copy_(args[0])
+                        return
+                    if stage[0] == "timing":
                         return
                     seen.add(_n)
                     x = args[0].detach().float()
@@ -91,13 +133,27 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
 
     runner, _ = ob.load_model(server_args, port_args, gpu_id, tp_rank)
     mr = runner.torch_runner
+    captured = {}
+    original_forward = mr.forward
+    def forward(fb, *args, **kwargs):
+        if stage[0] == "ext":
+            if os.environ.get("AX_MIXED") == "1":
+                from sglang.srt.model_executor.forward_batch_info import ForwardMode
+                fb.forward_mode = ForwardMode.MIXED
+            captured["extend"] = replace(fb, **{k: v.clone() for k, v in vars(fb).items() if torch.is_tensor(v)})
+        return original_forward(fb, *args, **kwargs)
+    mr.forward = forward
     alloc = mr.token_to_kv_pool_allocator
     pre = [int(x) for x in os.environ.get("AX_PREFIX", "8192,6144").split(",")]
     ext = [int(x) for x in os.environ.get("AX_EXT", "1000,700").split(",")]
     n_dec = int(os.environ.get("AX_DECODE", "4"))
     frac = float(os.environ.get("AX_FILL_FRAC", "0"))
+    from sglang.srt.layers.quantization.fp8_humming_moe import humming_moe_layer_count
     info = {"alloc_size": int(alloc.size), "alloc_page": int(alloc.page_size),
-            "pool_rows": int(mr.token_to_kv_pool.size)}
+            "pool_rows": int(mr.token_to_kv_pool.size),
+            "mixed_input": os.environ.get("AX_MIXED") == "1",
+            "heads_total": mr.model_config.num_attention_heads,
+            "humming_layers": humming_moe_layer_count()}
     if frac > 0:
         n = int(alloc.size * frac) // alloc.page_size * alloc.page_size
         filler = alloc.alloc(n)
@@ -138,13 +194,85 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     if dec:
         out["dec"] = torch.stack(dec)
     torch.cuda.synchronize()
-    if tp_rank == 0:
+    timing = None
+    repeats = int(os.environ.get("AX_TIMING_REPEATS", "0"))
+    if repeats:
+        # Numerical observations are already frozen. Repeated execution uses
+        # the same shape/addresses; mutated KDA state is NOT a numerical oracle.
+        # Disable every diagnostic tensor copy in the measured forwards.
+        stage[0] = "timing"
+        fb = captured["extend"]
+        with torch.inference_mode():
+            for _ in range(5):
+                original_forward(replace(fb))
+            torch.cuda.synchronize()
+            wall_ms, device_ms = [], []
+            for _ in range(repeats):
+                begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+                start = time.perf_counter()
+                begin.record()
+                original_forward(replace(fb))
+                end.record(); end.synchronize()
+                wall_ms.append((time.perf_counter() - start) * 1000)
+                device_ms.append(begin.elapsed_time(end))
+        timing = {"wall_ms": wall_ms, "device_ms": device_ms,
+                  "scope": "ModelRunner.forward: metadata + all layers + logits; excludes scheduling/tokenization"}
+    if os.environ.get("AX_PAIRED_TIMING") == "1":
+        # Use one process to separate routing cost from drift across launches.
+        # Policy selection and the full runner still execute in the timed region.
+        stage[0] = "timing"
+        fb = captured["extend"]
+        policy = mr.eager_runner.dcp_local_extend_policy
+        assert policy is not None
+        arms = (("gather_kv", None), ("local_kv", policy))
+        paired = {name: {"wall_ms": [], "device_ms": [], "peak_temporary_bytes": 0}
+                  for name, _ in arms}
+        with torch.inference_mode():
+            for _, option in arms:
+                mr.eager_runner.dcp_local_extend_policy = option
+                for _ in range(5):
+                    original_forward(replace(fb))
+            for iteration in range(40):
+                for name, option in (arms if iteration % 2 == 0 else arms[::-1]):
+                    mr.eager_runner.dcp_local_extend_policy = option
+                    torch.cuda.synchronize()
+                    base_memory = torch.cuda.memory_allocated()
+                    torch.cuda.reset_peak_memory_stats()
+                    begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+                    start = time.perf_counter()
+                    begin.record()
+                    original_forward(replace(fb))
+                    end.record(); end.synchronize()
+                    result = paired[name]
+                    result["wall_ms"].append((time.perf_counter() - start) * 1000)
+                    result["device_ms"].append(begin.elapsed_time(end))
+                    result["peak_temporary_bytes"] = max(result["peak_temporary_bytes"],
+                        torch.cuda.max_memory_allocated() - base_memory)
+        mr.eager_runner.dcp_local_extend_policy = policy
+        timing = {"paired": paired, "scope": "Interleaved full ModelRunner.forward; mutated state only for timing, not numerics"}
+    if os.environ.get("AX_COMPONENT_BENCH"):
+        stage[0] = "timing"
+        from dcp_local_extend_bench import run
+        run(os.environ["AX_COMPONENT_BENCH"] + f".rank{tp_rank}.json")
+    info["routes"] = routes
+    if os.environ.get("SGLANG_AX_DCP_LOCAL_EXTEND", "0") == "1" and not any(r["local"] for r in routes):
+        raise RuntimeError("No local extend executed; this arm cannot validate the mechanism")
+    if tp_rank >= 0:
         out["info"] = info
         out["attn"] = {st: {n: torch.cat(v) for n, v in d.items()} for st, d in cap.items() if st != "load"}
-        torch.save(out, os.environ["AX_CHECK_OUT"])
+        dest = os.environ["AX_CHECK_OUT"] + (f".rank{tp_rank}" if tp_rank else "")
+        torch.save(out, dest)
+        if input_records:
+            torch.save(input_records, dest + ".inputs")
+        with open(dest + ".json", "w") as handle:
+            json.dump({"rank": tp_rank, "info": info, "timing": timing}, handle, indent=2)
         print("AX_CHECK done", info, {k: tuple(v.shape) for k, v in out.items() if torch.is_tensor(v)}, flush=True)
 
 
 if __name__ == "__main__":  # spawned TP ranks re-import this module; only the parent launches
     ob.latency_test = work
     ob.cli_main()
+    # one_batch can return success when a spawned TP worker crashes.
+    # No output means this diagnostic failed, never a passing numerical run.
+    if not os.path.isfile(os.environ["AX_CHECK_OUT"]):
+        raise SystemExit("DCP check failed: TP workers produced no result")
