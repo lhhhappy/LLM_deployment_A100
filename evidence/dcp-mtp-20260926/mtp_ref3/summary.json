@@ -1,0 +1,8 @@
+{
+  "validity": "MTP_DIAGNOSTIC",
+  "dcp": 1,
+  "hicache": false,
+  "graph_phase_rank_replays": {},
+  "trace_files": 504,
+  "limitations": "Scaled model; natural acceptance only; host eviction/restore not proven by this model probe."
+}

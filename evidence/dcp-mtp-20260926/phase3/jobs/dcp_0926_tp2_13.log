@@ -1,0 +1,18 @@
+START move13
+COMPLETE move13
+START mtp_tp2_ref13
+COMPLETE mtp_tp2_ref13
+START mtp_tp2_dcp13
+COMPLETE mtp_tp2_dcp13
+START mtp_tp2_accept_ref13
+COMPLETE mtp_tp2_accept_ref13
+START mtp_tp2_accept_dcp13
+COMPLETE mtp_tp2_accept_dcp13
+START mtp_tp2_compact13
+COMPLETE mtp_tp2_compact13
+START mtp_tp2_host_ref13
+COMPLETE mtp_tp2_host_ref13
+START mtp_tp2_host_dcp13
+COMPLETE mtp_tp2_host_dcp13
+ALL_DIAGNOSTICS_COMPLETED
+DONE rc=0

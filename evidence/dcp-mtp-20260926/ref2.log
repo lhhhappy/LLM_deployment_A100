@@ -1,0 +1,237 @@
+[1;33m'--cuda-graph-max-bs' is deprecated and will be removed in a future release. Use '--cuda-graph-max-bs-decode' instead.[0m
+[1;33m'--disable-cuda-graph' is deprecated and will be removed in a future release. Use '--cuda-graph-backend-{decode,prefill}=disabled' instead.[0m
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Use dsa attention backend for DeepSeek with DSA.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=2, attn_tp_size=2, attention weights will be sharded across 2 ranks.
+Set DSA backends for bfloat16 KV Cache: prefill=tilelang, decode=tilelang.
+Compiled-kernel caches now live under SGLANG_CACHE_DIR (/sjtu/linhang/arena/cache/sglang). These older directories are no longer used by sglang, but may still be used by other frameworks on this machine, so they were left alone: /root/.triton, /root/.cache/flashinfer. Remove them yourself if nothing else needs them.
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Ignore import error when loading sglang.srt.models.bailing_moe_linear: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.bailing_moe_linear: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.bailing_moe_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.bailing_moe_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.bailing_moe_v3: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.bailing_moe_v3: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+Ignore import error when loading sglang.srt.models.longcat_flash: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.longcat_flash_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.longcat_flash: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+Ignore import error when loading sglang.srt.models.longcat_flash_nextn: cannot import name 'awq_dequantize' from 'sgl_kernel' (/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/sgl_kernel/__init__.py)
+Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W926 12:11:38.636182959 ProcessGroupNCCL.cpp:5276] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+Process Process-1:
+Process Process-2:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 71, in _load_tilelang
+    new_tilelang = importlib.import_module("tilelang")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 71, in _load_tilelang
+    new_tilelang = importlib.import_module("tilelang")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'tilelang'
+ModuleNotFoundError: No module named 'tilelang'
+
+The above exception was the direct cause of the following exception:
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 111, in work
+    nxt, lg, batch = runner.extend(reqs)
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 111, in work
+    nxt, lg, batch = runner.extend(reqs)
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 574, in extend
+    return extend(reqs, self.torch_runner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 574, in extend
+    return extend(reqs, self.torch_runner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 526, in extend
+    logits_output = model_runner.forward(forward_batch).logits_output
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 526, in extend
+    logits_output = model_runner.forward(forward_batch).logits_output
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1573, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1573, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1193, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1193, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 880, in forward
+    hidden_states, residual = self.layer_communicator.prepare_attn(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 880, in forward
+    hidden_states, residual = self.layer_communicator.prepare_attn(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator_mhc.py", line 476, in prepare_attn
+    hidden_states, residual = self.mhc.attn_split(
+                              ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator_mhc.py", line 476, in prepare_attn
+    hidden_states, residual = self.mhc.attn_split(
+                              ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator_mhc.py", line 88, in attn_split
+    hidden_states, self.h_res, self.h_post, norm_fused = self.hc_attn_pre(
+                                                         ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator_mhc.py", line 88, in attn_split
+    hidden_states, self.h_res, self.h_post, norm_fused = self.hc_attn_pre(
+                                                         ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 831, in hc_attn_pre
+    return self._hc_pre(
+           ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 831, in hc_attn_pre
+    return self._hc_pre(
+           ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 815, in _hc_pre
+    return _hc_pre_fn(
+           ^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 815, in _hc_pre
+    return _hc_pre_fn(
+           ^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1883, in hc_pre
+    post_mix, comb_mix, layer_input, norm_fused = _mhc_pre_dispatch(
+                                                  ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1883, in hc_pre
+    post_mix, comb_mix, layer_input, norm_fused = _mhc_pre_dispatch(
+                                                  ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1827, in _mhc_pre_dispatch
+    post_mix, comb_mix, layer_input = mhc_pre(
+                                      ^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1827, in _mhc_pre_dispatch
+    post_mix, comb_mix, layer_input = mhc_pre(
+                                      ^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1084, in mhc_pre
+    mhc_pre_gemm_sqrsum_tilelang(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 1084, in mhc_pre
+    mhc_pre_gemm_sqrsum_tilelang(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 100, in wrapper
+    real_tilelang = _load_tilelang()
+                    ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 100, in wrapper
+    real_tilelang = _load_tilelang()
+                    ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 74, in _load_tilelang
+    raise RuntimeError(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/layernorm/mhc.py", line 74, in _load_tilelang
+    raise RuntimeError(
+RuntimeError: tilelang is not installed; this kernel cannot run on the current platform
+RuntimeError: tilelang is not installed; this kernel cannot run on the current platform
+max_total_num_tokens=32768
+[rank0]:[W926 12:11:41.546917859 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+kill_process_tree called: parent_pid=3243444, include_parent=False, pid=3243444
+DCP check failed: TP workers produced no result

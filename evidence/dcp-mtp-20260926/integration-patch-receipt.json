@@ -1,0 +1,9 @@
+{
+  "development": "aebaff56 -> f254c64f",
+  "integration": "84dcca0e -> e4d7ca68",
+  "same_added_removed_engine_lines": true,
+  "engine_files": 13,
+  "conflict_resolution": "Only README table conflict; retained stack2 117/118/128 rows and updated 115 status. Engine patch applied without conflicts.",
+  "development_patch_sha256": "cd34778ab5b59b27932355fbee641c5dc794eba6f5302ccbc6c0609e2574aeb6",
+  "integration_patch_sha256": "1fcf23897ab03bd225add236d6986bc6f61d8a48ab53fb2109dfa440aba09326"
+}

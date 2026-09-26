@@ -1,0 +1,23 @@
+{
+  "expected_files": 2576,
+  "same_remote_path_matches": 2573,
+  "snapshot_matches": [
+    {
+      "archive_path": "dcp_mtp_probe.py",
+      "remote_snapshot": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/audit_mtp4/dcp_mtp_probe.py",
+      "sha256": "c7efa5b61204c3e4ece22e720dfd642037cbfb7d3522df1bbb063d1beb717572"
+    },
+    {
+      "archive_path": "dcp_mtp_compare.py",
+      "remote_snapshot": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/audit_mtp4/dcp_mtp_compare.py",
+      "sha256": "403ab707b362eb12ab7841fb48e167aa75abd20b45960163d8755e8cc4105fd6"
+    },
+    {
+      "archive_path": "run_dcp_devbox.sh",
+      "remote_snapshot": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/audit_mtp4/run_dcp_devbox.sh",
+      "sha256": "a3e8d10015f1127806ea31f983b3788baa1cc044b45097f3914947501c3843aa"
+    }
+  ],
+  "mismatches": [],
+  "all_verified": true
+}

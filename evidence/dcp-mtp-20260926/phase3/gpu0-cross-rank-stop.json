@@ -1,0 +1,66 @@
+{
+  "utc": "2026-09-26T14:37:04Z",
+  "authorization": "Prior user approval to stop GPU0 occupation; two GPUs required for cross-rank DCP validation",
+  "targets": [
+    {
+      "pid": 215561,
+      "ppid": 1028286,
+      "start": "1472789491",
+      "cmd": [
+        "bash",
+        "/sjtu/linhang/MAS/runs/_services/e61_gpt_oss_120b_gpu0_single_20260926T1423/serve.sh"
+      ],
+      "cuda": null
+    },
+    {
+      "pid": 215565,
+      "ppid": 215561,
+      "start": "1472789491",
+      "cmd": [
+        "/sjtu/conda/miniconda/envs/phys/bin/python",
+        "-m",
+        "vllm.entrypoints.openai.api_server",
+        "--model",
+        "/sjtu/public_model/gpt-oss",
+        "--served-model-name",
+        "gpt-oss-120b",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "30163",
+        "--max-model-len",
+        "8192",
+        "--gpu-memory-utilization",
+        "0.88",
+        "--enforce-eager",
+        "--max-num-seqs",
+        "64",
+        "--enable-prefix-caching"
+      ],
+      "cuda": "0"
+    },
+    {
+      "pid": 219735,
+      "ppid": 215565,
+      "start": "1472792019",
+      "cmd": [
+        "/sjtu/conda/miniconda/envs/phys/bin/python",
+        "-B",
+        "-c",
+        "from multiprocessing.resource_tracker import main;main(28)"
+      ],
+      "cuda": "0"
+    },
+    {
+      "pid": 219736,
+      "ppid": 215565,
+      "start": "1472792019",
+      "cmd": [
+        "VLLM::EngineCore"
+      ],
+      "cuda": null
+    }
+  ],
+  "remaining": [],
+  "gpu": "0, GPU-14c26f76-e5a4-9d1f-5d33-9ff397af4933, 4 MiB, 81046 MiB\n1, GPU-0fd597b1-c02f-3a31-8fa7-8ecb15791ca8, 4 MiB, 81046 MiB\n"
+}

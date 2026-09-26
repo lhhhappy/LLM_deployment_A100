@@ -1,0 +1,19 @@
+{
+  "source_config": "scripts/pod/jobs/v3_n34_124_125x_117_48_60m.sh",
+  "source_config_sha256": "37a74edc2eaf181616bddaf340398da74452bc89808a063eed59e7086a67a9d8",
+  "integrated_engine": "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90",
+  "prepared_not_queued": true,
+  "configuration_reason": "130e5 rejected the 10 s warm starvation policy; retain candidate A budgets and 120 s starvation, explicit in both arms",
+  "shared_changes_vs_source": [
+    "fixed max_mamba_cache_size418",
+    "same integrated engine, compact-topk=1, sparse-triton=0",
+    "explicit original A deadline defaults",
+    "capability smoke enabled in both arms"
+  ],
+  "pair_only_difference": "dcp-size1 vs2",
+  "files": {
+    "dcp_mtp_stack2_w1_n34_60m.sh": "6fb007fc51570cef5a0558293b248049bea9999d1b1de9be5ccaca44c0a980b5",
+    "dcp_mtp_stack2_w2_n34_60m.sh": "8fb4c5d82a863525bfb7cb181a869bf08d06522ce053fc5097364841ea2ce09a",
+    "dcp_mtp_stack2_w2_n34_n38_full.sh": "e03b96b81e4663433ee65a28358c5b50951223d0b148cddc606ad5d8ba31e5b5"
+  }
+}

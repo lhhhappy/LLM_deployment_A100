@@ -32,7 +32,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 110 | DSA indexer on A100 (fp8 soft-decode, bf16 MMA) | yes | `SGLANG_AX_SM80_INDEXER` (1) | yes |
 | 111 | FP8 MoE via Marlin W8A16 on sm80 | yes | `SGLANG_AX_SM80_FP8_MOE_MARLIN` (1) | yes |
 | 114 | indexer prefill rows split over TP ranks | yes | `SGLANG_AX_INDEXER_ROW_SHARD` (1) | yes |
-| 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | 33/40 padding fixed; TP2 NextN eager/three graph phases numerical pass at low addresses. Full-capacity/HiCache and TP8 validation pending |
+| 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP2 diagnostics pass: capacity, NextN acceptance 1–4, three graph phases, HiCache restore/flush, relocation and ordinary high addresses. Full-checkpoint TP8/N34/N38 pending |
 | 117 | FP8 MoE via Humming W8A16 on sm80 (takes precedence over 111) | no | `SGLANG_AX_SM80_FP8_MOE_HUMMING` (0) | dev box only |
 | 118 | DSA sparse attention through a Triton kernel instead of TileLang (prefill, verify, draft, decode) | no | `SGLANG_AX_DSA_SPARSE_TRITON` (off) | not run on 8 cards |
 | 128 | family leader ranking inside 124: waiting cold requests sharing an uncached prefix (256-token block hashes) form a family; the leader ranks by work per rider, riders wait for it | no | `SGLANG_AX_DEADLINE_FAMILY` (0), needs 124 | CPU only; N34 opening probe pending |

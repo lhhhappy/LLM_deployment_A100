@@ -1,0 +1,281 @@
+[1;33m'--cuda-graph-max-bs' is deprecated and will be removed in a future release. Use '--cuda-graph-max-bs-decode' instead.[0m
+[1;33m'--disable-cuda-graph' is deprecated and will be removed in a future release. Use '--cuda-graph-backend-{decode,prefill}=disabled' instead.[0m
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Use dsa attention backend for DeepSeek with DSA.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=2, attn_tp_size=2, attention weights will be sharded across 2 ranks.
+Set DSA backends for bfloat16 KV Cache: prefill=tilelang, decode=tilelang.
+Compiled-kernel caches now live under SGLANG_CACHE_DIR (/sjtu/linhang/arena/cache/sglang). These older directories are no longer used by sglang, but may still be used by other frameworks on this machine, so they were left alone: /root/.triton, /root/.cache/flashinfer. Remove them yourself if nothing else needs them.
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+Ignore import error when loading sglang.srt.models.inkling: No module named 'quack'
+Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+Ignore import error when loading sglang.srt.models.midashenglm: No module named 'torchaudio'
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W926 12:18:54.514697399 ProcessGroupNCCL.cpp:5276] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+Process Process-1:
+Process Process-2:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 111, in work
+    nxt, lg, batch = runner.extend(reqs)
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 111, in work
+    nxt, lg, batch = runner.extend(reqs)
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 574, in extend
+    return extend(reqs, self.torch_runner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 574, in extend
+    return extend(reqs, self.torch_runner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 526, in extend
+    logits_output = model_runner.forward(forward_batch).logits_output
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/benchmark/one_batch.py", line 526, in extend
+    logits_output = model_runner.forward(forward_batch).logits_output
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1573, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1573, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1193, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 1193, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 898, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/glm5_next.py", line 898, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2088, in forward
+    s = self.forward_prepare(
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2146, in forward_prepare
+    inner_state = self.forward_absorb_prepare(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2088, in forward
+    s = self.forward_prepare(
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 320, in forward_absorb_prepare
+    .fetch_qkv_latent()
+     ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2146, in forward_prepare
+    inner_state = self.forward_absorb_prepare(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator.py", line 348, in fetch_qkv_latent
+    return attn_inputs.fetch_qkv_latent()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 320, in forward_absorb_prepare
+    .fetch_qkv_latent()
+     ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator.py", line 275, in fetch_qkv_latent
+    self.qkv_latent_ = self.qkv_latent_func(
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator.py", line 348, in fetch_qkv_latent
+    return attn_inputs.fetch_qkv_latent()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2270, in prepare_qkv_latent
+    return self.fused_qkv_a_proj_with_mqa(hidden_states)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/communicator.py", line 275, in fetch_qkv_latent
+    self.qkv_latent_ = self.qkv_latent_func(
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 2270, in prepare_qkv_latent
+    return self.fused_qkv_a_proj_with_mqa(hidden_states)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/linear.py", line 300, in forward
+    output = self.quant_method.apply(self, x, bias)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/quantization/fp8.py", line 973, in apply
+    return torch.ops.sglang.apply_fp8_marlin_linear(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/linear.py", line 300, in forward
+    output = self.quant_method.apply(self, x, bias)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_ops.py", line 1279, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/quantization/fp8.py", line 973, in apply
+    return torch.ops.sglang.apply_fp8_marlin_linear(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/quantization/marlin_utils_fp8.py", line 79, in apply_fp8_marlin_linear
+    output = gptq_marlin_gemm(
+             ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_ops.py", line 1279, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/quantization/gptq_marlin.py", line 97, in gptq_marlin_gemm
+    module = _jit_gptq_marlin_module(a.dtype)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/quantization/marlin_utils_fp8.py", line 79, in apply_fp8_marlin_linear
+    output = gptq_marlin_gemm(
+             ^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/common.py", line 38, in wrapper
+    result_map[key] = fn(*args, **kwargs)
+                      ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/quantization/gptq_marlin.py", line 97, in gptq_marlin_gemm
+    module = _jit_gptq_marlin_module(a.dtype)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/quantization/gptq_marlin.py", line 21, in _jit_gptq_marlin_module
+    return load_jit(
+           ^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/common.py", line 38, in wrapper
+    result_map[key] = fn(*args, **kwargs)
+                      ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/ops/quantization/gptq_marlin.py", line 21, in _jit_gptq_marlin_module
+    return load_jit(
+           ^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/compile/loader.py", line 159, in load_jit
+    library = ninja.build(spec=spec, build_dir=staging, build_file=build_file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/compile/ninja.py", line 159, in build
+    completed = subprocess.run(
+                ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/compile/loader.py", line 159, in load_jit
+    library = ninja.build(spec=spec, build_dir=staging, build_file=build_file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/kernels/jit/utils/compile/ninja.py", line 159, in build
+    completed = subprocess.run(
+                ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ninja'
+FileNotFoundError: [Errno 2] No such file or directory: 'ninja'
+max_total_num_tokens=32768
+[rank0]:[W926 12:20:57.377333988 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+kill_process_tree called: parent_pid=3308480, include_parent=False, pid=3308480
+DCP check failed: TP workers produced no result

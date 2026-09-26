@@ -1,0 +1,90 @@
+{
+  "validity": "DIAGNOSTIC",
+  "device": "cpu",
+  "torch_version": "2.13.0+cu130",
+  "source_sha256": {
+    "srt/layers/dcp/comm.py": "a3135a10ae3e8c6c5f7147161590f6eaa8f3d94226d40e72011976b5f31adfd9",
+    "srt/models/deepseek_common/attention_forward_methods/forward_mla.py": "92b084d35f20a4e3c8af7426ecdfed83ebdf0e5b7b28ae527729c53cc7e388b1",
+    "srt/layers/attention/dsa_backend.py": "17b7eb8eabf6bf41c1dd34aa82435f1771bd702bbad0c53e47d7e15b8a846587",
+    "srt/mem_cache/index_key_cache.py": "b1e1960c4ce7872538c058be4c3ca31fec320d6410658f462c825d276aac2500",
+    "srt/arg_groups/hicache_hook.py": "78585b2444ed8c00e3e6732f6af54431662154a9486046dd0d0a2f9ca7283375"
+  },
+  "cases": [
+    {
+      "case": "extend_padding",
+      "logical": 32,
+      "padded": 32,
+      "outcome": "completed"
+    },
+    {
+      "case": "extend_padding",
+      "logical": 33,
+      "padded": 40,
+      "outcome": "runtime_error",
+      "error": "The expanded size of the tensor (33) must match the existing size (40) at non-singleton dimension 0.  Target sizes: [33, 1, 512].  Tensor sizes: [40, 1, 512]"
+    },
+    {
+      "case": "extend_padding",
+      "logical": 33,
+      "padded": 34,
+      "outcome": "runtime_error",
+      "error": "The expanded size of the tensor (33) must match the existing size (34) at non-singleton dimension 0.  Target sizes: [33, 1, 512].  Tensor sizes: [34, 1, 512]"
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "DECODE",
+      "q_gather_and_merge": true,
+      "dsa_returns_lse": true
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "TARGET_VERIFY",
+      "q_gather_and_merge": true,
+      "dsa_returns_lse": true
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "DRAFT_EXTEND_V2",
+      "q_gather_and_merge": false,
+      "dsa_returns_lse": false
+    },
+    {
+      "case": "indexer_token_move",
+      "dst": 1,
+      "src": 2,
+      "outcome": "completed",
+      "correct": false,
+      "different_bytes": 8580
+    },
+    {
+      "case": "indexer_token_move",
+      "dst": 65,
+      "src": 66,
+      "outcome": "index_error",
+      "error": "index 66 is out of bounds for dimension 0 with size 4"
+    },
+    {
+      "case": "hicache_guard",
+      "spec": null,
+      "outcome": "accepted"
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "EAGLE",
+      "outcome": "rejected",
+      "error": "HiCache with --dcp-size > 1 only supports DSPARK speculative decoding; other draft-model host pools have no DCP index translation."
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "NEXTN",
+      "outcome": "rejected",
+      "error": "HiCache with --dcp-size > 1 only supports DSPARK speculative decoding; other draft-model host pools have no DCP index translation."
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "DSPARK",
+      "outcome": "accepted"
+    }
+  ],
+  "limitations": "Extracted real function bodies, synthetic fixtures; no distributed forward, GPU numerical, performance, or SLO claim."
+}

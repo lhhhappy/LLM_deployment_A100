@@ -1,0 +1,36 @@
+
+CodeGraph Status
+
+Project: /workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/engine/sglang
+
+Index Statistics:
+  Files:     4,038
+  Nodes:     105,930
+  Edges:     316,850
+  DB Size:   305.96 MB
+  Backend:   node:sqlite — built-in (full WAL)
+  Journal:   wal
+
+Nodes by Kind:
+  import          33,876
+  method          30,700
+  function        18,303
+  variable        9,476
+  class           7,361
+  file            4,034
+  type_alias      1,103
+  struct          796
+  enum_member     157
+  constant        57
+  enum            41
+  union           26
+
+Files by Language:
+  python          3,628
+  cpp             388
+  c               14
+  javascript      4
+  yaml            4
+
+✓ Index is up to date
+

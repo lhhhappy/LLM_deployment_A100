@@ -1,0 +1,12 @@
+{
+  "archive": "/sjtu/linhang/arena/archives/dcp-mtp-20260926/phase3-evidence.tgz",
+  "bytes": 50073526,
+  "sha256": "45238e76b6e8eee5501155af7a33a9ebf6098df15f99a1abaca0daddcc595cdc",
+  "file_count": 4651,
+  "uncompressed_bytes": 116572396,
+  "manifest": "/sjtu/linhang/arena/archives/dcp-mtp-20260926/phase3-manifest.json",
+  "all_sources_unchanged": true,
+  "local_archive": "/workspace/Agentic_science_challenge/build/scratch/dcp-mtp-20260926/phase3-evidence.tgz",
+  "local_directory": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase3",
+  "all_files_verified": true
+}

@@ -1,0 +1,29 @@
+{
+  "symbol": "move_kv_cache",
+  "callers": [
+    {
+      "name": "_move_pages_and_rebind",
+      "kind": "method",
+      "filePath": "srt/mem_cache/multi_ended_allocator.py",
+      "startLine": 1495
+    },
+    {
+      "name": "_commit_move_batch",
+      "kind": "method",
+      "filePath": "srt/mem_cache/multi_ended_allocator.py",
+      "startLine": 1979
+    },
+    {
+      "name": "duplicate_prefix_tail_to_draft_branches",
+      "kind": "function",
+      "filePath": "srt/speculative/eagle_worker_common.py",
+      "startLine": 58
+    },
+    {
+      "name": "move_accept_tokens_to_target_kvcache",
+      "kind": "function",
+      "filePath": "srt/speculative/spec_utils.py",
+      "startLine": 705
+    }
+  ]
+}

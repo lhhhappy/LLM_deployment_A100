@@ -1,0 +1,5 @@
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+{"validity": "MTP_DIAGNOSTIC", "tp": 1, "dcp": 1, "hicache": false, "graph_phase_rank_replays": {}, "host_restore_and_flush": false, "controlled_proposals": false, "trace_files": 252, "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."}

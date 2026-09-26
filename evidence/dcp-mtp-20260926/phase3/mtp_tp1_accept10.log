@@ -1,0 +1,37 @@
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):  50%|█████     | 1/2 [00:05<00:05,  5.79s/it]Capturing batches (bs=1 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:05<00:05,  5.79s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:05<00:00,  2.45s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:05<00:00,  2.95s/it]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:00<00:00,  2.34it/s]Capturing batches (bs=1 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  2.34it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  1.99it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  2.04it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  6.11it/s]Capturing batches (bs=1 avail_mem=67.54 GB):  50%|█████     | 1/2 [00:00<00:00,  6.11it/s]Capturing batches (bs=1 avail_mem=67.54 GB): 100%|██████████| 2/2 [00:00<00:00, 10.74it/s]
+[2026-09-26 14:15:53] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 6053, in run_scheduler_process
+    scheduler.run_event_loop()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 2178, in run_event_loop
+    dispatch_event_loop(self)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 5899, in dispatch_event_loop
+    scheduler.event_loop_overlap()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 2276, in event_loop_overlap
+    batch_result = self.run_batch(batch)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/utils/nvtx_utils.py", line 109, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 4534, in run_batch
+    batch_result = self.model_worker.forward_batch_generation(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_worker_v2.py", line 1300, in forward_batch_generation
+    verify_input: EagleVerifyInput = self.draft_worker.draft(batch)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_worker_v2.py", line 565, in draft
+    verify_input = build_eagle_verify_input(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_acceptance.py", line 44, in build
+    assert 0 <= offset and offset + wanted < len(gold), (label, offset, wanted)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('short_local_empty', 11, 2)
+
+[2026-09-26 14:15:53] SIGQUIT received. signum=None, frame=None. It usually means one child failed.
+[rank0]:[W926 14:15:55.321795579 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[2026-09-26 14:15:58] No live scheduler processes found; skipping py-spy and CUDA coredump.
+/sjtu/linhang/arena/runs/dcp-mtp-20260926/run_dcp_devbox.sh: line 50: 134364 Killed                  python "$DCP_RUN_ROOT/dcp_mtp_probe.py" --model "${DCP_MTP_MODEL:-$DCP_RUN_ROOT/model-mtp}" --tp "${DCP_TP:-2}" --dcp "$DCP_WIDTH" --output "$DCP_RUN_ROOT/$DCP_ARM" "${hicache_args[@]}" "${graph_args[@]}"

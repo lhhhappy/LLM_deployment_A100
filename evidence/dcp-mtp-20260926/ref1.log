@@ -1,0 +1,53 @@
+[1;33m'--cuda-graph-max-bs' is deprecated and will be removed in a future release. Use '--cuda-graph-max-bs-decode' instead.[0m
+[1;33m'--disable-cuda-graph' is deprecated and will be removed in a future release. Use '--cuda-graph-backend-{decode,prefill}=disabled' instead.[0m
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 19359), got 154820. This may result in unexpected behavior.
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Use dsa attention backend for DeepSeek with DSA.
+Setting page size to 64 for DeepSeek DSA.
+Set dense attention kv len threshold to model index_topk=2048 for DeepSeek with DSA.
+DSA with TP mode is active, dp_size=1, tp_size=2, attn_tp_size=2, attention weights will be sharded across 2 ranks.
+Set DSA backends for bfloat16 KV Cache: prefill=tilelang, decode=tilelang.
+Compiled-kernel caches now live under SGLANG_CACHE_DIR (/sjtu/linhang/arena/cache/sglang). These older directories are no longer used by sglang, but may still be used by other frameworks on this machine, so they were left alone: /root/.triton, /root/.cache/flashinfer. Remove them yourself if nothing else needs them.
+Process Process-1:
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 56, in work
+    _ld.initialize_dummy_weights = _ax_well_scaled_init(_ld.initialize_dummy_weights)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 28, in _ax_well_scaled_init
+    from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 65, in <module>
+    from sglang.srt.layers.attention.dsa.dsa_indexer import Indexer
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/attention/dsa/dsa_indexer.py", line 103, in <module>
+    import deep_gemm
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/deep_gemm/__init__.py", line 561, in <module>
+    find_cuda_home()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/deep_gemm/cuda_helpers.py", line 20, in find_cuda_home
+    assert cuda_home is not None
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+Process Process-2:
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 56, in work
+    _ld.initialize_dummy_weights = _ax_well_scaled_init(_ld.initialize_dummy_weights)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_check.py", line 28, in _ax_well_scaled_init
+    from sglang.srt.models.deepseek_v2 import DeepseekV2AttentionMLA
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/models/deepseek_v2.py", line 65, in <module>
+    from sglang.srt.layers.attention.dsa.dsa_indexer import Indexer
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/base/engine/sglang/srt/layers/attention/dsa/dsa_indexer.py", line 103, in <module>
+    import deep_gemm
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/deep_gemm/__init__.py", line 561, in <module>
+    find_cuda_home()
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/deep_gemm/cuda_helpers.py", line 20, in find_cuda_home
+    assert cuda_home is not None
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+kill_process_tree called: parent_pid=3153469, include_parent=False, pid=3153469

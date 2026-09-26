@@ -234,3 +234,28 @@ raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只�
 用户要求中断060旧版N30，已用stopjob执行，保留734条不完整记录作诊断，不报整档成绩。新180（8312cbf7）只改总开关到排除L3 storage，独立CPU真实方法复核protect/pace启用；3项tier和12项host开启的pace测试通过。新版本062 lite N30已入队，与060z原样A比较，GPU结果待测。
 
 证据：[059完整判分](../evidence/L059-official_a_180_hicache_lite_n14/N14/level_verdict.json)、[059原始记录目录](../evidence/L059-official_a_180_hicache_lite_n14/N14/)、[总开关复核](../evidence/hicache180-scheduler-review/README.md)。
+
+## DCP-20260926：TP2 NextN、HiCache及跨rank搬运开发诊断
+
+2026-09-26，Codex；源码自审，尚待另一参与者复核原始记录。**状态为已闭合开发诊断，不是N34/N38成绩。** 当前8卡候选分支`codex/dcp-mtp-stack2-n34`，开发起点与整合差分见[证据入口](../evidence/dcp-mtp-20260926/README.md)。
+
+问题：DCP在保留当前3/1/4 NextN和HiCache时，真实池容量、三阶段attention、图重放、接受提交与跨owner搬运是否正确？目标实现同时修复真实/补齐行、草稿latent分片与计费、hybrid目标复制式indexer容量、主机逻辑地址与预算。可选列选择只删去不可能属于本rank的列；单变量归因不跨这些机制组合。
+
+固定两张A100、同TP2、缩小8层GLM（6 KDA、2 DSA）+单层NextN；两臂按参数名初始化同一有量纲权重。当前整合源码全部4,697文件与冻结提交逐项一致。四种输入覆盖短/冷/前缀/更长前缀；比较DSA敏感的o_proj输入、元信息、有效行和输出tokens。有效行来自实际接受长度，保留所有拒绝行原始值；相对L∞及逐行门槛均为0.01，没有放宽门槛。
+
+| 已闭合诊断 | 实测结果 | 范围 |
+|---|---|---|
+| 跨owner搬运 | NCCL两rank、24项BF16/uint8逐字节一致 | 重叠循环、重复源、无本地写入rank、padding；不证明压缩KPool树式MTP |
+| 自然MTP W1 eager / W2 graph | 504条观测；最大有效行误差0.007519；输出相同 | 三类图各96次rank重放 |
+| 受控proposal W1 / W2 graph | 264条观测；最大有效行误差0.007353；四种输入、每rank实际接受1/2/3/4 | 使用真实verifier/KDA提交；不代表自然接受率或性能 |
+| W2列选择开/关 | 264条有效观测逐位一致、输出相同 | 同一缩小完整MTP，三类图各48次rank重放 |
+| HiCache W1 / W2 graph | 756条观测；最大有效行误差0.007519；真实host命中4096、device0；flush成功后cached_tokens0 | 三类图各144次rank重放；缩小模型实际挤出与恢复续算 |
+| 当前高地址普通forward | 32768物理行、最大loc55484；8次decode graph；attention误差≤0.005376 | 目标模型普通前向，不含MTP |
+
+主机池CPU/CUDA检查另覆盖W2/4/8、rank0及末rank共六种布局；真实构造器、源页毒化和异址恢复，不手动修正indexer掩盖分配问题。单卡稀疏kernel用真实KPool输出，21个长度边界、18种attention形状、FP32抽样和图重放通过；每形状交替顺序16对×10次，T136/152下graph p50观察到W2约1.71倍、W4约2.77–3.11倍、W8约2.94–3.23倍。它只比较DCP内原列列表与列选择，不包含TP8通信、完整模型或排队。
+
+失败诊断完整保留：早期夹具的量化层号错配；host10仅拒绝行差异；11版在图捕获中使用CPU索引列表；host12最终flush返回值序列化失败。现行13版针对具体原因修复并闭合。压缩KPool任意token搬运仍在写前明确报错，现行topk1链式MTP不调用接受路径压实；不宣称树式MTP已支持。
+
+结论：工程实现已具备上述两卡证据。仍需另一参与者对照raw复核，TP8真实权重/通信/高水位与容量账、同冻结负载的W1/W2 N34对照、完整N34→N38原harness判分。容量倍数及局部kernel差异均不能代替N@SLO提升。
+
+证据：[可复算摘要](../evidence/dcp-mtp-20260926/development-summary.json)、[完整证据与失败记录](../evidence/dcp-mtp-20260926/README.md)、[4,651文件传输校验](../evidence/dcp-mtp-20260926/phase3/local-receipt.json)、[技术方案](plan-dcp-8card.md)。

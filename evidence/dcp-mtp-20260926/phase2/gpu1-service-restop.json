@@ -1,0 +1,94 @@
+{
+  "utc": "2026-09-26T14:08:44Z",
+  "reason": "User explicitly authorized stopping GPU1 gpt-oss service on port30162; same service relaunched",
+  "targets": [
+    {
+      "pid": 4173715,
+      "ppid": 4173710,
+      "start": "1472636300",
+      "cmd": [
+        "/sjtu/conda/miniconda/envs/phys/bin/python",
+        "-m",
+        "vllm.entrypoints.openai.api_server",
+        "--model",
+        "/sjtu/public_model/gpt-oss",
+        "--served-model-name",
+        "gpt-oss-120b",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "30162",
+        "--max-model-len",
+        "8192",
+        "--gpu-memory-utilization",
+        "0.88",
+        "--enforce-eager",
+        "--max-num-seqs",
+        "64",
+        "--enable-prefix-caching"
+      ],
+      "cuda": "1",
+      "cwd": "/root"
+    },
+    {
+      "pid": 4176125,
+      "ppid": 4173715,
+      "start": "1472637658",
+      "cmd": [
+        "/sjtu/conda/miniconda/envs/phys/bin/python",
+        "-B",
+        "-c",
+        "from multiprocessing.resource_tracker import main;main(28)"
+      ],
+      "cuda": "1",
+      "cwd": "/root"
+    },
+    {
+      "pid": 4176126,
+      "ppid": 4173715,
+      "start": "1472637658",
+      "cmd": [
+        "VLLM::EngineCore"
+      ],
+      "cuda": null,
+      "cwd": "/root"
+    }
+  ],
+  "parents": [
+    {
+      "pid": 4173710,
+      "ppid": 1028286,
+      "start": "1472636300",
+      "cmd": [
+        "bash",
+        "/sjtu/linhang/MAS/runs/_services/e61_gpt_oss_120b_gpu1_loop_20260926T1358/serve.sh"
+      ],
+      "cuda": null,
+      "cwd": "/root"
+    },
+    {
+      "pid": 1028286,
+      "ppid": 1,
+      "start": "1420027713",
+      "cmd": [
+        "tmux",
+        "[unrelated ancestor arguments omitted]"
+      ],
+      "cuda": null,
+      "cwd": "/sjtu/linhang/OpenAlpha_Evolve"
+    },
+    {
+      "pid": 1,
+      "ppid": 0,
+      "start": "1361947919",
+      "cmd": [
+        "/nix/store/fvcmm299294nvcdmg519si6a7ixqrb0r-python3-3.8.13/bin/python3.8",
+        "[unrelated ancestor arguments omitted]"
+      ],
+      "cuda": null,
+      "cwd": "/"
+    }
+  ],
+  "remaining": [],
+  "gpu": "0, GPU-14c26f76-e5a4-9d1f-5d33-9ff397af4933, 4 MiB, 81046 MiB\n1, GPU-0fd597b1-c02f-3a31-8fa7-8ecb15791ca8, 4 MiB, 81046 MiB\n"
+}

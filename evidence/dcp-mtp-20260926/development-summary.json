@@ -1,0 +1,809 @@
+{
+  "validity": "CLOSED_DEVELOPMENT_DIAGNOSTICS_NOT_SLO",
+  "generator": "python3 scripts/analysis/dcp_receipt.py evidence/dcp-mtp-20260926",
+  "source_verification": {
+    "commit": "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90",
+    "frozen_source": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix5",
+    "checked": 4697,
+    "mismatched": [],
+    "passed": true
+  },
+  "comparisons": {
+    "mtp": {
+      "source": "phase3/compare_mtp13.json",
+      "passed": true,
+      "observations": 504,
+      "max_valid_row_relative_linf": 0.007518797181546688,
+      "max_global_relative_linf": 0.00684931506849315,
+      "identical_output_tokens": true,
+      "tolerance": 0.01
+    },
+    "accept": {
+      "source": "phase3/compare_accept13.json",
+      "passed": true,
+      "observations": 264,
+      "max_valid_row_relative_linf": 0.007352941203862429,
+      "max_global_relative_linf": 0.007142857142857143,
+      "identical_output_tokens": true,
+      "tolerance": 0.01
+    },
+    "compact": {
+      "source": "phase3/compare_compact13.json",
+      "passed": true,
+      "observations": 264,
+      "max_valid_row_relative_linf": 0.0,
+      "max_global_relative_linf": 0.0,
+      "identical_output_tokens": true,
+      "tolerance": 0.01
+    },
+    "host": {
+      "source": "phase3/compare_host13.json",
+      "passed": true,
+      "observations": 756,
+      "max_valid_row_relative_linf": 0.007518797181546688,
+      "max_global_relative_linf": 0.00684931506849315,
+      "identical_output_tokens": true,
+      "tolerance": 0.01
+    }
+  },
+  "arms": {
+    "dcp": {
+      "source": "phase3/mtp_tp2_dcp13",
+      "summary": {
+        "validity": "MTP_DIAGNOSTIC",
+        "tp": 2,
+        "dcp": 2,
+        "hicache": false,
+        "graph_phase_rank_replays": {
+          "draft:DECODE": 96,
+          "draft:DRAFT_EXTEND_V2": 96,
+          "target:TARGET_VERIFY": 96
+        },
+        "host_restore_and_flush": false,
+        "controlled_proposals": false,
+        "trace_files": 504,
+        "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+      },
+      "capacity": {
+        "target": {
+          "role": "target",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 67239936,
+          "indexer_storage_bytes": 17335296,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ],
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ],
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.layers.3.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.3.self_attn.kv_b_proj.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        },
+        "draft": {
+          "role": "draft",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 33619968,
+          "indexer_storage_bytes": 8667648,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        }
+      }
+    },
+    "accept_dcp": {
+      "source": "phase3/mtp_tp2_accept_dcp13",
+      "summary": {
+        "validity": "MTP_DIAGNOSTIC",
+        "tp": 2,
+        "dcp": 2,
+        "hicache": false,
+        "graph_phase_rank_replays": {
+          "draft:DECODE": 48,
+          "draft:DRAFT_EXTEND_V2": 48,
+          "target:TARGET_VERIFY": 48
+        },
+        "host_restore_and_flush": false,
+        "controlled_proposals": true,
+        "trace_files": 264,
+        "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+      },
+      "capacity": {
+        "target": {
+          "role": "target",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 67239936,
+          "indexer_storage_bytes": 17335296,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ],
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ],
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.layers.3.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.3.self_attn.kv_b_proj.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        },
+        "draft": {
+          "role": "draft",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 33619968,
+          "indexer_storage_bytes": 8667648,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        }
+      },
+      "acceptance": {
+        "validity": "CONTROLLED_PROPOSALS_REAL_VERIFIER",
+        "responses": [
+          {
+            "case": "short_local_empty",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "cold",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "prefix",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "longer_prefix",
+            "same_greedy_tokens": true
+          }
+        ],
+        "ranks": {
+          "0": {
+            "records": 24,
+            "cases": {
+              "short_local_empty": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "cold": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "longer_prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              }
+            },
+            "unchecked_tail_rounds": 4,
+            "passed": true
+          },
+          "1": {
+            "records": 24,
+            "cases": {
+              "short_local_empty": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "cold": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "longer_prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              }
+            },
+            "unchecked_tail_rounds": 4,
+            "passed": true
+          }
+        },
+        "passed": true,
+        "limitations": "Proposals injected from a natural reference; not an acceptance-rate or speed result."
+      }
+    },
+    "compact": {
+      "source": "phase3/mtp_tp2_compact13",
+      "summary": {
+        "validity": "MTP_DIAGNOSTIC",
+        "tp": 2,
+        "dcp": 2,
+        "hicache": false,
+        "graph_phase_rank_replays": {
+          "draft:DECODE": 48,
+          "draft:DRAFT_EXTEND_V2": 48,
+          "target:TARGET_VERIFY": 48
+        },
+        "host_restore_and_flush": false,
+        "controlled_proposals": true,
+        "trace_files": 264,
+        "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+      },
+      "capacity": {
+        "target": {
+          "role": "target",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 67239936,
+          "indexer_storage_bytes": 17335296,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ],
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ],
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.layers.3.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.3.self_attn.kv_b_proj.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        },
+        "draft": {
+          "role": "draft",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 33619968,
+          "indexer_storage_bytes": 8667648,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        }
+      },
+      "acceptance": {
+        "validity": "CONTROLLED_PROPOSALS_REAL_VERIFIER",
+        "responses": [
+          {
+            "case": "short_local_empty",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "cold",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "prefix",
+            "same_greedy_tokens": true
+          },
+          {
+            "case": "longer_prefix",
+            "same_greedy_tokens": true
+          }
+        ],
+        "ranks": {
+          "0": {
+            "records": 24,
+            "cases": {
+              "short_local_empty": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "cold": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "longer_prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              }
+            },
+            "unchecked_tail_rounds": 4,
+            "passed": true
+          },
+          "1": {
+            "records": 24,
+            "cases": {
+              "short_local_empty": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "cold": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              },
+              "longer_prefix": {
+                "observed": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "passed": true
+              }
+            },
+            "unchecked_tail_rounds": 4,
+            "passed": true
+          }
+        },
+        "passed": true,
+        "limitations": "Proposals injected from a natural reference; not an acceptance-rate or speed result."
+      }
+    },
+    "host_ref": {
+      "source": "phase3/mtp_tp2_host_ref13",
+      "summary": {
+        "validity": "MTP_DIAGNOSTIC",
+        "tp": 2,
+        "dcp": 1,
+        "hicache": true,
+        "graph_phase_rank_replays": {
+          "draft:DECODE": 144,
+          "draft:DRAFT_EXTEND_V2": 144,
+          "target:TARGET_VERIFY": 144
+        },
+        "host_restore_and_flush": true,
+        "controlled_proposals": false,
+        "trace_files": 756,
+        "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+      },
+      "capacity": {
+        "target": {
+          "role": "target",
+          "rank": 0,
+          "dcp_size": 1,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 32768,
+          "latent_storage_bytes": 67239936,
+          "indexer_storage_bytes": 8667648,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ],
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              513,
+              8448
+            ],
+            [
+              513,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.layers.3.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.3.self_attn.kv_b_proj.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        },
+        "draft": {
+          "role": "draft",
+          "rank": 0,
+          "dcp_size": 1,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 32768,
+          "latent_storage_bytes": 33619968,
+          "indexer_storage_bytes": 4333824,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              513,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        }
+      },
+      "restore": {
+        "warm_cache": {
+          "device": 4096,
+          "host": 0
+        },
+        "restored_cache": {
+          "device": 0,
+          "host": 4096
+        },
+        "same_tokens": true,
+        "same_trace_count": true,
+        "passed": true
+      },
+      "flush": {
+        "success": true,
+        "cached_tokens_after_flush": 0
+      }
+    },
+    "host_dcp": {
+      "source": "phase3/mtp_tp2_host_dcp13",
+      "summary": {
+        "validity": "MTP_DIAGNOSTIC",
+        "tp": 2,
+        "dcp": 2,
+        "hicache": true,
+        "graph_phase_rank_replays": {
+          "draft:DECODE": 144,
+          "draft:DRAFT_EXTEND_V2": 144,
+          "target:TARGET_VERIFY": 144
+        },
+        "host_restore_and_flush": true,
+        "controlled_proposals": false,
+        "trace_files": 756,
+        "limitations": "Scaled model; only observed acceptance lengths; no TP8 or SLO claim."
+      },
+      "capacity": {
+        "target": {
+          "role": "target",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 67239936,
+          "indexer_storage_bytes": 17335296,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ],
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ],
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.layers.3.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.3.self_attn.kv_b_proj.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.layers.7.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        },
+        "draft": {
+          "role": "draft",
+          "rank": 0,
+          "dcp_size": 2,
+          "physical_latent_rows": 32768,
+          "physical_page_size": 64,
+          "allocator_logical_size": 65536,
+          "latent_storage_bytes": 33619968,
+          "indexer_storage_bytes": 8667648,
+          "latent_shapes": [
+            [
+              32832,
+              1,
+              512
+            ]
+          ],
+          "indexer_shapes": [
+            [
+              1026,
+              8448
+            ]
+          ],
+          "attention_parameter_dtypes": {
+            "model.decoder.self_attn.q_a_layernorm.weight": "torch.bfloat16",
+            "model.decoder.self_attn.kv_b_proj.weight": "torch.bfloat16"
+          }
+        }
+      },
+      "restore": {
+        "warm_cache": {
+          "device": 4096,
+          "host": 0
+        },
+        "restored_cache": {
+          "device": 0,
+          "host": 4096
+        },
+        "same_tokens": true,
+        "same_trace_count": true,
+        "passed": true
+      },
+      "flush": {
+        "success": true,
+        "cached_tokens_after_flush": 0
+      }
+    }
+  },
+  "move": {
+    "source": "phase3/move13.json",
+    "cases": 24,
+    "passed": true
+  },
+  "sparse": {
+    "source": "phase2/sparse10.json",
+    "cases": 18,
+    "boundary_contracts": 6,
+    "passed": true,
+    "max_row_relative_linf": 0.007751937955617905,
+    "graph_performance": {
+      "2": {
+        "cases": 4,
+        "baseline_p50_ms_range": [
+          0.2670080065727234,
+          0.3252703845500946
+        ],
+        "candidate_p50_ms_range": [
+          0.15608960390090942,
+          0.1897279918193817
+        ],
+        "ratio_range": [
+          1.7093030059074121,
+          1.7144037705292705
+        ]
+      },
+      "4": {
+        "cases": 4,
+        "baseline_p50_ms_range": [
+          0.4079039990901947,
+          0.4106687903404236
+        ],
+        "candidate_p50_ms_range": [
+          0.13106559216976166,
+          0.14810240268707275
+        ],
+        "ratio_range": [
+          2.772870546929143,
+          3.112212689367476
+        ]
+      },
+      "8": {
+        "cases": 4,
+        "baseline_p50_ms_range": [
+          0.6902912259101868,
+          0.694051206111908
+        ],
+        "candidate_p50_ms_range": [
+          0.21368639171123505,
+          0.23593918979167938
+        ],
+        "ratio_range": [
+          2.941652917960407,
+          3.2314720293250097
+        ]
+      }
+    }
+  },
+  "archive": {
+    "archive": "/sjtu/linhang/arena/archives/dcp-mtp-20260926/phase3-evidence.tgz",
+    "bytes": 50073526,
+    "sha256": "45238e76b6e8eee5501155af7a33a9ebf6098df15f99a1abaca0daddcc595cdc",
+    "file_count": 4651,
+    "uncompressed_bytes": 116572396,
+    "manifest": "/sjtu/linhang/arena/archives/dcp-mtp-20260926/phase3-manifest.json",
+    "all_sources_unchanged": true,
+    "local_archive": "/workspace/Agentic_science_challenge/build/scratch/dcp-mtp-20260926/phase3-evidence.tgz",
+    "local_directory": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase3",
+    "all_files_verified": true
+  },
+  "limitations": [
+    "Scaled weights, TP2; no full-checkpoint TP8 quality or SLO result.",
+    "Controlled proposals test the real verifier but not natural acceptance rate or speed.",
+    "Sparse timings exclude TP8 communication and the rest of the service.",
+    "Independent participant review remains pending."
+  ]
+}
