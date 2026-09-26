@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# N34 base48 without MTP: the NEXTN speculative decoding removed (one token per decode step). Question (Fable
-# 2026-09-26): at N34 batch sizes does MTP still buy tokens per GPU second, or does its draft+verify cost exceed it?
-# Role-boundary IDs are blanked so 101 stays off as under MTP (160 clears them); 140 stays off. Single change versus
-# v3_n34_base48_60m: spec=- instead of EAGLE.
+# N34 base48 without MTP (one token per decode step) with the KDA state pool pinned at 418 slots: without the pin the
+# non-speculative branch of the configurator solves a far larger state pool (about 750 slots) and the KV pool would not grow
+# (R34). Question (Fable 2026-09-26): at N34 batch sizes does MTP still buy tokens per GPU second? Freed draft weights and
+# draft KV (about 2.4 GB) go to the KV pool. Role-boundary IDs blanked so 101 stays off as under MTP; 140 off.
+# Single change versus v3_n34_base48_60m: spec=- instead of EAGLE (plus the pin).
 G_COMMIT=7c6cb6349f088de3af0e4d32440bdfbac6ee7941
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="101=off 117=off 118=off 119=off 120=on 122=off 123=off 124=off 125=off 126=off 140=off 180=on spec=- dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
-G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87"
+G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 --max-mamba-cache-size 418"
 G_ENV="SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS= SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=6144 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
 G_MEASURE_SECONDS=3600
 G_WARMUP_PROFILE=rep16-v1

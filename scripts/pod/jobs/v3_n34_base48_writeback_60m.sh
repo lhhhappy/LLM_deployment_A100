@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-# N34 base48 + mem fraction static 0.87 -> 0.89 with the KDA state pool pinned at its default 418 slots
-# (--max-mamba-cache-size 418), so the extra budget goes to the KV pool instead of being split 0.9:1 with the state pool
-# (kv_cache_configurator mamba_full_memory_ratio, R34). Expected about +1.6 GB/GPU -> about +120k KV tokens (estimate).
-# Risk to watch: activation peak of a 16k chunk at long context (L081p: +1.82 GB over the resident 76.4 GB), CUDA graph capture
-# with bs 48; an OOM shows in job.log at startup or as a request error. Single change versus v3_n34_base48_60m.
+# N34 base48 + host tier write policy write_through -> write_back (upstream option: a page is copied to the host only when
+# evicted from the device, so the 64 GB host tier holds cold content only instead of a copy of everything; R34 estimate: host
+# effective capacity about +1.4M tokens). The D2H copy moves onto the device-eviction path. Watch: host used/total, load-backs,
+# "dropped" backup warnings in server.log, fast/overall and chain. Single change versus v3_n34_base48_60m.
 G_COMMIT=7c6cb6349f088de3af0e4d32440bdfbac6ee7941
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="117=off 118=off 119=off 120=on 122=off 123=off 124=off 125=off 126=off 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
-G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.89 --max-mamba-cache-size 418"
+G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_back --mem-fraction-static 0.87"
 G_ENV="SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=6144 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
 G_MEASURE_SECONDS=3600
 G_WARMUP_PROFILE=rep16-v1
