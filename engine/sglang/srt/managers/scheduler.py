@@ -1512,10 +1512,30 @@ class Scheduler(
                 logger.info("[ax] 124 %s | 125 %s | 128 %s", deadline or "off", backlog or "off", family or "off")
         return cfgs
 
+    def _ax_flush_admission_state(self):
+        """[ax] Per-level admission state, reset at /flush_cache (the platform flushes before every level):
+        125's TPOT guard, relief and open rate interval; 128's pairwise shared-prefix cache; the short-hit reserve
+        state shared by 122/126, which remembers RIDs reserved beside the last continuation (the same data is replayed
+        with the same RIDs at every level, so a stale entry would stop reserving for a hit that was never refused)."""
+        if getattr(self, "_ax_backlog", None) is not None:
+            self._ax_backlog.reset()
+            self._ax_backlog_relieved = False
+        if getattr(self, "_ax_family_shared", None):
+            self._ax_family_shared.clear()
+        if getattr(self, "_ax_family_last", None) is not None:
+            self._ax_family_last = (0.0, None)
+        if getattr(self, "_ax_reserve_state", None) is not None:
+            self._ax_reserve_state = (None, frozenset(), frozenset())
+
     def _ax_family_plan(self, cfg, deadline):
         """[ax] 128 (request-plane rank 0): families among the waiting cold requests from block hashes of their
         prompts, pairwise shared prefixes cached per pair while both wait. Broadcast with 124's order."""
         cands = [r for r in self.waiting_queue if ax_deadline.is_cold(r, deadline.cold_hit_ratio)]
+        if len(cands) > cfg.max_candidates:
+            # Bounded CPU: the pairwise scan is O(n^2) per round (about 100 ms first time for 30 prompts of 250k
+            # tokens, then cached per pair); above the bound fall back to 124's per-request order this round.
+            self._ax_family_shared.clear()
+            return {}, set()
         cache = self._ax_family_shared
         live = {r.rid for r in cands}
         for key in [k for k in cache if k[0] not in live or k[1] not in live]:
@@ -5350,13 +5370,7 @@ class Scheduler(
             self.req_to_token_pool.reset_aux_cache_allocator()
             self.grammar_manager.clear()
             self.metrics_reporter.reset_metrics()
-            if getattr(self, "_ax_backlog", None) is not None:
-                # [ax] 125: the platform flushes before every level; the TPOT guard counts per level and
-                # no prefill rate sample spans the flush.
-                self._ax_backlog.reset()
-                self._ax_backlog_relieved = False
-            if getattr(self, "_ax_family_shared", None):
-                self._ax_family_shared.clear()  # [ax] 128: pairwise shared-prefix cache of the previous level
+            self._ax_flush_admission_state()
 
             if self.draft_worker:
                 self.draft_worker.clear_cache_pool()

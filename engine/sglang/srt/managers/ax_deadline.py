@@ -275,6 +275,7 @@ class FamilyConfig:
     block: int = 256        # hash block in tokens (the checkpoint grid: a shared prefix is reusable per whole block)
     link_min: int = 4096    # uncached shared prefix that links two requests (tokens)
     rider_max: int = 6144   # a member finishes as a short hit after the leader when its own tail is at most this
+    max_candidates: int = 64  # more waiting cold requests than this: skip the pairwise scan this round (CPU bound)
 
 
 def family_config() -> Optional[FamilyConfig]:
@@ -283,8 +284,9 @@ def family_config() -> Optional[FamilyConfig]:
         return None
     cfg = FamilyConfig(block=int(_env("SGLANG_AX_FAMILY_BLOCK", "256")),
                        link_min=int(_env("SGLANG_AX_FAMILY_LINK_MIN", "4096")),
-                       rider_max=int(_env("SGLANG_AX_FAMILY_RIDER_MAX", "6144")))
-    if cfg.block <= 0 or cfg.link_min <= 0 or cfg.rider_max <= 0:
+                       rider_max=int(_env("SGLANG_AX_FAMILY_RIDER_MAX", "6144")),
+                       max_candidates=int(_env("SGLANG_AX_FAMILY_MAX_CANDIDATES", "64")))
+    if cfg.block <= 0 or cfg.link_min <= 0 or cfg.rider_max <= 0 or cfg.max_candidates <= 0:
         raise ValueError(f"[ax] 128: invalid family config {cfg}")
     return cfg
 

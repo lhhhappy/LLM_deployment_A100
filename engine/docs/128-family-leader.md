@@ -25,14 +25,22 @@ On request-plane rank 0, inside 124's plan (so the result travels with the broad
    another member whose remaining after the leader's prefix is at most `rider_max` (6144: it then finishes as
    a short hit beside the next cold chunk). A member with a longer tail neither holds nor counts.
 4. The leader ranks in 124's order by `remaining / (1 + riders)` (its rescuable/hopeless judgement keeps the
-   real remaining); the riders are held (tier 3) while the leader waits. Once the leader runs, its chunks enter
-   the tree, the riders' matches grow and they become ordinary short hits.
+   real remaining); the riders are held (tier 3, last in the order, like LPM's holdbacks) while the leader waits.
+   Held is a priority, not a ban: the admission loop does not skip them, but a rider is reached only after every
+   earlier waiter was admitted or refused, and with the leader admitted as the round's partial a multi-round rider
+   is refused anyway (one partial per batch). Once the leader runs, its chunks enter the tree, the riders' matches
+   grow and they become ordinary short hits.
+5. Bounded CPU: with more than `max_candidates` (64) waiting cold requests the pairwise scan is skipped for the
+   round and 124's per-request order applies. Measured by Codex on the real functions (rank-0 CPU, Python lists):
+   34 fully shared prompts of 35k tokens, first round 17.8 ms, cached rounds 0.2 ms; 250k tokens, 117.9 ms then
+   0.3 ms; 100 prompts of 250k, 460 ms then 1.8 ms. N34 keeps at most 34 chains active (run 082's queue peak was
+   29), so the bound is a guard for higher levels, not a cost expected at N34.
 Logs `[ax-128] families=N leader=…:riders=k:others=m:work=…` when the set changes (at most every 2 s); the
 mechanism line shows `128=on`.
 
 ## Switches
 `SGLANG_AX_DEADLINE_FAMILY` (0/1); `SGLANG_AX_FAMILY_BLOCK` (256), `SGLANG_AX_FAMILY_LINK_MIN` (4096),
-`SGLANG_AX_FAMILY_RIDER_MAX` (6144).
+`SGLANG_AX_FAMILY_RIDER_MAX` (6144), `SGLANG_AX_FAMILY_MAX_CANDIDATES` (64).
 
 ## Evidence
 CPU (`tests/test_ax_deadline.py` `Family`, `tests/test_ax_admission_scheduler.py` `FamilyOrder`): block hashes,

@@ -42,12 +42,16 @@ Not validated: TP8 and any performance effect (TPOT while the cold chunk is at t
 
 Before this follow-up 125's relief replaced the cap wholesale: while relieved the cold chunk was `BACKLOG_COLD_CAP`
 (8192, the whole round) whatever was waiting, so 126's reserve had no effect exactly when the lane was busiest.
-Run 109 (124 + aggressive 125, v3 N26 opening) showed the cost: its three turn-start misses were warm requests with
-10k–35k new tokens that waited 18–23 s for the lane while cold chunks of 8192 ran back to back
+Run 109 (124 + aggressive 125, v3 N26 opening) showed the lane fully taken by 8192-token cold chunks while relief ran
 (`notes/reports/109-chain-turn-rootcause-0926.md`). Now, when 126 is on, the relieved round is sized by the same
 rule with 125's cap as the maximum: `clamp(budget − reserve, COLD_CAP, BACKLOG_COLD_CAP)`. With nothing waiting the
 cold chunk still takes the whole round; with a short hit waiting it leaves the hit's seat. Without 126 the relief
-behaviour is unchanged. Intended configuration for the opening probes: `SGLANG_AX_SCHED_COLD_CAP=2048` (floor),
+behaviour is unchanged. What the seat does and does not cover (Codex review): the reserve counts only complete
+device-hit requests with 0 < new ≤ SHORT_TOKENS (8192) and no host restore, the requests 120 lets share a batch with
+a partial. That is the common real shape (organizer sample: 12 of 20 non-head turn starts have 2–7k new tokens;
+run 081, full N30: 237 of 242 fast misses and 6 of 7 turn misses were warm one-round requests). Run 109's three
+turn-start misses (10k–35k new tokens) are not covered: a request needing more than one round still cannot run
+beside a cold partial, so the probe measures only the indirect effect on them. Intended configuration for the opening probes: `SGLANG_AX_SCHED_COLD_CAP=2048` (floor),
 `SGLANG_AX_SCHED_COLD_CAP_MAX=6144` (the usual cap, so no hit waiting keeps 109's 6144), `SGLANG_AX_BACKLOG_COLD_CAP=8192`.
 CPU: `tests/test_ax_admission_scheduler.py` `DemandCapUnderRelief` (relieved chunk 8192 − 3008 → 5120 on the grid
 and the hit rides along; without 126 the hit waits). Not validated: TP8 and any performance effect.

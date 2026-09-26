@@ -305,11 +305,60 @@ class FamilyOrder(unittest.TestCase):
             t = step(s)
         self.assertEqual(t['reqs'][0][0], 'h14')
 
+    def test_too_many_candidates_fall_back_to_the_per_request_order(self):
+        with self.env(SGLANG_AX_FAMILY_MAX_CANDIDATES='4'):
+            s, _ = scheduler(waiting=self.queue(), budget=16384)  # 6 cold heads > 4
+            t = step(s)
+        self.assertEqual(t['reqs'][0][0], 'h14')
+        self.assertEqual(s._ax_family_shared, {})
+
     def test_family_needs_124(self):
         with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_FAMILY': '1'}):
             s, _ = scheduler()
             with self.assertRaisesRegex(ValueError, '128'):
                 s._ax_admission_cfgs()
+
+
+class FlushResetsAdmissionState(unittest.TestCase):
+    """/flush_cache resets the per-level admission state: 125's guard, 128's cache and the 122/126 reserve state.
+
+    The reserve state remembers RIDs reserved beside the last continuation; the same data is replayed with the same
+    RIDs at every level, so a stale entry would stop reserving for a hit that was never refused (Codex review).
+    """
+
+    def test_reserve_state_and_caches_are_reset(self):
+        env = {**PROTECT, 'SGLANG_AX_SCHED_COLD_CAP': '4096', 'SGLANG_AX_SCHED_COLD_CAP_MAX': '6144',
+               'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_FAMILY': '1',
+               'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_COLD_CAP': '8192', 'SGLANG_AX_BACKLOG_INTERVAL': '2'}
+        with patch.dict(os.environ, env):
+            cont = continuation('cont', 60000, 50000)  # under 124's park_min_remaining: no parking, both run
+            s, _ = scheduler(chunk=cont, waiting=[Req('h', 3000, cached=65536)], budget=8192, interval=2)
+            s._ax_admission_cfgs()
+            t = step(s)
+            self.assertEqual(t['reqs'], [('cont', 60000, 65120), ('h', 65536, 68536)])  # h reserved and admitted
+            s._ax_reserve_state = ('cont', frozenset({'h'}), frozenset())  # as if h had been refused for a slot
+            s._ax_backlog_relieved = True
+            s._ax_backlog.slow.add('x')
+            s._ax_family_shared[('a', 'b')] = 4096
+            s._ax_flush_admission_state()
+            self.assertEqual(s._ax_reserve_state, (None, frozenset(), frozenset()))
+            self.assertFalse(s._ax_backlog_relieved)
+            self.assertEqual((s._ax_backlog.slow, s._ax_family_shared), (set(), {}))
+            # the next level replays the same RID beside the same continuation RID: it is reserved again
+            cont2 = continuation('cont', 60000, 50000)
+            s2, _ = scheduler(chunk=cont2, waiting=[Req('h', 3000, cached=65536)], budget=8192, interval=2)
+            s2._ax_admission_cfgs()
+            s2._ax_reserve_state = s._ax_reserve_state
+            self.assertEqual(step(s2)['reqs'], [('cont', 60000, 65120), ('h', 65536, 68536)])
+
+    def test_stale_reserve_state_would_have_starved_the_hit(self):
+        # the failure the reset prevents: a leftover ('cont', {'h'}) makes 126 stop reserving for h
+        env = {**PROTECT, 'SGLANG_AX_SCHED_COLD_CAP': '4096', 'SGLANG_AX_SCHED_COLD_CAP_MAX': '6144'}
+        with patch.dict(os.environ, env):
+            cont = continuation('cont', 60000, 100000)
+            s, _ = scheduler(chunk=cont, waiting=[Req('h', 3000, cached=65536)], budget=8192, interval=2)
+            s._ax_reserve_state = ('cont', frozenset({'h'}), frozenset())
+            self.assertEqual(step(s)['reqs'], [('cont', 60000, 66144)])
 
 
 class Refusals(unittest.TestCase):
