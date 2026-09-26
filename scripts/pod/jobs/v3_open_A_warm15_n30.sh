@@ -16,7 +16,7 @@ G_WARMUP_PROFILE=rep16-v1
 LADDER_UP="30"
 unset LADDER_DOWN SGLANG_AX_SRPT_AGING SGLANG_AX_SHORT_RESERVE
 unset SGLANG_AX_NUMTRACE_DIR SGLANG_AX_NUMTRACE_DUMP_LAYER
-SMOKE_GATE=0
+SMOKE_GATE=1
 # v3 data (5601 requests, cohort 13b346fde05bd592), checked by hash before any engine starts.
 G_DATA_ROOT="$AX/data/s1-dev-longchain-v3"
 G_DATA_SET=s1-dev-longchain-v3
