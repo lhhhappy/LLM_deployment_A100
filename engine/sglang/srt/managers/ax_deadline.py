@@ -34,6 +34,14 @@ class DeadlineConfig:
     warm_budget_s: float = 5.0
     fast_budget_s: float = 3.0
     fast_tokens: int = 4096
+    # Size-tiered warm budget: a warm request with more remaining work than warm_multi_tokens (more than one
+    # 8192-token round, so it holds the single chunked-prefill lane for several rounds) gets warm_multi_budget_s
+    # instead of warm_budget_s. Runs 130b/130e5: a 15 s warm budget for every warm request let 20k-70k-token warm
+    # turn starts outrank cold chain heads and queue the one-round warm hits behind them (chain +4, fast/overall
+    # +48/+64 versus the 5 s budget), while the one-round turn starts were the misses the wider budget fixed.
+    # Defaults to warm_budget_s (no change unless set).
+    warm_multi_tokens: int = 8192
+    warm_multi_budget_s: float = 5.0
     cold_hit_ratio: float = 0.5
     # Service estimate load * (chunks * fixed + tokens * per_token); defaults measured on run 071 with
     # 8192-token chunks (0.12-0.15 s per chunk, 66-70 us/token, loaded/pure execution p50 1.27). Other
@@ -66,6 +74,8 @@ def deadline_config() -> Optional[DeadlineConfig]:
         warm_budget_s=float(_env("SGLANG_AX_DEADLINE_WARM_S", "5")),
         fast_budget_s=float(_env("SGLANG_AX_DEADLINE_FAST_S", "3")),
         fast_tokens=int(_env("SGLANG_AX_DEADLINE_FAST_TOKENS", "4096")),
+        warm_multi_tokens=int(_env("SGLANG_AX_DEADLINE_WARM_MULTI_TOKENS", "8192")),
+        warm_multi_budget_s=float(_env("SGLANG_AX_DEADLINE_WARM_MULTI_S", _env("SGLANG_AX_DEADLINE_WARM_S", "5"))),
         cold_hit_ratio=float(_env("SGLANG_AX_DEADLINE_COLD_HIT_RATIO", "0.5")),
         fixed_s=float(_env("SGLANG_AX_DEADLINE_FIXED_S", "0.13")),
         per_token_s=float(_env("SGLANG_AX_DEADLINE_PER_TOKEN_S", "0.000068")),
@@ -78,6 +88,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
         park_max_s=float(_env("SGLANG_AX_PARK_MAX_S", "2")),
     )
     if not (cfg.cold_budget_s > 0 and cfg.warm_budget_s > 0 and cfg.fast_budget_s > 0
+            and cfg.warm_multi_budget_s > 0 and cfg.warm_multi_tokens >= 0
             and cfg.fast_tokens >= 0 and 0 <= cfg.cold_hit_ratio <= 1
             and cfg.per_token_s > 0 and cfg.fixed_s >= 0 and cfg.load_factor > 0
             and cfg.arrival_offset_s >= 0 and cfg.max_wait_s > 0 and cfg.max_wait_warm_s > 0 and cfg.park_min_remaining >= 0
@@ -103,7 +114,12 @@ def remaining_tokens(req) -> int:
 def budget_s(req, cfg: DeadlineConfig) -> float:
     if is_cold(req, cfg.cold_hit_ratio):
         return cfg.cold_budget_s
-    return cfg.fast_budget_s if remaining_tokens(req) <= cfg.fast_tokens else cfg.warm_budget_s
+    remaining = remaining_tokens(req)
+    if remaining <= cfg.fast_tokens:
+        return cfg.fast_budget_s
+    if remaining > cfg.warm_multi_tokens:
+        return cfg.warm_multi_budget_s
+    return cfg.warm_budget_s
 
 
 def service_s(tokens: int, chunk: int, cfg: DeadlineConfig) -> float:

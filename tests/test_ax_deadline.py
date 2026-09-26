@@ -25,6 +25,27 @@ def req(rid, prompt, matched=0, output=0):
 
 
 class Estimates(unittest.TestCase):
+    def test_warm_budget_is_tiered_by_rounds_only_when_configured(self):
+        # Default: every warm request over fast_tokens gets warm_budget_s, as before this option existed.
+        one_round = req('one', 100000, matched=94000)     # 6000 remaining: fits one 8192 round
+        multi_round = req('multi', 100000, matched=60000)  # 40000 remaining: five rounds on the lane
+        self.assertEqual(ax.budget_s(one_round, CFG), CFG.warm_budget_s)
+        self.assertEqual(ax.budget_s(multi_round, CFG), CFG.warm_budget_s)
+        # Configured: a warm request needing more than one round gets the multi-round budget; one-round keeps warm's.
+        tiered = ax.DeadlineConfig(warm_budget_s=15.0, warm_multi_budget_s=5.0, warm_multi_tokens=8192)
+        self.assertEqual(ax.budget_s(one_round, tiered), 15.0)
+        self.assertEqual(ax.budget_s(multi_round, tiered), 5.0)
+        self.assertEqual(ax.budget_s(req('fast', 100000, matched=98000), tiered), tiered.fast_budget_s)
+        self.assertEqual(ax.budget_s(req('cold', 100000, matched=1000), tiered), tiered.cold_budget_s)
+        # Env: WARM_MULTI_S falls back to WARM_S, so setting only WARM_S=15 changes nothing for multi-round requests.
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_WARM_S': '15'}, clear=False):
+            cfg = ax.deadline_config()
+        self.assertEqual((cfg.warm_budget_s, cfg.warm_multi_budget_s, cfg.warm_multi_tokens), (15.0, 15.0, 8192))
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_WARM_S': '15',
+                                     'SGLANG_AX_DEADLINE_WARM_MULTI_S': '5'}, clear=False):
+            cfg = ax.deadline_config()
+        self.assertEqual((cfg.warm_budget_s, cfg.warm_multi_budget_s), (15.0, 5.0))
+
     def test_remaining_counts_output_like_123(self):
         self.assertEqual(ax.remaining_tokens(req('a', 10000, matched=4000, output=5)), 6005)
 
