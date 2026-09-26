@@ -33,7 +33,11 @@
   - 这是底包 BCG 的通用缺陷，DeepSeek-V2/V4 等所有在外层包 `maybe_input_scattered` 的模型都一样，不是 170 的桥或 slicing 引入的；只是 170 让 GLM 第一次走到这条路径。coordinator 怀疑的 eager break `x[:n]` 切片：scatter 下 DSA/线性层输入都已预先 all-gather 成 B 行（`dsa_pre_gather`；线性层 `qkv_latent_func=None`），n 是全局真实 token 数，所以切片没问题。
 - **修复（v2，`[ax] 170 v2`）**：
   1. capture 时用 `maybe_input_scattered(forward_batch)` 包住 `layer_model.forward`，决策与 replay 时外层 forward 相同（`use_input_scattered`：extend 且不是 verify）。scatter 下断言桶是 tp_size 的倍数（v1 已按 tp 对齐）。
-  2. `can_run_graph` 增加保护：replay 时的 scatter 决策与 capture 时不同就回退 eager（按逻辑不应触发，只作兜底）。
+  2. `can_run_graph` 增加保护：replay 时的 scatter 决策与 capture 时不同就回退 eager。
+     2026-09-26 复核修正：capture 布局按 token 桶保存，检查和 `load_batch` 共用桶选择函数。
+     119 的阈值会使小桶不 scatter、大桶 scatter；原先单个布尔值被最后捕获的小桶覆盖，导致大桶
+     错误回退 eager。缺失或不匹配的桶仍回退。CPU 用例覆盖阈值两侧及 CP 选桶，见
+     [S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md)。该修正的 TP8 数值尚待验证。
 - **验证（实测，`evidence/T52b/SUMMARY_v2.txt`，22 个请求：冷启动长度 37/100/500/512/1000/1024/3000/4096/5000、P=2万/10万 前缀命中 × c=100/1000/3000、并发混合对）**：
   | 配置 | 首 token 相同 | 生成 logprob 最大差 | 首 token top-5 最大差 |
   |---|---|---|---|

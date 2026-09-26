@@ -768,7 +768,10 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
                         f"[ax] 170: prefill graph bucket {num_tokens} is not a multiple of "
                         f"tp_size={tp} under --enable-attn-tp-input-scattered"
                     )
-                self._ax170_capture_input_scattered = scattered
+                captured_layouts = getattr(self, "_ax170_capture_input_scattered", None)
+                if captured_layouts is None:
+                    captured_layouts = self._ax170_capture_input_scattered = {}
+                captured_layouts[num_tokens] = scattered
                 with attn_tp_ctx.maybe_input_scattered(forward_batch):
                     return self.layer_model.forward(
                         input_ids,
@@ -1253,27 +1256,18 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
             return False
         # [ax] 170 v2: replay is only valid if the replay-time outer forward makes the same
         # attn-tp scatter decision the body was captured with; otherwise run eager.
-        captured_scattered = getattr(self, "_ax170_capture_input_scattered", None)
-        if captured_scattered is not None and self._uses_eager_prefill_tail():
+        replay_bucket = self._select_replay_bucket(forward_batch)
+        if replay_bucket is None:
+            return False
+        captured_layouts = getattr(self, "_ax170_capture_input_scattered", None)
+        if captured_layouts is not None and self._uses_eager_prefill_tail():
             from sglang.srt.layers.communicator import get_attn_tp_context
 
+            captured_scattered = captured_layouts.get(replay_bucket)
             if (
-                get_attn_tp_context().use_input_scattered(forward_batch)
+                captured_scattered is None
+                or get_attn_tp_context().use_input_scattered(forward_batch)
                 != captured_scattered
-            ):
-                return False
-        if getattr(self, "enable_cp_v2_bcg_capture", False) and is_cp_v2_active(
-            forward_batch
-        ):
-            assert self.prefill_cp_bcg_input is not None
-            if (
-                self.prefill_cp_bcg_input.select_replay_bucket_for_batch(
-                    num_tokens=len(forward_batch.input_ids),
-                    extend_seq_lens=forward_batch.extend_seq_lens_cpu,
-                    capture_num_tokens=self.capture_num_tokens,
-                    max_padding_factor=_MAX_PREFILL_CUDA_GRAPH_PADDING_FACTOR,
-                )
-                is None
             ):
                 return False
         # Multi-req replay is supported by body-capture backends via the
@@ -1281,6 +1275,18 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
         # the transformer stack, then the outer model.forward runs
         # logits_processor eagerly on top with live request metadata.
         return True
+
+    def _select_replay_bucket(self, forward_batch: ForwardBatch):
+        """Use the same bucket for layout validation and static buffer loading."""
+        if getattr(self, "enable_cp_v2_bcg_capture", False) and is_cp_v2_active(forward_batch):
+            assert self.prefill_cp_bcg_input is not None
+            return self.prefill_cp_bcg_input.select_replay_bucket_for_batch(
+                num_tokens=len(forward_batch.input_ids),
+                extend_seq_lens=forward_batch.extend_seq_lens_cpu,
+                capture_num_tokens=self.capture_num_tokens,
+                max_padding_factor=_MAX_PREFILL_CUDA_GRAPH_PADDING_FACTOR,
+            )
+        return self._pad_to_bucket(len(forward_batch.input_ids), self.capture_num_tokens)
 
     def _build_capture_spec_info(self, num_tokens: int):
         if self.static_draft_hidden_states is None:
@@ -1571,23 +1577,9 @@ class PrefillCudaGraphRunner(BaseCudaGraphRunner):
         the model code reads during replay.
         """
         num_tokens = len(forward_batch.input_ids)
-        static_num_tokens = self._pad_to_bucket(num_tokens, self.capture_num_tokens)
-        if getattr(self, "enable_cp_v2_bcg_capture", False) and is_cp_v2_active(
-            forward_batch
-        ):
-            assert self.prefill_cp_bcg_input is not None
-            static_num_tokens = (
-                self.prefill_cp_bcg_input.select_replay_bucket_for_batch(
-                    num_tokens=num_tokens,
-                    extend_seq_lens=forward_batch.extend_seq_lens_cpu,
-                    capture_num_tokens=self.capture_num_tokens,
-                    max_padding_factor=_MAX_PREFILL_CUDA_GRAPH_PADDING_FACTOR,
-                )
-            )
-            if static_num_tokens is None:
-                raise RuntimeError(
-                    "Prefill CUDA graph replay was admitted without a fitting bucket"
-                )
+        static_num_tokens = self._select_replay_bucket(forward_batch)
+        if static_num_tokens is None:
+            raise RuntimeError("Prefill CUDA graph replay was admitted without a fitting bucket")
         self.raw_num_tokens = num_tokens
 
         bs = forward_batch.batch_size
