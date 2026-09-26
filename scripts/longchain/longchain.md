@@ -1,8 +1,21 @@
 # 长程 s1-dev：生成设计与验收契约
 
-2026-09-24。当前实现为 `longchain.py` + `longchain_events.py`：先冻结事件计划，再编译不可变历史快照；复用原 Renderer、数据布局和回放程序。正文以 s1-dev 为素材，Phoenix 只指导结构与等待，生产正文不进入成品。独立性指每条接收链的历史和依赖自足，不强制隔离 KV，也不要求每个文本片段唯一。
+2026-09-26 起为 v3（`source-event-longchain-v3`）。当前实现为 `longchain.py` + `longchain_events.py`：先冻结事件计划，再编译不可变历史快照；复用原 Renderer、数据布局和回放程序。正文以 s1-dev 为素材；每一步的负载（新增 token、等待、输出）照搬主办方同类公开请求，每条链对齐主办方冻结的三个总数（见下节）。不再读取 Phoenix。独立性指每条接收链的历史和依赖自足，不强制隔离 KV，也不要求每个文本片段唯一。
 
-唯一成品入口是 [`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/s1-dev-longchain-build/`，通过验收才替换成品。旧96链候选及其父数据副本已按用户要求删除，仅保留验收/分析记录，不再占用cache。Phoenix原始正文cache也已删除；冻结结构profile仍支持复现生成。
+## v3：按主办方 token 结构对齐（2026-09-26）
+
+目标是让本地实测接近线上：生成器对齐的是引擎感受到的量，正文语义不追求。依据全部来自主办方 dev-combined-v1 的冻结元数据与 722 份公开正文，核对方式写在括号里。
+
+- **每条链三个精确总数**：`chains.jsonl` 的 `sum_glm_tokens`（prompt 总量）、`sum_uncached_expected`（新增总量）、`total_edges - append_only_edges`（改写历史的相邻转换数；链从会话中途开始时 `total_edges` 多计链首入边）。66 条正文全公开的链上，逐条请求求和与链级总数 66/66 相等；逐条 `edge_type` 还原的改写数与链级 66/66 相等。合成部分以"总数减去公开部分"为目标。
+- **每步负载照搬同类公开请求**：同轮续跑用非链首 intra（388 条），新轮开头用非链首 turn_start（20 条），重建用全部 context_reset（23 条）；照搬该请求的 `uncached_expected`、`replay_gap_ms`（主办方的工具+思考封顶规则）、`max_output_i`。三者成组抽取，保留它们的真实关联。事件位置未观测，随机放置；次数按链的 phase 计数。
+- **重建是追加**：公开的 23 条 context_reset 全部是纯追加（新增 504–4750，中位约 1.9k），所以计划中的重建按模板大小追加，只是阶段标签为 context_reset（计入链首门）。只有上下文超过 `--max-context-tokens` 时才做真正缩短历史的重建（`compact-rebuild`，保留约四分之一尾部）。
+- **新轮收尾规则**（公开正文全部相邻请求实测）：新 human 消息到来时，刚结束那一轮带工具调用的 assistant 消息正文被清空（11/11；同一轮内从不清空，231/231），因此从该轮第一条被清空的消息起全部重算；运行时 reminder 移到新问题之后。
+- **改写（历史被打断）**：按链的改写数安排，新轮开头优先，余量随机落在同轮续跑。实现为在较早的工具调用消息里多加一个 Read 调用（至多 1024 token）：之后的历史全部重算而上下文几乎不增长；分叉点取估计重算量最接近目标的位置。构建时跟踪实际改写：计划外的改写（有正文可清空的新轮、上下文超限重建）会取消后面一个计划中的续跑改写；计划中的改写即使目标已达到也做最小分叉。公开数据中 5/20 个新轮开头是另一条轨迹、在第一条 human 消息后即分叉。工具调用 ID 不进入渲染，改 ID 不会导致重算（实测）。
+- **两个总量的分配**：上下文增长会带入之后每条请求，所以 prompt 总量限制同轮续跑和重建的增长幅度；剩余新增 token 交给改写步。缩放系数限于 [1/16, 16]；增长步长不超过公开样本最大值；改写至多重算第一条 human 消息之后的全部历史。改写次数与 prompt 总量优先，一条链的新增总量若超出"改写次数 × 可重算长度"，就如实偏少，不用更大的 Read 硬凑。
+- **长度补足**：借来的工具块短于目标时，加一个并行 Read 调用，结果文本先取公开工具结果中的长文本，再取冻结源码树 `build/base_exact`（`--read-corpus`）的文本文件，按固定顺序往下读、不回头重复；清单记录语料哈希与读取位置，只有 token 数有意义。
+- **已知偏差**：公开请求集中在链的前几步，模板带有"开头"特征；主办方少数链有压缩式改写（下一条 prompt 变短），v3 只在上下文超限时缩短上下文；5 份公开正文的会话没有可用的 Read 定义，这些链的新增与改写会偏少；新增总量可能偏少（见上）。偏差按链写入 `manifest.json` 的 `chain_summaries`（`synthesized_*` 对 `target_*`，目标为源链总数减公开部分），用 `workload_compare.py` 汇总。
+
+v2 成品为 [`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，v3 通过验收后放在 `data/s1-dev-longchain-v3/`；规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/` 下的新目录，通过验收才成为成品。全量生成需数 GB 内存，在 GPU 开发机 `/sjtu/linhang/arena/runs/` 下运行，产物再经 `scripts/pod/ppush` 进 Pod。
 
 三路审查已修复重建摘要被下一步删除、素材不足绕过压力重建、丢弃试选污染使用计数，以及重建收据和工具边界漏检。极短中间历史的摘要可能比原文更长，生成器会收紧同一次重建的尾部/摘录并重新真实渲染，仍不缩短则拒绝生成；调整写入来源账本。
 
@@ -12,8 +25,11 @@
 
 ```bash
 uv run --with-requirements scripts/longchain/requirements-longchain.txt python -B scripts/longchain/longchain.py build \
-  --chains 311 --seed 20260924 --set s1-dev-longchain \
-  --out cache/s1-dev-longchain-build
+  --chains 311 --seed 20260924 --set s1-dev-longchain-v3 \
+  --out cache/s1-dev-longchain-v3-build          # --read-corpus 默认 build/base_exact
+
+python3 scripts/longchain/workload_compare.py --root dev=s1-dev/data/dev-combined-v1 \
+  --root v3=cache/s1-dev-longchain-v3-build     # 四道门占比、各类新增 token、逐链三总数对比
 
 uv run --with-requirements scripts/longchain/requirements-longchain.txt python -B scripts/longchain/longchain_replay.py \
   --root cache/s1-dev-longchain-build \
@@ -36,10 +52,9 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt python -
 |---|---|---|
 | s1-dev完整请求正文 | system/tools、用户/assistant/工具文本及结构素材 | 缺失的真实请求已经恢复 |
 | s1-dev源链摘要 | Bio/Sci链长、事件计数、输出和输入工作量的参考约束 | 等于正式隐藏集 |
-| Phoenix及数据库观测 | 连续调用序列中增长、等待、输出、压缩的联合模式 | 供应商缓存命中率等于TP8命中率；源token等于GLM token |
 | 正式A/B与原样本地校准 | 检查负载解释是否合理，识别分布敏感性 | 两点反演隐藏集或拟合固定换算系数 |
 
-不引入Phoenix正文；不加密后直接填充prompt；不靠循环复制同一个8k块扩成16k。可以组合不同s1-dev素材，也可以适度复用同一素材；生成位置、结构、来源和估计字段必须可追踪。
+不加密后直接填充prompt；不靠循环复制同一个8k块扩成16k。可以组合不同s1-dev素材，也可以适度复用同一素材；生成位置、结构、来源和估计字段必须可追踪。
 
 “允许mock正文”与“禁止mock测量”分开：低成本模型可生成主题变体、追问、回答、示例工具结果和摘要；不能让模型编造token计数、等待时间、cache miss、吞吐或评分。相邻调用的完整语义一致不作高成本验收项目；格式闭合、前缀稳定、长度与事件分布仍是硬要求。
 
@@ -96,13 +111,11 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt python -
 
 这些是操作类型，不是各占固定百分比的独立抽签。长等待、大返回、用户追问和重建可以有联合关系；不能把若干边际分布独立随机后声称保留真实行为。
 
-重建可以有两种不同结构：历史压缩为摘要并保留近期工具组；更早工具结果清理而保留其后消息。它们的首次分叉位置不同，LCP和新算量不同，不能都做成清空全部历史，也不能固定“每20轮压一次”。模板优先依据s1-dev真实前后转移；不足部分用明确的合成操作，Phoenix只提供位置与前后长度等形状参考。
+重建可以有两种不同结构：历史压缩为摘要并保留近期工具组；更早工具结果清理而保留其后消息。它们的首次分叉位置不同，LCP和新算量不同，不能都做成清空全部历史，也不能固定“每20轮压一次”。v3 的重建保留尾部，使重建后 prompt 接近所抄公开重建请求的长度。
 
 ## 4. 如何组成一条长链
 
-先选择链长/起始上下文/提示词家族，再选择多段连续行为模板，最后编译正文快照。优先保留“连续工具续跑→等待或重建→恢复续跑”的邻接关系；模板拼接处记录为合成边界，不能伪装真实相邻调用。
-
-事件位置随上下文增长和任务阶段选择，不能均匀撒reset。计划阶段预估重建前后的长度与保留尾部；编译后验证实测token。若计划在很短历史上重建、移除内容不足或会打断工具组，则回到计划层重选，不仅修改phase使其通过评分。
+先选择链长/起始上下文/提示词家族，再按主办方 phase 计数与改写数安排事件，最后编译正文快照。v3 的事件位置随机（重建尽量不放在首尾），另有上下文压力触发的强制重建；编译后验证实测token。若计划在很短历史上重建、移除内容不足或会打断工具组，则回到计划层重选，不仅修改phase使其通过评分。
 
 链长参考源摘要的经验分布，分别保留Bio/Sci特点；查看按链和按请求加权的占比。源摘要311链/5601请求中31+的50链贡献3627请求，不能把公开722正文的短前缀当完整链长分布。具体候选规模不靠5150/341的均值反推。
 
@@ -112,9 +125,7 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt python -
 
 ## 5. 时间、子代理与并发
 
-原始工具等待采用时间区间并集，不能相加并行工具时长。用户思考单列。已知分解的原数据遵循`min(tool_union,300s)+min(net_think,10s)`；harness再执行每链累计gap 3600秒上限。当前新增事件只取得Phoenix end-to-start gap，采用明确估计的`min(gap,300s)`，`tool_union_ms/net_think_ms`留空。这与正式分解公式不等价，不能声称已恢复真实工具耗时；等待分解校准仍是代表性限制。原始间隔、估计回放间隔与每链cap分开记录。
-
-Phoenix只有相邻LLM间隔而没有完整工具归因时，标为gap分解未知，不能把整段时间直接声称为工具耗时。可用s1-dev已验证的同类等待作为明确估计，并报告替代比例。对长等待优先核对工具span和父子关系。
+原始工具等待采用时间区间并集，不能相加并行工具时长。用户思考单列。已知分解的原数据遵循`min(tool_union,300s)+min(net_think,10s)`；harness再执行每链累计gap 3600秒上限。v3 的新增事件照搬同类公开请求的 `replay_gap_ms`（已按该公式计算），`tool_union_ms/net_think_ms` 留空，不复制分解。
 
 N是逻辑槽数；等待占槽，但该链此时没有在飞模型请求。其他槽继续调用或结束补位，形成真实缓存竞争。等待后不保证miss，立即返回也不保证全命中。不能以部署实测cache_read反过来修改数据或phase。
 
@@ -174,7 +185,7 @@ N是逻辑槽数；等待占槽，但该链此时没有在飞模型请求。其�
 
 方案review不是向用户再索取批准的关口；在既有授权下推进。发现不一致就修复并记录，不能用review作为一直不生成数据的理由。
 
-证据入口：[四类请求与来源审查](../../notes/codex-四类请求与造数建议.md)、[Phoenix采样框](../../evidence/phoenix-longchain-20260924/expanded/sampling-frame.json)、[旧候选冻结](../../evidence/longchain-audit/frozen-candidate/README.md)。
+证据入口：[四类请求与来源审查](../../notes/codex-四类请求与造数建议.md)、[旧候选冻结](../../evidence/longchain-audit/frozen-candidate/README.md)。
 
 ## 当前完整集的代表性边界
 
