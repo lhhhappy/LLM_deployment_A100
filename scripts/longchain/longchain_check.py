@@ -106,6 +106,69 @@ def _new_message_suffix(previous, current):
     return None
 
 
+def _diverged_end(expected, after, k):
+    """Index in `after` where expected[k:] ends after the only allowed divergence, else None.
+
+    The divergence: expected[k] is a tool-call message that gains exactly one extra Read call
+    (a new ID, absent from `expected`), whose result directly follows the message's own results.
+    Every other message and field must be identical.
+    """
+    e, a = expected[k], after[k] if k < len(after) else None
+    if not isinstance(e, dict) or not isinstance(a, dict) or not e.get("tool_calls"):
+        return None
+    calls = a.get("tool_calls") or []
+    extra = calls[-1] if len(calls) == len(e["tool_calls"]) + 1 else None
+    if (not isinstance(extra, dict) or (extra.get("function") or {}).get("name") != "Read" or not extra.get("id")
+            or calls[:-1] != e["tool_calls"] or {**a, "tool_calls": None} != {**e, "tool_calls": None}):
+        return None
+    old_ids = {str(c.get("id")) for m in expected if isinstance(m, dict)
+               for c in (m.get("tool_calls") or []) if isinstance(c, dict) and c.get("id") is not None}
+    if str(extra["id"]) in old_ids:
+        return None
+    results = k + 1
+    while results < len(expected) and isinstance(expected[results], dict) and expected[results].get("role") == "tool":
+        results += 1
+    read_result = after[results] if results < len(after) else None
+    if (after[k + 1:results] != expected[k + 1:results] or not isinstance(read_result, dict)
+            or read_result.get("role") != "tool" or read_result.get("tool_call_id") != extra["id"]
+            or after[results + 1:results + 1 + len(expected) - results] != expected[results:]):
+        return None
+    return len(expected) + 1
+
+
+def _rewrite_start(previous, current, close_turn):
+    """First new message after a history rewrite, re-derived here rather than trusted from provenance.
+
+    Allowed history change: a trailing runtime reminder is dropped; at a turn start (close_turn)
+    every assistant tool-call message after the last human user message has its text emptied; the
+    history after the first human message may then diverge at one tool-call message (see
+    _diverged_end). Returns (start, emptied indices, divergence index or None), or
+    (None, None, None) when the body is not such a rewrite plus a suffix.
+    """
+    def is_reminder(m):
+        return isinstance(m, dict) and m.get("role") == "user" and "system-reminder" in str(m.get("content", ""))
+    before, after = list(previous or []), current or []
+    if (before and is_reminder(before[-1])
+            and not str(before[-1].get("content", "")).startswith("历史上下文摘录（中间记录已归档）：\n")):
+        before = before[:-1]
+    last_human = max((i for i, m in enumerate(before) if isinstance(m, dict) and m.get("role") == "user"
+                      and not is_reminder(m)), default=-1)
+    emptied = [i for i, m in enumerate(before) if close_turn and i > last_human and isinstance(m, dict)
+               and m.get("role") == "assistant" and m.get("tool_calls") and m.get("content")]
+    expected = [dict(m, content="") if i in emptied else m for i, m in enumerate(before)]
+    k = 0
+    while k < min(len(expected), len(after)) and expected[k] == after[k]:
+        k += 1
+    if k == len(expected):
+        return (k, emptied, None) if len(after) > k else (None, None, None)
+    first_human = next((i for i, m in enumerate(before) if isinstance(m, dict) and m.get("role") == "user"
+                        and not is_reminder(m)), -1)
+    end = _diverged_end(expected, after, k) if k > first_human else None
+    if end is None or len(after) <= end:
+        return None, None, None
+    return end, emptied, k
+
+
 def _new_tool_block_errors(messages, start, rid):
     """Validate only calls/results introduced in one newly appended message suffix."""
     errors, implicit = [], 0
@@ -708,6 +771,14 @@ def check_dataset(root, harness_dir, tok_dir=None, cohort=None):
                     errors.append(f"{rid}: synthetic continuation changes system/tools without an implemented event")
                 start = _new_message_suffix((prev_body or {}).get("messages", []),
                                             bodies[rid].get("messages", []))
+                if start is None and p.get("event_kind") in ("turn_start", "intra"):
+                    closing = p.get("event_kind") == "turn_start"
+                    start, emptied, diverged = _rewrite_start((prev_body or {}).get("messages", []),
+                                                              bodies[rid].get("messages", []), closing)
+                    if start is not None and closing and emptied != (p.get("turn_close") or {}).get("stripped_indices"):
+                        errors.append(f"{rid}: turn_close receipt does not match the emptied narration")
+                    if start is not None and diverged != (p.get("divergence") or {}).get("diverged_at"):
+                        errors.append(f"{rid}: divergence receipt does not match the rewritten history")
                 if p.get("event_kind") == "context_reset":
                     errors.extend(_rebuild_errors(prev_body, bodies[rid], row, p, rid))
                 elif start is None:

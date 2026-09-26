@@ -36,6 +36,7 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt \
 | `longchain_material_inventory.py` | 公共素材盘点 |
 | `longchain_distribution.py` | 分布、素材重复与链首共享前缀诊断 |
 | `dev_distribution_observe.py` | 原开发集与048固定记录的来源分布审查 |
+| `workload_compare.py` | 只读元数据：按评分器的门归属比较各数据集的请求占比与新增token，并逐链对比主办方三总数 |
 | `requirements-longchain.txt` | 原GLM Renderer的冻结CPU依赖 |
 | [`phoenix/`](phoenix/README.md) | Phoenix只读采集、连续事件分析与目录展示 |
 | [`longchain.md`](longchain.md) | 唯一现行生成设计与复现命令 |

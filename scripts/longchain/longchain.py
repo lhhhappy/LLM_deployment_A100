@@ -23,10 +23,13 @@ import platform
 from pathlib import Path
 import random
 import re
+import resource
 import sys
 
 REPO = Path(__file__).resolve().parents[2]
-VERSION = "source-event-longchain-v2"
+VERSION = "source-event-longchain-v3"
+# Bounds of the per-chain factor that scales sampled continuation sizes to the chain's source total.
+STEP_SCALE_MIN, STEP_SCALE_MAX = 1 / 16, 16.0
 
 
 def read_jsonl(path):
@@ -451,6 +454,31 @@ def output_budgets(target_total, original_rows, donor_weights):
     return [n + 2 for n in shares], 0
 
 
+def chain_scales(plan, shapes, persistence, offset, new_left, prompt_left, context):
+    """Size factors for the remaining growing continuations and rewriting steps of a chain (see build).
+
+    Without further growth every remaining prompt carries the current context, reduced at each planned
+    reset to its template's post-reset prompt. The prompt tokens left above that baseline bound the
+    continuations' growth, each growth token costing one token per prompt until the next reset.
+    """
+    rest = range(offset, len(plan))
+    baseline = 0
+    for j in rest:
+        if plan[j]["kind"] == "context_reset":
+            context = min(context, plan[j]["template"]["glm_tokens"])
+        baseline += context
+    clamp = lambda x: min(STEP_SCALE_MAX, max(STEP_SCALE_MIN, x))
+    growing = [j for j in rest if plan[j]["kind"] == "intra"]
+    rewriting = [j for j in rest if shapes[j] and plan[j]["rewrite"]]
+    plain = sum(shapes[j] for j in growing if not plan[j]["rewrite"])
+    uniform = new_left / max(1, sum(shapes[j] for j in rest))
+    growth_cost = sum(shapes[j] * persistence[j] for j in growing)
+    growth = clamp(min(uniform, (prompt_left - baseline) / growth_cost) if growth_cost else uniform)
+    rewrite_shapes = sum(shapes[j] for j in rewriting)
+    rewrite = clamp((new_left - growth * plain) / rewrite_shapes) if rewrite_shapes else growth
+    return {"growth": growth, "rewrite": max(rewrite, growth)}
+
+
 def json_dump(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
 
@@ -475,7 +503,7 @@ def build(args):
     rows, chains, bodies, grouped = load_source(root)
     chosen = choose_chains(chains, args.chains, args.seed)
     donors, rejected = extract_donors(grouped, bodies, renderer)
-    compiler = EventCompiler(args, grouped, bodies, donors)
+    compiler = EventCompiler(args, grouped, bodies, donors, renderer.tokenizer)
     print(f"SOURCE requests={len(rows)} chains={len(chains)} donors={len(donors)} selected_chains={len(chosen)}", flush=True)
     dest.mkdir(parents=True)
     (dest / "bodies").mkdir()
@@ -491,14 +519,18 @@ def build(args):
                               "files": {p.name: file_digest(p) for p in sorted(Path(args.tok_dir).iterdir()) if p.is_file()}},
                 "source_files": {str(p.relative_to(root)): file_digest(p) for p in
                                  [root / "requests.jsonl", root / "chains.jsonl", *sorted((root / "bodies").rglob("*.jsonl.gz"))]},
-                "behavior_profile": {"path": str(compiler.profile_path.resolve()), "sha256": file_digest(compiler.profile_path)},
                 "implementation_event_compiler_sha256": file_digest(Path(__file__).with_name("longchain_events.py")),
+                "read_corpus": compiler.read_corpus.receipt,
+                "load_templates": {"origin": "public requests with a valid replay gap: non-head intra/turn_start, all context_reset",
+                                   "n": {kind: len(v) for kind, v in compiler.templates.items()},
+                                   "scale_bounds": [STEP_SCALE_MIN, STEP_SCALE_MAX]},
                 "assumptions": ["Public content plus explicit synthetic events, not recovered hidden requests.",
                                 "Public bodies/budgets/gaps/labels retained; session IDs scoped to generated receiving chains.",
-                                "Phoenix supplies linked structural observations only; production text is never read by the compiler.",
-                                "Source phase counts constrain event frequencies; missing positions and transplanted associations are inferred.",
-                                "Phoenix positive-growth/output ranks map onto public material/output distributions, not GLM token counts.",
-                                "Replay gap is min(Phoenix end-to-start gap,300s): an estimated proxy with unknown tool/user decomposition, not claimed as observed tool union.",
+                                "Source phase counts constrain event frequencies; event positions are unobserved and drawn at random.",
+                                "Each synthesized step copies one public request of its kind (frozen uncached_expected, replay gap, output budget); new-token sizes are scaled per chain, within fixed bounds, towards the source chain's frozen new-token total, and output budgets are apportioned to the source chain's output total.",
+                                "A continuation whose donor block is shorter than its size gets one extra parallel Read call; its text is corpus filler read front to back, so only its token count is meaningful.",
+                                "A turn start closes the finished turn as the public agent does: tool-call narration of that turn becomes empty and the runtime reminder follows the new query. When that recomputes less than the turn start's sampled size, the finished turn is re-issued from a later tool call under new call IDs (a sibling trajectory, as in a quarter of the public turn starts), plus a Read when the whole turn is too short.",
+                                "Replay gaps are copied from public requests, which follow the organizer's capped tool-plus-thinking rule; the decomposition is not copied.",
                                 "Synthetic dispatch offsets only order requests; original harness executes completion-relative gaps and chain gap cap.",
                                 "Rebuilds use explicit receiving-history extracts and retain whole recent groups; no engine-side truncation.",
                                 "No cache salt, per-session flush, N-dependent timing, tool execution or generated-output feedback.",
@@ -562,12 +594,36 @@ def build(args):
             prefix = generated_session
             total_prompt = sum(r["glm_tokens"] for r in chain_rows)
             generated_append_edges = 0
+            # The synthesized requests aim at two frozen source totals of this chain: new tokens and
+            # prompt tokens. Growth persists into every later prompt until a reset, so the prompt total
+            # caps how much continuations grow the context; the planned rewrites, which recompute
+            # history without growing it, take the rest of the new tokens.
+            new_token_budget = max(0, target["sum_uncached_expected"] - sum(r["uncached_expected"] for r in original))
+            prompt_budget = max(0, target["sum_glm_tokens"] - sum(r["glm_tokens"] for r in original))
+            shapes = [compiler.step_shape(item) for item in plan]
+            kinds = [item["kind"] for item in plan]
+            persistence, until_reset = [0] * len(plan), 0  # prompts carrying a growth at j, up to the next reset
+            for j in reversed(range(len(plan))):
+                until_reset = 0 if kinds[j] == "context_reset" else until_reset + 1
+                persistence[j] = until_reset
+            new_tokens = prompt_tokens = 0
             for offset, (item, budget) in enumerate(zip(plan, budgets)):
                 step = len(original) + offset
                 before_body = current_body
                 room = args.max_context_tokens - len(prev_tokens) - budget - 256
                 logical_id = f"{prefix}:llm:{step:04d}"
                 rid = f"{target['pack']}:canon:{logical_id}"
+                if shapes[offset]:
+                    scales = chain_scales(plan, shapes, persistence, offset, new_token_budget - new_tokens,
+                                          prompt_budget - prompt_tokens, len(prev_tokens))
+                    # A rewrite recomputes at most the whole current prompt; growth stays within public sizes.
+                    ceiling = compiler.step_ceiling(item)
+                    size = lambda factor, cap=ceiling: min(cap, max(1, round(shapes[offset] * factor)))
+                    item = {**item, "step_scale": scales["rewrite" if item["rewrite"] else "growth"],
+                            "step_target": size(scales["rewrite"], max(ceiling, len(prev_tokens))) if item["rewrite"]
+                                           else size(scales["growth"])}
+                    if item["kind"] == "intra" and item["rewrite"]:
+                        item["growth_target"] = min(item["step_target"], size(scales["growth"]))
                 try:
                     current_body, event_receipt, donor = compiler.event(item, target, before_body, prefix, step, usage, room)
                     current_body["req_id"] = rid
@@ -579,8 +635,7 @@ def build(args):
                 if pressure:
                     # Whole-event rebuild, never truncate a request sent to the engine.
                     forced = {**item, "kind": "context_reset", "position_origin": "explicit_context_pressure"}
-                    forced["reference"] = compiler.rng.choices(compiler.compressions,
-                        weights=[e["weight"] for e in compiler.compressions], k=1)[0]
+                    forced["template"] = compiler.template("context_reset")
                     active_item = forced
                     current_body, event_receipt, donor = compiler.event(forced, target, before_body, prefix, step, usage, room)
                     event_receipt["displaced_planned_kind"] = item["kind"]
@@ -605,6 +660,8 @@ def build(args):
                     raise ValueError(f"context limit exceeded for {rid}; no truncation performed")
                 phase = event_receipt["event_kind"]
                 gap = event_receipt["replay_gap_ms"]
+                new_tokens += len(ids) - common_tokens
+                prompt_tokens += len(ids)
                 is_append = transition_messages(before_body["messages"], current_body["messages"]) is not None
                 generated_append_edges += is_append
                 if phase == "context_reset" and len(ids) >= len(prev_tokens):
@@ -617,8 +674,14 @@ def build(args):
                              "first_output_offset_ms": None, "end_offset_ms": None,
                              "glm_tokens": len(ids), "glm_lcp_with_prev": common_tokens,
                              "uncached_expected": len(ids) - common_tokens,
-                             "edge_type": "append-only" if is_append else "compact-rebuild", "edge_subtype": phase,
-                             "break_reason": "explicit_context_rebuild" if phase == "context_reset" else None, "sys_tools_hash": original[-1].get("sys_tools_hash"),
+                             # Edge labels use the organizer's vocabulary so rewrite counts compare directly.
+                             "edge_type": "append-only" if is_append else "compact-rebuild" if phase == "context_reset"
+                                          else "unexplained-break",
+                             "edge_subtype": phase,
+                             "break_reason": None if is_append else "explicit_context_rebuild" if phase == "context_reset"
+                                             else "divergence" if (event_receipt.get("divergence") or {}).get("diverged_at") is not None
+                                             else "finished_turn_narration_removed",
+                             "sys_tools_hash": original[-1].get("sys_tools_hash"),
                              "prefix_family_id": original[-1].get("prefix_family_id"),
                              "max_output_i": budget, "replay_gap_ms": gap, "gap_valid": True,
                              "gap_imputed": True, "gap_invalid_reason": None,
@@ -656,13 +719,18 @@ def build(args):
             summary = {"chain_id": cid, "requests": len(chain_rows), "original_requests": len(original),
                        "prompt_sum": total_prompt, "source_prompt_sum": target["sum_glm_tokens"],
                        "prompt_sum_relative_error": total_prompt / target["sum_glm_tokens"] - 1,
+                       "new_tokens": new_tokens, "source_new_tokens": new_token_budget,
+                       "synthesized_prompt_tokens": prompt_tokens, "source_synthesized_prompt_tokens": prompt_budget,
+                       "new_tokens_relative_error": new_tokens / new_token_budget - 1 if new_token_budget else None,
                        "output_sum": out_chain["max_output_i_sum"], "source_output_sum": target["max_output_i_sum"],
                        "source_output_residual": budget_residual, "phases": phase_counts, "source_phases": target["phases"],
                        "source_output_aggregate_conflict": aggregate_conflict,
                        "visible_start_after_source_start": order(original[0])[0] > (target.get("first_dispatch_offset_ms") or 0),
                        "unique_donor_blocks": len(usage), "max_donor_reuse": max(usage.values(), default=0)}
             summaries.append(summary)
-            print(f"CHAIN {ci+1}/{len(chosen)} requests={len(chain_rows)} prompt_error={summary['prompt_sum_relative_error']:+.1%} max_reuse={summary['max_donor_reuse']}", flush=True)
+            print(f"CHAIN {ci+1}/{len(chosen)} requests={len(chain_rows)} prompt_error={summary['prompt_sum_relative_error']:+.1%} "
+                  f"new_tokens={new_tokens}/{new_token_budget} max_reuse={summary['max_donor_reuse']} "
+                  f"peak_rss_mb={resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024}", flush=True)
     new_index, _, _ = common.load_index(str(dest))
     cohort = common.freeze_cohort(str(dest), args.set, new_index, args.seed, str(dest / "cohort.json"))
     manifest.update(status="BUILT_UNVALIDATED", n_chains=cohort["n_chains"], n_requests=cohort["n_requests"],
@@ -670,6 +738,10 @@ def build(args):
                     original_requests=sum(s["original_requests"] for s in summaries),
                     actual_prompt_sum=sum(s["prompt_sum"] for s in summaries),
                     actual_output_sum=sum(s["output_sum"] for s in summaries),
+                    actual_new_tokens=sum(s["new_tokens"] for s in summaries),
+                    source_new_tokens=sum(s["source_new_tokens"] for s in summaries),
+                    read_corpus_position={"piece": compiler.read_corpus.index, "offset": compiler.read_corpus.offset,
+                                          "wraps": compiler.read_corpus.wraps},
                     artifacts={str(p.relative_to(dest)): file_digest(p) for p in
                                [dest / "requests.jsonl", dest / "chains.jsonl", dest / "provenance.jsonl", shard_path,
                                 dest / "cohort.json", dest / "event-plans.jsonl", dest / "samples" / f"{args.set}.jsonl"]})
@@ -874,10 +946,11 @@ def main(argv=None):
     bp.add_argument("--tok-dir", default=str(REPO / "s1-dev/glm_tok"))
     bp.add_argument("--out", required=True)
     bp.add_argument("--set", default="s1-dev-longchain")
-    bp.add_argument("--behavior-profile", default=str(REPO / "evidence/phoenix-longchain-20260924/expanded/joint-events.jsonl"))
     bp.add_argument("--chains", type=int, default=311)
     bp.add_argument("--seed", type=int, default=20260924)
     bp.add_argument("--max-context-tokens", type=int, default=524288)
+    bp.add_argument("--read-corpus", default=str(REPO / "build/base_exact"),
+                    help="frozen source tree whose text files follow the public tool-result text as Read filler")
     pp = sub.add_parser("polish", help="apply reviewed edits consistently, re-render, and freeze a new dataset")
     pp.add_argument("--root", required=True)
     pp.add_argument("--edits", required=True)
