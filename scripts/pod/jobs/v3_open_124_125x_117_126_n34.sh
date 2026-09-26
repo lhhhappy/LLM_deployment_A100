@@ -4,7 +4,7 @@
 # Single change versus 114: SGLANG_AX_SCHED_COLD_CAP 6144 -> 2048 (floor) with SGLANG_AX_SCHED_COLD_CAP_MAX=6144, so with no
 # short hit waiting the cold chunk stays 6144 (8192 while relieved) and with hits waiting it leaves their seat. Judged
 # against 114's first 600 s on the same request IDs: turn-start and fast misses of warm requests, chain misses, TPOT>0.10.
-G_COMMIT=b38e5b247d9fdcc0bba50a51c79aa3e8bfc82808
+G_COMMIT=51237af7c00b34d412caee00636b452437f6bc3e
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=on 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
 G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87"
