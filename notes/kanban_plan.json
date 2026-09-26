@@ -45,7 +45,7 @@
     "job": "130c-v3_open_A_warm15_126_n30",
     "ref": "130a-v3_open_A_warm15_n30",
     "what": "A′ + 126 座位",
-    "status": "排队中（S2 候选）"
+    "verdict": "四门都不变差、fast/overall/chain 各降几条：座位有效，S2 可叠"
   },
   {
     "job": "130d-v3_open_A_warm15_128_n30",
