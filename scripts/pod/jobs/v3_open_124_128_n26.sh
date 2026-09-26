@@ -4,7 +4,7 @@
 # N26 opening probe on v3 (the organizer's 311 public chain heads open every run): 600-second admission, drain all
 # admitted; stack2 7c6cb634, 46364's configuration otherwise (cold cap 6144). Judged relative to the other v3 opening
 # probes on the same request IDs: chain misses (first 5 minutes and window), turn misses, requests above 0.10 s/token.
-G_COMMIT=dd64e9a8e64de364ab2939aea509e784c7c9c7be
+G_COMMIT=3aad9c4f984702dd294c2897a141736515e41ccb
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
 G_EXPECT="117=off 118=off 119=off 120=on 122=off 123=off 124=on 125=off 126=off 128=on 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1"
 G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87"
