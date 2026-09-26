@@ -16,7 +16,6 @@ last flush.
 """
 
 import os
-from array import array
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 
@@ -315,8 +314,43 @@ def family_config() -> Optional[FamilyConfig]:
 
 def block_hashes(ids: Sequence[int], block: int) -> Tuple[int, ...]:
     """One hash per complete block of `block` prompt tokens; a tail shorter than a block is ignored."""
-    arr = ids if isinstance(ids, array) else array("q", ids)
-    return tuple(hash(arr[i:i + block].tobytes()) for i in range(0, len(arr) - block + 1, block))
+    # Token IDs already live in a Python sequence. Hashing bounded tuples
+    # avoids copying/converting the entire long prompt to an int64 array.
+    return tuple(hash(tuple(ids[i:i + block])) for i in range(0, len(ids) - block + 1, block))
+
+
+def cache_namespace(req) -> tuple:
+    """The radix tree cannot share KV across either of these namespaces."""
+    return getattr(req, "extra_key", None), getattr(req, "cache_salt", None) or None
+
+
+def family_pair_key(a, b) -> tuple:
+    return (a.rid, b.rid) if a.rid < b.rid else (b.rid, a.rid)
+
+
+def fill_shared_prefix_cache(reqs: Sequence, hashes: Callable, cache: dict, block: int) -> None:
+    """Fill missing pair LCPs using adjacent LCPs of sorted block sequences.
+
+    LCP(a, b) is the minimum adjacent LCP between them in lexicographic
+    order. Only n-1 Python prefix walks are needed per namespace, instead
+    of n*(n-1)/2; cached pairs are not recomputed on unchanged rounds.
+    The caller invalidates pairs when a RID's request identity/namespace changes.
+    """
+    groups = {}
+    for req in reqs:
+        groups.setdefault(cache_namespace(req), []).append(req)
+    for members in groups.values():
+        if len(members) < 2 or all(family_pair_key(a, b) in cache
+                                   for i, a in enumerate(members) for b in members[i + 1:]):
+            continue
+        ordered = sorted(members, key=hashes)
+        adjacent = [shared_prefix_blocks(hashes(a), hashes(b))
+                    for a, b in zip(ordered, ordered[1:])]
+        for i, a in enumerate(ordered[:-1]):
+            common = len(hashes(a))
+            for j in range(i + 1, len(ordered)):
+                common = min(common, adjacent[j - 1])
+                cache.setdefault(family_pair_key(a, ordered[j]), common * block)
 
 
 def shared_prefix_blocks(a: Sequence[int], b: Sequence[int]) -> int:
@@ -343,6 +377,7 @@ def family_plan(reqs: Sequence, shared_tokens: Callable[[object, object], int], 
     """
     n = len(reqs)
     parent = list(range(n))
+    namespaces = [cache_namespace(req) for req in reqs]
 
     def find(i):
         while parent[i] != i:
@@ -352,6 +387,8 @@ def family_plan(reqs: Sequence, shared_tokens: Callable[[object, object], int], 
 
     for i in range(n):
         for j in range(i + 1, n):
+            if namespaces[i] != namespaces[j]:
+                continue
             matched = max(reqs[i].num_matched_prefix_tokens, reqs[j].num_matched_prefix_tokens)
             if shared_tokens(reqs[i], reqs[j]) - matched >= cfg.link_min:
                 parent[find(i)] = find(j)

@@ -1524,6 +1524,7 @@ class Scheduler(
             self._ax_family_shared.clear()
         if getattr(self, "_ax_family_last", None) is not None:
             self._ax_family_last = (0.0, None)
+        self._ax_family_members = None
         if getattr(self, "_ax_reserve_state", None) is not None:
             self._ax_reserve_state = (None, frozenset(), frozenset())
 
@@ -1532,14 +1533,12 @@ class Scheduler(
         prompts, pairwise shared prefixes cached per pair while both wait. Broadcast with 124's order."""
         cands = [r for r in self.waiting_queue if ax_deadline.is_cold(r, deadline.cold_hit_ratio)]
         if len(cands) > cfg.max_candidates:
-            # Bounded CPU: the pairwise scan is O(n^2) per round (about 100 ms first time for 30 prompts of 250k
-            # tokens, then cached per pair); above the bound fall back to 124's per-request order this round.
+            # Family grouping remains O(n^2) per round; above this bound use
+            # 124's per-request order. Prompt hashing is cached per request.
             self._ax_family_shared.clear()
+            self._ax_family_members = None
             return {}, set()
         cache = self._ax_family_shared
-        live = {r.rid for r in cands}
-        for key in [k for k in cache if k[0] not in live or k[1] not in live]:
-            del cache[key]
 
         def hashes(r):
             h = getattr(r, "_ax_family_hash", None)
@@ -1547,12 +1546,28 @@ class Scheduler(
                 h = r._ax_family_hash = ax_deadline.block_hashes(r.origin_input_ids, cfg.block)
             return h
 
+        members = {}
+        for r in cands:
+            identity = getattr(r, "_ax_family_identity", None)
+            if identity is None:
+                # Keep only a tiny identity token: id(req) may be recycled,
+                # while retaining req itself would retain its full prompt.
+                identity = r._ax_family_identity = object()
+            members[r.rid] = (identity, ax_deadline.cache_namespace(r))
+        previous = getattr(self, "_ax_family_members", None) or {}
+        if members != previous:
+            # Preserve stable pairs, but a reused RID or changed namespace
+            # invalidates all pairs involving that request.
+            stable = {rid for rid, identity in members.items() if previous.get(rid) == identity}
+            for key in [k for k in cache if k[0] not in stable or k[1] not in stable]:
+                del cache[key]
+            ax_deadline.fill_shared_prefix_cache(cands, hashes, cache, cfg.block)
+            self._ax_family_members = members
+
         def shared(a, b):
+            # family_plan partitions namespaces before requesting pair LCPs.
             key = (a.rid, b.rid) if a.rid < b.rid else (b.rid, a.rid)
-            v = cache.get(key)
-            if v is None:
-                v = cache[key] = ax_deadline.shared_prefix_blocks(hashes(a), hashes(b)) * cfg.block
-            return v
+            return cache[key]
 
         work, held, families = ax_deadline.family_plan(cands, shared, cfg)
         now = time.perf_counter()

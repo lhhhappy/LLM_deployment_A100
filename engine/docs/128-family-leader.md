@@ -18,23 +18,27 @@ so this structure is the real workload, not an artifact of the synthetic set.
 Off unless `SGLANG_AX_DEADLINE_FAMILY=1`; requires 124 (`SGLANG_AX_DEADLINE_TIERS=1`), refuses otherwise.
 On request-plane rank 0, inside 124's plan (so the result travels with the broadcast order):
 1. Every waiting cold request (124's `is_cold`) gets a hash per 256-token block of its prompt, computed once.
-2. For every pair of waiting cold requests the shared prefix is the number of leading equal blocks (cached per
-   pair while both wait). Two requests are linked when that prefix minus the longer cache match of the two is
+2. Partition by radix namespace (`extra_key`, `cache_salt`): different namespaces cannot be a family. On a
+   membership change, sort the block-hash sequences in each namespace, compute their adjacent LCPs, then fill
+   pair LCPs with interval minima. This needs only n−1 Python prefix walks per namespace. Existing pairs remain
+   cached; a changed namespace or reused RID invalidates affected pairs. Two requests are linked when the prefix
+   minus the longer cache match of the two is
    at least `link_min` (4096): the part one of them computes and the other reuses.
 3. Families are the connected components. The leader is the member with the least remaining work. A rider is
    another member whose remaining after the leader's prefix is at most `rider_max` (6144: it then finishes as
    a short hit beside the next cold chunk). A member with a longer tail neither holds nor counts.
 4. The leader ranks in 124's order by `remaining / (1 + riders)` (its rescuable/hopeless judgement keeps the
    real remaining); the riders are held (tier 3, last in the order, like LPM's holdbacks) while the leader waits.
-   Held is a priority, not a ban: the admission loop does not skip them, but a rider is reached only after every
+   The starvation priority releases family-held riders; LPM holdbacks remain separate. Held is a priority, not a
+   ban: the admission loop does not skip them, but a rider is reached only after every
    earlier waiter was admitted or refused, and with the leader admitted as the round's partial a multi-round rider
    is refused anyway (one partial per batch). Once the leader runs, its chunks enter the tree, the riders' matches
    grow and they become ordinary short hits.
 5. Bounded CPU: with more than `max_candidates` (64) waiting cold requests the pairwise scan is skipped for the
-   round and 124's per-request order applies. Measured by Codex on the real functions (rank-0 CPU, Python lists):
-   34 fully shared prompts of 35k tokens, first round 17.8 ms, cached rounds 0.2 ms; 250k tokens, 117.9 ms then
-   0.3 ms; 100 prompts of 250k, 460 ms then 1.8 ms. N34 keeps at most 34 chains active (run 082's queue peak was
-   29), so the bound is a guard for higher levels, not a cost expected at N34.
+   round and 124's per-request order applies. Pair metadata is reset by `/flush_cache`; prompt hashes live on the
+   request. Hashing uses bounded token tuples rather than copying the full prompt into an int64 array. Both first
+   and cached rounds are measured by `scripts/analysis/benchmark_s1s2_cpu.py`; see the
+   [S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md) for paired results and source hashes.
 Logs `[ax-128] families=N leader=…:riders=k:others=m:work=…` when the set changes (at most every 2 s); the
 mechanism line shows `128=on`.
 
@@ -48,5 +52,5 @@ leader and rider selection, the link needs an uncached shared prefix, a big-tail
 dilutes, the override only ranks; on the real scheduler the family leader is admitted before a 14k and a 19k lone
 head while its riders stay held, with 128 off the 14k head goes first, 128 without 124 refuses.
 Estimate (queueing model of 109's opening, 10.3k tok/s): the family's 4 misses become passes, chain 9 → 5.
-Not validated: TP8 and any performance effect; the hashing cost on rank 0 (one pass per prompt, at most
-30 × 30 pair comparisons per round in the opening) is unmeasured.
+Additional regressions compare every pair against a naive LCP reference, separate namespaces, reuse RIDs and
+flush state. Local CPU timings do not establish TP8 or end-to-end SLO improvements.
