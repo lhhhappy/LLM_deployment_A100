@@ -99,6 +99,9 @@ def is_dcp_mla_decode_phase(forward_batch: ForwardBatch) -> bool:
     return (
         forward_batch.forward_mode.is_decode()
         or forward_batch.forward_mode.is_target_verify()
+        # [ax] 115: the NextN draft writes the same owner-striped latent
+        # layout. Draft extend must gather Q and merge partial attention too.
+        or forward_batch.forward_mode.is_draft_extend_v2()
     )
 
 
