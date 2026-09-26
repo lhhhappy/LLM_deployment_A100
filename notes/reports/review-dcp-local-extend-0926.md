@@ -34,3 +34,15 @@
 
 ## 探针应记录
 每条路由的 batch 数（含 T、P）；on/off 之外加 off/off 的 A/A，固定长前缀短尾 prompt，比较 greedy + top-k logprob 分布而非逐 token 相等（12 题冒烟太粗）；TP8 抽样行的选键捕获（集合重叠、第 512 组的 logit 差）；MTP 接受长度分布；每 rank 峰值显存、两臂相同 KV 池；每个新 T 首次出现的延迟离群。
+
+## 复审（6976639e，23:30 UTC）
+
+B1、B2、N1 已修，**不再阻塞 TP8 探针**。
+- B1：`kernels/ops/attention/dcp_local_indices.py:11-23` 的 ROWS/COLS/S0/S1/OUT_COLS 改为运行时参数并 `do_not_specialize`；剩余 constexpr（WIDTH、RANK、STRIDE、BLOCK）进程内固定。证据 `review_jit_v1.rank{0,1}.json`：543 种形状始终 1 个编译版本，后续首调最多 0.166 ms（旧实现 8 种形状 8 版、中位 56 ms）。TP8 上预期每进程 1 版（RANK 为 constexpr，两种 rank 值共 2 版）。COMPACT_TOPK=1 时索引表补到与 decode 相同的 1088 列，TileLang kernel 与 decode 共用，不新增编译；COMPACT_TOPK=0 会在服务中触发新的 TileLang 编译，要保持 =1。
+- B2：机制 token 来自已初始化的 policy 对象（`tp_worker.model_runner.eager_runner.dcp_local_extend_policy`），行内形如 `dcp_local=on dcp_local_max=512 dcp_local_large=0`，关闭/缺失时 `off/0/0`；路由计数纯 CPU（张量 shape、Python 列表求和、`time.monotonic`），首次每路线加每 30 s 一次日志，无 `.item()/.cpu()`。关闭时 policy 与计数都为 None，只剩逐层 `uses_local_extend()` 返回 False。
+- N1：`local_extend.py:125-128` 自行拒绝 KPool≠4 或 page_size%4≠0，启动时 ValueError（`:135-138`），有用例。
+- 第 3950 行：`review_indexer_final.json` 80/80 条记录，20 次运行里第 7 层第 512/513 名分数完全相等（0.0012001374270766973，两组 21028/23340），pooled K/scale/query/权重/FP32 logits 逐字节相同；base 与 local 各 5/10 翻转、两 rank 一致；翻转时 base A/A 差 5.419%、base 对 local 5.338%；同选键时 base 差 0、local 差 0.578%/0.617%（<1%）。根因在底包未改的 `kpool_topk_transform.cuh:186-195`：精确平局由 `atomicAdd` 竞争决定。结论：底包自身的非确定性，不是新路径的缺陷；残余风险是没人数过 8K 里有多少行在 512/513 边界精确平局，TP8 数值判定必须对照 OFF/OFF 的离散度。
+- CPU 用例 17/17。
+- 非阻塞：短路线按设计不覆盖冷首块（P=0）和 >512 token 的 batch，按 130ed 服务日志估算只有 5% 的 batch、约 7.9% 的缓存前缀 token 走它，对门的影响要靠 A/A 臂判定；第一个真实本地 batch 会在服务中编译一次（开发机约 61 ms），可在 policy 初始化时预热一次；计数是聚合值、含预热；冒烟/AIME/GPQA 都没有 4096+ 缓存前缀，不经过该路线。
+
+探针设计（已排队，130ez4/5/6）：引擎 6976639e、S1 设置 + dcp 2、N34 开场 600 s、冒烟门；三臂 OFF-a → ON → OFF-b（env 不同即各自起引擎，OFF-b 对 OFF-a 是 A/A 噪声）；G_EXPECT 分别带 `dcp_local=off dcp_local_max=0 dcp_local_large=0` / `dcp_local=on dcp_local_max=512 dcp_local_large=0`；ON 臂用 `scripts/analysis/dcp_route_audit.py --tp-size 8 --role target|draft --require local_short` 在测量窗口内核 8 个 rank 的路由快照，OFF 臂 `grep -c '\[ax-dcp-local\]'` 应为 0；比较同 ID 四门、短暖续算（缓存 ≥4096、新算 ≤512）的执行与排队时间、TPOT、MTP 接受长度、每卡峰值显存与池容量。

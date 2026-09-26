@@ -117,13 +117,19 @@
     "job": "130eezz-dcp_stack2_w4_n38_60m",
     "ref": "130eezy-dcp_stack2_w2_n38_60m",
     "what": "DCP W4 N38（--dcp-size 4，池约 ×2.56；冒烟门先过）",
-    "status": "running；冒烟 11/12（第 2 题 738 答成 657，平均完成 1204 token，W2 同题 12/12、2670）：W4 的数值未经 TP8 验证，本轮只当容量/TPOT 读数，不作提交候选，闭合后对比同 ID 的输出长度"
+    "verdict": "排空 3361；冒烟 11/12（第 2 题错）。对 W2 N38 同 3348 条：chain 22=22、turn 7=7（各换了 5 条）、overall 90→76、fast 103→76、TPOT>0.10 78→69、均值 52.7→53.1 ms；产能账相同（D 30.3→30.6、W 1.89→1.78）。池 3.63M 用 43–61%、无排队，但只换来 fast/overall 各减二三十条：N38 剩下的 chain/turn 是开场吞吐和通道，不是容量。输出长度由 harness 钉死（3348 条全到 max_output），不能用它验数值；W4 数值仍以 11/12 存疑，不作候选"
   },
   {
     "job": "130ee-dcp_stack2_w1_n30_60m",
     "ref": "112-v3_n30_124_125x_117_60m",
     "what": "DCP 对照 W1（--dcp-size 1，同引擎）N30 60 分钟；对 112 看新栈本身有没有变化",
     "verdict": "排空 3105、冒烟 12/12。对 112 同 3078 条：chain 26→21、turn 24→31、overall 448→452、fast 508→514、TPOT>0.10 35=35，修/新各约 300 条——新栈（DCP 三补丁，dcp=1）与旧引擎无系统差别；池 1.36M 峰值 99%、排队 6–9、host 回载 388–560 GiB/2 min，旧形态原样复现"
+  },
+  {
+    "job": "130eezzy-cap_full_S1dcp_w2",
+    "ref": "",
+    "what": "能力复核（只测最可疑的候选引擎）：S1+DCP2 跑公开 AIME26（30）+ GPQA-Diamond（197）；过线即可，S1 参照只在它失败时再跑",
+    "status": "running：就绪 195 s，冒烟 12/12（平均 4332 token），AIME26+GPQA 全量进行中"
   },
   {
     "job": "130ef-v3_n30_A_warm15_fixes_60m",
@@ -148,6 +154,24 @@
     "ref": "130ef-v3_n30_A_warm15_fixes_60m",
     "what": "S1 + DCP2 在 N30 对 S1 参照：给线上 46676→下一次提交的差值一个本地对应",
     "status": "待发布"
+  },
+  {
+    "job": "130ez4-v3_open_S1dcp_local_offa_n34",
+    "ref": "",
+    "what": "Codex 本地续算路径探针 OFF-a（引擎 6976639e，S1+dcp2，N34 开场）",
+    "status": "已发布（能力复核之后、按名字在 130ez3 后）"
+  },
+  {
+    "job": "130ez5-v3_open_S1dcp_local_on_n34",
+    "ref": "130ez4-v3_open_S1dcp_local_offa_n34",
+    "what": "同上 ON（SGLANG_AX_DCP_LOCAL_EXTEND=1）",
+    "status": "已发布"
+  },
+  {
+    "job": "130ez6-v3_open_S1dcp_local_offb_n34",
+    "ref": "130ez4-v3_open_S1dcp_local_offa_n34",
+    "what": "同上 OFF-b（A/A 噪声）",
+    "status": "已发布"
   },
   {
     "job": "130f-v3_n30_A_warm15_nomtp_60m",
