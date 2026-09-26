@@ -1397,25 +1397,27 @@ class Scheduler(
             if cap_max and cap_max < _ax_sched_protect_config()[0]:
                 raise ValueError("[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX is below SGLANG_AX_SCHED_COLD_CAP")
             backlog = self._ax_admission_cfgs()[1]
-            if cap_max and backlog is not None and backlog.cold_cap:
-                raise ValueError("[ax] 126 and 125's SGLANG_AX_BACKLOG_COLD_CAP both size the cold cap; set one")
             cap_max = cap_max or None
             self._ax_demand_cap_max_cfg = cap_max
             if cap_max:
-                logger.info(f"[ax] 126 on: cold cap between 120's cap and {cap_max} by waiting short-hit demand")
+                relief = backlog.cold_cap if backlog is not None and backlog.cold_cap else None
+                # With 125, its cold cap is the maximum while relieved (the reserve still applies, so waiting
+                # short hits keep their seat in the opening); the usual maximum applies otherwise.
+                logger.info(f"[ax] 126 on: cold cap between 120's cap and {cap_max} by waiting short-hit demand"
+                            + (f"; {relief} while 125 relieves" if relief else ""))
         return cap_max
 
-    def _ax_demand_limits(self, chunk_size, ax_protect):
+    def _ax_demand_limits(self, chunk_size, ax_protect, cap_max=None):
         """[ax] 126: this round's cold cap = the budget minus what the waiting complete short hits need (the
         requests 120 lets share a batch with a partial), counting only hits that fit beside 120's cap, clamped to
         [120's cap, COLD_CAP_MAX] on the checkpoint grid. Hits refused for another reason stop being reserved
         (_ax_short_hit_reserve). The inputs are the queue after calc_priority's prefix match, identical on every TP
-        rank.
+        rank. `cap_max` overrides COLD_CAP_MAX for this round (125's cold cap while relieved).
         """
         floor, short, grid = ax_protect
         budget = min(chunk_size, self.max_prefill_tokens) // grid * grid
         reserve = self._ax_short_hit_reserve(budget, floor, short)
-        cap_max = self._ax_demand_cap_max() // grid * grid
+        cap_max = (cap_max or self._ax_demand_cap_max()) // grid * grid
         return max(floor, min(cap_max, (budget - reserve) // grid * grid)), short, grid
 
     def _ax_should_decode(self, running_batch: ScheduleBatch) -> bool:
@@ -4102,17 +4104,22 @@ class Scheduler(
             prefill_tile_block_m = 64  # Fallback for non-Triton backends
 
         ax_protect = self._ax_sched_protect_limits(chunked_prefill_size)
+        backlog = self._ax_admission_cfgs()[1]
+        # [ax] 125 opening mode: the cold cap while relieved. The flag is last round's broadcast
+        # decision (this round's plan needs the cap as its round budget), so all ranks agree.
+        relieved_cap = (backlog.cold_cap if ax_protect is not None and backlog is not None
+                        and backlog.cold_cap and self._ax_backlog_relieved else 0)
         if ax_protect is not None and self._ax_pace() is not None:
             chunked_prefill_size, ax_protect = self._ax_pace_limits(chunked_prefill_size, ax_protect)
         elif ax_protect is not None and self._ax_demand_cap_max() is not None:
-            ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect)
-        backlog = self._ax_admission_cfgs()[1]
-        if ax_protect is not None and backlog is not None and backlog.cold_cap and self._ax_backlog_relieved:
-            # [ax] 125 opening mode: the cold cap while relieved. The flag is last round's broadcast
-            # decision (this round's plan needs the cap as its round budget), so all ranks agree.
+            # [ax] 126 with 125: while relieved, 125's cold cap is the maximum the demand-sized cap may reach, so
+            # the waiting short hits keep their seat beside the cold chunk in the opening as well (run 109: warm
+            # turn starts waited 18-23 s for the lane while relief ran 8192-token cold chunks with no room left).
+            ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect, cap_max=relieved_cap or None)
+        elif relieved_cap:
             _, short, grid = ax_protect
             budget = min(chunked_prefill_size, self.max_prefill_tokens) // grid * grid
-            ax_protect = (min(max(grid, backlog.cold_cap // grid * grid), budget), short, grid)
+            ax_protect = (min(max(grid, relieved_cap // grid * grid), budget), short, grid)
 
         adder = PrefillAdder(
             self.page_size,

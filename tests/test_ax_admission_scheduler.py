@@ -229,6 +229,47 @@ class BacklogRelief(unittest.TestCase):
         self.assertEqual(chunks, [('c0', 0, 4096), ('c0', 4096, 12288)])
 
 
+class DemandCapUnderRelief(unittest.TestCase):
+    # 126 with 125: while relieved, 125's cold cap is the maximum of 126's demand-sized cap, so a waiting short hit
+    # keeps its seat beside the cold chunk instead of waiting the whole continuation (run 109: warm turn starts
+    # waited 18-23 s while relief ran 8192-token cold chunks with no room left).
+    def env(self, **extra):
+        return patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_SCHED_COLD_CAP': '4096',
+                                       'SGLANG_AX_SCHED_COLD_CAP_MAX': '6144', 'SGLANG_AX_DEADLINE_TIERS': '1',
+                                       'SGLANG_AX_BACKLOG_RELIEF': '1', 'SGLANG_AX_BACKLOG_COLD_CAP': '8192',
+                                       'SGLANG_AX_BACKLOG_INTERVAL': '2', **extra})
+
+    def hit(self, rid, new):
+        return Req(rid, new, cached=65536)  # device prefix hit, `new` uncached tokens
+
+    def run_two_rounds(self, with_126):
+        env = self.env() if with_126 else self.env(SGLANG_AX_SCHED_COLD_CAP_MAX='')
+        with env:
+            # a 30k cold start (short: no parking) and three long ones make the cold backlog large at 9000 tok/s
+            s, _ = scheduler(waiting=[cold('c0', 30000)] + [cold(f'c{i}', 120000) for i in (1, 2, 3)],
+                             budget=8192, interval=2)
+            s._ax_admission_cfgs()
+            s._ax_backlog.rate = 9000.0
+            first = step(s)
+            self.assertEqual(first['mode'], 'prefill')
+            self.assertTrue(s._ax_backlog_relieved)  # decided in round one, applied from round two
+            t = step(s, arrivals=[self.hit('h', 3000)])
+            while t['mode'] != 'prefill':
+                t = step(s)
+        return first['reqs'], t['reqs']
+
+    def test_relieved_cold_chunk_leaves_the_seat_when_126_is_on(self):
+        first, second = self.run_two_rounds(with_126=True)
+        self.assertEqual(first, [('c0', 0, 6144)])  # not yet relieved: 126's maximum
+        # relieved: 8192 minus the hit's paged need (3008), on the 256 grid -> 5120, and the hit rides along
+        self.assertEqual(second, [('c0', 6144, 11264), ('h', 65536, 68536)])
+
+    def test_relieved_cold_chunk_takes_the_whole_round_without_126(self):
+        first, second = self.run_two_rounds(with_126=False)
+        self.assertEqual(first, [('c0', 0, 4096)])
+        self.assertEqual(second, [('c0', 4096, 12288)])  # the hit waits
+
+
 class Refusals(unittest.TestCase):
     # Each refusal is matched on its message, so a config refused for another reason does not pass.
     def test_124_with_123_refuses(self):
