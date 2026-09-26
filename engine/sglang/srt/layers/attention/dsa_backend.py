@@ -175,11 +175,14 @@ def _should_all_gather_dsa_trtllm_fp8_kv(
     return save_kv_cache and cos_sin_cache is not None and dsa_prefill_cp
 
 
-def _should_return_dsa_dcp_lse(*, forward_mode: ForwardMode, dcp_enabled: bool) -> bool:
+def _should_return_dsa_dcp_lse(
+    *, forward_mode: ForwardMode, dcp_enabled: bool, local_extend: bool = False
+) -> bool:
     return dcp_enabled and (
         forward_mode.is_decode()
         or forward_mode.is_target_verify()
         or forward_mode.is_draft_extend_v2()
+        or local_extend
     )
 
 
@@ -3038,6 +3041,10 @@ class DeepseekSparseAttnBackend(
         metadata = self.forward_metadata
         assert causal, "DSA is causal only"
 
+        from sglang.srt.layers.dcp.local_extend import uses_local_extend
+
+        local_extend = uses_local_extend(forward_batch)
+
         dsa_impl = (
             self.dsa_decode_impl
             if (
@@ -3175,6 +3182,7 @@ class DeepseekSparseAttnBackend(
             and get_parallel().dcp_enabled
             and not forward_batch.forward_mode.is_target_verify()
             and not forward_batch.forward_mode.is_draft_extend_v2()
+            and not local_extend
         ):
             md = forward_batch.attn_dcp_metadata
             if md is None or md.dcp_kv_buffer is None:
@@ -3217,18 +3225,38 @@ class DeepseekSparseAttnBackend(
             if _should_return_dsa_dcp_lse(
                 forward_mode=forward_batch.forward_mode,
                 dcp_enabled=get_parallel().dcp_enabled,
+                local_extend=local_extend,
             ):
                 # [ax] 116: target-verify under DCP is a partial (LSE) pass like decode.
+                if local_extend:
+                    from sglang.kernels.ops.attention.dcp_local_indices import (
+                        local_dcp_indices,
+                    )
+
+                    ps = get_parallel()
+                    local_indices = local_dcp_indices(
+                        page_table_1,
+                        width=ps.attn_dcp_size,
+                        rank=ps.attn_dcp_rank,
+                        kpool_stride=math.gcd(ps.attn_dcp_size, self.dsa_index_kpool),
+                    )
+                else:
+                    local_indices = _ax116_dcp_local_indices(
+                        page_table_1, kpool_stride=self.dcp_topk_column_stride
+                    )
                 out, lse = self._forward_tilelang(
                     q_all=q_all,
                     kv_cache=kv_cache,
-                    page_table_1=_ax116_dcp_local_indices(
-                        page_table_1, kpool_stride=self.dcp_topk_column_stride
-                    ),
+                    page_table_1=local_indices,
                     sm_scale=layer.scaling,
                     v_head_dim=layer.v_head_dim,
                     return_lse=True,
                 )
+                if local_extend:
+                    # Eager-only output owned by this call; no graph buffer or
+                    # caller aliases it. Avoid another T*H*W*D output allocation
+                    # while retaining zero contribution from an empty shard.
+                    return out.nan_to_num_(nan=0.0, posinf=0.0, neginf=0.0), lse
                 return torch.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0), lse
             return self._forward_tilelang(
                 q_all=q_all,

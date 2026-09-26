@@ -31,6 +31,8 @@ from sglang.srt.layers.cp.utils import (
     is_cp_v2_active,
     prepare_cp_forward,
 )
+from sglang.srt.layers.dcp.local_extend import LocalExtendPolicy
+from sglang.srt.layers.dcp.metadata import DecodeContextParallelMetadata
 from sglang.srt.layers.pooler import EmbeddingPoolerOutput
 from sglang.srt.model_executor.cuda_graph_buffer_registry import (
     build_eager_registry,
@@ -86,6 +88,8 @@ class EagerRunner(BaseRunner):
         super().__init__(model_runner)
         mr = model_runner
         sa = mr.server_args
+        self.dcp_local_extend_policy = LocalExtendPolicy.from_runner(mr)
+        self._dcp_local_extend_batches = 0
         # Built first so the cg runners coalesce onto its buffers via the shared
         # input pool; size to the largest tokens/req across modes the worker hits.
         num_tokens_per_req = 1
@@ -302,22 +306,46 @@ class EagerRunner(BaseRunner):
                     model_runner.model, "prepare_context_parallel_metadata_for_dcp"
                 )
             ):
-                # prepare kv cache buffer for dcp to gather kv cache
-                forward_batch.attn_dcp_metadata = (
-                    model_runner.model.prepare_context_parallel_metadata_for_dcp(
-                        forward_batch.seq_lens,
-                        forward_batch.extend_prefix_lens,
-                        forward_batch.extend_prefix_lens_cpu,
-                        forward_batch.extend_seq_lens,
-                        forward_batch.req_pool_indices,
-                        get_req_to_token_pool().req_to_token,
-                        forward_batch.seq_lens_sum,
-                        get_token_to_kv_pool().get_kv_buffer_shape()[0],
-                        model_runner.kv_cache_dtype,
-                        model_runner.device,
-                        create_chunked_prefix_cache_kv_indices,
+                # Choose once from replicated CPU lengths and padded Q count.
+                # Local attention needs neither the prefix gather buffer nor its
+                # virtual-to-gathered-row table. Never touch the cached pool here.
+                policy = self.dcp_local_extend_policy
+                local_extend = (
+                    policy is not None
+                    and forward_batch.forward_mode.is_context_parallel_extend()
+                    and policy.select(
+                        sum(forward_batch.extend_prefix_lens_cpu),
+                        len(forward_batch.input_ids),
                     )
                 )
+                if local_extend:
+                    forward_batch.attn_dcp_metadata = DecodeContextParallelMetadata(
+                        dcp_local_extend=True,
+                    )
+                    self._dcp_local_extend_batches += 1
+                    if self._dcp_local_extend_batches == 1:
+                        logger.info(
+                            "[ax] DCP local extend engaged: prefix=%d, padded_q=%d, heads=%d",
+                            sum(forward_batch.extend_prefix_lens_cpu),
+                            len(forward_batch.input_ids),
+                            policy.heads,
+                        )
+                else:
+                    forward_batch.attn_dcp_metadata = (
+                        model_runner.model.prepare_context_parallel_metadata_for_dcp(
+                            forward_batch.seq_lens,
+                            forward_batch.extend_prefix_lens,
+                            forward_batch.extend_prefix_lens_cpu,
+                            forward_batch.extend_seq_lens,
+                            forward_batch.req_pool_indices,
+                            get_req_to_token_pool().req_to_token,
+                            forward_batch.seq_lens_sum,
+                            get_token_to_kv_pool().get_kv_buffer_shape()[0],
+                            model_runner.kv_cache_dtype,
+                            model_runner.device,
+                            create_chunked_prefix_cache_kv_indices,
+                        )
+                    )
             if hasattr(model_runner.model, "prepare_forward_batch"):
                 # Prepare model-specific attention metadata before planning,
                 # e.g. Moss-VL's prefill cross-attention custom mask.

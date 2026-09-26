@@ -35,3 +35,6 @@ class DecodeContextParallelMetadata:
     dcp_kv_indices: Optional[torch.Tensor] = None
     dcp_local_prefix_kv_indices: Optional[torch.Tensor] = None
     dcp_extend_prefix_lens_sum: Optional[int] = None
+    # Keep the existing positional constructor order. Selected once by the
+    # eager runner, before allocating a gathered KV buffer.
+    dcp_local_extend: bool = False
