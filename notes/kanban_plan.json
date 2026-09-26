@@ -81,13 +81,73 @@
     "job": "130eb-v3_open_A_warm15_fixes_n30",
     "ref": "130a-v3_open_A_warm15_n30",
     "what": "A′ + 审查分支对已启用机制的四个修正（124/110/117/180，引擎 f546934e）",
-    "status": "运行中（46676/46677 所用引擎的开场对照）"
+    "verdict": "冒烟 12/12；chain 14→15（修 1 新 2）、turn 0=0、overall 47→36、fast 51→42、TPOT>0.10 34→39：与 130ea 同向，fast/overall 各降约 10，chain 在噪声内。46676/46677 所用引擎"
   },
   {
     "job": "130ec-v3_n30_A_warm15_fixes_slow250_60m",
     "ref": "130b-v3_n30_A_warm15_60m",
     "what": "S2 确认：A′ + 修正引擎 + 125 护栏 80→250（60 分钟）",
-    "status": "发布任务已挂（130eb 之后）；S2 已直接提交，此运行只作事后确认"
+    "verdict": "开跑约 3 分钟后由 fable stopjob 停止（用户：S2 先不测，把 8 卡让给 DCP）"
+  },
+  {
+    "job": "130ed-dcp_stack2_w2_n30_60m",
+    "ref": "112-v3_n30_124_125x_117_60m",
+    "what": "DCP W2（--dcp-size 2）N30 60 分钟，Codex 分支 b261cbd9，A 调度、MTP 3/1/4、running 32",
+    "verdict": "排空 3123 条、0 错误、冒烟 12/12。对 112（同 A 调度）同 3076 条：chain 27→15（修 13 新 1，剩下的 15 条全是开场）、turn 24→2、overall 449→74、fast 506→72；TPOT 均值 36.5→42.7 ms、>0.10 35→40。产能账：同时解码会话 19.8→23.4，等首 token 4.96→1.38，完成率与输出 tok/s 相同。机制：池 1.40M→2.38M，全程无排队——本地 N30 的墙是显存，DCP2 直接拆掉。W1 对照（130ee）待跑以分离新栈自身的贡献"
+  },
+  {
+    "job": "130ee5-dcp_stack2_w2_n34_60m",
+    "ref": "130eez-dcp_stack2_w1_n34_60m",
+    "what": "DCP W2 N34（running 48）",
+    "status": "已发布，130ed 之后"
+  },
+  {
+    "job": "130eez-dcp_stack2_w1_n34_60m",
+    "ref": "136-v3_n34_base48_60m",
+    "what": "DCP 对照 W1 N34（running 48）",
+    "status": "已发布，130ee 之后"
+  },
+  {
+    "job": "130ee-dcp_stack2_w1_n30_60m",
+    "ref": "112-v3_n30_124_125x_117_60m",
+    "what": "DCP 对照 W1（--dcp-size 1，同引擎）N30 60 分钟；对 112 看新栈本身有没有变化",
+    "status": "已发布，130ed 之后"
+  },
+  {
+    "job": "130ef-v3_n30_A_warm15_fixes_60m",
+    "ref": "130b-v3_n30_A_warm15_60m",
+    "what": "基线：A′ + 修正引擎 f546934e（46676 引擎）60 分钟",
+    "status": "已发布"
+  },
+  {
+    "job": "130eg-v3_n30_A_warm15_fixes_slow250_60m",
+    "ref": "130ef-v3_n30_A_warm15_fixes_60m",
+    "what": "K1：MAX_SLOW 80→250（= 46677）",
+    "status": "已发布"
+  },
+  {
+    "job": "130eh-v3_n30_A_warm15_fixes_pdi1_60m",
+    "ref": "130ef-v3_n30_A_warm15_fixes_60m",
+    "what": "K2：prefill-decode-interval 2→1",
+    "status": "已发布"
+  },
+  {
+    "job": "130ei-v3_n30_A_warm15_fixes_high8_60m",
+    "ref": "130ef-v3_n30_A_warm15_fixes_60m",
+    "what": "K4：BACKLOG_HIGH_S 15→8",
+    "status": "已发布"
+  },
+  {
+    "job": "130ej-v3_open_A_warm15_fixes_multi5_n30",
+    "ref": "130eb-v3_open_A_warm15_fixes_n30",
+    "what": "K3 探针：分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 9be15822",
+    "status": "待发布"
+  },
+  {
+    "job": "130ek-v3_n30_A_warm15_fixes_multi5_60m",
+    "ref": "130ef-v3_n30_A_warm15_fixes_60m",
+    "what": "K3 60 分钟",
+    "status": "待发布"
   },
   {
     "job": "130f-v3_n30_A_warm15_nomtp_60m",

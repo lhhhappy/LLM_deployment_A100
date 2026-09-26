@@ -4,7 +4,7 @@
 # diagnostics, not verdicts), plus the job.log lines that decide whether the run is healthy (mechanism and data checks,
 # warmup, gate failures, tracebacks, OOM). Each snapshot line is appended to build/scratch/progress/<job>.log so the
 # ticks can be compared. Nothing is written on the pod.
-#   bash scripts/analysis/pod_progress.sh            # report
+#   bash scripts/analysis/pod_progress.sh            # report (per running job: window snapshot + bottleneck reading from live metrics)
 # Early stop is a human decision: stop a single test job with scripts/pod/stopjob <job.sh> on the GPU box; never the service.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
@@ -24,6 +24,12 @@ for job in $running; do
   echo "  now:  $snap"
   prev=$(tail -n 2 "build/scratch/progress/$name.log" | head -n 1)
   [ "$prev" != "$line" ] && [ -n "$prev" ] && echo "  prev: ${prev#* }"
+  # Bottleneck reading from the job's sampled server metrics (KV pool, KDA slots, running/queued, decode rate, host tier).
+  bn=$(timeout 200 python3 -B scripts/analysis/bottleneck_snapshot.py "$name" 2>&1 | tail -1 | cut -c1-600)
+  echo "$(date -u +%FT%TZ) $bn" >> "build/scratch/progress/$name.bottleneck.log"
+  echo "  load: ${bn#*: }"
+  prevbn=$(tail -n 2 "build/scratch/progress/$name.bottleneck.log" | head -n 1)
+  [ -n "$prevbn" ] && [ "$prevbn" != "$(date -u +%FT%TZ) $bn" ] && echo "  prev load: ${prevbn#* }" | cut -c1-400
 done
 [ -n "$running" ] || echo "(nothing running)"
 # Global board: every job of the plan with its reference and per-gate arrows (notes/kanban_plan.json -> notes/kanban.md).
