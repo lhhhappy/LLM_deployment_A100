@@ -216,6 +216,14 @@ class DSAIndexerPoolHost(HostKVCache):
         if buffer is not None and self.pin_memory and (_is_cuda or _is_hip):
             _cuda_host_unregister(buffer)
         self.index_k_with_scale_buffer = None
+        # layer_first views keep the entire host allocation alive even after
+        # its owning attribute is cleared. Release our views and staging
+        # allocations too; the device pool retains its own original buffers.
+        self.index_k_data_refs = []
+        self.index_k_data_ptrs = None
+        self.index_k_device_ptrs = None
+        self.packed_device_index_buffers = []
+        self.staging_buffer = None
         super().destroy()
 
     def get_size_per_token(self):
