@@ -45,7 +45,8 @@ def build(out, specs):
     if not jobs or len({j['name'] for j in jobs}) != len(jobs):
         raise ValueError('empty or duplicate job list')
     for p in [Path('scripts/pod/lib.sh'), Path('scripts/pod/storage_env.sh'),
-              Path('scripts/pod/jobs/dev_ladder_template.sh')]:
+              Path('scripts/pod/jobs/dev_ladder_template.sh'),
+              Path('scripts/longchain/make_prefix_set.py')]:
         dest = Path('bin')/p
         (out/dest).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT/p, out/dest)
@@ -71,7 +72,7 @@ def atomic_copy(source, dest):
     tmp.replace(dest)
 
 
-def publish(stage, ax):
+def publish(stage, ax, allow_pending=False):
     manifest = json.loads((stage/'bundle.json').read_text())
     assert manifest['workflow'] == 'engine_commit_v1'
     queue = ax/'queue'
@@ -88,7 +89,15 @@ def publish(stage, ax):
         assert src.is_file(), str(src)
     names = {j['name'] for j in manifest['jobs']}
     pending = {p.name for p in (queue/'pending').glob('*.sh')}
-    assert pending <= names, f'unexpected pending jobs: {pending-names}'
+    if allow_pending:
+        # Insert jobs ahead of or among jobs that are already pending. The runtime files are replaced for
+        # everyone, so this is only safe when the deployed runtime is the same code (same scripts/pod); the
+        # worker picks pending jobs in name order, so the caller chooses names that sort where it wants them.
+        foreign = sorted(pending - names)
+        if foreign:
+            print('PENDING_KEPT', ' '.join(foreign), flush=True)
+    else:
+        assert pending <= names, f'unexpected pending jobs: {pending-names}'
     for job in manifest['jobs']:
         src = stage/job['source']
         assert src.is_file()
@@ -122,9 +131,10 @@ def main():
     p.add_argument('stage', type=Path)
     p.add_argument('jobs', nargs='*')
     p.add_argument('--ax', type=Path, default=Path('/tmp/ax'))
+    p.add_argument('--allow-pending', action='store_true', help='publish while other jobs are pending (same runtime code)')
     a = p.parse_args()
     if a.action == 'build': build(a.stage, a.jobs)
-    else: publish(a.stage, a.ax)
+    else: publish(a.stage, a.ax, allow_pending=a.allow_pending)
 
 
 if __name__ == '__main__': main()

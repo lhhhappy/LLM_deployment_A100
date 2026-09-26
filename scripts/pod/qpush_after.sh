@@ -7,6 +7,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 wait_for=${1:?done-job-name substring to wait for}; shift
+ignore_pending=0
+if [ "${1:-}" = "--ignore-pending" ]; then ignore_pending=1; shift; fi   # insert among pending jobs (name order decides)
 [ "$#" -gt 0 ] || { echo 'qpush_after <wait-for> queue-name.sh=scripts/pod/jobs/file.sh ...'; exit 2; }
 bash scripts/pod/verify/make_kit.sh >/dev/null
 id="queue-after-$(date -u +%Y%m%dT%H%M%S)-$$"
@@ -18,14 +20,15 @@ cd /sjtu/linhang/arena/repo
 source scripts/pod/common.sh
 state() { PEXEC_TIMEOUT=60 bexec 'cd /tmp/ax/queue && echo "running=\$(ls running 2>/dev/null | tr "\n" " ")" && echo "pending=\$(ls pending 2>/dev/null | tr "\n" " ")" && echo "finished=\$(ls done failed 2>/dev/null | tr "\n" " ")"'; }
 pushed=0
+allow_flag=""; [ "$ignore_pending" = 1 ] && allow_flag="--allow-pending"
 while :; do
   s=\$(state) || { echo "[wait] \$(date -u +%FT%TZ) state read failed; retry in 120 s"; sleep 120; continue; }
   echo "[wait] \$(date -u +%FT%TZ) \$(tr '\n' ' ' <<<"\$s")"
-  if grep -q '^running= *\$' <<<"\$s" && grep -q '^pending= *\$' <<<"\$s" && grep -q "^finished=.*$wait_for" <<<"\$s"; then
+  if grep -q '^running= *\$' <<<"\$s" && { [ "$ignore_pending" = 1 ] || grep -q '^pending= *\$' <<<"\$s"; } && grep -q "^finished=.*$wait_for" <<<"\$s"; then
     # idle: pause, deploy, publish; if another publisher got in first the publish asserts and we resume and retry
     bexec 'touch /tmp/ax/queue/PAUSE && echo paused'
     [ "\$pushed" = 1 ] || { scripts/pod/ppush /tmp/ax/staging/$id $bundle && pushed=1; }
-    if bexec 'python3 /tmp/ax/staging/$id/$bundle/queue_bundle.py publish /tmp/ax/staging/$id/$bundle'; then
+    if bexec 'python3 /tmp/ax/staging/$id/$bundle/queue_bundle.py publish /tmp/ax/staging/$id/$bundle $allow_flag'; then
       bexec 'rm -f /tmp/ax/queue/PAUSE && echo resumed'
       break
     fi
