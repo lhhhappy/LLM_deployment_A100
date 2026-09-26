@@ -78,3 +78,15 @@ The 2026-09-26 repair regressions are in `tests/test_s1s2_review_optimizations.p
 with fake pools, including native rejection cleanup, same-pass fallback and two simulated ranks. See the
 [S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md) for counterexamples and validation boundaries.
 The new repair has not established TP8 performance; the estimate's constants remain from 071.
+
+## Size-tiered warm budget (follow-up, 2026-09-26)
+
+`SGLANG_AX_DEADLINE_WARM_MULTI_S` (default = `SGLANG_AX_DEADLINE_WARM_S`) and `SGLANG_AX_DEADLINE_WARM_MULTI_TOKENS`
+(default 8192): a warm request whose remaining prefill exceeds the token threshold, so it needs more than one
+chunked round and holds the single partial-prefill lane for several rounds, is judged against the multi-round
+budget; one-round warm requests keep the warm budget. Why: with one 15 s warm budget (run 130b versus 112) the
+20k-70k-token warm turn starts became "rescuable" and outranked cold chain heads, and the one-round warm hits
+queued behind them (chain 26->30, overall 448->512, fast 506->554), while the requests the 15 s budget actually
+saved were one-round turn starts (turn 24->16). Setting WARM_S=15 with WARM_MULTI_S=5 keeps the rescue for the
+one-round class and leaves the multi-round class where the 5 s budget put it. Unset, the order is unchanged.
+
