@@ -21,6 +21,9 @@ source scripts/pod/common.sh
 state() { PEXEC_TIMEOUT=60 bexec 'cd /tmp/ax/queue && echo "running=\$(ls running 2>/dev/null | tr "\n" " ")" && echo "pending=\$(ls pending 2>/dev/null | tr "\n" " ")" && echo "finished=\$(ls done failed 2>/dev/null | tr "\n" " ")"'; }
 pushed=0
 allow_flag=""; [ "$ignore_pending" = 1 ] && allow_flag="--allow-pending"
+# Inserting among pending jobs: pause now, so the worker does not start the next pending job in the seconds
+# between the target job ending and this publish (it did on 2026-09-26: 134 started before 130a could be queued).
+[ "$ignore_pending" = 1 ] && bexec 'touch /tmp/ax/queue/PAUSE && echo paused-early'
 while :; do
   s=\$(state) || { echo "[wait] \$(date -u +%FT%TZ) state read failed; retry in 120 s"; sleep 120; continue; }
   echo "[wait] \$(date -u +%FT%TZ) \$(tr '\n' ' ' <<<"\$s")"
