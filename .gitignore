@@ -20,4 +20,6 @@ credentials*
 .venv-longchain/
 data/longchain-*/
 data/s1-dev-longchain/
+data/s1-dev-longchain-lite/
 build/engine/
+.codegraph/
