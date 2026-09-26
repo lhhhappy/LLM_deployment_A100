@@ -27,6 +27,13 @@ if [ "${SMOKE_GATE:-1}" = 1 ]; then
   c=$(grep -o "correct=[0-9]*" $RUN_DIR/smoke.log | cut -d= -f2)
   [ -n "$c" ] && [ "$c" -ge "${SMOKE_MIN:-6}" ] || { echo "GATE FAIL: capability smoke ${c:-?}/12"; exit 6; }
 fi
+# Optional full capability check (public AIME 2026 + GPQA-Diamond through the served engine; see verify_kit/cap_full_body.sh).
+# G_CAP_FULL=1 runs it after the smoke; LADDER_UP=none then ends the job without a load level.
+if [ "${G_CAP_FULL:-0}" = 1 ]; then
+  RUN_DIR=$RUN_DIR PORT=$PORT CAP_DIR=${G_CAP_DIR:-$AX/verify_kit} CAP_CONCURRENCY=${G_CAP_CONCURRENCY:-24} \
+    bash $AX/verify_kit/cap_full_body.sh | tee $RUN_DIR/cap_full.log | grep CAP_FULL
+fi
+if [ "${LADDER_UP:-}" = none ]; then echo "LADDER none: capability-only job"; exit 0; fi
 S1=$AX/s1/s1-dev; first=1
 # Independent frozen datasets must use their own root/set/cohort consistently.
 # These variables only affect newly scheduled jobs; existing pod jobs are not updated.

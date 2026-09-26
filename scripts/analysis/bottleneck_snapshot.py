@@ -7,7 +7,7 @@ each a JSON line of /metrics gauges written by build/verify_kit/metrics_sampler.
   KV pool used/evictable share, KDA slots used, running and queued requests, decode throughput, MTP acceptance,
   host tier fill, load-back and eviction deltas over the sampled span, retractions,
 followed by a reading of what binds now:
-  KV wall      used >= 90% of the pool, little evictable, and requests queued: admission waits for KV (capacity);
+  KV wall      peak use >= 95% of the pool (or >= 90% with <= 10% evictable) and requests queued: admission waits for KV;
   lane-bound   requests queued while KV is available: the single chunked-prefill lane / ordering decides the waits;
   cap-bound    running at the --max-running-requests cap with a queue: the concurrency cap, not memory;
   decode-only  no queue: whatever misses appear come from execution time, not from waiting.
@@ -49,7 +49,16 @@ def main():
     a = ap.parse_args()
     m = re.search(r'_n(\d+)_', a.job)
     level = m.group(1) if m else '30'
-    cap = a.max_running or (48 if '_48_' in a.job or 'n34' in a.job else 32)
+    cap = a.max_running
+    if cap is None:
+        # Read --max-running-requests from the job script when it exists locally; else 48 for N34+ names, 32 otherwise.
+        cap = 48 if re.search(r'_n(3[4-9]|[4-9]\d)_', a.job) or '_48_' in a.job else 32
+        base = re.sub(r'^[0-9a-z]+-', '', a.job)
+        script = ROOT / 'scripts/pod/jobs' / f'{base}.sh'
+        if script.exists():
+            m2 = re.search(r'--max-running-requests (\d+)', script.read_text())
+            if m2:
+                cap = int(m2.group(1))
     rows = pread_tail(f'/tmp/ax/runs/{a.job}/N{level}/metrics.jsonl', a.lines)
     if not rows:
         print(f'{a.job}: no metrics samples yet')
@@ -59,14 +68,16 @@ def main():
     kda_used, _, kda_pool = share(last.get('mamba_used_tokens'), last.get('mamba_available_tokens'), last.get('mamba_evictable_tokens'))
     running, queued = int(last.get('num_running_reqs') or 0), int(last.get('num_queue_reqs') or 0)
     span = max(1.0, (last.get('t', 0) - first.get('t', 0)))
-    lb = (last.get('load_back_tokens_total') or 0) - (first.get('load_back_tokens_total') or 0)
+    # The sampler keeps load-back as bytes and a count (the token counter is labeled per pool and not flattened).
+    lb = (last.get('load_back_bytes_total') or 0) - (first.get('load_back_bytes_total') or 0)
+    lbn = (last.get('load_back_duration_seconds_count') or 0) - (first.get('load_back_duration_seconds_count') or 0)
     ev = (last.get('evicted_tokens_total') or 0) - (first.get('evicted_tokens_total') or 0)
     host = last.get('hicache_host_used_tokens') or 0
     host_tot = last.get('hicache_host_total_tokens') or 0
     avg_running = sum(int(r.get('num_running_reqs') or 0) for r in rows) / len(rows)
     avg_queued = sum(int(r.get('num_queue_reqs') or 0) for r in rows) / len(rows)
     max_kv = max(share(r.get('kv_used_tokens'), r.get('kv_available_tokens'), r.get('kv_evictable_tokens'))[0] for r in rows)
-    if avg_queued >= 0.5 and max_kv >= 0.90 and kv_evict <= 0.05:
+    if avg_queued >= 0.5 and (max_kv >= 0.95 or (max_kv >= 0.90 and kv_evict <= 0.10)):
         reading = 'KV wall (admission waits for pool space)'
     elif avg_queued >= 0.5 and running >= cap:
         reading = f'cap-bound (running at the {cap} cap with a queue)'
@@ -77,7 +88,7 @@ def main():
     print(f'{a.job}: last {len(rows)} samples over {span:.0f}s | KV used {kv_used:.0%} (peak {max_kv:.0%}), evictable {kv_evict:.0%} of {pool/1e6:.2f}M | '
           f'KDA slots {kda_used:.0%} of {kda_pool:.0f} | running {running} (avg {avg_running:.1f}), queued {queued} (avg {avg_queued:.1f}) | '
           f'decode {last.get("gen_throughput", 0):.0f} tok/s, MTP accept {last.get("spec_accept_length", 0):.2f} | host {host/1e6:.2f}/{host_tot/1e6:.2f}M | '
-          f'load-back +{lb/1e3:.0f}k tok, evicted +{ev/1e3:.0f}k tok, retracted {int(last.get("num_retracted_reqs") or 0)} | reading: {reading}')
+          f'load-back +{lb/2**30:.2f} GiB in {lbn:.0f} ops, evicted +{ev/1e6:.1f}M tok, retracted {int(last.get("num_retracted_reqs") or 0)} | reading: {reading}')
 
 
 if __name__ == '__main__':
