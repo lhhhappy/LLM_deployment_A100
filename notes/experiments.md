@@ -8,14 +8,17 @@
 
 | 运行 | 状态与比较问题 | 证据入口 |
 | --- | --- | --- |
-| 103 v3/N26 底座 | 开场 600 秒、排空；124/125/117 对照基线 | [分析索引](../evidence/L103-v3_open_base_n26/opening/analysis.json) |
-| 104 124 | 对 103 单改 124 排序与停车，排空 | [分析索引](../evidence/L104-v3_open_124_n26/opening/analysis.json) |
-| 105 124+125 | 对 104 加积压模式，排空 | [分析索引](../evidence/L105-v3_open_124_125_n26/opening/analysis.json) |
-| 106 124+冷块 8192 | 对 104 固定扩大冷块，排空 | [分析索引](../evidence/L106-v3_open_124_cap8192_n26/opening/analysis.json) |
+| 094 公开 dev 原样开场 | 派发并排空 722/722；原 harness 四类 TTFT 均 FAIL，chain p95 69.69 秒；附加窗口 verdict 因 cohort 文件缺失为 INVALID，不能替代原 harness | [任务目录](../evidence/L094-dev_opening_release0_n22/) |
+| 096 K9+117 校准 | 启动阶段按用户要求停止，未形成比较结果 | [任务目录](../evidence/L096-calib_k9v2_117_n22/) |
+| 097 v3 初次部署 | 缺失数据检查脚本而落回默认数据；发现后停止，整次作废。098–102 尚未启动即撤队 | [任务目录](../evidence/L097-v3_open_base_n26/) |
+| 103 v3/N26 底座 | 开场 600 秒、排空；后续对照基线 | [分析索引](../evidence/L103-v3_open_base_n26/opening/analysis.json) |
+| 104 124 | 对 103 同 ID 443 条：chain 超时 19→17，fast 56→26、overall 40→21、turn 1→1；排空 | [分析索引](../evidence/L104-v3_open_124_n26/opening/analysis.json) |
+| 105 124+125 | 对 104 同 ID：chain 超时 17→13；排空 | [分析索引](../evidence/L105-v3_open_124_125_n26/opening/analysis.json) |
+| 106 124+冷块 8192 | 对 104 同 ID：chain 超时 17→15；排空 | [分析索引](../evidence/L106-v3_open_124_cap8192_n26/opening/analysis.json) |
 | 107 124+117 | 启动机制校验失败，未测量；脚本已修正，见 110 | [任务目录](../evidence/L107-v3_open_124_117_n26/) |
 | 108 全集 N26 | 用户要求中途停止，不能判分 | [任务目录](../evidence/L108-v3_46364_n26_full/) |
-| 109 124+激进 125 | 对 105 调整积压阈值与护栏，排空 | [分析索引](../evidence/L109-v3_open_124_125x_n26/opening/analysis.json) |
-| 110 124+117 重跑 | 运行中；以队列和最终收据为准 | [任务目录](../evidence/L110-v3_open_124_117_n26/) |
+| 109 124+激进 125 | 对 105 同 ID 440 条：chain 超时 13→9（修 4、新 0），turn 2→3，TPOT 均值 55.45→61.84 ms；排空 453/453、错误 0 | [分析索引](../evidence/L109-v3_open_124_125x_n26/opening/analysis.json) |
+| 110 124+117 重跑 | Pod 已结束；最终 raw、排空收据和同 ID 结果仍待闭合，不判分 | [任务目录](../evidence/L110-v3_open_124_117_n26/) |
 
 上述链接指向索引文件或任务目录，完整 raw 位于各运行的 `window/raw.jsonl`，服务日志和校验收据在同一证据目录。历史编号无需重排；失效、取消的编号要保留原因，避免误用其结果。
 
