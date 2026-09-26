@@ -30,6 +30,14 @@ export SGLANG_AX_SM80_FP8_MOE_HUMMING=1
 export SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0
 export SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=
 command -v ninja >/dev/null || { echo "Missing JIT build tool ninja" >&2; exit 2; }
+if [[ ${DCP_PROBE:-attention} = indices ]]; then
+  legacy_args=(); [[ -z ${DCP_INDEX_LEGACY:-} ]] || legacy_args+=(--legacy "$DCP_INDEX_LEGACY")
+  python -m torch.distributed.run --standalone --nproc-per-node=2 \
+    "$DCP_RUN_ROOT/dcp_local_indices_jit.py" \
+    --source "$DCP_SOURCE/sglang/kernels/ops/attention/dcp_local_indices.py" \
+    --output "$DCP_RUN_ROOT/$DCP_ARM" "${legacy_args[@]}"
+  exit
+fi
 if [[ ${DCP_PROBE:-attention} = move ]]; then
   python -m torch.distributed.run --standalone --nproc-per-node=2 \
     "$DCP_RUN_ROOT/dcp_move_probe.py" --source-root "$DCP_SOURCE/sglang" \

@@ -68,6 +68,10 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     cap, stage, static, seen, names = {}, ["load"], {}, set(), []
     routes = []
     input_records = []
+    indexer_records = []
+    if os.environ.get("AX_CAPTURE_INDEXER") == "1":
+        from dcp_indexer_capture import install as install_indexer_capture
+        install_indexer_capture(stage, indexer_records)
     if os.environ.get("AX_CAPTURE_INPUTS") == "1":
         from sglang.srt.layers.attention.dsa_backend import DeepseekSparseAttnBackend
         original_extend = DeepseekSparseAttnBackend.forward_extend
@@ -128,6 +132,11 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
                     x = args[0].detach().float()
                     if stage[0] == "cold":
                         x = torch.cat([x[::16], x[-64:]])
+                    elif stage[0] == "ext" and os.environ.get("AX_ATTN_CAPTURE_ROW"):
+                        row = int(os.environ["AX_ATTN_CAPTURE_ROW"])
+                        if not 0 <= row < x.shape[0]:
+                            raise ValueError("attention capture row outside extend batch")
+                        x = x[row:row+1]
                     cap.setdefault(stage[0], {}).setdefault(_n, []).append(x.cpu())
                 m.o_proj.register_forward_pre_hook(pre)
 
@@ -151,6 +160,9 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
     from sglang.srt.layers.quantization.fp8_humming_moe import humming_moe_layer_count
     info = {"alloc_size": int(alloc.size), "alloc_page": int(alloc.page_size),
             "pool_rows": int(mr.token_to_kv_pool.size),
+            "prefix_lengths": pre, "extend_lengths": ext,
+            "attention_capture_row": (int(os.environ["AX_ATTN_CAPTURE_ROW"])
+                                      if os.environ.get("AX_ATTN_CAPTURE_ROW") else None),
             "mixed_input": os.environ.get("AX_MIXED") == "1",
             "heads_total": mr.model_config.num_attention_heads,
             "humming_layers": humming_moe_layer_count()}
@@ -255,6 +267,10 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
         from dcp_local_extend_bench import run
         run(os.environ["AX_COMPONENT_BENCH"] + f".rank{tp_rank}.json")
     info["routes"] = routes
+    from sglang.srt.layers.dcp.local_extend import local_extend_mechanism_tokens
+    info["mechanisms"] = local_extend_mechanism_tokens(mr)
+    stats = mr.eager_runner.dcp_local_extend_stats
+    info["route_counts"] = stats.snapshot() if stats is not None else None
     if os.environ.get("SGLANG_AX_DCP_LOCAL_EXTEND", "0") == "1" and not any(r["local"] for r in routes):
         raise RuntimeError("No local extend executed; this arm cannot validate the mechanism")
     if tp_rank >= 0:
@@ -264,6 +280,11 @@ def work(server_args, port_args, bench_args, gpu_id, tp_rank):
         torch.save(out, dest)
         if input_records:
             torch.save(input_records, dest + ".inputs")
+        if os.environ.get("AX_CAPTURE_INDEXER") == "1":
+            from dcp_indexer_capture import cpu_records
+            if not indexer_records:
+                raise RuntimeError("No pooled indexer row captured; diagnostic is incomplete")
+            torch.save(cpu_records(indexer_records), dest + ".indexer")
         with open(dest + ".json", "w") as handle:
             json.dump({"rank": tp_rank, "info": info, "timing": timing}, handle, indent=2)
         print("AX_CHECK done", info, {k: tuple(v.shape) for k, v in out.items() if torch.is_tensor(v)}, flush=True)
