@@ -82,13 +82,19 @@ class TestGlmHostTier(unittest.TestCase):
         self._kernels.__enter__()
         self.addCleanup(self._kernels.__exit__, None, None, None)
 
-    def _build(self, *, with_draft):
+    def _build(self, *, with_draft, dcp_width=1, dcp_rank=0):
         from sglang.srt.mem_cache.hybrid_cache import hybrid_pool_assembler as asm
+        from sglang.srt.runtime_context import get_parallel
 
-        req_pool, kv, draft = H.glm_like_pools(with_draft=with_draft)
+        if dcp_width > 1:
+            self.enterContext(get_parallel().override(
+                dcp_enabled=True, dcp_size=dcp_width, dcp_rank=dcp_rank,
+                attn_dcp_size=dcp_width, attn_dcp_rank=dcp_rank,
+            ))
+        req_pool, kv, draft = H.glm_like_pools(with_draft=with_draft, dcp_width=dcp_width)
         allocator = _FakeAllocator(kv)
         params = SimpleNamespace(
-            page_size=64,
+            page_size=64 * dcp_width,
             req_to_token_pool=req_pool,
             token_to_kv_pool_allocator=allocator,
             mtp_draft_device_pools=(draft,) if draft is not None else (),
@@ -146,11 +152,27 @@ class TestGlmHostTier(unittest.TestCase):
             with self.subTest(with_draft=with_draft):
                 self._round_trip(with_draft)
 
-    def _round_trip(self, with_draft):
-        req_pool, kv, draft, allocator, result = self._build(with_draft=with_draft)
+    def test_dcp_round_trip_and_virtual_indexer_capacity(self):
+        """Real host controller/kernel route for both shard owners, W=2/4/8.
+        No collective is needed for host copies; each case emulates one rank's
+        topology while using its actual device/host pools and transfer kernels.
+        """
+        for width in (2, 4, 8):
+            for rank in (0, width - 1):
+                with self.subTest(width=width, rank=rank):
+                    self._round_trip(True, dcp_width=width, dcp_rank=rank)
+                    print(f"DCP_HOST_ROUNDTRIP device={H.DEVICE} width={width} rank={rank} byte_exact=1", flush=True)
+
+    def _round_trip(self, with_draft, *, dcp_width=1, dcp_rank=0):
+        req_pool, kv, draft, allocator, result = self._build(
+            with_draft=with_draft, dcp_width=dcp_width, dcp_rank=dcp_rank)
         ctrl, group = result.cache_controller, result.host_pool_group
         full = kv.full_kv_pool
         pools = [full] + ([draft.full_kv_pool] if draft is not None else [])
+        for pool in pools:
+            required_rows = (pool.size + pool.page_size) * dcp_width
+            for indexer in pool.index_k_with_scale_buffer:
+                self.assertGreaterEqual(indexer.shape[0] * pool.page_size, required_rows)
         cache = req_pool.mamba_pool.mamba_cache
         state_tensors = [cache.temporal] + list(cache.conv)
         _fill_random([b for p in pools for b in p.kv_buffer], 1)
@@ -158,14 +180,18 @@ class TestGlmHostTier(unittest.TestCase):
         _fill_random(state_tensors, 3)
 
         dev = H.DEVICE
-        src_pages = torch.arange(2, 6, device=dev)  # one 256-token compression group
-        dst_pages = torch.arange(10, 14, device=dev)
+        # DCP cases use virtual slots above the per-rank physical capacity.
+        first = 2 if dcp_width == 1 else full.size // 64 + 2 * dcp_width
+        src_pages = torch.arange(first, first + 4 * dcp_width, device=dev)
+        dst_pages = src_pages + 8 * dcp_width
         src_tok = (src_pages[:, None] * 64 + torch.arange(64, device=dev)).reshape(-1)
         dst_tok = (dst_pages[:, None] * 64 + torch.arange(64, device=dev)).reshape(-1)
+        src_physical = src_tok[dcp_rank::dcp_width] // dcp_width
+        dst_physical = dst_tok[dcp_rank::dcp_width] // dcp_width
         src_slot = req_pool.mamba_allocator.alloc(1)
 
         ref = {
-            "mla": [p.kv_buffer[i][src_tok].clone() for p in pools for i in range(p.layer_num)],
+            "mla": [p.kv_buffer[i][src_physical].clone() for p in pools for i in range(p.layer_num)],
             "idx": [p.index_k_with_scale_buffer[i][src_pages].clone() for p in pools for i in range(p.layer_num)],
             "state": [t[:, src_slot].clone() for t in state_tensors],
         }
@@ -176,6 +202,14 @@ class TestGlmHostTier(unittest.TestCase):
             for s in result.sidecars
         ]
         mamba_w = PoolTransfer(name=PoolName.MAMBA, device_indices=src_slot)
+        if dcp_width > 1:
+            # Make the host locs exceed its physical latent size as well.
+            anchor = group.anchor_entry.host_pool
+            filler_size = anchor.size // (64 * dcp_width) * (64 * dcp_width)
+            self.assertIsNotNone(group.alloc(filler_size))
+            indexer = group.entry_map[PoolName.INDEXER].host_pool
+            self.assertEqual(indexer.size, anchor.logical_size)
+            self.assertEqual(indexer.dcp_size, 1)
         # HybridCacheController.write resolves the side-pool host slots in
         # place and submits (start_writing) immediately.
         host = ctrl.write(src_tok, node_id=1, extra_pools=[mamba_w] + sidecars)
@@ -189,8 +223,8 @@ class TestGlmHostTier(unittest.TestCase):
         # ---- evict: poison the source copies and every page we may reuse ----
         for p in pools:
             for i in range(p.layer_num):
-                _poison(p.kv_buffer[i], src_tok)
-                _poison(p.kv_buffer[i], dst_tok)
+                _poison(p.kv_buffer[i], src_physical)
+                _poison(p.kv_buffer[i], dst_physical)
                 _poison(p.index_k_with_scale_buffer[i], src_pages)
                 _poison(p.index_k_with_scale_buffer[i], dst_pages)
         for t in state_tensors:
@@ -221,7 +255,7 @@ class TestGlmHostTier(unittest.TestCase):
         for p in pools:
             for i in range(p.layer_num):
                 self.assertTrue(
-                    _same_bytes(p.kv_buffer[i][dst_tok], ref["mla"][k]),
+                    _same_bytes(p.kv_buffer[i][dst_physical], ref["mla"][k]),
                     f"MLA latent layer {k} not restored",
                 )
                 self.assertTrue(

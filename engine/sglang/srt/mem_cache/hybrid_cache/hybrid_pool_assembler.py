@@ -763,7 +763,14 @@ def _carve_declared_sidecars(
         owned = decl.owned_device_layers
         layers = decl.device_pool.layer_num if owned is None else len(owned)
         layers += len(config.packed_draft_device_pools)
-        side_bpt += decl.storage_info.bytes_per_token_per_layer * layers
+        # [ax] 180: one physical latent row represents W logical tokens.
+        # Replicated DSA index-K retains W entries for that same host row.
+        loc_scale = (
+            get_parallel().attn_dcp_size
+            if decl.pool_name == PoolName.INDEXER
+            else 1
+        )
+        side_bpt += decl.storage_info.bytes_per_token_per_layer * layers * loc_scale
     if side_bpt == 0:
         return kv_host_size
     carved = kv_host_size * root_bpt / (root_bpt + side_bpt)
