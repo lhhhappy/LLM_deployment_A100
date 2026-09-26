@@ -8,17 +8,19 @@
 # Inputs: CAP_DIR/aime26.jsonl {id, problem, answer}, CAP_DIR/gpqa_diamond.jsonl {id, question, choices[4], answer} (letter).
 set -u
 curl -sf http://127.0.0.1:$PORT/v1/models >/dev/null || { echo "ENGINE_NOT_RUNNING"; exit 2; }
-python3 - "$RUN_DIR" "${CAP_DIR:?}" "${CAP_CONCURRENCY:-24}" <<'PY'
+python3 - "$RUN_DIR" "${CAP_DIR:?}" "${CAP_CONCURRENCY:-12}" <<'PY'
 import json, re, sys, time, urllib.request, concurrent.futures as cf, os
 d, cap, conc = sys.argv[1], sys.argv[2], int(sys.argv[3]); port = os.environ.get("PORT", "30000")
 def load(p): return [json.loads(l) for l in open(p) if l.strip()]
 aime = load(f"{cap}/aime26.jsonl"); gpqa = load(f"{cap}/gpqa_diamond.jsonl")
 items = [("aime", x) for x in aime] + [("gpqa", x) for x in gpqa]
 def prompt(kind, x):
+    # Same request shape and wording as verify_kit/cap_smoke_body.sh (the 12/12 smoke): one user message, the problem text,
+    # then the smoke's own instruction sentence; GPQA keeps the published copy's instruction (letter in \boxed{}).
     if kind == "aime":
-        return x["problem"] + "\n\nPut the final integer answer in \\boxed{}."
+        return x["problem"] + " Put the final integer answer in \\boxed{}."
     opts = "\n".join(f"({l}) {c}" for l, c in zip("ABCD", x["choices"]))
-    return x["question"] + "\n\n" + opts + "\n\nThink it through, then give only the letter of the correct option in \\boxed{}."
+    return x["question"] + "\n\n" + opts + "\n\nPlease write your final answer in the form of \\boxed{A}, \\boxed{B}, \\boxed{C}, or \\boxed{D}"
 def ask(k):
     kind, x = items[k]
     body = {"model": "default", "messages": [{"role": "user", "content": prompt(kind, x)}], "max_tokens": 60000}
