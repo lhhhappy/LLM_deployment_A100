@@ -1,0 +1,241 @@
+{
+  "passed": true,
+  "acceptance": {
+    "accept_ref:rank0": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    },
+    "accept_ref:rank1": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    },
+    "accept_dcp:rank0": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0,
+        1
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    },
+    "accept_dcp:rank1": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0,
+        1
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    },
+    "compact:rank0": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0,
+        1
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    },
+    "compact:rank1": {
+      "checked": 20,
+      "unchecked_tail": 4,
+      "cases": {
+        "short_local_empty": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "cold": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "prefix": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "longer_prefix": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "owners": [
+        0,
+        1
+      ],
+      "windows_crossing_virtual_boundary": {
+        "256": 0,
+        "512": 0
+      }
+    }
+  },
+  "restore": {
+    "host_ref": {
+      "checked_pairs": 126,
+      "max_row_relative_linf": 0.0031250000465661287
+    },
+    "host_dcp": {
+      "checked_pairs": 126,
+      "max_row_relative_linf": 0.0
+    }
+  }
+}

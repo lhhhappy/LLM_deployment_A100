@@ -1,0 +1,74 @@
+{
+  "CUDA_VISIBLE_DEVICES": "",
+  "script_sha256": "d8ec4acdc475ad15287ebe0dda82ac882538e1594a5bcd2aef84f17ba647417b",
+  "commands": [
+    {
+      "label": "natural",
+      "command": [
+        "/sjtu/linhang/arena/env/m0/bin/python",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/audit_dcp_mtp_traces.py",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_dcp13",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_ref13",
+        "--output",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/phase3-recheck/natural.json",
+        "--expected-traces",
+        "504",
+        "--expected-cases",
+        "4",
+        "--accepted-rows"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "acceptance",
+      "command": [
+        "/sjtu/linhang/arena/env/m0/bin/python",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/audit_dcp_mtp_traces.py",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_accept_dcp13",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_accept_ref13",
+        "--output",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/phase3-recheck/acceptance.json",
+        "--expected-traces",
+        "264",
+        "--expected-cases",
+        "4",
+        "--accepted-rows"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "compact",
+      "command": [
+        "/sjtu/linhang/arena/env/m0/bin/python",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/audit_dcp_mtp_traces.py",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_compact13",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_accept_dcp13",
+        "--output",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/phase3-recheck/compact.json",
+        "--expected-traces",
+        "264",
+        "--expected-cases",
+        "4",
+        "--accepted-rows"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "host",
+      "command": [
+        "/sjtu/linhang/arena/env/m0/bin/python",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/audit_dcp_mtp_traces.py",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_host_dcp13",
+        "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_host_ref13",
+        "--output",
+        "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/phase3-recheck/host.json",
+        "--expected-traces",
+        "756",
+        "--expected-cases",
+        "6",
+        "--accepted-rows"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

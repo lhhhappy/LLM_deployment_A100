@@ -1,10 +1,10 @@
 # DCP + NextN 在 S2 上的实现复核
 
-2026-09-26，Codex 独立复核。对象固定为 `codex/dcp-mtp-stack2-n34` 的 `e4d7ca680bfc0efd5a7f5121a814cc93279eaa90`，基线 `submission/s2-0926` / `84dcca0e`。本报告中的“最终分支”指这个固定提交，不随分支后来移动而变更。
+2026-09-26，Codex 独立复核。对象固定为 `codex/dcp-mtp-stack2-n34` 的 `396225e7c0eb113ab48f853028b87d874de013b4`，基线 `submission/s2-0926` / `84dcca0e`。初审运行代码提交为 `e4d7ca68`；交付核对发现分支新增两项证据/文档提交后，已补审增量。两者的 `engine/sglang` tree hash 完全相同，见 [版本前进收据](../../evidence/review-dcp-mtp-20260926/head-advance.json)。本报告中的“最终分支”指 `396225e7`，不随分支后来移动而变更。
 
-结论：新增的地址空间、NextN 阶段和 host 计费修正方向正确；发现并修复一处启动参数误拒绝。不能据此宣称 TP8、完整 HiCache 模型恢复或 N34/N38 已通过。S2 自身上一轮已发现的问题仍在这个提交中，不能因为 DCP 移植完成就视为已修复。
+结论：新增的地址空间、NextN 阶段和 host 计费修正方向正确；发现并修复一处启动参数误拒绝。新增证据已补齐 TP2 缩模的受控接受长度 1/2/3/4、HiCache 恢复续算和 flush；不能据此宣称 TP8、真实完整权重或 N34/N38 已通过。S2 自身上一轮已发现的问题仍在这个提交中，不能因为 DCP 移植完成就视为已修复。
 
-工作分支：`review/dcp-mtp-stack2-20260926`；工作目录 `build/worktrees/review-dcp-mtp-0926`。生产改动仅为 180 的参数守卫修正，另有回归与本报告。没有改作者分支，没有修改 Pod、使用 GPU 或终止任何服务。
+工作分支：`review/dcp-mtp-stack2-20260926`；工作目录 `build/worktrees/review-dcp-mtp-0926`。生产改动仅为 `b261cbd9` 的 180 参数守卫修正，另有回归与本报告。没有改作者分支，没有修改 Pod、使用 GPU 或终止任何服务。
 
 ## 范围与去重
 
@@ -12,8 +12,10 @@
 |---|---|---|
 | `01b3be05` | 115 | NextN latent 分片、indexer 容量、三个推测阶段、真实/补齐行数、迁移原语、可选 KPool 列裁剪、SM80 H32 布局 |
 | `e4d7ca68` | 180 | packed NextN / DCP 准入、indexer host 逻辑容量、host 预算、传输字节 |
+| `4ec0ff7e` | 诊断交付 | 冻结脚本/缩模配置/原始证据索引；补充 final-source TP2、受控接受、host restore/flush、high-loc graph 矩阵 |
+| `396225e7` | 文档 | 共享 N30 计划引用修正 |
 
-合计 19 个变更文件，其中 13 个引擎源码文件。开发版 `aebaff56..f254c64f` 与最终版 `84dcca0e..e4d7ca68` 的引擎增删行逐项相同，已独立计算，见 [范围与函数清单](../../evidence/review-dcp-mtp-20260926/scope.json)。因此共同实现只读审一次；移植后的上下文另外核对。
+前两项运行实现提交合计 19 个变更文件，其中 13 个引擎源码文件；后两项为诊断、证据及文档交付，不增加运行代码。开发版 `aebaff56..f254c64f` 与最终版 `84dcca0e..e4d7ca68` 的引擎增删行逐项相同，已独立计算，见 [范围与函数清单](../../evidence/review-dcp-mtp-20260926/scope.json)。因此共同实现只读审一次；移植后的上下文另外核对。
 
 S1/S2 的 37 项原有 patch 已在 `879216e8` 的 `notes/reports/review-s1s2-patches-0926.md` 复核，本轮不重复计算覆盖率或重复申报发现。可用 `git show 879216e8:notes/reports/review-s1s2-patches-0926.md` 查看。
 
@@ -76,15 +78,15 @@ MTP 搬移的手工追踪：`_finalize_accept_tree_path` → `move_accept_tokens
 
 验证：[生产函数 AST 回归](../../scripts/tests/test_dcp_mtp_review.py)；[修复前](../../evidence/review-dcp-mtp-20260926/guard-before.log) 的 NEXTN/EAGLE × W2/4/8 六种默认组合均失败；[修复后](../../evidence/review-dcp-mtp-20260926/guard-after.log) 7 个 unittest 方法通过，包含原拒绝边界。这里只证明参数合同，没有假装运行完整模型。
 
-### D2 / P2：最终提交的诊断交付不完整
+### D2：初审发现的诊断交付缺口，已由新增提交关闭
 
-在固定 `e4d7ca68` 中，`notes/plan-dcp-8card.md`、`notes/reports/dcp-code-review-20260926.md`、新 `dcp_contract_probe.py` / `dcp_sparse_probe.py` / `dcp_mtp_probe.py` / `run_dcp_devbox.sh` 尚未受版本控制；115/180 文档却已经引用其中部分入口。它们存在于开发工作树，不等于存在于最终提交。
+初审 `e4d7ca68` 时，`notes/plan-dcp-8card.md`、`notes/reports/dcp-code-review-20260926.md`、新诊断脚本和证据未进入分支，文档存在悬空引用。`4ec0ff7e` 已将这些文件和分期归档清单提交，`396225e7` 修正共享计划引用。本项不再作为当前分支缺陷。
 
-影响：另一个人只 checkout 最终分支，无法按其文档重新获得这些诊断。交付时应把实际使用的脚本、缩模配置生成器、源码清单与证据索引冻结在相应提交或不可变归档；原始 `.pt` 可以留在开发机归档，入口要包含路径和哈希。不要用以后更新过的比较器解释旧运行，却丢失当时版本。本次仅冻结用于复核的 [作者证据快照与收据](../../evidence/review-dcp-mtp-20260926/author-snapshot/receipt.json)，没有替作者提交其正在修改的全部材料。
+补审读取了接受注入器、比较器、缩模配置生成器、receipt 汇总器和 TP2 实际运行脚本，并核对 phase3 的原始接受事件、容量、host 命中、flush 及 trace。早期 [只读快照](../../evidence/review-dcp-mtp-20260926/author-snapshot/receipt.json) 保留作为初审轨迹；现行证据直接使用分支中已提交的 `evidence/dcp-mtp-20260926/phase3/`，无需再复制一套。
 
 ### 已知 S2 问题仍未进入最终分支
 
-这不是新发现，也没有重复审计。`e4d7ca68` 从 `84dcca0e` 接入两项 DCP 提交，没有包含上一轮修复：
+这不是新发现，也没有重复审计。最终分支从 `84dcca0e` 接入两项 DCP 实现及诊断交付，没有包含上一轮修复：
 
 | 已有修复 | 与本候选的关系 |
 |---|---|
@@ -123,6 +125,27 @@ MTP 搬移的手工追踪：`_finalize_accept_tree_path` → `move_accept_tokens
 
 本轮额外用 [独立 trace 复算器](../../scripts/analysis/audit_dcp_mtp_traces.py) 检查保存的每个采样行、元信息、文件完整性及 graph 标识：[eager 复算](../../evidence/review-dcp-mtp-20260926/mtp_dcp4-recheck.json) 和 [graph 复算](../../evidence/review-dcp-mtp-20260926/mtp_graph4-recheck.json) 各 504 项通过，最大逐行相对 L∞ 均为 `0.0075757578`。graph 的三类推测阶段逐条都有非空 graph key/replay id；eager 对照本来不要求 graph。每个原始 `.pt` 的路径和 SHA256 均在复算 JSON 中。它只读 CPU，不运行模型。
 
+### 新增 phase3：最终源码 TP2 证据的独立复算
+
+phase3 的 `fix5` 源码收据核对了 4697 个引擎文件，匹配 `e4d7ca68`，与 `396225e7` 的运行 tree 相同。target/draft 的 W2 indexer 都为 1026×8448 B/层，覆盖 65536 个 allocator 逻辑 token 加 padding；旧 phase2 的容量缺口已补上。这里运行的是 TP2、缩小层数、dummy 权重模型，保留 NextN 的 BF16 排除项；不是完整真实权重验证。
+
+我重新读取作者开发机的原始 `.pt`，四组全部通过。逐行相对 L∞ 门槛为 0.01；输出 token、输入元信息、文件集合和三类推测图重放标识同时核对。
+
+| 对照 | trace 对数 | 最大有效行相对 L∞ | 独立复算 |
+|---|---:|---:|---|
+| 自然接受，W2 / W1 | 504 | 0.0075187972 | [natural.json](../../evidence/review-dcp-mtp-20260926/phase3-recheck/natural.json) |
+| 受控接受 1/2/3/4，W2 / W1 | 264 | 0.0073529412 | [acceptance.json](../../evidence/review-dcp-mtp-20260926/phase3-recheck/acceptance.json) |
+| W2 列裁剪开 / 关 | 264 | 0 | [compact.json](../../evidence/review-dcp-mtp-20260926/phase3-recheck/compact.json) |
+| HiCache 模型恢复，W2 / W1 | 756 | 0.0075187972 | [host.json](../../evidence/review-dcp-mtp-20260926/phase3-recheck/host.json) |
+
+这 1788 对与旧 phase2 的 1008 对分开留证。新版 probe 保留 draft extend 的被拒绝行；本次从 `accepted_tokens`、窗口宽度、前置 token 数和采样行号**独立重建**有效行 mask，再核对记录的 mask。源码中 draft-extend logits/hidden/indexer seed 由 `accept_lens-1` 选取，KPool 的写计划也用 `num_accept_tokens`，因此拒绝行不进入有效数值判定；其差值另记 `all_rows_max_abs`，没有删掉原始行。该判定不能外推到未经核对的其他输出消费者。
+
+[接受与恢复复核脚本](../../scripts/analysis/audit_dcp_mtp_receipts.py) 另从原始 JSONL 检查 oracle 的 SHA256、受控 proposal 的匹配/故意不匹配位置、真实 verifier 输出、每个 case 的 1/2/3/4 覆盖和 owner 余数。每臂每 rank 有 20 个受检 round，另有 4 个尾部 round 越过保留参考窗口，不计入。W2 的受检窗口覆盖 owner 0/1，但实际跨 256/512 虚拟地址边界的窗口数均为 **0**，不能把“有长前缀”写成接受窗口跨页通过。
+
+HiCache 从真实响应检查 device 4096 → host 4096、32×4096 token churn、相同输出及 flush 后 cached_tokens=0，并独立比较同臂 device-repeat / host-restore 的原始 trace：W1/W2 各 126 对通过，最大有效行相对 L∞ 分别为 0.0031250000 / 0。详见 [收据复核](../../evidence/review-dcp-mtp-20260926/phase3-recheck/receipts-audit.json)。作者 phase3 原始归档 50,073,526 B 的 SHA256 也独立复核一致，见 [归档检查](../../evidence/review-dcp-mtp-20260926/phase3-recheck/raw-archive-check.json)。
+
+`high_graph13` 记录 ordinary target 路径的虚拟 loc 53759/55484，均高于 32768 物理容量，含 8 次实际 graph replay。它关闭了 MTP，不能称为“高地址 + NextN + 受控接受”的组合覆盖。受控接受与 host restore 也是两个分开的诊断，probe 明确禁止组合运行；接受长度 2/3/4 与 host 恢复叠加仍待测。以上都没有自然接受率或服务性能结论。
+
 ## 本轮独立验证
 
 55 项真实 host-pool/controller/tree CPU 测试通过，加上 7 项启动参数回归，共 62 项。CPU suite 只替换底层 CUDA 字节 mover 和锁页调用；实际构造、页单位、打包层、写读控制器和树逻辑照生产代码执行。运行源码共 4713 个文件逐项核验，零不符，见 [源码收据](../../evidence/review-dcp-mtp-20260926/source-verification.json)、[命令收据](../../evidence/review-dcp-mtp-20260926/cpu-review-receipts.json) 和 [完整日志](../../evidence/review-dcp-mtp-20260926/host_cpu.log)。使用开发机现有 Python 环境，`CUDA_VISIBLE_DEVICES=""`、`HC180_DEVICE=cpu`。
@@ -131,7 +154,7 @@ MTP 搬移的手工追踪：`_finalize_accept_tree_path` → `move_accept_tokens
 
 首轮新测试把 MLA `page_first` 的首维误当成页，导致测试期望值少乘 page_size；已修正为实际的 token-major layout，并重跑完整 suite。初轮日志和测试版本留在证据目录，明确属于测试编写错误，没有列为引擎 bug。
 
-新增报告的相对链接全部有效；固定候选原有 DCP 文档的缺失链接列在 [检查收据](../../evidence/review-dcp-mtp-20260926/document-link-check.json)，对应 D2，未将其隐藏成“所有文档检查通过”。
+新增报告和 115/180 当前文档的相对链接均经检查；初审缺失链接保留在 `document-link-check-v1.json`，更新后的 [检查收据](../../evidence/review-dcp-mtp-20260926/document-link-check.json) 对应 D2 已关闭。
 
 ## 值得继续做的具体优化
 
@@ -192,9 +215,9 @@ S2 `ax_deadline.service_s` 仍使用 run071 的固定开销、每新增 token �
 
 ## 验收边界和下一次实验
 
-1. 用冻结的最终候选跑 high virtual loc + 真正模型续算；覆盖 target/draft，以及 target verify、draft decode、draft extend v2 三类图的实际重放。
-2. 接受长度 1/2/3/4 都要有证据，跨 owner 和 256/512 边界。受控 proposal 可以验证 verifier/state commit 合同，但不能拿它测自然接受率或服务性能。
-3. 完整 HiCache 链：真实设备命中参考 → 足量 churn → 证明确实 host 命中 → latent/indexer/KDA 对应同一检查点 → 续算敏感观测与输出 → 真 flush。单纯 memcpy 往返不足以闭合。
+1. TP2 缩模的三个推测阶段图、受控接受 1/2/3/4、HiCache 恢复续算和真 flush 已闭合，保留上表证据；向 TP8 和完整真实权重迁移时需要重新验证，不能以本次通过替代。
+2. 补齐组合边界：高虚拟 loc 的 target/draft 真正 NextN 续算、混合 batch、host 恢复叠加接受长度 2/3/4，以及实际跨 256/512 边界的接受窗口。当前 owner 交错证明不能替代页边界覆盖。受控 proposal 只验证 verifier/state commit 合同，不能拿它测自然接受率或服务性能。
+3. 先带入已有 124 可准入资源修复；按实际启用机制选择上一轮其他修复。当前候选仍从未经这些修复的 S2 出发，DCP 数值通过不能排除其服务层风险。
 4. 再做同一提交、同一 workload、相同 MTP/调度/host64/418 KDA 槽的 W1/W2；118 关闭且记录 compact-topk 的有效 stride。W1/W2 的完整组合才能相互比较。
 5. N34 的 60 分钟窗口加 drain 只能作诊断；完整档仍需原 harness、cohort 完整且每条请求恰好一次、所有门和正式排序口径。逐请求区分 chain/turn/overall/fast 与 TPOT 超线，不从局部加速倍数外推名次。
 

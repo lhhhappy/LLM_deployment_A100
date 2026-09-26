@@ -1,0 +1,13 @@
+{
+  "utc": "2026-09-26T15:41:58.965940+00:00",
+  "CUDA_VISIBLE_DEVICES": "",
+  "command": [
+    "/sjtu/linhang/arena/env/m0/bin/python",
+    "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/audit_dcp_mtp_receipts.py",
+    "/sjtu/linhang/arena/runs/dcp-mtp-20260926",
+    "--output",
+    "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/phase3-recheck/receipts-audit.json"
+  ],
+  "exit_code": 0,
+  "script_sha256": "af321d0e350e10fd5e1a10fbec6617cfaecb60f827992c6eabc50100855bebad"
+}

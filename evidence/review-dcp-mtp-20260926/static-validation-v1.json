@@ -1,5 +1,4 @@
 {
-  "reviewed_target": "396225e7c0eb113ab48f853028b87d874de013b4",
   "ast_parsed_files": [
     "engine/sglang/kernels/ops/attention/dsa/tilelang_kernel.py",
     "engine/sglang/srt/arg_groups/hicache_hook.py",
@@ -16,16 +15,13 @@
     "engine/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py",
     "scripts/tests/test_dcp_mtp_review.py",
     "scripts/tests/hicache180/test_180_dcp_accounting.py",
-    "scripts/analysis/audit_dcp_mtp_traces.py",
-    "scripts/analysis/audit_dcp_mtp_receipts.py"
+    "scripts/analysis/audit_dcp_mtp_traces.py"
   ],
   "missing_new_document_links": [],
   "tracked_diff_whitespace_errors": "",
   "new_script_sha256": {
     "scripts/tests/test_dcp_mtp_review.py": "ee509615a7cdf67321dc8cce2d488ae64ba912732a81351618e2fc98da5190de",
     "scripts/tests/hicache180/test_180_dcp_accounting.py": "b4d57a8c8f66df171ab5cfae3a45451a8436dd4f977c325be99b48ec48641362",
-    "scripts/analysis/audit_dcp_mtp_traces.py": "d8ec4acdc475ad15287ebe0dda82ac882538e1594a5bcd2aef84f17ba647417b",
-    "scripts/analysis/audit_dcp_mtp_receipts.py": "af321d0e350e10fd5e1a10fbec6617cfaecb60f827992c6eabc50100855bebad"
-  },
-  "note": "CPU suite unchanged because target advance contains no engine changes; guard rerun passed 7 tests after merge."
+    "scripts/analysis/audit_dcp_mtp_traces.py": "63d223bc6b58baed617b9060a4e52c04f62e9834b12c763f319e85a423eb192d"
+  }
 }

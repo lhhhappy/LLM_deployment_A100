@@ -1,0 +1,43 @@
+{
+  "validity": "CPU_RECHECK_OF_AUTHOR_GPU_TRACES",
+  "test": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_host_dcp13",
+  "reference": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_tp2_host_ref13",
+  "passed": true,
+  "phases": {
+    "draft:EXTEND": 12,
+    "draft:DECODE": 288,
+    "draft:DRAFT_EXTEND_V2": 144,
+    "target:EXTEND": 24,
+    "target:TARGET_VERIFY": 288
+  },
+  "same_outputs": true,
+  "graph_required": true,
+  "graph_coverage": {
+    "draft:DECODE": true,
+    "draft:DRAFT_EXTEND_V2": true,
+    "target:TARGET_VERIFY": true
+  },
+  "max_row_relative_linf": 0.007518797181546688,
+  "acceptance_histograms": [
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ]
+  ],
+  "accepted_rows_only": true,
+  "limits": "Stored samples only; use source, acceptance and restore receipts to establish coverage. No TP8/SLO claim."
+}

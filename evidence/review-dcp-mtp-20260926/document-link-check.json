@@ -1,13 +1,6 @@
 {
   "notes/reports/review-dcp-mtp-stack2-20260926.md": [],
-  "engine/docs/115-dcp-sm80.md": [
-    "../../notes/plan-dcp-8card.md",
-    "../../notes/reports/dcp-code-review-20260926.md",
-    "../../evidence/dcp-mtp-20260926/phase2/sparse10.json",
-    "../../evidence/dcp-mtp-20260926/phase2/sparse10.json",
-    "../../notes/plan-dcp-8card.md"
-  ],
-  "engine/docs/180-hicache-glm-dsa.md": [
-    "../../notes/plan-dcp-8card.md"
-  ]
+  "engine/docs/115-dcp-sm80.md": [],
+  "engine/docs/180-hicache-glm-dsa.md": [],
+  "evidence/review-dcp-mtp-20260926/README.md": []
 }
