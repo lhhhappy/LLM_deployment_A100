@@ -459,7 +459,10 @@ def main(argv=None):
         if terminal or args.once:
             if terminal: print('WATCH_END '+args.job, flush=True)
             return 0
-        time.sleep(60)
+        # A Pod exec transport race can outlast the three immediate attempts in
+        # remote(); retry the whole read soon so a drained job is not left with
+        # its previous partial raw for another full monitoring interval.
+        time.sleep(10 if state.get('health') == 'retrying' else 60)
 
 
 if __name__ == '__main__':
