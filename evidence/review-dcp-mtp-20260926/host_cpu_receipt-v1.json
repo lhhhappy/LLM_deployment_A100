@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/sjtu/linhang/arena/env/m0/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "scripts/tests/hicache180",
+    "-p",
+    "test_180_*.py",
+    "-v"
+  ],
+  "cwd": "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926",
+  "CUDA_VISIBLE_DEVICES": "",
+  "HC180_DEVICE": "cpu",
+  "exit_code": 1
+}

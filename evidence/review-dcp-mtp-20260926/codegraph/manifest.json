@@ -1,0 +1,83 @@
+{
+  "head": "f254c64fecefd090d6c9954df32fffe483d800b1",
+  "queries": [
+    {
+      "args": [
+        "codegraph",
+        "callers",
+        "is_dcp_mla_decode_phase",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callers-is_dcp_mla_decode_phase.json",
+      "sha256": "7a0deeff5791701561f73ba908ee5afcbf4169a826421c5ed4809f54fb5ec131",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "codegraph",
+        "callers",
+        "resolve_hicache_dcp_compatibility",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callers-resolve_hicache_dcp_compatibility.json",
+      "sha256": "9dc23e81a1bdd1b7014e49b41b102b80baa7ee31d150448a0757e5d365d82b76",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "codegraph",
+        "callers",
+        "IndexKeyCache.move",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callers-IndexKeyCache.move.json",
+      "sha256": "3c0f2822203aa38f32448b421fdb60967c35b36581210e867b4e39da1a237a39",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "codegraph",
+        "callers",
+        "_carve_declared_sidecars",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callers-_carve_declared_sidecars.json",
+      "sha256": "f017637ab46fbfa0e7d2b0db3223b094d9b1b05ea58150674f866970e2fb802b",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "codegraph",
+        "callers",
+        "loc_space_scale",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callers-loc_space_scale.json",
+      "sha256": "89eec0d1d2f7e946b8ad6374ea5d1ba2fcd303f006a63619f49f0ff41595da3e",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "codegraph",
+        "callees",
+        "DSAIndexerPoolHost.__init__",
+        "--json",
+        "--limit",
+        "60"
+      ],
+      "file": "callees-DSAIndexerPoolHost.__init__.json",
+      "sha256": "8de7de06f49762897728c905fc26ca151bafd08532f85c52298a0293bc64f630",
+      "stderr": ""
+    }
+  ]
+}

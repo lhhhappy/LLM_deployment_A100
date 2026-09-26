@@ -1,0 +1,11 @@
+{
+  "symbol": "IndexKeyCache.move",
+  "callers": [
+    {
+      "name": "move",
+      "kind": "method",
+      "filePath": "srt/mem_cache/index_key_cache.py",
+      "startLine": 49
+    }
+  ]
+}

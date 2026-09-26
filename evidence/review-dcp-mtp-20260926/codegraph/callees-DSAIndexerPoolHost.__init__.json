@@ -1,0 +1,17 @@
+{
+  "symbol": "DSAIndexerPoolHost.__init__",
+  "callees": [
+    {
+      "name": "data_ptr",
+      "kind": "method",
+      "filePath": "multimodal_gen/test/unit/test_host_memory_budget.py",
+      "startLine": 246
+    },
+    {
+      "name": "alloc_func",
+      "kind": "function",
+      "filePath": "srt/mem_cache/pool_host/mamba.py",
+      "startLine": 138
+    }
+  ]
+}

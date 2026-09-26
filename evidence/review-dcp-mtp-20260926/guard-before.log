@@ -1,0 +1,71 @@
+test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) ... test_explicit_chain (__main__.TestDCPNextNResolution) ... ok
+test_no_dcp_or_no_hicache_keeps_existing_behavior (__main__.TestDCPNextNResolution) ... ok
+test_none_and_dspark_keep_existing_behavior (__main__.TestDCPNextNResolution) ... ok
+test_other_layout_guards_stay_active (__main__.TestDCPNextNResolution) ... ok
+test_tree_drafting_rejected (__main__.TestDCPNextNResolution) ... ok
+test_unvalidated_models_and_algorithms_stay_rejected (__main__.TestDCPNextNResolution) ... ok
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='NEXTN', width=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='NEXTN', width=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='NEXTN', width=8)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='EAGLE', width=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='EAGLE', width=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+======================================================================
+ERROR: test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) (algorithm='EAGLE', width=8)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/scripts/tests/test_dcp_mtp_review.py", line 60, in test_default_topk_at_actual_pipeline_order
+    self.check(self.cfg)
+  File "/workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang/srt/arg_groups/hicache_hook.py", line 102, in resolve_hicache_dcp_compatibility
+    raise NotImplementedError(
+NotImplementedError: HiCache with DCP supports DSPARK or the same-checkpoint GLM NextN chain (topk=1, one draft layer); separate draft models and tree drafting have no validated host layout.
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.020s
+
+FAILED (errors=6)

@@ -1,0 +1,48 @@
+{
+  "target": "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90",
+  "note": "indexed independent worktree; hicache default-topk fix is present",
+  "queries": [
+    {
+      "kind": "callers",
+      "symbol": "is_dcp_mla_decode_phase",
+      "file": "callers-is_dcp_mla_decode_phase.json",
+      "sha256": "7a0deeff5791701561f73ba908ee5afcbf4169a826421c5ed4809f54fb5ec131",
+      "stderr": ""
+    },
+    {
+      "kind": "callers",
+      "symbol": "resolve_hicache_dcp_compatibility",
+      "file": "callers-resolve_hicache_dcp_compatibility.json",
+      "sha256": "9dc23e81a1bdd1b7014e49b41b102b80baa7ee31d150448a0757e5d365d82b76",
+      "stderr": ""
+    },
+    {
+      "kind": "callers",
+      "symbol": "move_accept_tokens_to_target_kvcache",
+      "file": "callers-move_accept_tokens_to_target_kvcache.json",
+      "sha256": "d4b1bab09f10e6427a6b22b88b9fc2fabe0129ef982453d07223f852c872f088",
+      "stderr": ""
+    },
+    {
+      "kind": "callers",
+      "symbol": "_carve_declared_sidecars",
+      "file": "callers-_carve_declared_sidecars.json",
+      "sha256": "f017637ab46fbfa0e7d2b0db3223b094d9b1b05ea58150674f866970e2fb802b",
+      "stderr": ""
+    },
+    {
+      "kind": "callers",
+      "symbol": "loc_space_scale",
+      "file": "callers-loc_space_scale.json",
+      "sha256": "89eec0d1d2f7e946b8ad6374ea5d1ba2fcd303f006a63619f49f0ff41595da3e",
+      "stderr": ""
+    },
+    {
+      "kind": "callees",
+      "symbol": "DSAIndexerPoolHost.__init__",
+      "file": "callees-DSAIndexerPoolHost.__init__.json",
+      "sha256": "8de7de06f49762897728c905fc26ca151bafd08532f85c52298a0293bc64f630",
+      "stderr": ""
+    }
+  ]
+}

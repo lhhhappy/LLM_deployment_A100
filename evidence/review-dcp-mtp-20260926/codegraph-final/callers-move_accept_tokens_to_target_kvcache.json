@@ -1,0 +1,29 @@
+{
+  "symbol": "move_accept_tokens_to_target_kvcache",
+  "callers": [
+    {
+      "name": "_finalize_accept_tree_path",
+      "kind": "function",
+      "filePath": "srt/speculative/eagle_worker_common.py",
+      "startLine": 406
+    },
+    {
+      "name": "forward_batch_generation",
+      "kind": "method",
+      "filePath": "srt/speculative/ngram_worker.py",
+      "startLine": 429
+    },
+    {
+      "name": "eagle_worker_common.py",
+      "kind": "file",
+      "filePath": "srt/speculative/eagle_worker_common.py",
+      "startLine": 1
+    },
+    {
+      "name": "ngram_worker.py",
+      "kind": "file",
+      "filePath": "srt/speculative/ngram_worker.py",
+      "startLine": 1
+    }
+  ]
+}

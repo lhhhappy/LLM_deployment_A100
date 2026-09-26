@@ -1,0 +1,47 @@
+[
+  {
+    "command": [
+      "/sjtu/linhang/arena/env/m0/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts/tests/hicache180",
+      "-p",
+      "test_180_*.py",
+      "-v"
+    ],
+    "cwd": "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926",
+    "CUDA_VISIBLE_DEVICES": "",
+    "HC180_DEVICE": "cpu",
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/sjtu/linhang/arena/env/m0/bin/python",
+      "audit_dcp_mtp_traces.py",
+      "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_dcp4",
+      "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_ref4",
+      "--output",
+      "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/mtp_dcp4-recheck.json"
+    ],
+    "cwd": "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926",
+    "CUDA_VISIBLE_DEVICES": "",
+    "HC180_DEVICE": "cpu",
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/sjtu/linhang/arena/env/m0/bin/python",
+      "audit_dcp_mtp_traces.py",
+      "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_graph4",
+      "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_ref4",
+      "--output",
+      "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/mtp_graph4-recheck.json"
+    ],
+    "cwd": "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926",
+    "CUDA_VISIBLE_DEVICES": "",
+    "HC180_DEVICE": "cpu",
+    "exit_code": 0
+  }
+]

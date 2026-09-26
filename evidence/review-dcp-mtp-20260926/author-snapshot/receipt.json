@@ -1,0 +1,210 @@
+{
+  "source_root": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926",
+  "note": "Author diagnostics, frozen for independent interpretation. No new GPU run is claimed.",
+  "files": [
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/README.md",
+      "path": "README.md",
+      "sha256": "be3b8754f42bf406bb7e511364e9ef6bd918f217a35bfdca6bbc66a00ce71e88",
+      "bytes": 10791
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase2/compare_mtp4_strict.json",
+      "path": "phase2/compare_mtp4_strict.json",
+      "sha256": "b200ba54acd465671615571863c4558ab8c4df6d54faf8c98ca7f1a38ad920e6",
+      "bytes": 181464
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase2/compare_mtp_graph4_strict.json",
+      "path": "phase2/compare_mtp_graph4_strict.json",
+      "sha256": "9a2fe6bc243886ecbc7af7e889eebae6e240f654fde3b33c55fa4b6a39966cd1",
+      "bytes": 181365
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase2/sparse10.json",
+      "path": "phase2/sparse10.json",
+      "sha256": "892a0b954df60fe5850c55b23c58e9fde2c623106fc2337100ddc1f35a119e81",
+      "bytes": 69924
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase2/host_cpu10_fix.log",
+      "path": "phase2/host_cpu10_fix.log",
+      "sha256": "5e6d385636c5cfe2104de07c6d86d5f76f2c41a47fbebec833db725bd08258ea",
+      "bytes": 1169
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/phase2/host_gpu7b_fix.log",
+      "path": "phase2/host_gpu7b_fix.log",
+      "sha256": "b8dfad13fbd272cf49658d98706e5e5cc9dafc4d9cbcbc1721bf0de613025b13",
+      "bytes": 1175
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/mtp_ref4/summary.json",
+      "path": "mtp_ref4/summary.json",
+      "sha256": "45215a44c1c919109257d0bcefcfdad2bffdd4064686e2a711b2ac1a1ef2cad3",
+      "bytes": 236
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/mtp_dcp4/summary.json",
+      "path": "mtp_dcp4/summary.json",
+      "sha256": "2fe297ff96ef4c222b341b23b8c9ad518d1c995a0d28eb4772c3d08273bbc1ba",
+      "bytes": 236
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/mtp_graph4/summary.json",
+      "path": "mtp_graph4/summary.json",
+      "sha256": "0010579efe20589e552a598061652163f49035bc34086b9237f58ec7ce692c86",
+      "bytes": 327
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/mtp_dcp4/capacity_target0.json",
+      "path": "mtp_dcp4/capacity_target0.json",
+      "sha256": "5ee7d9efc86087ecaa5d0e996891b0bb93a063b3b0a9152a647c087ed6bfbdb4",
+      "bytes": 746
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/mtp_dcp4/capacity_draft0.json",
+      "path": "mtp_dcp4/capacity_draft0.json",
+      "sha256": "f36d2c0175ec5f1ca2d09a9dc786fd17d5a34ee7d8c39fa188eee9eb84731aa5",
+      "bytes": 526
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/move1.json",
+      "path": "move1.json",
+      "sha256": "c51317666adb7c352749f7e1f027266a5e31b0fbeb8c772d3b9b029516853e88",
+      "bytes": 4268
+    },
+    {
+      "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-mtp-n34/evidence/dcp-mtp-20260926/contract_fix2.json",
+      "path": "contract_fix2.json",
+      "sha256": "dce024428e47ca061671e76c6c41bc45421a5cc7087eb7ab49c882c5a7dc3147",
+      "bytes": 2293
+    }
+  ],
+  "sparse_source_checks": [
+    {
+      "path": "srt/layers/attention/dsa_backend.py",
+      "recorded": "c0f11d2673e966c6363edd2fbb6fd889de65a12a8832be13cc2c8de2f45a09f3",
+      "final": "6afbf44da66e913e2769f7a9dd20a1aa00ad9743e74ca027b8ba3242c5343347",
+      "same_file": false
+    },
+    {
+      "path": "kernels/ops/attention/dsa/tilelang_kernel.py",
+      "recorded": "ae04899315dd9b365125db61e7f67b214fe5e4c254cc1d4dba8e9b4ede4621ce",
+      "final": "ae04899315dd9b365125db61e7f67b214fe5e4c254cc1d4dba8e9b4ede4621ce",
+      "same_file": true
+    },
+    {
+      "path": "srt/layers/attention/dsa/kpool_fp8_index.py",
+      "recorded": "23599aa7957f5dbce399ed16a8f16141a457c5448ec98fd167a1d4387921eed3",
+      "final": "23599aa7957f5dbce399ed16a8f16141a457c5448ec98fd167a1d4387921eed3",
+      "same_file": true
+    },
+    {
+      "path": "kernels/ops/moe/kpool_topk_transform.py",
+      "recorded": "d88d178e9542d2d9af953e762f20cc044a819cca70b14bdecdc0c9bf063507c0",
+      "final": "d88d178e9542d2d9af953e762f20cc044a819cca70b14bdecdc0c9bf063507c0",
+      "same_file": true
+    },
+    {
+      "path": "kernels/jit/csrc/dsa/kpool_topk_transform.cuh",
+      "recorded": "e3d9f3f46d04e6299da6f6b966d293c677fae5c24fe972790f47678505b1954c",
+      "final": "e3d9f3f46d04e6299da6f6b966d293c677fae5c24fe972790f47678505b1954c",
+      "same_file": true
+    }
+  ],
+  "sparse_cases": 18,
+  "sparse_all_cases_pass": true,
+  "sparse_max_row_relative": 0.007751937955617905,
+  "sparse_timings": [
+    {
+      "W": 2,
+      "rank": 0,
+      "T": 136,
+      "base_ms": 0.3252703845500946,
+      "compact_ms": 0.1897279918193817
+    },
+    {
+      "W": 2,
+      "rank": 0,
+      "T": 152,
+      "base_ms": 0.2681663930416107,
+      "compact_ms": 0.15688639879226685
+    },
+    {
+      "W": 2,
+      "rank": 1,
+      "T": 136,
+      "base_ms": 0.2670080065727234,
+      "compact_ms": 0.15608960390090942
+    },
+    {
+      "W": 2,
+      "rank": 1,
+      "T": 152,
+      "base_ms": 0.2684895992279053,
+      "compact_ms": 0.15687359869480133
+    },
+    {
+      "W": 4,
+      "rank": 0,
+      "T": 136,
+      "base_ms": 0.40944957733154297,
+      "compact_ms": 0.1463296115398407
+    },
+    {
+      "W": 4,
+      "rank": 0,
+      "T": 152,
+      "base_ms": 0.4106687903404236,
+      "compact_ms": 0.14810240268707275
+    },
+    {
+      "W": 4,
+      "rank": 3,
+      "T": 136,
+      "base_ms": 0.4079039990901947,
+      "compact_ms": 0.13106559216976166
+    },
+    {
+      "W": 4,
+      "rank": 3,
+      "T": 152,
+      "base_ms": 0.40933117270469666,
+      "compact_ms": 0.13254079222679138
+    },
+    {
+      "W": 8,
+      "rank": 0,
+      "T": 136,
+      "base_ms": 0.6902912259101868,
+      "compact_ms": 0.23056960105895996
+    },
+    {
+      "W": 8,
+      "rank": 0,
+      "T": 152,
+      "base_ms": 0.694051206111908,
+      "compact_ms": 0.23593918979167938
+    },
+    {
+      "W": 8,
+      "rank": 7,
+      "T": 136,
+      "base_ms": 0.6905215978622437,
+      "compact_ms": 0.21368639171123505
+    },
+    {
+      "W": 8,
+      "rank": 7,
+      "T": 152,
+      "base_ms": 0.6924768090248108,
+      "compact_ms": 0.2168159931898117
+    }
+  ],
+  "helper_ast_comparison": {
+    "_ax116_dcp_local_indices": true,
+    "_should_return_dsa_dcp_lse": true
+  },
+  "backend_file_difference_reason": "S2 adds mechanism 118 dispatch, guarded against DCP and disabled in the prepared W1/W2 jobs; DCP helper ASTs are identical."
+}

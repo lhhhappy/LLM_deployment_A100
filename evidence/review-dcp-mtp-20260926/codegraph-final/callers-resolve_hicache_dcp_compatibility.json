@@ -1,0 +1,11 @@
+{
+  "symbol": "resolve_hicache_dcp_compatibility",
+  "callers": [
+    {
+      "name": "handle_hicache",
+      "kind": "function",
+      "filePath": "srt/arg_groups/hicache_hook.py",
+      "startLine": 19
+    }
+  ]
+}

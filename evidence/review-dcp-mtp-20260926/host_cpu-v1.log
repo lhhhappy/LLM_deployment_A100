@@ -1,0 +1,126 @@
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/cuda/__init__.py:188: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 12020). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at /__w/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/engine/sglang/srt/layers/quantization/awq/awq.py:53: UserWarning: Only CUDA, HIP and XPU support AWQ currently.
+  warnings.warn(f"Only CUDA, HIP and XPU support AWQ currently.")
+/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/engine/sglang/srt/layers/quantization/gguf.py:69: UserWarning: Only CUDA, MUSA and NPU support GGUF quantization currently.
+  warnings.warn(f"Only CUDA, MUSA and NPU support GGUF quantization currently.")
+test_fixed_budget_includes_actual_backing_storages (test_180_dcp_accounting.TestDCPAccounting.test_fixed_budget_includes_actual_backing_storages) ... DCP_HOST_BUDGET width=1 backing_bytes=1000084832
+DCP_HOST_BUDGET width=2 backing_bytes=1000266208
+DCP_HOST_BUDGET width=4 backing_bytes=1000039600
+DCP_HOST_BUDGET width=8 backing_bytes=1000255712
+ok
+test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) ... 
+  test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=1) ... FAIL
+  test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=2) ... FAIL
+  test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=4) ... FAIL
+  test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=8) ... FAIL
+test_dcp_round_trip_and_virtual_indexer_capacity (test_180_glm_host_pools.TestGlmHostTier.test_dcp_round_trip_and_virtual_indexer_capacity)
+Real host controller/kernel route for both shard owners, W=2/4/8. ... torch.cpu.Event does not support timing; L2 transfer timing is disabled
+DCP_HOST_ROUNDTRIP device=cpu width=2 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=2 rank=1 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=4 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=4 rank=3 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=8 rank=0 byte_exact=1
+DCP_HOST_ROUNDTRIP device=cpu width=8 rank=7 byte_exact=1
+ok
+test_flush_clears_every_host_pool (test_180_glm_host_pools.TestGlmHostTier.test_flush_clears_every_host_pool)
+/flush_cache -> UnifiedRadixCache.reset -> HostPoolGroup.clear(): ... ok
+test_hicache_size_is_a_total_that_includes_the_indexer (test_180_glm_host_pools.TestGlmHostTier.test_hicache_size_is_a_total_that_includes_the_indexer)
+--hicache-size (per rank) must bound MLA + indexer + Mamba host bytes. ... ok
+test_packed_draft_must_cover_target_slots (test_180_glm_host_pools.TestGlmHostTier.test_packed_draft_must_cover_target_slots)
+A packed draft pool is addressed with target device indices. ... ok
+test_round_trip_restores_every_component_byte_exact (test_180_glm_host_pools.TestGlmHostTier.test_round_trip_restores_every_component_byte_exact)
+Backup one 256-token group + one KDA slot through the real controller, ... ok
+test_stack_declares_indexer_next_to_kv_and_mamba (test_180_glm_host_pools.TestGlmHostTier.test_stack_declares_indexer_next_to_kv_and_mamba)
+Fails without 180 (no INDEXER entry, no sidecar). ... ok
+test_tree_page_stays_physical (test_180_tree_hicache_e2e.TestNoHiCacheKeepsBaseBehaviour.test_tree_page_stays_physical) ... ok
+test_flush_empties_device_and_host_tiers (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_flush_empties_device_and_host_tiers)
+True flush: after reset nothing matches (device or host) and every ... ok
+test_flush_with_write_through_in_flight (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_flush_with_write_through_in_flight)
+/flush_cache while a write-through D2H is still unacknowledged (on ... ok
+test_fork_inside_group_does_not_overwrite_sibling (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_fork_inside_group_does_not_overwrite_sibling)
+Hazard (b). Branch A = X[0:128] + Y, branch B = X[0:128] + Z; a state ... ok
+test_host_restore_after_chunk_then_decode_keeps_group_rows (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_host_restore_after_chunk_then_decode_keeps_group_rows)
+Hazard (a). A 1024-token request is prefilled to 960 (checkpoint, ... ok
+test_tree_page_is_widened_to_one_compression_group (test_180_tree_hicache_e2e.TestTreeHiCacheIndexerOwnership.test_tree_page_is_widened_to_one_compression_group)
+Fails without 180: the tree keeps 64-token ownership. ... ok
+test_branch_checkpoint_must_be_on_the_absolute_tree_grid (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_branch_checkpoint_must_be_on_the_absolute_tree_grid) ... ok
+test_finished_request_donates_exact_checkpoint_and_frees_other_slots (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_finished_request_donates_exact_checkpoint_and_frees_other_slots) ... ok
+test_invalid_checkpoint_is_not_rounded_to_a_different_prefix (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_invalid_checkpoint_is_not_rounded_to_a_different_prefix) ... ok
+test_second_request_copies_the_state_at_its_matched_prefix (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_second_request_copies_the_state_at_its_matched_prefix) ... ok
+test_short_chunks_track_when_they_cross_an_absolute_boundary (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_short_chunks_track_when_they_cross_an_absolute_boundary) ... ok
+test_successive_320_token_chunks_publish_the_matching_state (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_successive_320_token_chunks_publish_the_matching_state) ... ok
+test_unrepresentable_snapshot_is_not_published (test_180_upstream_38212_checkpoint.TestCompressedDsaCheckpointRoundtrip.test_unrepresentable_snapshot_is_not_published) ... ok
+test_host_bytes_match_observed_allocation (test_180_upstream_decl_stack.TestDSAIndexerPoolDecl.test_host_bytes_match_observed_allocation) ... ok
+test_mirror_consumes_decl (test_180_upstream_decl_stack.TestDSAIndexerPoolDecl.test_mirror_consumes_decl) ... ok
+test_mirror_is_compact_over_layers_that_own_index_buffers (test_180_upstream_decl_stack.TestDSAIndexerPoolDecl.test_mirror_is_compact_over_layers_that_own_index_buffers)
+Shared-topk layers have 0-row device buffers; mirroring or ... ok
+test_accepts_dsa_declaration (test_180_upstream_decl_stack.TestDeclaredPoolPlanning.test_accepts_dsa_declaration) ... ok
+test_rejects_primary_that_is_not_kv (test_180_upstream_decl_stack.TestDeclaredPoolPlanning.test_rejects_primary_that_is_not_kv) ... ok
+test_rejects_self_referencing_index_source (test_180_upstream_decl_stack.TestDeclaredPoolPlanning.test_rejects_self_referencing_index_source) ... ok
+test_rejects_self_referencing_layout_source (test_180_upstream_decl_stack.TestDeclaredPoolPlanning.test_rejects_self_referencing_layout_source) ... ok
+test_complete_stack_passes_silently (test_180_upstream_decl_stack.TestDeclaredPoolVerification.test_complete_stack_passes_silently) ... ok
+test_hybrid_pool_declares_through_its_sub_pool (test_180_upstream_decl_stack.TestDeclaredPoolVerification.test_hybrid_pool_declares_through_its_sub_pool) ... ok
+test_migrated_strategy_raises_on_missing_indexer (test_180_upstream_decl_stack.TestDeclaredPoolVerification.test_migrated_strategy_raises_on_missing_indexer) ... ok
+test_unmigrated_strategy_logs_missing_indexer (test_180_upstream_decl_stack.TestDeclaredPoolVerification.test_unmigrated_strategy_logs_missing_indexer) ... ok
+test_dsa_target (test_180_upstream_decl_stack.TestDeclaredStackStructure.test_dsa_target) ... ok
+test_dsa_target_layer_sharded (test_180_upstream_decl_stack.TestDeclaredStackStructure.test_dsa_target_layer_sharded) ... ok
+test_dsa_target_with_packed_draft (test_180_upstream_decl_stack.TestDeclaredStackStructure.test_dsa_target_with_packed_draft) ... ok
+test_plain_mla_target (test_180_upstream_decl_stack.TestDeclaredStackStructure.test_plain_mla_target) ... ok
+test_dsa_draft_maps_to_draft_and_draft_indexer (test_180_upstream_decl_stack.TestDraftSidecarDeclarations.test_dsa_draft_maps_to_draft_and_draft_indexer) ... ok
+test_sidecar_group_plans_with_external_index_primary (test_180_upstream_decl_stack.TestDraftSidecarDeclarations.test_sidecar_group_plans_with_external_index_primary) ... ok
+test_full_builder_registers_separate_dsa_draft_indexer (test_180_upstream_decl_stack.TestDraftSidecarPoolDispatch.test_full_builder_registers_separate_dsa_draft_indexer)
+The separate-draft DSA branch must build its indexer mirror from a ... ok
+test_full_builder_sizes_sidecar_for_anchor_logical_space (test_180_upstream_decl_stack.TestDraftSidecarPoolDispatch.test_full_builder_sizes_sidecar_for_anchor_logical_space) ... ok
+test_full_builder_unwraps_empty_hybrid_linear_pool (test_180_upstream_decl_stack.TestDraftSidecarPoolDispatch.test_full_builder_unwraps_empty_hybrid_linear_pool) ... ok
+test_build_order_resolves_dependencies_before_allocation (test_180_upstream_decl_stack.TestHostPoolPreflight.test_build_order_resolves_dependencies_before_allocation) ... ok
+test_draft_declarations_are_collected_once (test_180_upstream_decl_stack.TestHostPoolPreflight.test_draft_declarations_are_collected_once) ... ok
+test_invalid_dependencies_do_not_allocate (test_180_upstream_decl_stack.TestHostPoolPreflight.test_invalid_dependencies_do_not_allocate) ... ok
+test_packed_draft_rejects_duplicate_pool_names (test_180_upstream_decl_stack.TestHostPoolPreflight.test_packed_draft_rejects_duplicate_pool_names) ... ok
+test_transfer_range_is_not_the_number_of_entries (test_180_upstream_decl_stack.TestHostPoolPreflight.test_transfer_range_is_not_the_number_of_entries) ... ok
+test_stack_declares_indexer_and_skips_empty_layers (test_180_upstream_decl_stack.TestHybridMambaDeclaredIndexer.test_stack_declares_indexer_and_skips_empty_layers) ... ok
+test_mla_row_width_comes_from_the_device_pool (test_180_upstream_decl_stack.TestKvHostPoolRow.test_mla_row_width_comes_from_the_device_pool) ... ok
+test_packed_draft_with_a_different_kv_row_is_rejected (test_180_upstream_decl_stack.TestKvHostPoolRow.test_packed_draft_with_a_different_kv_row_is_rejected) ... ok
+test_draft_with_empty_index_layers_is_rejected (test_180_upstream_decl_stack.TestPackedDraftPairing.test_draft_with_empty_index_layers_is_rejected) ... ok
+test_draft_without_indexer_is_rejected (test_180_upstream_decl_stack.TestPackedDraftPairing.test_draft_without_indexer_is_rejected) ... ok
+test_pool_with_only_shared_topk_layers_declares_kv_only (test_180_upstream_decl_stack.TestPackedDraftPairing.test_pool_with_only_shared_topk_layers_declares_kv_only) ... ok
+test_storage_info_mismatch_is_rejected (test_180_upstream_decl_stack.TestPackedDraftPairing.test_storage_info_mismatch_is_rejected) ... ok
+test_draft_without_index_buffers_has_no_indexer_sidecar (test_180_upstream_decl_stack.TestSeparateDraftStructure.test_draft_without_index_buffers_has_no_indexer_sidecar) ... ok
+test_dsa_draft_sidecars (test_180_upstream_decl_stack.TestSeparateDraftStructure.test_dsa_draft_sidecars) ... ok
+
+======================================================================
+FAIL: test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/scripts/tests/hicache180/test_180_dcp_accounting.py", line 67, in test_transfer_bytes_match_physical_copy_geometry
+    self.assertEqual(result.cache_controller._transfer_num_bytes(op), expected)
+AssertionError: 1183744 != 151552
+
+======================================================================
+FAIL: test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/scripts/tests/hicache180/test_180_dcp_accounting.py", line 67, in test_transfer_bytes_match_physical_copy_geometry
+    self.assertEqual(result.cache_controller._transfer_num_bytes(op), expected)
+AssertionError: 1318912 != 286720
+
+======================================================================
+FAIL: test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/scripts/tests/hicache180/test_180_dcp_accounting.py", line 67, in test_transfer_bytes_match_physical_copy_geometry
+    self.assertEqual(result.cache_controller._transfer_num_bytes(op), expected)
+AssertionError: 1589248 != 557056
+
+======================================================================
+FAIL: test_transfer_bytes_match_physical_copy_geometry (test_180_dcp_accounting.TestDCPAccounting.test_transfer_bytes_match_physical_copy_geometry) (width=8)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/review-dcp-mtp-stack2-20260926/scripts/tests/hicache180/test_180_dcp_accounting.py", line 67, in test_transfer_bytes_match_physical_copy_geometry
+    self.assertEqual(result.cache_controller._transfer_num_bytes(op), expected)
+AssertionError: 2129920 != 1097728
+
+----------------------------------------------------------------------
+Ran 55 tests in 10.186s
+
+FAILED (failures=4)

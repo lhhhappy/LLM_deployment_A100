@@ -1,0 +1,11 @@
+{
+  "symbol": "_carve_declared_sidecars",
+  "callers": [
+    {
+      "name": "build_hybrid_mamba_stack",
+      "kind": "function",
+      "filePath": "srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py",
+      "startLine": 788
+    }
+  ]
+}

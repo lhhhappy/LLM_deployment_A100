@@ -1,0 +1,36 @@
+{
+  "validity": "CPU_RECHECK_OF_AUTHOR_GPU_TRACES",
+  "test": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_graph4",
+  "reference": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_ref4",
+  "passed": true,
+  "phases": {
+    "draft:EXTEND": 8,
+    "draft:DECODE": 192,
+    "draft:DRAFT_EXTEND_V2": 96,
+    "target:EXTEND": 16,
+    "target:TARGET_VERIFY": 192
+  },
+  "same_outputs": true,
+  "graph_required": true,
+  "graph_coverage": {
+    "draft:DECODE": true,
+    "draft:DRAFT_EXTEND_V2": true,
+    "target:TARGET_VERIFY": true
+  },
+  "max_row_relative_linf": 0.007575757801532745,
+  "acceptance_histograms": [
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ],
+    [
+      11
+    ]
+  ],
+  "limits": "Stored samples only; old source, low addresses, TP2, no HiCache or acceptance>1 claim."
+}

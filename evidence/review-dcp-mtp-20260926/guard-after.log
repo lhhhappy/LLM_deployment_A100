@@ -1,0 +1,12 @@
+test_default_topk_at_actual_pipeline_order (__main__.TestDCPNextNResolution) ... ok
+test_explicit_chain (__main__.TestDCPNextNResolution) ... ok
+test_no_dcp_or_no_hicache_keeps_existing_behavior (__main__.TestDCPNextNResolution) ... ok
+test_none_and_dspark_keep_existing_behavior (__main__.TestDCPNextNResolution) ... ok
+test_other_layout_guards_stay_active (__main__.TestDCPNextNResolution) ... ok
+test_tree_drafting_rejected (__main__.TestDCPNextNResolution) ... ok
+test_unvalidated_models_and_algorithms_stay_rejected (__main__.TestDCPNextNResolution) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.018s
+
+OK

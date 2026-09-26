@@ -1,0 +1,15 @@
+┌  Initializing CodeGraph
+│
+◆  Initialized in /workspace/Agentic_science_challenge/build/worktrees/review-dcp-mtp-0926/engine/sglang
+│
+Scanning files...
+Parsing code...
+Resolving refs...
+Linking dynamic dispatch...
+│
+◆  Indexed 4,038 files
+│
+●  105,933 nodes, 316,862 edges in 10.9s
+│
+└  Done
+

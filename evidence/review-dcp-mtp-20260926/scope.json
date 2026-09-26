@@ -1,0 +1,3727 @@
+{
+  "review_target": "codex/dcp-mtp-stack2-n34",
+  "base": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "head": "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90",
+  "review_branch": "review/dcp-mtp-stack2-20260926",
+  "date_utc": "2026-09-26T15:07:14.384091+00:00",
+  "commits": [
+    "e4d7ca680bfc0efd5a7f5121a814cc93279eaa90 engine 180: account for replicated DCP indexers in NextN host pools",
+    "01b3be0566697537f9965cf57bb56f4b70fbfc91 engine 115: align DCP NextN pools, attention phases and relocation"
+  ],
+  "same_added_removed_engine_lines_as_development": true,
+  "files": [
+    {
+      "path": "engine/sglang/kernels/ops/attention/dsa/tilelang_kernel.py",
+      "target_sha256": "ae04899315dd9b365125db61e7f67b214fe5e4c254cc1d4dba8e9b4ede4621ce",
+      "functions": [
+        {
+          "name": "_legalize_result_idx_safe",
+          "start": 29,
+          "end": 32
+        },
+        {
+          "name": "fast_log2_ceil",
+          "start": 59,
+          "end": 63
+        },
+        {
+          "name": "fast_pow2",
+          "start": 66,
+          "end": 68
+        },
+        {
+          "name": "fast_round_scale",
+          "start": 71,
+          "end": 72
+        },
+        {
+          "name": "_pick_inner_iter",
+          "start": 76,
+          "end": 89
+        },
+        {
+          "name": "act_quant_kernel",
+          "start": 93,
+          "end": 140
+        },
+        {
+          "name": "act_quant_kernel.act_quant_kernel_",
+          "start": 105,
+          "end": 138
+        },
+        {
+          "name": "act_quant",
+          "start": 143,
+          "end": 170
+        },
+        {
+          "name": "fp8_index_kernel",
+          "start": 174,
+          "end": 227
+        },
+        {
+          "name": "fp8_index_kernel.fp8_index_kernel_",
+          "start": 183,
+          "end": 225
+        },
+        {
+          "name": "fp8_index",
+          "start": 230,
+          "end": 253
+        },
+        {
+          "name": "sparse_attention_fwd_kernel_v1",
+          "start": 263,
+          "end": 441
+        },
+        {
+          "name": "sparse_attention_fwd_kernel_v1.main",
+          "start": 328,
+          "end": 439
+        },
+        {
+          "name": "sparse_attention_fwd_kernel_v2",
+          "start": 459,
+          "end": 826
+        },
+        {
+          "name": "sparse_attention_fwd_kernel_v2.main",
+          "start": 517,
+          "end": 824
+        },
+        {
+          "name": "sparse_mla_fwd_decode_partial",
+          "start": 836,
+          "end": 1004
+        },
+        {
+          "name": "sparse_mla_fwd_decode_partial.main",
+          "start": 894,
+          "end": 1002
+        },
+        {
+          "name": "sparse_mla_fwd_decode_combine",
+          "start": 1014,
+          "end": 1090
+        },
+        {
+          "name": "sparse_mla_fwd_decode_combine.main",
+          "start": 1044,
+          "end": 1088
+        },
+        {
+          "name": "sparse_mla_fwd_decode_partial_fp8",
+          "start": 1094,
+          "end": 1339
+        },
+        {
+          "name": "sparse_mla_fwd_decode_partial_fp8.main",
+          "start": 1152,
+          "end": 1337
+        },
+        {
+          "name": "tilelang_sparse_fwd",
+          "start": 1342,
+          "end": 1447
+        },
+        {
+          "name": "fp8_paged_mqa_logits_kernel",
+          "start": 1451,
+          "end": 1539
+        },
+        {
+          "name": "fp8_paged_mqa_logits_kernel.fp8_paged_mqa_logits",
+          "start": 1480,
+          "end": 1537
+        },
+        {
+          "name": "tilelang_fp8_paged_mqa_logits",
+          "start": 1542,
+          "end": 1578
+        },
+        {
+          "name": "_build_fp8_combined_view",
+          "start": 1581,
+          "end": 1603
+        },
+        {
+          "name": "_topk_length_sentinel",
+          "start": 1610,
+          "end": 1618
+        },
+        {
+          "name": "dpsk_v4_fp8_partial_kernel",
+          "start": 1629,
+          "end": 2259
+        },
+        {
+          "name": "dpsk_v4_fp8_partial_kernel.main",
+          "start": 1729,
+          "end": 2074
+        },
+        {
+          "name": "dpsk_v4_fp8_partial_kernel.main",
+          "start": 2079,
+          "end": 2257
+        },
+        {
+          "name": "dpsk_v4_combine_kernel",
+          "start": 2270,
+          "end": 2512
+        },
+        {
+          "name": "dpsk_v4_combine_kernel.main",
+          "start": 2318,
+          "end": 2426
+        },
+        {
+          "name": "dpsk_v4_combine_kernel.main",
+          "start": 2431,
+          "end": 2510
+        },
+        {
+          "name": "dpsk_v4_fp8_attention_fwd",
+          "start": 2521,
+          "end": 2636
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/arg_groups/hicache_hook.py",
+      "target_sha256": "e374ee8b1b5ec3e532d689ddc30e465a628efcef3fd8a9a86415c42b073dd1ad",
+      "functions": [
+        {
+          "name": "handle_hicache",
+          "start": 19,
+          "end": 47
+        },
+        {
+          "name": "handle_hicache_ratio_default",
+          "start": 50,
+          "end": 69
+        },
+        {
+          "name": "resolve_hicache_dcp_compatibility",
+          "start": 72,
+          "end": 128
+        },
+        {
+          "name": "resolve_layout_io_compatibility",
+          "start": 131,
+          "end": 154
+        },
+        {
+          "name": "resolve_storage_layout_compatibility",
+          "start": 157,
+          "end": 181
+        },
+        {
+          "name": "validate_hicache_host_memory_mode",
+          "start": 184,
+          "end": 228
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/layers/attention/dsa_backend.py",
+      "target_sha256": "6afbf44da66e913e2769f7a9dd20a1aa00ad9743e74ca027b8ba3242c5343347",
+      "functions": [
+        {
+          "name": "ax118_state",
+          "start": 130,
+          "end": 134
+        },
+        {
+          "name": "_all_gather_dsa_trtllm_fp8_kv",
+          "start": 151,
+          "end": 166
+        },
+        {
+          "name": "_should_all_gather_dsa_trtllm_fp8_kv",
+          "start": 169,
+          "end": 175
+        },
+        {
+          "name": "_should_return_dsa_dcp_lse",
+          "start": 178,
+          "end": 183
+        },
+        {
+          "name": "_ax116_dcp_local_indices",
+          "start": 190,
+          "end": 204
+        },
+        {
+          "name": "_ax116_dcp_extend_rows",
+          "start": 207,
+          "end": 245
+        },
+        {
+          "name": "materialize_full_kv_cp",
+          "start": 248,
+          "end": 262
+        },
+        {
+          "name": "_to_2d_context_lens",
+          "start": 291,
+          "end": 299
+        },
+        {
+          "name": "_is_kpool_metadata_fusion_supported",
+          "start": 305,
+          "end": 313
+        },
+        {
+          "name": "_get_plan_topk_v2",
+          "start": 316,
+          "end": 329
+        },
+        {
+          "name": "DSAFlashMLAMetadata.slice",
+          "start": 339,
+          "end": 343
+        },
+        {
+          "name": "DSAFlashMLAMetadata.copy_",
+          "start": 345,
+          "end": 347
+        },
+        {
+          "name": "_compiled_cat",
+          "start": 430,
+          "end": 431
+        },
+        {
+          "name": "_cat",
+          "start": 434,
+          "end": 447
+        },
+        {
+          "name": "_DSAInGraphVerifyMetadataState.__init__",
+          "start": 463,
+          "end": 476
+        },
+        {
+          "name": "_DSAInGraphVerifyMetadataState.matches",
+          "start": 478,
+          "end": 487
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.__init__",
+          "start": 513,
+          "end": 810
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._make_aiter_dsa_decode_metadata_buffer",
+          "start": 812,
+          "end": 857
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._ensure_aiter_dsa_decode_metadata_buffer",
+          "start": 859,
+          "end": 894
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._prepare_aiter_dsa_decode_metadata",
+          "start": 896,
+          "end": 949
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._check_kpool_tail_backend",
+          "start": 951,
+          "end": 967
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._resolve_kpool_tail_backend",
+          "start": 969,
+          "end": 984
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._pad_trtllm_sparse_page_table",
+          "start": 986,
+          "end": 999
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_paged_mqa_schedule_2d_ctx_lens",
+          "start": 1001,
+          "end": 1022
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._refresh_paged_mqa_schedule_metadata",
+          "start": 1024,
+          "end": 1035
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_topk_v2_plan",
+          "start": 1037,
+          "end": 1051
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._refresh_topk_v2_plan",
+          "start": 1053,
+          "end": 1065
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._get_fused_topk_page_table",
+          "start": 1067,
+          "end": 1075
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.get_device_int32_arange",
+          "start": 1077,
+          "end": 1083
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.update_verify_buffers_to_fill_after_draft",
+          "start": 1085,
+          "end": 1086
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._graph_page_table_width",
+          "start": 1088,
+          "end": 1094
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._transform_table_1_to_real",
+          "start": 1096,
+          "end": 1104
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._kpool_slots_per_page",
+          "start": 1106,
+          "end": 1107
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_kpool_paged_mqa_schedule_metadata",
+          "start": 1109,
+          "end": 1112
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._init_kpool_metadata",
+          "start": 1114,
+          "end": 1200
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._init_kpool_metadata_capture",
+          "start": 1202,
+          "end": 1243
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._update_kpool_metadata_replay",
+          "start": 1245,
+          "end": 1299
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._update_kpool_metadata_from_precomputed",
+          "start": 1301,
+          "end": 1343
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.init_forward_metadata_out_graph",
+          "start": 1345,
+          "end": 1362
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.init_forward_metadata",
+          "start": 1364,
+          "end": 1811
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._cal_indexer_k_start_end",
+          "start": 1813,
+          "end": 1892
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.init_cuda_graph_state",
+          "start": 1894,
+          "end": 1977
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_forward_metadata_cuda_graph",
+          "start": 1979,
+          "end": 2147
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._apply_cuda_graph_metadata",
+          "start": 2149,
+          "end": 2510
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._ingraph_verify_metadata_eligible",
+          "start": 2512,
+          "end": 2528
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.init_forward_metadata_in_graph",
+          "start": 2530,
+          "end": 2546
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._record_ingraph_verify_metadata",
+          "start": 2548,
+          "end": 2670
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_ingraph_verify_dg_residual",
+          "start": 2672,
+          "end": 2724
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._build_ingraph_verify_dg_residual.residual",
+          "start": 2697,
+          "end": 2722
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.init_forward_metadata_replay_cuda_graph_from_precomputed",
+          "start": 2726,
+          "end": 2770
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._copy_base_replay_buffers",
+          "start": 2772,
+          "end": 2900
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._sibling_replay_metadata_compatible",
+          "start": 2903,
+          "end": 2929
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._sibling_replay_metadata_compatible._match",
+          "start": 2906,
+          "end": 2907
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._copy_kpool_metadata_from_sibling",
+          "start": 2931,
+          "end": 2964
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._copy_replay_metadata_from_sibling",
+          "start": 2966,
+          "end": 3018
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.forward_extend",
+          "start": 3020,
+          "end": 3392
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.forward_decode",
+          "start": 3394,
+          "end": 3587
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_fa3",
+          "start": 3589,
+          "end": 3633
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_flashmla_sparse",
+          "start": 3635,
+          "end": 3696
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.q8kv8_born_fp8_q_eligible",
+          "start": 3698,
+          "end": 3734
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.q8kv8_acquire_born_q_buffer",
+          "start": 3736,
+          "end": 3760
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.q8kv8_stash_born_q",
+          "start": 3762,
+          "end": 3770
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.q8kv8_born_q_sentinel",
+          "start": 3772,
+          "end": 3787
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_flashmla_sparse_q8kv8",
+          "start": 3789,
+          "end": 4007
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_flashinfer_sparse_mla",
+          "start": 4009,
+          "end": 4036
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_flashmla_kv",
+          "start": 4038,
+          "end": 4097
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_standard_mha",
+          "start": 4099,
+          "end": 4164
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._ax118_init",
+          "start": 4166,
+          "end": 4209
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_tilelang",
+          "start": 4211,
+          "end": 4269
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_aiter",
+          "start": 4271,
+          "end": 4348
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_aiter_extend",
+          "start": 4350,
+          "end": 4437
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._forward_trtllm",
+          "start": 4439,
+          "end": 4626
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._pad_topk_indices",
+          "start": 4628,
+          "end": 4647
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.get_cuda_graph_seq_len_fill_value",
+          "start": 4649,
+          "end": 4651
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.set_dsa_prefill_impl",
+          "start": 4653,
+          "end": 4713
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.get_topk_transform_method",
+          "start": 4715,
+          "end": 4735
+        },
+        {
+          "name": "DeepseekSparseAttnBackend.get_indexer_metadata",
+          "start": 4737,
+          "end": 4753
+        },
+        {
+          "name": "DeepseekSparseAttnBackend._compute_flashmla_metadata",
+          "start": 4755,
+          "end": 4774
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend.__init__",
+          "start": 4783,
+          "end": 4802
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend.init_forward_metadata",
+          "start": 4804,
+          "end": 4806
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend._multistep_dedup_enabled",
+          "start": 4808,
+          "end": 4812
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend.init_cuda_graph_state",
+          "start": 4814,
+          "end": 4816
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend.init_forward_metadata_out_graph",
+          "start": 4818,
+          "end": 5009
+        },
+        {
+          "name": "DeepseekSparseAttnMultiStepBackend.init_forward_metadata_in_graph",
+          "start": 5011,
+          "end": 5013
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/layers/dcp/comm.py",
+      "target_sha256": "25de999de1a6ffbe055460a334d4ed9f3c6479fa5c2c17b79c0f727fe2253073",
+      "functions": [
+        {
+          "name": "_warn_deprecated_dcp_accessor",
+          "start": 42,
+          "end": 47
+        },
+        {
+          "name": "dcp_enabled",
+          "start": 50,
+          "end": 53
+        },
+        {
+          "name": "get_attention_dcp_world_size",
+          "start": 56,
+          "end": 61
+        },
+        {
+          "name": "get_attention_dcp_rank",
+          "start": 64,
+          "end": 69
+        },
+        {
+          "name": "_ag_lse",
+          "start": 72,
+          "end": 80
+        },
+        {
+          "name": "cp_lse_ag_out_rs_mha",
+          "start": 83,
+          "end": 109
+        },
+        {
+          "name": "cp_lse_ag_out_rs_mla",
+          "start": 112,
+          "end": 150
+        },
+        {
+          "name": "_all_gather_dcp_kv_cache",
+          "start": 153,
+          "end": 173
+        },
+        {
+          "name": "all_gather_kv_cache_for_mha_chunk_extend",
+          "start": 176,
+          "end": 192
+        },
+        {
+          "name": "all_gather_kv_cache_for_mha_extend",
+          "start": 195,
+          "end": 247
+        },
+        {
+          "name": "all_gather_q_for_mla_decode",
+          "start": 250,
+          "end": 264
+        },
+        {
+          "name": "all_gather_kv_cache_for_mla_extend",
+          "start": 267,
+          "end": 312
+        },
+        {
+          "name": "all_gather_kv_cache_for_dcp",
+          "start": 316,
+          "end": 386
+        },
+        {
+          "name": "init_fi_a2a_workspace",
+          "start": 400,
+          "end": 462
+        },
+        {
+          "name": "dcp_a2a_lse_reduce",
+          "start": 465,
+          "end": 528
+        },
+        {
+          "name": "_dcp_fi_a2a_lse_reduce",
+          "start": 531,
+          "end": 585
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/managers/cache_controller.py",
+      "target_sha256": "cddf906e4c60d7c85b4f878f10335e050eae827b1c260ebe9f40ea5f5173f176",
+      "functions": [
+        {
+          "name": "LayerLoadingEvent.__init__",
+          "start": 54,
+          "end": 57
+        },
+        {
+          "name": "LayerLoadingEvent.complete",
+          "start": 59,
+          "end": 61
+        },
+        {
+          "name": "LayerLoadingEvent.wait",
+          "start": 63,
+          "end": 64
+        },
+        {
+          "name": "LayerLoadingEvent.finish_event",
+          "start": 67,
+          "end": 68
+        },
+        {
+          "name": "LayerDoneCounter.__init__",
+          "start": 72,
+          "end": 78
+        },
+        {
+          "name": "LayerDoneCounter.update_producer",
+          "start": 80,
+          "end": 87
+        },
+        {
+          "name": "LayerDoneCounter.set_consumer",
+          "start": 89,
+          "end": 90
+        },
+        {
+          "name": "LayerDoneCounter.wait_until",
+          "start": 92,
+          "end": 95
+        },
+        {
+          "name": "LayerDoneCounter.reset",
+          "start": 97,
+          "end": 99
+        },
+        {
+          "name": "CacheOperation.__init__",
+          "start": 106,
+          "end": 123
+        },
+        {
+          "name": "CacheOperation._merge_pool_transfers",
+          "start": 126,
+          "end": 152
+        },
+        {
+          "name": "CacheOperation._merge_pool_transfers.cat_or_none",
+          "start": 138,
+          "end": 140
+        },
+        {
+          "name": "CacheOperation.merge_ops",
+          "start": 155,
+          "end": 173
+        },
+        {
+          "name": "CacheOperation.__lt__",
+          "start": 175,
+          "end": 176
+        },
+        {
+          "name": "StorageOperation.__init__",
+          "start": 221,
+          "end": 244
+        },
+        {
+          "name": "StorageOperation.__lt__",
+          "start": 246,
+          "end": 247
+        },
+        {
+          "name": "PrefetchOperation.__init__",
+          "start": 260,
+          "end": 274
+        },
+        {
+          "name": "PrefetchOperation.mark_terminate",
+          "start": 276,
+          "end": 278
+        },
+        {
+          "name": "PrefetchOperation.is_terminated",
+          "start": 280,
+          "end": 282
+        },
+        {
+          "name": "HiCacheController.__init__",
+          "start": 287,
+          "end": 383
+        },
+        {
+          "name": "HiCacheController.get_attn_cp_rank_and_size",
+          "start": 385,
+          "end": 392
+        },
+        {
+          "name": "HiCacheController._create_sync_groups",
+          "start": 394,
+          "end": 419
+        },
+        {
+          "name": "HiCacheController._destroy_sync_groups",
+          "start": 421,
+          "end": 428
+        },
+        {
+          "name": "HiCacheController._all_reduce",
+          "start": 430,
+          "end": 437
+        },
+        {
+          "name": "HiCacheController._start_storage_threads",
+          "start": 439,
+          "end": 471
+        },
+        {
+          "name": "HiCacheController._stop_storage_threads",
+          "start": 473,
+          "end": 521
+        },
+        {
+          "name": "HiCacheController.attach_storage_backend",
+          "start": 523,
+          "end": 634
+        },
+        {
+          "name": "HiCacheController.detach_storage_backend",
+          "start": 636,
+          "end": 680
+        },
+        {
+          "name": "HiCacheController._generate_storage_config",
+          "start": 682,
+          "end": 743
+        },
+        {
+          "name": "HiCacheController.reset",
+          "start": 745,
+          "end": 785
+        },
+        {
+          "name": "HiCacheController.write",
+          "start": 787,
+          "end": 803
+        },
+        {
+          "name": "HiCacheController.start_writing",
+          "start": 805,
+          "end": 827
+        },
+        {
+          "name": "HiCacheController._transfer_num_bytes",
+          "start": 829,
+          "end": 833
+        },
+        {
+          "name": "HiCacheController._num_tokens_by_pool",
+          "start": 835,
+          "end": 836
+        },
+        {
+          "name": "HiCacheController.load",
+          "start": 838,
+          "end": 853
+        },
+        {
+          "name": "HiCacheController.move_indices",
+          "start": 855,
+          "end": 877
+        },
+        {
+          "name": "HiCacheController._move_write_operation",
+          "start": 879,
+          "end": 889
+        },
+        {
+          "name": "HiCacheController._move_op_indices",
+          "start": 891,
+          "end": 894
+        },
+        {
+          "name": "HiCacheController._l2_transfers",
+          "start": 896,
+          "end": 910
+        },
+        {
+          "name": "HiCacheController._l2_load_transfers",
+          "start": 912,
+          "end": 918
+        },
+        {
+          "name": "HiCacheController.start_loading",
+          "start": 920,
+          "end": 957
+        },
+        {
+          "name": "HiCacheController.evict_device",
+          "start": 959,
+          "end": 961
+        },
+        {
+          "name": "HiCacheController.evict_host",
+          "start": 963,
+          "end": 968
+        },
+        {
+          "name": "HiCacheController.prefetch",
+          "start": 970,
+          "end": 984
+        },
+        {
+          "name": "HiCacheController.terminate_prefetch",
+          "start": 986,
+          "end": 996
+        },
+        {
+          "name": "HiCacheController.append_host_mem_release",
+          "start": 998,
+          "end": 1003
+        },
+        {
+          "name": "HiCacheController._page_get_zero_copy",
+          "start": 1005,
+          "end": 1019
+        },
+        {
+          "name": "HiCacheController._generic_page_get",
+          "start": 1022,
+          "end": 1045
+        },
+        {
+          "name": "HiCacheController._page_transfer",
+          "start": 1047,
+          "end": 1091
+        },
+        {
+          "name": "HiCacheController._page_transfer_kv_batch",
+          "start": 1093,
+          "end": 1130
+        },
+        {
+          "name": "HiCacheController.prefetch_io_aux_func",
+          "start": 1132,
+          "end": 1151
+        },
+        {
+          "name": "HiCacheController.prefetch_rate_limited",
+          "start": 1153,
+          "end": 1171
+        },
+        {
+          "name": "HiCacheController._storage_hit_query",
+          "start": 1173,
+          "end": 1196
+        },
+        {
+          "name": "HiCacheController.prefetch_thread_func",
+          "start": 1198,
+          "end": 1230
+        },
+        {
+          "name": "HiCacheController.write_storage",
+          "start": 1232,
+          "end": 1246
+        },
+        {
+          "name": "HiCacheController._generic_page_set",
+          "start": 1249,
+          "end": 1254
+        },
+        {
+          "name": "HiCacheController._page_set_zero_copy",
+          "start": 1256,
+          "end": 1259
+        },
+        {
+          "name": "HiCacheController._page_backup",
+          "start": 1262,
+          "end": 1282
+        },
+        {
+          "name": "HiCacheController.backup_thread_func",
+          "start": 1284,
+          "end": 1299
+        },
+        {
+          "name": "HiCacheController.prefetch_sync_thread_func",
+          "start": 1301,
+          "end": 1311
+        },
+        {
+          "name": "HiCacheController._reduce_prefetch_ack",
+          "start": 1313,
+          "end": 1325
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/hybrid_cache/hybrid_cache_controller.py",
+      "target_sha256": "0c33f4a6c305dd13a6a8d3b042904450d86f6bd9f19a7a4778cab7e482de50f7",
+      "functions": [
+        {
+          "name": "StorageOperation.__init__",
+          "start": 46,
+          "end": 57
+        },
+        {
+          "name": "PrefetchOperation.__init__",
+          "start": 61,
+          "end": 81
+        },
+        {
+          "name": "PrefetchOperation.mark_terminate",
+          "start": 83,
+          "end": 85
+        },
+        {
+          "name": "PrefetchOperation.is_terminated",
+          "start": 87,
+          "end": 89
+        },
+        {
+          "name": "HybridCacheController.__init__",
+          "start": 93,
+          "end": 147
+        },
+        {
+          "name": "HybridCacheController._start_storage_threads",
+          "start": 149,
+          "end": 151
+        },
+        {
+          "name": "HybridCacheController.attach_storage_backend",
+          "start": 153,
+          "end": 169
+        },
+        {
+          "name": "HybridCacheController.register_host_pool_entry",
+          "start": 171,
+          "end": 178
+        },
+        {
+          "name": "HybridCacheController.parse_storage_backend_extra_config",
+          "start": 181,
+          "end": 241
+        },
+        {
+          "name": "HybridCacheController.clear_storage_backend",
+          "start": 243,
+          "end": 254
+        },
+        {
+          "name": "HybridCacheController._init_extra_host_mem_release_queues",
+          "start": 256,
+          "end": 263
+        },
+        {
+          "name": "HybridCacheController._append_host_mem_release_pages",
+          "start": 265,
+          "end": 271
+        },
+        {
+          "name": "HybridCacheController.append_host_mem_release",
+          "start": 273,
+          "end": 299
+        },
+        {
+          "name": "HybridCacheController.reset",
+          "start": 301,
+          "end": 307
+        },
+        {
+          "name": "HybridCacheController.write",
+          "start": 309,
+          "end": 338
+        },
+        {
+          "name": "HybridCacheController._move_op_indices",
+          "start": 340,
+          "end": 343
+        },
+        {
+          "name": "HybridCacheController._move_write_operation",
+          "start": 345,
+          "end": 383
+        },
+        {
+          "name": "HybridCacheController._move_write_operation.move_for_pool",
+          "start": 356,
+          "end": 361
+        },
+        {
+          "name": "HybridCacheController._l2_transfers",
+          "start": 385,
+          "end": 419
+        },
+        {
+          "name": "HybridCacheController._l2_load_transfers",
+          "start": 421,
+          "end": 462
+        },
+        {
+          "name": "HybridCacheController._l2_load_transfers.draft_layer_mapper",
+          "start": 442,
+          "end": 450
+        },
+        {
+          "name": "HybridCacheController._num_tokens_by_pool",
+          "start": 464,
+          "end": 474
+        },
+        {
+          "name": "HybridCacheController._transfer_num_bytes",
+          "start": 476,
+          "end": 500
+        },
+        {
+          "name": "HybridCacheController.load",
+          "start": 502,
+          "end": 542
+        },
+        {
+          "name": "HybridCacheController.prefetch",
+          "start": 544,
+          "end": 560
+        },
+        {
+          "name": "HybridCacheController.write_storage",
+          "start": 562,
+          "end": 578
+        },
+        {
+          "name": "HybridCacheController._storage_hit_query",
+          "start": 580,
+          "end": 605
+        },
+        {
+          "name": "HybridCacheController.move_hybrid_indices",
+          "start": 607,
+          "end": 633
+        },
+        {
+          "name": "HybridCacheController._page_transfer",
+          "start": 635,
+          "end": 640
+        },
+        {
+          "name": "HybridCacheController._page_transfer_sidecar",
+          "start": 642,
+          "end": 678
+        },
+        {
+          "name": "HybridCacheController._page_backup",
+          "start": 680,
+          "end": 717
+        },
+        {
+          "name": "HybridCacheController.should_backup",
+          "start": 719,
+          "end": 739
+        },
+        {
+          "name": "HybridCacheController.backup_thread_func",
+          "start": 741,
+          "end": 756
+        },
+        {
+          "name": "HybridCacheController._resolve_sidecar_kv_derived_pool_transfers",
+          "start": 758,
+          "end": 763
+        },
+        {
+          "name": "HybridCacheController._resolve_sidecar_nonkv_derived_pool_transfers",
+          "start": 765,
+          "end": 788
+        },
+        {
+          "name": "HybridCacheController._sync_trailing_keys",
+          "start": 790,
+          "end": 830
+        },
+        {
+          "name": "HybridCacheController._resolve_device_transfers",
+          "start": 832,
+          "end": 897
+        },
+        {
+          "name": "HybridCacheController._resolve_device_transfers.rollback_allocated",
+          "start": 844,
+          "end": 847
+        },
+        {
+          "name": "HybridCacheController._reduce_prefetch_ack",
+          "start": 899,
+          "end": 917
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py",
+      "target_sha256": "2fb8099cb13c4f926920854fd78f64d9c7f5d5c732d1bc5be7d42b688b0d824c",
+      "functions": [
+        {
+          "name": "_get_allocator_type",
+          "start": 58,
+          "end": 59
+        },
+        {
+          "name": "_evict_swa_for_device_alloc",
+          "start": 62,
+          "end": 68
+        },
+        {
+          "name": "_evict_mamba_for_device_alloc",
+          "start": 71,
+          "end": 79
+        },
+        {
+          "name": "_make_layer_mapper",
+          "start": 82,
+          "end": 91
+        },
+        {
+          "name": "_make_layer_mapper.mapper",
+          "start": 86,
+          "end": 89
+        },
+        {
+          "name": "_with_mtp_layer_mapping",
+          "start": 94,
+          "end": 104
+        },
+        {
+          "name": "_resolve_deepseek_v4_layer_mappings",
+          "start": 117,
+          "end": 142
+        },
+        {
+          "name": "_kv_row_signature",
+          "start": 145,
+          "end": 148
+        },
+        {
+          "name": "_check_packed_kv_rows",
+          "start": 151,
+          "end": 162
+        },
+        {
+          "name": "build_kv_host_pool",
+          "start": 165,
+          "end": 207
+        },
+        {
+          "name": "_split_hicache_size",
+          "start": 210,
+          "end": 223
+        },
+        {
+          "name": "build_pool_entry",
+          "start": 226,
+          "end": 251
+        },
+        {
+          "name": "build_kv_only_group",
+          "start": 254,
+          "end": 293
+        },
+        {
+          "name": "build_hybrid_swa_group",
+          "start": 296,
+          "end": 362
+        },
+        {
+          "name": "build_kv_only_stack",
+          "start": 365,
+          "end": 407
+        },
+        {
+          "name": "build_hybrid_swa_stack",
+          "start": 410,
+          "end": 473
+        },
+        {
+          "name": "_deepseek_v4_num_host_pages",
+          "start": 476,
+          "end": 497
+        },
+        {
+          "name": "_dsv4_compressed_region_buffers",
+          "start": 500,
+          "end": 508
+        },
+        {
+          "name": "build_deepseek_v4_hicache_stack",
+          "start": 511,
+          "end": 743
+        },
+        {
+          "name": "_carve_declared_sidecars",
+          "start": 746,
+          "end": 785
+        },
+        {
+          "name": "build_hybrid_mamba_stack",
+          "start": 788,
+          "end": 887
+        },
+        {
+          "name": "build_hybrid_mamba_swa_stack",
+          "start": 890,
+          "end": 998
+        },
+        {
+          "name": "HostPoolAssemblyResult.sidecars",
+          "start": 1007,
+          "end": 1008
+        },
+        {
+          "name": "_root_config",
+          "start": 1011,
+          "end": 1012
+        },
+        {
+          "name": "_validate_host_pool_buffers",
+          "start": 1015,
+          "end": 1033
+        },
+        {
+          "name": "_build_declared_controller",
+          "start": 1036,
+          "end": 1066
+        },
+        {
+          "name": "_build_declared_entries",
+          "start": 1069,
+          "end": 1096
+        },
+        {
+          "name": "assemble_host_pools_from_decls",
+          "start": 1099,
+          "end": 1163
+        },
+        {
+          "name": "_build_mha_mla_host_pool",
+          "start": 1166,
+          "end": 1191
+        },
+        {
+          "name": "build_full_draft_pools",
+          "start": 1194,
+          "end": 1228
+        },
+        {
+          "name": "build_swa_draft_pools",
+          "start": 1231,
+          "end": 1281
+        },
+        {
+          "name": "build_hicache_draft_sidecars",
+          "start": 1284,
+          "end": 1302
+        },
+        {
+          "name": "StackStrategy.matches",
+          "start": 1327,
+          "end": 1328
+        },
+        {
+          "name": "StackStrategy.build_direct_linker_pool_group",
+          "start": 1330,
+          "end": 1340
+        },
+        {
+          "name": "StackStrategy.build",
+          "start": 1342,
+          "end": 1356
+        },
+        {
+          "name": "_DeepSeekV4Strategy.matches",
+          "start": 1360,
+          "end": 1368
+        },
+        {
+          "name": "_DeepSeekV4Strategy.build_direct_linker_pool_group",
+          "start": 1370,
+          "end": 1375
+        },
+        {
+          "name": "_DeepSeekV4Strategy.build",
+          "start": 1377,
+          "end": 1440
+        },
+        {
+          "name": "_MambaStrategy.matches",
+          "start": 1444,
+          "end": 1450
+        },
+        {
+          "name": "_MambaStrategy.build",
+          "start": 1452,
+          "end": 1498
+        },
+        {
+          "name": "_swa_layer_mappings",
+          "start": 1501,
+          "end": 1506
+        },
+        {
+          "name": "_SwaStrategy.matches",
+          "start": 1510,
+          "end": 1520
+        },
+        {
+          "name": "_SwaStrategy.build",
+          "start": 1522,
+          "end": 1562
+        },
+        {
+          "name": "_MambaSwaStrategy.matches",
+          "start": 1566,
+          "end": 1577
+        },
+        {
+          "name": "_MambaSwaStrategy.build",
+          "start": 1579,
+          "end": 1634
+        },
+        {
+          "name": "_MiniMaxSparseStrategy.matches",
+          "start": 1638,
+          "end": 1643
+        },
+        {
+          "name": "_MiniMaxSparseStrategy.build",
+          "start": 1645,
+          "end": 1688
+        },
+        {
+          "name": "_PlainKvStrategy.matches",
+          "start": 1692,
+          "end": 1714
+        },
+        {
+          "name": "_PlainKvStrategy.build",
+          "start": 1716,
+          "end": 1755
+        },
+        {
+          "name": "_DsaStrategy.matches",
+          "start": 1759,
+          "end": 1764
+        },
+        {
+          "name": "_DsaStrategy.build_direct_linker_pool_group",
+          "start": 1766,
+          "end": 1771
+        },
+        {
+          "name": "_DsaStrategy.build",
+          "start": 1773,
+          "end": 1812
+        },
+        {
+          "name": "register_stack_strategy",
+          "start": 1827,
+          "end": 1830
+        },
+        {
+          "name": "_select_strategy",
+          "start": 1833,
+          "end": 1840
+        },
+        {
+          "name": "_check_declared_pools_present",
+          "start": 1848,
+          "end": 1867
+        },
+        {
+          "name": "_apply_stack_result",
+          "start": 1870,
+          "end": 1897
+        },
+        {
+          "name": "attach_hybrid_pool_to_unified_cache",
+          "start": 1900,
+          "end": 1931
+        },
+        {
+          "name": "build_minimax_sparse_hicache_stack",
+          "start": 1934,
+          "end": 2022
+        },
+        {
+          "name": "attach_hybrid_minimax_sparse_pool_to_hiradix_cache",
+          "start": 2025,
+          "end": 2094
+        },
+        {
+          "name": "attach_hybrid_dsa_pool_to_hiradix_cache",
+          "start": 2097,
+          "end": 2138
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/index_key_cache.py",
+      "target_sha256": "252f98456df115c56b2454d666c522a34ff731319b3c282fd1c8062fb405f22c",
+      "functions": [
+        {
+          "name": "IndexKeyCache.__init__",
+          "start": 16,
+          "end": 31
+        },
+        {
+          "name": "IndexKeyCache._buffer_shape",
+          "start": 33,
+          "end": 39
+        },
+        {
+          "name": "IndexKeyCache._layer_num_pages",
+          "start": 41,
+          "end": 44
+        },
+        {
+          "name": "IndexKeyCache.clear",
+          "start": 46,
+          "end": 47
+        },
+        {
+          "name": "IndexKeyCache.move",
+          "start": 49,
+          "end": 90
+        },
+        {
+          "name": "IndexKeyCache.move.offsets",
+          "start": 76,
+          "end": 81
+        },
+        {
+          "name": "IndexKeyCache.get_local_buffer",
+          "start": 92,
+          "end": 97
+        },
+        {
+          "name": "IndexKeyCache.get_buffer",
+          "start": 99,
+          "end": 100
+        },
+        {
+          "name": "IndexKeyCache.get_k_continuous",
+          "start": 102,
+          "end": 106
+        },
+        {
+          "name": "IndexKeyCache.get_k_scale_continuous",
+          "start": 108,
+          "end": 114
+        },
+        {
+          "name": "IndexKeyCache.get_k_and_scale",
+          "start": 116,
+          "end": 132
+        },
+        {
+          "name": "IndexKeyCache.store_quantized",
+          "start": 134,
+          "end": 148
+        },
+        {
+          "name": "IndexKeyCache.cpu_copy",
+          "start": 150,
+          "end": 168
+        },
+        {
+          "name": "IndexKeyCache.load_cpu_copy",
+          "start": 170,
+          "end": 184
+        },
+        {
+          "name": "IndexKeyCache._item_len",
+          "start": 186,
+          "end": 189
+        },
+        {
+          "name": "IndexKeyCache.state_buf_infos",
+          "start": 191,
+          "end": 196
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/kv_cache_configurator.py",
+      "target_sha256": "3cd3bffea2d394446511df547d7297bce1ac9ad0ef101b9a472d78908f35842c",
+      "functions": [
+        {
+          "name": "_should_elide_dsa_index_k",
+          "start": 98,
+          "end": 105
+        },
+        {
+          "name": "_get_dsv4_compress_state_dtypes",
+          "start": 111,
+          "end": 120
+        },
+        {
+          "name": "_should_enable_lazy_compaction",
+          "start": 126,
+          "end": 131
+        },
+        {
+          "name": "mm_runtime_reservation_gb",
+          "start": 134,
+          "end": 151
+        },
+        {
+          "name": "_pp_local_per_request_bytes",
+          "start": 167,
+          "end": 185
+        },
+        {
+          "name": "KVCacheConfigurator.__post_init__",
+          "start": 270,
+          "end": 282
+        },
+        {
+          "name": "KVCacheConfigurator._build_fp4_quant_method",
+          "start": 284,
+          "end": 296
+        },
+        {
+          "name": "KVCacheConfigurator.configure",
+          "start": 298,
+          "end": 331
+        },
+        {
+          "name": "KVCacheConfigurator.loc_space_scale",
+          "start": 338,
+          "end": 345
+        },
+        {
+          "name": "KVCacheConfigurator.pool_page_size",
+          "start": 348,
+          "end": 349
+        },
+        {
+          "name": "KVCacheConfigurator._dsa_pool_geometry",
+          "start": 351,
+          "end": 355
+        },
+        {
+          "name": "KVCacheConfigurator._derive_pool_sizes",
+          "start": 357,
+          "end": 408
+        },
+        {
+          "name": "KVCacheConfigurator._init_pools",
+          "start": 410,
+          "end": 608
+        },
+        {
+          "name": "KVCacheConfigurator._init_unified_mamba_pools",
+          "start": 610,
+          "end": 691
+        },
+        {
+          "name": "KVCacheConfigurator._init_unified_mamba_swa_pools",
+          "start": 693,
+          "end": 804
+        },
+        {
+          "name": "KVCacheConfigurator._init_unified_swa_pools",
+          "start": 806,
+          "end": 909
+        },
+        {
+          "name": "KVCacheConfigurator._validate_prefill_only_disable_kv_cache_pool_family",
+          "start": 911,
+          "end": 949
+        },
+        {
+          "name": "KVCacheConfigurator._build_req_to_token_pool",
+          "start": 951,
+          "end": 979
+        },
+        {
+          "name": "KVCacheConfigurator._get_mamba_layer_ids_for_req_pool",
+          "start": 981,
+          "end": 991
+        },
+        {
+          "name": "KVCacheConfigurator._build_hybrid_mamba_decode_req_pool",
+          "start": 993,
+          "end": 1032
+        },
+        {
+          "name": "KVCacheConfigurator._build_decode_req_pool",
+          "start": 1034,
+          "end": 1055
+        },
+        {
+          "name": "KVCacheConfigurator._build_hybrid_req_pool",
+          "start": 1057,
+          "end": 1112
+        },
+        {
+          "name": "KVCacheConfigurator._build_default_req_pool",
+          "start": 1114,
+          "end": 1136
+        },
+        {
+          "name": "KVCacheConfigurator._build_token_to_kv_pool",
+          "start": 1138,
+          "end": 1258
+        },
+        {
+          "name": "KVCacheConfigurator._build_dsv4_kv_pool",
+          "start": 1260,
+          "end": 1329
+        },
+        {
+          "name": "KVCacheConfigurator._build_oot_dsa_kv_pool",
+          "start": 1331,
+          "end": 1350
+        },
+        {
+          "name": "KVCacheConfigurator._build_oot_mla_kv_pool",
+          "start": 1352,
+          "end": 1369
+        },
+        {
+          "name": "KVCacheConfigurator._build_oot_mha_kv_pool",
+          "start": 1371,
+          "end": 1387
+        },
+        {
+          "name": "KVCacheConfigurator._build_ascend_swa_kv_pool",
+          "start": 1389,
+          "end": 1427
+        },
+        {
+          "name": "KVCacheConfigurator._build_ascend_minimax_sparse_kv_pool",
+          "start": 1429,
+          "end": 1458
+        },
+        {
+          "name": "KVCacheConfigurator._build_ascend_mla_kv_pool",
+          "start": 1460,
+          "end": 1480
+        },
+        {
+          "name": "KVCacheConfigurator._build_ascend_mha_kv_pool",
+          "start": 1482,
+          "end": 1501
+        },
+        {
+          "name": "KVCacheConfigurator._build_dsa_kv_pool",
+          "start": 1503,
+          "end": 1567
+        },
+        {
+          "name": "KVCacheConfigurator._build_hybrid_mla_swa_kv_pool",
+          "start": 1569,
+          "end": 1620
+        },
+        {
+          "name": "KVCacheConfigurator._build_mla_fp4_kv_pool",
+          "start": 1622,
+          "end": 1635
+        },
+        {
+          "name": "KVCacheConfigurator._build_mla_kv_pool",
+          "start": 1637,
+          "end": 1650
+        },
+        {
+          "name": "KVCacheConfigurator._build_hybrid_swa_kv_pool",
+          "start": 1652,
+          "end": 1709
+        },
+        {
+          "name": "KVCacheConfigurator._build_minimax_sparse_kv_pool",
+          "start": 1711,
+          "end": 1746
+        },
+        {
+          "name": "KVCacheConfigurator._build_hybrid_linear_kv_pool",
+          "start": 1748,
+          "end": 1836
+        },
+        {
+          "name": "KVCacheConfigurator._build_mha_fp4_kv_pool",
+          "start": 1838,
+          "end": 1856
+        },
+        {
+          "name": "KVCacheConfigurator._build_mha_kv_pool",
+          "start": 1858,
+          "end": 1892
+        },
+        {
+          "name": "KVCacheConfigurator._build_token_to_kv_pool_allocator",
+          "start": 1894,
+          "end": 2050
+        },
+        {
+          "name": "KVCacheConfigurator._profile_available_bytes",
+          "start": 2052,
+          "end": 2105
+        },
+        {
+          "name": "KVCacheConfigurator._calculate_mamba_ratio",
+          "start": 2107,
+          "end": 2136
+        },
+        {
+          "name": "KVCacheConfigurator._apply_token_constraints",
+          "start": 2138,
+          "end": 2165
+        },
+        {
+          "name": "KVCacheConfigurator.resolve_max_num_reqs",
+          "start": 2167,
+          "end": 2220
+        },
+        {
+          "name": "KVCacheConfigurator._resolve_memory_pool_config",
+          "start": 2222,
+          "end": 2238
+        },
+        {
+          "name": "KVCacheConfigurator.config_from_budget",
+          "start": 2240,
+          "end": 2270
+        },
+        {
+          "name": "KVCacheConfigurator._handle_max_mamba_cache",
+          "start": 2272,
+          "end": 2438
+        },
+        {
+          "name": "calculate_mla_kv_cache_dim",
+          "start": 2441,
+          "end": 2496
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/memory_pool.py",
+      "target_sha256": "2644539a8c597274344efdcb59a4965d5feea5d4064ac636a717ccb60c0893e2",
+      "functions": [
+        {
+          "name": "conv_window_dedup_enabled",
+          "start": 117,
+          "end": 132
+        },
+        {
+          "name": "get_tensor_size_bytes",
+          "start": 135,
+          "end": 138
+        },
+        {
+          "name": "_set_kv_buffer_impl",
+          "start": 141,
+          "end": 192
+        },
+        {
+          "name": "_set_kv_buffer_prefix_valid_impl",
+          "start": 195,
+          "end": 253
+        },
+        {
+          "name": "ReqToTokenPool.__init__",
+          "start": 261,
+          "end": 284
+        },
+        {
+          "name": "ReqToTokenPool.write",
+          "start": 286,
+          "end": 287
+        },
+        {
+          "name": "ReqToTokenPool.available_size",
+          "start": 289,
+          "end": 290
+        },
+        {
+          "name": "ReqToTokenPool.alloc",
+          "start": 292,
+          "end": 308
+        },
+        {
+          "name": "ReqToTokenPool.alloc_rows",
+          "start": 310,
+          "end": 323
+        },
+        {
+          "name": "ReqToTokenPool.free_rows",
+          "start": 325,
+          "end": 331
+        },
+        {
+          "name": "ReqToTokenPool.free",
+          "start": 333,
+          "end": 336
+        },
+        {
+          "name": "ReqToTokenPool.clear",
+          "start": 338,
+          "end": 342
+        },
+        {
+          "name": "ReqToTokenPool.attach_aux_cache",
+          "start": 344,
+          "end": 346
+        },
+        {
+          "name": "ReqToTokenPool.reset_aux_cache_allocator",
+          "start": 348,
+          "end": 350
+        },
+        {
+          "name": "ReqToTokenPool.schedulable_token_capacity",
+          "start": 352,
+          "end": 355
+        },
+        {
+          "name": "ReqToTokenPool.alloc_aux_to_lengths",
+          "start": 357,
+          "end": 367
+        },
+        {
+          "name": "MambaPool.State.at_layer_idx",
+          "start": 400,
+          "end": 413
+        },
+        {
+          "name": "MambaPool.State.mem_usage_bytes",
+          "start": 415,
+          "end": 420
+        },
+        {
+          "name": "MambaPool._detect_conv_window_axis",
+          "start": 430,
+          "end": 456
+        },
+        {
+          "name": "MambaPool._allocate_deduplicated_conv_window",
+          "start": 458,
+          "end": 496
+        },
+        {
+          "name": "MambaPool.__init__",
+          "start": 498,
+          "end": 926
+        },
+        {
+          "name": "MambaPool.get_speculative_mamba2_params_all_layers",
+          "start": 928,
+          "end": 930
+        },
+        {
+          "name": "MambaPool.mamba2_layer_cache",
+          "start": 932,
+          "end": 933
+        },
+        {
+          "name": "MambaPool._conv_fuse_ok",
+          "start": 939,
+          "end": 950
+        },
+        {
+          "name": "MambaPool._conv_slot_desc",
+          "start": 953,
+          "end": 956
+        },
+        {
+          "name": "MambaPool._should_fuse_slot_ops",
+          "start": 958,
+          "end": 959
+        },
+        {
+          "name": "MambaPool.clear_slots",
+          "start": 961,
+          "end": 989
+        },
+        {
+          "name": "MambaPool.copy_from",
+          "start": 991,
+          "end": 1038
+        },
+        {
+          "name": "MambaPool.get_cpu_copy",
+          "start": 1040,
+          "end": 1062
+        },
+        {
+          "name": "MambaPool.load_cpu_copy",
+          "start": 1064,
+          "end": 1089
+        },
+        {
+          "name": "MambaPool._iter_transfer_state_tensors",
+          "start": 1104,
+          "end": 1116
+        },
+        {
+          "name": "MambaPool.get_contiguous_buf_infos",
+          "start": 1118,
+          "end": 1130
+        },
+        {
+          "name": "MambaPool.get_state_dim_per_tensor",
+          "start": 1132,
+          "end": 1146
+        },
+        {
+          "name": "MambaPool.get_state_layer_ids",
+          "start": 1148,
+          "end": 1156
+        },
+        {
+          "name": "MambaPool.get_state_slice_outer_counts",
+          "start": 1158,
+          "end": 1164
+        },
+        {
+          "name": "MambaPool.get_state_conv_shard_groups",
+          "start": 1166,
+          "end": 1186
+        },
+        {
+          "name": "MambaPool.get_kv_size_bytes",
+          "start": 1188,
+          "end": 1189
+        },
+        {
+          "name": "HybridReqToTokenPool.__init__",
+          "start": 1197,
+          "end": 1245
+        },
+        {
+          "name": "HybridReqToTokenPool._init_mamba_pool",
+          "start": 1247,
+          "end": 1308
+        },
+        {
+          "name": "HybridReqToTokenPool.clone_with_new_mamba",
+          "start": 1310,
+          "end": 1343
+        },
+        {
+          "name": "HybridReqToTokenPool.register_layer_transfer_counter",
+          "start": 1345,
+          "end": 1346
+        },
+        {
+          "name": "HybridReqToTokenPool.alloc",
+          "start": 1350,
+          "end": 1400
+        },
+        {
+          "name": "HybridReqToTokenPool.get_mamba_indices",
+          "start": 1402,
+          "end": 1403
+        },
+        {
+          "name": "HybridReqToTokenPool.translate_mamba_indices",
+          "start": 1405,
+          "end": 1411
+        },
+        {
+          "name": "HybridReqToTokenPool.mamba2_layer_index",
+          "start": 1413,
+          "end": 1422
+        },
+        {
+          "name": "HybridReqToTokenPool.mamba2_layer_cache",
+          "start": 1424,
+          "end": 1425
+        },
+        {
+          "name": "HybridReqToTokenPool.copy_mamba_state",
+          "start": 1427,
+          "end": 1438
+        },
+        {
+          "name": "HybridReqToTokenPool.get_speculative_mamba2_params_all_layers",
+          "start": 1440,
+          "end": 1441
+        },
+        {
+          "name": "HybridReqToTokenPool.get_state_buf_infos",
+          "start": 1443,
+          "end": 1444
+        },
+        {
+          "name": "HybridReqToTokenPool.get_state_dim_per_tensor",
+          "start": 1446,
+          "end": 1447
+        },
+        {
+          "name": "HybridReqToTokenPool.get_state_slice_outer_counts",
+          "start": 1449,
+          "end": 1450
+        },
+        {
+          "name": "HybridReqToTokenPool.get_state_conv_shard_groups",
+          "start": 1452,
+          "end": 1453
+        },
+        {
+          "name": "HybridReqToTokenPool.get_mamba_ping_pong_other_idx",
+          "start": 1455,
+          "end": 1459
+        },
+        {
+          "name": "HybridReqToTokenPool.get_mamba_ping_pong_keep_idx",
+          "start": 1461,
+          "end": 1463
+        },
+        {
+          "name": "HybridReqToTokenPool._alloc_ping_pong_buffer",
+          "start": 1465,
+          "end": 1494
+        },
+        {
+          "name": "HybridReqToTokenPool.set_mamba_ping_pong_slot",
+          "start": 1496,
+          "end": 1506
+        },
+        {
+          "name": "HybridReqToTokenPool.donate_mamba_ping_pong_slot",
+          "start": 1508,
+          "end": 1529
+        },
+        {
+          "name": "HybridReqToTokenPool.free_mamba_cache",
+          "start": 1531,
+          "end": 1593
+        },
+        {
+          "name": "HybridReqToTokenPool.clear",
+          "start": 1595,
+          "end": 1607
+        },
+        {
+          "name": "KVWriteLoc.__post_init__",
+          "start": 1639,
+          "end": 1646
+        },
+        {
+          "name": "unwrap_write_loc",
+          "start": 1649,
+          "end": 1653
+        },
+        {
+          "name": "KvBufferDesc.__init__",
+          "start": 1662,
+          "end": 1666
+        },
+        {
+          "name": "KvBufferDesc._rows",
+          "start": 1668,
+          "end": 1670
+        },
+        {
+          "name": "KvBufferDesc.reserved_span_bytes",
+          "start": 1672,
+          "end": 1674
+        },
+        {
+          "name": "KvBufferDesc.prefix_span_bytes",
+          "start": 1676,
+          "end": 1678
+        },
+        {
+          "name": "KvBufferDesc.final_span_bytes",
+          "start": 1680,
+          "end": 1684
+        },
+        {
+          "name": "KvBufferDesc.item_len_bytes",
+          "start": 1686,
+          "end": 1688
+        },
+        {
+          "name": "KVCache.__init__",
+          "start": 1699,
+          "end": 1742
+        },
+        {
+          "name": "KVCache.host_pool_decls",
+          "start": 1744,
+          "end": 1753
+        },
+        {
+          "name": "KVCache._finalize_allocation_log",
+          "start": 1755,
+          "end": 1781
+        },
+        {
+          "name": "KVCache.get_kv_buffer_shape",
+          "start": 1783,
+          "end": 1785
+        },
+        {
+          "name": "KVCache.get_key_buffer",
+          "start": 1788,
+          "end": 1789
+        },
+        {
+          "name": "KVCache.get_value_buffer",
+          "start": 1792,
+          "end": 1793
+        },
+        {
+          "name": "KVCache.get_kv_buffer",
+          "start": 1796,
+          "end": 1797
+        },
+        {
+          "name": "KVCache.set_kv_buffer",
+          "start": 1800,
+          "end": 1807
+        },
+        {
+          "name": "KVCache.register_layer_transfer_counter",
+          "start": 1809,
+          "end": 1810
+        },
+        {
+          "name": "KVCache.get_cpu_copy",
+          "start": 1812,
+          "end": 1813
+        },
+        {
+          "name": "KVCache.load_cpu_copy",
+          "start": 1815,
+          "end": 1818
+        },
+        {
+          "name": "KVCache.get_kv_cache_quant_method",
+          "start": 1820,
+          "end": 1836
+        },
+        {
+          "name": "KVCache.maybe_get_custom_mem_pool",
+          "start": 1838,
+          "end": 1839
+        },
+        {
+          "name": "MHATokenToKVPool.__init__",
+          "start": 1843,
+          "end": 1964
+        },
+        {
+          "name": "MHATokenToKVPool._init_kv_copy_and_warmup",
+          "start": 1966,
+          "end": 2012
+        },
+        {
+          "name": "MHATokenToKVPool.is_quantized_kv_cache",
+          "start": 2015,
+          "end": 2016
+        },
+        {
+          "name": "MHATokenToKVPool._create_buffers",
+          "start": 2018,
+          "end": 2035
+        },
+        {
+          "name": "MHATokenToKVPool._create_quantized_buffers",
+          "start": 2037,
+          "end": 2059
+        },
+        {
+          "name": "MHATokenToKVPool._check_quantized_buffer_access_requirements",
+          "start": 2061,
+          "end": 2093
+        },
+        {
+          "name": "MHATokenToKVPool._slot_move_pointer_buffers",
+          "start": 2095,
+          "end": 2105
+        },
+        {
+          "name": "MHATokenToKVPool._init_data_ptrs_and_strides",
+          "start": 2107,
+          "end": 2130
+        },
+        {
+          "name": "MHATokenToKVPool._kv_buffer_shapes",
+          "start": 2132,
+          "end": 2143
+        },
+        {
+          "name": "MHATokenToKVPool._create_buffers_normal",
+          "start": 2145,
+          "end": 2196
+        },
+        {
+          "name": "MHATokenToKVPool._build_kv_buffer_descs",
+          "start": 2200,
+          "end": 2231
+        },
+        {
+          "name": "MHATokenToKVPool._assign_post_capture_tensors",
+          "start": 2233,
+          "end": 2236
+        },
+        {
+          "name": "MHATokenToKVPool._alloc_post_capture_buffers",
+          "start": 2238,
+          "end": 2249
+        },
+        {
+          "name": "MHATokenToKVPool.finalize_backing",
+          "start": 2251,
+          "end": 2255
+        },
+        {
+          "name": "MHATokenToKVPool._finalize_backing_tokens",
+          "start": 2257,
+          "end": 2260
+        },
+        {
+          "name": "MHATokenToKVPool.post_capture_backed_bytes",
+          "start": 2263,
+          "end": 2264
+        },
+        {
+          "name": "MHATokenToKVPool._clear_buffers",
+          "start": 2266,
+          "end": 2279
+        },
+        {
+          "name": "MHATokenToKVPool.get_kv_size_bytes",
+          "start": 2281,
+          "end": 2292
+        },
+        {
+          "name": "MHATokenToKVPool._pd_registerable_tensors",
+          "start": 2295,
+          "end": 2298
+        },
+        {
+          "name": "MHATokenToKVPool.get_contiguous_buf_infos",
+          "start": 2300,
+          "end": 2314
+        },
+        {
+          "name": "MHATokenToKVPool.get_cpu_copy",
+          "start": 2316,
+          "end": 2336
+        },
+        {
+          "name": "MHATokenToKVPool.load_cpu_copy",
+          "start": 2338,
+          "end": 2359
+        },
+        {
+          "name": "MHATokenToKVPool._get_key_buffer",
+          "start": 2361,
+          "end": 2375
+        },
+        {
+          "name": "MHATokenToKVPool.get_key_buffer",
+          "start": 2377,
+          "end": 2383
+        },
+        {
+          "name": "MHATokenToKVPool._get_value_buffer",
+          "start": 2385,
+          "end": 2399
+        },
+        {
+          "name": "MHATokenToKVPool.get_value_buffer",
+          "start": 2401,
+          "end": 2404
+        },
+        {
+          "name": "MHATokenToKVPool.get_v_head_dim",
+          "start": 2406,
+          "end": 2411
+        },
+        {
+          "name": "MHATokenToKVPool.get_kv_buffer",
+          "start": 2413,
+          "end": 2414
+        },
+        {
+          "name": "MHATokenToKVPool.set_kv_buffer",
+          "start": 2416,
+          "end": 2495
+        },
+        {
+          "name": "MHATokenToKVPool._store_kv_layer",
+          "start": 2497,
+          "end": 2544
+        },
+        {
+          "name": "MHATokenToKVPool._quantized_scales",
+          "start": 2546,
+          "end": 2554
+        },
+        {
+          "name": "MHATokenToKVPool._set_quantized_kv_buffer",
+          "start": 2556,
+          "end": 2587
+        },
+        {
+          "name": "MHATokenToKVPool.get_raw_kv_buffer",
+          "start": 2589,
+          "end": 2606
+        },
+        {
+          "name": "MHATokenToKVPool.get_dequant_workspace",
+          "start": 2608,
+          "end": 2613
+        },
+        {
+          "name": "MHATokenToKVPool.get_flashinfer_dequant_workspace_kv_buffer",
+          "start": 2615,
+          "end": 2669
+        },
+        {
+          "name": "MHATokenToKVPool.get_flashinfer_decode_dequant_workspace_kv_buffer",
+          "start": 2671,
+          "end": 2696
+        },
+        {
+          "name": "MHATokenToKVPool._to_cpu_int_list",
+          "start": 2699,
+          "end": 2704
+        },
+        {
+          "name": "MHATokenToKVPool._prepare_dequant_extend_workspace",
+          "start": 2706,
+          "end": 2763
+        },
+        {
+          "name": "MHATokenToKVPool._prepare_dequant_decode_workspace",
+          "start": 2765,
+          "end": 2793
+        },
+        {
+          "name": "MHATokenToKVPool.set_kv_buffer_prefix_valid",
+          "start": 2795,
+          "end": 2887
+        },
+        {
+          "name": "MHATokenToKVPool.move_kv_cache",
+          "start": 2889,
+          "end": 2907
+        },
+        {
+          "name": "MHATokenToKVPool._move_kv_cache_impl",
+          "start": 2909,
+          "end": 2955
+        },
+        {
+          "name": "NoOpMHATokenToKVPool._create_buffers",
+          "start": 2976,
+          "end": 3024
+        },
+        {
+          "name": "NoOpMHATokenToKVPool._finalize_allocation_log",
+          "start": 3026,
+          "end": 3039
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.get_kv_size_bytes",
+          "start": 3041,
+          "end": 3043
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.set_kv_buffer",
+          "start": 3045,
+          "end": 3053
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.get_key_buffer",
+          "start": 3055,
+          "end": 3059
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.get_value_buffer",
+          "start": 3061,
+          "end": 3062
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.get_kv_buffer",
+          "start": 3064,
+          "end": 3065
+        },
+        {
+          "name": "NoOpMHATokenToKVPool.move_kv_cache",
+          "start": 3067,
+          "end": 3069
+        },
+        {
+          "name": "MHATokenToKVPoolFP4._create_buffers",
+          "start": 3073,
+          "end": 3120
+        },
+        {
+          "name": "MHATokenToKVPoolFP4._clear_buffers",
+          "start": 3122,
+          "end": 3126
+        },
+        {
+          "name": "MHATokenToKVPoolFP4._get_key_buffer",
+          "start": 3128,
+          "end": 3144
+        },
+        {
+          "name": "MHATokenToKVPoolFP4._get_value_buffer",
+          "start": 3146,
+          "end": 3162
+        },
+        {
+          "name": "MHATokenToKVPoolFP4.set_kv_buffer",
+          "start": 3164,
+          "end": 3223
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool.__init__",
+          "start": 3234,
+          "end": 3254
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool._create_buffers",
+          "start": 3256,
+          "end": 3263
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool.get_contiguous_buf_infos",
+          "start": 3270,
+          "end": 3275
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool.get_cpu_copy",
+          "start": 3277,
+          "end": 3281
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool.load_cpu_copy",
+          "start": 3283,
+          "end": 3289
+        },
+        {
+          "name": "PageMajorMHATokenToKVPool.set_kv_buffer_prefix_valid",
+          "start": 3291,
+          "end": 3295
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._create_buffers",
+          "start": 3307,
+          "end": 3413
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._clear_buffers",
+          "start": 3415,
+          "end": 3419
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._get_key_buffer",
+          "start": 3421,
+          "end": 3422
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._get_value_buffer",
+          "start": 3424,
+          "end": 3425
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.get_kv_scale_buffer",
+          "start": 3427,
+          "end": 3429
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.set_kv_buffer",
+          "start": 3431,
+          "end": 3486
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._write_scales",
+          "start": 3488,
+          "end": 3504
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._read_sf_interleaved",
+          "start": 3506,
+          "end": 3527
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.move_kv_cache",
+          "start": 3529,
+          "end": 3553
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8._read_scales",
+          "start": 3555,
+          "end": 3562
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.get_cpu_copy",
+          "start": 3564,
+          "end": 3592
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.load_cpu_copy",
+          "start": 3594,
+          "end": 3623
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.get_kv_scale_buf_infos",
+          "start": 3625,
+          "end": 3639
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.set_kv_buffer_prefix_valid",
+          "start": 3641,
+          "end": 3645
+        },
+        {
+          "name": "MHATokenToKVPoolMXFP8.get_kv_size_bytes",
+          "start": 3647,
+          "end": 3658
+        },
+        {
+          "name": "HybridLinearKVPool.__init__",
+          "start": 3666,
+          "end": 3824
+        },
+        {
+          "name": "HybridLinearKVPool.host_pool_decls",
+          "start": 3826,
+          "end": 3830
+        },
+        {
+          "name": "HybridLinearKVPool.post_capture_active",
+          "start": 3833,
+          "end": 3834
+        },
+        {
+          "name": "HybridLinearKVPool.post_capture_backed_bytes",
+          "start": 3837,
+          "end": 3838
+        },
+        {
+          "name": "HybridLinearKVPool.finalize_backing",
+          "start": 3840,
+          "end": 3843
+        },
+        {
+          "name": "HybridLinearKVPool.dsa_kv_cache_store_fp8",
+          "start": 3846,
+          "end": 3847
+        },
+        {
+          "name": "HybridLinearKVPool.kv_cache_dim",
+          "start": 3850,
+          "end": 3851
+        },
+        {
+          "name": "HybridLinearKVPool.index_head_dim",
+          "start": 3854,
+          "end": 3855
+        },
+        {
+          "name": "HybridLinearKVPool.quant_block_size",
+          "start": 3858,
+          "end": 3859
+        },
+        {
+          "name": "HybridLinearKVPool.index_kpool",
+          "start": 3862,
+          "end": 3863
+        },
+        {
+          "name": "HybridLinearKVPool.index_kpool_compress",
+          "start": 3866,
+          "end": 3867
+        },
+        {
+          "name": "HybridLinearKVPool.tail_extra_slots",
+          "start": 3870,
+          "end": 3871
+        },
+        {
+          "name": "HybridLinearKVPool.slots_per_page",
+          "start": 3874,
+          "end": 3875
+        },
+        {
+          "name": "HybridLinearKVPool.layer_shard_enabled",
+          "start": 3878,
+          "end": 3879
+        },
+        {
+          "name": "HybridLinearKVPool.layer_shard_rank",
+          "start": 3882,
+          "end": 3883
+        },
+        {
+          "name": "HybridLinearKVPool.layer_shard_size",
+          "start": 3886,
+          "end": 3887
+        },
+        {
+          "name": "HybridLinearKVPool.layer_shard_start",
+          "start": 3890,
+          "end": 3891
+        },
+        {
+          "name": "HybridLinearKVPool._is_layer_owned",
+          "start": 3893,
+          "end": 3897
+        },
+        {
+          "name": "HybridLinearKVPool.get_kv_size_bytes",
+          "start": 3899,
+          "end": 3900
+        },
+        {
+          "name": "HybridLinearKVPool.get_kv_buffer_shape",
+          "start": 3902,
+          "end": 3906
+        },
+        {
+          "name": "HybridLinearKVPool.get_contiguous_buf_infos",
+          "start": 3908,
+          "end": 3909
+        },
+        {
+          "name": "HybridLinearKVPool.get_kv_layer_ids",
+          "start": 3911,
+          "end": 3914
+        },
+        {
+          "name": "HybridLinearKVPool.get_state_buf_infos",
+          "start": 3916,
+          "end": 3920
+        },
+        {
+          "name": "HybridLinearKVPool.get_state_dim_per_tensor",
+          "start": 3922,
+          "end": 3924
+        },
+        {
+          "name": "HybridLinearKVPool.get_state_layer_ids",
+          "start": 3926,
+          "end": 3928
+        },
+        {
+          "name": "HybridLinearKVPool.get_state_slice_outer_counts",
+          "start": 3930,
+          "end": 3932
+        },
+        {
+          "name": "HybridLinearKVPool.get_state_conv_shard_groups",
+          "start": 3934,
+          "end": 3936
+        },
+        {
+          "name": "HybridLinearKVPool.maybe_get_custom_mem_pool",
+          "start": 3938,
+          "end": 3939
+        },
+        {
+          "name": "HybridLinearKVPool._transfer_full_attention_id",
+          "start": 3941,
+          "end": 3946
+        },
+        {
+          "name": "HybridLinearKVPool.register_layer_transfer_counter",
+          "start": 3948,
+          "end": 3952
+        },
+        {
+          "name": "HybridLinearKVPool._wait_for_layer",
+          "start": 3954,
+          "end": 3956
+        },
+        {
+          "name": "HybridLinearKVPool.get_key_buffer",
+          "start": 3958,
+          "end": 3963
+        },
+        {
+          "name": "HybridLinearKVPool.get_value_buffer",
+          "start": 3965,
+          "end": 3970
+        },
+        {
+          "name": "HybridLinearKVPool.get_kv_buffer",
+          "start": 3972,
+          "end": 3975
+        },
+        {
+          "name": "HybridLinearKVPool.get_raw_kv_buffer",
+          "start": 3977,
+          "end": 3982
+        },
+        {
+          "name": "HybridLinearKVPool.get_dequant_workspace",
+          "start": 3984,
+          "end": 3985
+        },
+        {
+          "name": "HybridLinearKVPool.get_flashinfer_dequant_workspace_kv_buffer",
+          "start": 3987,
+          "end": 3992
+        },
+        {
+          "name": "HybridLinearKVPool.get_flashinfer_decode_dequant_workspace_kv_buffer",
+          "start": 3994,
+          "end": 3999
+        },
+        {
+          "name": "HybridLinearKVPool.get_kv_scale_buffer",
+          "start": 4001,
+          "end": 4005
+        },
+        {
+          "name": "HybridLinearKVPool._transfer_id_context",
+          "start": 4008,
+          "end": 4019
+        },
+        {
+          "name": "HybridLinearKVPool._transfer_id_context._patch_layer_id",
+          "start": 4010,
+          "end": 4016
+        },
+        {
+          "name": "HybridLinearKVPool.set_kv_buffer",
+          "start": 4021,
+          "end": 4058
+        },
+        {
+          "name": "HybridLinearKVPool.move_kv_cache",
+          "start": 4060,
+          "end": 4061
+        },
+        {
+          "name": "HybridLinearKVPool.get_cpu_copy",
+          "start": 4063,
+          "end": 4071
+        },
+        {
+          "name": "HybridLinearKVPool.load_cpu_copy",
+          "start": 4073,
+          "end": 4081
+        },
+        {
+          "name": "HybridLinearKVPool.get_v_head_dim",
+          "start": 4083,
+          "end": 4088
+        },
+        {
+          "name": "HybridLinearKVPool.set_mla_kv_buffer",
+          "start": 4090,
+          "end": 4099
+        },
+        {
+          "name": "HybridLinearKVPool.prefetch_full_attention_kv_buffer",
+          "start": 4101,
+          "end": 4107
+        },
+        {
+          "name": "HybridLinearKVPool.get_mla_kv_buffer",
+          "start": 4109,
+          "end": 4121
+        },
+        {
+          "name": "HybridLinearKVPool.set_index_k_scale_buffer",
+          "start": 4123,
+          "end": 4134
+        },
+        {
+          "name": "HybridLinearKVPool.get_index_k_with_scale_buffer",
+          "start": 4136,
+          "end": 4142
+        },
+        {
+          "name": "HybridLinearKVPool.get_broadcastable_index_k_with_scale_buffer",
+          "start": 4144,
+          "end": 4154
+        },
+        {
+          "name": "HybridLinearKVPool.invalidate_index_buffer_for_layer",
+          "start": 4156,
+          "end": 4162
+        },
+        {
+          "name": "HybridLinearKVPool.get_index_k_continuous",
+          "start": 4164,
+          "end": 4173
+        },
+        {
+          "name": "HybridLinearKVPool.get_index_k_scale_continuous",
+          "start": 4175,
+          "end": 4186
+        },
+        {
+          "name": "HybridLinearKVPool.get_index_k_scale_buffer",
+          "start": 4188,
+          "end": 4201
+        },
+        {
+          "name": "HybridLinearKVPool.get_compress_tail_buffers",
+          "start": 4203,
+          "end": 4208
+        },
+        {
+          "name": "HybridLinearKVPool.kpool_decode_update_index_cache",
+          "start": 4210,
+          "end": 4238
+        },
+        {
+          "name": "HybridLinearKVPool.set_compress_tail_for_request",
+          "start": 4240,
+          "end": 4260
+        },
+        {
+          "name": "MLATokenToKVPool.__init__",
+          "start": 4264,
+          "end": 4315
+        },
+        {
+          "name": "MLATokenToKVPool._create_buffers",
+          "start": 4317,
+          "end": 4332
+        },
+        {
+          "name": "MLATokenToKVPool._clear_buffers",
+          "start": 4334,
+          "end": 4335
+        },
+        {
+          "name": "MLATokenToKVPool.get_kv_size_bytes",
+          "start": 4337,
+          "end": 4342
+        },
+        {
+          "name": "MLATokenToKVPool.get_contiguous_buf_infos",
+          "start": 4345,
+          "end": 4352
+        },
+        {
+          "name": "MLATokenToKVPool.get_key_buffer",
+          "start": 4354,
+          "end": 4361
+        },
+        {
+          "name": "MLATokenToKVPool.get_value_buffer",
+          "start": 4363,
+          "end": 4371
+        },
+        {
+          "name": "MLATokenToKVPool.get_kv_buffer",
+          "start": 4373,
+          "end": 4374
+        },
+        {
+          "name": "MLATokenToKVPool.set_kv_buffer",
+          "start": 4376,
+          "end": 4407
+        },
+        {
+          "name": "MLATokenToKVPool._write_mla_kv_buffer",
+          "start": 4409,
+          "end": 4458
+        },
+        {
+          "name": "MLATokenToKVPool.set_mla_kv_buffer",
+          "start": 4460,
+          "end": 4486
+        },
+        {
+          "name": "MLATokenToKVPool.get_mla_kv_buffer",
+          "start": 4488,
+          "end": 4512
+        },
+        {
+          "name": "MLATokenToKVPool.move_kv_cache",
+          "start": 4514,
+          "end": 4552
+        },
+        {
+          "name": "MLATokenToKVPool.get_cpu_copy",
+          "start": 4554,
+          "end": 4569
+        },
+        {
+          "name": "MLATokenToKVPool.load_cpu_copy",
+          "start": 4571,
+          "end": 4585
+        },
+        {
+          "name": "MLATokenToKVPoolFP4._create_buffers",
+          "start": 4589,
+          "end": 4620
+        },
+        {
+          "name": "MLATokenToKVPoolFP4._clear_buffers",
+          "start": 4622,
+          "end": 4624
+        },
+        {
+          "name": "MLATokenToKVPoolFP4.get_key_buffer",
+          "start": 4626,
+          "end": 4645
+        },
+        {
+          "name": "MLATokenToKVPoolFP4.set_kv_buffer",
+          "start": 4647,
+          "end": 4676
+        },
+        {
+          "name": "MLATokenToKVPoolFP4.set_mla_kv_buffer",
+          "start": 4678,
+          "end": 4730
+        },
+        {
+          "name": "DSATokenToKVPool.__init__",
+          "start": 4738,
+          "end": 4830
+        },
+        {
+          "name": "DSATokenToKVPool._create_index_key_cache",
+          "start": 4832,
+          "end": 4833
+        },
+        {
+          "name": "DSATokenToKVPool._should_allocate_index_layer",
+          "start": 4835,
+          "end": 4836
+        },
+        {
+          "name": "DSATokenToKVPool.host_pool_decls",
+          "start": 4838,
+          "end": 4847
+        },
+        {
+          "name": "DSATokenToKVPool.index_k_with_scale_buffer",
+          "start": 4850,
+          "end": 4852
+        },
+        {
+          "name": "DSATokenToKVPool._init_kpool_compress_tail_buffers",
+          "start": 4854,
+          "end": 4904
+        },
+        {
+          "name": "DSATokenToKVPool.get_compress_tail_buffers",
+          "start": 4906,
+          "end": 4916
+        },
+        {
+          "name": "DSATokenToKVPool.get_compress_tail_buf_infos",
+          "start": 4918,
+          "end": 4937
+        },
+        {
+          "name": "DSATokenToKVPool.kpool_decode_update_index_cache",
+          "start": 4939,
+          "end": 4975
+        },
+        {
+          "name": "DSATokenToKVPool.set_compress_tail_for_request",
+          "start": 4977,
+          "end": 4997
+        },
+        {
+          "name": "DSATokenToKVPool._clear_buffers",
+          "start": 4999,
+          "end": 5004
+        },
+        {
+          "name": "DSATokenToKVPool.move_kv_cache",
+          "start": 5006,
+          "end": 5021
+        },
+        {
+          "name": "DSATokenToKVPool.get_index_k_with_scale_buffer",
+          "start": 5023,
+          "end": 5024
+        },
+        {
+          "name": "DSATokenToKVPool.get_index_k_continuous",
+          "start": 5026,
+          "end": 5032
+        },
+        {
+          "name": "DSATokenToKVPool.get_index_k_scale_continuous",
+          "start": 5034,
+          "end": 5042
+        },
+        {
+          "name": "DSATokenToKVPool.get_index_k_scale_buffer",
+          "start": 5044,
+          "end": 5054
+        },
+        {
+          "name": "DSATokenToKVPool.set_index_k_scale_buffer",
+          "start": 5056,
+          "end": 5063
+        },
+        {
+          "name": "DSATokenToKVPool._get_compress_tail_cpu_copy",
+          "start": 5065,
+          "end": 5080
+        },
+        {
+          "name": "DSATokenToKVPool._load_compress_tail_cpu_copy",
+          "start": 5082,
+          "end": 5102
+        },
+        {
+          "name": "DSATokenToKVPool.get_cpu_copy",
+          "start": 5104,
+          "end": 5115
+        },
+        {
+          "name": "DSATokenToKVPool.load_cpu_copy",
+          "start": 5117,
+          "end": 5136
+        },
+        {
+          "name": "DSATokenToKVPool.get_state_buf_infos",
+          "start": 5138,
+          "end": 5139
+        },
+        {
+          "name": "DSATokenToKVPool.get_kv_size_bytes",
+          "start": 5141,
+          "end": 5145
+        },
+        {
+          "name": "move_kv_cache_native",
+          "start": 5148,
+          "end": 5166
+        },
+        {
+          "name": "masked_set_kv_buffer_kernel",
+          "start": 5170,
+          "end": 5209
+        },
+        {
+          "name": "MHATokenToKOnlyPool.__init__",
+          "start": 5216,
+          "end": 5255
+        },
+        {
+          "name": "MHATokenToKOnlyPool._get_key_buffer",
+          "start": 5257,
+          "end": 5260
+        },
+        {
+          "name": "MHATokenToKOnlyPool.register_layer_transfer_counter",
+          "start": 5262,
+          "end": 5265
+        },
+        {
+          "name": "MHATokenToKOnlyPool.get_key_buffer",
+          "start": 5267,
+          "end": 5270
+        },
+        {
+          "name": "MHATokenToKOnlyPool.set_k_buffer",
+          "start": 5272,
+          "end": 5282
+        },
+        {
+          "name": "MHATokenToKOnlyPool.get_value_buffer",
+          "start": 5284,
+          "end": 5285
+        },
+        {
+          "name": "MHATokenToKOnlyPool.get_kv_buffer",
+          "start": 5287,
+          "end": 5288
+        },
+        {
+          "name": "MHATokenToKOnlyPool.set_kv_buffer",
+          "start": 5290,
+          "end": 5304
+        },
+        {
+          "name": "MHATokenToKOnlyPool.get_kv_size_bytes",
+          "start": 5306,
+          "end": 5308
+        },
+        {
+          "name": "MiniMaxSparseKVPool.__init__",
+          "start": 5312,
+          "end": 5428
+        },
+        {
+          "name": "MiniMaxSparseKVPool.register_layer_transfer_counter",
+          "start": 5430,
+          "end": 5433
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_kv_cache_quant_method",
+          "start": 5435,
+          "end": 5438
+        },
+        {
+          "name": "MiniMaxSparseKVPool._wait_for_layer",
+          "start": 5440,
+          "end": 5442
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_key_buffer",
+          "start": 5444,
+          "end": 5446
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_value_buffer",
+          "start": 5448,
+          "end": 5450
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_kv_buffer",
+          "start": 5452,
+          "end": 5454
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_index_kv_buffer",
+          "start": 5456,
+          "end": 5465
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_index_k_buffer",
+          "start": 5467,
+          "end": 5480
+        },
+        {
+          "name": "MiniMaxSparseKVPool.set_kv_buffer",
+          "start": 5482,
+          "end": 5503
+        },
+        {
+          "name": "MiniMaxSparseKVPool.set_index_kv_buffer",
+          "start": 5505,
+          "end": 5529
+        },
+        {
+          "name": "MiniMaxSparseKVPool.set_index_k_buffer",
+          "start": 5531,
+          "end": 5549
+        },
+        {
+          "name": "MiniMaxSparseKVPool._can_fuse_kv_index_store",
+          "start": 5551,
+          "end": 5574
+        },
+        {
+          "name": "MiniMaxSparseKVPool.set_fused_kv_index_buffer",
+          "start": 5576,
+          "end": 5639
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_kv_size_bytes",
+          "start": 5641,
+          "end": 5644
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_contiguous_buf_infos",
+          "start": 5646,
+          "end": 5648
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_index_k_state_buf_infos",
+          "start": 5650,
+          "end": 5658
+        },
+        {
+          "name": "MiniMaxSparseKVPool.maybe_get_custom_mem_pool",
+          "start": 5660,
+          "end": 5661
+        },
+        {
+          "name": "MiniMaxSparseKVPool.move_kv_cache",
+          "start": 5663,
+          "end": 5669
+        },
+        {
+          "name": "MiniMaxSparseKVPool.get_v_head_dim",
+          "start": 5671,
+          "end": 5674
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/mem_cache/pool_host/dsa.py",
+      "target_sha256": "1da228a559b6f4e5d6450bea66940abf1d4f8843a50bbb9ceb790b28428a3c4f",
+      "functions": [
+        {
+          "name": "dsa_indexer_bytes_per_token_per_layer",
+          "start": 55,
+          "end": 60
+        },
+        {
+          "name": "DSAIndexerHostPoolBuilder.validate",
+          "start": 64,
+          "end": 79
+        },
+        {
+          "name": "DSAIndexerHostPoolBuilder.build",
+          "start": 81,
+          "end": 94
+        },
+        {
+          "name": "make_dsa_indexer_pool_decl",
+          "start": 97,
+          "end": 119
+        },
+        {
+          "name": "DSAIndexerPoolHost.__init__",
+          "start": 127,
+          "end": 211
+        },
+        {
+          "name": "DSAIndexerPoolHost.destroy",
+          "start": 213,
+          "end": 222
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_size_per_token",
+          "start": 224,
+          "end": 225
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_ksize_per_token",
+          "start": 227,
+          "end": 228
+        },
+        {
+          "name": "DSAIndexerPoolHost._is_device_layer_owned",
+          "start": 230,
+          "end": 231
+        },
+        {
+          "name": "DSAIndexerPoolHost._host_layer_index",
+          "start": 233,
+          "end": 234
+        },
+        {
+          "name": "DSAIndexerPoolHost._owned_device_layer_ids",
+          "start": 236,
+          "end": 237
+        },
+        {
+          "name": "DSAIndexerPoolHost._draft_host_layer",
+          "start": 239,
+          "end": 241
+        },
+        {
+          "name": "DSAIndexerPoolHost.init_kv_buffer",
+          "start": 243,
+          "end": 289
+        },
+        {
+          "name": "DSAIndexerPoolHost._init_write_back_staging_buffers",
+          "start": 291,
+          "end": 311
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_hybrid_pool_buffer",
+          "start": 313,
+          "end": 314
+        },
+        {
+          "name": "DSAIndexerPoolHost._get_indexer_page_indices",
+          "start": 316,
+          "end": 329
+        },
+        {
+          "name": "DSAIndexerPoolHost.load_to_device_per_layer",
+          "start": 331,
+          "end": 397
+        },
+        {
+          "name": "DSAIndexerPoolHost._backup_from_device_per_layer",
+          "start": 399,
+          "end": 452
+        },
+        {
+          "name": "DSAIndexerPoolHost.backup_from_device_all_layer",
+          "start": 454,
+          "end": 532
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_data_page",
+          "start": 534,
+          "end": 544
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_dummy_flat_data_page",
+          "start": 546,
+          "end": 552
+        },
+        {
+          "name": "DSAIndexerPoolHost.set_from_flat_data_page",
+          "start": 554,
+          "end": 574
+        },
+        {
+          "name": "DSAIndexerPoolHost.get_page_buffer_meta",
+          "start": 576,
+          "end": 590
+        },
+        {
+          "name": "DSAIndexerPoolHost.is_stride_page_aligned",
+          "start": 592,
+          "end": 601
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/model_executor/pool_configurator.py",
+      "target_sha256": "d3f278a91f00e904ce37a8d98e00284dc9e16e6a19ce420cfeb99ca6f39971d0",
+      "functions": [
+        {
+          "name": "MemoryPoolConfig.__post_init__",
+          "start": 81,
+          "end": 86
+        },
+        {
+          "name": "_dflash_draft_cell_size",
+          "start": 95,
+          "end": 109
+        },
+        {
+          "name": "_get_dsa_cache_layer_ids",
+          "start": 112,
+          "end": 126
+        },
+        {
+          "name": "_get_dsa_indexer_effective_num_layers",
+          "start": 129,
+          "end": 158
+        },
+        {
+          "name": "_get_dsv4_compress_state_dtype_sizes",
+          "start": 161,
+          "end": 170
+        },
+        {
+          "name": "MemoryPoolConfigurator.calculate_pool_sizes",
+          "start": 181,
+          "end": 185
+        },
+        {
+          "name": "MemoryPoolConfigurator.calculate_pool_sizes_from_max_tokens",
+          "start": 187,
+          "end": 191
+        },
+        {
+          "name": "MemoryPoolConfigurator.finalize_with_max_running_requests",
+          "start": 193,
+          "end": 196
+        },
+        {
+          "name": "DefaultPoolConfigurator.__init__",
+          "start": 206,
+          "end": 302
+        },
+        {
+          "name": "DefaultPoolConfigurator._compute_cell_size",
+          "start": 304,
+          "end": 424
+        },
+        {
+          "name": "DefaultPoolConfigurator._compute_dsa_indexer_cell_size",
+          "start": 426,
+          "end": 467
+        },
+        {
+          "name": "DefaultPoolConfigurator.calculate_pool_sizes",
+          "start": 469,
+          "end": 478
+        },
+        {
+          "name": "DefaultPoolConfigurator.calculate_pool_sizes_from_max_tokens",
+          "start": 480,
+          "end": 484
+        },
+        {
+          "name": "HybridSWAPoolConfigurator.__init__",
+          "start": 494,
+          "end": 626
+        },
+        {
+          "name": "HybridSWAPoolConfigurator._solve_pool_sizes",
+          "start": 628,
+          "end": 674
+        },
+        {
+          "name": "HybridSWAPoolConfigurator._solve_pool_sizes.align_page_size",
+          "start": 633,
+          "end": 634
+        },
+        {
+          "name": "HybridSWAPoolConfigurator.calculate_pool_sizes",
+          "start": 676,
+          "end": 680
+        },
+        {
+          "name": "HybridSWAPoolConfigurator.calculate_pool_sizes_from_max_tokens",
+          "start": 682,
+          "end": 685
+        },
+        {
+          "name": "SWAChunkCapPoolConfigurator.__init__",
+          "start": 697,
+          "end": 740
+        },
+        {
+          "name": "SWAChunkCapPoolConfigurator.is_applicable",
+          "start": 743,
+          "end": 753
+        },
+        {
+          "name": "SWAChunkCapPoolConfigurator.calculate_pool_sizes",
+          "start": 755,
+          "end": 784
+        },
+        {
+          "name": "SWAChunkCapPoolConfigurator.calculate_pool_sizes_from_max_tokens",
+          "start": 786,
+          "end": 796
+        },
+        {
+          "name": "DSV4PoolConfigurator.__init__",
+          "start": 817,
+          "end": 908
+        },
+        {
+          "name": "DSV4PoolConfigurator._assert_ring_serves_draft_tokens",
+          "start": 910,
+          "end": 928
+        },
+        {
+          "name": "DSV4PoolConfigurator._get_bytes_per_full_token",
+          "start": 930,
+          "end": 970
+        },
+        {
+          "name": "DSV4PoolConfigurator._compute_dsv4_sizes",
+          "start": 972,
+          "end": 982
+        },
+        {
+          "name": "DSV4PoolConfigurator._get_num_req_slots",
+          "start": 984,
+          "end": 987
+        },
+        {
+          "name": "DSV4PoolConfigurator._get_c128_state_fixed_bytes",
+          "start": 989,
+          "end": 1009
+        },
+        {
+          "name": "DSV4PoolConfigurator._get_c128_state_fixed_bytes_for_token_capacity",
+          "start": 1011,
+          "end": 1022
+        },
+        {
+          "name": "DSV4PoolConfigurator._to_config",
+          "start": 1024,
+          "end": 1042
+        },
+        {
+          "name": "DSV4PoolConfigurator.finalize_with_max_running_requests",
+          "start": 1044,
+          "end": 1053
+        },
+        {
+          "name": "DSV4PoolConfigurator.calculate_pool_sizes",
+          "start": 1055,
+          "end": 1083
+        },
+        {
+          "name": "DSV4PoolConfigurator.calculate_pool_sizes_from_max_tokens",
+          "start": 1085,
+          "end": 1092
+        },
+        {
+          "name": "create_memory_pool_configurator",
+          "start": 1095,
+          "end": 1106
+        }
+      ]
+    },
+    {
+      "path": "engine/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py",
+      "target_sha256": "7e1e18d69fae09cbf389de7fdb0c0dafdd1ad17744f913937385cd56fd49da1b",
+      "functions": [
+        {
+          "name": "_select_local_dcp_heads_for_autotune",
+          "start": 88,
+          "end": 93
+        },
+        {
+          "name": "is_dcp_mla_decode_phase",
+          "start": 96,
+          "end": 105
+        },
+        {
+          "name": "is_mla_dcp_lse_base_on_e",
+          "start": 108,
+          "end": 109
+        },
+        {
+          "name": "should_defer_dsa_cp_kv_gather",
+          "start": 116,
+          "end": 121
+        },
+        {
+          "name": "DeepseekMLAForwardMixin.init_mla_forward",
+          "start": 125,
+          "end": 128
+        },
+        {
+          "name": "DeepseekMLAForwardMixin.should_run_indexer",
+          "start": 130,
+          "end": 149
+        },
+        {
+          "name": "DeepseekMLAForwardMixin._can_fuse_bmm_into_attention",
+          "start": 151,
+          "end": 173
+        },
+        {
+          "name": "DeepseekMLAForwardMixin._split_q_nope_pe",
+          "start": 175,
+          "end": 182
+        },
+        {
+          "name": "DeepseekMLAForwardMixin._make_mla_bmm_fusion_plan",
+          "start": 184,
+          "end": 208
+        },
+        {
+          "name": "DeepseekMLAForwardMixin._q8kv8_born_fp8_q_backend",
+          "start": 210,
+          "end": 280
+        },
+        {
+          "name": "DeepseekMLAForwardMixin.forward_absorb_prepare",
+          "start": 282,
+          "end": 673
+        },
+        {
+          "name": "DeepseekMLAForwardMixin.forward_absorb_core",
+          "start": 675,
+          "end": 928
+        },
+        {
+          "name": "DeepseekMLAForwardMixin._fuse_rope_for_trtllm_mla",
+          "start": 930,
+          "end": 953
+        },
+        {
+          "name": "mla_bmm_then_unified_attention",
+          "start": 969,
+          "end": 999
+        }
+      ]
+    }
+  ]
+}
