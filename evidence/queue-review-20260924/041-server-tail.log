@@ -1,0 +1,201 @@
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 1156, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 861, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2088, in forward
+    s = self.forward_prepare(
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2146, in forward_prepare
+    inner_state = self.forward_absorb_prepare(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 643, in forward_absorb_prepare
+    all_gather_kv_cache_for_mla_extend(
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/layers/dcp/comm.py", line 293, in all_gather_kv_cache_for_mla_extend
+    dcp_kv_buffer[
+RuntimeError: The expanded size of the tensor (33) must match the existing size (40) at non-singleton dimension 0.  Target sizes: [33, 1, 512].  Tensor sizes: [40, 1, 512]
+
+[2026-09-23 22:29:35 TP6] Scheduler hit an exception: Traceback (most recent call last):
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 5703, in run_scheduler_process
+    scheduler.run_event_loop()
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 1871, in run_event_loop
+    dispatch_event_loop(self)
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 5549, in dispatch_event_loop
+    scheduler.event_loop_overlap()
+  File "/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 1969, in event_loop_overlap
+    batch_result = self.run_batch(batch)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/utils/nvtx_utils.py", line 109, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 4184, in run_batch
+    batch_result = self.model_worker.forward_batch_generation(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/tp_worker.py", line 628, in forward_batch_generation
+    out = self.model_runner.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 1536, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 1156, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 861, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2088, in forward
+    s = self.forward_prepare(
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2146, in forward_prepare
+    inner_state = self.forward_absorb_prepare(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 643, in forward_absorb_prepare
+    all_gather_kv_cache_for_mla_extend(
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/layers/dcp/comm.py", line 293, in all_gather_kv_cache_for_mla_extend
+    dcp_kv_buffer[
+RuntimeError: The expanded size of the tensor (33) must match the existing size (40) at non-singleton dimension 0.  Target sizes: [33, 1, 512].  Tensor sizes: [40, 1, 512]
+
+[2026-09-23 22:29:35 TP2] Scheduler hit an exception: Traceback (most recent call last):
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 5703, in run_scheduler_process
+    scheduler.run_event_loop()
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 1871, in run_event_loop
+    dispatch_event_loop(self)
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 5549, in dispatch_event_loop
+    scheduler.event_loop_overlap()
+  File "/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 1969, in event_loop_overlap
+    batch_result = self.run_batch(batch)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/utils/nvtx_utils.py", line 109, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/scheduler.py", line 4184, in run_batch
+    batch_result = self.model_worker.forward_batch_generation(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/tp_worker.py", line 628, in forward_batch_generation
+    out = self.model_runner.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/model_runner.py", line 1613, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/model_runner.py", line 1800, in _forward_raw
+    ret = self.eager_runner.execute(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/runner/eager_runner.py", line 227, in execute
+    return self._execute_extend(forward_batch, pp_proxy_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/model_executor/runner/eager_runner.py", line 375, in _execute_extend
+    ret = model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 1536, in forward
+    hidden_states = general_mm_embed_routine(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/managers/mm_utils.py", line 750, in general_mm_embed_routine
+    hidden_states = language_model(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 1156, in forward
+    hidden_states, residual, topk_indices = layer(
+                                            ^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/glm5_next.py", line 861, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2088, in forward
+    s = self.forward_prepare(
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_v2.py", line 2146, in forward_prepare
+    inner_state = self.forward_absorb_prepare(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 643, in forward_absorb_prepare
+    all_gather_kv_cache_for_mla_extend(
+  File "/tmp/ax/src/s1_dcp8/sglang/srt/layers/dcp/comm.py", line 293, in all_gather_kv_cache_for_mla_extend
+    dcp_kv_buffer[
+RuntimeError: The expanded size of the tensor (33) must match the existing size (40) at non-singleton dimension 0.  Target sizes: [33, 1, 512].  Tensor sizes: [40, 1, 512]
+
+[rank0]:[W923 22:29:36.919386983 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[2026-09-23 22:29:40] No live scheduler processes found; skipping py-spy and CUDA coredump.
+[2026-09-23 22:29:40] kill_process_tree called: parent_pid=237008, include_parent=True, pid=237008
+exit_code: 0

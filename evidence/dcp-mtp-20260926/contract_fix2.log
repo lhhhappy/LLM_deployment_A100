@@ -1,0 +1,87 @@
+{
+  "validity": "DIAGNOSTIC",
+  "device": "cpu",
+  "torch_version": "2.13.0+cu130",
+  "source_sha256": {
+    "srt/layers/dcp/comm.py": "25de999de1a6ffbe055460a334d4ed9f3c6479fa5c2c17b79c0f727fe2253073",
+    "srt/models/deepseek_common/attention_forward_methods/forward_mla.py": "7e1e18d69fae09cbf389de7fdb0c0dafdd1ad17744f913937385cd56fd49da1b",
+    "srt/layers/attention/dsa_backend.py": "6c21ed8cd1387c67abf6d95bad7e0ee5d0528498e2e1ce0b268059316c0a4b92",
+    "srt/mem_cache/index_key_cache.py": "70da26d8756f1bc315a34a6b77ca58c4e56ad04359d48563e9ed8ee0db72502d",
+    "srt/arg_groups/hicache_hook.py": "e374ee8b1b5ec3e532d689ddc30e465a628efcef3fd8a9a86415c42b073dd1ad"
+  },
+  "cases": [
+    {
+      "case": "extend_padding",
+      "logical": 32,
+      "padded": 32,
+      "outcome": "completed"
+    },
+    {
+      "case": "extend_padding",
+      "logical": 33,
+      "padded": 40,
+      "outcome": "completed"
+    },
+    {
+      "case": "extend_padding",
+      "logical": 33,
+      "padded": 34,
+      "outcome": "completed"
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "DECODE",
+      "q_gather_and_merge": true,
+      "dsa_returns_lse": true
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "TARGET_VERIFY",
+      "q_gather_and_merge": true,
+      "dsa_returns_lse": true
+    },
+    {
+      "case": "phase_dispatch",
+      "mode": "DRAFT_EXTEND_V2",
+      "q_gather_and_merge": true,
+      "dsa_returns_lse": true
+    },
+    {
+      "case": "indexer_token_move",
+      "dst": 1,
+      "src": 2,
+      "outcome": "completed",
+      "correct": true,
+      "different_bytes": 0
+    },
+    {
+      "case": "indexer_token_move",
+      "dst": 65,
+      "src": 66,
+      "outcome": "completed",
+      "correct": true,
+      "different_bytes": 0
+    },
+    {
+      "case": "hicache_guard",
+      "spec": null,
+      "outcome": "accepted"
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "EAGLE",
+      "outcome": "accepted"
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "NEXTN",
+      "outcome": "accepted"
+    },
+    {
+      "case": "hicache_guard",
+      "spec": "DSPARK",
+      "outcome": "accepted"
+    }
+  ],
+  "limitations": "Extracted real function bodies, synthetic fixtures; no distributed forward, GPU numerical, performance, or SLO claim."
+}

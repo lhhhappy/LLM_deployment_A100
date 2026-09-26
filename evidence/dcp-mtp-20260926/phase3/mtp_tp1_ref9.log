@@ -1,0 +1,58 @@
+[rank0]:[W926 14:01:26.610056981 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 167772160 bytes (free: 22020096, total: 84987740160).
+[rank0]:[W926 14:01:26.610391709 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 167772160 bytes (free: 22020096, total: 84987740160).
+[2026-09-26 14:01:26] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/scheduler.py", line 6037, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/scheduler.py", line 559, in __init__
+    self.init_model_worker()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/scheduler.py", line 1056, in init_model_worker
+    self.init_tp_model_worker()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/scheduler.py", line 978, in init_tp_model_worker
+    self.tp_worker = TpModelWorker(**worker_kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/tp_worker.py", line 351, in __init__
+    self._init_model_runner()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/managers/tp_worker.py", line 483, in _init_model_runner
+    self._model_runner = ModelRunner(
+                         ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_executor/model_runner.py", line 459, in __init__
+    self.initialize()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_executor/model_runner.py", line 651, in initialize
+    self.load_model()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_executor/model_runner.py", line 1165, in load_model
+    loaded = load_model_with_memory_saver(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_executor/model_runner_components/load_model_utils.py", line 307, in load_model_with_memory_saver
+    model = loader.load_model(
+            ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_loader/loader.py", line 1600, in load_model
+    model = _initialize_model(
+            ^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/model_loader/loader.py", line 301, in _initialize_model
+    return model_class(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/models/glm5_next.py", line 1346, in __init__
+    self.visual = Glm5NextVisionModel(
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/models/glm5_next.py", line 304, in __init__
+    self.merger = Glm5NextVisionPatchMerger(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/models/glm5_next.py", line 191, in __init__
+    super().__init__(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/models/glm4v.py", line 250, in __init__
+    self.gate_up_proj = MergedColumnParallelLinear(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/layers/linear.py", line 570, in __init__
+    super().__init__(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/layers/linear.py", line 377, in __init__
+    self.quant_method.create_weights(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix3/engine/sglang/srt/layers/quantization/unquant.py", line 349, in create_weights
+    torch.empty(
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 160.00 MiB. GPU 0 has a total capacity of 79.15 GiB of which 21.00 MiB is free. Process 313694 has 70.42 GiB memory in use. Process 350081 has 8.69 GiB memory in use. Of the allocated memory 8.19 GiB is allocated by PyTorch, and 4.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[2026-09-26 14:01:26] Received sigquit from a child process. It usually means the child failed.
+/sjtu/linhang/arena/runs/dcp-mtp-20260926/run_dcp_devbox.sh: line 50:  5721 Killed                  python "$DCP_RUN_ROOT/dcp_mtp_probe.py" --model "${DCP_MTP_MODEL:-$DCP_RUN_ROOT/model-mtp}" --tp "${DCP_TP:-2}" --dcp "$DCP_WIDTH" --output "$DCP_RUN_ROOT/$DCP_ARM" "${hicache_args[@]}" "${graph_args[@]}"

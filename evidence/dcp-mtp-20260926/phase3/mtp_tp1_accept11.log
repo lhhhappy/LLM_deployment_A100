@@ -1,0 +1,110 @@
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):  50%|█████     | 1/2 [00:05<00:05,  5.61s/it]Capturing batches (bs=1 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:05<00:05,  5.61s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:05<00:00,  2.86s/it]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:00<00:00,  2.57it/s]Capturing batches (bs=1 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  2.57it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  2.09it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  2.15it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):   0%|          | 0/2 [00:00<?, ?it/s]
+[2026-09-26 14:24:19] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py", line 284, in __init__
+    self.capture()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1075, in capture
+    self._capture_one_stream()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py", line 1144, in _capture_one_stream
+    self.capture_one_shape(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py", line 477, in capture_one_shape
+    self.backend.capture_one(
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 57, in capture
+    return original_capture(backend, shape_key, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/model_executor/runner_backend/full_cuda_graph_backend.py", line 134, in capture_one
+    out = forward_fn()
+          ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py", line 442, in run_once
+    ret = self.model_runner.model.forward(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_nextn.py", line 428, in forward
+    hidden_states = self.model(input_ids, positions, forward_batch)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_nextn.py", line 287, in forward
+    hidden_states, residual, topk_indices = self.decoder(
+                                            ^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_v2.py", line 2515, in forward
+    hidden_states = self.self_attn(
+                    ^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1884, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1832, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_v2.py", line 2097, in forward
+    return self.forward_core(s)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_v2.py", line 2225, in forward_core
+    return self.forward_absorb_core(*inner_state)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/models/deepseek_common/attention_forward_methods/forward_mla.py", line 919, in forward_absorb_core
+    output, _ = self.o_proj(attn_bmm_output)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1884, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1821, in inner
+    args_result = hook(self, args)
+                  ^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 137, in observe
+    record.update(valid_rows=valid[rows], accepted_tokens=accepted,
+                             ~~~~~^^^^^^
+RuntimeError: Cannot copy between CPU and CUDA tensors during CUDA graph capture unless the CPU tensor is pinned. Please use tensor.pin_memory() or allocate the tensor with pin_memory=True.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 6037, in run_scheduler_process
+    scheduler = Scheduler(
+                ^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 559, in __init__
+    self.init_model_worker()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 1067, in init_model_worker
+    self.init_all_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/managers/scheduler.py", line 1052, in init_all_cuda_graphs
+    self.draft_worker.init_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_worker_v2.py", line 1180, in init_cuda_graphs
+    super().init_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/base_spec_worker.py", line 341, in init_cuda_graphs
+    self.draft_worker.init_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_worker_v2.py", line 251, in init_cuda_graphs
+    self._capture_cuda_graphs()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_worker_v2.py", line 493, in _capture_cuda_graphs
+    self.cuda_graph_runner_for_draft_extend = Device2ExtendCudaGraphRunner[
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/fix4/engine/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py", line 286, in __init__
+    raise Exception(
+Exception: Capture cuda graph failed: Cannot copy between CPU and CUDA tensors during CUDA graph capture unless the CPU tensor is pinned. Please use tensor.pin_memory() or allocate the tensor with pin_memory=True.
+Possible solutions:
+1. set --mem-fraction-static to a smaller value (e.g., 0.8 or 0.7)
+2. set --cuda-graph-max-bs-decode to a smaller value (e.g., 16)
+3. disable decode CUDA graph by --cuda-graph-backend-decode=disabled. (Not recommended. Huge performance loss)
+Open an issue on GitHub https://github.com/sgl-project/sglang/issues/new/choose 
+
+
+[2026-09-26 14:24:19] Received sigquit from a child process. It usually means the child failed.
+/sjtu/linhang/arena/runs/dcp-mtp-20260926/run_dcp_devbox.sh: line 50: 214623 Killed                  python "$DCP_RUN_ROOT/dcp_mtp_probe.py" --model "${DCP_MTP_MODEL:-$DCP_RUN_ROOT/model-mtp}" --tp "${DCP_TP:-2}" --dcp "$DCP_WIDTH" --output "$DCP_RUN_ROOT/$DCP_ARM" "${hicache_args[@]}" "${graph_args[@]}"

@@ -1,0 +1,182 @@
+{
+  "validity": "DISTRIBUTED_PRIMITIVE",
+  "passed": true,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "world_size": 2,
+  "torch": "2.13.0+cu130",
+  "source_sha256": {
+    "srt/mem_cache/memory_pool.py": "899ccdf7388597e6d191e4c7737ea2bbec69acf20db01848691b3aad419c1fd6",
+    "srt/mem_cache/index_key_cache.py": "70da26d8756f1bc315a34a6b77ca58c4e56ad04359d48563e9ed8ee0db72502d"
+  },
+  "cases": [
+    {
+      "case": "owner_change",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "overlapping_cycle",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "repeated_source",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "one_rank_no_writes",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "padding",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "empty",
+      "dtype": "torch.bfloat16",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "owner_change",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "overlapping_cycle",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "repeated_source",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "one_rank_no_writes",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "padding",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "empty",
+      "dtype": "torch.uint8",
+      "rank": 0,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "owner_change",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "overlapping_cycle",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "repeated_source",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "one_rank_no_writes",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "padding",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "empty",
+      "dtype": "torch.bfloat16",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "owner_change",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "overlapping_cycle",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "repeated_source",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "one_rank_no_writes",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "padding",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    },
+    {
+      "case": "empty",
+      "dtype": "torch.uint8",
+      "rank": 1,
+      "latent_bit_exact": true,
+      "indexer_bit_exact": true
+    }
+  ],
+  "limitations": "Actual function bodies and NCCL, synthetic pools; no attention, graph, MTP acceptance, or compressed kpool proof."
+}

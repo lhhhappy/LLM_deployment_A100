@@ -1,0 +1,89 @@
+{
+  "validity": "MTP_NUMERICAL_DIAGNOSTIC",
+  "passed": false,
+  "tolerance": 0.01,
+  "test": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_dcp3",
+  "reference": "/sjtu/linhang/arena/runs/dcp-mtp-20260926/mtp_ref3",
+  "missing_trace_files": [],
+  "missing_phases": [],
+  "signals_present": true,
+  "phases": {
+    "draft:EXTEND": {
+      "observations": 8,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 5.8906152844429016e-08,
+      "passed": false
+    },
+    "draft:DECODE": {
+      "observations": 192,
+      "max_relative_linf": 0.06611473880597014,
+      "max_ref_signal": 5.471520125865936e-08,
+      "passed": false
+    },
+    "draft:DRAFT_EXTEND_V2": {
+      "observations": 96,
+      "max_relative_linf": 0.06611473880597014,
+      "max_ref_signal": 3.702007234096527e-08,
+      "passed": false
+    },
+    "target:EXTEND": {
+      "observations": 16,
+      "max_relative_linf": 0.0,
+      "max_ref_signal": 0.01171875,
+      "passed": false
+    },
+    "target:TARGET_VERIFY": {
+      "observations": 192,
+      "max_relative_linf": 0.059926470588235296,
+      "max_ref_signal": 0.00823974609375,
+      "passed": false
+    }
+  },
+  "responses": [
+    {
+      "case": "short_local_empty",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "cold",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    },
+    {
+      "case": "longer_prefix",
+      "same_fixture": true,
+      "same_tokens": true,
+      "test_accept_histogram": [
+        11
+      ],
+      "ref_accept_histogram": [
+        11
+      ]
+    }
+  ],
+  "limitations": "Scaled model and observed acceptance only; no TP8, performance, or SLO claim."
+}

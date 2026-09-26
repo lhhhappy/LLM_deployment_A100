@@ -1,0 +1,25 @@
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):  50%|█████     | 1/2 [00:06<00:06,  6.20s/it]Capturing batches (bs=1 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:06<00:06,  6.20s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:06<00:00,  3.15s/it]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:00<00:00,  2.26it/s]Capturing batches (bs=1 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  2.26it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  1.97it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  2.01it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  6.40it/s]Capturing batches (bs=1 avail_mem=67.54 GB):  50%|█████     | 1/2 [00:00<00:00,  6.40it/s]Capturing batches (bs=1 avail_mem=67.54 GB): 100%|██████████| 2/2 [00:00<00:00, 11.18it/s]
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 309, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 292, in main
+    (args.output / "flush.json").write_text(json.dumps(flush_receipt, indent=2) + "\n")
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "/sjtu/linhang/arena/env/sgl/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type FlushCacheReqOutput is not JSON serializable

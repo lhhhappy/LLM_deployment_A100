@@ -41,10 +41,10 @@
 
 ## 3. DCP（序列分片 KV）
 
-- 【代码/文档】115 doc 的"33/40 行不匹配"是 025 崩溃的历史根因，已在 115/116 用 4 个文件修完，开发机 TP2+DCP2 数值验证通过（相对 L∞ ≤ 2e-3/5.2e-3，含 CUDA graph decode）；缺的只是 8 卡验证。
-- 与 MTP 不兼容不是硬约束：`move_kv_cache`（`memory_pool.py:4514/4967`）是纯 `kv[tgt]=kv[src]`，无 DCP 掩码；上游 #39638 同样卡在这里。加 DCP 感知 3–5 天，且要写能暴露跨 rank 错位的用例。
+- 【代码核查，2026-09-26更正】025是虚拟loc/物理池协议问题，历史115/116与r7覆盖该修复及普通decode graph。041的33/40是另一处真实/补齐行数错误，基线`aebaff56`仍能复现；不能说只差8卡。新修复与实际函数探针见[DCP计划](../../notes/plan-dcp-8card.md)。
+- 【代码】当前topk=1链式MTP不调用接受KV压实；`move_kv_cache`的跨rank修复是工程完整性项，不能解释为现有链式MTP唯一卡点。真实缺口包括草稿分配与写入布局不符、DRAFT_EXTEND_V2未完整Q gather/LSE合并、HiCache indexer主机池覆盖不足及组合guard。调用点审查见[记录](../../notes/reports/dcp-code-review-20260926.md)。
 - 【上游】#39330（Hopper 专用）：H200×8 DCP8 每副本 2.34M 可调度 token vs TP8 505k（4.6×）；评论区吞吐 +19–48%、TTFT p99 → 0.46×，但 ITL（≈TPOT）+25%。vLLM 与 SGLang roadmap 均不覆盖混合线性注意力模型——这条路没有上游先例。
-- 只切 11 层 DSA、KDA 复制：每层每 token 每卡 260 B（非 MTP）→ 逻辑容量 ×4.45，草稿复制 ×3.45，18 GiB 折 4.8–6.2M token/卡【推断】。
+- 【算术】DCP8每DSA层每逻辑token每卡`1024/8+132=260 B`。草稿也按真实写入协议分片时，11目标层+1草稿层的KV容量预算比为4.45；草稿复制的替代方案为3.45。KDA、图池、collective临时量另计，不能把容量比换成并发档位保证。
 
 ## 4. 独占式主机层：底包已有 `write_back`
 
@@ -65,7 +65,7 @@
 |---|---|---:|---|---|
 | 0 | 修排队实验：mamba 200→256；mem089 与 nomtp 钉住 `--max-mamba-cache-size 418` | 0.1 | — | 已改（139/140/142） |
 | 1 | mem 0.90 + 钉 418 | 0.5 | +13% | 待排 |
-| 2 | 115/116 DCP 8 卡验证（先关 MTP） | 1–2 | ×3.45–4.45 | 待排（执行层） |
+| 2 | DCP保留链式MTP：先修补齐、草稿布局与HiCache，再TP8验证 | 以验收为准 | W8 KV预算×4.45，净收益待测 | 见现行DCP计划 |
 | 3 | `write_back`（零代码） | 0.5 | 主机 +1.4M | 已排（143） |
 | 3b | 复测 `write_through_selective` | 0.5 | 未知 | 待排 |
 | 4 | 试 `flashmla_auto`（开发机冒烟） | 0.5–1 | ×1.75 若可行 | 待做 |
@@ -73,7 +73,7 @@
 | 6 | `SGLANG_MAMBA_SSM_DTYPE=bfloat16` + numcheck | 0.2+ | +26% | 已排（144，能力冒烟开） |
 | 7 | 关 MTP + 钉槽 | 0.2 | +30%，TPOT 代价 | 已排（142） |
 | 8 | FP8 KV tilelang 反量化 kernel | 5–10 | ×1.75 | 执行层立项 |
-| 9 | DCP + MTP：`move_kv_cache` DCP 感知 | 3–5 | 让 2 带 MTP | 后置 |
+| 9 | DCP跨owner KV搬运与错位用例 | 以验收为准 | 工程完整性；topk=1不依赖该压实 | 属DCP计划；压缩树式搬运另验 |
 | 10 | 真正独占式 + 去重 | 3–5 | <2× | 看 3 的结果再定 |
 
-未核实：COW 槽在候选未接纳时是否释放；`move_kv_cache` 缺 DCP 感知未在 8 卡复现；fp8 反量化在 tilelang/sm80 的最小可行性；write_back 与 256 组所有权/140 的组合只做了代码走读；250k+ 上下文 indexer 临时缓冲的激活峰值；DCP 在 A100 的实际 TPOT 代价。
+未核实：COW 槽在候选未接纳时是否释放；`move_kv_cache`跨owner原语只有两卡合成池证据，压缩树式MTP与TP8仍未覆盖；fp8 反量化在 tilelang/sm80 的最小可行性；write_back 与 256 组所有权/140 的组合只做了代码走读；250k+ 上下文 indexer 临时缓冲的激活峰值；DCP 在 A100 的实际 TPOT 代价。

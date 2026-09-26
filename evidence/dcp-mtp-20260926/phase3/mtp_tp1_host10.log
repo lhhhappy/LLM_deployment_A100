@@ -1,0 +1,9 @@
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.73 GB):  50%|█████     | 1/2 [00:06<00:06,  6.60s/it]Capturing batches (bs=1 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:06<00:06,  6.60s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:06<00:00,  2.79s/it]Capturing batches (bs=1 avail_mem=67.61 GB): 100%|██████████| 2/2 [00:06<00:00,  3.36s/it]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.61 GB):  50%|█████     | 1/2 [00:00<00:00,  2.34it/s]Capturing batches (bs=1 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  2.34it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  1.97it/s]Capturing batches (bs=1 avail_mem=67.58 GB): 100%|██████████| 2/2 [00:00<00:00,  2.02it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):   0%|          | 0/2 [00:00<?, ?it/s]Capturing batches (bs=2 avail_mem=67.58 GB):  50%|█████     | 1/2 [00:00<00:00,  5.82it/s]Capturing batches (bs=1 avail_mem=67.54 GB):  50%|█████     | 1/2 [00:00<00:00,  5.82it/s]Capturing batches (bs=1 avail_mem=67.54 GB): 100%|██████████| 2/2 [00:00<00:00, 10.16it/s]
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 294, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/dcp-mtp-20260926/dcp_mtp_probe.py", line 271, in main
+    raise RuntimeError("Host restore sensitive numerical comparison failed")
+RuntimeError: Host restore sensitive numerical comparison failed

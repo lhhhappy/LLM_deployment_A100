@@ -1,0 +1,3 @@
+# Full raw tensors and frozen archives remain in the worktree and GPU evidence directory.
+*.pt
+*.tgz
