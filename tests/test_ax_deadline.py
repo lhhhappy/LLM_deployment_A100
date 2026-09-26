@@ -292,5 +292,14 @@ class Family(unittest.TestCase):
         cfg = ax.DeadlineConfig(max_wait_s=120)
         lead, rider = req('lead', 36000), req('rider', 35000)
         waited = {'lead': 0.0, 'rider': 121.0}
-        order = ax.tier_order([lead, rider], lambda r: waited[r.rid], {'rider'}, 8192, cfg, {'lead': 9000})
+        order = ax.tier_order([lead, rider], lambda r: waited[r.rid], set(), 8192, cfg, {'lead': 9000},
+                              family_held={'rider'})
         self.assertEqual([r.rid for r in order], ['rider', 'lead'])
+
+    def test_lpm_holdback_stays_last_even_when_starved(self):
+        # 124 unchanged: an LPM in-batch holdback is last whatever it waited (so 128 off equals 124)
+        cfg = ax.DeadlineConfig(max_wait_s=120)
+        lead, held = req('lead', 36000), req('held', 35000)
+        waited = {'lead': 0.0, 'held': 121.0}
+        order = ax.tier_order([held, lead], lambda r: waited[r.rid], {'held'}, 8192, cfg)
+        self.assertEqual([r.rid for r in order], ['lead', 'held'])

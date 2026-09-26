@@ -1585,16 +1585,15 @@ class Scheduler(
         # the continuation's num_matched_prefix_tokens is still its match from when it waited.
         cont_left = cont.seqlen - len(cont.prefix_indices) if cont is not None else 0
         if deadline is not None:
-            held = set(getattr(self.policy, "ax_held", set()))
-            work = None
+            held = getattr(self.policy, "ax_held", set())
+            work, family_held = None, None
             family = getattr(self, "_ax_family_cfg", None)
             if family is not None:
                 work, family_held = self._ax_family_plan(family, deadline)
-                held |= family_held
-            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work)
+            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
             order = [r.rid for r in ranked]
             if cont is not None:
-                head = next((r for r in ranked if r.rid not in held), None)
+                head = next((r for r in ranked if r.rid not in held and not (family_held and r.rid in family_held)), None)
                 rounds = getattr(cont, "_ax_parked_rounds", 0)
                 parked_s = now - self._ax_park_start if rounds and self._ax_park_start else 0.0
                 park = ax_deadline.should_park(

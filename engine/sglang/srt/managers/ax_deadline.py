@@ -111,19 +111,27 @@ def slack_s(req, work: int, waited_s: float, chunk: int, cfg: DeadlineConfig) ->
 
 
 def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[str], chunk: int,
-               cfg: DeadlineConfig, work: Optional[Dict[str, int]] = None) -> List:
+               cfg: DeadlineConfig, work: Optional[Dict[str, int]] = None,
+               family_held: Optional[Set[str]] = None) -> List:
     """Starved (oldest first), rescuable and hopeless (each by remaining work), held-back; stable.
 
-    Recomputed every round, so a request misjudged as hopeless is promoted as soon as it is not. `work` (128)
-    overrides the ranking work of a family leader; the rescuable/hopeless judgement keeps its real remaining.
+    Recomputed every round, so a request misjudged as hopeless is promoted as soon as it is not. `held` are LPM's
+    in-batch prefix-sharing holdbacks, last as under 124 whatever they waited. `work` and `family_held` belong to
+    128: `work` overrides the ranking work of a family leader (the rescuable/hopeless judgement keeps its real
+    remaining); a rider in `family_held` is last while its leader waits, except that the starvation bound still
+    frees it, so a leader that never runs cannot keep its riders last for ever. With 128 off both are empty and
+    the order equals 124's.
     """
+    family_held = family_held or set()
 
     def key(item):
         index, req = item
+        if req.rid in held:
+            return (3, 0.0, index)
         waited = waited_s(req)
         if waited > cfg.max_wait_s:
-            return (0, -waited, index)  # the starvation bound also frees a held rider whose leader never ran
-        if req.rid in held:
+            return (0, -waited, index)
+        if req.rid in family_held:
             return (3, 0.0, index)
         remaining = remaining_tokens(req)
         hopeless = slack_s(req, remaining, waited, chunk, cfg) < 0
