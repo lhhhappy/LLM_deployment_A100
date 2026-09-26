@@ -109,6 +109,40 @@ class AdmissionWindow:
         return receipt
 
 
+class ChainStartPacer:
+    """Delay only a chain's first turn; the original driver handles all later gaps."""
+    def __init__(self, interval, chains, out, clock=time):
+        if not math.isfinite(interval) or interval <= 0:
+            raise ValueError('invalid chain start interval')
+        ids = [c['chain_id'] for c in chains]
+        if len(ids) != len(set(ids)):
+            raise ValueError('duplicate chain id in cohort')
+        self.interval, self.order, self.clock = interval, {cid: i for i, cid in enumerate(ids)}, clock
+        self.lock = threading.Lock()
+        self.origin = None
+        self.ledger = (Path(out)/'chain_start_ledger.jsonl').open('x')
+
+    def wait(self, chain, stop):
+        cid = chain['chain_id']
+        index = self.order[cid]
+        with self.lock:
+            if self.origin is None:
+                self.origin = self.clock.monotonic()
+            due = self.origin + index*self.interval
+        if stop.wait(max(0, due-self.clock.monotonic())):
+            return False
+        with self.lock:
+            self.ledger.write(json.dumps(dict(chain_id=cid, cohort_index=index,
+                scheduled_after_s=index*self.interval,
+                released_after_s=self.clock.monotonic()-self.origin,
+                released_at_s=self.clock.time()), separators=(',', ':'))+'\n')
+            self.ledger.flush()
+        return True
+
+    def close(self):
+        self.ledger.close()
+
+
 def install(module, controller):
     # Strictly locate the original request dispatch timestamp assignment. Fail
     # rather than silently instrument the wrong upstream code after an update.
@@ -140,14 +174,26 @@ def install(module, controller):
     module.raw_record = record
 
 
+def install_stagger(module, pacer, original_signature):
+    original_drive = module.drive
+    def drive(*args, **kwargs):
+        bound = original_signature.bind(*args, **kwargs)
+        bound.apply_defaults()
+        if pacer.wait(bound.arguments['chain'], bound.arguments['stop']):
+            return original_drive(*args, **kwargs)
+    module.drive = drive
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--loadgen', type=Path, required=True)
     ap.add_argument('--seconds', type=float, required=True)
+    ap.add_argument('--chain-start-interval-s', type=float, default=0)
     args, rest = ap.parse_known_args(argv)
     if rest[:1] == ['--']: rest = rest[1:]
     opts = argparse.ArgumentParser(add_help=False)
     opts.add_argument('--out-dir', type=Path, required=True)
+    opts.add_argument('--cohort', type=Path)
     parsed, _ = opts.parse_known_args(rest)
     if '--warmup' in rest or '--no-gap' in rest or '--max-chains' in rest:
         raise ValueError('timed measurement must preserve the full frozen workload')
@@ -156,13 +202,22 @@ def main(argv=None):
     sys.path.insert(0, str(args.loadgen.parent))
     spec.loader.exec_module(module)
     controller = AdmissionWindow(args.seconds, parsed.out_dir)
+    original_signature = inspect.signature(module.drive)
     install(module, controller)
+    pacer = None
+    if args.chain_start_interval_s:
+        if parsed.cohort is None:
+            raise ValueError('chain start pacing requires --cohort')
+        chains = json.loads(parsed.cohort.read_text())['chains']
+        pacer = ChainStartPacer(args.chain_start_interval_s, chains, parsed.out_dir)
+        install_stagger(module, pacer, original_signature)
     before = set(parsed.out_dir.glob('raw_*.jsonl'))
     sys.argv = [str(args.loadgen), *rest]
     rc = 2
     try:
         rc = int(module.main() or 0)
     finally:
+        if pacer: pacer.close()
         paths = set(parsed.out_dir.glob('raw_*.jsonl'))-before
         if len(paths) == 1:
             path = paths.pop()

@@ -56,6 +56,21 @@ class TimedReplay(unittest.TestCase):
         self.assertEqual(receipt['status'], 'INVALID')
         self.assertEqual(receipt['outstanding'], ['slow'])
 
+    def test_chain_start_interval_preserves_order_and_interrupts_wait(self):
+        chains=[{'chain_id':cid} for cid in ('first', 'second', 'third')]
+        pacer=timed.ChainStartPacer(.03, chains, self.out)
+        stop=threading.Event()
+        try:
+            self.assertTrue(pacer.wait(chains[0], stop))
+            self.assertTrue(pacer.wait(chains[1], stop))
+            stop.set()
+            self.assertFalse(pacer.wait(chains[2], stop))
+        finally:
+            pacer.close()
+        ledger=[json.loads(s) for s in (self.out/'chain_start_ledger.jsonl').read_text().splitlines()]
+        self.assertEqual([x['cohort_index'] for x in ledger], [0, 1])
+        self.assertGreaterEqual(ledger[1]['released_after_s'], .025)
+
     def test_real_harness_drains_inflight_and_interrupts_gap(self):
         spec=importlib.util.spec_from_file_location('test_timed_original', ROOT/'s1-dev/harness/s1_loadgen.py')
         mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)

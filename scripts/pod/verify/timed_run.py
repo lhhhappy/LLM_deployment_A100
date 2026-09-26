@@ -20,6 +20,8 @@ def main(argv=None):
     ap.add_argument('--runner', type=Path, required=True)
     ap.add_argument('--seconds', type=float, default=4200)
     ap.add_argument('--warmup-profile', choices=['original', 'rep16-v1'], default='original')
+    ap.add_argument('--chain-start-interval-s', type=float, default=0,
+                    help='Diagnostic only: release cohort chains at this fixed interval; N remains the worker cap')
     args, rest = ap.parse_known_args(argv)
     if rest[:1] == ['--']: rest = rest[1:]
     p = argparse.ArgumentParser(add_help=False)
@@ -29,7 +31,8 @@ def main(argv=None):
     opts.out.mkdir(parents=True, exist_ok=True)
     evidence = dict(schema_version=1, runner_started_s=time.time(), n=opts.n,
                     flush_success=False, runner_rc=None, scope='fixed_duration_diagnostic',
-                    warmup_profile=args.warmup_profile)
+                    warmup_profile=args.warmup_profile,
+                    chain_start_interval_s=args.chain_start_interval_s)
     receipt_path = opts.out/'flush_evidence.json'
     write_json(receipt_path, evidence)
     spec = importlib.util.spec_from_file_location('timed_original_runner', args.runner)
@@ -44,7 +47,8 @@ def main(argv=None):
             instance = command[command.index('--instance-id')+1]
             if instance.endswith('-measure'):
                 command = [command[0], str(Path(__file__).with_name('timed_loadgen.py')),
-                           '--loadgen', command[1], '--seconds', str(args.seconds), '--', *command[2:]]
+                           '--loadgen', command[1], '--seconds', str(args.seconds),
+                           '--chain-start-interval-s', str(args.chain_start_interval_s), '--', *command[2:]]
         return original_run(command, log, env)
     module._run = run
     def flush(url):
@@ -65,7 +69,8 @@ def main(argv=None):
             s = json.loads(summary.read_text())
             evidence.update({k: Path(s.get(k) or '').name for k in ('raw', 'run')})
             s.update(scope='fixed_duration_diagnostic', full_cohort_complete=False,
-                     warmup_profile=args.warmup_profile)
+                     warmup_profile=args.warmup_profile,
+                     chain_start_interval_s=args.chain_start_interval_s)
             # The original report remains for audit; its partial-cohort flags
             # must not be displayed as the overall experiment verdict.
             s.pop('ALL_PASS', None)
