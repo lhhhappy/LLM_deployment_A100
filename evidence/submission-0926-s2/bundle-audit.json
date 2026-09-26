@@ -1,0 +1,25 @@
+{
+ "attempt_id": 46677,
+ "arm": "B",
+ "submission_sha256": "25d8d93d51053744bc91c1d58065509642802013d6b0430af07457b645556b6a",
+ "bundle_sha256": "13ee559400fab2f1f2408331e61a5b2b1558de42df047c54a19838fb04b61a2d",
+ "bundle_bytes": 11972,
+ "bundle_copies_identical": true,
+ "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926b",
+ "engine_commit": "f546934eff67f7b1d9f9cc5516c5a89377aaeb71",
+ "env_added_vs_46364": {
+  "SGLANG_AX_SM80_FP8_MOE_HUMMING": "1",
+  "SGLANG_AX_DEADLINE_TIERS": "1",
+  "SGLANG_AX_BACKLOG_RELIEF": "1",
+  "SGLANG_AX_BACKLOG_COLD_CAP": "8192",
+  "SGLANG_AX_BACKLOG_INTERVAL": "0",
+  "SGLANG_AX_BACKLOG_HIGH_S": "15",
+  "SGLANG_AX_BACKLOG_LOW_S": "5",
+  "SGLANG_AX_BACKLOG_MAX_SLOW": "250",
+  "SGLANG_AX_BACKLOG_GATE": "0.10",
+  "SGLANG_AX_DEADLINE_WARM_S": "15"
+ },
+ "env_removed_vs_46364": {},
+ "command_same_as_46364": true,
+ "image_46364": "registry.dp.tech/dptech/dp/native/prod-4727808/4650601/lh-img:0925a"
+}

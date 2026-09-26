@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# Candidate A + 126 warm seat, N30 opening probe. Single change versus v3_open_A_n30: SGLANG_AX_SCHED_COLD_CAP 6144 -> 2048
-# (floor) with SGLANG_AX_SCHED_COLD_CAP_MAX=6144, so with no short hit waiting the cold chunk stays 6144 (8192 while 125
-# relieves) and with hits waiting it leaves their seat (run 081: 237 of 242 fast misses and 6 of 7 turn misses were warm
-# one-round requests). Watch: turn and fast misses of warm requests, chain misses, TPOT>0.10.
-# 2026-09-26 evening: verification probe for the aggressive submission arm S2 = A + 126 (never run before; 131 was planned but
-# superseded by the A-prime series). SMOKE_GATE=1 so the 12-question capability smoke covers exactly the S2 environment.
-G_COMMIT=4f9d1f0b9c71522ad8e97413924baf513e6f4357
+# 2026-09-26 evening: A' 60-minute N30 window on engine f546934eff67f7b1d9f9cc5516c5a89377aaeb71 (84dcca0e + review fixes 110/117/124/180, see
+# v3_open_A_warm15_fixes_n30.sh); single engine change versus 130b (4f9d1f0b). Confirmation run for the next submission.
+# Candidate A (112: 124 + aggressive 125 + 117, v3, N30, 3600-second admission then drain) with one change:
+# SGLANG_AX_DEADLINE_WARM_S=15. 124 cannot see the harness buckets and gives a warm request with more than 4096
+# uncached tokens a 5 s budget; turn starts (15 s in the harness) and shared-prefix chain starts (30 s) of that
+# shape were judged hopeless after 5 s and waited until the 120 s starvation bound (112 vs 111: turn 12->24,
+# 6 new turn misses waited 120.8-124.2 s; notes/program-n30-v3.md). Judged against 112 on the same request IDs:
+# turn misses and waits near 120 s first, then chain, overall, fast.
+G_COMMIT=f546934eff67f7b1d9f9cc5516c5a89377aaeb71
 # NEXTN is the CLI name; the base normalizes it to EAGLE before logging effective config.
-G_EXPECT="117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=on 128=off 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
+G_EXPECT="117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
 G_ARGS="--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87"
-G_ENV="SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=2048 SGLANG_AX_SCHED_COLD_CAP_MAX=6144 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_BACKLOG_COLD_CAP=8192 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
-G_MEASURE_SECONDS=600
+G_ENV="SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=6144 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_BACKLOG_COLD_CAP=8192 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
+G_MEASURE_SECONDS=3600
 G_WARMUP_PROFILE=rep16-v1
 LADDER_UP="30"
 unset LADDER_DOWN SGLANG_AX_SRPT_AGING SGLANG_AX_SHORT_RESERVE

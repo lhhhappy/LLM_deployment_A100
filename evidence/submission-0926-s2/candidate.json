@@ -25,12 +25,13 @@
   "SGLANG_AX_BACKLOG_INTERVAL": "0",
   "SGLANG_AX_BACKLOG_HIGH_S": "15",
   "SGLANG_AX_BACKLOG_LOW_S": "5",
-  "SGLANG_AX_BACKLOG_MAX_SLOW": "80",
+  "SGLANG_AX_BACKLOG_MAX_SLOW": "250",
   "SGLANG_AX_BACKLOG_GATE": "0.10",
   "SGLANG_AX_DEADLINE_WARM_S": "15"
  },
  "model_name": "default",
- "_image_digest": "sha256:ac3e5b5d763af45345bfa73a5d30d7106789dbf8b8c44f6ad9f3826aafc81fa7",
  "_engine_commit": "f546934eff67f7b1d9f9cc5516c5a89377aaeb71",
+ "_image_digest": "sha256:ac3e5b5d763af45345bfa73a5d30d7106789dbf8b8c44f6ad9f3826aafc81fa7",
+ "_note": "S2 (aggressive arm) = S1 + SGLANG_AX_BACKLOG_MAX_SLOW 80 -> 250. The 125 guard latches: in 112 and 130b the cumulative transient-slow counter passed 80 about 14 minutes into the hour and relief (cold chunk 8192, interval 0) stayed off for the remaining 46 minutes, while 13-17 of the ~170 later chain heads still missed 30 s (TTFT 32-64 s for most). 250 transient slow requests correspond to well under the 5% (257 of 5150) that the tpot_p95 gate tolerates for final TPOT. Expected: chain better in the steady state, fast/overall worse (fewer seats beside 8192 chunks), TPOT>0.10 count higher. Same image as S1 (engine chosen after probe 130eb). Confirmation run: v3_n30_A_warm15_fixes_slow250_60m (or the 4f9d1f0b variant).",
  "_engine_note": "f546934e = 4f9d1f0b + 84dcca0e (neutral) + review fixes 124 (bab21ddf) / 110 (67a00da8) / 117 (7dbe80f9) / 180 (07f8de24); image lh-img:0926b FROM lh-img:0925a"
 }

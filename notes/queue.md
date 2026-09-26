@@ -4,12 +4,9 @@
 
 | Job | 要回答的问题与对照 | 当前状态 |
 | --- | --- | --- |
-| `110-v3_open_124_117_n26` | 对 104 的 v3/N26 开场对照，确认 117 在 124 上的效果 | done：raw 500/500、错误 0；对 104 同 ID 452 条 chain 17→18，TPOT 均值 50.63→45.56 ms、>0.10 秒 23→4；claude 已用 harness 复核一致 |
-| `111-v3_n30_base_60m` | C 阶段底座：103 配置、N30、派发 3600 秒后排空 | done：2915 条全部完成、0 错误。四门全挂（chain 53/243、turn 12/106、overall 742/2566、fast 979/2353），逐请求看是等显存（KV 池 99.3%、81% 时间有队列、running 峰值 28）；只作 112 的同 ID 对照 |
-| `112-v3_n30_124_125x_117_60m` | 对 111 同窗口，只开 124、激进 125、117 | done：约 10:45 UTC 排空；55 分钟时快照 chain 24、turn 22、overall 407、fast 469（未闭合），TPOT 36.8 ms、>0.10 34 条；claude 写同 ID 逐请求分析 |
-| `113-v3_n34_base48_60m` | N34 底座（running/graph 48） | 启动后由 fable 用 stopjob 停止（为今天的提交腾出 8 卡），未测量；改名 136 重排 |
-| `130-v3_open_A_n30`（fable） | 候选 A（117+124+激进 125，即 112 配置）N30 开场基线，引擎 4f9d1f0b | done：511 条、0 错误；chain 13/70、turn 1/23、fast 36/381、overall 35/415、TPOT>0.10 37；对 130a 同 508 条见 program 账本 |
-| `130a-v3_open_A_warm15_n30` → `130b-v3_n30_A_warm15_60m` → `130c-v3_open_A_warm15_126_n30` → `130d-…_128_n30` → `130e-…_122_n30` → `130f-v3_n30_A_warm15_nomtp_60m`（fable；130b 脚本由 claude 提交 3f9e13e3） | 今天提交的依据，全部基于 A′ = A + `SGLANG_AX_DEADLINE_WARM_S=15`：112 对 111 同 2915 条 ID 逐请求（claude，`evidence/L112-…/analysis/misses_vs_111.csv`）chain 53→25、fast/overall 减半，但 turn 12→24，新增 turn 中 6 条等了 120.8–124.2 s：124 把命中过半且新增 >4096 的 warm 请求按 5 s 预算判"来不及"、垫底到 120 s 饥饿上限。130a 开场基线（能力冒烟开）；130b 60 分钟对 112 看 turn 是否回落（S1 依据，冒烟开）；130c/d/e 各单改于 130a（126 座位、128 家族、125x→122，选 S2）；130f 去 MTP 对 130b（MTP 是否间接伤 chain/turn） | 11:20 UTC 由 `queue-after-20260926T111836-43143` 以 `--allow-pending` 插入队首，130a running；第一次插入因 qpush_after 引号 bug 丢了 `--allow-pending` 而失败（已修 bf7181db） |
+| `130eb-v3_open_A_warm15_fixes_n30`（fable） | A′ 环境不变，引擎 f546934e（46676/46677 所用）= 84dcca0e + 审查修正 124 停车/110 守卫/117 缓存/180 销毁；对 130a 同 ID；SMOKE_GATE=1 | running（冒烟 12/12、机制行正确），闭合后配对 130a 进看板 |
+| `130ec-v3_n30_A_warm15_fixes_slow250_60m`（fable） | 46677（S2）的事后确认：A′ + 修正引擎 + 125 护栏 80→250，60 分钟 N30，对 130b（组合判断；护栏 14 分钟后才起作用） | 发布任务已挂在 130eb 之后（queue-after-…），排在 130f 前 |
+| `130f-v3_n30_A_warm15_nomtp_60m`（fable） | A′ 去掉 MTP（钉住状态池），60 分钟对 130b：MTP 是否拖累 chain/turn | pending，130ec 之后 |
 | `130g-v3g_n30_base_60m` → `130h-v3g_n30_A_warm15_60m`（fable；原 134/135） | 与 111/130b 除数据外逐字一致，数据换成 v3g（补插间隔按主办方真实链时长放大，均值 5.5→22.3 s，截断不摊；Pod `/tmp/ax/data/s1-dev-longchain-v3g`，requests SHA256 `1b14aab2…`）。问题：真实间隔下 N30 稳态是否退出显存墙，A′ 的相对收益是否不变；claude 建议用底座稳态每路 tpm_all 对线上 78.6k/分钟检验密度 | 原 134/135 被 worker 在插入前抢先启动，均已 stopjob（未测量）；由 `queue-after`（130 之后、130f 之后按名字顺序）重排 |
 | `136-v3_n34_base48_60m` → `137-v3_n34_124_125x_117_48_60m` → `138-v3_n34_124_122_117_48_60m`（fable） | N34 三组（原 113–115，脚本不变）：底座 + 上限 48；A + 上限 48；A 把 125x 换 122 | pending，134/135 之后 |
 | `139`–`144`（fable） | N34 容量单变量（各对 136；按 R34 修正）：139 KDA 状态池 418→256（不用 200：200÷5 会把并发压到 40）；140 mem 0.89 + 钉住 418 槽；141 hicache 96；142 去掉 MTP + 钉住 418 槽；143 主机层 write_back（独占式）；144 KDA 状态 bf16（能力冒烟开） | pending，最后 |

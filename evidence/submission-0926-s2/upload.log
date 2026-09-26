@@ -1,0 +1,27 @@
+=== submit A
+        "operator_name": null
+      }
+    },
+    "bundle_sha256": "4491ab49f87a7e9709c5275cf2f4e89d81b6e78a4547f7c4993b78689fa0455b",
+    "bundle_bytes": 11969,
+    "native_trace_sha256": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f"
+  }
+}
+rc=0
+=== submit B
+        "operator_name": null
+      }
+    },
+    "bundle_sha256": "13ee559400fab2f1f2408331e61a5b2b1558de42df047c54a19838fb04b61a2d",
+    "bundle_bytes": 11972,
+    "native_trace_sha256": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f"
+  }
+}
+rc=0
+=== attempts log
+2026-09-26T15:33:45Z arm=A attempt_id=46676 created
+2026-09-26T15:33:47Z arm=A attempt_id=46676 uploaded
+2026-09-26T15:33:50Z arm=B attempt_id=46677 created
+2026-09-26T15:33:52Z arm=B attempt_id=46677 uploaded
+
+[exited with code 0]
