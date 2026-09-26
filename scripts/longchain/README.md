@@ -2,6 +2,8 @@
 
 当前成品：[`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，311链、5601请求；已完成全量CPU验收。交付与分布见[`data/README.md`](../../data/README.md)。本目录集中维护生成、校验、回放入口与Phoenix观测，不在`scripts/analysis/`保留旧副本。
 
+64链快速试跑集已生成：`data/s1-dev-longchain-lite`，1123请求，按用户要求未跑自检。原runner只换root/set/cohort，具体参数见[`data/README.md`](../../data/README.md)。复现命令：`python3 -B scripts/longchain/longchain_subset.py`。
+
 ## 直接回放当前成品
 
 在仓库根目录运行，换成实际引擎根地址和本次N；每次使用全新的输出目录。下面N=14只是命令示例，不是CPU推断出的推荐通过档。
@@ -31,10 +33,12 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt \
 | 文件 | 用途 |
 |---|---|
 | `longchain.py` / `longchain_events.py` | 源素材、冻结事件计划与不可变历史编译 |
+| `longchain_subset.py` | 从成品按链长、pack分层抽取64条完整链；正文和等待不变，不运行自检 |
 | `longchain_check.py` | 独立正文、工具组、token/LCP、预算和来源验收 |
 | `longchain_replay.py` | 离线防护后调用原runner与评分，不是另一套回放算法 |
 | `longchain_material_inventory.py` | 公共素材盘点 |
 | `longchain_distribution.py` | 分布、素材重复与链首共享前缀诊断 |
+| `longchain_timing.py` | 仅读元数据，对比dev/full/lite等待分位数、事件条件分布与长等待连续性 |
 | `dev_distribution_observe.py` | 原开发集与048固定记录的来源分布审查 |
 | `requirements-longchain.txt` | 原GLM Renderer的冻结CPU依赖 |
 | [`phoenix/`](phoenix/README.md) | Phoenix只读采集、连续事件分析与目录展示 |
