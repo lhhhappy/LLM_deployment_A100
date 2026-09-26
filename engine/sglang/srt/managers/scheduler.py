@@ -1565,7 +1565,8 @@ class Scheduler(
                 for leader, riders, others in families[:6]))
         return work, held
 
-    def _ax_admission_plan(self, running_batch: ScheduleBatch, round_budget: int, kv_room: int):
+    def _ax_admission_plan(self, running_batch: ScheduleBatch, round_budget: int, kv_room: int,
+                           adder=None):
         """[ax] 124/125 on request-plane rank 0: (waiting RIDs in order or None, park, relieve).
 
         Reads rank-local clocks and arrival stamps, so the scheduler broadcasts the result; only rank-0
@@ -1592,14 +1593,30 @@ class Scheduler(
                 work, family_held = self._ax_family_plan(family, deadline)
             ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
             order = [r.rid for r in ranked]
-            if cont is not None:
-                head = next((r for r in ranked if r.rid not in held and not (family_held and r.rid in family_held)), None)
+            if cont is not None and self.get_num_allocatable_reqs(
+                len(running_batch.reqs), running_batch=running_batch
+            ) > 0:
                 rounds = getattr(cont, "_ax_parked_rounds", 0)
                 parked_s = now - self._ax_park_start if rounds and self._ax_park_start else 0.0
-                park = ax_deadline.should_park(
-                    cont, cont_left, waited(cont), head, waited(head) if head is not None else 0.0,
-                    round_budget, kv_room, rounds, parked_s, deadline,
-                )
+                # Bounded scan: a high-ranked but non-runnable waiter must not
+                # consume the continuation's turn or hide a complete short hit.
+                for head in ranked[:64]:
+                    head_waited = waited(head)
+                    if head.rid in held or (family_held and head.rid in family_held
+                                           and not ax_deadline.is_starved(head, head_waited, deadline)):
+                        continue
+                    budget = adder.ax_complete_waiter_budget(head) if adder is not None else round_budget
+                    if budget <= 0:
+                        continue
+                    park = ax_deadline.should_park(
+                        cont, cont_left, waited(cont), head, head_waited,
+                        budget, kv_room, rounds, parked_s, deadline,
+                    )
+                    if park:
+                        # The normal adder stops at NO_TOKEN; put the selected
+                        # feasible waiter first on every rank before admission.
+                        order = [head.rid] + [rid for rid in order if rid != head.rid]
+                        break
                 if park and not rounds:
                     self._ax_park_start = now
         relieved = False
@@ -4210,13 +4227,12 @@ class Scheduler(
         if deadline is not None or backlog is not None:
             # [ax] 124/125: decided on request-plane rank 0 (rank-local clocks and stamps) and applied on
             # every rank. Reached under identical control flow: waiting requests or a continuation exist.
-            # With 120's protection a cold request is cut to the cold cap even when the round has room,
-            # so the cap is both the chunk a cold request runs in and the most a waiter can finish in
-            # one round (a longer one would be a second partial, which protection refuses).
+            # Cost estimation uses the cold chunk size. Parking uses the
+            # adder's candidate-specific complete-fit budget, including KV.
             round_budget = min(chunked_prefill_size, ax_protect[0]) if ax_protect else chunked_prefill_size
             kv_room = int(adder.rem_total_tokens)
             order, ax_park, self._ax_backlog_relieved = self._ax_rank0_decide(
-                lambda: self._ax_admission_plan(running_batch, round_budget, kv_room)
+                lambda: self._ax_admission_plan(running_batch, round_budget, kv_room, adder=adder)
             )
             if order is not None:
                 by_id = {r.rid: r for r in self.waiting_queue}
@@ -4227,14 +4243,10 @@ class Scheduler(
 
         if self.chunked_req is not None:
             self.chunked_req.init_next_round_input()
-            if ax_park:
-                # [ax] 124: parked for this round so a rescuable waiter that fits runs instead. It computes
-                # no KV, so extend_range still ends at the cached prefix and the next round skips the
-                # stash; 120 counts only continuations that run. Not marking it as the adder's
-                # continuation keeps the normal (complete-fit) admission path for cold waiters.
-                self.chunked_req._ax_parked_rounds = getattr(self.chunked_req, "_ax_parked_rounds", 0) + 1
-                self._ax_admission_stats["parks"] += 1
-            else:
+            # When parking, leave the adder's continuation unset so a complete
+            # waiter can run. Count the park only after admission succeeds;
+            # otherwise resume this owner below in the same scheduling pass.
+            if not ax_park:
                 if deadline is not None:
                     self.chunked_req._ax_parked_rounds = 0
                 self.chunked_req = adder.add_chunked_req(self.chunked_req)
@@ -4252,6 +4264,7 @@ class Scheduler(
                     running_batch.reqs,
                 )
 
+        batch_was_full = running_batch.batch_is_full
         mamba_allocator = getattr(self.req_to_token_pool, "mamba_allocator", None)
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_begin(len(self.waiting_queue))
@@ -4365,6 +4378,19 @@ class Scheduler(
 
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_end()
+
+        if ax_park:
+            if adder.can_run_list:
+                self.chunked_req._ax_parked_rounds = getattr(self.chunked_req, "_ax_parked_rounds", 0) + 1
+                self._ax_admission_stats["parks"] += 1
+            else:
+                # Prefix re-match, locks, COW or a delayer may invalidate the
+                # preview. Resume the owner in THIS pass with live KV limits.
+                # No waiter was admitted, so the adder's budgets are unspent.
+                self.chunked_req._ax_parked_rounds = 0
+                self._ax_park_start = 0.0
+                running_batch.batch_is_full = batch_was_full
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
 
         # Update waiting queue
         can_run_list: List[Req] = adder.can_run_list

@@ -1109,6 +1109,36 @@ class PrefillAdder:
             <= self.ax_protect[1]
         )
 
+    def _request_total_tokens(self, req: Req, extend_tokens: int) -> int:
+        """Admission's resident KV, output reserve, page and shared-state charge."""
+        max_new = min(
+            max(req.sampling_params.max_new_tokens - len(req.output_ids), 0),
+            CLIP_MAX_NEW_TOKENS,
+        )
+        return (extend_tokens + max_new + self.page_size
+                + self._mamba_gap_budget_for_req(req))
+
+    def ax_complete_waiter_budget(self, req: Req) -> int:
+        """Read-only parking eligibility after policy prefix matching.
+
+        A host hit saves compute but still needs device KV for the reload.
+        Complete device short hits may use the whole round, unlike cold work.
+        Matching with COW, locking and host loading remain in add_one_req;
+        its authoritative checks may still reject, so parking has a fallback.
+        """
+        extend = req.seqlen - len(req.prefix_indices)
+        compute = self.ceil_paged_tokens(extend - req.host_hit_length)
+        if compute <= 0 or self._request_total_tokens(req, extend) >= self.rem_total_tokens:
+            return 0
+        budget = min(self.rem_chunk_tokens, self.rem_input_tokens)
+        if self.ax_protect is not None:
+            cap, short, _ = self.ax_protect
+            device_short = (len(req.prefix_indices) > 0 and not req.needs_host_load_back()
+                            and 0 < extend <= short)
+            if not device_short:
+                budget = min(budget, cap)
+        return int(budget) if compute <= budget else 0
+
     def add_chunked_req(self, req: Req):
         if self.dllm_config is not None:
             _rem_tokens = self._get_dllm_remain_tokens()
@@ -1382,17 +1412,10 @@ class PrefillAdder:
         # Reserve page_size for page-alignment overhead: the paged allocator may
         # consume one extra page per request (see alloc_extend), which
         # _update_prefill_budget also deducts.
-        max_new = min(
-            max(req.sampling_params.max_new_tokens - len(req.output_ids), 0),
-            CLIP_MAX_NEW_TOKENS,
-        )
         cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
             req.prefix_indices
         )
-        total_tokens = cand_extend_input_len + max_new + self.page_size
-        # Shared Mamba pool: fold the new mamba state's shared-gap cost into
-        # `total_tokens` so both `rem_total_tokens` gates reflect the joint budget.
-        total_tokens += self._mamba_gap_budget_for_req(req)
+        total_tokens = self._request_total_tokens(req, cand_extend_input_len)
 
         # adjusting the input_tokens based on host_hit_length and page_size
         real_input_tokens = cand_extend_input_len - req.host_hit_length

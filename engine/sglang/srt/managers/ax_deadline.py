@@ -116,6 +116,11 @@ def slack_s(req, work: int, waited_s: float, chunk: int, cfg: DeadlineConfig) ->
     return budget_s(req, cfg) - (waited_s + cfg.arrival_offset_s) - service_s(work, chunk, cfg)
 
 
+def is_starved(req, waited_s: float, cfg: DeadlineConfig) -> bool:
+    limit = cfg.max_wait_s if is_cold(req, cfg.cold_hit_ratio) else cfg.max_wait_warm_s
+    return waited_s > limit
+
+
 def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[str], chunk: int,
                cfg: DeadlineConfig, work: Optional[Dict[str, int]] = None,
                family_held: Optional[Set[str]] = None) -> List:
@@ -135,7 +140,7 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
         if req.rid in held:
             return (3, 0.0, index)
         waited = waited_s(req)
-        if waited > (cfg.max_wait_s if is_cold(req, cfg.cold_hit_ratio) else cfg.max_wait_warm_s):
+        if is_starved(req, waited, cfg):
             return (0, -waited, index)
         if req.rid in family_held:
             return (3, 0.0, index)
@@ -149,11 +154,11 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
 def should_park(continuation, continuation_left: int, continuation_waited_s: float, head,
                 head_waited_s: float, round_budget: int, kv_room: int, parked_rounds: int, parked_s: float,
                 cfg: DeadlineConfig) -> bool:
-    """Yield this round's budget to a rescuable waiter that finishes its prefill within the round.
+    """Yield one round to a rescuable or starved waiter that finishes its prefill within the round.
 
     The waiter must fit entirely in both the round budget and the KV room (a truncated one would be a
-    second partial, which protection refuses, so the round would be wasted); the continuation must be
-    long or already hopeless, so short ones are never delayed. `continuation_left` is the continuation's
+    second partial, which protection refuses, so the round would be wasted). Unless the waiter is starved,
+    the continuation must be long or already hopeless. `continuation_left` is the continuation's
     prefill still to run; its budget stays the one it was admitted with. Reads nothing but its arguments.
     """
     if head is None or cfg.park_max_rounds == 0 or parked_rounds >= cfg.park_max_rounds:
@@ -161,11 +166,14 @@ def should_park(continuation, continuation_left: int, continuation_waited_s: flo
     if parked_rounds and parked_s >= cfg.park_max_s:
         return False
     head_work = remaining_tokens(head)
-    if head_work > min(round_budget, kv_room) or slack_s(head, head_work, head_waited_s, round_budget, cfg) < 0:
+    if head_work > min(round_budget, kv_room):
+        return False
+    starved = is_starved(head, head_waited_s, cfg)
+    if not starved and slack_s(head, head_work, head_waited_s, round_budget, cfg) < 0:
         return False
     long_left = continuation_left > cfg.park_min_remaining
     hopeless = slack_s(continuation, continuation_left, continuation_waited_s, round_budget, cfg) < 0
-    return long_left or hopeless
+    return starved or long_left or hopeless
 
 
 @dataclass(frozen=True)
