@@ -37,6 +37,10 @@ python3 -B scripts/analysis/dcp_run_audit.py \
 
 ## 必须保留的失败
 
-原生 8K 的 [repeat2](gpu-results/local_8k_repeat2-compare.txt) 复现第二个 attention 层第 3950 行超出 1% 容差。不得只看 greedy token 相同就算通过。`AX_CAPTURE_INPUTS=1` 保存该行 Q/K/V/top-k；`AX_TOPK_ROW_ORACLE` 只在诊断脚本中固定选键。两次固定选键对照恢复通过，且替换前再次出现原生选键集合变化，见 [topk-isolation.json](gpu-results/topk-isolation.json)。未保存 indexer logits，不能宣称已找到选键变化的全部根因，也不能把原生端到端结果改记为 PASS。
+原生 8K 的 [repeat2](gpu-results/local_8k_repeat2-compare.txt) 复现第二个 attention 层第 3950 行超出 1% 容差。不得只看 greedy token 相同就算通过。`AX_CAPTURE_INPUTS=1` 保存该行 Q/K/V/top-k；`AX_TOPK_ROW_ORACLE` 只在诊断脚本中固定选键。两次固定选键对照恢复通过，且替换前再次出现原生选键集合变化，见 [topk-isolation.json](gpu-results/topk-isolation.json)。后续已经补齐两臂各 10 次原生重跑和该行 indexer logits，定位为底包 A/A 也会出现的精确平局换组；保留原失败记录，不能改记为全路径数值 PASS。
+
+## 独立审查后的修正证据
+
+`review-fixes/` 保存修订后两 rank 的 543 形状 JIT/oracle 实测、各臂 10 次 indexer 逐字段对照、8K 完整前向 40 对交错计时、MTP 数值与实际机制/路由观测。具体结果、命令与待验边界见[修订报告](../../notes/reports/dcp-local-extend-review-fixes-0926.md)。二进制捕获留在原开发机目录，不归档或清理。
 
 二进制 tensor 和完整 GPU 日志留在上述开发机运行目录，不重复纳入 Git；本目录提交可审阅的数值/时间记录、服务原始文本和派生表。真实 TP8 权重、质量、峰值显存及整档收益仍待验证。

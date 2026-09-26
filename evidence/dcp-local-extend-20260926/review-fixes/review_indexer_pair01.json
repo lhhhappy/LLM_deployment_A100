@@ -1,0 +1,281 @@
+{
+  "scope": "row-3950 diagnosis with identical capture in both arms; not a TP8 quality verdict",
+  "complete": true,
+  "missing": [],
+  "selection_variants": {
+    "base:rank0:layer3": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "base:rank0:layer7": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "base:rank1:layer3": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "base:rank1:layer7": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "local:rank0:layer3": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "local:rank0:layer7": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "local:rank1:layer3": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    },
+    "local:rank1:layer7": {
+      "variants": 1,
+      "counts": [
+        1
+      ]
+    }
+  },
+  "rows": [
+    {
+      "arm": "review_base_01",
+      "kind": "base",
+      "rank": 0,
+      "layer": 3,
+      "computed_here": true,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": false
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.0,
+      "greedy_equal": true,
+      "boundary_512_513": [
+        0.00041480406071059406,
+        0.00041335527203045785
+      ],
+      "boundary_gap": 1.4487886801362038e-06,
+      "boundary_groups": [
+        24808,
+        19844
+      ],
+      "logits_max_abs_delta": 0.0,
+      "pair_scores": {
+        "21028": -0.0011193656828254461,
+        "23340": 0.0001792092516552657
+      },
+      "pair_keys_equal": false,
+      "selection_regret": -1.4487886801362038e-06
+    },
+    {
+      "arm": "review_base_01",
+      "kind": "base",
+      "rank": 0,
+      "layer": 7,
+      "computed_here": true,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": true
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.0,
+      "greedy_equal": true,
+      "boundary_512_513": [
+        0.0012001374270766973,
+        0.0012001374270766973
+      ],
+      "boundary_gap": 0.0,
+      "boundary_groups": [
+        23340,
+        21028
+      ],
+      "logits_max_abs_delta": 0.0,
+      "pair_scores": {
+        "21028": 0.0012001374270766973,
+        "23340": 0.0012001374270766973
+      },
+      "pair_keys_equal": false,
+      "selection_regret": 0.0
+    },
+    {
+      "arm": "review_base_01",
+      "kind": "base",
+      "rank": 1,
+      "layer": 3,
+      "computed_here": false,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": false
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.0,
+      "greedy_equal": true
+    },
+    {
+      "arm": "review_base_01",
+      "kind": "base",
+      "rank": 1,
+      "layer": 7,
+      "computed_here": false,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": true
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.0,
+      "greedy_equal": true
+    },
+    {
+      "arm": "review_local_01",
+      "kind": "local",
+      "rank": 0,
+      "layer": 3,
+      "computed_here": true,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": false
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.006172839552164078,
+      "greedy_equal": true,
+      "boundary_512_513": [
+        0.00041480406071059406,
+        0.00041335527203045785
+      ],
+      "boundary_gap": 1.4487886801362038e-06,
+      "boundary_groups": [
+        24808,
+        19844
+      ],
+      "logits_max_abs_delta": 0.0,
+      "pair_scores": {
+        "21028": -0.0011193656828254461,
+        "23340": 0.0001792092516552657
+      },
+      "pair_keys_equal": false,
+      "selection_regret": -1.4487886801362038e-06
+    },
+    {
+      "arm": "review_local_01",
+      "kind": "local",
+      "rank": 0,
+      "layer": 7,
+      "computed_here": true,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": true
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.005780346691608429,
+      "greedy_equal": true,
+      "boundary_512_513": [
+        0.0012001374270766973,
+        0.0012001374270766973
+      ],
+      "boundary_gap": 0.0,
+      "boundary_groups": [
+        23340,
+        21028
+      ],
+      "logits_max_abs_delta": 0.0,
+      "pair_scores": {
+        "21028": 0.0012001374270766973,
+        "23340": 0.0012001374270766973
+      },
+      "pair_keys_equal": false,
+      "selection_regret": 0.0
+    },
+    {
+      "arm": "review_local_01",
+      "kind": "local",
+      "rank": 1,
+      "layer": 3,
+      "computed_here": false,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": false
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.006172839552164078,
+      "greedy_equal": true
+    },
+    {
+      "arm": "review_local_01",
+      "kind": "local",
+      "rank": 1,
+      "layer": 7,
+      "computed_here": false,
+      "selected_groups": 512,
+      "selected_only": [],
+      "reference_only": [],
+      "pair_present": {
+        "21028": false,
+        "23340": true
+      },
+      "valid_key_bytes_changed": 0,
+      "valid_key_scales_changed": 0,
+      "query_bytes_changed": 0,
+      "weights_max_abs_delta": 0.0,
+      "attention_row_relative_linf": 0.005780346691608429,
+      "greedy_equal": true
+    }
+  ]
+}

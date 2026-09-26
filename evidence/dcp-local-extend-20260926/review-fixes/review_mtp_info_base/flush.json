@@ -1,0 +1,30 @@
+{
+  "flush_result": {
+    "success": true,
+    "message": ""
+  },
+  "after_flush_meta": {
+    "id": "b785af414e40464aad000d236150ba73",
+    "finish_reason": {
+      "type": "length",
+      "length": 1
+    },
+    "prompt_tokens": 4164,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "reasoning_tokens": 0,
+    "completion_tokens": 1,
+    "cached_tokens": 0,
+    "weight_versions": [
+      {
+        "version": "default",
+        "start": 0,
+        "end": 1
+      }
+    ],
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 0.13572480529546738,
+    "response_sent_to_client_ts": 1790463027.7861469
+  }
+}

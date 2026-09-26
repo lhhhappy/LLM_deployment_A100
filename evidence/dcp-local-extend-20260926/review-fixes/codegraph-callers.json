@@ -1,0 +1,53 @@
+{
+  "local_extend_mechanism_tokens": {
+    "symbol": "local_extend_mechanism_tokens",
+    "callers": [
+      {
+        "name": "_ax_mechanism_report",
+        "kind": "method",
+        "filePath": "srt/managers/scheduler.py",
+        "startLine": 1295
+      }
+    ]
+  },
+  "local_dcp_indices": {
+    "symbol": "local_dcp_indices",
+    "callers": [
+      {
+        "name": "forward_extend",
+        "kind": "method",
+        "filePath": "srt/layers/attention/dsa_backend.py",
+        "startLine": 3023
+      }
+    ]
+  },
+  "_topk_from_kpool_logits": {
+    "symbol": "_topk_from_kpool_logits",
+    "callers": [
+      {
+        "name": "_get_topk_paged",
+        "kind": "method",
+        "filePath": "srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "startLine": 875
+      },
+      {
+        "name": "_get_topk_ragged_kpool_plan",
+        "kind": "method",
+        "filePath": "srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "startLine": 982
+      },
+      {
+        "name": "_get_topk_ragged_with_cp",
+        "kind": "method",
+        "filePath": "srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "startLine": 1112
+      },
+      {
+        "name": "_get_topk_ragged_kpool",
+        "kind": "method",
+        "filePath": "srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "startLine": 1220
+      }
+    ]
+  }
+}

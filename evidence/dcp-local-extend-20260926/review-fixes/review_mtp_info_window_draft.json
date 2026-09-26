@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "role": "draft",
+  "required": [
+    "local_short",
+    "local_large"
+  ],
+  "missing": [],
+  "observed_batches": {
+    "0": {
+      "gather_kv": 3,
+      "local_short": 1,
+      "local_large": 1
+    },
+    "1": {
+      "gather_kv": 3,
+      "local_short": 1,
+      "local_large": 1
+    }
+  },
+  "first": {
+    "0": {
+      "role": "draft",
+      "rank": 0,
+      "observed_at_s": 1790463091.3017025,
+      "routes": {
+        "gather_kv": {
+          "batches": 1,
+          "query_tokens": 1,
+          "prefix_tokens": 0,
+          "last_t": 1,
+          "last_p": 0
+        },
+        "local_short": {
+          "batches": 0,
+          "query_tokens": 0,
+          "prefix_tokens": 0,
+          "last_t": 0,
+          "last_p": 0
+        },
+        "local_large": {
+          "batches": 0,
+          "query_tokens": 0,
+          "prefix_tokens": 0,
+          "last_t": 0,
+          "last_p": 0
+        }
+      }
+    },
+    "1": {
+      "role": "draft",
+      "rank": 1,
+      "observed_at_s": 1790463091.3021085,
+      "routes": {
+        "gather_kv": {
+          "batches": 1,
+          "query_tokens": 1,
+          "prefix_tokens": 0,
+          "last_t": 1,
+          "last_p": 0
+        },
+        "local_short": {
+          "batches": 0,
+          "query_tokens": 0,
+          "prefix_tokens": 0,
+          "last_t": 0,
+          "last_p": 0
+        },
+        "local_large": {
+          "batches": 0,
+          "query_tokens": 0,
+          "prefix_tokens": 0,
+          "last_t": 0,
+          "last_p": 0
+        }
+      }
+    }
+  },
+  "latest": {
+    "0": {
+      "role": "draft",
+      "rank": 0,
+      "observed_at_s": 1790463093.239194,
+      "routes": {
+        "gather_kv": {
+          "batches": 4,
+          "query_tokens": 1350,
+          "prefix_tokens": 10240,
+          "last_t": 125,
+          "last_p": 4096
+        },
+        "local_short": {
+          "batches": 1,
+          "query_tokens": 68,
+          "prefix_tokens": 4096,
+          "last_t": 68,
+          "last_p": 4096
+        },
+        "local_large": {
+          "batches": 1,
+          "query_tokens": 3073,
+          "prefix_tokens": 0,
+          "last_t": 3073,
+          "last_p": 0
+        }
+      }
+    },
+    "1": {
+      "role": "draft",
+      "rank": 1,
+      "observed_at_s": 1790463093.2397563,
+      "routes": {
+        "gather_kv": {
+          "batches": 4,
+          "query_tokens": 1350,
+          "prefix_tokens": 10240,
+          "last_t": 125,
+          "last_p": 4096
+        },
+        "local_short": {
+          "batches": 1,
+          "query_tokens": 68,
+          "prefix_tokens": 4096,
+          "last_t": 68,
+          "last_p": 4096
+        },
+        "local_large": {
+          "batches": 1,
+          "query_tokens": 3073,
+          "prefix_tokens": 0,
+          "last_t": 3073,
+          "last_p": 0
+        }
+      }
+    }
+  },
+  "scope": "differences of snapshots inside the requested window; excludes unsampled boundaries"
+}

@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "role": "target",
+  "required": [
+    "gather_kv",
+    "local_short",
+    "local_large"
+  ],
+  "missing": [],
+  "observed_batches": {
+    "1": {
+      "gather_kv": 4,
+      "local_short": 1,
+      "local_large": 1
+    },
+    "0": {
+      "gather_kv": 4,
+      "local_short": 1,
+      "local_large": 1
+    }
+  },
+  "first": {},
+  "latest": {
+    "1": {
+      "role": "target",
+      "rank": 1,
+      "observed_at_s": 1790463093.2274337,
+      "routes": {
+        "gather_kv": {
+          "batches": 4,
+          "query_tokens": 1350,
+          "prefix_tokens": 10240,
+          "last_t": 125,
+          "last_p": 4096
+        },
+        "local_short": {
+          "batches": 1,
+          "query_tokens": 68,
+          "prefix_tokens": 4096,
+          "last_t": 68,
+          "last_p": 4096
+        },
+        "local_large": {
+          "batches": 1,
+          "query_tokens": 3073,
+          "prefix_tokens": 0,
+          "last_t": 3073,
+          "last_p": 0
+        }
+      }
+    },
+    "0": {
+      "role": "target",
+      "rank": 0,
+      "observed_at_s": 1790463093.2269378,
+      "routes": {
+        "gather_kv": {
+          "batches": 4,
+          "query_tokens": 1350,
+          "prefix_tokens": 10240,
+          "last_t": 125,
+          "last_p": 4096
+        },
+        "local_short": {
+          "batches": 1,
+          "query_tokens": 68,
+          "prefix_tokens": 4096,
+          "last_t": 68,
+          "last_p": 4096
+        },
+        "local_large": {
+          "batches": 1,
+          "query_tokens": 3073,
+          "prefix_tokens": 0,
+          "last_t": 3073,
+          "last_p": 0
+        }
+      }
+    }
+  },
+  "scope": "cumulative logged snapshots, including warmup; activation proof only"
+}
