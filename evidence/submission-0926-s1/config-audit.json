@@ -1,0 +1,28 @@
+{
+ "base": "46364 (evidence/submission-0925-cap6144/candidate.json, image lh-img:0925a, engine 759a6eb)",
+ "engine": "4f9d1f0b9c71522ad8e97413924baf513e6f4357 (claude/129-warm-seat: stack2 7c6cb634 + 126/128 follow-ups, both off)",
+ "command": "identical to 46364",
+ "env_added": {
+  "SGLANG_AX_SM80_FP8_MOE_HUMMING": "1",
+  "SGLANG_AX_DEADLINE_TIERS": "1",
+  "SGLANG_AX_BACKLOG_RELIEF": "1",
+  "SGLANG_AX_BACKLOG_COLD_CAP": "8192",
+  "SGLANG_AX_BACKLOG_INTERVAL": "0",
+  "SGLANG_AX_BACKLOG_HIGH_S": "15",
+  "SGLANG_AX_BACKLOG_LOW_S": "5",
+  "SGLANG_AX_BACKLOG_MAX_SLOW": "80",
+  "SGLANG_AX_BACKLOG_GATE": "0.10",
+  "SGLANG_AX_DEADLINE_WARM_S": "15"
+ },
+ "env_unchanged": "the other 16 keys of 46364",
+ "evidence": [
+  "109/110 (v3 N26 opening), 112 vs 111 (v3 N30 60 min: chain 53->25, fast/overall halved, turn 12->24 fixed by WARM_S=15 pending 130b)",
+  "130a/130b (A-prime opening + 60 min, capability smoke ON) pending"
+ ],
+ "dockerfile": "diff 759a6eb..4f9d1f0b engine/sglang = 92,678 B raw, 36,140 B base64 -> Dockerfile 36,969 B < 65,536 (Sonnet checklist agent, measured locally)",
+ "open_risks": [
+  "AIME/GPQA never run with 117+124+125 (platform-only); 117 alone 12/12 in 084; 124/125 do not touch numerics",
+  "125 guard MAX_SLOW=80 is 1.6% of 5150 (conservative)",
+  "disk/log requirements of notes/submissions.md line 35 unchanged since 46364"
+ ]
+}
