@@ -55,8 +55,11 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
     runner+=(--warmup-profile "$G_WARMUP_PROFILE")
   fi
   if [ -n "${G_MEASURE_SECONDS:-}" ]; then
-    runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS" --warmup-profile "${G_WARMUP_PROFILE:-original}")
-    echo "TIMED_DIAGNOSTIC N=$N admission_seconds=$G_MEASURE_SECONDS drain_all_admitted=true"
+    runner=("$AX/verify_kit/timed_run.py" --seconds "$G_MEASURE_SECONDS" --warmup-profile "${G_WARMUP_PROFILE:-original}"
+            --chain-start-interval-s "${G_CHAIN_START_INTERVAL_S:-0}")
+    echo "TIMED_DIAGNOSTIC N=$N admission_seconds=$G_MEASURE_SECONDS chain_start_interval_s=${G_CHAIN_START_INTERVAL_S:-0} drain_all_admitted=true"
+  elif [ -n "${G_CHAIN_START_INTERVAL_S:-}" ]; then
+    echo "DATA INVALID: chain start interval requires a timed diagnostic"; return 2
   fi
   ( cd $S1 && S1_HARNESS_DIR=$S1/harness python3 -B "${runner[@]}" --runner "$S1/run_dev.py" -- --base-url http://127.0.0.1:$PORT --set "$DATA_SET" \
       --root "$DATA_ROOT" --cohort "$COHORT" \
