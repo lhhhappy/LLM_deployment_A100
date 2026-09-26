@@ -1,0 +1,23 @@
+{
+  "python_ast_files": 13,
+  "python_ast": "passed",
+  "launcher_bash_syntax": "passed",
+  "engine_diff_whitespace": "passed",
+  "markdown_checked": 8,
+  "new_missing_relative_links": [],
+  "preexisting_S2_missing_links": [
+    {
+      "file": "engine/docs/117-sm80-fp8-moe-humming.md",
+      "target": "../../research/claude/R25_moe_sm80_path.md"
+    },
+    {
+      "file": "engine/docs/117-sm80-fp8-moe-humming.md",
+      "target": "../../evidence/moe-kernels-devbox-20260925/README.md"
+    },
+    {
+      "file": "engine/docs/117-sm80-fp8-moe-humming.md",
+      "target": "../../evidence/moe-kernels-devbox-20260925/README.md"
+    }
+  ],
+  "scope": "Only review-owned changed/new docs were checked. The two missing historical 117 source targets already occur in frozen S2; preserved without fabricating those evidence files."
+}

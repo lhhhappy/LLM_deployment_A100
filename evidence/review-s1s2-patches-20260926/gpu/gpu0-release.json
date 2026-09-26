@@ -1,0 +1,26 @@
+{
+  "authorization": "User explicitly authorized stopping developer GPU0 occupants for this review single-GPU validation",
+  "parent_pid": 4053607,
+  "worker_pid": 4055968,
+  "parent_cmd": "/sjtu/conda/miniconda/envs/phys/bin/python -m vllm.entrypoints.openai.api_server --model /sjtu/public_model/gpt-oss --served-model-name gpt-oss-120b --host 127.0.0.1 --port 30163 --max-model-len 8192 --gpu-memory-utilization 0.88 --enforce-eager --max-num-seqs 64 --enable-prefix-caching ",
+  "cuda_visible_devices": "0",
+  "signals": [
+    [
+      4053607,
+      "SIGTERM"
+    ],
+    [
+      4055968,
+      "SIGTERM"
+    ],
+    [
+      4053607,
+      "SIGKILL"
+    ]
+  ],
+  "terminated": {
+    "4053607": true,
+    "4055968": true
+  },
+  "gpu_after": "0, GPU-14c26f76-e5a4-9d1f-5d33-9ff397af4933, 4 MiB, 81920 MiB, 0 %\n1, GPU-0fd597b1-c02f-3a31-8fa7-8ecb15791ca8, 72123 MiB, 81920 MiB, 35 %\n"
+}

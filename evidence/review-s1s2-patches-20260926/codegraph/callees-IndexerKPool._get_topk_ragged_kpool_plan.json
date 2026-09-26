@@ -1,0 +1,77 @@
+{
+  "symbol": "IndexerKPool._get_topk_ragged_kpool_plan",
+  "callees": [
+    {
+      "name": "cp_zigzag_full_plan_rows",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/utils.py",
+      "startLine": 181
+    },
+    {
+      "name": "_ax_indexer_row_shard",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+      "startLine": 64
+    },
+    {
+      "name": "min",
+      "kind": "method",
+      "filePath": "engine/sglang/kernels/aot/python/sgl_kernel/scalar_type.py",
+      "startLine": 171
+    },
+    {
+      "name": "get_token_to_kv_pool",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/model_executor/forward_context.py",
+      "startLine": 70
+    },
+    {
+      "name": "gather_index_k_scale_prefix_into",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/kpool_fp8_index.py",
+      "startLine": 33
+    },
+    {
+      "name": "_get_index_k_read_buffer",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+      "startLine": 236
+    },
+    {
+      "name": "view",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/deepseek_v4_compress_state.py",
+      "startLine": 61
+    },
+    {
+      "name": "contiguous",
+      "kind": "variable",
+      "filePath": "engine/sglang/kernels/ops/attention/fla/utils.py",
+      "startLine": 182
+    },
+    {
+      "name": "get",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/attention/dsv4/sparse_prefill_utils.py",
+      "startLine": 91
+    },
+    {
+      "name": "_topk_from_kpool_logits",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+      "startLine": 735
+    },
+    {
+      "name": "all_gather_into_tensor",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/distributed/parallel_state.py",
+      "startLine": 1270
+    },
+    {
+      "name": "deep_gemm",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+      "startLine": 29
+    }
+  ]
+}

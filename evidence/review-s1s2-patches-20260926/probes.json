@@ -1,0 +1,218 @@
+{
+  "scope": "CPU decision counterexamples; fake pools/Req/forwards, no GPU claims",
+  "tree": "/workspace/Agentic_science_challenge/build/worktrees/review-s1s2-0926",
+  "engine_commit": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "review_head": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "script_sha256": "914b42e0525b11df793cde33ad0f3ff636e636bc83c06dc3e0152cc27abf6635",
+  "reproduced": {
+    "F1_park_without_output_reserve": {
+      "124_on": {
+        "mode": "idle",
+        "reqs": [],
+        "waiting": [
+          "waiter"
+        ],
+        "chunk": "cont",
+        "full": true,
+        "interval": 0,
+        "budget": [
+          8192,
+          16384,
+          0,
+          0
+        ],
+        "verdicts": [
+          [
+            "waiter",
+            "NO_TOKEN"
+          ]
+        ],
+        "parked": 1,
+        "batch_full": true
+      },
+      "124_off": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cont",
+            65536,
+            66560
+          ]
+        ],
+        "waiting": [
+          "waiter"
+        ],
+        "chunk": "cont",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          7168,
+          15360,
+          1088,
+          1088
+        ],
+        "verdicts": [
+          [
+            "waiter",
+            "OTHER"
+          ]
+        ],
+        "parked": 0,
+        "batch_full": false
+      }
+    },
+    "F1_park_without_host_load_room": {
+      "mode": "idle",
+      "reqs": [],
+      "waiting": [
+        "waiter"
+      ],
+      "chunk": "cont",
+      "full": true,
+      "interval": 0,
+      "budget": [
+        8192,
+        16384,
+        0,
+        0
+      ],
+      "verdicts": [
+        [
+          "waiter",
+          "NO_TOKEN"
+        ]
+      ],
+      "parked": 1,
+      "batch_full": true
+    },
+    "F2_cold_cap_used_for_warm_park": {
+      "actual": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cont",
+            65536,
+            71680
+          ]
+        ],
+        "waiting": [
+          "warm_7k"
+        ],
+        "chunk": "cont",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          2048,
+          10240,
+          6208,
+          6208
+        ],
+        "verdicts": [
+          [
+            "warm_7k",
+            "OTHER"
+          ]
+        ],
+        "parked": 0,
+        "batch_full": false
+      },
+      "parking_with_budget": {
+        "6144": false,
+        "8192": true
+      },
+      "full_round_budget_control": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "warm_7k",
+            65536,
+            72536
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cont",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          1152,
+          9344,
+          7344,
+          7104
+        ],
+        "verdicts": [
+          [
+            "warm_7k",
+            "CONTINUE"
+          ]
+        ],
+        "parked": 1,
+        "batch_full": false
+      }
+    },
+    "F3_warm_wait_bound_is_priority_only": {
+      "actual": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cont",
+            65536,
+            71680
+          ]
+        ],
+        "waiting": [
+          "warm_7k"
+        ],
+        "chunk": "cont",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          2048,
+          10240,
+          6208,
+          6208
+        ],
+        "verdicts": [
+          [
+            "warm_7k",
+            "OTHER"
+          ]
+        ],
+        "parked": 0,
+        "batch_full": false
+      },
+      "order": [
+        "warm_7k",
+        "fresh"
+      ],
+      "parking_even_with_full_budget": false
+    },
+    "F4_family_ignores_cache_namespace": {
+      "work": {
+        "a": 6000
+      },
+      "held": [
+        "b"
+      ],
+      "cache_salts": [
+        "tenant-a",
+        "tenant-b"
+      ],
+      "prompt_tokens": 12000
+    },
+    "F5_scatter_flag_is_not_per_graph_bucket": {
+      "capture_order": [
+        [
+          4096,
+          true
+        ],
+        [
+          1024,
+          false
+        ]
+      ],
+      "small_replay": true,
+      "large_replay": false,
+      "large_replay_with_its_own_flag": true
+    }
+  }
+}

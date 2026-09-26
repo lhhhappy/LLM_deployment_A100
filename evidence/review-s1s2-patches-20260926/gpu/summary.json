@@ -1,0 +1,152 @@
+{
+  "status": "DIAGNOSTIC",
+  "scope": "single A100, random TP8 per-rank MoE shapes and small real pinned host pools; not TP8/full model/SLO",
+  "source_log_sha256": {
+    "moe-validation-v3.log": "7e9428d234c48f94def003788a646350fe2ab66339ffd5b6050d3b27c8d0755a",
+    "humming-cache-v2.log": "5b1626f800464b4137348b37f0efb833e773fb1b38323f9c7e964299bac59eb5",
+    "host-lifetime-v2.log": "834fa3f08ed0f64d15932d757fa110bc8cecb3b51699f9c59efd55aed7dbf8f0"
+  },
+  "script_sha256": "850baa0bbcdb9dcff6a96febd58c84c2475701423e585b7a1ebd0143084f4eb4",
+  "moe": {
+    "checks_passed": 57,
+    "checks_by_kind": {
+      "switch selects the method": 1,
+      "EP refused with a clear error": 1,
+      "finite outputs": 7,
+      "error vs fp32 reference": 7,
+      "humming error within 1.25x marlin": 7,
+      "negative controls rejected": 7,
+      "graph replay recomputes fresh inputs": 20,
+      "switch off selects the reference method and Marlin runner": 1,
+      "bitwise-equal weights after loading": 1,
+      "bitwise-equal outputs vs reference fp8.py": 5
+    },
+    "max_humming_relative_l2_vs_fp32": 0.00628
+  },
+  "humming_timing": [
+    {
+      "M": 1,
+      "median_metadata_pair_us": {
+        "base": 27.618711,
+        "candidate": 3.3248624
+      },
+      "median_layer_wall_ms": {
+        "base": 0.5708002,
+        "candidate": 0.50743975
+      }
+    },
+    {
+      "M": 128,
+      "median_metadata_pair_us": {
+        "base": 27.6163002,
+        "candidate": 3.3510701
+      },
+      "median_layer_wall_ms": {
+        "base": 0.651758775,
+        "candidate": 0.659420425
+      }
+    },
+    {
+      "M": 2048,
+      "median_metadata_pair_us": {
+        "base": 27.4424186,
+        "candidate": 3.4821844
+      },
+      "median_layer_wall_ms": {
+        "base": 1.261360525,
+        "candidate": 1.263474525
+      }
+    },
+    {
+      "M": 8192,
+      "median_metadata_pair_us": {
+        "base": 27.3996024,
+        "candidate": 3.4624982
+      },
+      "median_layer_wall_ms": {
+        "base": 3.4706558,
+        "candidate": 3.48767685
+      }
+    }
+  ],
+  "host_lifetime": [
+    {
+      "kind": "host_lifetime",
+      "layout": "layer_first",
+      "repeat": 0,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "layer_first",
+      "repeat": 1,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "layer_first",
+      "repeat": 2,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first",
+      "repeat": 0,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 2162688
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first",
+      "repeat": 1,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 2162688
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first",
+      "repeat": 2,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 2162688
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first_direct",
+      "repeat": 0,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first_direct",
+      "repeat": 1,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    },
+    {
+      "kind": "host_lifetime",
+      "layout": "page_first_direct",
+      "repeat": 2,
+      "ok": true,
+      "released_host_bytes": 4359168,
+      "released_staging_bytes": 0
+    }
+  ],
+  "limitations": [
+    "eager layer speedup was observed only at M=1 in this paired run",
+    "MoE CUDA graph checks do not validate mechanism 170's full-model graphs",
+    "no model weights, MTP acceptance or multi-rank collectives",
+    "only before/after GPU occupancy snapshots; no continuous isolation/power trace"
+  ]
+}

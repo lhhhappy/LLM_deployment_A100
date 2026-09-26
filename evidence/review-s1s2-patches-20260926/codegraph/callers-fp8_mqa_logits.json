@@ -1,0 +1,23 @@
+{
+  "symbol": "fp8_mqa_logits",
+  "callers": [
+    {
+      "name": "_get_topk_ragged",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/dsa_indexer.py",
+      "startLine": 1076
+    },
+    {
+      "name": "sm80_deep_gemm.py",
+      "kind": "file",
+      "filePath": "engine/sglang/srt/layers/attention/dsa/sm80_deep_gemm.py",
+      "startLine": 1
+    },
+    {
+      "name": "pre",
+      "kind": "function",
+      "filePath": "tests/gpu/test_mtp_sm80_160.py",
+      "startLine": 309
+    }
+  ]
+}

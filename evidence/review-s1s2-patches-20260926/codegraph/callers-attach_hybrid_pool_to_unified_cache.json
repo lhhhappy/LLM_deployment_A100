@@ -1,0 +1,11 @@
+{
+  "symbol": "attach_hybrid_pool_to_unified_cache",
+  "callers": [
+    {
+      "name": "init_hicache",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/unified_radix_cache.py",
+      "startLine": 420
+    }
+  ]
+}

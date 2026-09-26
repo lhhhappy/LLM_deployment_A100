@@ -1,0 +1,17 @@
+{
+  "symbol": "_AxFp8HummingRunnerCore.get_buffer_metas",
+  "callees": [
+    {
+      "name": "all",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 321
+    },
+    {
+      "name": "next",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/batch_overlap/operations.py",
+      "startLine": 133
+    }
+  ]
+}

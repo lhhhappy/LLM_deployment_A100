@@ -1,0 +1,23 @@
+{
+  "symbol": "BacklogState.note_tpot",
+  "callers": [
+    {
+      "name": "_ax_admission_plan",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1568
+    },
+    {
+      "name": "test_guard_trips_for_good",
+      "kind": "method",
+      "filePath": "tests/test_ax_deadline.py",
+      "startLine": 126
+    },
+    {
+      "name": "test_ratio_guard_after_min_seen_holds_until_flush",
+      "kind": "method",
+      "filePath": "tests/test_ax_deadline.py",
+      "startLine": 140
+    }
+  ]
+}

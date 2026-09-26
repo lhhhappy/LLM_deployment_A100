@@ -1,0 +1,11 @@
+{"kind": "start", "test": "host", "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "visible_devices": "0", "engine": "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/engine/sglang", "source_sha256": {"srt/layers/quantization/fp8_humming_moe.py": "8029d5e3e55ba83d958484ff55955b0aa383c882d0fa606db0b1da4108c0ffb7", "srt/mem_cache/pool_host/dsa.py": "5bd1cb3d718d95682405241ee7deea059876dbde9ec543820bdfb35c2342fce3"}}
+{"kind": "host_lifetime", "layout": "layer_first", "repeat": 0, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "host_lifetime", "layout": "layer_first", "repeat": 1, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "host_lifetime", "layout": "layer_first", "repeat": 2, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "host_lifetime", "layout": "page_first", "repeat": 0, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 2162688}
+{"kind": "host_lifetime", "layout": "page_first", "repeat": 1, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 2162688}
+{"kind": "host_lifetime", "layout": "page_first", "repeat": 2, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 2162688}
+{"kind": "host_lifetime", "layout": "page_first_direct", "repeat": 0, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "host_lifetime", "layout": "page_first_direct", "repeat": 1, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "host_lifetime", "layout": "page_first_direct", "repeat": 2, "ok": true, "released_host_bytes": 4359168, "released_staging_bytes": 0}
+{"kind": "done", "ok": true, "peak_gpu_allocated_bytes": 21685760}

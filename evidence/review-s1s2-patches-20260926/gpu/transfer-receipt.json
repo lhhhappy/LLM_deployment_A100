@@ -1,0 +1,10 @@
+{
+  "status": "VERIFIED",
+  "checked_utc": "2026-09-26T14:43:25.307247+00:00",
+  "source": "GPU:/sjtu/linhang/arena/runs/review-s1s2-20260926/",
+  "target": "/workspace/Agentic_science_challenge/build/worktrees/review-s1s2-0926/evidence/review-s1s2-patches-20260926/gpu",
+  "verified_original_files": 17,
+  "source_manifest_sha256": "7c168cbb4b70148c2a82974eb65742be645784e02d1e3152252ba24f649cdaca",
+  "launcher_used_sha256": "e15484c9e070d5a4215daada64cab0e126443d3566ee91b84e2264987bd9cbf2",
+  "method": "SHA256 of each local copy equals the source-side per-file SHA256; original files are retained"
+}

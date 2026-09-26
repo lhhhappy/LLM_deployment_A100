@@ -1,0 +1,323 @@
+{
+  "symbol": "Scheduler._get_new_batch_prefill_raw",
+  "callees": [
+    {
+      "name": "has_waiting_grammars",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/constrained/grammar_manager.py",
+      "startLine": 69
+    },
+    {
+      "name": "get_ready_grammar_requests",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/constrained/grammar_manager.py",
+      "startLine": 184
+    },
+    {
+      "name": "_add_request_to_queue",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 3555
+    },
+    {
+      "name": "get_memory",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/runtime_context.py",
+      "startLine": 1296
+    },
+    {
+      "name": "check_hicache_events",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/base_prefix_cache.py",
+      "startLine": 435
+    },
+    {
+      "name": "_retry_missed_storage_prefetches",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 3525
+    },
+    {
+      "name": "should_delay",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/min_free_slots_delayer.py",
+      "startLine": 37
+    },
+    {
+      "name": "get_num_allocatable_reqs",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 4046
+    },
+    {
+      "name": "calc_priority",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 253
+    },
+    {
+      "name": "predict_next_chunk_size",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler_pp_mixin.py",
+      "startLine": 770
+    },
+    {
+      "name": "_ax_sched_protect_limits",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1369
+    },
+    {
+      "name": "_ax_admission_cfgs",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1480
+    },
+    {
+      "name": "_ax_pace",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1437
+    },
+    {
+      "name": "_ax_pace_limits",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1720
+    },
+    {
+      "name": "_ax_demand_cap_max",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1385
+    },
+    {
+      "name": "_ax_demand_limits",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1411
+    },
+    {
+      "name": "min",
+      "kind": "method",
+      "filePath": "engine/sglang/kernels/aot/python/sgl_kernel/scalar_type.py",
+      "startLine": 171
+    },
+    {
+      "name": "max",
+      "kind": "method",
+      "filePath": "engine/sglang/kernels/aot/python/sgl_kernel/scalar_type.py",
+      "startLine": 178
+    },
+    {
+      "name": "get_schedule",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/runtime_context.py",
+      "startLine": 1292
+    },
+    {
+      "name": "_ax_rank0_decide",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1474
+    },
+    {
+      "name": "_ax_admission_plan",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1568
+    },
+    {
+      "name": "init_next_round_input",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 1395
+    },
+    {
+      "name": "add_chunked_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 1112
+    },
+    {
+      "name": "finished",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 1364
+    },
+    {
+      "name": "update_draining_state",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/lora/lora_drainer.py",
+      "startLine": 61
+    },
+    {
+      "name": "alloc_group_begin",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/allocator/mamba.py",
+      "startLine": 58
+    },
+    {
+      "name": "chunk_budget_exhausted",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 898
+    },
+    {
+      "name": "_can_schedule_lora_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 4472
+    },
+    {
+      "name": "available_size",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/disaggregation/decode.py",
+      "startLine": 172
+    },
+    {
+      "name": "preempt_to_schedule",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 1643
+    },
+    {
+      "name": "check_prefetch_progress",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/embedding_cache_controller.py",
+      "startLine": 741
+    },
+    {
+      "name": "pop_prefetch_loaded_tokens",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/hiradix_cache.py",
+      "startLine": 1724
+    },
+    {
+      "name": "plan_staged_splice",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/buffer_mode/pipeline.py",
+      "startLine": 867
+    },
+    {
+      "name": "add_one_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 1353
+    },
+    {
+      "name": "is_empty",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2378
+    },
+    {
+      "name": "free",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/disaggregation/common/staging_buffer.py",
+      "startLine": 235
+    },
+    {
+      "name": "alloc_group_end",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/allocator/mamba.py",
+      "startLine": 66
+    },
+    {
+      "name": "set_time_batch",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/observability/req_time_stats.py",
+      "startLine": 1249
+    },
+    {
+      "name": "init_new",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2336
+    },
+    {
+      "name": "ready_to_load_host_cache",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/mem_cache/base_prefix_cache.py",
+      "startLine": 429
+    },
+    {
+      "name": "prepare_for_extend",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2515
+    },
+    {
+      "name": "from_adder",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler_components/metrics_reporter.py",
+      "startLine": 98
+    },
+    {
+      "name": "_get_num_pending_tokens",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler_components/load_inquirer.py",
+      "startLine": 60
+    },
+    {
+      "name": "all",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 321
+    },
+    {
+      "name": "filter_batch",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 3412
+    },
+    {
+      "name": "prepare_for_decode",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 3322
+    },
+    {
+      "name": "mix_with_running",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2921
+    },
+    {
+      "name": "is_none",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/moe/utils.py",
+      "startLine": 58
+    },
+    {
+      "name": "stash_bonus_tokens",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/overlap_utils.py",
+      "startLine": 464
+    },
+    {
+      "name": "PrefillAdder",
+      "kind": "class",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 561
+    },
+    {
+      "name": "ScheduleBatch",
+      "kind": "class",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2139
+    },
+    {
+      "name": "TEST_RETRACT_NO_PREFILL_BS",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 372
+    },
+    {
+      "name": "TEST_RETRACT",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 370
+    }
+  ]
+}

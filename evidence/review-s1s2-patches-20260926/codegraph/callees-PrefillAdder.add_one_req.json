@@ -1,0 +1,101 @@
+{
+  "symbol": "PrefillAdder.add_one_req",
+  "callees": [
+    {
+      "name": "ceil_paged_tokens",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 895
+    },
+    {
+      "name": "_mamba_gap_budget_for_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 880
+    },
+    {
+      "name": "min",
+      "kind": "method",
+      "filePath": "engine/sglang/kernels/aot/python/sgl_kernel/scalar_type.py",
+      "startLine": 171
+    },
+    {
+      "name": "_swa_budget_for_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 784
+    },
+    {
+      "name": "_swa_new_tokens",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 829
+    },
+    {
+      "name": "add_req_state",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 1236
+    },
+    {
+      "name": "negotiate_should_allow_prefill",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/prefill_delayer.py",
+      "startLine": 427
+    },
+    {
+      "name": "batch_size",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 2375
+    },
+    {
+      "name": "_check_prefill_tile_budget",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 694
+    },
+    {
+      "name": "_add_dllm_req",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 995
+    },
+    {
+      "name": "set_extend_range",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_batch.py",
+      "startLine": 1368
+    },
+    {
+      "name": "append",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/eplb/expert_distribution.py",
+      "startLine": 688
+    },
+    {
+      "name": "_update_prefill_budget",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 926
+    },
+    {
+      "name": "budget_state",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 903
+    },
+    {
+      "name": "CLIP_MAX_NEW_TOKENS",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 81
+    },
+    {
+      "name": "IGNORE_EOS_RESERVE_TOKENS",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/managers/schedule_policy.py",
+      "startLine": 101
+    }
+  ]
+}

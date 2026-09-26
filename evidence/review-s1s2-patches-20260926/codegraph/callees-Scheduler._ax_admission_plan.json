@@ -1,0 +1,11 @@
+{
+  "symbol": "Scheduler._ax_admission_plan",
+  "callees": [
+    {
+      "name": "max",
+      "kind": "method",
+      "filePath": "engine/sglang/kernels/aot/python/sgl_kernel/scalar_type.py",
+      "startLine": 178
+    }
+  ]
+}

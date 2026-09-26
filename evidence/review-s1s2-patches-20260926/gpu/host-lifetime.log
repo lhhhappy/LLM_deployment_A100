@@ -1,0 +1,10 @@
+{"kind": "start", "test": "host", "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "visible_devices": "0", "engine": "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/engine/sglang", "source_sha256": {"srt/layers/quantization/fp8_humming_moe.py": "7d7f9528ed9d03ffb2b4acd0477a18005edede8fea7825b2ce4e7d74cc8c0cf3", "srt/mem_cache/pool_host/dsa.py": "5bd1cb3d718d95682405241ee7deea059876dbde9ec543820bdfb35c2342fce3"}}
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_s1s2_review_gpu.py", line 130, in <module>
+    main()
+  File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_s1s2_review_gpu.py", line 122, in main
+    host_lifetime()
+  File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_s1s2_review_gpu.py", line 61, in host_lifetime
+    assert all(ref() is None for ref in refs), "pool still owns a host view or staging allocation"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: pool still owns a host view or staging allocation

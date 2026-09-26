@@ -1,0 +1,44 @@
+{"kind": "start", "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "argv": ["--base-fp8", "build-fp8-s2-review.py", "--only", "numerics,graph,identity"], "commit": null}
+nvrtc: error: failed to open libnvrtc-builtins.so.13.0.
+  Make sure that libnvrtc-builtins.so.13.0 is installed correctly.
+nvrtc_compile: compile failed: NVRTC_ERROR_BUILTIN_OPERATION_FAILURE
+
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_fp8_moe_humming_117.py", line 431, in <module>
+[rank0]:     main()
+[rank0]:   File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_fp8_moe_humming_117.py", line 404, in main
+[rank0]:     layers[name] = build_layer(ckpt, humming=name == "humming")
+[rank0]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/tests/gpu/test_fp8_moe_humming_117.py", line 125, in build_layer
+[rank0]:     layer.quant_method.process_weights_after_loading(layer)
+[rank0]:   File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/engine/sglang/srt/layers/quantization/fp8_humming_moe.py", line 128, in process_weights_after_loading
+[rank0]:     prepare_humming_moe_layer(layer, weight_config)
+[rank0]:   File "/sjtu/linhang/arena/runs/review-s1s2-20260926/candidate/engine/sglang/srt/layers/quantization/humming_utils.py", line 202, in prepare_humming_moe_layer
+[rank0]:     HummingMethod.transform_humming_layer(layer, sublayer_name=sublayer_name)
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/layer.py", line 176, in transform_humming_layer
+[rank0]:     outputs = transform_humming_tensors(
+[rank0]:               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/transform.py", line 439, in transform_humming_tensors
+[rank0]:     weight = transform_humming_weight(
+[rank0]:              ^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/transform.py", line 305, in transform_humming_weight
+[rank0]:     repacked_weight = ops.repack_weight(
+[rank0]:                       ^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/_ops.py", line 1279, in __call__
+[rank0]:     return self._op(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/ops/weight.py", line 156, in repack_weight
+[rank0]:     kernel = RepackWeightKernel(
+[rank0]:              ^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "<string>", line 12, in __init__
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/jit/runtime.py", line 42, in __post_init__
+[rank0]:     self.init_kernel()
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/kernel/repack_weight.py", line 67, in init_kernel
+[rank0]:     self.prepare()
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/jit/runtime.py", line 90, in prepare
+[rank0]:     kernel_filename = compiler_cls.compile(
+[rank0]:                       ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/jit/compiler.py", line 101, in compile
+[rank0]:     raise RuntimeError(f"{cls} run failed")
+[rank0]: RuntimeError: <class 'humming.jit.compiler.NVRTCCompiler'> run failed
+[rank0]:[W926 14:04:55.924610598 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

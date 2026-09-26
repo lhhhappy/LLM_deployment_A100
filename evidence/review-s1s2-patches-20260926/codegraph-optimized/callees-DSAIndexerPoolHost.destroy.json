@@ -1,0 +1,23 @@
+{
+  "symbol": "DSAIndexerPoolHost.destroy",
+  "callees": [
+    {
+      "name": "_cuda_host_unregister",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/mem_cache/pool_host/common.py",
+      "startLine": 204
+    },
+    {
+      "name": "_is_hip",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/mem_cache/pool_host/dsa.py",
+      "startLine": 37
+    },
+    {
+      "name": "_is_cuda",
+      "kind": "variable",
+      "filePath": "engine/sglang/srt/mem_cache/pool_host/dsa.py",
+      "startLine": 36
+    }
+  ]
+}

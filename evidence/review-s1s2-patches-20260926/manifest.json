@@ -1,0 +1,104 @@
+{
+  "status": "DIAGNOSTIC",
+  "date": "2026-09-26",
+  "branch": "review/s1s2-patches-0926",
+  "engine_base": "e7dab838b4c025e5ab5acf16ddac8f4c2889a9e8",
+  "s1": "4f9d1f0b9c71522ad8e97413924baf513e6f4357",
+  "s2": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "candidate_engine_head": "07f8de249917cf032651696f810e6855a7bd3d71",
+  "candidate_commits": [
+    {
+      "commit": "67a00da82a3ed43efd88ab05ed65076077d05580",
+      "subject": "engine 110: preserve DeepGEMM when the indexer shim is disabled"
+    },
+    {
+      "commit": "7dbe80f91edf03e5792c275fc6e6c1b7d7ad7040",
+      "subject": "engine 117: cache bounded shape metadata in the FP8 Humming runner"
+    },
+    {
+      "commit": "bab21ddfe5d85bac3afae1bd1a045588308b084d",
+      "subject": "engine 124: park for feasible waiters and resume rejected turns immediately"
+    },
+    {
+      "commit": "93fcf1345c77be48e1e6aa90086743f6fbe179e7",
+      "subject": "engine 128: isolate namespaces and batch shared-prefix comparisons"
+    },
+    {
+      "commit": "afdca82eb28f2f8ae52e3d53017cd5764f0056a9",
+      "subject": "engine 170: validate scatter layout against the selected graph bucket"
+    },
+    {
+      "commit": "07f8de249917cf032651696f810e6855a7bd3d71",
+      "subject": "engine 180: release host sidecar views and staging during destruction"
+    }
+  ],
+  "review_scope": {
+    "unique_original_engine_commits": 37,
+    "unique_original_source_files": 61,
+    "shared_commits_reviewed_once": true
+  },
+  "source_sha256": {
+    "engine/sglang/srt/layers/attention/dsa/sm80_deep_gemm.py": "090e78e5557ac2d574baa200f219470674a5d7f1c3e4b78a84335bb19fccbcb6",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "8029d5e3e55ba83d958484ff55955b0aa383c882d0fa606db0b1da4108c0ffb7",
+    "engine/sglang/srt/managers/ax_deadline.py": "3df1f4c14e5c2c44905552fba1ca0f1068054281b4fe4c77115bf90054432e9b",
+    "engine/sglang/srt/managers/schedule_policy.py": "a000cfa411d26aa1a5cf3a448d27e8f0183dc08a6a0bf2bbc5f7ad21b8b16040",
+    "engine/sglang/srt/managers/scheduler.py": "4bb3e77085bd75526f973b8bbbbb0f34e7703f2ff98cb5cdd38b631595153232",
+    "engine/sglang/srt/mem_cache/pool_host/dsa.py": "5bd1cb3d718d95682405241ee7deea059876dbde9ec543820bdfb35c2342fce3",
+    "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py": "ff36e20b586a9a1034b678afa85b7569fdfc6c7f0c560b1b26ebc3db6bdfdde5",
+    "scripts/analysis/audit_s1s2_0926.py": "914b42e0525b11df793cde33ad0f3ff636e636bc83c06dc3e0152cc27abf6635",
+    "scripts/analysis/benchmark_s1s2_cpu.py": "c16fc652785ee0933a80abedb8609b3584460134b28bc36f03871f05a0e945c0",
+    "scripts/analysis/summarize_s1s2_gpu.py": "850baa0bbcdb9dcff6a96febd58c84c2475701423e585b7a1ebd0143084f4eb4",
+    "scripts/analysis/run_s1s2_gpu_review.sh": "a9cbf4fda05562d247daaa514fb51354c76d5525c143b7e9cfbcc6538e58e2c7",
+    "tests/test_s1s2_review_optimizations.py": "eaeb94314a60e41a6547d681170f4ce7a78555198ec19e9b98f88279a3412662",
+    "tests/gpu/test_s1s2_review_gpu.py": "00eb637d0cc350be6f29c151d359a98b0a067b19f250cb3436dc6f72952aaaf5",
+    "tests/gpu/test_fp8_moe_humming_117.py": "9f3160fcbbd39fb5f7df8f9545704078259594dc609f6039faba07a61f05f78f"
+  },
+  "validation": {
+    "cpu": {
+      "tests": 154,
+      "result": "passed",
+      "log": "optimized-tests.log",
+      "environment": "local Python production AST methods; fake requests/pools/clocks/forward, two simulated ranks",
+      "command": "PYTHONPATH=tests python3 -B -m unittest test_ax_deadline test_ax_admission_scheduler test_sched_protect_chain test_srpt_admission test_tpot_paced_prefill test_demand_cap test_s1s2_review_optimizations"
+    },
+    "cpu_timing": {
+      "file": "optimized-cpu-benchmark-final.json",
+      "command": "python3 -B scripts/analysis/benchmark_s1s2_cpu.py --out evidence/review-s1s2-patches-20260926/optimized-cpu-benchmark-final.json",
+      "data": "synthetic 250000-token prompts, 249000 shared; per-shape five alternating A/B rounds, twenty cache rounds; constructed outside timing"
+    },
+    "gpu": {
+      "summary": "gpu/summary.json",
+      "provenance": "gpu/provenance.json",
+      "transfer": "gpu/transfer-receipt.json",
+      "numerical_graph_identity_checks": 57,
+      "host_lifetime_cases": 9,
+      "timing_shapes": 4,
+      "result": "latest three processes exit 0",
+      "data": "random FP8 checkpoint seed 0, E289 K4096 N256 topk9; shape-seeded random inputs/routing. Host probe uses small real CUDA pools. No formal dataset used.",
+      "warmup": "Humming layer process_weights_after_loading plus three warm forwards per timing arm; existing fixture graph warmup; no HTTP service or flush endpoint involved.",
+      "dispatch_and_drain": "no harness dispatch; all own diagnostic processes completed",
+      "server_logs": "complete probe stdout/stderr under gpu/*.log",
+      "reproduce_summary": "python3 -B scripts/analysis/summarize_s1s2_gpu.py --logs evidence/review-s1s2-patches-20260926/gpu --out build/review-repeat/gpu.json"
+    },
+    "coverage_boundaries": [
+      "117/180 final source and both GPU fixtures equal the actual GPU export",
+      "110 and final 128 identity change validated on CPU only",
+      "170 scatter/bucket guard validated on CPU only; MoE graphs are not full-model prefill graphs",
+      "no real model checkpoint, TP8 collectives, MTP acceptance, complete replay or official score",
+      "no second-participant review yet; this is not a deployment decision"
+    ],
+    "earlier_attempts": [
+      "gpu/moe-validation.log: missing NVRTC builtins, fixed existing CUDA library path before v2/v3",
+      "gpu/host-lifetime.log: test spy retained tensor, corrected test ownership before v2",
+      "gpu/humming-cache.log and moe-validation-v2.log: successful earlier cache iteration, not final timing source"
+    ]
+  },
+  "historical_window_comparisons": {
+    "file": "comparisons.json",
+    "scope": "common completed IDs only; original harness selectors; DIAGNOSTIC, no full-cohort verdict"
+  },
+  "archive_target": "GPU:/sjtu/linhang/arena/archives/code-reviews/review-s1s2-patches-20260926/",
+  "shared_pod_touched": false,
+  "submission_refs_changed_by_review": false,
+  "checksum_command": "sha256sum -c SHA256SUMS (from this evidence directory)"
+}

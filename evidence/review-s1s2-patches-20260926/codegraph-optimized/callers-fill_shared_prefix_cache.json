@@ -1,0 +1,17 @@
+{
+  "symbol": "fill_shared_prefix_cache",
+  "callers": [
+    {
+      "name": "_ax_family_plan",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1531
+    },
+    {
+      "name": "test_sorted_adjacent_lcp_matches_naive_all_pairs",
+      "kind": "method",
+      "filePath": "tests/test_s1s2_review_optimizations.py",
+      "startLine": 169
+    }
+  ]
+}

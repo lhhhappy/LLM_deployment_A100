@@ -1,0 +1,11 @@
+{
+  "symbol": "PrefillAdder.ax_complete_waiter_budget",
+  "callers": [
+    {
+      "name": "_ax_admission_plan",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/scheduler.py",
+      "startLine": 1583
+    }
+  ]
+}

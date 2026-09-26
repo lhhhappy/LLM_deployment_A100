@@ -1,0 +1,29 @@
+{
+  "symbol": "Fp8HummingMoEMethod.apply",
+  "callees": [
+    {
+      "name": "run",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/moe/moe_runner/aiter.py",
+      "startLine": 223
+    },
+    {
+      "name": "HummingRunnerInput",
+      "kind": "class",
+      "filePath": "engine/sglang/srt/layers/moe/moe_runner/humming.py",
+      "startLine": 73
+    },
+    {
+      "name": "HummingMoeQuantInfo",
+      "kind": "class",
+      "filePath": "engine/sglang/srt/layers/moe/moe_runner/humming.py",
+      "startLine": 98
+    },
+    {
+      "name": "StandardCombineInput",
+      "kind": "class",
+      "filePath": "engine/sglang/srt/layers/moe/token_dispatcher/standard.py",
+      "startLine": 85
+    }
+  ]
+}

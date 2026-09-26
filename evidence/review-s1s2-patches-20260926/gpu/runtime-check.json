@@ -1,0 +1,6 @@
+{
+  "scope": "post-run verification under the unchanged launcher and SSH environment; no forward or timing",
+  "SGLANG_AX_MOE_FUSE_SWIGLU": null,
+  "SGLANG_AX_MOE_SWIGLU_FUSED": "0",
+  "effective_fuse_clamped_swiglu": false
+}

@@ -1,0 +1,36 @@
+{
+  "authorization": "User authorized freeing developer GPU0; its dedicated restart loop relaunched the same GPU0 service",
+  "group": 4173703,
+  "members": {
+    "4173703": "1472636299",
+    "4173709": "1472636300",
+    "4176056": "1472637648",
+    "4176057": "1472637648"
+  },
+  "loop_cmd": "bash /sjtu/linhang/MAS/runs/_services/e61_gpt_oss_120b_gpu0_loop_20260926T1358/serve.sh ",
+  "signals": [
+    [
+      4173703,
+      "SIGTERM"
+    ],
+    [
+      4173709,
+      "SIGTERM"
+    ],
+    [
+      4176056,
+      "SIGTERM"
+    ],
+    [
+      4176057,
+      "SIGTERM"
+    ]
+  ],
+  "terminated": {
+    "4173703": true,
+    "4173709": true,
+    "4176056": true,
+    "4176057": true
+  },
+  "gpu_after": "0, GPU-14c26f76-e5a4-9d1f-5d33-9ff397af4933, 4 MiB, 81920 MiB\n1, GPU-0fd597b1-c02f-3a31-8fa7-8ecb15791ca8, 72121 MiB, 81920 MiB\n"
+}

@@ -1,0 +1,53 @@
+{
+  "symbol": "PrefillCudaGraphRunner.can_run_graph",
+  "callees": [
+    {
+      "name": "_has_inactive_dp_rank",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py",
+      "startLine": 867
+    },
+    {
+      "name": "can_replay_locally",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py",
+      "startLine": 1159
+    },
+    {
+      "name": "is_target_verify",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/model_executor/forward_batch_info.py",
+      "startLine": 167
+    },
+    {
+      "name": "can_use_prefill_cuda_graph",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/lora/lora_manager.py",
+      "startLine": 174
+    },
+    {
+      "name": "_select_replay_bucket",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py",
+      "startLine": 1279
+    },
+    {
+      "name": "_uses_eager_prefill_tail",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py",
+      "startLine": 622
+    },
+    {
+      "name": "use_input_scattered",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/layers/communicator.py",
+      "startLine": 330
+    },
+    {
+      "name": "get_attn_tp_context",
+      "kind": "function",
+      "filePath": "engine/sglang/srt/layers/communicator.py",
+      "startLine": 392
+    }
+  ]
+}

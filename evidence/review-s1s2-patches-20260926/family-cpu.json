@@ -1,0 +1,38 @@
+{
+  "scope": "local CPU synthetic upper sharing case, not TP8 service timing",
+  "samples": [
+    {
+      "requests": 8,
+      "prompt_tokens_each": 250000,
+      "shared_prefix": "entire prompt; identical synthetic tokens",
+      "first_ms": 22.29799999622628,
+      "cached_ms": [
+        0.04700000863522291,
+        0.019625003915280104,
+        0.017290993127971888
+      ]
+    },
+    {
+      "requests": 30,
+      "prompt_tokens_each": 250000,
+      "shared_prefix": "entire prompt; identical synthetic tokens",
+      "first_ms": 90.35908299847506,
+      "cached_ms": [
+        0.18637499306350946,
+        0.16754199168644845,
+        0.16770799993537366
+      ]
+    },
+    {
+      "requests": 64,
+      "prompt_tokens_each": 250000,
+      "shared_prefix": "entire prompt; identical synthetic tokens",
+      "first_ms": 213.10716698644683,
+      "cached_ms": [
+        0.7572920003440231,
+        0.7358749862760305,
+        0.7444579969160259
+      ]
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "scope": "common completed IDs in partial dispatch windows; no full score or causal attribution",
+  "raw_root": "/workspace/Agentic_science_challenge",
+  "harness_sha256": "8da35984ce6bc88e6f2cabff18d8e58ecb257fff2a50e03baec831665d49af16",
+  "common_sha256": "a7238b5f1adf728bcccbeeb492f90f7e191dff68e3accac71f29dd8deb939f82",
+  "sources": {
+    "111": {
+      "path": "/workspace/Agentic_science_challenge/evidence/L111-v3_n30_base_60m/N30/raw_s1-dev-longchain-v3_N30_1790411861.jsonl",
+      "sha256": "e75c8ed292c4c4d1b3aaa55ebce2e6cbe754d032163c99a187a08c6ff3b1aa66",
+      "rows": 2915,
+      "tpot_gt_100ms": 48
+    },
+    "112": {
+      "path": "/workspace/Agentic_science_challenge/evidence/L112-v3_n30_124_125x_117_60m/N30/raw_s1-dev-longchain-v3_N30_1790416026.jsonl",
+      "sha256": "f54acd1713a2f22844290434972f1601ec9eb569ac055f2e55d2f3162a7efbcc",
+      "rows": 3115,
+      "tpot_gt_100ms": 35
+    },
+    "130b": {
+      "path": "/workspace/Agentic_science_challenge/evidence/L130b-v3_n30_A_warm15_60m/N30/raw_s1-dev-longchain-v3_N30_1790423235.jsonl",
+      "sha256": "be95e55b3173e8b185285071cb11330e002262761aa272ab6263c3699bf0ac65",
+      "rows": 3090,
+      "tpot_gt_100ms": 37
+    },
+    "130a": {
+      "path": "/workspace/Agentic_science_challenge/evidence/L130a-v3_open_A_warm15_n30/window/raw.jsonl",
+      "sha256": "59bb425e96a627e6d16843cc185c0b36d54b271e9d2e07b86f4fd8577afc6d11",
+      "rows": 524,
+      "tpot_gt_100ms": 34
+    },
+    "130c": {
+      "path": "/workspace/Agentic_science_challenge/evidence/L130c-v3_open_A_warm15_126_n30/window/raw.jsonl",
+      "sha256": "3ee98c2456d2f58b7b0787ec440497c370594aeb1c257a1b6607e6a42c8e83d7",
+      "rows": 522,
+      "tpot_gt_100ms": 33
+    }
+  },
+  "pairs": {
+    "111_to_112": {
+      "common_ids": 2915,
+      "before_only": 0,
+      "after_only": 200,
+      "gates": {
+        "fast_intra": {
+          "n": 2353,
+          "limit_s": 3.0,
+          "before": 979,
+          "after": 492,
+          "fixed": 731,
+          "new": 244
+        },
+        "overall_intra": {
+          "n": 2566,
+          "limit_s": 5.0,
+          "before": 742,
+          "after": 430,
+          "fixed": 583,
+          "new": 271
+        },
+        "turn_start": {
+          "n": 106,
+          "limit_s": 15.0,
+          "before": 12,
+          "after": 24,
+          "fixed": 10,
+          "new": 22
+        },
+        "chain_start": {
+          "n": 243,
+          "limit_s": 30.0,
+          "before": 53,
+          "after": 25,
+          "fixed": 33,
+          "new": 5
+        }
+      },
+      "tpot_gt_100ms": [
+        48,
+        35
+      ]
+    },
+    "112_to_130b": {
+      "common_ids": 3063,
+      "before_only": 52,
+      "after_only": 27,
+      "gates": {
+        "fast_intra": {
+          "n": 2474,
+          "limit_s": 3.0,
+          "before": 506,
+          "after": 554,
+          "fixed": 325,
+          "new": 373
+        },
+        "overall_intra": {
+          "n": 2702,
+          "limit_s": 5.0,
+          "before": 448,
+          "after": 512,
+          "fixed": 296,
+          "new": 360
+        },
+        "turn_start": {
+          "n": 109,
+          "limit_s": 15.0,
+          "before": 24,
+          "after": 16,
+          "fixed": 18,
+          "new": 10
+        },
+        "chain_start": {
+          "n": 252,
+          "limit_s": 30.0,
+          "before": 26,
+          "after": 30,
+          "fixed": 7,
+          "new": 11
+        }
+      },
+      "tpot_gt_100ms": [
+        35,
+        37
+      ]
+    },
+    "130a_to_130c": {
+      "common_ids": 516,
+      "before_only": 8,
+      "after_only": 6,
+      "gates": {
+        "fast_intra": {
+          "n": 390,
+          "limit_s": 3.0,
+          "before": 51,
+          "after": 43,
+          "fixed": 36,
+          "new": 28
+        },
+        "overall_intra": {
+          "n": 423,
+          "limit_s": 5.0,
+          "before": 47,
+          "after": 44,
+          "fixed": 31,
+          "new": 28
+        },
+        "turn_start": {
+          "n": 23,
+          "limit_s": 15.0,
+          "before": 0,
+          "after": 0,
+          "fixed": 0,
+          "new": 0
+        },
+        "chain_start": {
+          "n": 70,
+          "limit_s": 30.0,
+          "before": 14,
+          "after": 13,
+          "fixed": 1,
+          "new": 0
+        }
+      },
+      "tpot_gt_100ms": [
+        34,
+        33
+      ]
+    }
+  },
+  "112_server_log_sha256": "5f48b51eae4cec30746dc4e4e15a307e1b606d5e692224467c30dcf6dad789d0"
+}

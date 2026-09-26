@@ -1,0 +1,11 @@
+{
+  "symbol": "AsyncTextTokenizer.run",
+  "callers": [
+    {
+      "name": "run",
+      "kind": "method",
+      "filePath": "engine/sglang/srt/managers/async_text_tokenizer.py",
+      "startLine": 22
+    }
+  ]
+}

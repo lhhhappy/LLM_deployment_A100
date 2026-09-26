@@ -1,0 +1,107 @@
+{
+  "baseline": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "engine_head": "07f8de249917cf032651696f810e6855a7bd3d71",
+  "scope": "final optimized engine; static candidates with manually checked receivers",
+  "queries": [
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "Scheduler._ax_admission_plan",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callees-Scheduler._ax_admission_plan.json",
+      "sha256": "f0180be16aa1d6f56ae679b772d25cfc702a078f62dff04c28774f95f8288081",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "Scheduler._ax_family_plan",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callees-Scheduler._ax_family_plan.json",
+      "sha256": "0c03e65da4d381c996ba06f7a810bec66dddd7eb8d4ea8b38177f3637271579a",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "PrefillAdder.ax_complete_waiter_budget",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callers-PrefillAdder.ax_complete_waiter_budget.json",
+      "sha256": "4bf372e014a3d977fd7739e934d9d5ed4d0710175d42c45573b3e79bc8216b78",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "PrefillCudaGraphRunner.can_run_graph",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callees-PrefillCudaGraphRunner.can_run_graph.json",
+      "sha256": "d7b6f3fbd12e52b657c82edf7e09d0e4d86e5bc421598eb786b1dba2cedf24cb",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "DSAIndexerPoolHost.destroy",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callees-DSAIndexerPoolHost.destroy.json",
+      "sha256": "556443a379830221cd715f2aea2d5b32211f83d362c9ca51f37a55c9cb354d2d",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "_AxFp8HummingRunnerCore.get_buffer_metas",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callees-_AxFp8HummingRunnerCore.get_buffer_metas.json",
+      "sha256": "d8a1a80344c6f57c66dbd9b74d5b1c8d10c49493d05ce1358f4b5e2e98d84001",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "fill_shared_prefix_cache",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "file": "callers-fill_shared_prefix_cache.json",
+      "sha256": "faa544b3b90404e60b7d9c159375eb8c8043da6cdf7e8d675a11037148363a1a",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": {
+    "engine/sglang/srt/layers/attention/dsa/sm80_deep_gemm.py": "090e78e5557ac2d574baa200f219470674a5d7f1c3e4b78a84335bb19fccbcb6",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "8029d5e3e55ba83d958484ff55955b0aa383c882d0fa606db0b1da4108c0ffb7",
+    "engine/sglang/srt/managers/ax_deadline.py": "3df1f4c14e5c2c44905552fba1ca0f1068054281b4fe4c77115bf90054432e9b",
+    "engine/sglang/srt/managers/schedule_policy.py": "a000cfa411d26aa1a5cf3a448d27e8f0183dc08a6a0bf2bbc5f7ad21b8b16040",
+    "engine/sglang/srt/managers/scheduler.py": "4bb3e77085bd75526f973b8bbbbb0f34e7703f2ff98cb5cdd38b631595153232",
+    "engine/sglang/srt/mem_cache/pool_host/dsa.py": "5bd1cb3d718d95682405241ee7deea059876dbde9ec543820bdfb35c2342fce3",
+    "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py": "ff36e20b586a9a1034b678afa85b7569fdfc6c7f0c560b1b26ebc3db6bdfdde5"
+  }
+}

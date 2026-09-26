@@ -1,0 +1,403 @@
+{
+  "s1": "4f9d1f0b9c71522ad8e97413924baf513e6f4357",
+  "s2": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "base": "e7dab838b4c025e5ab5acf16ddac8f4c2889a9e8",
+  "s1_is_ancestor": true,
+  "commit_count": 37,
+  "source_file_count": 61,
+  "commits": [
+    {
+      "commit": "da281c6797c886951422ddd4bc7cd4cf3f67cf62",
+      "title": "engine 000: 接口合规：现行实现",
+      "engine_files": [
+        "engine/sglang/srt/entrypoints/http_server.py",
+        "engine/sglang/srt/managers/tokenizer_control_mixin.py"
+      ]
+    },
+    {
+      "commit": "0ae3be67cd1136d8ac284e3c28f2bf1916066929",
+      "title": "engine 101: KDA state at the last role boundary",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_policy.py"
+      ]
+    },
+    {
+      "commit": "7da95c6efa620b802b43351cb291b3ba63062ec3",
+      "title": "engine 106: KV 无余量时推迟续算分块（修复 \"Prefill out of memory\" 引擎崩溃）",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_policy.py"
+      ]
+    },
+    {
+      "commit": "96fc86d39d77ba156ed780ddfabf2a45b4003fac",
+      "title": "engine 110: DSA indexer on A100 (sm80)",
+      "engine_files": [
+        "engine/sglang/kernels/ops/attention/dsa/ax_soft_fp8.py",
+        "engine/sglang/kernels/ops/attention/dsa/triton_kernel.py",
+        "engine/sglang/srt/layers/attention/dsa/dsa_indexer.py",
+        "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "engine/sglang/srt/layers/attention/dsa/kpool_fp8_index.py",
+        "engine/sglang/srt/layers/attention/dsa/sm80_deep_gemm.py",
+        "engine/sglang/srt/layers/attention/dsa/sm80_indexer_kernels.py",
+        "engine/sglang/srt/layers/attention/dsa_backend.py"
+      ]
+    },
+    {
+      "commit": "8f4e4c5e7790877fe8f1d60276c5b2d2a58efd5b",
+      "title": "engine 111: sm80：块量化 FP8 MoE 专家改走 Marlin（fp8 e4m3 权重 + bf16 激活）",
+      "engine_files": [
+        "engine/sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py",
+        "engine/sglang/srt/layers/moe/moe_runner/marlin.py",
+        "engine/sglang/srt/layers/quantization/fp8.py",
+        "engine/sglang/srt/layers/quantization/marlin_utils_fp8.py"
+      ]
+    },
+    {
+      "commit": "cf7e00a5c29a61fc75259110978d00d362697b6f",
+      "title": "engine 114: DSA indexer 按查询行切分到 TP 组（去掉 8 卡冗余）",
+      "engine_files": [
+        "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py"
+      ]
+    },
+    {
+      "commit": "bdeca5c3a9fb234d56b4acf487a7807c2a7e4833",
+      "title": "engine 120: scheduler: protect decoding and short requests from long cold prefills",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_policy.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "179eb466e187daaccbe86478f1d084a44bca2195",
+      "title": "engine 121: scheduler: also cap cold chunks while requests are decoding (candidate, on top of 120)",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_policy.py"
+      ]
+    },
+    {
+      "commit": "c1b6e1aeb9286cb73105126b2d920c56b2f9d530",
+      "title": "engine 130: 完整分词移出事件循环 + S1 路由键（T42 / W16）",
+      "engine_files": [
+        "engine/sglang/srt/entrypoints/http_server.py",
+        "engine/sglang/srt/entrypoints/request_headers.py",
+        "engine/sglang/srt/managers/async_text_tokenizer.py",
+        "engine/sglang/srt/managers/io_struct.py",
+        "engine/sglang/srt/managers/tokenizer_manager.py"
+      ]
+    },
+    {
+      "commit": "ad931d6b25e55f12962e4cec33b926dc35dee057",
+      "title": "engine 140: KDA 双点 fp32 快照（T45 / W19）",
+      "engine_files": [
+        "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py",
+        "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py",
+        "engine/sglang/kernels/ops/attention/fla/kda.py",
+        "engine/sglang/kernels/ops/attention/fla/kda_snapshot.py",
+        "engine/sglang/srt/layers/attention/linear/kda_backend.py",
+        "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py",
+        "engine/sglang/srt/managers/schedule_batch.py",
+        "engine/sglang/srt/managers/schedule_policy.py",
+        "engine/sglang/srt/mem_cache/kda_dual_snapshot.py",
+        "engine/sglang/srt/mem_cache/memory_pool.py",
+        "engine/sglang/srt/mem_cache/unified_cache/components/full_component.py",
+        "engine/sglang/srt/mem_cache/unified_cache/components/mamba_component.py",
+        "engine/sglang/srt/mem_cache/unified_radix_cache.py",
+        "engine/sglang/srt/model_executor/forward_batch_info.py"
+      ]
+    },
+    {
+      "commit": "6a9bea37aa949ec798fffe9bf8eb2f8e16eed091",
+      "title": "engine 150: 启动期请求预热（T46 / W20）",
+      "engine_files": [
+        "engine/sglang/srt/entrypoints/ax_shapes.py",
+        "engine/sglang/srt/entrypoints/warmup.py",
+        "engine/sglang/srt/managers/io_struct.py",
+        "engine/sglang/srt/managers/scheduler.py",
+        "engine/sglang/srt/managers/scheduler_components/flush_wrapper.py",
+        "engine/sglang/srt/managers/tokenizer_control_mixin.py",
+        "engine/sglang/srt/observability/request_metrics_exporter.py"
+      ]
+    },
+    {
+      "commit": "ed1d37f9631bfc2039f68925d243ee7ff4d58b0b",
+      "title": "engine 160: GLM NEXTN sm80兼容配置与可加权spec统计（T48/W22）",
+      "engine_files": [
+        "engine/sglang/srt/arg_groups/ax_mtp_sm80.py",
+        "engine/sglang/srt/arg_groups/speculative_hook.py",
+        "engine/sglang/srt/managers/scheduler_components/metrics_reporter.py"
+      ]
+    },
+    {
+      "commit": "152617cb3c9dce796d03406636e68c3b7cea44ff",
+      "title": "engine 170: GLM-5.3-Flash 预填充 breakable CUDA graph（移植上游 PR #38522，T52；v2 修 scatter，T52b）",
+      "engine_files": [
+        "engine/sglang/srt/arg_groups/cuda_graph_hook.py",
+        "engine/sglang/srt/arg_groups/pipeline.py",
+        "engine/sglang/srt/configs/model_config.py",
+        "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py",
+        "engine/sglang/srt/layers/attention/dsa/kpool_prefill_cuda_graph.py",
+        "engine/sglang/srt/layers/radix_linear_attention.py",
+        "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py"
+      ]
+    },
+    {
+      "commit": "0cb0eab6909b8dd354d22a11c41ceedebc818cfc",
+      "title": "engine 115: decode context parallel (DCP) on A100",
+      "engine_files": [
+        "engine/sglang/kernels/ops/attention/dsa/tilelang_kernel.py",
+        "engine/sglang/kernels/ops/kvcache/mla_buffer.py",
+        "engine/sglang/srt/layers/attention/dsa_backend.py",
+        "engine/sglang/srt/mem_cache/kv_cache_configurator.py",
+        "engine/sglang/srt/model_executor/pool_configurator.py"
+      ]
+    },
+    {
+      "commit": "fe121b23c22d90c6694e8a24a4fae498b97ed784",
+      "title": "engine 122: TPOT-paced prefill budget (candidate, on top of 120/121)",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "015d5bd2c8e060d0f5173659f4ef27d29063fd87",
+      "title": "engine 123: shortest remaining prefill first, with aging (candidate, on top of 120)",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_policy.py"
+      ]
+    },
+    {
+      "commit": "c2132b6349b1a837b59d1936ee5c813442c60b82",
+      "title": "engine 171: FP8 模型内免量化 KDA 投影融合（候选）",
+      "engine_files": [
+        "engine/sglang/srt/models/glm5_next.py"
+      ]
+    },
+    {
+      "commit": "9f53ac5997c6fd4482e36a88e71ce8f57e9a2db9",
+      "title": "engine 172: Marlin MoE 的 BF16 clamped SwiGLU 融合（候选）",
+      "engine_files": [
+        "engine/sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py"
+      ]
+    },
+    {
+      "commit": "f7bcf7523e517ca12448cc324439998e8724c4aa",
+      "title": "engine 180: GLM-5.3-Flash 的主机内存二级缓存（HiCache）做对：DSA indexer + 256 组所有权",
+      "engine_files": [
+        "engine/sglang/srt/managers/schedule_batch.py",
+        "engine/sglang/srt/managers/scheduler.py",
+        "engine/sglang/srt/mem_cache/hybrid_cache/host_pool_config.py",
+        "engine/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py",
+        "engine/sglang/srt/mem_cache/memory_pool.py",
+        "engine/sglang/srt/mem_cache/pool_host/dsa.py",
+        "engine/sglang/srt/mem_cache/pool_host/host_pool_decl.py",
+        "engine/sglang/srt/mem_cache/unified_cache/components/mamba_component.py",
+        "engine/sglang/srt/mem_cache/unified_radix_cache.py"
+      ]
+    },
+    {
+      "commit": "e43e2dcf2934a8b878ba405b451027b306964069",
+      "title": "engine: name why 120's protection is off and log every mechanism's effective state",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "8a44a24d8424736200842d443b2b9d90c6513ec5",
+      "title": "engine 115: keep the base sparse-attention kernel on the default path",
+      "engine_files": [
+        "engine/sglang/kernels/ops/attention/dsa/tilelang_kernel.py"
+      ]
+    },
+    {
+      "commit": "759a6ebb8e31723519ad5daf438e26e24b32501a",
+      "title": "engine 122: reserve only hits that fit beside a continuation, and stop reserving for refused hits",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "37e9002368390fefc92621ea8b18f73e86429596",
+      "title": "engine 123: broadcast leader admission order across request TP ranks",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_rank0_decision.py",
+        "engine/sglang/srt/managers/schedule_policy.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "26002a149d0271e18971640234a5fbf9aa183ece",
+      "title": "engine 117: sm80 block-FP8 MoE experts through Humming (FP8 e4m3 weights, BF16 activations)",
+      "engine_files": [
+        "engine/sglang/srt/layers/quantization/fp8.py",
+        "engine/sglang/srt/layers/quantization/fp8_humming_moe.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "928b9e186e19c3fdecb07971e31a26578b6d2ec1",
+      "title": "engine 119: scatter attention-TP inputs only for extends of at least SGLANG_AX_SCATTER_MIN_TOKENS tokens",
+      "engine_files": [
+        "engine/sglang/srt/layers/communicator.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "9f483efce4b83c469d40911df7af3a9cb9fe5a22",
+      "title": "engine 120: defer truncated sub-grid continuations and observe checkpoint recovery",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_chunk_alignment.py",
+        "engine/sglang/srt/managers/schedule_batch.py",
+        "engine/sglang/srt/managers/schedule_policy.py"
+      ]
+    },
+    {
+      "commit": "14097601b29475c78c9d19008dcee4bdc25f79b4",
+      "title": "engine 120: account only for continuations selected into the current batch",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "d9e613239bd5ff0d9741a9c82a1f9cc651fb07d4",
+      "title": "engine 124: deadline-tiered cold admission and chunk-level parking (default off)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py",
+        "engine/sglang/srt/managers/schedule_policy.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "18a41e6e88ffbdfc0ecc0d567f243c931c839f99",
+      "title": "engine 125: opening mode, spend TPOT on cold prefill while the cold backlog is large (default off)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "b0776ae5d6cc7656c642a2a80c6d0b3badc3cf10",
+      "title": "engine 126: size the cold chunk by the waiting short hits' demand (default off)",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "7c6cb6349f088de3af0e4d32440bdfbac6ee7941",
+      "title": "engine 118: DSA sparse attention through a Triton kernel on A100 (default off)",
+      "engine_files": [
+        "engine/sglang/srt/layers/attention/dsa/sparse_attention_triton.py",
+        "engine/sglang/srt/layers/attention/dsa_backend.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "83c52de59dd5e742107451899a39c16a111536be",
+      "title": "engine 126: keep the short-hit seat while 125 relieves (relief cap becomes the demand cap's maximum)",
+      "engine_files": [
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "b38e5b247d9fdcc0bba50a51c79aa3e8bfc82808",
+      "title": "engine 128: family leader ranking inside 124 from shared prefixes among waiting cold requests (default off)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "5c30b9ed8b13097b3cb1e0692d5ac7c8af97eb38",
+      "title": "engine 126/128: flush resets the 122/126 short-hit reserve state and 128's caches; 128 candidate bound; docs (Codex review)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "51237af7c00b34d412caee00636b452437f6bc3e",
+      "title": "engine 128: the starvation bound frees a held rider; multi-round closed-loop test (riders re-match after the leader's chunks and ride along from the shared prefix)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py"
+      ]
+    },
+    {
+      "commit": "4f9d1f0b9c71522ad8e97413924baf513e6f4357",
+      "title": "engine 128: only family holdbacks are freed by the starvation bound; LPM holdbacks keep 124's order (Codex review)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py",
+        "engine/sglang/srt/managers/scheduler.py"
+      ]
+    },
+    {
+      "commit": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+      "title": "engine 124: separate starvation bound for warm requests (SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S, default = max_wait_s)",
+      "engine_files": [
+        "engine/sglang/srt/managers/ax_deadline.py"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "engine/sglang/kernels/ops/attention/dsa/ax_soft_fp8.py": "92d006fa72562c627cbf6e53e0bd41dddcf1572f574caec7cf2b8c6b37879869",
+    "engine/sglang/kernels/ops/attention/dsa/tilelang_kernel.py": "56b66bfd1a0e5b75f04c2904fca5be423159642cef59aa16d51ff5f670009807",
+    "engine/sglang/kernels/ops/attention/dsa/triton_kernel.py": "f6e70f802cbcdef2cf6725cf4372bb350139e3fe4fb0bdd2598e5f48312ba53f",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": "4e24e178a2b4dfbb5f4ad5ee0a86e9371f0a273e7822dd1bff7509bfd93ecd24",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "ee6301244990657e4418f445493f65f4f0bfaad459142c5a797e3a36bed68cc2",
+    "engine/sglang/kernels/ops/attention/fla/kda.py": "153d7d2450532a4e04c10ab511c62af5447b0faaee131c50630e7c61f68c5991",
+    "engine/sglang/kernels/ops/attention/fla/kda_snapshot.py": "2ec79796dc8b2ed0705ce1faa076b20701c972bea9959d19f679f15403c097d5",
+    "engine/sglang/kernels/ops/kvcache/mla_buffer.py": "f4172f53ba6d8eadbb37a839d01359528eef7555d54a05749f640a9078979bce",
+    "engine/sglang/srt/arg_groups/ax_mtp_sm80.py": "c8dddc710c56961028cc5e210c118fa075bc157db21329404089f970d18cd930",
+    "engine/sglang/srt/arg_groups/cuda_graph_hook.py": "b9f2447bb76479da2551a88c8baf32b731feedd2a8224eacbeec480aa669c579",
+    "engine/sglang/srt/arg_groups/pipeline.py": "e191d2ec6390c7ed6ed0ab403dcb06815c59b86caa467bd8ec6293d73f66606e",
+    "engine/sglang/srt/arg_groups/speculative_hook.py": "557073913ea3a2eec4e73c6deaf3f5578dc585942b84976fbca4d0ef8d29e9f6",
+    "engine/sglang/srt/configs/model_config.py": "bd9b2121c8dd3107e7b15852e07ad85b1a2f768f42d376c9b1a1d911fe7b6f66",
+    "engine/sglang/srt/entrypoints/ax_shapes.py": "f98db3ed772d554c79addc7b5b4e76c3385f6b3c631aa934089f1c53619c6e04",
+    "engine/sglang/srt/entrypoints/http_server.py": "17cb239164d19bf5ee944e9710d61ab9b892bfe28214b9c11dfb73b87c62f32a",
+    "engine/sglang/srt/entrypoints/request_headers.py": "1164ff9702ed699d523b2a3ad80d409a41c3c40fd5607dc20a0145c05df14fc1",
+    "engine/sglang/srt/entrypoints/warmup.py": "4745571e10885ff4f70e36983b1023032989f4d1d6747364ff75e646c6a17aba",
+    "engine/sglang/srt/layers/attention/dsa/dsa_indexer.py": "684acc150a3a9773ca801b71ab9bb2a163e6ecd540954f85f2980cbcce9e0a08",
+    "engine/sglang/srt/layers/attention/dsa/dsa_indexer_kpool.py": "b88529bb56236935e8d6184467fad910111235b314b33ddb6a12215a58bf8c97",
+    "engine/sglang/srt/layers/attention/dsa/kpool_fp8_index.py": "23599aa7957f5dbce399ed16a8f16141a457c5448ec98fd167a1d4387921eed3",
+    "engine/sglang/srt/layers/attention/dsa/kpool_prefill_cuda_graph.py": "ec081bd3921617ca34ff3f5ed64058bd12bf6e76dae4d31481c6dad23a927510",
+    "engine/sglang/srt/layers/attention/dsa/sm80_deep_gemm.py": "84bdd730950139210ec4892d0964cca34cbb416ee419cf5a1da60892efd33221",
+    "engine/sglang/srt/layers/attention/dsa/sm80_indexer_kernels.py": "2c6302f7e9c5403d973bf2ee2bf6834926bb399679d802ef3ffaba39c23822d3",
+    "engine/sglang/srt/layers/attention/dsa/sparse_attention_triton.py": "14d0301db821c9cfbe48f285b0d6bee44ccb5b91147e03bf038b035946a4ebf9",
+    "engine/sglang/srt/layers/attention/dsa_backend.py": "4acba1b08b55a2b73d2df86e9b76b88102849fa70ac41b1e0c3bde55b532e958",
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "bfd038fdec7b63a9fd65fbe5ebe88d49a124af575268eacea1aab8ebe16614ad",
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "3b13e2ebbdc727ba7da3ce86348acf57bd65c2f396835a1bbaa783f8c7de1c14",
+    "engine/sglang/srt/layers/communicator.py": "99a0c88f47e2c468382d5422ccf6ad119d465a9ddf5c9e9e61165aa46c1c55e9",
+    "engine/sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py": "c33fc53e551572f27a142412c18566deae2186a2a6aff4f9a37a81f9b740d999",
+    "engine/sglang/srt/layers/moe/moe_runner/marlin.py": "ca7e9286702c713210332143cc1be6eb13a75335775986be75fd26f4cd735cd4",
+    "engine/sglang/srt/layers/quantization/fp8.py": "cfa5e3d29a36ce42f74fbed7c6ab4a4bdfda99d455672abdea7bf983ec751858",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "d2c377b4057be21ab7279709e91a527b8d8af90bc48119152248f837cff47a9b",
+    "engine/sglang/srt/layers/quantization/marlin_utils_fp8.py": "3462e4809e01ea34d7b4710eae4e0cfb0398e32c59ce9b126b410f2f03907f57",
+    "engine/sglang/srt/layers/radix_linear_attention.py": "c8bd3e131a83fa66d19a9641ca11dde3c6fe60309acab61dd1484535221688ba",
+    "engine/sglang/srt/managers/async_text_tokenizer.py": "b1083909febb103266732e106f78ddaed89c5fe7df94e9c53a7de5108333db1e",
+    "engine/sglang/srt/managers/ax_chunk_alignment.py": "acdd95f7cc12a2b1a7c3f4aef63ab25c3394e5be20a0423e6474c1c2d92f5d5c",
+    "engine/sglang/srt/managers/ax_deadline.py": "d2a1f9ac2accc541b750efe68824fb1411b9b12fb6adc10a31fb9eaea7fbdb09",
+    "engine/sglang/srt/managers/ax_rank0_decision.py": "9bd2f64b14bc56a49c6edd4fdad78b2449b6d73dc7ad69e9aebf7133e2c487d7",
+    "engine/sglang/srt/managers/io_struct.py": "7558a6f6fb528b05f5802ddcc437b2c55ac4af817e177048e8483ef30109f67a",
+    "engine/sglang/srt/managers/schedule_batch.py": "ab6f3d9986b3642f1cbc2c50dfaa25a092ccf57ec1f4f1ce2eb8bbad220deb3c",
+    "engine/sglang/srt/managers/schedule_policy.py": "507de6b654c10a4161c806b618002e662f5dbb357d5551670f9196512f939e5e",
+    "engine/sglang/srt/managers/scheduler.py": "d8d54929eb0c0d8a739a64871a236ba004a7ca6099dbcfe7aafaa037cc9bbb7a",
+    "engine/sglang/srt/managers/scheduler_components/flush_wrapper.py": "8181e1d17d4e62dcfcea93a8dedc447e7222ec9b06122905cb0a158ff1319f43",
+    "engine/sglang/srt/managers/scheduler_components/metrics_reporter.py": "b80b0d703ccfa1b532f1a29acbb29c0835b0c31dc9c309d608eb9853e93a6da8",
+    "engine/sglang/srt/managers/tokenizer_control_mixin.py": "187658dd28f4a7e964a967e1b123d98fe411dd931a563ddd37911bed484d6b06",
+    "engine/sglang/srt/managers/tokenizer_manager.py": "b799633d7a8a00265a17dfb029b1c453912d85f33bdaed546da8ffa33de23180",
+    "engine/sglang/srt/mem_cache/hybrid_cache/host_pool_config.py": "66725aca10479f62ffee8c8f2cbd15aa8230dec1cc9fce561dbfa3d8c8d5afb5",
+    "engine/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py": "b97da2a2dca99c0d227989816997daa62fe0d827d6dcae7268a73850ee4948fb",
+    "engine/sglang/srt/mem_cache/kda_dual_snapshot.py": "23949c4c62be1c7c14937814bf94b71907c4f03a3d115c028e0a1b042f76f57e",
+    "engine/sglang/srt/mem_cache/kv_cache_configurator.py": "d389027cba6c69c8b00444285a62371c16fd569943f3902ab3e3c5aa3f41758d",
+    "engine/sglang/srt/mem_cache/memory_pool.py": "3568726c8a4ba8bfdc04eecf2f703b4847c57517ee3a8279e5bb5fcf7e7ae381",
+    "engine/sglang/srt/mem_cache/pool_host/dsa.py": "e66cc4f703103731bb15e9fe06b4d38a74c358729f6c4689420474115ccc72ee",
+    "engine/sglang/srt/mem_cache/pool_host/host_pool_decl.py": "aed742c5d9df2129d452464bb07724552b4e14bfe5e5d9bc8bd2402487c0751b",
+    "engine/sglang/srt/mem_cache/unified_cache/components/full_component.py": "3473df2c0bd35b952df3be477fb44d048e88337fa86ce9099182549bf28c76e7",
+    "engine/sglang/srt/mem_cache/unified_cache/components/mamba_component.py": "51cbe9686223a0d95c2e633a4c239b23bdbe2b5d707e0bc1a09eebae3f8d4477",
+    "engine/sglang/srt/mem_cache/unified_radix_cache.py": "a8280dfb7fb59b98de256380c86694c75ad1fceac680d20d3d4de85404f5da5e",
+    "engine/sglang/srt/model_executor/forward_batch_info.py": "b8ffea7aed79c5c741462a12f320a5d9878f6886dadee7f8bfc31585bb119013",
+    "engine/sglang/srt/model_executor/pool_configurator.py": "9c7e80e1c158721c42dfcc3b4dba5cd1a3e40d951aa0627c0c82fdb09217fe59",
+    "engine/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py": "9eb5d3590df4f0c8e2a52bcdadb4171e6dabe4bd1a8bc4d2113fb1a5925c051b",
+    "engine/sglang/srt/models/glm5_next.py": "2b5e4a65290c62818bf8bfa67d224a63696d7bfbfa2bcf00415b4d8e0b4de082",
+    "engine/sglang/srt/observability/request_metrics_exporter.py": "212cae28693ad2e85f271d332db847f3ee6cc84cf97c995d07141fedb1226051"
+  },
+  "s2_only_diff": "diff --git a/engine/sglang/srt/managers/ax_deadline.py b/engine/sglang/srt/managers/ax_deadline.py\nindex 8ee11119..330e08a9 100644\n--- a/engine/sglang/srt/managers/ax_deadline.py\n+++ b/engine/sglang/srt/managers/ax_deadline.py\n@@ -45,6 +45,11 @@ class DeadlineConfig:\n     arrival_offset_s: float = 0.4\n     # Starvation bound: a request waiting longer than this goes first whatever its tier (oldest first).\n     max_wait_s: float = 120.0\n+    # Same bound for warm requests (most of the prompt cached: turn starts and mid-chain requests, gates 3/5/15 s).\n+    # Run 112: warm turn starts judged hopeless after their 5 s budget waited the full 120 s behind rescuable cold\n+    # heads (turn misses 12 -> 24). A lower bound frees them in time without letting them outrank cold heads while\n+    # they can still make it. Defaults to max_wait_s (no change unless set).\n+    max_wait_warm_s: float = 120.0\n     # Parking: only a continuation with more remaining work than this yields, for at most this many\n     # rounds and seconds in a row; 0 rounds disables parking.\n     park_min_remaining: int = 65536\n@@ -67,6 +72,7 @@ def deadline_config() -> Optional[DeadlineConfig]:\n         load_factor=float(_env(\"SGLANG_AX_DEADLINE_LOAD\", \"1.27\")),\n         arrival_offset_s=float(_env(\"SGLANG_AX_DEADLINE_ARRIVAL_OFFSET_S\", \"0.4\")),\n         max_wait_s=float(_env(\"SGLANG_AX_DEADLINE_MAX_WAIT_S\", \"120\")),\n+        max_wait_warm_s=float(_env(\"SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S\", _env(\"SGLANG_AX_DEADLINE_MAX_WAIT_S\", \"120\"))),\n         park_min_remaining=int(_env(\"SGLANG_AX_PARK_MIN_REMAINING\", \"65536\")),\n         park_max_rounds=int(_env(\"SGLANG_AX_PARK_MAX_ROUNDS\", \"8\")),\n         park_max_s=float(_env(\"SGLANG_AX_PARK_MAX_S\", \"2\")),\n@@ -74,7 +80,7 @@ def deadline_config() -> Optional[DeadlineConfig]:\n     if not (cfg.cold_budget_s > 0 and cfg.warm_budget_s > 0 and cfg.fast_budget_s > 0\n             and cfg.fast_tokens >= 0 and 0 <= cfg.cold_hit_ratio <= 1\n             and cfg.per_token_s > 0 and cfg.fixed_s >= 0 and cfg.load_factor > 0\n-            and cfg.arrival_offset_s >= 0 and cfg.max_wait_s > 0 and cfg.park_min_remaining >= 0\n+            and cfg.arrival_offset_s >= 0 and cfg.max_wait_s > 0 and cfg.max_wait_warm_s > 0 and cfg.park_min_remaining >= 0\n             and cfg.park_max_rounds >= 0 and cfg.park_max_s >= 0):\n         raise ValueError(f\"[ax] 124: invalid deadline config {cfg}\")\n     return cfg\n@@ -129,7 +135,7 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st\n         if req.rid in held:\n             return (3, 0.0, index)\n         waited = waited_s(req)\n-        if waited > cfg.max_wait_s:\n+        if waited > (cfg.max_wait_s if is_cold(req, cfg.cold_hit_ratio) else cfg.max_wait_warm_s):\n             return (0, -waited, index)\n         if req.rid in family_held:\n             return (3, 0.0, index)\ndiff --git a/tests/test_ax_deadline.py b/tests/test_ax_deadline.py\nindex 30a7c112..8dd79815 100644\n--- a/tests/test_ax_deadline.py\n+++ b/tests/test_ax_deadline.py\n@@ -303,3 +303,26 @@ class Family(unittest.TestCase):\n         waited = {'lead': 0.0, 'held': 121.0}\n         order = ax.tier_order([held, lead], lambda r: waited[r.rid], {'held'}, 8192, cfg)\n         self.assertEqual([r.rid for r in order], ['lead', 'held'])\n+\n+\n+class WarmStarvationBound(unittest.TestCase):\n+    def test_warm_request_is_freed_by_its_own_bound(self):\n+        # a warm turn start (matched 55k of 75k, 20k new) judged hopeless after 5 s: with max_wait_warm_s=10 it\n+        # goes first after 10 s; a cold head waiting 10 s keeps the 120 s bound\n+        cfg = ax.DeadlineConfig(max_wait_warm_s=10)\n+        warm = req('warm', 75000, matched=55000)\n+        cold_head = req('cold', 30000)\n+        waited = {'warm': 11.0, 'cold': 11.0}\n+        order = ax.tier_order([cold_head, warm], lambda r: waited[r.rid], set(), 8192, cfg)\n+        self.assertEqual([r.rid for r in order], ['warm', 'cold'])\n+        waited['warm'] = 6.0  # hopeless (5 s budget) but not yet starved: stays behind the rescuable cold head\n+        order = ax.tier_order([cold_head, warm], lambda r: waited[r.rid], set(), 8192, cfg)\n+        self.assertEqual([r.rid for r in order], ['cold', 'warm'])\n+\n+    def test_default_equals_the_cold_bound(self):\n+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_MAX_WAIT_S': '90'}):\n+            cfg = ax.deadline_config()\n+        self.assertEqual((cfg.max_wait_s, cfg.max_wait_warm_s), (90.0, 90.0))\n+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S': '10'}):\n+            cfg = ax.deadline_config()\n+        self.assertEqual((cfg.max_wait_s, cfg.max_wait_warm_s), (120.0, 10.0))"
+}

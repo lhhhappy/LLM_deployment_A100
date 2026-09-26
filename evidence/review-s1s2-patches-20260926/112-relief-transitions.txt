@@ -1,0 +1,14 @@
+[2026-09-26 09:45:10 TP0] [ax-125] relief on: cold backlog 43087 tokens at 1 tok/s, slow 0/0
+[2026-09-26 09:45:12 TP0] [ax-125] relief off: cold backlog 18511 tokens at 6199 tok/s, slow 0/0
+[2026-09-26 09:45:37 TP0] [ax-125] relief on: cold backlog 327489 tokens at 6625 tok/s, slow 0/0
+[2026-09-26 09:46:24 TP0] [ax-125] relief off: cold backlog 64924 tokens at 13331 tok/s, slow 0/0
+[2026-09-26 09:47:07 TP0] [ax-125] relief on: cold backlog 317931 tokens at 5989 tok/s, slow 0/0
+[2026-09-26 09:48:26 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13639 tok/s, slow 0/0
+[2026-09-26 09:50:00 TP0] [ax-125] relief on: cold backlog 251859 tokens at 6165 tok/s, slow 43/140
+[2026-09-26 09:50:14 TP0] [ax-125] relief off: cold backlog 65491 tokens at 13215 tok/s, slow 52/140
+[2026-09-26 09:50:37 TP0] [ax-125] relief on: cold backlog 219666 tokens at 10314 tok/s, slow 56/158
+[2026-09-26 09:50:51 TP0] [ax-125] relief off: cold backlog 57874 tokens at 12327 tok/s, slow 64/160
+[2026-09-26 09:52:32 TP0] [ax-125] relief on: cold backlog 113998 tokens at 4280 tok/s, slow 68/255
+[2026-09-26 09:52:51 TP0] [ax-125] relief off: cold backlog 56654 tokens at 11595 tok/s, slow 70/263
+[2026-09-26 09:53:15 TP0] [ax-125] relief on: cold backlog 181294 tokens at 8532 tok/s, slow 70/287
+[2026-09-26 09:53:22 TP0] [ax-125] relief off: cold backlog 98670 tokens at 12863 tok/s, slow 82/293

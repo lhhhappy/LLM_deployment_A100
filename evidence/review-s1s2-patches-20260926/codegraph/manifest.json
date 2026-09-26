@@ -1,0 +1,137 @@
+{
+  "commit": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "version": "1.6.0",
+  "caveat": "Static candidates only. Python dynamic dispatch and deep_gemm monkey patches need manual receiver/source validation.",
+  "queries": [
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "Scheduler._get_new_batch_prefill_raw",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callees-Scheduler._get_new_batch_prefill_raw.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "Scheduler._ax_admission_plan",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callees-Scheduler._ax_admission_plan.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "BacklogState.note_tpot",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callers-BacklogState.note_tpot.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "PrefillAdder.add_one_req",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callees-PrefillAdder.add_one_req.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "fp8_mqa_logits",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callers-fp8_mqa_logits.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "IndexerKPool._get_topk_ragged_kpool_plan",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callees-IndexerKPool._get_topk_ragged_kpool_plan.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callees",
+        "Fp8HummingMoEMethod.apply",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callees-Fp8HummingMoEMethod.apply.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "PrefillCudaGraphRunner.can_run_graph",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callers-PrefillCudaGraphRunner.can_run_graph.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "attach_hybrid_pool_to_unified_cache",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callers-attach_hybrid_pool_to_unified_cache.json"
+    },
+    {
+      "command": [
+        "codegraph",
+        "callers",
+        "AsyncTextTokenizer.run",
+        "-j",
+        "-l",
+        "80"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "file": "callers-AsyncTextTokenizer.run.json"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "scope": "local CPU helpers; synthetic requests/shape objects, no GPU or SLO claim",
+  "baseline": "84dcca0ed84f949cf44acd0a5d2427b171d317a2",
+  "family": [
+    {
+      "requests": 8,
+      "tokens_each": 250000,
+      "shared_tokens": 249000,
+      "samples": {
+        "base": [
+          {
+            "first_ms": 22.917584,
+            "cached_ms": 0.01681665
+          },
+          {
+            "first_ms": 23.054167,
+            "cached_ms": 0.01681665
+          },
+          {
+            "first_ms": 22.52,
+            "cached_ms": 0.01736045
+          },
+          {
+            "first_ms": 22.765333,
+            "cached_ms": 0.0175521
+          },
+          {
+            "first_ms": 22.721167,
+            "cached_ms": 0.01708955
+          }
+        ],
+        "candidate": [
+          {
+            "first_ms": 13.142125,
+            "cached_ms": 0.01940835
+          },
+          {
+            "first_ms": 13.190625,
+            "cached_ms": 0.01800835
+          },
+          {
+            "first_ms": 13.108708,
+            "cached_ms": 0.01851875
+          },
+          {
+            "first_ms": 13.069625,
+            "cached_ms": 0.017675
+          },
+          {
+            "first_ms": 13.326041,
+            "cached_ms": 0.0184375
+          }
+        ]
+      },
+      "median": {
+        "base": {
+          "first_ms": 22.765333,
+          "cached_ms": 0.01708955
+        },
+        "candidate": {
+          "first_ms": 13.142125,
+          "cached_ms": 0.0184375
+        }
+      }
+    },
+    {
+      "requests": 30,
+      "tokens_each": 250000,
+      "shared_tokens": 249000,
+      "samples": {
+        "base": [
+          {
+            "first_ms": 93.087917,
+            "cached_ms": 0.17418335
+          },
+          {
+            "first_ms": 92.734626,
+            "cached_ms": 0.17570205
+          },
+          {
+            "first_ms": 92.746042,
+            "cached_ms": 0.1821708
+          },
+          {
+            "first_ms": 91.913042,
+            "cached_ms": 0.16518125
+          },
+          {
+            "first_ms": 91.825291,
+            "cached_ms": 0.1840625
+          }
+        ],
+        "candidate": [
+          {
+            "first_ms": 50.201667,
+            "cached_ms": 0.18485415
+          },
+          {
+            "first_ms": 51.859167,
+            "cached_ms": 0.18150415
+          },
+          {
+            "first_ms": 49.922166,
+            "cached_ms": 0.1811875
+          },
+          {
+            "first_ms": 57.267125,
+            "cached_ms": 0.1724771
+          },
+          {
+            "first_ms": 56.838125,
+            "cached_ms": 0.18279165
+          }
+        ]
+      },
+      "median": {
+        "base": {
+          "first_ms": 92.734626,
+          "cached_ms": 0.17570205
+        },
+        "candidate": {
+          "first_ms": 51.859167,
+          "cached_ms": 0.18150415
+        }
+      }
+    },
+    {
+      "requests": 64,
+      "tokens_each": 250000,
+      "shared_tokens": 249000,
+      "samples": {
+        "base": [
+          {
+            "first_ms": 333.233125,
+            "cached_ms": 0.75525835
+          },
+          {
+            "first_ms": 220.37875,
+            "cached_ms": 0.7527583
+          },
+          {
+            "first_ms": 228.433375,
+            "cached_ms": 0.7636375
+          },
+          {
+            "first_ms": 227.772958,
+            "cached_ms": 0.7770771
+          },
+          {
+            "first_ms": 220.989042,
+            "cached_ms": 0.75798955
+          }
+        ],
+        "candidate": [
+          {
+            "first_ms": 113.990166,
+            "cached_ms": 0.7424292
+          },
+          {
+            "first_ms": 108.348917,
+            "cached_ms": 0.7394229
+          },
+          {
+            "first_ms": 108.277042,
+            "cached_ms": 0.74325835
+          },
+          {
+            "first_ms": 106.441,
+            "cached_ms": 0.75616665
+          },
+          {
+            "first_ms": 107.207875,
+            "cached_ms": 0.7354021
+          }
+        ]
+      },
+      "median": {
+        "base": {
+          "first_ms": 227.772958,
+          "cached_ms": 0.75798955
+        },
+        "candidate": {
+          "first_ms": 108.277042,
+          "cached_ms": 0.7424292
+        }
+      }
+    }
+  ],
+  "humming_metadata": {
+    "unit": "microseconds per pair of metadata calls",
+    "samples": {
+      "base": [
+        2.0711042,
+        2.06125,
+        2.07423335,
+        2.0503,
+        2.0574104,
+        2.41026875,
+        2.069075
+      ],
+      "candidate": [
+        0.69228955,
+        0.69388545,
+        0.67384585,
+        0.68715,
+        0.68018125,
+        0.6912854,
+        0.6823125
+      ]
+    },
+    "median": {
+      "base": 2.069075,
+      "candidate": 0.68715
+    }
+  },
+  "source_sha256": {
+    "scripts/analysis/benchmark_s1s2_cpu.py": "c16fc652785ee0933a80abedb8609b3584460134b28bc36f03871f05a0e945c0",
+    "tests/test_s1s2_review_optimizations.py": "eaeb94314a60e41a6547d681170f4ce7a78555198ec19e9b98f88279a3412662",
+    "engine/sglang/srt/managers/ax_deadline.py": "3df1f4c14e5c2c44905552fba1ca0f1068054281b4fe4c77115bf90054432e9b",
+    "engine/sglang/srt/managers/scheduler.py": "4bb3e77085bd75526f973b8bbbbb0f34e7703f2ff98cb5cdd38b631595153232",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "8029d5e3e55ba83d958484ff55955b0aa383c882d0fa606db0b1da4108c0ffb7"
+  }
+}
