@@ -45,6 +45,11 @@ class DeadlineConfig:
     arrival_offset_s: float = 0.4
     # Starvation bound: a request waiting longer than this goes first whatever its tier (oldest first).
     max_wait_s: float = 120.0
+    # Same bound for warm requests (most of the prompt cached: turn starts and mid-chain requests, gates 3/5/15 s).
+    # Run 112: warm turn starts judged hopeless after their 5 s budget waited the full 120 s behind rescuable cold
+    # heads (turn misses 12 -> 24). A lower bound frees them in time without letting them outrank cold heads while
+    # they can still make it. Defaults to max_wait_s (no change unless set).
+    max_wait_warm_s: float = 120.0
     # Parking: only a continuation with more remaining work than this yields, for at most this many
     # rounds and seconds in a row; 0 rounds disables parking.
     park_min_remaining: int = 65536
@@ -67,6 +72,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
         load_factor=float(_env("SGLANG_AX_DEADLINE_LOAD", "1.27")),
         arrival_offset_s=float(_env("SGLANG_AX_DEADLINE_ARRIVAL_OFFSET_S", "0.4")),
         max_wait_s=float(_env("SGLANG_AX_DEADLINE_MAX_WAIT_S", "120")),
+        max_wait_warm_s=float(_env("SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S", _env("SGLANG_AX_DEADLINE_MAX_WAIT_S", "120"))),
         park_min_remaining=int(_env("SGLANG_AX_PARK_MIN_REMAINING", "65536")),
         park_max_rounds=int(_env("SGLANG_AX_PARK_MAX_ROUNDS", "8")),
         park_max_s=float(_env("SGLANG_AX_PARK_MAX_S", "2")),
@@ -74,7 +80,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
     if not (cfg.cold_budget_s > 0 and cfg.warm_budget_s > 0 and cfg.fast_budget_s > 0
             and cfg.fast_tokens >= 0 and 0 <= cfg.cold_hit_ratio <= 1
             and cfg.per_token_s > 0 and cfg.fixed_s >= 0 and cfg.load_factor > 0
-            and cfg.arrival_offset_s >= 0 and cfg.max_wait_s > 0 and cfg.park_min_remaining >= 0
+            and cfg.arrival_offset_s >= 0 and cfg.max_wait_s > 0 and cfg.max_wait_warm_s > 0 and cfg.park_min_remaining >= 0
             and cfg.park_max_rounds >= 0 and cfg.park_max_s >= 0):
         raise ValueError(f"[ax] 124: invalid deadline config {cfg}")
     return cfg
@@ -129,7 +135,7 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
         if req.rid in held:
             return (3, 0.0, index)
         waited = waited_s(req)
-        if waited > cfg.max_wait_s:
+        if waited > (cfg.max_wait_s if is_cold(req, cfg.cold_hit_ratio) else cfg.max_wait_warm_s):
             return (0, -waited, index)
         if req.rid in family_held:
             return (3, 0.0, index)

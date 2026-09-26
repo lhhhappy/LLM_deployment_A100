@@ -303,3 +303,26 @@ class Family(unittest.TestCase):
         waited = {'lead': 0.0, 'held': 121.0}
         order = ax.tier_order([held, lead], lambda r: waited[r.rid], {'held'}, 8192, cfg)
         self.assertEqual([r.rid for r in order], ['lead', 'held'])
+
+
+class WarmStarvationBound(unittest.TestCase):
+    def test_warm_request_is_freed_by_its_own_bound(self):
+        # a warm turn start (matched 55k of 75k, 20k new) judged hopeless after 5 s: with max_wait_warm_s=10 it
+        # goes first after 10 s; a cold head waiting 10 s keeps the 120 s bound
+        cfg = ax.DeadlineConfig(max_wait_warm_s=10)
+        warm = req('warm', 75000, matched=55000)
+        cold_head = req('cold', 30000)
+        waited = {'warm': 11.0, 'cold': 11.0}
+        order = ax.tier_order([cold_head, warm], lambda r: waited[r.rid], set(), 8192, cfg)
+        self.assertEqual([r.rid for r in order], ['warm', 'cold'])
+        waited['warm'] = 6.0  # hopeless (5 s budget) but not yet starved: stays behind the rescuable cold head
+        order = ax.tier_order([cold_head, warm], lambda r: waited[r.rid], set(), 8192, cfg)
+        self.assertEqual([r.rid for r in order], ['cold', 'warm'])
+
+    def test_default_equals_the_cold_bound(self):
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_MAX_WAIT_S': '90'}):
+            cfg = ax.deadline_config()
+        self.assertEqual((cfg.max_wait_s, cfg.max_wait_warm_s), (90.0, 90.0))
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S': '10'}):
+            cfg = ax.deadline_config()
+        self.assertEqual((cfg.max_wait_s, cfg.max_wait_warm_s), (120.0, 10.0))
