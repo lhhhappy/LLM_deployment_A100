@@ -93,3 +93,5 @@ v3 全量元数据（[对比表](../evidence/longchain-v3-20260926/compare.json)
 - 109 的 chain/turn 超时逐条归因与针对性设计（第二条通道、家族领头排序）见 [109-chain-turn-rootcause-0926.md](reports/109-chain-turn-rootcause-0926.md)。
 
 - Fable 策略咨询（解码摊薄、122 全程让位、会话感知预算、硬上限）与决定见 [fable-策略-2026-09-26.md](fable-策略-2026-09-26.md)。
+
+- 2026-09-26 下午（fable）：主办方元数据核对三类 case 的真实性（[根因报告 §2](reports/109-chain-turn-rootcause-0926.md)、`scripts/analysis/workload_shape.py`）：家族兄弟与大冷链首是真实结构（291/311 链首属于 24 个家族；50 个链首 >5 万、17 个 >10 万），warm 多轮 turn-start 真实但 v3 放大一倍（公开 20% vs v3 44%）。081 完整 N30 逐请求剖面（`scripts/analysis/miss_profile.py`，四门 n/p95 与 harness 判定一致）：fast 超时 242 条里 237 条是 warm 一轮请求；turn 7 条里 6 条 warm 一轮；产能账 D=17.7 路在解码、W=1.6 等首 token、S=6.4 睡眠，running 峰值 28，主机层 p95 满。引擎：126 在 125 积压模式下留座位（83c52de5）、128 家族领头新版（b38e5b24），CPU 套件全过，Codex review 中。队列：112 + N34 批 113–119 + 探针 120/121 已挂自动发布。Fable 顾问意见与决定见 [fable-策略-2026-09-26.md](fable-策略-2026-09-26.md)。
