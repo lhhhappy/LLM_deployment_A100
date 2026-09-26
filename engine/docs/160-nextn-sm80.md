@@ -4,6 +4,8 @@
 
 完整路径/行号/不兼容清单、缓存交互、INFERRED性能与容量模型、L2闸门：[`R17_nextn_sm80.md`](../../research/codex/R17_nextn_sm80.md)。原始证据：[`evidence/T48/`](../../evidence/T48/README.md)。
 
+2026-09-26补充：当前topk=1链式路径不调用接受KV压实，不能把`move_kv_cache`当成保留现有MTP的唯一阻碍。DCP改动归[115](115-dcp-sm80.md)和[180](180-hicache-glm-dsa.md)：草稿latent分片、三阶段Q/LSE路由、HiCache逻辑地址；完整MTP与graph证据须单独验收，见[工程计划](../../notes/plan-dcp-8card.md)。
+
 ## 应用与实现
 
 以 `engine 160:` 提交为唯一版本（生成器已在 T57 删除）。

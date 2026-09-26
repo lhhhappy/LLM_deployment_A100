@@ -45,7 +45,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 110 | DSA indexer on A100 (fp8 soft-decode, bf16 MMA) | yes | `SGLANG_AX_SM80_INDEXER` (1) | yes |
 | 111 | FP8 MoE via Marlin W8A16 on sm80 | yes | `SGLANG_AX_SM80_FP8_MOE_MARLIN` (1) | yes |
 | 114 | indexer prefill rows split over TP ranks | yes | `SGLANG_AX_INDEXER_ROW_SHARD` (1) | yes |
-| 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP8 33/40 row mismatch unfixed |
+| 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | 33/40 padding fixed; TP2 NextN eager/three graph phases numerical pass at low addresses. Full-capacity/HiCache and TP8 validation pending |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | Fixed version: official 46174 host32 N18 PASS; 46173 off N14 PASS. Full local N30 067/068 both FAIL; host64+122 recovery experiment 071 pending |

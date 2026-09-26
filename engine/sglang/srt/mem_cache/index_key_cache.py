@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import torch
 
 from sglang.kernels.ops.attention.dsa import index_buf_accessor
+from sglang.srt.runtime_context import get_parallel
 
 if TYPE_CHECKING:
     from sglang.srt.mem_cache.memory_pool import DSATokenToKVPool
@@ -50,10 +51,43 @@ class IndexKeyCache:
             return
         tgt_loc_flat = tgt_loc.view(-1).long()
         src_loc_flat = src_loc.view(-1).long()
+        if not get_parallel().dcp_enabled:
+            # Keep the fixed baseline when 115 is disabled. Its original
+            # page-indexed relocation is not used by the topk=1 NextN chain.
+            for index_k in self.buffer:
+                if index_k.shape[0] == 0:
+                    continue
+                index_k[tgt_loc_flat] = index_k[src_loc_flat]
+            return
+        if tgt_loc.numel() != src_loc.numel():
+            raise ValueError("indexer move requires one source per destination")
+        # The leading dimension is pages, not token slots. Each page packs
+        # all keys followed by all scales. Snapshot both before any writes,
+        # including for overlapping/cyclic moves. Slot zero is graph padding.
+        valid = tgt_loc_flat != 0
+        tgt_loc_flat = tgt_loc_flat[valid]
+        src_loc_flat = src_loc_flat[valid]
+        page = self.pool.page_size
+        key_bytes = self.pool.index_head_dim
+        scale_bytes = key_bytes // self.pool.quant_block_size * 4
+        keys = torch.arange(key_bytes, device=src_loc.device)
+        scales = torch.arange(scale_bytes, device=src_loc.device)
+
+        def offsets(loc):
+            row = (loc % page).unsqueeze(1)
+            return torch.cat(
+                (row * key_bytes + keys, page * key_bytes + row * scale_bytes + scales),
+                dim=1,
+            )
+
+        src_page = (src_loc_flat // page).unsqueeze(1)
+        tgt_page = (tgt_loc_flat // page).unsqueeze(1)
+        src_offset, tgt_offset = offsets(src_loc_flat), offsets(tgt_loc_flat)
         for index_k in self.buffer:
             if index_k.shape[0] == 0:
                 continue
-            index_k[tgt_loc_flat] = index_k[src_loc_flat]
+            values = index_k[src_page, src_offset]
+            index_k[tgt_page, tgt_offset] = values
 
     def get_local_buffer(self, layer_id: int) -> torch.Tensor:
         if self.pool.layer_transfer_counter is not None:
