@@ -77,8 +77,8 @@ class Relay:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--to', required=True, choices=['lead', 'claude', 'data', 'codex'])
-    parser.add_argument('--from-agent', required=True, choices=['lead', 'claude', 'data', 'codex'])
+    parser.add_argument('--to', required=True, choices=['lead', 'claude', 'data', 'codex', 'fable'])
+    parser.add_argument('--from-agent', required=True, choices=['lead', 'claude', 'data', 'codex', 'fable'])
     content = parser.add_mutually_exclusive_group(required=True)
     content.add_argument('--text')
     content.add_argument('--file', type=Path)
