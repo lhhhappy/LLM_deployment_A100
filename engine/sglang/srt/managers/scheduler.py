@@ -1333,6 +1333,7 @@ class Scheduler(
             "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
             "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
+            "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1496,14 +1497,53 @@ class Scheduler(
             if backlog and self._ax_pace() is not None:
                 raise ValueError("[ax] 125 changes the cold cap and fixed decode interval that 122 replaces; "
                                  "unset SGLANG_AX_PACE_TPOT")
+            family = ax_deadline.family_config()
+            if family and not deadline:
+                raise ValueError("[ax] 128 ranks families inside 124's order; set SGLANG_AX_DEADLINE_TIERS=1")
+            self._ax_family_cfg = family
+            self._ax_family_shared = {}
+            self._ax_family_last = (0.0, None)
             self._ax_backlog = ax_deadline.BacklogState(backlog) if backlog else None
             self._ax_backlog_relieved = False
             self._ax_park_start = None
             self._ax_admission_stats = dict(parks=0, relief_rounds=0, log_t=0.0)
             cfgs = self._ax_admission_cfg = (deadline, backlog)
             if deadline or backlog:
-                logger.info("[ax] 124 %s | 125 %s", deadline or "off", backlog or "off")
+                logger.info("[ax] 124 %s | 125 %s | 128 %s", deadline or "off", backlog or "off", family or "off")
         return cfgs
+
+    def _ax_family_plan(self, cfg, deadline):
+        """[ax] 128 (request-plane rank 0): families among the waiting cold requests from block hashes of their
+        prompts, pairwise shared prefixes cached per pair while both wait. Broadcast with 124's order."""
+        cands = [r for r in self.waiting_queue if ax_deadline.is_cold(r, deadline.cold_hit_ratio)]
+        cache = self._ax_family_shared
+        live = {r.rid for r in cands}
+        for key in [k for k in cache if k[0] not in live or k[1] not in live]:
+            del cache[key]
+
+        def hashes(r):
+            h = getattr(r, "_ax_family_hash", None)
+            if h is None:
+                h = r._ax_family_hash = ax_deadline.block_hashes(r.origin_input_ids, cfg.block)
+            return h
+
+        def shared(a, b):
+            key = (a.rid, b.rid) if a.rid < b.rid else (b.rid, a.rid)
+            v = cache.get(key)
+            if v is None:
+                v = cache[key] = ax_deadline.shared_prefix_blocks(hashes(a), hashes(b)) * cfg.block
+            return v
+
+        work, held, families = ax_deadline.family_plan(cands, shared, cfg)
+        now = time.perf_counter()
+        last_t, last = self._ax_family_last
+        signature = tuple((leader, tuple(riders), tuple(others)) for leader, riders, others in families)
+        if signature != last and now - last_t >= 2.0:
+            self._ax_family_last = (now, signature)
+            logger.info("[ax-128] families=%d %s", len(families), " ".join(
+                f"leader={leader[-16:]}:riders={len(riders)}:others={len(others)}:work={work.get(leader, 0)}"
+                for leader, riders, others in families[:6]))
+        return work, held
 
     def _ax_admission_plan(self, running_batch: ScheduleBatch, round_budget: int, kv_room: int):
         """[ax] 124/125 on request-plane rank 0: (waiting RIDs in order or None, park, relieve).
@@ -1525,8 +1565,13 @@ class Scheduler(
         # the continuation's num_matched_prefix_tokens is still its match from when it waited.
         cont_left = cont.seqlen - len(cont.prefix_indices) if cont is not None else 0
         if deadline is not None:
-            held = getattr(self.policy, "ax_held", set())
-            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline)
+            held = set(getattr(self.policy, "ax_held", set()))
+            work = None
+            family = getattr(self, "_ax_family_cfg", None)
+            if family is not None:
+                work, family_held = self._ax_family_plan(family, deadline)
+                held |= family_held
+            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work)
             order = [r.rid for r in ranked]
             if cont is not None:
                 head = next((r for r in ranked if r.rid not in held), None)
@@ -5310,6 +5355,8 @@ class Scheduler(
                 # no prefill rate sample spans the flush.
                 self._ax_backlog.reset()
                 self._ax_backlog_relieved = False
+            if getattr(self, "_ax_family_shared", None):
+                self._ax_family_shared.clear()  # [ax] 128: pairwise shared-prefix cache of the previous level
 
             if self.draft_worker:
                 self.draft_worker.clear_cache_pool()

@@ -16,8 +16,9 @@ last flush.
 """
 
 import os
+from array import array
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Sequence, Set, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 
 
 def _env(name: str, default: str) -> str:
@@ -110,10 +111,11 @@ def slack_s(req, work: int, waited_s: float, chunk: int, cfg: DeadlineConfig) ->
 
 
 def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[str], chunk: int,
-               cfg: DeadlineConfig) -> List:
+               cfg: DeadlineConfig, work: Optional[Dict[str, int]] = None) -> List:
     """Starved (oldest first), rescuable and hopeless (each by remaining work), held-back; stable.
 
-    Recomputed every round, so a request misjudged as hopeless is promoted as soon as it is not.
+    Recomputed every round, so a request misjudged as hopeless is promoted as soon as it is not. `work` (128)
+    overrides the ranking work of a family leader; the rescuable/hopeless judgement keeps its real remaining.
     """
 
     def key(item):
@@ -123,9 +125,9 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
         waited = waited_s(req)
         if waited > cfg.max_wait_s:
             return (0, -waited, index)
-        work = remaining_tokens(req)
-        hopeless = slack_s(req, work, waited, chunk, cfg) < 0
-        return (2 if hopeless else 1, work, index)
+        remaining = remaining_tokens(req)
+        hopeless = slack_s(req, remaining, waited, chunk, cfg) < 0
+        return (2 if hopeless else 1, work.get(req.rid, remaining) if work else remaining, index)
 
     return [req for _, req in sorted(enumerate(reqs), key=key)]
 
@@ -260,3 +262,94 @@ class BacklogState:
         elif not self.relieved and seconds > self.cfg.high_s:
             self.relieved = True
         return self.relieved
+
+
+# --------------------------------------------------------------------------------------------- 128
+@dataclass(frozen=True)
+class FamilyConfig:
+    """128: waiting cold requests that share an uncached prefix form a family; the leader ranks by work per rider.
+
+    Run 104/109 (v3 N26 opening): four chain starts of 35-37k tokens shared 32k; their leader ranked by its own
+    36k behind smaller heads and finished at 29.7 s, so all four siblings (3k of their own work each) missed 30 s.
+    """
+    block: int = 256        # hash block in tokens (the checkpoint grid: a shared prefix is reusable per whole block)
+    link_min: int = 4096    # uncached shared prefix that links two requests (tokens)
+    rider_max: int = 6144   # a member finishes as a short hit after the leader when its own tail is at most this
+
+
+def family_config() -> Optional[FamilyConfig]:
+    """SGLANG_AX_DEADLINE_FAMILY=1 enables 128 inside 124; unset or 0 keeps 124's per-request order."""
+    if _env("SGLANG_AX_DEADLINE_FAMILY", "0") != "1":
+        return None
+    cfg = FamilyConfig(block=int(_env("SGLANG_AX_FAMILY_BLOCK", "256")),
+                       link_min=int(_env("SGLANG_AX_FAMILY_LINK_MIN", "4096")),
+                       rider_max=int(_env("SGLANG_AX_FAMILY_RIDER_MAX", "6144")))
+    if cfg.block <= 0 or cfg.link_min <= 0 or cfg.rider_max <= 0:
+        raise ValueError(f"[ax] 128: invalid family config {cfg}")
+    return cfg
+
+
+def block_hashes(ids: Sequence[int], block: int) -> Tuple[int, ...]:
+    """One hash per complete block of `block` prompt tokens; a tail shorter than a block is ignored."""
+    arr = ids if isinstance(ids, array) else array("q", ids)
+    return tuple(hash(arr[i:i + block].tobytes()) for i in range(0, len(arr) - block + 1, block))
+
+
+def shared_prefix_blocks(a: Sequence[int], b: Sequence[int]) -> int:
+    """Number of leading equal blocks of two hash sequences."""
+    n = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        n += 1
+    return n
+
+
+def family_plan(reqs: Sequence, shared_tokens: Callable[[object, object], int], cfg: FamilyConfig):
+    """Families among waiting cold requests and the ranking work of their leaders.
+
+    `shared_tokens(a, b)` is the shared prompt prefix of two requests in tokens (block hashes, cached by the caller).
+    Two requests are linked when that prefix minus the longer cache match of the two is at least link_min: the part
+    the first of them computes and the other reuses. The leader of a family is the member with the least remaining
+    work (ties by rid); a rider is another member whose remaining after the leader's prefix is at most rider_max,
+    so it finishes as a short hit beside the next cold chunk; a member with a longer tail neither holds nor counts.
+    Returns (work: leader rid -> remaining // (1 + riders), held: rider rids, families: [(leader, riders, others)]).
+    Riders are held only while their leader waits (this plan sees waiting requests only): once the leader runs, its
+    chunks enter the tree and the riders' matches grow until they are short hits.
+    """
+    n = len(reqs)
+    parent = list(range(n))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            matched = max(reqs[i].num_matched_prefix_tokens, reqs[j].num_matched_prefix_tokens)
+            if shared_tokens(reqs[i], reqs[j]) - matched >= cfg.link_min:
+                parent[find(i)] = find(j)
+    groups: Dict[int, list] = {}
+    for i in range(n):
+        groups.setdefault(find(i), []).append(reqs[i])
+    work: Dict[str, int] = {}
+    held: Set[str] = set()
+    families = []
+    for members in groups.values():
+        if len(members) < 2:
+            continue
+        leader = min(members, key=lambda r: (remaining_tokens(r), r.rid))
+        riders, others = [], []
+        for m in members:
+            if m is leader:
+                continue
+            tail = (len(m.origin_input_ids) + len(m.output_ids)
+                    - max(m.num_matched_prefix_tokens, shared_tokens(leader, m)))
+            (riders if tail <= cfg.rider_max else others).append(m)
+        if riders:
+            work[leader.rid] = max(1, remaining_tokens(leader) // (1 + len(riders)))
+            held.update(m.rid for m in riders)
+        families.append((leader.rid, [m.rid for m in riders], [m.rid for m in others]))
+    return work, held, families

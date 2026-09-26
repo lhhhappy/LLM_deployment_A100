@@ -202,3 +202,88 @@ class Config(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class Family(unittest.TestCase):
+    """128: families among waiting cold requests from block hashes of their prompts."""
+    CFG = None
+
+    def setUp(self):
+        self.cfg = ax.FamilyConfig(block=256, link_min=4096, rider_max=6144)
+
+    @staticmethod
+    def prompt(shared_blocks, tail_blocks, seed):
+        shared = [7] * (shared_blocks * 256)
+        return shared + [1000 + seed] * (tail_blocks * 256)
+
+    def req(self, rid, ids, matched=0):
+        return NS(rid=rid, origin_input_ids=ids, output_ids=[], num_matched_prefix_tokens=matched)
+
+    def shared_fn(self, reqs):
+        hashes = {r.rid: ax.block_hashes(r.origin_input_ids, 256) for r in reqs}
+        return lambda a, b: ax.shared_prefix_blocks(hashes[a.rid], hashes[b.rid]) * 256
+
+    def test_block_hashes_ignore_the_partial_tail(self):
+        self.assertEqual(len(ax.block_hashes([1] * 1000, 256)), 3)
+        self.assertEqual(ax.block_hashes([1] * 512, 256), ax.block_hashes([1] * 700, 256))
+        self.assertEqual(ax.shared_prefix_blocks((1, 2, 3), (1, 2, 9)), 2)
+
+    def test_leader_ranks_by_work_per_rider_and_riders_are_held(self):
+        # 104/109: a 36k leader and three 35k siblings sharing 32k (each 3k of its own), a 14k and a 19k head
+        leader = self.req('leader', self.prompt(128, 12, 1))          # 32768 + 3072 = 35840
+        sibs = [self.req(f's{i}', self.prompt(128, 12, 10 + i)) for i in range(3)]
+        others = [self.req('h14', self.prompt(0, 55, 2)), self.req('h19', self.prompt(0, 75, 3))]
+        reqs = [leader, *sibs, *others]
+        # leader = the member with the least remaining work: make it 36k by 1 extra block over the siblings
+        leader.origin_input_ids = self.prompt(128, 12, 1)[:-256] + [7] * 256  # same length; tie broken by rid
+        work, held, families = ax.family_plan(reqs, self.shared_fn(reqs), self.cfg)
+        self.assertEqual(held, {'s0', 's1', 's2'})
+        self.assertEqual(len(families), 1)
+        lead = families[0][0]
+        self.assertIn(lead, {'leader', 's0', 's1', 's2'})
+        self.assertEqual(work[lead], 35840 // 4)
+        # unrelated heads are not in any family
+        self.assertNotIn('h14', held)
+
+    def test_link_needs_an_uncached_shared_prefix(self):
+        # two heads sharing only the 8k app prefix that both already have cached do not form a family
+        a = self.req('a', self.prompt(32, 40, 1), matched=8192)
+        b = self.req('b', self.prompt(32, 60, 2), matched=8192)
+        work, held, families = ax.family_plan([a, b], self.shared_fn([a, b]), self.cfg)
+        self.assertEqual((work, held, families), ({}, set(), []))
+        # the same pair with nothing cached is linked (8192 shared > 4096)
+        a.num_matched_prefix_tokens = b.num_matched_prefix_tokens = 0
+        work, held, families = ax.family_plan([a, b], self.shared_fn([a, b]), self.cfg)
+        self.assertEqual(len(families), 1)
+
+    def test_big_tailed_member_neither_holds_nor_dilutes(self):
+        # a sibling with a 50k tail beyond the shared prefix rides nothing: it is listed as other, not held, and
+        # the leader's work is diluted only by the real riders
+        leader = self.req('leader', self.prompt(128, 12, 1))
+        rider = self.req('rider', self.prompt(128, 12, 2))
+        big = self.req('big', self.prompt(128, 200, 3))
+        reqs = [leader, rider, big]
+        work, held, families = ax.family_plan(reqs, self.shared_fn(reqs), self.cfg)
+        lead, riders, others = families[0]
+        self.assertEqual(set(riders), {'leader', 'rider'} - {lead})
+        self.assertEqual(others, ['big'])
+        self.assertEqual(held, set(riders))
+        self.assertEqual(work[lead], 35840 // 2)
+
+    def test_tier_order_uses_the_override_only_for_ranking(self):
+        cfg = ax.DeadlineConfig()
+        small = req('small', 14000)
+        lead = req('lead', 36000)
+        order = ax.tier_order([lead, small], lambda r: 0.0, set(), 8192, cfg, {'lead': 9000})
+        self.assertEqual([r.rid for r in order], ['lead', 'small'])
+        order = ax.tier_order([lead, small], lambda r: 0.0, set(), 8192, cfg)
+        self.assertEqual([r.rid for r in order], ['small', 'lead'])
+
+    def test_config(self):
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_FAMILY': '1', 'SGLANG_AX_FAMILY_LINK_MIN': '2048'}):
+            self.assertEqual(ax.family_config().link_min, 2048)
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_FAMILY': '0'}):
+            self.assertIsNone(ax.family_config())
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_FAMILY': '1', 'SGLANG_AX_FAMILY_BLOCK': '0'}):
+            with self.assertRaises(ValueError):
+                ax.family_config()

@@ -35,6 +35,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 115 | decode context parallel on A100 | no | `--dcp-size N` (off) | TP8 33/40 row mismatch unfixed |
 | 117 | FP8 MoE via Humming W8A16 on sm80 (takes precedence over 111) | no | `SGLANG_AX_SM80_FP8_MOE_HUMMING` (0) | dev box only |
 | 118 | DSA sparse attention through a Triton kernel instead of TileLang (prefill, verify, draft, decode) | no | `SGLANG_AX_DSA_SPARSE_TRITON` (off) | not run on 8 cards |
+| 128 | family leader ranking inside 124: waiting cold requests sharing an uncached prefix (256-token block hashes) form a family; the leader ranks by work per rider, riders wait for it | no | `SGLANG_AX_DEADLINE_FAMILY` (0), needs 124 | CPU only; N34 opening probe pending |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |

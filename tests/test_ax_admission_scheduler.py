@@ -270,6 +270,48 @@ class DemandCapUnderRelief(unittest.TestCase):
         self.assertEqual(second, [('c0', 4096, 12288)])  # the hit waits
 
 
+class FamilyOrder(unittest.TestCase):
+    """128 on the real scheduler: the family leader goes before smaller lone heads; riders wait for it."""
+
+    def env(self, **extra):
+        return patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_TIERS': '1',
+                                       'SGLANG_AX_DEADLINE_FAMILY': '1', **extra})
+
+    @staticmethod
+    def head(rid, shared_blocks, tail_blocks, seed):
+        r = cold(rid, (shared_blocks + tail_blocks) * 256)
+        r.origin_input_ids = [7] * (shared_blocks * 256) + [1000 + seed] * (tail_blocks * 256)
+        r.full_untruncated_fill_ids = r.origin_input_ids[:]
+        return r
+
+    def queue(self):
+        # arrival order: the 14k and 19k heads first, then a family of four sharing 32k (each 3k of its own)
+        return [self.head('h14', 0, 55, 1), self.head('h19', 0, 75, 2),
+                self.head('fam0', 128, 12, 10), self.head('fam1', 128, 12, 11),
+                self.head('fam2', 128, 12, 12), self.head('fam3', 128, 12, 13)]
+
+    def test_family_leader_is_admitted_before_the_smaller_lone_heads(self):
+        with self.env():
+            s, _ = scheduler(waiting=self.queue(), budget=16384)
+            t = step(s)
+        self.assertEqual(t['mode'], 'prefill')
+        self.assertTrue(t['reqs'][0][0].startswith('fam'), t['reqs'])  # ranked as 35840 // 4 = 8960 < 14080
+        self.assertEqual(sum(r[0].startswith('fam') for r in t['reqs']), 1)  # riders are held, not admitted
+        self.assertIn('h14', t['waiting'])
+
+    def test_off_keeps_the_per_request_order(self):
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_TIERS': '1'}):
+            s, _ = scheduler(waiting=self.queue(), budget=16384)
+            t = step(s)
+        self.assertEqual(t['reqs'][0][0], 'h14')
+
+    def test_family_needs_124(self):
+        with patch.dict(os.environ, {**PROTECT, 'SGLANG_AX_DEADLINE_FAMILY': '1'}):
+            s, _ = scheduler()
+            with self.assertRaisesRegex(ValueError, '128'):
+                s._ax_admission_cfgs()
+
+
 class Refusals(unittest.TestCase):
     # Each refusal is matched on its message, so a config refused for another reason does not pass.
     def test_124_with_123_refuses(self):
