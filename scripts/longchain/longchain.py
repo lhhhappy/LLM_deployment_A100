@@ -604,11 +604,21 @@ def build(args):
                     # (this one included). A rewrite recomputes a suffix of the history, so it adds new tokens
                     # without growing the prompt; diverge_to_target caps the recompute at the whole history.
                     ahead = [j for j in range(offset, len(plan)) if plan[j].get("rewrite") and plan[j]["kind"] in ("intra", "turn_start")]
-                    planned_rest = sum(plan[j].get("step_target") or shapes[j] for j in range(offset, len(plan)))
+                    # What the steps still ahead will deliver on their own: growth steps after the same
+                    # prompt-budget scaling the loop applies (v3's shortfall comes mostly from that
+                    # scaling), rewriting turn starts their template's new tokens, other turn starts 0.
+                    rest = range(offset, len(plan))
+                    headroom = prompt_budget - prompt_tokens - len(rest) * len(prev_tokens)
+                    cost = sum(shapes[j] * (len(plan) - j) for j in rest)
+                    proj_scale = min(1.0, max(GROWTH_SCALE_MIN, headroom / cost)) if cost else 1.0
+                    planned_rest = sum(shapes[j] * proj_scale if shapes[j] else
+                                       (compiler.step_shape(plan[j]) if plan[j].get("rewrite") and plan[j]["kind"] == "turn_start" else 0)
+                                       for j in rest)
                     deficit = new_token_budget - new_tokens - planned_rest
                     if deficit > 0 and ahead:
-                        base = item.get("step_target") or compiler.step_shape(item)
-                        item = {**item, "step_target": int(base + deficit / len(ahead)), "topup_tokens": int(deficit / len(ahead))}
+                        # Only the divergence target grows (earlier divergence = larger recomputed suffix); the
+                        # appended block keeps its template/growth-scaled size so prompt totals stay matched.
+                        item = {**item, "divergence_topup": int(deficit / len(ahead))}
                         topups += 1
                 try:
                     current_body, event_receipt, donor = compiler.event(item, target, before_body, prefix, step, usage, room)
@@ -724,7 +734,7 @@ def build(args):
                        "unique_donor_blocks": len(usage), "max_donor_reuse": max(usage.values(), default=0)}
             summaries.append(summary)
             print(f"CHAIN {ci+1}/{len(chosen)} requests={len(chain_rows)} prompt_error={summary['prompt_sum_relative_error']:+.1%} "
-                  f"new_tokens={new_tokens}/{new_token_budget} rewrites={rewrites}/{target_rewrites} max_reuse={summary['max_donor_reuse']} "
+                  f"new_tokens={new_tokens}/{new_token_budget} rewrites={rewrites}/{target_rewrites} topups={topups} max_reuse={summary['max_donor_reuse']} "
                   f"peak_rss_mb={resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024}", flush=True)
     new_index, _, _ = common.load_index(str(dest))
     cohort = common.freeze_cohort(str(dest), args.set, new_index, args.seed, str(dest / "cohort.json"))

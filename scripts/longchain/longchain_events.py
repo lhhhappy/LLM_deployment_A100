@@ -481,9 +481,9 @@ class EventCompiler:
                 # v4 top-up: the build may raise a planned rewrite's target above its template's so the
                 # chain's new-token total reaches the source's; v3 never sets step_target for turn starts.
                 history, receipt["divergence"] = self.diverge_to_target(
-                    history, stripped, block, item.get("step_target") or self.step_shape(item), lc.tool_schemas(current).get("Read")
+                    history, stripped, block, self.step_shape(item) + item.get("divergence_topup", 0), lc.tool_schemas(current).get("Read")
                     if "Read" in lc.available_tools(current) else None, f"{prefix}_{step:04d}_t", force=not stripped)
-            receipt.update(step_target_tokens=item.get("step_target") or self.step_shape(item))
+            receipt.update(step_target_tokens=self.step_shape(item), divergence_topup=item.get("divergence_topup", 0))
             return {**current, "messages": history + block}, receipt, None
         pool = self.pool(target, current)
         # Size: the template's new tokens, scaled
@@ -523,8 +523,9 @@ class EventCompiler:
         if reminder:
             block.append(deepcopy(reminder))
         if item.get("rewrite"):
+            # v4 top-up (divergence_topup) only moves the divergence earlier: the appended block keeps its size.
             history, receipt["divergence"] = self.diverge_to_target(
-                history, [], block, max(target_tokens, desired), schema, f"{prefix}_{step:04d}_d", force=True)
+                history, [], block, max(target_tokens, desired) + item.get("divergence_topup", 0), schema, f"{prefix}_{step:04d}_d", force=True)
         receipt.update(donor_req_id=donor.source_req_id, donor_chain_id=donor.chain_id,
                        donor_mode=donor.kind, donor_fingerprint=donor.fingerprint,
                        donor_source_phase=donor.phase, donor_tool_pairing=lc.tool_pairing(block),
