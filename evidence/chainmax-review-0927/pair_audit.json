@@ -1,0 +1,516 @@
+{
+  "scope": "Audit the closed chain-max windows, using the original harness buckets/q.\n\nNo PASS/FAIL or full-cohort score is produced. Common IDs do not imply equal\narrival times or interference in a closed-loop replay.",
+  "receipts": {
+    "S1": {
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn1-tail_n26_S1_40m/N26",
+      "rows": 1854,
+      "validity": "DRAINED/DIAGNOSTIC, not full cohort",
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790533298-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790533298-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "5b5c2cf7215c9e5d"
+      },
+      "workload_hash": "9d9cffd945ee6b1c",
+      "origin_s": 1790533442.0839958,
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "files": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790533441.jsonl": "dfcd5492feb20ee4332a95ccc1d857fdd05a8570b97256ff6cbeb914be4de150",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790533441.json": "1a7d131624a0398370a9aa2d1e5bf1324507234407ec7d32af0c5312a6313298",
+        "server.log": "6fb758e2896078c0e65b28f9f0514851eb3f18f30fd735b6d1ad63d694c4240e",
+        "job.log": "ad093a12b63f65a0b239da4fce9c76fd750f687b86e6f032ad402c31e601a171"
+      },
+      "job_receipts": [
+        "ENGINE_COMMIT f546934eff67f7b1d9f9cc5516c5a89377aaeb71",
+        "MECHANISMS OK expected=[117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 128=off 140=off 180=on spec=EAGLE dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1] engine=[101=off:role_ids_unset 117=on:43_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 140=off 180=on | spec=EAGLE dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]",
+        "CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=2633",
+        "TIMED_DIAGNOSTIC DRAINED 1854 requests; not full-cohort VALID"
+      ]
+    },
+    "S6": {
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn2-tail_n26_S6_40m/N26",
+      "rows": 1547,
+      "validity": "DRAINED/DIAGNOSTIC, not full cohort",
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790539274-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790539274-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "18e8200ef19af747"
+      },
+      "workload_hash": "9d9cffd945ee6b1c",
+      "origin_s": 1790539440.3577726,
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "files": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790539440.jsonl": "1039db6b267fd2569fdaddab21cd59cf6d15e7f5e19a29fd0f36aa21abb6a565",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790539440.json": "8b513c1f5a1ba3b899d732f57997ee8516a561877dd5c4eba38dc31801eabd36",
+        "server.log": "6a273cbafcb8e8077f491da460c7c94727e6002f325bcee63f33d428f10919ee",
+        "job.log": "e4cd850a88f835df828cb7f87987872e95db863fff9c2c1236c3aa3e6f45f024"
+      },
+      "job_receipts": [
+        "ENGINE_COMMIT 450e8580ca63b601fa45daa3dc0bf8aaa0abaef8",
+        "MECHANISMS OK expected=[117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 140=off 180=on spec=- dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 128p=on 131=on 128=off dcp_local=off dcp_local_max=0 dcp_local_large=0] engine=[101=on 117=on:42_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 128p=on 131=on 140=off 180=on dcp_local=off dcp_local_max=0 dcp_local_large=0 | spec=- dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]",
+        "CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=1727",
+        "TIMED_DIAGNOSTIC DRAINED 1547 requests; not full-cohort VALID"
+      ]
+    },
+    "chainmax16k": {
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn3-tail_n26_chainmax16k_40m/N26",
+      "rows": 1572,
+      "validity": "DRAINED/DIAGNOSTIC, not full cohort",
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790542291-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790542291-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "8c7cbde374715bfe"
+      },
+      "workload_hash": "9d9cffd945ee6b1c",
+      "origin_s": 1790542453.7644753,
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "files": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790542453.jsonl": "4b7a7537f80808b00e796122584d6b7dae70142c1d5c68a8ef270bf15ae127cd",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790542453.json": "b0d28e7024cac017ad5eed87d29c77c96383a7d6c9bb6f3cf7e01ddd34d66cee",
+        "server.log": "322f4d7687fce073cfc27a3eb4a0eb76f97420a0d0b0694ca38213ca483251c9",
+        "job.log": "80f080c58fd6e917d42a6c443e2f31c190677b78e48c4fef9f2ae5a49aec858a"
+      },
+      "job_receipts": [
+        "ENGINE_COMMIT c1fa4877d9337d78c122a930d53bd5946c1d7a81",
+        "MECHANISMS OK expected=[117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 140=off 180=on spec=- dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 128p=on 131=on 128=off dcp_local=off dcp_local_max=0 dcp_local_large=0] engine=[101=on 117=on:42_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 128p=on 131=on 140=off 180=on dcp_local=off dcp_local_max=0 dcp_local_large=0 | spec=- dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]",
+        "CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=1635",
+        "TIMED_DIAGNOSTIC DRAINED 1572 requests; not full-cohort VALID"
+      ]
+    },
+    "chainmax32k": {
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn4-tail_n26_chainmax32k_40m/N26",
+      "rows": 1572,
+      "validity": "DRAINED/DIAGNOSTIC, not full cohort",
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790545287-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790545287-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "5607b0a508858707"
+      },
+      "workload_hash": "9d9cffd945ee6b1c",
+      "origin_s": 1790545452.2165754,
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "files": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790545452.jsonl": "7e7da97057616bc78bdfa1db33b89f1500454f93bbefc02bad042125b0203506",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790545452.json": "5b893f0d9563bd0185cffeb33d6cc30851ba6f78be8bd7316a5d2a2390484b0e",
+        "server.log": "de3003b6ce6579d6150101bdcb505f72cea1bc7765dda870bff64a971a073cd6",
+        "job.log": "02b5b6a85f436021b8b2d4f462271a263936b99dfaeb6c3e672b07ae0a4d09bf"
+      },
+      "job_receipts": [
+        "ENGINE_COMMIT c1fa4877d9337d78c122a930d53bd5946c1d7a81",
+        "MECHANISMS OK expected=[117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 140=off 180=on spec=- dcp=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 128p=on 131=on 128=off dcp_local=off dcp_local_max=0 dcp_local_large=0] engine=[101=on 117=on:42_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 128p=on 131=on 140=off 180=on dcp_local=off dcp_local_max=0 dcp_local_large=0 | spec=- dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]",
+        "CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=2082",
+        "TIMED_DIAGNOSTIC DRAINED 1572 requests; not full-cohort VALID"
+      ]
+    }
+  },
+  "full_windows": {
+    "S1": {
+      "n_common": 1854,
+      "gates": {
+        "chain_start": {
+          "n": 165,
+          "over": 10,
+          "p95_s": 41.72841238975525
+        },
+        "turn_start": {
+          "n": 65,
+          "over": 5,
+          "p95_s": 24.76487398147583
+        },
+        "overall_intra": {
+          "n": 1624,
+          "over": 55,
+          "p95_s": 3.8739616870880127
+        },
+        "fast_intra": {
+          "n": 1440,
+          "over": 66,
+          "p95_s": 2.7780935764312744
+        }
+      },
+      "steady_chain_after_60s": {
+        "n": 140,
+        "over_30": 0,
+        "between_10_and_30": 19
+      },
+      "tpot": {
+        "n": 1854,
+        "mean_s": 0.03761921456078952,
+        "p95_s": 0.08082717205915187,
+        "over_010": 54
+      }
+    },
+    "S6": {
+      "n_common": 1547,
+      "gates": {
+        "chain_start": {
+          "n": 150,
+          "over": 8,
+          "p95_s": 41.34426188468933
+        },
+        "turn_start": {
+          "n": 57,
+          "over": 5,
+          "p95_s": 23.977256774902344
+        },
+        "overall_intra": {
+          "n": 1340,
+          "over": 75,
+          "p95_s": 5.650031328201294
+        },
+        "fast_intra": {
+          "n": 1185,
+          "over": 75,
+          "p95_s": 4.975176811218262
+        }
+      },
+      "steady_chain_after_60s": {
+        "n": 125,
+        "over_30": 0,
+        "between_10_and_30": 11
+      },
+      "tpot": {
+        "n": 1547,
+        "mean_s": 0.05022475724690178,
+        "p95_s": 0.09689566656947136,
+        "over_010": 73
+      }
+    },
+    "chainmax16k": {
+      "n_common": 1572,
+      "gates": {
+        "chain_start": {
+          "n": 153,
+          "over": 6,
+          "p95_s": 24.755746364593506
+        },
+        "turn_start": {
+          "n": 57,
+          "over": 5,
+          "p95_s": 19.72130513191223
+        },
+        "overall_intra": {
+          "n": 1362,
+          "over": 70,
+          "p95_s": 5.037031412124634
+        },
+        "fast_intra": {
+          "n": 1207,
+          "over": 101,
+          "p95_s": 4.826408386230469
+        }
+      },
+      "steady_chain_after_60s": {
+        "n": 128,
+        "over_30": 0,
+        "between_10_and_30": 6
+      },
+      "tpot": {
+        "n": 1572,
+        "mean_s": 0.04805298377613642,
+        "p95_s": 0.08783033459136884,
+        "over_010": 67
+      }
+    },
+    "chainmax32k": {
+      "n_common": 1572,
+      "gates": {
+        "chain_start": {
+          "n": 152,
+          "over": 8,
+          "p95_s": 38.56946635246277
+        },
+        "turn_start": {
+          "n": 57,
+          "over": 3,
+          "p95_s": 23.137274742126465
+        },
+        "overall_intra": {
+          "n": 1363,
+          "over": 65,
+          "p95_s": 4.832691669464111
+        },
+        "fast_intra": {
+          "n": 1208,
+          "over": 108,
+          "p95_s": 4.618625164031982
+        }
+      },
+      "steady_chain_after_60s": {
+        "n": 127,
+        "over_30": 0,
+        "between_10_and_30": 7
+      },
+      "tpot": {
+        "n": 1572,
+        "mean_s": 0.04776915291129025,
+        "p95_s": 0.09117153687590121,
+        "over_010": 67
+      }
+    }
+  },
+  "paired": {
+    "three_way": {
+      "n_common": 1547,
+      "arms": {
+        "S1": {
+          "n_common": 1547,
+          "gates": {
+            "chain_start": {
+              "n": 150,
+              "over": 10,
+              "p95_s": 43.98710632324219
+            },
+            "turn_start": {
+              "n": 57,
+              "over": 5,
+              "p95_s": 26.451452016830444
+            },
+            "overall_intra": {
+              "n": 1340,
+              "over": 47,
+              "p95_s": 4.0113842487335205
+            },
+            "fast_intra": {
+              "n": 1185,
+              "over": 55,
+              "p95_s": 2.7780935764312744
+            }
+          },
+          "steady_chain_after_60s": {
+            "n": 125,
+            "over_30": 0,
+            "between_10_and_30": 17
+          },
+          "tpot": {
+            "n": 1547,
+            "mean_s": 0.0397469682263848,
+            "p95_s": 0.08409999240164275,
+            "over_010": 52
+          }
+        },
+        "S6": {
+          "n_common": 1547,
+          "gates": {
+            "chain_start": {
+              "n": 150,
+              "over": 8,
+              "p95_s": 41.34426188468933
+            },
+            "turn_start": {
+              "n": 57,
+              "over": 5,
+              "p95_s": 23.977256774902344
+            },
+            "overall_intra": {
+              "n": 1340,
+              "over": 75,
+              "p95_s": 5.650031328201294
+            },
+            "fast_intra": {
+              "n": 1185,
+              "over": 75,
+              "p95_s": 4.975176811218262
+            }
+          },
+          "steady_chain_after_60s": {
+            "n": 125,
+            "over_30": 0,
+            "between_10_and_30": 11
+          },
+          "tpot": {
+            "n": 1547,
+            "mean_s": 0.05022475724690178,
+            "p95_s": 0.09689566656947136,
+            "over_010": 73
+          }
+        },
+        "chainmax16k": {
+          "n_common": 1547,
+          "gates": {
+            "chain_start": {
+              "n": 150,
+              "over": 6,
+              "p95_s": 24.755746364593506
+            },
+            "turn_start": {
+              "n": 57,
+              "over": 5,
+              "p95_s": 19.72130513191223
+            },
+            "overall_intra": {
+              "n": 1340,
+              "over": 70,
+              "p95_s": 5.094220876693726
+            },
+            "fast_intra": {
+              "n": 1185,
+              "over": 100,
+              "p95_s": 4.826408386230469
+            }
+          },
+          "steady_chain_after_60s": {
+            "n": 125,
+            "over_30": 0,
+            "between_10_and_30": 6
+          },
+          "tpot": {
+            "n": 1547,
+            "mean_s": 0.04807864514495001,
+            "p95_s": 0.08762039653789085,
+            "over_010": 65
+          }
+        }
+      }
+    },
+    "chunk_pair": {
+      "n_common": 1566,
+      "arms": {
+        "chainmax16k": {
+          "n_common": 1566,
+          "gates": {
+            "chain_start": {
+              "n": 152,
+              "over": 6,
+              "p95_s": 24.755746364593506
+            },
+            "turn_start": {
+              "n": 57,
+              "over": 5,
+              "p95_s": 19.72130513191223
+            },
+            "overall_intra": {
+              "n": 1357,
+              "over": 70,
+              "p95_s": 5.04164981842041
+            },
+            "fast_intra": {
+              "n": 1202,
+              "over": 101,
+              "p95_s": 4.826408386230469
+            }
+          },
+          "steady_chain_after_60s": {
+            "n": 127,
+            "over_30": 0,
+            "between_10_and_30": 6
+          },
+          "tpot": {
+            "n": 1566,
+            "mean_s": 0.047940772251226865,
+            "p95_s": 0.08449834657990386,
+            "over_010": 65
+          }
+        },
+        "chainmax32k": {
+          "n_common": 1566,
+          "gates": {
+            "chain_start": {
+              "n": 152,
+              "over": 8,
+              "p95_s": 38.56946635246277
+            },
+            "turn_start": {
+              "n": 57,
+              "over": 3,
+              "p95_s": 23.137274742126465
+            },
+            "overall_intra": {
+              "n": 1357,
+              "over": 65,
+              "p95_s": 4.951395750045776
+            },
+            "fast_intra": {
+              "n": 1202,
+              "over": 106,
+              "p95_s": 4.618625164031982
+            }
+          },
+          "steady_chain_after_60s": {
+            "n": 127,
+            "over_30": 0,
+            "between_10_and_30": 7
+          },
+          "tpot": {
+            "n": 1566,
+            "mean_s": 0.04784244234612322,
+            "p95_s": 0.09117153687590121,
+            "over_010": 67
+          }
+        }
+      }
+    }
+  },
+  "chainmax16k_common_fast_misses": {
+    "n": 100,
+    "wait_p50_s": 4.642129898071289,
+    "execution_p50_s": 0.4240303039550781,
+    "aggregate_wait_share": 0.9136196553481299,
+    "actual_tail_le": {
+      "2048": 73,
+      "4096": 96,
+      "8192": 97
+    },
+    "caveat": "Final cached_tokens does not prove device/KDA eligibility at arrival."
+  },
+  "short_warm_budget_observations": 1
+}

@@ -1,0 +1,1398 @@
+{
+  "scope": "CPU control-flow reproductions; no TP8 latency prediction",
+  "source_commit": "c1fa4877d9337d78c122a930d53bd5946c1d7a81",
+  "job": "/workspace/Agentic_science_challenge/scripts/pod/jobs/tail_n26_chainmax16k_40m.sh",
+  "job_args": "--kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87",
+  "job_env": {
+    "SGLANG_AX_DEADLINE_CHAIN_FIRST": "1",
+    "SGLANG_AX_DEADLINE_LOAD": "1.05",
+    "SGLANG_AX_CHAIN_RISK_INTERVAL": "1",
+    "SGLANG_AX_PREFIX_PRODUCER": "1",
+    "SGLANG_AX_DEADLINE_FAMILY": "0",
+    "SGLANG_AX_PREFIX_TRACE_S": "120",
+    "SGLANG_AX_PREFIX_TRACE_ROUNDS": "2048",
+    "SGLANG_AX_DEADLINE_FREEZE_CLASS": "1",
+    "SGLANG_AX_DSA_SPARSE_TRITON": "0",
+    "SGLANG_AX_KDA_DUAL_SNAPSHOT": "0",
+    "SGLANG_AX_SCHED_PROTECT": "1",
+    "SGLANG_AX_SCHED_SHORT_TOKENS": "2048",
+    "SGLANG_AX_ASYNC_TOKENIZE": "0",
+    "SGLANG_MAMBA_SSM_DTYPE": "float32",
+    "SGLANG_OPT_FUSED_KDA_VERIFY": "0",
+    "SGLANG_AX_INDEXER_ROW_SHARD": "1",
+    "SGLANG_AX_SCHED_COLD_CAP": "16384",
+    "SGLANG_AX_DEADLINE_TIERS": "1",
+    "SGLANG_AX_DEADLINE_WARM_S": "15",
+    "SGLANG_AX_BACKLOG_RELIEF": "1",
+    "SGLANG_AX_BACKLOG_COLD_CAP": "16384",
+    "SGLANG_AX_BACKLOG_INTERVAL": "0",
+    "SGLANG_AX_BACKLOG_HIGH_S": "15",
+    "SGLANG_AX_BACKLOG_LOW_S": "5",
+    "SGLANG_AX_BACKLOG_MAX_SLOW": "80",
+    "SGLANG_AX_BACKLOG_GATE": "0.10",
+    "SGLANG_AX_PACE_TPOT": "0",
+    "SGLANG_AX_KDA_FUSE_PROJ": "0",
+    "SGLANG_AX_MOE_FUSE_SWIGLU": "0",
+    "SGLANG_AX_SM80_INDEXER": "1",
+    "SGLANG_AX_SM80_FP8_MOE_MARLIN": "1",
+    "SGLANG_AX_SM80_FP8_MOE_HUMMING": "1"
+  },
+  "cases": [
+    {
+      "cold_cap": 16384,
+      "short_threshold": 2048,
+      "new_head": false,
+      "demand_max": null,
+      "with_warm": true,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "warm"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "cold",
+        "floor": 1024,
+        "reserve_kv": 1088,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            32768,
+            49152
+          ]
+        ],
+        "waiting": [
+          "warm"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          0,
+          16448,
+          16448
+        ],
+        "verdicts": []
+      },
+      "rows": [
+        {
+          "rid": "warm",
+          "gen": 2,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 32768,
+          "full": 32768,
+          "host": 0,
+          "left": 512,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336558.81511684705,
+          "due_in": 2.811363,
+          "result": "queue_stop_chunk_budget"
+        }
+      ],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    },
+    {
+      "cold_cap": 16384,
+      "short_threshold": 8192,
+      "new_head": false,
+      "demand_max": null,
+      "with_warm": true,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "warm"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "cold",
+        "floor": 1024,
+        "reserve_kv": 1088,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            32768,
+            49152
+          ]
+        ],
+        "waiting": [
+          "warm"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          0,
+          16448,
+          16448
+        ],
+        "verdicts": []
+      },
+      "rows": [
+        {
+          "rid": "warm",
+          "gen": 2,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 32768,
+          "full": 32768,
+          "host": 0,
+          "left": 512,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336558.907606763,
+          "due_in": 2.801173,
+          "result": "queue_stop_chunk_budget"
+        }
+      ],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    },
+    {
+      "cold_cap": 14336,
+      "short_threshold": 8192,
+      "new_head": false,
+      "demand_max": null,
+      "with_warm": true,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "warm"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "cold",
+        "floor": 1024,
+        "reserve_kv": 1088,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 14336,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            32768,
+            47104
+          ],
+          [
+            "warm",
+            32768,
+            33280
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          1536,
+          1536,
+          15216,
+          14976
+        ],
+        "verdicts": [
+          [
+            "warm",
+            "CONTINUE"
+          ]
+        ]
+      },
+      "rows": [
+        {
+          "rid": "warm",
+          "gen": 2,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 32768,
+          "full": 32768,
+          "host": 0,
+          "left": 512,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336559.00984801404,
+          "due_in": 2.776153,
+          "result": "ordinary_admitted"
+        }
+      ],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    },
+    {
+      "cold_cap": 16384,
+      "short_threshold": 8192,
+      "new_head": true,
+      "demand_max": null,
+      "with_warm": true,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "cold",
+          "warm"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": null,
+        "floor": 0,
+        "reserve_kv": 0,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 2
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            0,
+            16384
+          ]
+        ],
+        "waiting": [
+          "warm"
+        ],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          0,
+          16448,
+          16448
+        ],
+        "verdicts": [
+          [
+            "cold",
+            "OTHER"
+          ]
+        ]
+      },
+      "rows": [
+        {
+          "rid": "cold",
+          "gen": 1,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 0,
+          "full": 0,
+          "host": 0,
+          "left": 20000,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336557.24349618,
+          "due_in": 27.885531,
+          "result": "ordinary_admitted"
+        },
+        {
+          "rid": "warm",
+          "gen": 2,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 32768,
+          "full": 32768,
+          "host": 0,
+          "left": 512,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336559.14460605505,
+          "due_in": 2.786641,
+          "result": "not_attempted"
+        }
+      ],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    }
+  ],
+  "reuse126": [
+    {
+      "cold_cap": 12288,
+      "short_threshold": 4096,
+      "new_head": false,
+      "demand_max": 16384,
+      "with_warm": true,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "warm"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "cold",
+        "floor": 12288,
+        "reserve_kv": 12352,
+        "wait_prefix": [],
+        "demand": true,
+        "cold_floor": 12288,
+        "ordinary_reserve": 512,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            32768,
+            48640
+          ],
+          [
+            "warm",
+            32768,
+            33280
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          0,
+          16752,
+          16512
+        ],
+        "verdicts": [
+          [
+            "warm",
+            "OTHER"
+          ]
+        ]
+      },
+      "rows": [
+        {
+          "rid": "warm",
+          "gen": 2,
+          "producer": null,
+          "target": 0,
+          "state": "ORDINARY",
+          "reason": "ordinary",
+          "device": 32768,
+          "full": 32768,
+          "host": 0,
+          "left": 512,
+          "held": false,
+          "held_by": null,
+          "held_depth": 0,
+          "effective_held": false,
+          "work": null,
+          "received": 336559.264876722,
+          "due_in": 2.828142,
+          "result": "ordinary_admitted"
+        }
+      ],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    },
+    {
+      "cold_cap": 12288,
+      "short_threshold": 4096,
+      "new_head": false,
+      "demand_max": 16384,
+      "with_warm": false,
+      "warm_actual_tail": 512,
+      "kv_available": 10000000,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "cold",
+        "floor": 12288,
+        "reserve_kv": 12352,
+        "wait_prefix": [],
+        "demand": true,
+        "cold_floor": 12288,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 0
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "cold",
+            32768,
+            49152
+          ]
+        ],
+        "waiting": [],
+        "chunk": "cold",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          0,
+          0,
+          16448,
+          16448
+        ],
+        "verdicts": []
+      },
+      "rows": [],
+      "effective_deadline": {
+        "cold_budget_s": 30.0,
+        "warm_budget_s": 15.0,
+        "fast_budget_s": 3.0,
+        "fast_tokens": 4096,
+        "warm_multi_tokens": 8192,
+        "warm_multi_budget_s": 15.0,
+        "cold_hit_ratio": 0.5,
+        "freeze_class": true,
+        "chain_first": true,
+        "fixed_s": 0.13,
+        "per_token_s": 6.8e-05,
+        "load_factor": 1.05,
+        "arrival_offset_s": 0.4,
+        "max_wait_s": 120.0,
+        "max_wait_warm_s": 120.0,
+        "park_min_remaining": 65536,
+        "park_max_rounds": 8,
+        "park_max_s": 2.0
+      },
+      "effective_risk": {
+        "interval": 1,
+        "margin_s": 8.0,
+        "min_remaining": 32768,
+        "chunk": 8192
+      }
+    }
+  ],
+  "risk_model": [
+    {
+      "remaining": 200000,
+      "waited_s": 4.0,
+      "configured_8k": {
+        "projected_s": 22.0925,
+        "interval": 1
+      },
+      "model_16k": {
+        "projected_s": 20.454500000000003,
+        "interval": null
+      }
+    },
+    {
+      "remaining": 200000,
+      "waited_s": 20.4,
+      "configured_8k": {
+        "projected_s": 38.4925,
+        "interval": null
+      },
+      "model_16k": {
+        "projected_s": 36.8545,
+        "interval": 1
+      }
+    }
+  ],
+  "rank_risk": [
+    {
+      "case": "clock_boundary",
+      "prompt": 249152,
+      "device_prefix": 32768,
+      "current_chunk": 16384,
+      "ranks": [
+        {
+          "rank": 0,
+          "waited_s": 3.9,
+          "interval": 2,
+          "frozen_cold": true,
+          "defer_next_two": [
+            true,
+            true
+          ],
+          "rank0_decisions": []
+        },
+        {
+          "rank": 1,
+          "waited_s": 3.92,
+          "interval": 1,
+          "frozen_cold": true,
+          "defer_next_two": [
+            true,
+            false
+          ],
+          "rank0_decisions": []
+        }
+      ]
+    },
+    {
+      "case": "frozen_class_not_broadcast",
+      "prompt": 160000,
+      "device_prefix": 99840,
+      "current_chunk": 16384,
+      "ranks": [
+        {
+          "rank": 0,
+          "waited_s": 24.0,
+          "interval": 1,
+          "frozen_cold": true,
+          "defer_next_two": [
+            true,
+            false
+          ],
+          "rank0_decisions": []
+        },
+        {
+          "rank": 1,
+          "waited_s": 24.0,
+          "interval": 2,
+          "frozen_cold": false,
+          "defer_next_two": [
+            true,
+            true
+          ],
+          "rank0_decisions": []
+        }
+      ]
+    }
+  ],
+  "cold_rescue": [
+    {
+      "new_cold_tokens": 12000,
+      "late_waited_s": 31,
+      "late_remaining": 87232,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "new"
+        ],
+        "park": true,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "late",
+        "floor": 0,
+        "reserve_kv": 0,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "new",
+            0,
+            12000
+          ]
+        ],
+        "waiting": [],
+        "chunk": "late",
+        "full": false,
+        "interval": 2,
+        "budget": [
+          4352,
+          4352,
+          12336,
+          12096
+        ],
+        "verdicts": [
+          [
+            "new",
+            "CONTINUE"
+          ]
+        ]
+      }
+    },
+    {
+      "new_cold_tokens": 20000,
+      "late_waited_s": 31,
+      "late_remaining": 87232,
+      "plan": {
+        "version": 1,
+        "epoch": 1,
+        "sequence": 1,
+        "order": [
+          "new"
+        ],
+        "park": false,
+        "relieved": false,
+        "ready": [],
+        "preview": [],
+        "continuation": "late",
+        "floor": 1024,
+        "reserve_kv": 1088,
+        "wait_prefix": [],
+        "demand": false,
+        "cold_floor": 256,
+        "ordinary_reserve": 0,
+        "reserved_tokens": 0,
+        "cold_cap": 16384,
+        "queue": 1
+      },
+      "trace": {
+        "mode": "prefill",
+        "reqs": [
+          [
+            "late",
+            32768,
+            49152
+          ]
+        ],
+        "waiting": [
+          "new"
+        ],
+        "chunk": "late",
+        "full": false,
+        "interval": 1,
+        "budget": [
+          0,
+          0,
+          16448,
+          16448
+        ],
+        "verdicts": []
+      }
+    }
+  ],
+  "source_graph": [
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_mechanism_report",
+      "line": 1296,
+      "end_line": 1356,
+      "calls": [
+        "' '.join",
+        "_ax_srpt_aging",
+        "_role_boundary_token_ids",
+        "dsa_backend.ax118_state",
+        "float",
+        "get_parallel",
+        "get_spec",
+        "getattr",
+        "items.items",
+        "local_extend_mechanism_tokens",
+        "os.environ.get",
+        "self._ax_admission_cfgs",
+        "self._ax_chain_risk_cfg",
+        "self._ax_demand_cap_max",
+        "self._ax_humming_report",
+        "self._ax_scatter_report",
+        "self._ax_sched_protect_blocker",
+        "sys.modules.get"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_admission_plan",
+      "line": 1592,
+      "end_line": 1679,
+      "calls": [
+        "adder._request_total_tokens",
+        "adder.ax_complete_waiter_budget",
+        "ax_deadline.is_cold",
+        "ax_deadline.is_starved",
+        "ax_deadline.remaining_tokens",
+        "ax_deadline.tier_order",
+        "getattr",
+        "len",
+        "logger.info",
+        "max",
+        "parking_decision",
+        "producer.prepare",
+        "self._ax_admission_cfgs",
+        "self._ax_family_plan",
+        "self.get_num_allocatable_reqs",
+        "set",
+        "state.decide",
+        "state.note_tpot",
+        "sum",
+        "time.perf_counter",
+        "waited"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_prefix_plan",
+      "line": 1681,
+      "end_line": 1747,
+      "calls": [
+        "_ax_sched_protect_config",
+        "adder._ax_short_hit",
+        "adder._mamba_gap_budget_for_req",
+        "adder._request_total_tokens",
+        "adder.ax_complete_waiter_budget",
+        "adder.ax_prefix_preview",
+        "adder.ceil_paged_tokens",
+        "ax_prefix_readiness.view",
+        "bool",
+        "dict",
+        "int",
+        "len",
+        "math.ceil",
+        "max",
+        "min",
+        "preview.append",
+        "ready.append",
+        "self._ax_admission_plan",
+        "self._ax_demand_cap_max",
+        "self._ax_short_hit_reserve",
+        "self.get_num_allocatable_reqs",
+        "sorted",
+        "tracker.ready"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_prefix_admit_ready",
+      "line": 1763,
+      "end_line": 1818,
+      "calls": [
+        "RuntimeError",
+        "adder._lock_node",
+        "adder.add_one_req",
+        "adder.ax_prefix_preview",
+        "attempts.add",
+        "ax_prefix_readiness.view",
+        "bool",
+        "getattr",
+        "int",
+        "len",
+        "min",
+        "nullcontext",
+        "req.init_next_round_input",
+        "res.name.lower",
+        "results.append",
+        "self._ax_prefix_cleanup",
+        "self._ax_prefix_consensus",
+        "self.get_num_allocatable_reqs",
+        "str"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_short_hit_reserve",
+      "line": 1924,
+      "end_line": 1954,
+      "calls": [
+        "frozenset",
+        "getattr",
+        "len",
+        "req.needs_host_load_back",
+        "reserved.append"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_should_defer_prefill",
+      "line": 1956,
+      "end_line": 1961,
+      "calls": []
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_arm_prefill_decode_interval",
+      "line": 1963,
+      "end_line": 1983,
+      "calls": [
+        "batch.forward_mode.is_extend",
+        "getattr",
+        "self._ax_chain_risk_interval"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_ax_chain_risk_interval",
+      "line": 1998,
+      "end_line": 2021,
+      "calls": [
+        "ax_deadline.chain_risk_interval",
+        "getattr",
+        "len",
+        "logger.info",
+        "max",
+        "self._ax_admission_cfgs",
+        "self._ax_chain_risk_cfg",
+        "time.perf_counter"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "get_next_batch_to_run",
+      "line": 4112,
+      "end_line": 4279,
+      "calls": [
+        "NextBatchPlan",
+        "ScheduleBatch",
+        "chunked_req_to_exclude.add",
+        "chunked_req_to_exclude.update",
+        "converted.forward_mode.is_extend",
+        "get_spec",
+        "getattr",
+        "last_batch.batch_size",
+        "last_batch.filter_batch",
+        "last_batch.forward_mode.is_extend",
+        "last_batch.is_empty",
+        "len",
+        "list",
+        "ret.forward_mode.is_extend",
+        "running_batch.filter_batch",
+        "running_batch.is_empty",
+        "running_batch.merge_batch",
+        "scheduler_nvtx_method",
+        "self._abort_on_running_timeout",
+        "self._abort_on_waiting_timeout",
+        "self._arm_prefill_decode_interval",
+        "self._ax_backlog.note_batch",
+        "self._ax_pace",
+        "self._ax_pace_should_decode",
+        "self._ax_sched_protect_enabled",
+        "self._ax_should_decode",
+        "self._build_hisparse_decode_batch",
+        "self._should_defer_prefill",
+        "self.dllm_manager.any_staging_reqs",
+        "self.dllm_manager.filter_finished_reqs",
+        "self.dp_attn_adapter.maybe_convert_decode_to_extend",
+        "self.dp_attn_adapter.maybe_prepare_mlp_sync_batch",
+        "self.get_new_batch_dllm",
+        "self.get_new_batch_prefill",
+        "self.hisparse_coordinator.collect_ready_reqs",
+        "self.ngram_embedding_manager.prepare_for_forward",
+        "self.process_pending_chunked_abort",
+        "self.req_to_token_pool.free",
+        "self.spec_algorithm.is_none",
+        "self.stash_chunked_request",
+        "self.update_running_batch",
+        "set",
+        "set_schedule_time_batch",
+        "time.monotonic"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/scheduler.py",
+      "function": "_get_new_batch_prefill_raw",
+      "line": 4328,
+      "end_line": 4765,
+      "calls": [
+        "PrefillAdder",
+        "PrefillStats.from_adder",
+        "RuntimeError",
+        "ScheduleBatch",
+        "ScheduleBatch.init_new",
+        "adder.add_chunked_req",
+        "adder.add_one_req",
+        "adder.chunk_budget_exhausted",
+        "adder.preempt_to_schedule",
+        "all",
+        "bool",
+        "get_memory",
+        "get_schedule",
+        "getattr",
+        "hasattr",
+        "int",
+        "len",
+        "mamba_allocator.alloc_group_begin",
+        "mamba_allocator.alloc_group_end",
+        "max",
+        "min",
+        "new_batch.mix_with_running",
+        "new_batch.prepare_for_extend",
+        "prefix_results.append",
+        "req.finished",
+        "req.init_next_round_input",
+        "req.kv.mamba_pool_idx.unsqueeze",
+        "res.name.lower",
+        "running_batch.filter_batch",
+        "running_batch.is_empty",
+        "running_batch.prepare_for_decode",
+        "running_loras.add",
+        "running_loras.update",
+        "self._add_request_to_queue",
+        "self._ax_admission_cfgs",
+        "self._ax_admission_plan",
+        "self._ax_demand_cap_max",
+        "self._ax_demand_limits",
+        "self._ax_pace",
+        "self._ax_pace_limits",
+        "self._ax_prefix_admit_ready",
+        "self._ax_prefix_plan",
+        "self._ax_prefix_tracker.log",
+        "self._ax_rank0_decide",
+        "self._ax_sched_protect_limits",
+        "self._can_schedule_lora_req",
+        "self._retry_missed_storage_prefetches",
+        "self.chunked_req.init_next_round_input",
+        "self.future_map.stash_bonus_tokens",
+        "self.get_num_allocatable_reqs",
+        "self.grammar_manager.get_ready_grammar_requests",
+        "self.grammar_manager.has_waiting_grammars",
+        "self.load_inquirer._get_num_pending_tokens",
+        "self.lora_drainer.update_draining_state",
+        "self.min_free_slots_delayer.should_delay",
+        "self.policy.calc_priority",
+        "self.predict_next_chunk_size",
+        "self.req_to_token_pool.available_size",
+        "self.spec_algorithm.is_none",
+        "self.tree_cache.check_hicache_events",
+        "self.tree_cache.check_prefetch_progress",
+        "self.tree_cache.plan_staged_splice",
+        "self.tree_cache.pop_prefetch_loaded_tokens",
+        "self.tree_cache.ready_to_load_host_cache",
+        "self.tree_cache.req_to_token_pool.mamba_allocator.free",
+        "set",
+        "set_time_batch",
+        "time.perf_counter",
+        "torch.tensor"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/schedule_policy.py",
+      "function": "_update_prefill_budget",
+      "line": 947,
+      "end_line": 1003,
+      "calls": [
+        "self._swa_budget_for_req",
+        "self.ceil_paged_tokens",
+        "split_cached_prefix_by_tier"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/schedule_policy.py",
+      "function": "_ax_short_hit",
+      "line": 1125,
+      "end_line": 1131,
+      "calls": [
+        "len",
+        "req.needs_host_load_back"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/schedule_policy.py",
+      "function": "ax_complete_waiter_budget",
+      "line": 1142,
+      "end_line": 1161,
+      "calls": [
+        "int",
+        "len",
+        "min",
+        "req.needs_host_load_back",
+        "self._request_total_tokens",
+        "self.ceil_paged_tokens"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/schedule_policy.py",
+      "function": "add_chunked_req",
+      "line": 1188,
+      "end_line": 1274,
+      "calls": [
+        "ax_chunk_alignment.defer",
+        "ax_chunk_alignment.resume",
+        "int",
+        "len",
+        "min",
+        "os.environ.get",
+        "req.set_extend_range",
+        "self._get_dllm_remain_tokens",
+        "self._mamba_gap_budget_for_req",
+        "self._role_split_len",
+        "self._update_prefill_budget",
+        "self.can_run_list.append",
+        "self.prefill_delayer_single_pass.negotiate_should_allow_prefill",
+        "self.running_batch.batch_size",
+        "self.running_batch.is_empty"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/schedule_policy.py",
+      "function": "add_one_req",
+      "line": 1429,
+      "end_line": 1710,
+      "calls": [
+        "InitLoadBackParams",
+        "_role_boundary_token_ids",
+        "getattr",
+        "len",
+        "min",
+        "req.needs_host_load_back",
+        "req.set_extend_range",
+        "self._add_dllm_req",
+        "self._ax_short_hit",
+        "self._check_prefill_tile_budget",
+        "self._lock_node",
+        "self._mamba_gap_budget_for_req",
+        "self._req_inc_lock_ref",
+        "self._request_total_tokens",
+        "self._role_split_len",
+        "self._swa_budget_for_req",
+        "self._swa_chunk_cap",
+        "self._swa_new_tokens",
+        "self._swa_req_never_fits",
+        "self._update_prefill_budget",
+        "self.add_one_req_ignore_eos",
+        "self.budget_state",
+        "self.can_run_list.append",
+        "self.ceil_paged_tokens",
+        "self.prefill_delayer_single_pass.negotiate_should_allow_prefill",
+        "self.running_batch.batch_size",
+        "self.running_batch.is_empty",
+        "self.tree_cache.init_load_back",
+        "torch.cat"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_prefix_producer.py",
+      "function": "prepare",
+      "line": 194,
+      "end_line": 421,
+      "calls": [
+        "Dependency",
+        "all",
+        "ax_deadline.deadline_cold",
+        "ax_deadline.is_starved",
+        "ax_deadline.remaining_tokens",
+        "ax_deadline.service_s",
+        "ax_deadline.slack_s",
+        "bool",
+        "can_lift",
+        "can_produce",
+        "dict",
+        "effective_held.discard",
+        "enumerate",
+        "feasible.append",
+        "group_slack.get",
+        "groups.items",
+        "groups.setdefault",
+        "groups.setdefault(dep.producer, []).append",
+        "held_by.get",
+        "held_depth.get",
+        "len",
+        "list",
+        "live.get",
+        "match.reason",
+        "max",
+        "members.append",
+        "offers.append",
+        "positions.get",
+        "producer.finished",
+        "readiness.eligible",
+        "readiness.view",
+        "round",
+        "self._fallback",
+        "self._prime_shared",
+        "self._record",
+        "self._shared",
+        "self.dependencies.get",
+        "self.dependencies.items",
+        "self.dependencies.values",
+        "self.events.append",
+        "self.pairs.items",
+        "self.records.get",
+        "self.records.values",
+        "self.rows.append",
+        "self.starved",
+        "self.work.get",
+        "set",
+        "sorted",
+        "sum",
+        "tracked_ids.add",
+        "tracked_ids.update",
+        "used.add",
+        "used.update",
+        "wait_prefix.add",
+        "waited"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_prefix_producer.py",
+      "function": "should_park",
+      "line": 428,
+      "end_line": 445,
+      "calls": [
+        "ax_deadline.remaining_tokens",
+        "ax_deadline.service_s",
+        "ax_deadline.slack_s",
+        "min",
+        "self.records.get",
+        "self.starved",
+        "slack"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "deadline_cold",
+      "line": 117,
+      "end_line": 124,
+      "calls": [
+        "getattr",
+        "is_cold"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "service_s",
+      "line": 147,
+      "end_line": 149,
+      "calls": []
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "slack_s",
+      "line": 152,
+      "end_line": 154,
+      "calls": [
+        "budget_s",
+        "service_s"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "tier_order",
+      "line": 162,
+      "end_line": 193,
+      "calls": [
+        "deadline_cold",
+        "enumerate",
+        "is_starved",
+        "remaining_tokens",
+        "set",
+        "slack_s",
+        "sorted",
+        "waited_s",
+        "work.get"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "chain_risk_config",
+      "line": 236,
+      "end_line": 246,
+      "calls": [
+        "ChainRiskConfig",
+        "ValueError",
+        "_env",
+        "float",
+        "int"
+      ]
+    },
+    {
+      "file": "engine/sglang/srt/managers/ax_deadline.py",
+      "function": "chain_risk_interval",
+      "line": 249,
+      "end_line": 263,
+      "calls": [
+        "budget_s",
+        "deadline_cold",
+        "service_s"
+      ]
+    }
+  ]
+}

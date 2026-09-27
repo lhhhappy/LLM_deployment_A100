@@ -1,0 +1,103 @@
+{
+  "source": "/workspace/Agentic_science_challenge/evidence/L130ezn3-tail_n26_chainmax16k_40m/N26/server.log",
+  "configs": [
+    {
+      "line": 325,
+      "text": "[2026-09-27 20:49:51 TP0] [ax] 124 DeadlineConfig(cold_budget_s=30.0, warm_budget_s=15.0, fast_budget_s=3.0, fast_tokens=4096, warm_multi_tokens=8192, warm_multi_budget_s=15.0, cold_hit_ratio=0.5, freeze_class=True, chain_first=True, fixed_s=0.13, per_token_s=6.8e-05, load_factor=1.05, arrival_offset_s=0.4, max_wait_s=120.0, max_wait_warm_s=120.0, park_min_remaining=65536, park_max_rounds=8, park_max_s=2.0) | 125 BacklogConfig(high_s=15.0, low_s=5.0, relaxed_interval=0, cold_cap=16384, max_slow=80, max_slow_ratio=1.0, min_seen=200, gate=0.1, rate_weight=0.2) | 128 off"
+    },
+    {
+      "line": 326,
+      "text": "[2026-09-27 20:49:51 TP0] [ax] 131 chain-risk interval: ChainRiskConfig(interval=1, margin_s=8.0, min_remaining=32768, chunk=8192) (configured interval 2)"
+    }
+  ],
+  "observations": [
+    {
+      "line": 1397,
+      "matches": [
+        "biomaster:canon:lc_20260924_008:llm:0001"
+      ],
+      "decision": {
+        "epoch": 2,
+        "sequence": 108,
+        "t": 5803210.808083,
+        "plan": {
+          "version": 1,
+          "epoch": 2,
+          "sequence": 108,
+          "order": [
+            "biomaster:canon:k6PQuVDs6WfgpEV5U6nB2:llm:1",
+            "biomaster:canon:lc_20260924_008:llm:0001"
+          ],
+          "park": false,
+          "relieved": false,
+          "ready": [],
+          "preview": [],
+          "continuation": "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:4",
+          "floor": 1024,
+          "reserve_kv": 1088,
+          "wait_prefix": [],
+          "demand": false,
+          "cold_floor": 256,
+          "ordinary_reserve": 0,
+          "reserved_tokens": 0,
+          "cold_cap": 16384,
+          "queue": 2
+        },
+        "candidates": [
+          {
+            "rid": "biomaster:canon:k6PQuVDs6WfgpEV5U6nB2:llm:1",
+            "gen": 29,
+            "producer": null,
+            "target": 0,
+            "state": "ORDINARY",
+            "reason": "ordinary",
+            "device": 0,
+            "full": 0,
+            "host": 0,
+            "left": 75139,
+            "held": false,
+            "held_by": null,
+            "held_depth": 0,
+            "effective_held": false,
+            "work": null,
+            "received": 5803210.770417486,
+            "due_in": 29.963667,
+            "result": "queue_stop_chunk_budget"
+          },
+          {
+            "rid": "biomaster:canon:lc_20260924_008:llm:0001",
+            "gen": 30,
+            "producer": null,
+            "target": 0,
+            "state": "ORDINARY",
+            "reason": "ordinary",
+            "device": 33536,
+            "full": 33536,
+            "host": 0,
+            "left": 1587,
+            "held": false,
+            "held_by": null,
+            "held_depth": 0,
+            "effective_held": false,
+            "work": null,
+            "received": 5803210.770317542,
+            "due_in": 2.963567,
+            "result": "not_reached:queue_stop_chunk_budget"
+          }
+        ],
+        "discovery_bounded": true,
+        "events": [],
+        "result": [
+          [
+            "biomaster:canon:k6PQuVDs6WfgpEV5U6nB2:llm:1",
+            "queue_stop_chunk_budget"
+          ]
+        ],
+        "admitted": [
+          "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:4"
+        ]
+      }
+    }
+  ],
+  "scope": "epoch 2, bounded first-120s trace only"
+}
