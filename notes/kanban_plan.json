@@ -227,6 +227,12 @@
     "status": "已发布（130ezf 之后）"
   },
   {
+    "job": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
+    "ref": "130ezf-v3_n34_S1dcp_combo_30m",
+    "what": "S5b 候选：合并引擎 791453ca（128p + 本地续算）去掉 MTP（spec=-），其余同 130ezf。用户 09-27 判断去 MTP 的 TPOT 代价可接受、值得线上试；问题：合并引擎去 MTP 后稳态四门与 TPOT>0.10",
+    "status": "已发布（130ezg 之后）"
+  },
+  {
     "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb/130eze（130eze 因 G_EXPECT 写成 spec=none 在机制核对中止，改 spec=- 重发）",
