@@ -24,6 +24,13 @@
     "comparator": "130ezn2-tail_n26_S6_40m",
     "comparator_engine": "450e8580",
     "scope": "cross-commit screening; not same-engine OFF/ON",
+    "order_confirmation": {
+      "source": "Fable read the active worker process environment and checked its selector",
+      "locale": "LANG=LC_ALL=en_US.UTF-8",
+      "order": ["130ezn2a", "130ezn2"],
+      "reason": "Locale-sensitive ls|sort places 2a before 2-tail; queue left unchanged.",
+      "analysis": "Compare after both arms drain. Treatment-only updates describe health and mechanism observations, not comparative benefit."
+    },
     "reviewer_rationale": "Other intervening runtime changes are default-off 118/132; prior 118 OFF probe is supporting evidence for its disabled path.",
     "fallback": "Same-engine OFF script retained; enqueue if the comparison is inconclusive."
   },
