@@ -1,0 +1,898 @@
+{
+  "scope": "DIAGNOSTIC: common IDs from drained 40-minute runs; not a formal score",
+  "limitations": [
+    "Cross-commit screening pair, not same-engine OFF/ON or repeat evidence.",
+    "Raw cached_tokens does not identify the device/host cache tier at arrival.",
+    "Forward-to-first intervals include interleaving, not GPU kernel duration.",
+    "Cumulative stats cover all candidates; no per-request attribution outside trace.",
+    "Fixed-duration common-ID subset does not prove full-cohort SLO attainment."
+  ],
+  "inputs": [
+    {
+      "label": "off",
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn2-tail_n26_S6_40m/N26",
+      "raw_rows": 1547,
+      "scope": "DRAINED/DIAGNOSTIC; complete admitted window, not full cohort",
+      "inputs": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790539440.jsonl": "1039db6b267fd2569fdaddab21cd59cf6d15e7f5e19a29fd0f36aa21abb6a565",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790539440.json": "8b513c1f5a1ba3b899d732f57997ee8516a561877dd5c4eba38dc31801eabd36",
+        "server.log": "6a273cbafcb8e8077f491da460c7c94727e6002f325bcee63f33d428f10919ee",
+        "metrics.jsonl": "2f12743f43b1d7ea623e4d8dad092ec7e1f9bc0c55f37d7560b46184d283ac38",
+        "flush_evidence.json": "60fbc8e5f1a329ab6ec3f15b807087e6b611677988a31f4a76d30ea87aa79907",
+        "job.log": "e4cd850a88f835df828cb7f87987872e95db863fff9c2c1236c3aa3e6f45f024",
+        "summary.json": "19a8bd0c1fc5305f8dc063ba9174b0365b1d77a83f9200f30d578fcc4f38fda9",
+        "rundev_exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "level_verdict.json": "287df419ebe6ee707d4b35c1c24048aec35670955e0d84a06ea55f1e8cd9086d",
+        "fetch_status.json": "684dd647eedbbda3f6940e2a1ff80cb4b93628f3fc58ad87a89fcc26a49217c3"
+      },
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790539274-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790539274-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "18e8200ef19af747"
+      },
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "dispatch_origin_s": 1790539440.3577726,
+      "engine_commit": "450e8580ca63b601fa45daa3dc0bf8aaa0abaef8",
+      "mechanisms": [
+        {
+          "source_line": 327,
+          "wall_s": 1790539180.0,
+          "text": "[2026-09-27 19:59:40 TP0] [ax] mechanisms: 101=on 117=on:42_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 128p=on 131=on 140=off 180=on dcp_local=off dcp_local_max=0 dcp_local_large=0 | spec=- dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
+        }
+      ],
+      "trace_epoch": 2,
+      "trace_rounds": 227,
+      "trace_end": [
+        {
+          "source_line": 713,
+          "wall_s": 1790539316.0,
+          "text": "[2026-09-27 20:01:56 TP0] [ax-prefix-trace-end] epoch=1 sequence=3 elapsed=135.459 limits=120.0s/2048_rounds"
+        },
+        {
+          "source_line": 1730,
+          "wall_s": 1790539560.0,
+          "text": "[2026-09-27 20:06:00 TP0] [ax-prefix-trace-end] epoch=2 sequence=228 elapsed=120.459 limits=120.0s/2048_rounds"
+        }
+      ],
+      "traced_guard_observations": {},
+      "traced_guard_distinct_requests": {},
+      "last_stats_by_epoch": {
+        "1": {
+          "source_line": 999,
+          "wall_s": 1790539408.0,
+          "epoch": 1,
+          "counts": {
+            "admission_ordinary_admitted": 30,
+            "admission_ordinary_other": 26,
+            "admission_queue_stop_chunk_budget": 54,
+            "plans": 121,
+            "reserved": 0
+          }
+        },
+        "2": {
+          "source_line": 10120,
+          "wall_s": 1790541839.0,
+          "epoch": 2,
+          "counts": {
+            "admission_admitted": 3,
+            "admission_ordinary_admitted": 1544,
+            "admission_ordinary_no_token": 222,
+            "admission_ordinary_other": 1481,
+            "admission_preview_round_budget": 1,
+            "admission_queue_stop_chunk_budget": 92,
+            "admission_queue_stop_request_slots": 62,
+            "admission_wait_prefix": 37,
+            "dependency": 6,
+            "dependent_admitted": 6,
+            "fallback_hold_timeout": 3,
+            "plans": 3491,
+            "prefill_finished": 11,
+            "producer_admitted": 11,
+            "ready": 3,
+            "reserved": 3
+          }
+        }
+      },
+      "fetched_verdict": {
+        "status": "INVALID",
+        "n": 26,
+        "passed": false,
+        "reasons": [
+          "missing req_id x467",
+          "extra req_id x1292"
+        ]
+      },
+      "fetch_data_root": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+      "original_summary_scope": "fixed_duration_diagnostic"
+    },
+    {
+      "label": "on",
+      "directory": "/workspace/Agentic_science_challenge/evidence/L130ezn2a-tail_n26_S6_lpm_guard_on_40m/N26",
+      "raw_rows": 1551,
+      "scope": "DRAINED/DIAGNOSTIC; complete admitted window, not full cohort",
+      "inputs": {
+        "raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790536432.jsonl": "515bdb71e0e99ebf06abd69bcf82b8f42e47b35152a32e1e9fd196327bc2f767",
+        "run_s1-dev-longchain-v5g-tail-review-0927_N26_1790536432.json": "f3d96feb27d5ab38c5600360750057955a43dbb5913ba7750e66b4529468fbfe",
+        "server.log": "335963da669e0583d76a265854ac165418e5ddc4b6774157137822950056d101",
+        "metrics.jsonl": "648bfffcd427f681a5b15bf11e90f317329e77e98f21cb4124bf8231a740803c",
+        "flush_evidence.json": "85bb84184e8f5483fb95bcbe2b424bcaa9e66e872986280622fcce7328879d14",
+        "job.log": "79dcd9b918004a25be14cb77066a1a055fd57c89fb387cbb0d02d957971a976d",
+        "summary.json": "7746c6efc2f297998ab4edd9269370b8ef2d558ed113708ba7a4c50866df3829",
+        "rundev_exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "level_verdict.json": "97153f954a4073cfc38a3e9a1f7db501acb582381df60af9e7f926f0e62bf48c",
+        "fetch_status.json": "641381d042e47704bbbd830c932a6e0d0e3ee3aeb167419db54e5b41e944dc4b"
+      },
+      "config": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "N": 26,
+        "model": "glm-5.3-flash",
+        "seed": 20260910,
+        "instance_id": "s1-dev-longchain-v5g-tail-review-0927-1790536267-measure",
+        "cache_namespace": "s1-dev-longchain-v5g-tail-review-0927-1790536267-measure",
+        "cohort_sha256": "ff1dccae1087a798",
+        "cohort_version": "dev-roster-v1",
+        "warmup": false,
+        "prefix_warm_from_excluded": false,
+        "cohort_file": "/tmp/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927/cohort.json",
+        "pacing": "chain-total-gap-scaled-v1",
+        "chain_gap_cap_ms": 3600000,
+        "gap_rounding": "last-nonzero-remainder",
+        "workload_hash": "9d9cffd945ee6b1c",
+        "cohort_sha256_canonical": null,
+        "max_chains": null,
+        "config_hash": "eba4185b8aa449ae"
+      },
+      "warmup_plan": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+      "dispatch_origin_s": 1790536433.027054,
+      "engine_commit": "873031fdb4c975854eff63ca8b0d0a1fd2e9e762",
+      "mechanisms": [
+        {
+          "source_line": 344,
+          "wall_s": 1790536126.0,
+          "text": "[2026-09-27 19:08:46 TP0] [ax] mechanisms: 101=on 117=on:42_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 128p=on 128g=on:256 131=on 140=off 180=on dcp_local=off dcp_local_max=0 dcp_local_large=0 | spec=- dcp=1 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1"
+        }
+      ],
+      "trace_epoch": 2,
+      "trace_rounds": 229,
+      "trace_end": [
+        {
+          "source_line": 882,
+          "wall_s": 1790536309.0,
+          "text": "[2026-09-27 19:11:49 TP0] [ax-prefix-trace-end] epoch=1 sequence=3 elapsed=180.947 limits=120.0s/2048_rounds"
+        },
+        {
+          "source_line": 1901,
+          "wall_s": 1790536553.0,
+          "text": "[2026-09-27 19:15:53 TP0] [ax-prefix-trace-end] epoch=2 sequence=230 elapsed=120.518 limits=120.0s/2048_rounds"
+        }
+      ],
+      "traced_guard_observations": {
+        "keep": 495,
+        "release_zero_gain": 151
+      },
+      "traced_guard_distinct_requests": {
+        "keep": 20,
+        "release_zero_gain": 5
+      },
+      "last_stats_by_epoch": {
+        "1": {
+          "source_line": 1162,
+          "wall_s": 1790536400.0,
+          "epoch": 1,
+          "counts": {
+            "admission_ordinary_admitted": 30,
+            "admission_ordinary_other": 40,
+            "admission_queue_stop_chunk_budget": 53,
+            "lpm_hold_keep": 32,
+            "lpm_hold_release_zero_gain": 31,
+            "plans": 121,
+            "reserved": 0
+          }
+        },
+        "2": {
+          "source_line": 10166,
+          "wall_s": 1790538807.0,
+          "epoch": 2,
+          "counts": {
+            "admission_admitted": 3,
+            "admission_ordinary_admitted": 1530,
+            "admission_ordinary_no_token": 185,
+            "admission_ordinary_other": 1664,
+            "admission_queue_stop_chunk_budget": 91,
+            "admission_queue_stop_request_slots": 39,
+            "admission_wait_prefix": 44,
+            "dependency": 6,
+            "dependent_admitted": 6,
+            "fallback_hold_timeout": 3,
+            "lpm_hold_keep": 495,
+            "lpm_hold_release_zero_gain": 156,
+            "plans": 3399,
+            "prefill_finished": 11,
+            "producer_admitted": 12,
+            "ready": 3,
+            "reserved": 3
+          }
+        }
+      },
+      "fetched_verdict": {
+        "status": "INVALID",
+        "n": 26,
+        "passed": false,
+        "reasons": [
+          "missing req_id x467",
+          "extra req_id x1296"
+        ]
+      },
+      "fetch_data_root": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+      "original_summary_scope": "fixed_duration_diagnostic"
+    }
+  ],
+  "common_requests": 1542,
+  "unmatched_ids": {
+    "off": [
+      "biomaster:canon:lc_20260924_048:llm:0028",
+      "biomaster:canon:lc_20260924_048:llm:0029",
+      "biomaster:canon:lc_20260924_078:llm:0049",
+      "biomaster:canon:lc_20260924_136:llm:0013",
+      "biomaster:canon:lc_20260924_213:llm:0043"
+    ],
+    "on": [
+      "biomaster:canon:lc_20260924_031:llm:0003",
+      "biomaster:canon:lc_20260924_072:llm:0027",
+      "biomaster:canon:lc_20260924_095:llm:0004",
+      "biomaster:canon:lc_20260924_095:llm:0005",
+      "biomaster:canon:lc_20260924_106:llm:0030",
+      "biomaster:canon:lc_20260924_127:llm:0023",
+      "biomaster:canon:lc_20260924_129:llm:0004",
+      "scimaster:canon:lc_20260924_272:llm:0019",
+      "scimaster:canon:lc_20260924_291:llm:0002"
+    ]
+  },
+  "gates": {
+    "off": {
+      "fast_intra": {
+        "n": 1182,
+        "over_limit": 75,
+        "limit_s": 3.0,
+        "p95_s": 4.975176811218262
+      },
+      "overall_intra": {
+        "n": 1336,
+        "over_limit": 74,
+        "limit_s": 5.0,
+        "p95_s": 5.637943983078003
+      },
+      "turn_start": {
+        "n": 56,
+        "over_limit": 5,
+        "limit_s": 15.0,
+        "p95_s": 23.977256774902344
+      },
+      "chain_start": {
+        "n": 150,
+        "over_limit": 8,
+        "limit_s": 30.0,
+        "p95_s": 41.34426188468933
+      },
+      "tpot": {
+        "n": 1542,
+        "over_0_10": 73,
+        "mean_s": 0.05026667226663377,
+        "p95_s": 0.09689566656947136
+      }
+    },
+    "on": {
+      "fast_intra": {
+        "n": 1182,
+        "over_limit": 78,
+        "limit_s": 3.0,
+        "p95_s": 4.567615270614624
+      },
+      "overall_intra": {
+        "n": 1336,
+        "over_limit": 81,
+        "limit_s": 5.0,
+        "p95_s": 5.459644317626953
+      },
+      "turn_start": {
+        "n": 56,
+        "over_limit": 5,
+        "limit_s": 15.0,
+        "p95_s": 20.816741466522217
+      },
+      "chain_start": {
+        "n": 150,
+        "over_limit": 8,
+        "limit_s": 30.0,
+        "p95_s": 38.25624418258667
+      },
+      "tpot": {
+        "n": 1542,
+        "over_0_10": 74,
+        "mean_s": 0.04953386005644522,
+        "p95_s": 0.09511221150156632
+      }
+    }
+  },
+  "chain_swaps": [
+    {
+      "req_id": "biomaster:canon:6thoYJhAH8oJW6nmGr9Hr:llm:1",
+      "change": "fixed",
+      "phase": "intra",
+      "idx_in_chain": 0,
+      "off_prompt_tokens": 79033,
+      "off_cached_tokens": 0,
+      "off_arrival_relative_s": 1.4490180015563965,
+      "off_forward_relative_s": 50.53554940223694,
+      "off_first_relative_s": 56.709707498550415,
+      "off_ttft_s": 55.26068949699402,
+      "off_wait_to_forward_s": 49.08653140068054,
+      "off_forward_to_first_s": 6.174158096313477,
+      "on_prompt_tokens": 79033,
+      "on_cached_tokens": 0,
+      "on_arrival_relative_s": 1.518864631652832,
+      "on_forward_relative_s": 24.580557346343994,
+      "on_first_relative_s": 30.805683135986328,
+      "on_ttft_s": 29.286818504333496,
+      "on_wait_to_forward_s": 23.061692714691162,
+      "on_forward_to_first_s": 6.225125789642334
+    },
+    {
+      "req_id": "scimaster:canon:lc_20260924_307:llm:0062",
+      "change": "new_failure",
+      "phase": "context_reset",
+      "idx_in_chain": 62,
+      "off_prompt_tokens": 79915,
+      "off_cached_tokens": 78592,
+      "off_arrival_relative_s": 1314.8276784420013,
+      "off_forward_relative_s": 1320.0995614528656,
+      "off_first_relative_s": 1320.4913847446442,
+      "off_ttft_s": 5.663706302642822,
+      "off_wait_to_forward_s": 5.271883010864258,
+      "off_forward_to_first_s": 0.39182329177856445,
+      "on_prompt_tokens": 79915,
+      "on_cached_tokens": 78592,
+      "on_arrival_relative_s": 1277.094604253769,
+      "on_forward_relative_s": 1314.8506028652191,
+      "on_first_relative_s": 1315.3508484363556,
+      "on_ttft_s": 38.25624418258667,
+      "on_wait_to_forward_s": 37.755998611450195,
+      "on_forward_to_first_s": 0.5002455711364746
+    }
+  ],
+  "targets": {
+    "biomaster:canon:6thoYJhAH8oJW6nmGr9Hr:llm:1": {
+      "off": {
+        "timing": {
+          "req_id": "biomaster:canon:6thoYJhAH8oJW6nmGr9Hr:llm:1",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:55",
+          "prefix_family_id": "c04efa0384d4a46a",
+          "idx_in_chain": 0,
+          "phase": "intra",
+          "prompt_tokens": 79033,
+          "cached_tokens": 0,
+          "uncached_expected": 1584,
+          "output_tokens": 664,
+          "ttft_s": 55.26068949699402,
+          "tpot_s": 0.1371573958276219,
+          "replay_gap_ms": 750,
+          "effective_replay_gap_ms": 750,
+          "client_dispatch_at_s": 1790539441.1831615,
+          "client_finish_at_s": 1790539588.0294251,
+          "t_recv_s": 1790539441.8067906,
+          "t_exec_start_s": 1790539490.893322,
+          "t_first_token_s": 1790539497.06748,
+          "arrival_relative_s": 1.4490180015563965,
+          "forward_relative_s": 50.53554940223694,
+          "first_relative_s": 56.709707498550415,
+          "finish_relative_s": 147.6716525554657,
+          "wait_to_forward_s": 49.08653140068054,
+          "forward_to_first_s": 6.174158096313477
+        },
+        "observed_decisions": 102,
+        "effective_held_observations": 54,
+        "owner_transitions": [
+          {
+            "sequence": 4,
+            "owner": "scimaster:canon:7l9Wwl2lO9se-ZXfo7sP8:llm:0",
+            "held_depth": 58,
+            "source_line": 1099
+          },
+          {
+            "sequence": 9,
+            "owner": "biomaster:canon:member-v5-subagent-f3fc6c87545e0e2bbe03293e:llm:0",
+            "held_depth": 50,
+            "source_line": 1116
+          },
+          {
+            "sequence": 15,
+            "owner": "scimaster:canon:c371bc54-83cc-483d-8184-1bd4e9c32b69:llm:0",
+            "held_depth": 50,
+            "source_line": 1131
+          },
+          {
+            "sequence": 21,
+            "owner": "scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0",
+            "held_depth": 50,
+            "source_line": 1154
+          },
+          {
+            "sequence": 30,
+            "owner": "scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1",
+            "held_depth": 50,
+            "source_line": 1174
+          },
+          {
+            "sequence": 58,
+            "owner": null,
+            "held_depth": 0,
+            "source_line": 1243
+          }
+        ],
+        "first_unheld_sequence": 58,
+        "first_admitted_sequence": 105,
+        "stats_bracketing": [
+          {
+            "source_line": 1074,
+            "wall_s": 1790539440.0,
+            "epoch": 2,
+            "counts": {
+              "admission_ordinary_admitted": 1,
+              "plans": 1,
+              "reserved": 0
+            }
+          },
+          {
+            "source_line": 1270,
+            "wall_s": 1790539470.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 15,
+              "admission_ordinary_other": 315,
+              "admission_preview_round_budget": 1,
+              "admission_queue_stop_chunk_budget": 26,
+              "admission_wait_prefix": 37,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "plans": 66,
+              "prefill_finished": 11,
+              "producer_admitted": 11,
+              "ready": 3,
+              "reserved": 3
+            }
+          },
+          {
+            "source_line": 1418,
+            "wall_s": 1790539501.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 20,
+              "admission_ordinary_other": 361,
+              "admission_preview_round_budget": 1,
+              "admission_queue_stop_chunk_budget": 70,
+              "admission_wait_prefix": 37,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "plans": 124,
+              "prefill_finished": 11,
+              "producer_admitted": 11,
+              "ready": 3,
+              "reserved": 3
+            }
+          }
+        ],
+        "stats_delta": {
+          "admission_admitted": 3,
+          "admission_ordinary_admitted": 19,
+          "admission_ordinary_other": 361,
+          "admission_preview_round_budget": 1,
+          "admission_queue_stop_chunk_budget": 70,
+          "admission_wait_prefix": 37,
+          "dependency": 6,
+          "dependent_admitted": 6,
+          "fallback_hold_timeout": 3,
+          "plans": 123,
+          "prefill_finished": 11,
+          "producer_admitted": 11,
+          "ready": 3,
+          "reserved": 3
+        },
+        "predecessor": null,
+        "overlapping_forward_to_first_intervals": 21
+      },
+      "on": {
+        "timing": {
+          "req_id": "biomaster:canon:6thoYJhAH8oJW6nmGr9Hr:llm:1",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:55",
+          "prefix_family_id": "c04efa0384d4a46a",
+          "idx_in_chain": 0,
+          "phase": "intra",
+          "prompt_tokens": 79033,
+          "cached_tokens": 0,
+          "uncached_expected": 1584,
+          "output_tokens": 664,
+          "ttft_s": 29.286818504333496,
+          "tpot_s": 0.17607731543071176,
+          "replay_gap_ms": 750,
+          "effective_replay_gap_ms": 750,
+          "client_dispatch_at_s": 1790536433.8478947,
+          "client_finish_at_s": 1790536580.5997202,
+          "t_recv_s": 1790536434.5459187,
+          "t_exec_start_s": 1790536457.6076114,
+          "t_first_token_s": 1790536463.8327372,
+          "arrival_relative_s": 1.518864631652832,
+          "forward_relative_s": 24.580557346343994,
+          "first_relative_s": 30.805683135986328,
+          "finish_relative_s": 147.5726661682129,
+          "wait_to_forward_s": 23.061692714691162,
+          "forward_to_first_s": 6.225125789642334
+        },
+        "observed_decisions": 53,
+        "effective_held_observations": 0,
+        "owner_transitions": [
+          {
+            "sequence": 5,
+            "owner": null,
+            "held_depth": 0,
+            "source_line": 1262
+          }
+        ],
+        "first_unheld_sequence": 5,
+        "first_admitted_sequence": 57,
+        "stats_bracketing": [
+          {
+            "source_line": 1234,
+            "wall_s": 1790536433.0,
+            "epoch": 2,
+            "counts": {
+              "admission_ordinary_admitted": 1,
+              "plans": 1,
+              "reserved": 0
+            }
+          },
+          {
+            "source_line": 1442,
+            "wall_s": 1790536463.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 16,
+              "admission_ordinary_other": 331,
+              "admission_queue_stop_chunk_budget": 24,
+              "admission_wait_prefix": 44,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "lpm_hold_keep": 405,
+              "lpm_hold_release_zero_gain": 151,
+              "plans": 68,
+              "prefill_finished": 11,
+              "producer_admitted": 12,
+              "ready": 3,
+              "reserved": 3
+            }
+          }
+        ],
+        "stats_delta": {
+          "admission_admitted": 3,
+          "admission_ordinary_admitted": 15,
+          "admission_ordinary_other": 331,
+          "admission_queue_stop_chunk_budget": 24,
+          "admission_wait_prefix": 44,
+          "dependency": 6,
+          "dependent_admitted": 6,
+          "fallback_hold_timeout": 3,
+          "lpm_hold_keep": 405,
+          "lpm_hold_release_zero_gain": 151,
+          "plans": 67,
+          "prefill_finished": 11,
+          "producer_admitted": 12,
+          "ready": 3,
+          "reserved": 3
+        },
+        "predecessor": null,
+        "overlapping_forward_to_first_intervals": 17
+      }
+    },
+    "scimaster:canon:lc_20260924_307:llm:0062": {
+      "off": {
+        "timing": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0062",
+          "chain_id": "scimaster:canon:qC-a0syl9AozTV-86COCC:1",
+          "prefix_family_id": "a9a3295479e72f29",
+          "idx_in_chain": 62,
+          "phase": "context_reset",
+          "prompt_tokens": 79915,
+          "cached_tokens": 78592,
+          "uncached_expected": 1323,
+          "output_tokens": 131,
+          "ttft_s": 5.663706302642822,
+          "tpot_s": 0.026717459002079873,
+          "replay_gap_ms": 1731,
+          "effective_replay_gap_ms": 1731,
+          "client_dispatch_at_s": 1790540755.1815634,
+          "client_finish_at_s": 1790540764.3345413,
+          "t_recv_s": 1790540755.185451,
+          "t_exec_start_s": 1790540760.457334,
+          "t_first_token_s": 1790540760.8491573,
+          "arrival_relative_s": 1314.8276784420013,
+          "forward_relative_s": 1320.0995614528656,
+          "first_relative_s": 1320.4913847446442,
+          "finish_relative_s": 1323.976768732071,
+          "wait_to_forward_s": 5.271883010864258,
+          "forward_to_first_s": 0.39182329177856445
+        },
+        "observed_decisions": 0,
+        "effective_held_observations": 0,
+        "owner_transitions": [],
+        "first_unheld_sequence": null,
+        "first_admitted_sequence": null,
+        "stats_bracketing": [
+          {
+            "source_line": 6076,
+            "wall_s": 1790540735.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 844,
+              "admission_ordinary_no_token": 26,
+              "admission_ordinary_other": 673,
+              "admission_preview_round_budget": 1,
+              "admission_queue_stop_chunk_budget": 92,
+              "admission_queue_stop_request_slots": 59,
+              "admission_wait_prefix": 37,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "plans": 1843,
+              "prefill_finished": 11,
+              "producer_admitted": 11,
+              "ready": 3,
+              "reserved": 3
+            }
+          },
+          {
+            "source_line": 6188,
+            "wall_s": 1790540765.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 864,
+              "admission_ordinary_no_token": 46,
+              "admission_ordinary_other": 726,
+              "admission_preview_round_budget": 1,
+              "admission_queue_stop_chunk_budget": 92,
+              "admission_queue_stop_request_slots": 60,
+              "admission_wait_prefix": 37,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "plans": 1889,
+              "prefill_finished": 11,
+              "producer_admitted": 11,
+              "ready": 3,
+              "reserved": 3
+            }
+          }
+        ],
+        "stats_delta": {
+          "admission_admitted": 0,
+          "admission_ordinary_admitted": 20,
+          "admission_ordinary_no_token": 20,
+          "admission_ordinary_other": 53,
+          "admission_preview_round_budget": 0,
+          "admission_queue_stop_chunk_budget": 0,
+          "admission_queue_stop_request_slots": 1,
+          "admission_wait_prefix": 0,
+          "dependency": 0,
+          "dependent_admitted": 0,
+          "fallback_hold_timeout": 0,
+          "plans": 46,
+          "prefill_finished": 0,
+          "producer_admitted": 0,
+          "ready": 0,
+          "reserved": 0
+        },
+        "predecessor": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0061",
+          "chain_id": "scimaster:canon:qC-a0syl9AozTV-86COCC:1",
+          "prefix_family_id": "a9a3295479e72f29",
+          "idx_in_chain": 61,
+          "phase": "intra",
+          "prompt_tokens": 78592,
+          "cached_tokens": 76288,
+          "uncached_expected": 2075,
+          "output_tokens": 97,
+          "ttft_s": 35.73938250541687,
+          "tpot_s": 0.022842486505396664,
+          "replay_gap_ms": 4913,
+          "effective_replay_gap_ms": 4913,
+          "client_dispatch_at_s": 1790540715.4904468,
+          "client_finish_at_s": 1790540753.4325995,
+          "t_recv_s": 1790540715.49367,
+          "t_exec_start_s": 1790540750.7803094,
+          "t_first_token_s": 1790540751.2330525,
+          "arrival_relative_s": 1275.135897397995,
+          "forward_relative_s": 1310.4225368499756,
+          "first_relative_s": 1310.8752799034119,
+          "finish_relative_s": 1313.0748269557953,
+          "wait_to_forward_s": 35.28663945198059,
+          "forward_to_first_s": 0.4527430534362793
+        },
+        "overlapping_forward_to_first_intervals": 2
+      },
+      "on": {
+        "timing": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0062",
+          "chain_id": "scimaster:canon:qC-a0syl9AozTV-86COCC:1",
+          "prefix_family_id": "a9a3295479e72f29",
+          "idx_in_chain": 62,
+          "phase": "context_reset",
+          "prompt_tokens": 79915,
+          "cached_tokens": 78592,
+          "uncached_expected": 1323,
+          "output_tokens": 131,
+          "ttft_s": 38.25624418258667,
+          "tpot_s": 0.02226075348802484,
+          "replay_gap_ms": 1731,
+          "effective_replay_gap_ms": 1731,
+          "client_dispatch_at_s": 1790537710.1185749,
+          "client_finish_at_s": 1790537751.279283,
+          "t_recv_s": 1790537710.1216583,
+          "t_exec_start_s": 1790537747.877657,
+          "t_first_token_s": 1790537748.3779025,
+          "arrival_relative_s": 1277.094604253769,
+          "forward_relative_s": 1314.8506028652191,
+          "first_relative_s": 1315.3508484363556,
+          "finish_relative_s": 1318.252228975296,
+          "wait_to_forward_s": 37.755998611450195,
+          "forward_to_first_s": 0.5002455711364746
+        },
+        "observed_decisions": 0,
+        "effective_held_observations": 0,
+        "owner_transitions": [],
+        "first_unheld_sequence": null,
+        "first_admitted_sequence": null,
+        "stats_bracketing": [
+          {
+            "source_line": 6120,
+            "wall_s": 1790537695.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 837,
+              "admission_ordinary_no_token": 20,
+              "admission_ordinary_other": 606,
+              "admission_queue_stop_chunk_budget": 91,
+              "admission_queue_stop_request_slots": 7,
+              "admission_wait_prefix": 44,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "lpm_hold_keep": 495,
+              "lpm_hold_release_zero_gain": 151,
+              "plans": 1698,
+              "prefill_finished": 11,
+              "producer_admitted": 12,
+              "ready": 3,
+              "reserved": 3
+            }
+          },
+          {
+            "source_line": 6223,
+            "wall_s": 1790537727.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 843,
+              "admission_ordinary_no_token": 29,
+              "admission_ordinary_other": 736,
+              "admission_queue_stop_chunk_budget": 91,
+              "admission_queue_stop_request_slots": 28,
+              "admission_wait_prefix": 44,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "lpm_hold_keep": 495,
+              "lpm_hold_release_zero_gain": 151,
+              "plans": 1819,
+              "prefill_finished": 11,
+              "producer_admitted": 12,
+              "ready": 3,
+              "reserved": 3
+            }
+          },
+          {
+            "source_line": 6321,
+            "wall_s": 1790537758.0,
+            "epoch": 2,
+            "counts": {
+              "admission_admitted": 3,
+              "admission_ordinary_admitted": 861,
+              "admission_ordinary_no_token": 46,
+              "admission_ordinary_other": 765,
+              "admission_queue_stop_chunk_budget": 91,
+              "admission_queue_stop_request_slots": 28,
+              "admission_wait_prefix": 44,
+              "dependency": 6,
+              "dependent_admitted": 6,
+              "fallback_hold_timeout": 3,
+              "lpm_hold_keep": 495,
+              "lpm_hold_release_zero_gain": 151,
+              "plans": 1853,
+              "prefill_finished": 11,
+              "producer_admitted": 12,
+              "ready": 3,
+              "reserved": 3
+            }
+          }
+        ],
+        "stats_delta": {
+          "admission_admitted": 0,
+          "admission_ordinary_admitted": 24,
+          "admission_ordinary_no_token": 26,
+          "admission_ordinary_other": 159,
+          "admission_queue_stop_chunk_budget": 0,
+          "admission_queue_stop_request_slots": 21,
+          "admission_wait_prefix": 0,
+          "dependency": 0,
+          "dependent_admitted": 0,
+          "fallback_hold_timeout": 0,
+          "lpm_hold_keep": 0,
+          "lpm_hold_release_zero_gain": 0,
+          "plans": 155,
+          "prefill_finished": 0,
+          "producer_admitted": 0,
+          "ready": 0,
+          "reserved": 0
+        },
+        "predecessor": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0061",
+          "chain_id": "scimaster:canon:qC-a0syl9AozTV-86COCC:1",
+          "prefix_family_id": "a9a3295479e72f29",
+          "idx_in_chain": 61,
+          "phase": "intra",
+          "prompt_tokens": 78592,
+          "cached_tokens": 76288,
+          "uncached_expected": 2075,
+          "output_tokens": 97,
+          "ttft_s": 0.46101975440979004,
+          "tpot_s": 0.13512177795443372,
+          "replay_gap_ms": 4913,
+          "effective_replay_gap_ms": 4913,
+          "client_dispatch_at_s": 1790537694.9265573,
+          "client_finish_at_s": 1790537708.3701718,
+          "t_recv_s": 1790537694.9316585,
+          "t_exec_start_s": 1790537695.13809,
+          "t_first_token_s": 1790537695.3926783,
+          "arrival_relative_s": 1261.904604434967,
+          "forward_relative_s": 1262.111035823822,
+          "first_relative_s": 1262.3656241893768,
+          "finish_relative_s": 1275.3431177139282,
+          "wait_to_forward_s": 0.20643138885498047,
+          "forward_to_first_s": 0.25458836555480957
+        },
+        "overlapping_forward_to_first_intervals": 14
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # 128g 单变量探针交接
 
-2026-09-27，Codex → Fable。实现提交 `873031fd`；分支 `codex/lpm-reuse-guard-0927`。代码与归因的唯一说明见[报告](../reports/lpm-reuse-guard-0927.md)和[机制文档](../../engine/docs/128-lpm-reuse-guard.md)。原归因已复核更正；Fable 的代码独立审查已通过，TP8 效果待测，见[审查收据](../../evidence/lpm-reuse-guard-0927/fable-review.json)。运行状态由入队者在共享 `notes/queue.md` 登记。
+2026-09-27，Codex → Fable。实现提交 `873031fd`；分支 `codex/lpm-reuse-guard-0927`。**本次交接与首轮筛选已完成，chain 无净收益，暂不进候选。** 代码与逐请求归因的唯一说明见[报告](../reports/lpm-reuse-guard-0927.md)和[机制文档](../../engine/docs/128-lpm-reuse-guard.md)。原归因已复核更正；Fable 的代码独立审查已通过，见[审查收据](../../evidence/lpm-reuse-guard-0927/fable-review.json)。运行状态由入队者在共享 `notes/queue.md` 登记；以下入口保留作复现，不代表另行排队。
 
 已备好同引擎、同 S6、v5g-tail / N26 / running32 / 无 MTP / DCP1 / 40 分钟派发并排空的两个入口：
 

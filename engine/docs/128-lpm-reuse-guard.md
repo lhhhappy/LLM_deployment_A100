@@ -1,6 +1,6 @@
 # 128g：原生 LPM 暂缓须有新增可复用前缀的可能
 
-2026-09-27，Codex。默认关闭；CPU 复现与回归、Fable 独立代码审查通过，TP8 收益待测。属于 128 准入／held 协调修正，独立于 128p 的家族成本排序。
+2026-09-27，Codex。默认关闭；CPU 复现与回归、Fable 独立代码审查通过。TP8 S6 筛选已闭合，同 ID chain 8→8，暂不进入候选，详见[配对归因](../../notes/reports/lpm-reuse-guard-0927.md)。属于 128 准入／held 协调修正，独立于 128p 的家族成本排序。
 
 ## 问题与证据
 
@@ -14,7 +14,7 @@
 SGLANG_AX_LPM_REUSE_GUARD=1
 ```
 
-任务 `G_EXPECT` 加 `128g=on`；关闭臂显式设环境变量为 `0`，要求 `128g=off`。实际机制行带 `128g=on:<grid>`，例如 `on:64`；期望字符串不得写冒号。默认关闭时保持原生匹配、代表插入和 held 决策。
+任务 `G_EXPECT` 加 `128g=on`；关闭臂显式设环境变量为 `0`，要求 `128g=off`。实际机制行带 `128g=on:<grid>`；130ezn2a / S6 的实测为 `on:256`，其他配置仍须读取实际 grid，期望字符串不得写冒号。默认关闭时保持原生匹配、代表插入和 held 决策。
 
 开启后仍先执行真实缓存匹配与原生模拟树匹配。仅对原本将 held 的请求，计算保守的**新增可复用量上界**：
 
@@ -43,4 +43,4 @@ python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py
 
 新增 14 项测试执行真实 policy、RadixKey、模拟 RadixCache 和调度器/PrefillAdder；只替换 tensor 存储、物理缓存与 GPU 执行。覆盖 19k 被浅前缀压后、代表轮换、深前缀保留、64/128/256 页和非整除 checkpoint grid、logits/logprob/SWA 上限、已有 device 命中、域隔离、FORCE_MISS、关闭路径和不支持组合。原 128p 35 项与调度器 32 项也通过。调度器机制报告测试修正为读取 working tree，并加载真实 DCP token 函数，避免旧提交测试及缺失 import 掩盖机制行漂移。
 
-严格单变量实测使用同引擎 OFF/ON、同数据/cohort、同 S6 配置、同派发窗口和排空口径；除开关外不加 118、132 或块预算变化。本轮由 Fable 先排 ON 对旧 S6 的跨提交筛选，OFF 备用，比较边界见[交接](../../notes/handoffs/lpm-reuse-guard-0927.md)。观察 19k 等短冷头能否提早，真正深前缀的复用是否保住，以及其他请求的新 miss、整体 chain/turn、fast 和 TPOT 尾部。局部前置不保证净减少 chain，更不能从短测外推正式 N@SLO。
+严格单变量实测使用同引擎 OFF/ON、同数据/cohort、同 S6 配置、同派发窗口和排空口径；除开关外不加 118、132 或块预算变化。本轮由 Fable 完成 ON 对旧 S6 的跨提交筛选，OFF 备用，比较边界见[交接](../../notes/handoffs/lpm-reuse-guard-0927.md)。实测救回一个无实际缓存命中的 79k 头，但新增一个稳态 reset 超时；局部前置没有净减少 chain，不能从短测外推正式 N@SLO。稳态逐请求 trace 未覆盖该等待窗口，具体准入阻塞仍待证据。
