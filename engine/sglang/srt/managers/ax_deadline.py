@@ -50,6 +50,9 @@ class DeadlineConfig:
     # counted as warm (budget 3 s, slack -17.8), fell to the hopeless tier behind every rescuable cold head, and missed the
     # 30 s gate although only 3k tokens of work remained. The harness judges it as a chain start regardless. Default off.
     freeze_class: bool = False
+    # 132: among rescuable requests, cold ones (chain starts by the server's view) go before warm ones, each group
+    # shortest remaining work first. Off = 124's pure shortest-remaining order across classes.
+    chain_first: bool = False
     # Service estimate load * (chunks * fixed + tokens * per_token); defaults measured on run 071 with
     # 8192-token chunks (0.12-0.15 s per chunk, 66-70 us/token, loaded/pure execution p50 1.27). Other
     # chunk sizes or decode cadences need their own values.
@@ -85,6 +88,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
         warm_multi_budget_s=float(_env("SGLANG_AX_DEADLINE_WARM_MULTI_S", _env("SGLANG_AX_DEADLINE_WARM_S", "5"))),
         cold_hit_ratio=float(_env("SGLANG_AX_DEADLINE_COLD_HIT_RATIO", "0.5")),
         freeze_class=_env("SGLANG_AX_DEADLINE_FREEZE_CLASS", "0") == "1",
+        chain_first=_env("SGLANG_AX_DEADLINE_CHAIN_FIRST", "0") == "1",
         fixed_s=float(_env("SGLANG_AX_DEADLINE_FIXED_S", "0.13")),
         per_token_s=float(_env("SGLANG_AX_DEADLINE_PER_TOKEN_S", "0.000068")),
         load_factor=float(_env("SGLANG_AX_DEADLINE_LOAD", "1.27")),
@@ -172,15 +176,19 @@ def tier_order(reqs: Sequence, waited_s: Callable[[object], float], held: Set[st
     def key(item):
         index, req = item
         if req.rid in held:
-            return (3, 0.0, index)
+            return (3, 0, 0.0, index)
         waited = waited_s(req)
         if is_starved(req, waited, cfg):
-            return (0, -waited, index)
+            return (0, 0, -waited, index)
         if req.rid in family_held:
-            return (3, 0.0, index)
+            return (3, 0, 0.0, index)
         remaining = remaining_tokens(req)
         hopeless = slack_s(req, remaining, waited, chunk, cfg) < 0
-        return (2 if hopeless else 1, work.get(req.rid, remaining) if work else remaining, index)
+        # 132 (chain_first): rescuable cold requests before rescuable warm ones. The chain gate (30 s) is the
+        # binding gate online while fast/overall/turn keep 2-5x margin, so a short warm hit no longer jumps a
+        # cold head that can still make 30 s. Hopeless requests stay behind either way.
+        group = 0 if (not cfg.chain_first or hopeless or deadline_cold(req, cfg)) else 1
+        return (2 if hopeless else 1, group, work.get(req.rid, remaining) if work else remaining, index)
 
     return [req for _, req in sorted(enumerate(reqs), key=key)]
 

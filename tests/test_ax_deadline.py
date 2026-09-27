@@ -403,3 +403,29 @@ class ChainRisk(unittest.TestCase):
         with patch.dict(os.environ, {'SGLANG_AX_CHAIN_RISK_INTERVAL': '2'}):
             with self.assertRaises(ValueError):
                 ax.chain_risk_config(2)
+
+
+class ChainFirst(unittest.TestCase):
+    """132: SGLANG_AX_DEADLINE_CHAIN_FIRST puts rescuable cold requests before rescuable warm ones."""
+
+    def test_rescuable_cold_head_goes_before_a_short_warm_hit(self):
+        head = req('cold90k', 90000, matched=0)                 # chain start, ~8 s of work, waited 5 s: rescuable
+        hit = req('warm3k', 40000, matched=37000)                # 3k new tokens, 3 s budget, waited 0.5 s: rescuable
+        waited = {'cold90k': 5.0, 'warm3k': 0.5}
+        default = ax.DeadlineConfig()
+        self.assertEqual([r.rid for r in ax.tier_order([head, hit], lambda r: waited[r.rid], set(), CHUNK, default)], ['warm3k', 'cold90k'])
+        cf = ax.DeadlineConfig(chain_first=True)
+        self.assertEqual([r.rid for r in ax.tier_order([head, hit], lambda r: waited[r.rid], set(), CHUNK, cf)], ['cold90k', 'warm3k'])
+        # a hopeless cold head still goes behind the rescuable warm hit, and starvation still wins
+        late = req('cold250k', 250000, matched=0)                # ~27 s of work, waited 20 s: hopeless
+        waited['cold250k'] = 20.0
+        self.assertEqual([r.rid for r in ax.tier_order([late, hit], lambda r: waited[r.rid], set(), CHUNK, cf)], ['warm3k', 'cold250k'])
+        waited['warm3k'] = 130.0                                  # starved warm hit: first regardless
+        self.assertEqual([r.rid for r in ax.tier_order([head, hit], lambda r: waited[r.rid], set(), CHUNK, cf)][0], 'warm3k')
+
+    def test_env_default_off(self):
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1'}):
+            os.environ.pop('SGLANG_AX_DEADLINE_CHAIN_FIRST', None)
+            self.assertFalse(ax.deadline_config().chain_first)
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_CHAIN_FIRST': '1'}):
+            self.assertTrue(ax.deadline_config().chain_first)

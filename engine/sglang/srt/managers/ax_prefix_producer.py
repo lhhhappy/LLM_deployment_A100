@@ -389,16 +389,18 @@ class Tracker:
             i, req = item
             rec = self.records.get(req.rid)
             if self.starved(req, waited(req), deadline) and rec and rec.participant:
-                return 0, -waited(req), i
+                return 0, 0, -waited(req), i
             if req.rid in effective_held or req.rid in wait_prefix:
-                return 3, 0, i
+                return 3, 0, 0, i
             if ax_deadline.is_starved(req, waited(req), deadline):
-                return 0, -waited(req), i
+                return 0, 0, -waited(req), i
             left = ax_deadline.remaining_tokens(req)
             slack = (rec.due - now - deadline.arrival_offset_s - ax_deadline.service_s(left, chunk, deadline)
                      if rec and rec.participant else ax_deadline.slack_s(req, left, waited(req), chunk, deadline))
             slack = max(slack, group_slack.get(req.rid, slack))
-            return (2 if slack < 0 else 1), self.work.get(req.rid, left), i
+            # 132 chain_first (same rule as ax_deadline.tier_order): rescuable cold before rescuable warm.
+            group = 0 if (not deadline.chain_first or slack < 0 or ax_deadline.deadline_cold(req, deadline)) else 1
+            return (2 if slack < 0 else 1), group, self.work.get(req.rid, left), i
 
         ranked = [r for _, r in sorted(enumerate(waiting), key=key)]
         self.rows = []
