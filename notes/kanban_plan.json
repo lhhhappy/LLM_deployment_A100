@@ -376,7 +376,8 @@
     "job": "130ezn1-tail_n26_S1_40m",
     "ref": "130ezmb-v5g_n26_S1_40m（旧 v5g 同配置）/ 线上 46676",
     "what": "v5g-tail（Codex c9c14153，fable 复核通过：v5 + 239 条尾部 gap 延长，P50/P90 不变，P95/P99 33/245 s）上的 S1 锚点：46676 配置（f546934e，MTP，无 DCP，running 32），N26 2400 s 派发+排空。判定：本数据上 chain 的开场/稳态分布，作为后面三臂的同数据对照",
-    "status": "跑（18:20 UTC 起，DATA_READY v5g-tail）"
+    "status": "已闭合（1854 条排空，wall 2515 s）",
+    "verdict": "harness p95：chain 41.7、turn 24.8、overall 3.9、fast 2.8 s。对 ezmb（同配置、旧 v5g）同 1591 条：chain 10=10（全开场）、turn 5=5、overall 46→50、fast 43→57、TPOT>0.10 41→51、均值 31.5→39.4 ms；稳态 125 个链首样本 0 条 >30 s（10–30 s 的从 11 条变 16 条）；≥100k 冷头入批后时间相同，两条多等 3–6 s。v5g-tail 比旧 v5g 完成多 261 条（等待短），稳态仍复现不出线上的 chain 漏。它是 ezn2/ezn2a/ezn3–5 的同数据对照"
   },
   {
     "job": "130ezn2-tail_n26_S6_40m",
@@ -406,6 +407,6 @@
     "job": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
     "ref": "130ezn2-tail_n26_S6_40m（跨提交对照：450e8580 → 873031fd 只多默认关的 132/118/128g 代码，fable 已审）",
     "what": "128g（Codex 873031fd）：原生 LPM 批内前缀去优先只在“新增可复用量上界 > 0”时保留；上界 = 共享长度按消费者 logits/logprob/SWA 裁剪后向下对齐真实缓存页与 KDA checkpoint 网格（本配置 64）再减已在显存的前缀；上界为 0 的 hold 释放（仍插入模拟树给深前缀兄弟当代表）。S6 设置 + SGLANG_AX_LPM_REUSE_GUARD=1，显式 118/132/local_extend=0。判定：同 pack 短冷头（如 19k）首次入批轮次与 TTFT、chain 条数（开场/稳态、修/新）、深前缀复用是否保住、其他门与 TPOT 代价；决策日志 lpm_hold 的 keep/release 计数",
-    "status": "已入队（pending，名字序）"
+    "status": "跑（19:10 UTC 起；128g=on:256，即引擎取到的可复用网格是 256 而不是文档例子的 64；冒烟 12/12）"
   }
 ]
