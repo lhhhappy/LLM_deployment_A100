@@ -56,11 +56,10 @@ def reading(D, ids, opening_s, giant):
     return opening, steady, bins, giants
 
 def organizer_split(D, ids, opening_s):
-    """Chain-bucket items split by the organizer's phase label of the head. Online, a chain head is a
-    session_start (public: p50 18.6k, max 52k tokens) or a context reset; our cohorts also start chains at
-    public mid-chain rows (intra/turn_start segment heads, often 100k+), which online are intra/turn requests
-    with 5 s / 15 s gates. The organizer-like bucket (session_start heads + resets) is what the online chain
-    gate judges; misses on segment heads only tell how giants behave."""
+    """Chain-bucket items split by the organizer's phase label of the head. The organizer's chains are session
+    segments cut at system/tool changes, so a chain head is a session_start (p50 18.6k tokens) or a cold
+    mid-session row (intra/turn_start, p90 88k, up to 257k); the second group is where the misses are. The
+    session_start-plus-reset subset is printed as the light part of the bucket, not as the online population."""
     items = [(rid, D[rid]) for rid in ids if bucket(D[rid]) == 'chain']
     def kind(v):
         return ('head:' + str(v.get('phase'))) if v.get('idx_in_chain') == 0 else 'reset'
@@ -118,7 +117,7 @@ def main():
     for tag, D_ in (('run', A),) + ((('ref', B),) if B else ()):
         tot, miss, sop, sst = organizer_split(D_, ids, a.opening_s)
         print(f'   {tag}  chain misses by head kind {miss} of {tot}')
-        print(f'   {tag}  organizer-like bucket (session_start heads + resets): opening {sop} | steady {sst}')
+        print(f'   {tag}  light subset (session_start heads + resets): opening {sop} | steady {sst}')
 
 if __name__ == '__main__':
     main()
