@@ -390,19 +390,21 @@
     "job": "130ezn3-tail_n26_chainmax16k_40m",
     "ref": "130ezn2-tail_n26_S6_40m / 130ezn1",
     "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "跑（20:53 UTC 起；chunk 16384、CHAIN_FIRST=1、LOAD 1.05、SHORT 2048、冷块 16384 已核；冒烟 12/12）"
+    "status": "已闭合（1572 条排空，wall 2574 s）",
+    "verdict": "**harness p95 chain 24.8 s**（今晚唯一低于 30 的臂）、turn 19.7、overall 5.0、fast 4.8 s。对 ezn2（S6）同 1547 条：chain 8→6（开场 8→6，稳态 0）、turn 5=5、overall 75→70、fast 75→100、TPOT>0.10 73→65、均值 50.2→48.1 ms；稳态 10–30 s 档 11→6；249k 头入批后 19.7→17.6 s、165k 14.7→11.6。对 S1：chain 10→6。fast 的 100 条漏里 86% 是等待（中位等 4.6 s，入批后 0.4 s）：132 让暖请求排在冷头后、短命中预留 2048 让短暖请求少了保留通道"
   },
   {
     "job": "130ezn4-tail_n26_chainmax32k_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "已入队（pending，名字序）"
+    "status": "已闭合（1572 条排空，wall 2576 s）",
+    "verdict": "harness p95 chain 38.6、turn 23.1、overall 4.8、fast 4.6 s。对 ezn3（16k）同 1566 条：chain 6→8（开场 6→8）、turn 5→3、overall 70→65、fast 101→106、TPOT 65→67；大头入批后只再省 0.3–0.7 s（249k 17.6→17.1）；一条 114k 头多等 9.6 s。32k 不比 16k 好：开场多漏 2 条，块越大冷头之间互相等得越久。不采用"
   },
   {
     "job": "130ezn5-tail_n26_chainmax16k_118_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "已入队（pending，名字序）"
+    "status": "跑（22:32 UTC 起；118=on；第 7 分钟 chain 6）"
   },
   {
     "job": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
