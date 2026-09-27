@@ -272,7 +272,8 @@
     "job": "130ezm5-v4_n26_S5a_light_40m",
     "ref": "130ezm6-v4_n26_S5b_40m",
     "what": "最弱 MTP（NEXTN 1 步/2 候选）：S5b 配置的其他一切不变，v4、N26、40 分钟。用户假设：MTP 一直全开是线上差档的原因，最弱 MTP 能少打扰通道又保住 TPOT",
-    "status": "跑（14:00 UTC 起）"
+    "status": "已闭合（待 130ezm6 同 ID 配对）",
+    "verdict": "1828 条：chain 8（全开场）、turn 4、overall 46、fast 40；TPOT>0.10 69（3.8%）、均值 45.1 ms（全量 MTP 的校准 ezl 在同数据同 N 是 42–44 ms——最弱 MTP 每步便宜但每步只出 1.86 个 token，TPOT 基本持平）。稳态 chain 门 135 项：20–30 s 4 条、15–20 s 3 条、>30 s 0；252k 头入批后 25.0 s（ezl 全量 MTP 27.6 s），211k 头 22.3 s（等 7.5）。MTP 接受 1.86。KV 池 1.23M（max_total_num_tokens）"
   },
   {
     "job": "130ezm6-v4_n26_S5b_40m",
