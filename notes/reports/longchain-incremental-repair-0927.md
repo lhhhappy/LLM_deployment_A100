@@ -6,6 +6,7 @@
 结论：现有 v4/v5 可以复用正文、增量修订元数据。已经修复两个脚本的输入覆盖和发布契约问题，
 完成 v5 对照、旧 v5g 压力参照、v5g-tail 主候选，已在 GPU 开发机及 Pod 上复用正文部署。真实等待只有汇总统计，不能恢复每个请求的间隔或位置；
 补算工作量的偏差也不能通过改 `uncached_expected` 标签修好。
+Fable 已独立复核接受三套发布及 tail 规则，后续同数据对照由他编排；当前状态只看共享[实验队列](/workspace/Agentic_science_challenge/notes/queue.md)。
 
 ## 1. 审查覆盖与调用图
 
@@ -130,6 +131,14 @@ Pod 原 checker 已完成主候选的全量结构验收：311 链、5,601 请求
 结果一并放在验收收据。此检查没有运行模型、修改 harness 或启动新性能测试。
 
 ## 6. 验证与交付边界
+
+Fable 直接在 Pod 运行独立 `review_repair.py`，确认三套发布与 v4 的 ID 顺序、全部正文引用、cohort、
+产物摘要和字段差异。tail 的 239 条实际变更与规则谓词精确相等，分布在 70 条链，其中 237 条 intra、
+2 条 context_reset 前的等待；没有改 cohort 链首。审核同意作为敏感性臂使用。
+[独立原始收据](../../evidence/longchain-incremental-repair-0927/fable-review-receipt.json) 保留全部 JSON 及原文件摘要。
+其中 `changed_chain_index0=128` 指所属源会话切段编号为0，不能解释为改了128个链首；
+`changed_context_resets=0` 原字段统计非空事件ID，phase=context_reset 的正确数量见 `changed_phase`，为2。
+这两项字段解释已附在收据外层，不篡改独立原始记录，也不影响按cohort核实的非链首规则。
 
 12 项针对性回归通过：实际改写 CLI 覆盖保护、符号链接别名、父文件变动、正文/分桶字段禁改、
 gap 定位与边界、cohort 漏项/链内改序、真实 checker 对衍生数据的结构验收、缺正文拒绝、空缩放集以及只改等待尾部的边界。

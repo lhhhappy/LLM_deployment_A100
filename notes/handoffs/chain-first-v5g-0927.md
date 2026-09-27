@@ -3,6 +3,8 @@
 用户 2026-09-27 最新授权：先把数据做完，发给 Claude 独立 review，全部检查通过后开测；Codex 可随时只读监控并提建议。
 用户目标：**今晚看到一版大幅缓解 chain 的候选，不限定方案。本地 TPOT / fast 略超可以接受，优先 chain 与并发。**
 这允许探索失败的局部 SLO，不改变正式判分、不把诊断结果写成 N@SLO 通过。
+**数据交付与 Fable 独立复核已完成**，结论为可用的敏感性臂。代码 `c9c14153`，部署与实际 gap 收据 `0d411679`。
+实验由 Fable 按本交接编排；运行状态见共享[实验队列](/workspace/Agentic_science_challenge/notes/queue.md)，不在本文维护第二份状态。
 
 ## 数据已部署到两处，正文均复用
 
@@ -31,7 +33,7 @@ v5g-tail 规则：从 v5 出发，只接受“合成、非链首、原 gap >v5 �
 这保留普通等待，把部分回访拉远；**位置仍是合成的，是保守敏感性臂，不是恢复了源逐请求时间**。
 源导出已删除，用户只能提供汇总。源 P95、累计 3.5 倍等都没有被硬凑为目标。
 
-## 请先独立 review，再放新测试
+## 独立复核结果与测试边界
 
 实现分支：`codex/longchain-repair-0927`，本机 worktree：
 `/workspace/Agentic_science_challenge/build/worktrees/longchain-repair-0927`。
@@ -51,6 +53,9 @@ GPU 首次 checker 无完成报告，已由 Pod 补跑覆盖；两侧三套发�
 3. 原 `build_gap_plan` 已实际运行：v5 /tail 无链压缩，上表值即有效 gap；旧 v5g 有 1 条链压缩，
    有效链中总等待 122,275.427 秒，分位数和 >60 秒计数不变。请复核验收收据内的 `effective_gap`。
 4. 接受它作为敏感性实验，不接受“已复原正式负载”的断言。v4 的逐链合成新增量仍有明显误差，详见报告。
+
+上述各项已由 Fable 在 Pod 独立复核并 ACK，见[完整收据](../../evidence/longchain-incremental-repair-0927/fable-review-receipt.json)。
+其 `chain_index` 表示源会话切段编号，不能当作链内位置；实际未改任何 cohort 链首。
 
 补充开场口径：207 个公开切段链首本来保留非零 gap，原 harness 会等；最长 62.202 秒的头在 v4 第 26 位。
 这解释 N34 前 60 秒常只有 33 个头。不要按源统计的 head=NULL 擅自清零。
