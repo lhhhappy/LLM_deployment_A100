@@ -259,7 +259,8 @@
     "job": "130ezm-v4_n34_S1dcp_combo_nomtp_30m",
     "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
     "what": "S5b 在 v4 上 N34 30 分钟：有了来源级的改写重算，稳态链首是否超时、其他门如何",
-    "status": "已发布（130ezl 之后）"
+    "status": "已闭合",
+    "verdict": "对 130ezh（v3）同 815 条：chain 7=7、turn 0→3、overall 12→11、fast 10→8、TPOT>0.10 69→64；稳态 chain 门 64 项：20–30 s 2 条、>30 s 0；252k 大头入批后 23.1 s（v3 上 21.3）。v4 在 N34 30 分钟里稳态仍不翻线（steady_chain.py 读数）"
   },
   {
     "job": "130ezn-v3_open_S1dcp_combo_nomtp_writeback_n34",
@@ -268,10 +269,34 @@
     "status": "已发布（130ezm 之后）"
   },
   {
-    "job": "130ezo-v4_n26_S5b_40m",
+    "job": "130ezm5-v4_n26_S5a_light_40m",
+    "ref": "130ezm6-v4_n26_S5b_40m",
+    "what": "最弱 MTP（NEXTN 1 步/2 候选）：S5b 配置的其他一切不变，v4、N26、40 分钟。用户假设：MTP 一直全开是线上差档的原因，最弱 MTP 能少打扰通道又保住 TPOT",
+    "status": "跑（14:00 UTC 起）"
+  },
+  {
+    "job": "130ezm6-v4_n26_S5b_40m",
     "ref": "",
+    "what": "v4 稳态协议基线：S5b（无 MTP），引擎 450e8580（131 关），N26 40 分钟；也是 ezm5/ezr/ezp/ezq/ezs 的同 ID 参照",
+    "status": "已发布（130ezm5 之后）"
+  },
+  {
+    "job": "130ezr-v4_n26_S5a_full_40m",
+    "ref": "130ezm6-v4_n26_S5b_40m",
+    "what": "全量 MTP（3 步/4 候选，历次提交的设置）同协议，放在最弱与无 MTP 之间比较",
+    "status": "已发布（130ezq 之后）"
+  },
+  {
+    "job": "130ezs-v4_n26_S5b_wait600_40m",
+    "ref": "130ezm6-v4_n26_S5b_40m",
+    "what": "没救的冷链首不再插队：124 冷请求饥饿上限 120→600 s（暖保持 120）",
+    "status": "已发布（130ezr 之后）"
+  },
+  {
+    "job": "130ezo-v4_n26_S5b_40m",
+    "ref": "130ezm6-v4_n26_S5b_40m",
     "what": "v4 稳态协议基线：S5b 配置在带 131 的引擎 450e8580 上、131 关，N26 40 分钟窗口。判定口径：稳态 chain 门 TTFT 分布（15–20、20–30、>30 s 条数）、100k+ 链首入批后时间、TPOT>0.10、其他门",
-    "status": "已发布（130ezn 之后）"
+    "status": "撤（与 130ezm6 重复；发布者随 tmux 会话丢失，未重发）"
   },
   {
     "job": "130ezp-v4_n26_S5b_risk1_40m",
