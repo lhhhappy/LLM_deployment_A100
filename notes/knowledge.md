@@ -20,7 +20,7 @@
 
 - **v3 的 311 条链首与开发集逐条相同**（glm_tokens 差异 0 条；v3 只合成链首之后的请求，`original_requests: 722`）。本地开场的 chain 超时不是我们造数据造成的。
 - 开发集链首 glm_tokens：min 8.4k、p25 18.7k、中位 35.7k、p75 60.8k、p90 102k、max 257k；≥64k 的 69 条（22%）、≥100k 的 33 条（11%）、≥200k 的 9 条。
-- 只有 104 条链首是真正的会话冷首轮（phase=session_start、edge_type=chain-head，14–52k）；其余 207 条是**会话中段切出的链**（phase 为 intra 115、turn_start 72、context_reset 20），其中 148 条是 system/tools 变更边（`system-tools-changed`，与前一条 LCP=0，前一段即使在缓存里也复用不了）。一个会话可切成几十条链（d178f942 有 50 条、5f5b5fc16f0e43f5b26c6 有 33 条）。
+- 104 条链首是主办方标注的会话首轮（phase=session_start、edge_type=chain-head，14–52k；是标注的起点，不代表源业务里实测全冷）；其余 207 条是**会话中段切出的链**（phase 为 intra 115、turn_start 72、context_reset 20），其中 148 条是 system/tools 变更边（`system-tools-changed`，与前一条 LCP=0，前一段即使在缓存里也复用不了）。一个会话可切成几十条链（d178f942 有 50 条、5f5b5fc16f0e43f5b26c6 有 33 条）。
 - 主办方 harness（`s1-dev/harness/s1_loadgen.py` 第 250 行）把每条链的第一条请求（idx_in_chain==0）和 context_reset 都归入 chain_start（≤30 s）门，与正式压测同一套（task.md 第 322 行）。所以一条 100k–257k 的冷链首要在 30 s 内出首字，这是赛题本身的要求。
 - 正式集（341 链 / 5150 请求）是另一种切法，逐条构成未知；开发集链首的 split 字段为 hidden 178 / dev 125 / validation 8 只是公开元数据里的来源标签，不能据此断言正式集包含这些链首。线上 46677 在 N26 的 chain p95 39.1 s 而 turn/overall/fast 都很宽，与“线上链首同样又大又冷、开场堆积”一致，与“线上链首都很小”不一致。
 - 本地 N34 参照（130ez1）开场 16 条 chain 超时的构成（Codex 09-27 复核纠正，按 raw 的首次入批时间 t_exec_start_s 重算）：这 16 条从首次入批到首字只用 1.0–13.6 s（157k 那条 13.6 s，新算速率 8–12.5k tok/s），入批前的等待占 TTFT 的 91%。也就是说 65k–158k 的冷链首**单独算并不超过 30 s**；它们超时是因为排在更小的链首后面，轮到时已过 30 s。只有 ≥250k 的段首（稳态 2 条）入批后本身就要 33 s。8 条 ≥64k 大冷首 + 6 条有 16–33k 缓存的家族兄弟（128p/本地续算各修 5–7 条）+ 2 条中等。
