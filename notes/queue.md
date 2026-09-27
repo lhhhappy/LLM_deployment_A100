@@ -4,7 +4,7 @@
 
 | Job | 要回答的问题与对照 | 当前状态 |
 | --- | --- | --- |
-| 队列顺序（fable，16:40 UTC）：`130ezm7/ezm8`（118 prefill-only 同引擎 OFF/ON 开场探针，3caadef4）→ `130ezm9/ezma`（同引擎 OFF/ON 单请求剖析）→ `130ezmb/ezmc/ezmd`（v5g N26 40 分钟：S1 基线 / S1+去 MTP / S6）→ `130ezp/ezq/ezr/ezs`（v4 N26：131 两臂 / 全量 MTP / 饥饿上限 600） | 发布者 queue-after-…143624（已发 118）、…163705（等 ezma）、…163748（等 ezmd） | 已闭合：ezm（v4 N34）、ezm5/ezm6（最弱/无 MTP）、ezn（write_back，否决） |
+| 队列顺序（fable，17:25 UTC）：`130ezm9/ezma`（118 OFF/ON 单请求剖析，ezm9 在跑）→ `130ezmb/ezmc/ezmd`（v5g N26 40 分钟：S1 基线 / S1+去 MTP / S6）→ `130ezme/ezmf`（chain-max 合并臂：S6 + 132 链首优先 + 稳态冷块 16k/32k + 短命中预留 2048 + 124 成本系数 1.05，引擎 c1fa4877）→ `130ezp/ezq/ezr/ezs`（v4 N26 40 分钟：131 interval 1 / interval 0 / S5a 全 MTP / wait600）。`130ezm7/ezm8`（118 OFF/ON 开场探针）已闭合，原始数据拉取配对中。 | GPU 开发机容器 27 日多次重启（约 16:43、17:15、17:18 UTC，按 PID 1 启动时间），机上 tmux 发布者全部随之死亡（ezmb–ezmd 与 ezp–ezs 两个发布者未发布）。改为本地循环驱动 `build/queue/queue-after-20260927T171909-35680/deploy.sh`（经 gssh，断线自动重试；等 ezm9 结束后插入 pending，早停 PAUSE）；每个 tick 核对 `pread ls /tmp/ax/queue` 的 PAUSE 与 pending，发布者死则重跑。 | ezm9 在跑；其余 9 个任务待本地发布循环插入 |
 | `130ezl-v4_n26_S4_full`（第 43 分钟停，结论见 experiments/ledger）（fable） | 用户批准的 v4 校准：46758 配置整集 N26（对线上 41.1 s 的 chain p95，约 3 小时，完整判分）；随后 S5b 在 v4 上 N34 30 分钟对 130ezh | 已发布（queue-after 等 130ezk） |
 | `130ezi-v3_n38_S1dcp_combo_nomtp_30m`（fable） | S5b（合并引擎 791453ca：128p + 本地续算，去 MTP，池 3.13M）在 N38 的 30 分钟窗口：稳态池峰值/排队/驱逐、四门与 TPOT>0.10，对 130ezh（同引擎 N34） | 跑（11:10 UTC 起） |
 | `130ezj-v3_open_S1dcp_combo_nomtp_chunk16k_n34`（fable） | 单旋钮开场探针：S5b 配置把开场 prefill 块 8k→16k（--chunked-prefill-size 16384 + SGLANG_AX_BACKLOG_COLD_CAP=16384，稳态的 SCHED_COLD_CAP 6144 不变），对 130ezh 前 600 s 同 ID；看开场 chain 11 能否再少 | 发布者 queue-after-…095324 等 130ezi 结束 |
