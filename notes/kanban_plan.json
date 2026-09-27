@@ -266,7 +266,26 @@
     "job": "130ezn-v3_open_S1dcp_combo_nomtp_writeback_n34",
     "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
     "what": "单旋钮开场探针：S5b 配置把 HiCache 写策略 write_through→write_back（开场 backup 占墙钟 7–10%）",
-    "status": "已发布（130ezm 之后）"
+    "status": "已闭合",
+    "verdict": "对 130ezh 同 385 条：chain 11=11、turn 0→1、overall 6→11、fast 5→17、TPOT>0.10 71→100，600 s 内完成 354 对 378。write_back 更差（异步回写在开场反而更占资源），否决"
+  },
+  {
+    "job": "130ezmb-v5g_n26_S1_40m",
+    "ref": "线上 46676 @N26（chain 37.0、turn 5.4、overall 2.7、fast 1.9、tpot 25.2）",
+    "what": "v5g 协议（v5 长输出尾 + 主办方链时长的真实间隔）S1 基线：46676 的配置（f546934e，无 DCP，running 32，全量 MTP），N26 40 分钟",
+    "status": "已发布（130ezma 之后）"
+  },
+  {
+    "job": "130ezmc-v5g_n26_S1_nomtp_40m",
+    "ref": "130ezmb-v5g_n26_S1_40m",
+    "what": "S1 + 去 MTP（唯一改动：去掉 5 个 speculative 参数）——下一次上传的单变量候选",
+    "status": "已发布（130ezmb 之后）"
+  },
+  {
+    "job": "130ezmd-v5g_n26_S6_40m",
+    "ref": "130ezmb-v5g_n26_S1_40m",
+    "what": "S6 候选：S1 设置（无 DCP，running 32）在引擎 450e8580 上 + 去 MTP + 128p + 类别冻结 + 131 interval 1",
+    "status": "已发布（130ezmc 之后；131/MTP 四臂改到它之后）"
   },
   {
     "job": "130ezm5-v4_n26_S5a_light_40m",

@@ -1,0 +1,44 @@
+{
+ "generator": "regap-v1",
+ "set": "s1-dev-longchain-v5g",
+ "parent_set": "s1-dev-longchain-v4",
+ "parent_requests_sha256": "22917b5926f85a1c8ee38899be836c39579d50b090c87507ef77b5256e022855",
+ "parent_cohort_sha256": "ff1dccae1087a798",
+ "organizer_chains_sha256": "48d30c359099f9a6fc26cc68c5b5aabf927ba5de8d0fe4aea6463cb57c213e3f",
+ "rule": {
+  "ttft_s": 1.5,
+  "tpot_s": 0.03,
+  "gap_cap_s": 310.0,
+  "chain_cap_s": 3600.0,
+  "allow_scale_down": false,
+  "redistribute": false
+ },
+ "chains": 311,
+ "changed": 138,
+ "unchanged": {
+  "no_duration": 0,
+  "single": 48,
+  "no_imputed": 18,
+  "would_scale_down": 107
+ },
+ "chains_over_harness_cap": 14,
+ "gaps_capped": 58,
+ "factor": {
+  "median": 5.311484167584018,
+  "p90": 57.47373649969555,
+  "max": 1022.751968503937
+ },
+ "chain_gap_seconds": {
+  "before_mean": 113.59195817490495,
+  "after_mean": 464.9383891846318,
+  "organizer_duration_mean": 2232.2321482889733
+ },
+ "requests_sha256": "cfb58cd24adac24add334c5a7b7278e13c67ec171542558899d052f50870dc80",
+ "cohort_sha256": "ff1dccae1087a798",
+ "per_request_gap_s": {
+  "median": 6.946,
+  "mean": 22.34795615790431,
+  "p90": 49.125,
+  "max": 310.0
+ }
+}
