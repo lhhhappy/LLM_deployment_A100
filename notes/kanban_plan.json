@@ -238,7 +238,8 @@
     "job": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
     "ref": "130ezf-v3_n34_S1dcp_combo_30m",
     "what": "S5b 候选：合并引擎 791453ca（128p + 本地续算）去掉 MTP（spec=-），其余同 130ezf。用户 09-27 判断去 MTP 的 TPOT 代价可接受、值得线上试；问题：合并引擎去 MTP 后稳态四门与 TPOT>0.10",
-    "status": "已发布（130ezg 之后）"
+    "status": "已闭合",
+    "verdict": "同 1362 条对 130ezf（同引擎有 MTP）：chain 11=11、turn 1→2、overall 45→19（修 37 新 11）、fast 39→20（修 34 新 15）；TPOT>0.10 70→104（7.6%），稳态（第 600 s 后 915 条）均值 42→54 ms、p95 66→86 ms、超 0.10 的 4→25（2.7%）；1800 s 内完成 1361→1331（−2%）。对 130ez1（46757 配置）：chain 16→11、turn 2=2、overall 38→19、fast 42→20、TPOT>0.10 74→104。冒烟 12/12（平均输出 1616 token）。结论：S5b = 合并引擎去 MTP 在本地四门上全面优于 46757 配置（chain −5、overall/fast 减半、turn 持平），代价只有 TPOT；线上负载轻，TPOT 估 40–45 ms。作为 S5 去 MTP 臂成立"
   },
   {
     "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
