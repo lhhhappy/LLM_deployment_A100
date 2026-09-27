@@ -9,7 +9,11 @@ Default off. Two mutually exclusive modes use the existing numerical kernel in
   target verify, draft-extend-v2, mixed mode and decode retain their existing kernels. Ordinary draft-model
   EXTEND, if used, has the same full-KV contract and is included.
 
-The prefill-only integration is a **single-GPU-validated candidate as of 2026-09-27; TP8 is pending**.
+The prefill-only integration has **single-GPU numerical checks and a TP8 OFF/ON probe as of 2026-09-27**.
+Fable's TP8 profile shows the target 8k block at 588.3→540.7 ms and the 16k block at
+1084.9→989.2 ms. Codex independently checked the two rank ledgers and paired raw records:
+chain misses remain 11→11 on 446 common requests (one fixed, one new).
+The kernels are not bitwise equal; real-model logits or generated-sequence equality is not established.
 The current suite passes 15 tests, and all nine contiguous full-KV cost cases pass the fp32 reference checks
 with no post-warmup Triton loads. At 8192 query rows, measured attention speedups range from 1.32× at 262k
 context to 1.99× for the first chunk. These are synthetic operator results without DCP collectives or real

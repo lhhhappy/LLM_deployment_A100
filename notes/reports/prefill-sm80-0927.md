@@ -1,6 +1,7 @@
 # Prefill 执行层：118 的 DCP 普通续算入口
 
-2026-09-27，Codex。状态：候选实现、CPU 合同和单卡 GPU 矩阵完成，TP8 待测。
+2026-09-27，Codex。状态：候选实现、CPU 合同、单卡 GPU 矩阵和 Fable 的 TP8 OFF/ON 探针完成；
+本轮独立复核原始 raw 与 Pod 成本账本。算子误差验证通过，未证明真实权重全模型逐位或逐 token 相等。
 Fable 独立审查未发现引擎代码缺陷；其指出的任务模板、范围表述和 CPU 测试覆盖问题已在本报告修正。
 分支 `codex/prefill-sm80-0927`，基于组合引擎 `791453ca` 的独立 worktree。当前未改准入、排序、缓存或队列。
 
@@ -138,6 +139,47 @@ forward，不把 draft 平均进去。再用同数据、同派发窗口的开场
 负载验证还须区分源会话起点与回放链首；用户新提供的是源业务历史缓存统计，不是正式运行缓存。
 参见 [链首来源核实](chain-origin-audit-0927.md)。本候选按执行阶段生效，稳态普通 prefill 同样覆盖，
 不依赖开场计时、固定请求 ID 或源会话标签。
+
+## TP8 闭合与独立复核（17:35 UTC 之后）
+
+Fable 完成 `130ezm7/m8` 同引擎 OFF/ON 开场、`130ezm9/ma` 带 MTP 单请求剖析。
+Codex 直接读取两侧 raw、flush/runner 收据和 Pod `tp8_8k` /`tp8_16k` 的 rank0/rank1 账本复核。
+完整实验状态归[共享实验记录](/workspace/Agentic_science_challenge/notes/experiments.md)，这里补充数值证据与反例。
+
+单请求目标模型 8k 完整块（5 块）rank0 GPU 均值 **588.3→540.7 ms，−8.1%**，草稿26.8→22.6 ms。
+16k 块（3 块，平均16,381 tokens）**1,084.9→989.2 ms，−8.8%**，草稿50.1→42.0 ms。
+rank1 对应均值为588.2→540.7 ms、1,084.9→989.1 ms。账本在
+`/tmp/ax/runs/130ezm{9,a}-tp8_prefill_profile_118{off,prefill}/tp8_{8k,16k}/ledger-rank0-rank1.txt`。
+这是单请求实测，不证明16k在混合负载更优：16k的单块占用也接近1秒，短请求与decode须另外算账。
+
+开场600秒派发后，两臂分别排空446/464条，共同446个ID无重复或请求错误、flush成功，冻结字段相同。
+共同ID的chain为11→11（修1、新增1），turn 0→0、overall 6→4、fast 7→4、TPOT>0.10为79→72。
+chain p95为67.97→63.02秒；这是开发集窗口，不能写成完整档成绩。
+
+不能仅凭“chain总数不变”把剩余全部归为大头的固有算量：
+
+| 跨门请求 | prompt /cache OFF→ON | TTFT OFF→ON | recv→首次forward | 首次forward→首token |
+|---|---|---|---|---|
+| 新增坏例 `scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0` | 19,335 /0→0 | 25.420→32.255 s | 23.430→30.401 s | 1.991→1.855 s |
+| 修复 `biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:1` | 60,848 /16,640→18,176 | 30.811→27.048 s | 26.924→23.500 s | 3.887→3.547 s |
+
+两臂11条超时里各10条在首次forward前已经超过30秒。前者的计算变快，等待却变长；后者还混有缓存差异。
+所以118已有执行成本收益，但跨门变化不能全部归因kernel；需要服务层追查剩余工作、held/READY、
+活动chunked owner及每轮获选/让位原因。这些raw不能单独证明某个调度bug，也不能证明更换排序一定净救多少条。
+建议针对运行时可见状态保护仍可完成的请求，不按这些ID或正式隐藏标签写策略；所有请求仍须最终完成。
+
+**数值核对结果已经发给Fable：非bitwise。** 单卡原日志14个数值形状的fp32界限为
+`abs(error) <= 2^-8 * (abs(ref) + row_max_abs_KV)`，Triton和TileLang最坏误差/界限均为0.3664。
+两核第一块最大差0.00390625，peaky例0.0078125，其余可比较例不超过0.001953125。
+9个完整KV成本形状各核128–134个含边界参考行：冷8k ON/OFF对fp32最大误差0.0038791/0.0042545，
+其余8例ON最大误差≤0.0010387，9例ON平均误差均低于OFF。掩码错位和索引错位负例被捕获。
+这些覆盖不等同于TP8真实模型logits一致；冒烟12/12也不补足这个断言。
+
+复算脚本 [audit_118_tp8.py](../../scripts/analysis/audit_118_tp8.py)，
+[逐chain配对](../../evidence/prefill-sm80-0927/tp8-review/paired-chain.csv)，
+[数值明细与raw收据](../../evidence/prefill-sm80-0927/tp8-review/summary.json)。
+使用 `--repo /workspace/Agentic_science_challenge --out <新目录>` 复现，原始文件不改写。
+本轮没有未结束的113探针；此前113矩阵已完成，不需因开发机重启重跑已闭合测量。
 
 ## mHC post 探索：本轮不推进生产改动
 
