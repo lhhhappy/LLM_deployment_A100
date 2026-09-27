@@ -433,15 +433,15 @@
     "status": "已发布（ezn6 之后）"
   },
   {
-    "job": "130ezn9-tail_n30_S1_40m",
+    "job": "130ezn9-tail_rot150_n30_S1_40m",
     "ref": "线上 46676 的 N30 失败档（chain p95 未公布、仅知失败）",
-    "what": "S1（线上配置）在 N30 的锚点：开场 30 个头的漏数、稳态碰撞（到达时有 ≥50k 在算的链首数与等待）、tpot>0.10 占比、fast 余量",
+    "what": "S1（线上配置）在 N30、**旋转 cohort（rot150）**上的锚点：稳态巨型链首在窗口内出现；看开场 30 头漏数、稳态碰撞（到达时有 ≥50k 在算的链首数与等待）、tpot>0.10 占比、fast 余量",
     "status": "已发布（ezn8 之后）"
   },
   {
-    "job": "130ezna-tail_n30_chainmax16k_mamba400_40m",
-    "ref": "130ezn9-tail_n30_S1_40m（同 ID）",
-    "what": "上传候选在 N30：对 S1 同 ID 看三样——fast 是否在余量内、稳态 TPOT>0.10 是否远离 5%（p95 门无余量）、链首漏对 S1 的变化；决定明天上传的配置",
+    "job": "130ezna-tail_rot150_n30_chainmax16k_mamba400_40m",
+    "ref": "130ezn9-tail_rot150_n30_S1_40m（同 ID）",
+    "what": "上传候选（chain-max 16k + KDA 池钉 400）在 N30、rot150 上：对 S1 同 ID 看 fast 是否在余量内、稳态 TPOT>0.10 是否远离 5%、链首漏对 S1 的变化",
     "status": "已发布（ezn9 之后）"
   }
 ]

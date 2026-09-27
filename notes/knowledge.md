@@ -63,3 +63,9 @@
 - 用 `chains.jsonl` 的 `first_dispatch_offset_ms` 逐链对照 `requests.jsonl`：311 条链里 258 条的公开首行就是主办方链的第一条请求；这 258 个链首相位 session_start 104 / intra 82 / turn_start 72，`edge_type` chain-head 104 / system-tools-changed 148 / compact-rebuild 6，prompt p50 35k、p90 88k、p95 122k、max 257k，252/258 全未命中。207 条完整链根本没有 session_start。主办方是在系统提示/工具变化处把会话切成链，task.md 的"prompt 常达十万 token 级、结构性零缓存命中"是字面成立的。
 - 公开集是链前缀抽样；53 条链的首行未公开，我们的生成器补的头偏重（cohort 里 ≥100k 的链首 31 条，公开可核的 258 个里 17 条）。除此之外本地 chain 桶的人群与主办方一致，09-27 的 chain 结果有效。
 - 链中边：append-only 441/722（可命中）、system-tools-changed 148（链内整段重算 40k–257k）、unexplained-break 23、compact-rebuild 6；context_reset prompt 68k–230k、缓存在时未命中约 2k。
+
+## 数据集 v5g-tail-rot150（2026-09-28，fable；只改 cohort 顺序）
+- 位置：Pod `/tmp/ax/codex/data/s1-dev-longchain-v5g-tail-rot150`（实路径 /dev/shm/arena-runtime/ax/codex/data/…；requests/chains/bodies 软链到 v5g-tail-review-0927），cohort sha `b78593bdea138f58`，requests sha 6170fd82… 不变；cohort.json 的 `derivation` 记父集与规则。
+- 规则：父集 cohort 的 311 条链整体旋转 150 位（chains[150:]+chains[:150]），请求、正文、链内顺序全部不动。用途：父集顺序下 40 分钟窗口只启动约 121 条链，50 个巨型链首里 37 个从未跑到；旋转后这些链首在窗口内先出现，稳态碰撞可以被量到。用户 09-28 的要求："更改一下排序，40min 内优先看这个"。
+- 边界：开场那批链首换成了另一批，只能与同数据的锚点比；链深处的巨型 intra 仍要更长窗口才到。
+
