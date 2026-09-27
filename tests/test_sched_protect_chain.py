@@ -706,7 +706,7 @@ class HiCacheTierTests(unittest.TestCase):
         # 118's state comes from the DSA backend module when a DSA backend imported it: its production function
         # over the module switch and the flag a backend sets after validating and warming up the kernel.
         dsa = ModuleType('sglang.srt.layers.attention.dsa_backend')
-        dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_ax118_engaged': False}
+        dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_AX_DSA_SPARSE_TRITON_PREFILL': False, '_ax118_engaged': False}
         compile_nodes(TREE_180 / 'srt/layers/attention/dsa_backend.py', {'ax118_state'}, dsa_ns)
         dsa.ax118_state = dsa_ns['ax118_state']
         mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy,
