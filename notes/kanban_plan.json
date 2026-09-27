@@ -211,12 +211,25 @@
     "job": "130ezd5-v3_open_S1dcp_profile_n34",
     "ref": "",
     "what": "诊断：负载下开场剖析。46757 引擎（6976639e，本地续算关），N34 开场 300 s，队列首次 ≥20 后 8 s 起全卡 torch profiler 20 s；prof_ledger 拆 extend/decode/outside 与内核类别。问题：负载下 8k 块 0.57 s 对单请求 0.31 s，多出来的去哪了。不看门",
-    "status": "已发布（130ezd 之后、130eze 之前）"
+    "status": "已闭合（诊断）",
+    "verdict": "问题本身作废（Codex 纠正）：单请求的 0.31 s 是目标+草稿两个 span 的平均，真实单请求 8k 块 = 目标 592 ms + 草稿 27 ms（72 µs/token，13.1k tok/s）。负载下开场第 8–28 s：目标 8k 块 584 ms（71 µs/token）与单请求相同；窗口内 98.7% 在 prefill、decode 0%、步间空隙 1.3%。小块很贵：880 token 的块 218 ms（248 µs/token，40% 无内核空隙），5k 块 420 ms——每块约 150–200 ms 固定成本。内核分布同单请求：DSA/indexer 22%、MoE 25%、all-reduce 12%、mHC 14%、GEMM 10%、Marlin 5%、KDA 4%。结论：负载不拖慢 prefill；开场产能 13–14k tok/s = 内核效率（约 18% MFU），只能靠内核工作和减少小块提高"
   },
   {
-    "job": "130eze-v3_n34_S1dcp_w2_nomtp_30m",
+    "job": "130ezf-v3_n34_S1dcp_combo_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
-    "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb，改排到 prefill 剖析之后",
+    "what": "S5 候选：合并引擎 791453ca（128p + 本地续算都开）、S1 设置 + dcp 2、N34、30 分钟窗口。问题：两机制在稳态的表现（turn/overall/fast、TPOT>0.10、host 命中）",
+    "status": "已发布（130eze2 之后）"
+  },
+  {
+    "job": "130ezg-v3_open_S1dcp_combo_on_n38",
+    "ref": "",
+    "what": "N38 开场探针：合并引擎 791453ca（128p + 本地续算都开）、S1 + dcp 2、600 s。问题：38 个开场链首里几条超 30 s（按 N34 探针与链首分布估 14–16）",
+    "status": "已发布（130ezf 之后）"
+  },
+  {
+    "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb/130eze（130eze 因 G_EXPECT 写成 spec=none 在机制核对中止，改 spec=- 重发）",
     "status": "已发布"
   }
 ]
