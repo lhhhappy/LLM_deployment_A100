@@ -41,6 +41,6 @@ while :; do
   sleep 120
 done
 DEPLOY
-tar cf - "$bundle" scripts/pod | GSSH_TIMEOUT=120 scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
+tar cf - "$bundle" scripts/pod | GSSH_TIMEOUT=${QPUSH_TAR_TIMEOUT:-120} scripts/gssh 'tar xf - -C /sjtu/linhang/arena/repo'
 scripts/gjob run "$id" "cd /sjtu/linhang/arena/repo && bash $bundle/deploy.sh"
 echo "DEPLOYMENT_JOB=$id (gjob tail; waits for '$wait_for' in done/failed and an empty queue, then publishes and resumes)"
