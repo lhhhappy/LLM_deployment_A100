@@ -207,6 +207,12 @@
     "status": "已发布"
   },
   {
+    "job": "130ezd5-v3_open_S1dcp_profile_n34",
+    "ref": "",
+    "what": "诊断：负载下开场剖析。46757 引擎（6976639e，本地续算关），N34 开场 300 s，队列首次 ≥20 后 8 s 起全卡 torch profiler 20 s；prof_ledger 拆 extend/decode/outside 与内核类别。问题：负载下 8k 块 0.57 s 对单请求 0.31 s，多出来的去哪了。不看门",
+    "status": "已发布（130ezd 之后、130eze 之前）"
+  },
+  {
     "job": "130eze-v3_n34_S1dcp_w2_nomtp_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb，改排到 prefill 剖析之后",
