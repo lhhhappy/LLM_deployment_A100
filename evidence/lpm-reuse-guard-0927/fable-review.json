@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-27",
+  "reviewer": "fable",
+  "source": "user-authorized peer message in this conversation",
+  "engine_commit": "873031fd",
+  "verdict": "CODE_REVIEW_PASS; TP8 performance not yet measured",
+  "reviewed": [
+    "Default-off preserves the previous scheduling path; the mechanism report adds 128g=off.",
+    "Enabled behavior changes only native would-hold requests with zero possible new reusable gain.",
+    "Released requests are still inserted into the simulated radix tree.",
+    "128p family cost sorting, 132 and parking remain unchanged.",
+    "Consumer/cache methods referenced by the guard exist on deployed Req and UnifiedRadixCache.",
+    "Bigram radix trees are rejected when enabled; this deployment builds them for EAGLE MTP.",
+    "Reviewer reports all four CPU groups passed: guard, prefix producer, scheduler and deadline."
+  ],
+  "remaining_validation": [
+    "Observe the deployed KV/KDA checkpoint contract and actual runtime grid.",
+    "Measure host overhead from more simulated-tree representatives.",
+    "Measure net chain misses, newly late requests and tradeoffs on TP8."
+  ],
+  "initial_experiment": {
+    "treatment": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
+    "treatment_engine": "873031fd",
+    "comparator": "130ezn2-tail_n26_S6_40m",
+    "comparator_engine": "450e8580",
+    "scope": "cross-commit screening; not same-engine OFF/ON",
+    "reviewer_rationale": "Other intervening runtime changes are default-off 118/132; prior 118 OFF probe is supporting evidence for its disabled path.",
+    "fallback": "Same-engine OFF script retained; enqueue if the comparison is inconclusive."
+  },
+  "task_preflight_correction": {
+    "commit": "57cccc85",
+    "change": "Fable confirmed and corrected dcp_local_max expected 512 to 0 in his S6-derived tasks and repackaged them."
+  }
+}

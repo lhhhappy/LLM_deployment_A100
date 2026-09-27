@@ -1,6 +1,6 @@
 # 19k 冷头的原生浅前缀暂缓：归因修正与 128g
 
-2026-09-27，Codex。原日志归因已获 Fable 独立复核，他在 `89a35f40` 撤回原“128p 家族折算”解释；本补丁代码独立审查与 TP8 效果待验。独立分支 `codex/lpm-reuse-guard-0927`，底 `cfd25d0f`。
+2026-09-27，Codex。原日志归因已获 Fable 独立复核，他在 `89a35f40` 撤回原“128p 家族折算”解释；本补丁 `873031fd` 的代码独立审查也已通过，[收据](../../evidence/lpm-reuse-guard-0927/fable-review.json)记录范围与残余风险，TP8 效果待验。独立分支 `codex/lpm-reuse-guard-0927`，底 `cfd25d0f`。
 
 ## 已证实的等待路径
 
@@ -40,6 +40,8 @@ ON 原日志的 epoch 2：
 [机制说明](../../engine/docs/128-lpm-reuse-guard.md)给出开关、边界和日志。补丁只排除新增可复用量上界为零的原生暂缓；正上界不等于 READY，也不改变 128p 家族评分。单变量臂为 S6 + `SGLANG_AX_LPM_REUSE_GUARD=1`，要求 `128g=on`，同引擎控制臂显式置零。
 
 CPU 新增 14 项、128p 35 项、原调度器 32 项均通过；核心复现运行生产策略、真实 RadixKey/模拟树和真实调度器/PrefillAdder，OFF 先选大头，ON 先选 19k，同时保留真正深前缀的兄弟依赖。没有新增 GPU 分配，临时模拟树 CPU 开销及最终净 chain 收益待 TP8。
+
+Fable 另行审查并报告 guard、128p、调度和 deadline 四组测试通过。8 卡首轮采用 ON `130ezn2a` 对 S6 `130ezn2` 的跨提交筛选；严格同引擎 OFF 入口仍保留。选择与比较边界见[交接](../handoffs/lpm-reuse-guard-0927.md)，运行状态只在共享队列维护。
 
 ## 可复算证据
 

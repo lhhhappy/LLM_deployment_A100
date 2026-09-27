@@ -1,6 +1,6 @@
 # 128g：原生 LPM 暂缓须有新增可复用前缀的可能
 
-2026-09-27，Codex。默认关闭；CPU 复现与回归通过，TP8 收益待测。属于 128 准入／held 协调修正，独立于 128p 的家族成本排序。
+2026-09-27，Codex。默认关闭；CPU 复现与回归、Fable 独立代码审查通过，TP8 收益待测。属于 128 准入／held 协调修正，独立于 128p 的家族成本排序。
 
 ## 问题与证据
 
@@ -25,7 +25,7 @@ SGLANG_AX_LPM_REUSE_GUARD=1
 
 上界大于零仍使用原来的 held，不声称缓存已经 READY；128p 的 READY 仍必须来自真实 KV/KDA validator。被释放的请求照常插入模拟树，使其真正的深前缀兄弟仍能找到代表。缓存域 `extra_key/cache_salt` 继续由原生 RadixKey 隔离。
 
-开关要求启用缓存的 LPM，且原生 in-batch check 未关闭；不支持 bigram radix tree 时启动报错。队列超过 128 时保留原生临时 FCFS 回退。此机制不新增 deadline、超时计数或请求身份规则，不改变 124/132 或 128p 家族评分，也不改 KDA/页分配、停车预算和一个 partial 的约束。
+开关要求启用缓存的 LPM，且原生 in-batch check 未关闭；bigram radix tree 在开启时报错。部署的 `kv_cache_builder` 使用 `spec_algorithm.is_eagle()` 设置 `is_eagle`，因此当前补丁不能与 EAGLE MTP 同开；本轮 S6 无 MTP。队列超过 128 时保留原生临时 FCFS 回退。此机制不新增 deadline、超时计数或请求身份规则，不改变 124/132 或 128p 家族评分，也不改 KDA/页分配、停车预算和一个 partial 的约束。
 
 ## 日志、资源与验证
 
@@ -43,4 +43,4 @@ python3 -B -m unittest discover -s tests -p test_sched_protect_chain.py
 
 新增 14 项测试执行真实 policy、RadixKey、模拟 RadixCache 和调度器/PrefillAdder；只替换 tensor 存储、物理缓存与 GPU 执行。覆盖 19k 被浅前缀压后、代表轮换、深前缀保留、64/128/256 页和非整除 checkpoint grid、logits/logprob/SWA 上限、已有 device 命中、域隔离、FORCE_MISS、关闭路径和不支持组合。原 128p 35 项与调度器 32 项也通过。调度器机制报告测试修正为读取 working tree，并加载真实 DCP token 函数，避免旧提交测试及缺失 import 掩盖机制行漂移。
 
-8 卡必须同引擎 OFF/ON、同数据/cohort、同 S6 配置、同派发窗口和排空口径；除开关外不加 118、132 或块预算变化。观察 19k 等短冷头能否提早，真正深前缀的复用是否保住，以及其他请求的新 miss、整体 chain/turn、fast 和 TPOT 尾部。局部前置不保证净减少 chain，更不能从短测外推正式 N@SLO。
+严格单变量实测使用同引擎 OFF/ON、同数据/cohort、同 S6 配置、同派发窗口和排空口径；除开关外不加 118、132 或块预算变化。本轮由 Fable 先排 ON 对旧 S6 的跨提交筛选，OFF 备用，比较边界见[交接](../../notes/handoffs/lpm-reuse-guard-0927.md)。观察 19k 等短冷头能否提早，真正深前缀的复用是否保住，以及其他请求的新 miss、整体 chain/turn、fast 和 TPOT 尾部。局部前置不保证净减少 chain，更不能从短测外推正式 N@SLO。
