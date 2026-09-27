@@ -262,6 +262,30 @@
     "status": "已发布（130ezl 之后）"
   },
   {
+    "job": "130ezn-v3_open_S1dcp_combo_nomtp_writeback_n34",
+    "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
+    "what": "单旋钮开场探针：S5b 配置把 HiCache 写策略 write_through→write_back（开场 backup 占墙钟 7–10%）",
+    "status": "已发布（130ezm 之后）"
+  },
+  {
+    "job": "130ezo-v4_n26_S5b_40m",
+    "ref": "",
+    "what": "v4 稳态协议基线：S5b 配置在带 131 的引擎 450e8580 上、131 关，N26 40 分钟窗口。判定口径：稳态 chain 门 TTFT 分布（15–20、20–30、>30 s 条数）、100k+ 链首入批后时间、TPOT>0.10、其他门",
+    "status": "已发布（130ezn 之后）"
+  },
+  {
+    "job": "130ezp-v4_n26_S5b_risk1_40m",
+    "ref": "130ezo-v4_n26_S5b_40m",
+    "what": "131 链首风险期少插 decode：interval 1（风险期每块后 1 轮 decode 而非 2）",
+    "status": "已发布（130ezo 之后）"
+  },
+  {
+    "job": "130ezq-v4_n26_S5b_risk0_40m",
+    "ref": "130ezo-v4_n26_S5b_40m",
+    "what": "131 interval 0（风险期不插 decode）：看大头入批后时间的最大收益与 TPOT>0.10 的代价",
+    "status": "已发布（130ezp 之后）"
+  },
+  {
     "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb/130eze（130eze 因 G_EXPECT 写成 spec=none 在机制核对中止，改 spec=- 重发）",
