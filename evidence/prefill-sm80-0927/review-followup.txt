@@ -1,0 +1,6 @@
+CPU routing suite: 3 tests PASS; 24 subtests + 8 wrapper cases = 32 configurations
+NEGATIVE CONTROL: real LSE gate forced to False; 6 route assertions caught the defect
+NEGATIVE CONTROL: real LSE gate forced to True; 8 route assertions caught the defect
+ACTUAL TEMPLATE LOOP: G_EXPECT=118=on log=118=on:prefill exit=0
+ACTUAL TEMPLATE LOOP: G_EXPECT=118=on:prefill log=118=on:prefill exit=2 MECHANISMS INVALID expectation=118=on:prefill
+ACTUAL TEMPLATE LOOP: G_EXPECT=118=off log=118=on:prefill exit=2 MECHANISMS MISMATCH 118 expected=off got=on:prefill
