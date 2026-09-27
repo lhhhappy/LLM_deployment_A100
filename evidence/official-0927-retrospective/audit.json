@@ -1,0 +1,1680 @@
+{
+  "scope": "official returned levels plus local DRAINED diagnostics; no inferred failing-level verdict",
+  "input_root": "/workspace/Agentic_science_challenge",
+  "official": {
+    "46677": {
+      "source": "evidence/official/attempt-46677-20260927.json",
+      "updated_at": "2026-09-27T01:15:00+00:00",
+      "capability": {
+        "aime26": 0.9772727272727273,
+        "gpqa-diamond": 0.9807692307692307
+      },
+      "stress": {
+        "chain_start_p95": 39.131380558013916,
+        "evaluation_status": "PASS",
+        "fast_intra_p95": 1.8180763721466064,
+        "n": 26,
+        "n_at_slo": 26,
+        "overall_intra_p95": 2.761202573776245,
+        "passed": true,
+        "reason": null,
+        "slo_attainment": 0.9642058165548099,
+        "tpm_all": 1687455.2666666666,
+        "tpm_decode": 18899.95,
+        "tpot_mean": 0.025099119361062804,
+        "tpot_p95": 0.04753992603552387,
+        "turn_start_p95": 4.875575304031372
+      }
+    },
+    "46757": {
+      "source": "evidence/official/attempt-46757-20260927.json",
+      "updated_at": "2026-09-27T09:08:36+00:00",
+      "capability": {
+        "aime26": 0.9545454545454546,
+        "gpqa-diamond": 0.9871794871794872
+      },
+      "stress": {
+        "chain_start_p95": 29.143433570861816,
+        "evaluation_status": "PASS",
+        "fast_intra_p95": 1.449904441833496,
+        "n": 22,
+        "n_at_slo": 22,
+        "overall_intra_p95": 2.1639530658721924,
+        "passed": true,
+        "reason": null,
+        "slo_attainment": 0.9793064876957495,
+        "tpm_all": 1716985.25,
+        "tpm_decode": 19253.533333333333,
+        "tpot_mean": 0.02220894831367539,
+        "tpot_p95": 0.04086820975593899,
+        "turn_start_p95": 4.236369848251343
+      }
+    },
+    "46758": {
+      "source": "evidence/official/attempt-46758-20260927.json",
+      "updated_at": "2026-09-27T10:23:29+00:00",
+      "capability": {
+        "aime26": 1,
+        "gpqa-diamond": 0.9743589743589743
+      },
+      "stress": {
+        "chain_start_p95": 41.10718059539795,
+        "evaluation_status": "PASS",
+        "fast_intra_p95": 1.4229822158813477,
+        "n": 26,
+        "n_at_slo": 26,
+        "overall_intra_p95": 2.35687255859375,
+        "passed": true,
+        "reason": null,
+        "slo_attainment": 0.9737136465324385,
+        "tpm_all": 1696202.3833333333,
+        "tpm_decode": 19037.45,
+        "tpot_mean": 0.02565818366544594,
+        "tpot_p95": 0.04775077948096203,
+        "turn_start_p95": 9.433470964431763
+      }
+    }
+  },
+  "configuration_deltas": {
+    "46677->46757": {
+      "image": [
+        "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926b",
+        "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926c"
+      ],
+      "flags": {
+        "--cuda-graph-max-bs": [
+          "32",
+          "48"
+        ],
+        "--dcp-size": [
+          null,
+          "2"
+        ],
+        "--max-mamba-cache-size": [
+          null,
+          "418"
+        ],
+        "--max-running-requests": [
+          "32",
+          "48"
+        ]
+      },
+      "env": {
+        "SGLANG_AX_BACKLOG_MAX_SLOW": [
+          "250",
+          "80"
+        ],
+        "SGLANG_AX_DCP_COMPACT_TOPK": [
+          null,
+          "1"
+        ],
+        "SGLANG_AX_DSA_SPARSE_TRITON": [
+          null,
+          "0"
+        ]
+      }
+    },
+    "46757->46758": {
+      "image": [
+        "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926c",
+        "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926d"
+      ],
+      "flags": {},
+      "env": {
+        "SGLANG_AX_DCP_LOCAL_EXTEND": [
+          null,
+          "1"
+        ]
+      }
+    }
+  },
+  "runs": {
+    "130ez1": {
+      "raw": "evidence/L130ez1-v3_n34_S1dcp_w2_60m/N34/raw_s1-dev-longchain-v3_N34_1790470437.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790470437.3229988,
+      "finish_s": 1790474085.7525873,
+      "stats": {
+        "requests": 3219,
+        "gates": {
+          "fast_intra": {
+            "samples": 2572,
+            "over": 103
+          },
+          "overall_intra": {
+            "samples": 2817,
+            "over": 94
+          },
+          "turn_start": {
+            "samples": 117,
+            "over": 4
+          },
+          "chain_start": {
+            "samples": 285,
+            "over": 17
+          }
+        },
+        "tpot": {
+          "p50": 0.040025806382151155,
+          "p90": 0.06235490874151775,
+          "p95": 0.0771661517675966,
+          "p99": 0.18359042583985932
+        },
+        "tpot_over_100ms": 79
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 16,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 0.6770012378692627,
+            "line": 1098,
+            "text": "[2026-09-27 00:53:58 TP0] [ax-125] relief on: cold backlog 367085 tokens at 6397 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 88.67700123786926,
+            "line": 1350,
+            "text": "[2026-09-27 00:55:26 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13420 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 109.67700123786926,
+            "line": 1423,
+            "text": "[2026-09-27 00:55:47 TP0] [ax-125] relief on: cold backlog 285950 tokens at 10213 tok/s, slow 35/49"
+          },
+          {
+            "elapsed_s": 129.67700123786926,
+            "line": 1481,
+            "text": "[2026-09-27 00:56:07 TP0] [ax-125] relief off: cold backlog 59859 tokens at 12787 tok/s, slow 46/49"
+          },
+          {
+            "elapsed_s": 161.67700123786926,
+            "line": 1587,
+            "text": "[2026-09-27 00:56:39 TP0] [ax-125] relief on: cold backlog 219666 tokens at 5220 tok/s, slow 63/86"
+          },
+          {
+            "elapsed_s": 175.67700123786926,
+            "line": 1639,
+            "text": "[2026-09-27 00:56:53 TP0] [ax-125] relief off: cold backlog 57874 tokens at 11652 tok/s, slow 73/86"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 181.67700123786926,
+          "line": 1654,
+          "text": "[2026-09-27 00:56:59 TP0] [ax-124/125] parks=15 relief_rounds=304",
+          "parks": 15,
+          "relief_rounds": 304
+        },
+        "last_counter": {
+          "elapsed_s": 3589.6770012378693,
+          "line": 12339,
+          "text": "[2026-09-27 01:53:47 TP0] [ax-124/125] parks=175 relief_rounds=304",
+          "parks": 175,
+          "relief_rounds": 304
+        },
+        "trip_timestamp_observable": false
+      }
+    },
+    "130ez5": {
+      "raw": "evidence/L130ez5-v3_open_S1dcp_local_on_n34/N34/raw_s1-dev-longchain-v3_N34_1790475761.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790475761.7249947,
+      "finish_s": 1790476439.1382456,
+      "stats": {
+        "requests": 514,
+        "gates": {
+          "fast_intra": {
+            "samples": 380,
+            "over": 24
+          },
+          "overall_intra": {
+            "samples": 415,
+            "over": 24
+          },
+          "turn_start": {
+            "samples": 23,
+            "over": 1
+          },
+          "chain_start": {
+            "samples": 76,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.0456220025253858,
+          "p90": 0.12726461963284993,
+          "p95": 0.2557273620340441,
+          "p99": 0.8424479552611176
+        },
+        "tpot_over_100ms": 68
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 11,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 0.2750053405761719,
+            "line": 1286,
+            "text": "[2026-09-27 02:22:42 TP0] [ax-125] relief on: cold backlog 367085 tokens at 6393 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 89.27500534057617,
+            "line": 1570,
+            "text": "[2026-09-27 02:24:11 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13430 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 110.27500534057617,
+            "line": 1661,
+            "text": "[2026-09-27 02:24:32 TP0] [ax-125] relief on: cold backlog 285950 tokens at 9927 tok/s, slow 37/50"
+          },
+          {
+            "elapsed_s": 130.27500534057617,
+            "line": 1732,
+            "text": "[2026-09-27 02:24:52 TP0] [ax-125] relief off: cold backlog 62675 tokens at 12719 tok/s, slow 47/50"
+          },
+          {
+            "elapsed_s": 143.27500534057617,
+            "line": 1777,
+            "text": "[2026-09-27 02:25:05 TP0] [ax-125] relief on: cold backlog 121837 tokens at 7308 tok/s, slow 59/69"
+          },
+          {
+            "elapsed_s": 149.27500534057617,
+            "line": 1792,
+            "text": "[2026-09-27 02:25:11 TP0] [ax-125] relief off: cold backlog 50588 tokens at 11177 tok/s, slow 64/69"
+          },
+          {
+            "elapsed_s": 164.27500534057617,
+            "line": 1865,
+            "text": "[2026-09-27 02:25:26 TP0] [ax-125] relief on: cold backlog 219666 tokens at 4882 tok/s, slow 70/90"
+          },
+          {
+            "elapsed_s": 173.27500534057617,
+            "line": 1896,
+            "text": "[2026-09-27 02:25:35 TP0] [ax-125] relief off: cold backlog 115218 tokens at 11689 tok/s, slow 80/90"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 182.27500534057617,
+          "line": 1939,
+          "text": "[2026-09-27 02:25:44 TP0] [ax-124/125] parks=14 relief_rounds=302",
+          "parks": 14,
+          "relief_rounds": 302
+        },
+        "last_counter": {
+          "elapsed_s": 608.2750053405762,
+          "line": 3593,
+          "text": "[2026-09-27 02:32:50 TP0] [ax-124/125] parks=40 relief_rounds=302",
+          "parks": 40,
+          "relief_rounds": 302
+        },
+        "trip_timestamp_observable": false
+      }
+    },
+    "130ez6zzzz": {
+      "raw": "evidence/L130ez6zzzz-v3_open_S1dcp_combo_on_n34/N34/raw_s1-dev-longchain-v3_N34_1790488626.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790488626.4418578,
+      "finish_s": 1790489303.7328212,
+      "stats": {
+        "requests": 505,
+        "gates": {
+          "fast_intra": {
+            "samples": 370,
+            "over": 25
+          },
+          "overall_intra": {
+            "samples": 405,
+            "over": 24
+          },
+          "turn_start": {
+            "samples": 24,
+            "over": 0
+          },
+          "chain_start": {
+            "samples": 76,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.04581500139087438,
+          "p90": 0.12804235618594767,
+          "p95": 0.25582349813333893,
+          "p99": 0.8555839923127289
+        },
+        "tpot_over_100ms": 67
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 11,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 0.5581421852111816,
+            "line": 1267,
+            "text": "[2026-09-27 05:57:07 TP0] [ax-125] relief on: cold backlog 350701 tokens at 5791 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 89.55814218521118,
+            "line": 1730,
+            "text": "[2026-09-27 05:58:36 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13440 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 101.55814218521118,
+            "line": 1803,
+            "text": "[2026-09-27 05:58:48 TP0] [ax-125] relief on: cold backlog 105782 tokens at 7034 tok/s, slow 33/38"
+          },
+          {
+            "elapsed_s": 104.55814218521118,
+            "line": 1817,
+            "text": "[2026-09-27 05:58:51 TP0] [ax-125] relief off: cold backlog 56630 tokens at 11798 tok/s, slow 36/38"
+          },
+          {
+            "elapsed_s": 113.55814218521118,
+            "line": 1866,
+            "text": "[2026-09-27 05:59:00 TP0] [ax-125] relief on: cold backlog 251859 tokens at 9825 tok/s, slow 42/52"
+          },
+          {
+            "elapsed_s": 130.55814218521118,
+            "line": 1947,
+            "text": "[2026-09-27 05:59:17 TP0] [ax-125] relief off: cold backlog 57299 tokens at 12768 tok/s, slow 50/52"
+          },
+          {
+            "elapsed_s": 163.55814218521118,
+            "line": 2079,
+            "text": "[2026-09-27 05:59:50 TP0] [ax-125] relief on: cold backlog 219666 tokens at 4178 tok/s, slow 63/88"
+          },
+          {
+            "elapsed_s": 176.55814218521118,
+            "line": 2121,
+            "text": "[2026-09-27 06:00:03 TP0] [ax-125] relief off: cold backlog 57874 tokens at 12366 tok/s, slow 77/88"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 182.55814218521118,
+          "line": 2153,
+          "text": "[2026-09-27 06:00:09 TP0] [ax-124/125] parks=19 relief_rounds=303",
+          "parks": 19,
+          "relief_rounds": 303
+        },
+        "last_counter": {
+          "elapsed_s": 577.5581421852112,
+          "line": 3688,
+          "text": "[2026-09-27 06:06:44 TP0] [ax-124/125] parks=31 relief_rounds=303",
+          "parks": 31,
+          "relief_rounds": 303
+        },
+        "trip_timestamp_observable": false
+      }
+    },
+    "130ez9": {
+      "raw": "evidence/L130ez9-v3_n34_S1dcp_w2_slow250_30m/N34/raw_s1-dev-longchain-v3_N34_1790486207.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790486207.537583,
+      "finish_s": 1790488079.6366296,
+      "stats": {
+        "requests": 1564,
+        "gates": {
+          "fast_intra": {
+            "samples": 1232,
+            "over": 55
+          },
+          "overall_intra": {
+            "samples": 1349,
+            "over": 38
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 145,
+            "over": 16
+          }
+        },
+        "tpot": {
+          "p50": 0.041890128176423354,
+          "p90": 0.07233942950488595,
+          "p95": 0.09998535123874538,
+          "p99": 0.42118369689745494
+        },
+        "tpot_over_100ms": 78
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 15,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 0.4624168872833252,
+            "line": 1163,
+            "text": "[2026-09-27 05:16:48 TP0] [ax-125] relief on: cold backlog 367085 tokens at 5738 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 88.46241688728333,
+            "line": 1413,
+            "text": "[2026-09-27 05:18:16 TP0] [ax-125] relief off: cold backlog 63676 tokens at 13435 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 99.46241688728333,
+            "line": 1451,
+            "text": "[2026-09-27 05:18:27 TP0] [ax-125] relief on: cold backlog 111926 tokens at 6325 tok/s, slow 33/39"
+          },
+          {
+            "elapsed_s": 103.46241688728333,
+            "line": 1460,
+            "text": "[2026-09-27 05:18:31 TP0] [ax-125] relief off: cold backlog 56630 tokens at 11682 tok/s, slow 37/39"
+          },
+          {
+            "elapsed_s": 112.46241688728333,
+            "line": 1495,
+            "text": "[2026-09-27 05:18:40 TP0] [ax-125] relief on: cold backlog 251859 tokens at 9683 tok/s, slow 42/52"
+          },
+          {
+            "elapsed_s": 130.46241688728333,
+            "line": 1551,
+            "text": "[2026-09-27 05:18:58 TP0] [ax-125] relief off: cold backlog 57299 tokens at 12663 tok/s, slow 50/52"
+          },
+          {
+            "elapsed_s": 142.46241688728333,
+            "line": 1592,
+            "text": "[2026-09-27 05:19:10 TP0] [ax-125] relief on: cold backlog 99253 tokens at 6485 tok/s, slow 60/67"
+          },
+          {
+            "elapsed_s": 145.46241688728333,
+            "line": 1606,
+            "text": "[2026-09-27 05:19:13 TP0] [ax-125] relief off: cold backlog 52149 tokens at 11553 tok/s, slow 63/67"
+          },
+          {
+            "elapsed_s": 161.46241688728333,
+            "line": 1657,
+            "text": "[2026-09-27 05:19:29 TP0] [ax-125] relief on: cold backlog 219666 tokens at 8168 tok/s, slow 68/88"
+          },
+          {
+            "elapsed_s": 175.46241688728333,
+            "line": 1705,
+            "text": "[2026-09-27 05:19:43 TP0] [ax-125] relief off: cold backlog 57874 tokens at 12336 tok/s, slow 80/88"
+          },
+          {
+            "elapsed_s": 260.4624168872833,
+            "line": 2001,
+            "text": "[2026-09-27 05:21:08 TP0] [ax-125] relief on: cold backlog 57694 tokens at 3517 tok/s, slow 91/194"
+          },
+          {
+            "elapsed_s": 262.4624168872833,
+            "line": 2007,
+            "text": "[2026-09-27 05:21:10 TP0] [ax-125] relief off: cold backlog 31376 tokens at 8261 tok/s, slow 91/194"
+          },
+          {
+            "elapsed_s": 271.4624168872833,
+            "line": 2035,
+            "text": "[2026-09-27 05:21:19 TP0] [ax-125] relief on: cold backlog 173091 tokens at 7545 tok/s, slow 93/202"
+          },
+          {
+            "elapsed_s": 279.4624168872833,
+            "line": 2060,
+            "text": "[2026-09-27 05:21:27 TP0] [ax-125] relief off: cold backlog 64846 tokens at 13159 tok/s, slow 94/202"
+          },
+          {
+            "elapsed_s": 312.4624168872833,
+            "line": 2159,
+            "text": "[2026-09-27 05:22:00 TP0] [ax-125] relief on: cold backlog 176238 tokens at 4044 tok/s, slow 98/230"
+          },
+          {
+            "elapsed_s": 323.4624168872833,
+            "line": 2197,
+            "text": "[2026-09-27 05:22:11 TP0] [ax-125] relief off: cold backlog 55406 tokens at 12130 tok/s, slow 100/230"
+          },
+          {
+            "elapsed_s": 348.4624168872833,
+            "line": 2274,
+            "text": "[2026-09-27 05:22:36 TP0] [ax-125] relief on: cold backlog 55323 tokens at 2424 tok/s, slow 111/258"
+          },
+          {
+            "elapsed_s": 350.4624168872833,
+            "line": 2279,
+            "text": "[2026-09-27 05:22:38 TP0] [ax-125] relief off: cold backlog 24603 tokens at 7974 tok/s, slow 112/258"
+          },
+          {
+            "elapsed_s": 357.4624168872833,
+            "line": 2300,
+            "text": "[2026-09-27 05:22:45 TP0] [ax-125] relief on: cold backlog 103228 tokens at 6754 tok/s, slow 113/263"
+          },
+          {
+            "elapsed_s": 362.4624168872833,
+            "line": 2312,
+            "text": "[2026-09-27 05:22:50 TP0] [ax-125] relief off: cold backlog 47932 tokens at 10657 tok/s, slow 114/263"
+          },
+          {
+            "elapsed_s": 483.4624168872833,
+            "line": 2722,
+            "text": "[2026-09-27 05:24:51 TP0] [ax-125] relief on: cold backlog 76791 tokens at 5118 tok/s, slow 133/391"
+          },
+          {
+            "elapsed_s": 486.4624168872833,
+            "line": 2737,
+            "text": "[2026-09-27 05:24:54 TP0] [ax-125] relief off: cold backlog 46071 tokens at 9548 tok/s, slow 135/391"
+          },
+          {
+            "elapsed_s": 555.4624168872833,
+            "line": 2965,
+            "text": "[2026-09-27 05:26:03 TP0] [ax-125] relief on: cold backlog 111547 tokens at 3871 tok/s, slow 142/469"
+          },
+          {
+            "elapsed_s": 560.4624168872833,
+            "line": 2983,
+            "text": "[2026-09-27 05:26:08 TP0] [ax-125] relief off: cold backlog 53947 tokens at 11808 tok/s, slow 145/469"
+          },
+          {
+            "elapsed_s": 572.4624168872833,
+            "line": 3020,
+            "text": "[2026-09-27 05:26:20 TP0] [ax-125] relief on: cold backlog 96721 tokens at 5583 tok/s, slow 147/481"
+          },
+          {
+            "elapsed_s": 578.4624168872833,
+            "line": 3044,
+            "text": "[2026-09-27 05:26:26 TP0] [ax-125] relief off: cold backlog 41937 tokens at 10409 tok/s, slow 149/481"
+          },
+          {
+            "elapsed_s": 592.4624168872833,
+            "line": 3089,
+            "text": "[2026-09-27 05:26:40 TP0] [ax-125] relief on: cold backlog 134015 tokens at 8197 tok/s, slow 160/497"
+          },
+          {
+            "elapsed_s": 599.4624168872833,
+            "line": 3111,
+            "text": "[2026-09-27 05:26:47 TP0] [ax-125] relief off: cold backlog 57123 tokens at 12545 tok/s, slow 162/497"
+          },
+          {
+            "elapsed_s": 671.4624168872833,
+            "line": 3349,
+            "text": "[2026-09-27 05:27:59 TP0] [ax-125] relief on: cold backlog 71687 tokens at 2958 tok/s, slow 174/576"
+          },
+          {
+            "elapsed_s": 674.4624168872833,
+            "line": 3358,
+            "text": "[2026-09-27 05:28:02 TP0] [ax-125] relief off: cold backlog 32775 tokens at 8959 tok/s, slow 175/576"
+          },
+          {
+            "elapsed_s": 747.4624168872833,
+            "line": 3574,
+            "text": "[2026-09-27 05:29:15 TP0] [ax-125] relief on: cold backlog 87196 tokens at 5060 tok/s, slow 183/628"
+          },
+          {
+            "elapsed_s": 750.4624168872833,
+            "line": 3583,
+            "text": "[2026-09-27 05:29:18 TP0] [ax-125] relief off: cold backlog 47235 tokens at 10807 tok/s, slow 184/628"
+          },
+          {
+            "elapsed_s": 882.4624168872833,
+            "line": 4019,
+            "text": "[2026-09-27 05:31:30 TP0] [ax-125] relief on: cold backlog 43187 tokens at 1896 tok/s, slow 199/772"
+          },
+          {
+            "elapsed_s": 884.4624168872833,
+            "line": 4025,
+            "text": "[2026-09-27 05:31:32 TP0] [ax-125] relief off: cold backlog 20659 tokens at 5805 tok/s, slow 200/772"
+          },
+          {
+            "elapsed_s": 908.4624168872833,
+            "line": 4115,
+            "text": "[2026-09-27 05:31:56 TP0] [ax-125] relief on: cold backlog 248076 tokens at 5292 tok/s, slow 202/804"
+          },
+          {
+            "elapsed_s": 923.4624168872833,
+            "line": 4154,
+            "text": "[2026-09-27 05:32:11 TP0] [ax-125] relief off: cold backlog 61708 tokens at 12715 tok/s, slow 210/804"
+          },
+          {
+            "elapsed_s": 949.4624168872833,
+            "line": 4228,
+            "text": "[2026-09-27 05:32:37 TP0] [ax-125] relief on: cold backlog 83175 tokens at 2547 tok/s, slow 213/822"
+          },
+          {
+            "elapsed_s": 953.4624168872833,
+            "line": 4237,
+            "text": "[2026-09-27 05:32:41 TP0] [ax-125] relief off: cold backlog 44263 tokens at 9752 tok/s, slow 214/822"
+          },
+          {
+            "elapsed_s": 1008.4624168872833,
+            "line": 4418,
+            "text": "[2026-09-27 05:33:36 TP0] [ax-125] relief on: cold backlog 122206 tokens at 3432 tok/s, slow 220/878"
+          },
+          {
+            "elapsed_s": 1015.4624168872833,
+            "line": 4440,
+            "text": "[2026-09-27 05:33:43 TP0] [ax-125] relief off: cold backlog 50526 tokens at 11000 tok/s, slow 222/878"
+          },
+          {
+            "elapsed_s": 1158.4624168872833,
+            "line": 4867,
+            "text": "[2026-09-27 05:36:06 TP0] [ax-125] relief on: cold backlog 126647 tokens at 5327 tok/s, slow 233/1008"
+          },
+          {
+            "elapsed_s": 1165.4624168872833,
+            "line": 4893,
+            "text": "[2026-09-27 05:36:13 TP0] [ax-125] relief off: cold backlog 54967 tokens at 11702 tok/s, slow 237/1008"
+          },
+          {
+            "elapsed_s": 1221.4624168872833,
+            "line": 5064,
+            "text": "[2026-09-27 05:37:09 TP0] [ax-125] relief on: cold backlog 112743 tokens at 7220 tok/s, slow 248/1058"
+          },
+          {
+            "elapsed_s": 1225.4624168872833,
+            "line": 5077,
+            "text": "[2026-09-27 05:37:13 TP0] [ax-125] relief off: cold backlog 57447 tokens at 11814 tok/s, slow 249/1058"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 1254.4624168872833,
+          "line": 5173,
+          "text": "[2026-09-27 05:37:42 TP0] [ax-124/125] parks=53 relief_rounds=480",
+          "parks": 53,
+          "relief_rounds": 480
+        },
+        "last_counter": {
+          "elapsed_s": 1774.4624168872833,
+          "line": 6794,
+          "text": "[2026-09-27 05:46:22 TP0] [ax-124/125] parks=89 relief_rounds=480",
+          "parks": 89,
+          "relief_rounds": 480
+        },
+        "trip_timestamp_observable": false
+      }
+    },
+    "130ezf": {
+      "raw": "evidence/L130ezf-v3_n34_S1dcp_combo_30m/N34/raw_s1-dev-longchain-v3_N34_1790495918.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790495919.0318422,
+      "finish_s": 1790497800.4023988,
+      "stats": {
+        "requests": 1588,
+        "gates": {
+          "fast_intra": {
+            "samples": 1252,
+            "over": 55
+          },
+          "overall_intra": {
+            "samples": 1369,
+            "over": 57
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 1
+          },
+          "chain_start": {
+            "samples": 149,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.041711186445082114,
+          "p90": 0.07440139712441875,
+          "p95": 0.09501531974779903,
+          "p99": 0.44247877400304225
+        },
+        "tpot_over_100ms": 73
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 11,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 88.96815776824951,
+            "line": 1899,
+            "text": "[2026-09-27 08:00:08 TP0] [ax-125] relief off: cold backlog 58812 tokens at 13363 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 109.96815776824951,
+            "line": 2025,
+            "text": "[2026-09-27 08:00:29 TP0] [ax-125] relief on: cold backlog 281086 tokens at 10353 tok/s, slow 36/49"
+          },
+          {
+            "elapsed_s": 128.9681577682495,
+            "line": 2120,
+            "text": "[2026-09-27 08:00:48 TP0] [ax-125] relief off: cold backlog 59603 tokens at 12767 tok/s, slow 46/49"
+          },
+          {
+            "elapsed_s": 160.9681577682495,
+            "line": 2245,
+            "text": "[2026-09-27 08:01:20 TP0] [ax-125] relief on: cold backlog 219666 tokens at 7277 tok/s, slow 64/88"
+          },
+          {
+            "elapsed_s": 174.9681577682495,
+            "line": 2288,
+            "text": "[2026-09-27 08:01:34 TP0] [ax-125] relief off: cold backlog 57874 tokens at 11995 tok/s, slow 77/88"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 182.9681577682495,
+          "line": 2329,
+          "text": "[2026-09-27 08:01:42 TP0] [ax-124/125] parks=14 relief_rounds=301",
+          "parks": 14,
+          "relief_rounds": 301
+        },
+        "last_counter": {
+          "elapsed_s": 1801.9681577682495,
+          "line": 8523,
+          "text": "[2026-09-27 08:28:41 TP0] [ax-124/125] parks=88 relief_rounds=301",
+          "parks": 88,
+          "relief_rounds": 301
+        },
+        "trip_timestamp_observable": false
+      }
+    },
+    "130ezh": {
+      "raw": "evidence/L130ezh-v3_n34_S1dcp_combo_nomtp_30m/N34/raw_s1-dev-longchain-v3_N34_1790500165.jsonl",
+      "scope": "fixed_duration_diagnostic",
+      "cohort": "13b346fde05bd592",
+      "workload_hash": "53bb088742c029c9",
+      "origin_s": 1790500165.24293,
+      "finish_s": 1790502099.6435878,
+      "stats": {
+        "requests": 1362,
+        "gates": {
+          "fast_intra": {
+            "samples": 1065,
+            "over": 20
+          },
+          "overall_intra": {
+            "samples": 1171,
+            "over": 19
+          },
+          "turn_start": {
+            "samples": 59,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 132,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.05173189182897484,
+          "p90": 0.08968038493259387,
+          "p95": 0.12719798575731078,
+          "p99": 0.4850923215754289
+        },
+        "tpot_over_100ms": 104
+      },
+      "opening_chain_n": 33,
+      "opening_chain_over": 11,
+      "guard": {
+        "transitions": [
+          {
+            "elapsed_s": 0.7570700645446777,
+            "line": 1162,
+            "text": "[2026-09-27 09:09:26 TP0] [ax-125] relief on: cold backlog 193073 tokens at 3638 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 86.75707006454468,
+            "line": 1637,
+            "text": "[2026-09-27 09:10:52 TP0] [ax-125] relief off: cold backlog 67004 tokens at 13831 tok/s, slow 0/0"
+          },
+          {
+            "elapsed_s": 96.75707006454468,
+            "line": 1703,
+            "text": "[2026-09-27 09:11:02 TP0] [ax-125] relief on: cold backlog 90123 tokens at 4471 tok/s, slow 33/36"
+          },
+          {
+            "elapsed_s": 100.75707006454468,
+            "line": 1728,
+            "text": "[2026-09-27 09:11:06 TP0] [ax-125] relief off: cold backlog 51211 tokens at 10327 tok/s, slow 35/36"
+          },
+          {
+            "elapsed_s": 111.75707006454468,
+            "line": 1794,
+            "text": "[2026-09-27 09:11:17 TP0] [ax-125] relief on: cold backlog 251859 tokens at 4980 tok/s, slow 41/48"
+          },
+          {
+            "elapsed_s": 126.75707006454468,
+            "line": 1874,
+            "text": "[2026-09-27 09:11:32 TP0] [ax-125] relief off: cold backlog 57299 tokens at 12666 tok/s, slow 47/48"
+          },
+          {
+            "elapsed_s": 159.75707006454468,
+            "line": 2011,
+            "text": "[2026-09-27 09:12:05 TP0] [ax-125] relief on: cold backlog 219666 tokens at 7714 tok/s, slow 74/83"
+          },
+          {
+            "elapsed_s": 172.75707006454468,
+            "line": 2052,
+            "text": "[2026-09-27 09:12:18 TP0] [ax-125] relief off: cold backlog 57874 tokens at 11598 tok/s, slow 78/83"
+          }
+        ],
+        "relief_counter_plateau_first_observed": {
+          "elapsed_s": 183.75707006454468,
+          "line": 2088,
+          "text": "[2026-09-27 09:12:29 TP0] [ax-124/125] parks=17 relief_rounds=325",
+          "parks": 17,
+          "relief_rounds": 325
+        },
+        "last_counter": {
+          "elapsed_s": 1777.7570700645447,
+          "line": 8301,
+          "text": "[2026-09-27 09:39:03 TP0] [ax-124/125] parks=68 relief_rounds=325",
+          "parks": 68,
+          "relief_rounds": 325
+        },
+        "trip_timestamp_observable": false
+      }
+    }
+  },
+  "paired": {
+    "130ez5->130ez6zzzz": {
+      "common": 499,
+      "baseline": {
+        "requests": 499,
+        "gates": {
+          "fast_intra": {
+            "samples": 367,
+            "over": 23
+          },
+          "overall_intra": {
+            "samples": 401,
+            "over": 22
+          },
+          "turn_start": {
+            "samples": 23,
+            "over": 1
+          },
+          "chain_start": {
+            "samples": 75,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.04545744254278976,
+          "p90": 0.1337235680886824,
+          "p95": 0.25836669087367153,
+          "p99": 0.9524379260261956
+        },
+        "tpot_over_100ms": 67
+      },
+      "candidate": {
+        "requests": 499,
+        "gates": {
+          "fast_intra": {
+            "samples": 367,
+            "over": 25
+          },
+          "overall_intra": {
+            "samples": 401,
+            "over": 23
+          },
+          "turn_start": {
+            "samples": 23,
+            "over": 0
+          },
+          "chain_start": {
+            "samples": 75,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.04581500139087438,
+          "p90": 0.12951993148560356,
+          "p95": 0.268839013627307,
+          "p99": 0.9685137072942921
+        },
+        "tpot_over_100ms": 66
+      },
+      "gates": {
+        "fast_intra": {
+          "fixed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:2",
+            "biomaster:canon:lc_20260924_000:llm:0003",
+            "biomaster:canon:lc_20260924_008:llm:0011",
+            "biomaster:canon:lc_20260924_070:llm:0001",
+            "biomaster:canon:lc_20260924_096:llm:0009",
+            "biomaster:canon:lc_20260924_124:llm:0001",
+            "biomaster:canon:lc_20260924_127:llm:0001",
+            "biomaster:canon:lc_20260924_205:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0010",
+            "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:1",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "scimaster:canon:JLfw--4DbphnqmmPiLhlP:llm:1",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_276:llm:0006",
+            "scimaster:canon:lc_20260924_297:llm:0006"
+          ],
+          "regressed": [
+            "biomaster:canon:8ItUI0m1ejX7qAsNP_EvX:llm:4",
+            "biomaster:canon:lc_20260924_008:llm:0006",
+            "biomaster:canon:lc_20260924_008:llm:0015",
+            "biomaster:canon:lc_20260924_026:llm:0007",
+            "biomaster:canon:lc_20260924_050:llm:0011",
+            "biomaster:canon:lc_20260924_053:llm:0015",
+            "biomaster:canon:lc_20260924_053:llm:0018",
+            "biomaster:canon:lc_20260924_053:llm:0024",
+            "biomaster:canon:lc_20260924_053:llm:0025",
+            "biomaster:canon:lc_20260924_117:llm:0005",
+            "biomaster:canon:lc_20260924_140:llm:0006",
+            "biomaster:canon:lc_20260924_213:llm:0009",
+            "biomaster:canon:member-v5-subagent-e6f2a89298d811061c8a0bad:llm:1",
+            "scimaster:canon:eKZYIN2qdrKD1EkQU06YR:llm:2",
+            "scimaster:canon:lc_20260924_236:llm:0001",
+            "scimaster:canon:lc_20260924_248:llm:0007",
+            "scimaster:canon:lc_20260924_248:llm:0016",
+            "scimaster:canon:lc_20260924_289:llm:0009"
+          ]
+        },
+        "overall_intra": {
+          "fixed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:2",
+            "biomaster:canon:lc_20260924_000:llm:0003",
+            "biomaster:canon:lc_20260924_133:llm:0007",
+            "biomaster:canon:lc_20260924_213:llm:0010",
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:2",
+            "biomaster:canon:member-v5-subagent-ef1bebdf8a01a69a964a7416:llm:4",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:2",
+            "scimaster:canon:gY02rW_VpGnx_-P2QKDjz:llm:2",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_248:llm:0008",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_276:llm:0006"
+          ],
+          "regressed": [
+            "biomaster:canon:lc_20260924_002:llm:0006",
+            "biomaster:canon:lc_20260924_008:llm:0006",
+            "biomaster:canon:lc_20260924_050:llm:0011",
+            "biomaster:canon:lc_20260924_053:llm:0024",
+            "biomaster:canon:lc_20260924_205:llm:0002",
+            "biomaster:canon:lc_20260924_213:llm:0009",
+            "biomaster:canon:member-v5-subagent-e6f2a89298d811061c8a0bad:llm:1",
+            "biomaster:canon:member-v5-subagent-ef1bebdf8a01a69a964a7416:llm:2",
+            "biomaster:canon:member-v5-subagent-ef1bebdf8a01a69a964a7416:llm:3",
+            "scimaster:canon:lc_20260924_236:llm:0001",
+            "scimaster:canon:lc_20260924_248:llm:0016",
+            "scimaster:canon:lc_20260924_252:llm:0006",
+            "scimaster:canon:lc_20260924_252:llm:0010",
+            "scimaster:canon:lc_20260924_289:llm:0009"
+          ]
+        },
+        "turn_start": {
+          "fixed": [
+            "scimaster:canon:lc_20260924_301:llm:0003"
+          ],
+          "regressed": []
+        },
+        "chain_start": {
+          "fixed": [
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:1",
+            "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:1"
+          ],
+          "regressed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:1",
+            "scimaster:canon:a9zWdpRfqikUJh_A1Yn7o:llm:1"
+          ]
+        }
+      }
+    },
+    "130ez1->130ez9": {
+      "common": 1564,
+      "baseline": {
+        "requests": 1564,
+        "gates": {
+          "fast_intra": {
+            "samples": 1232,
+            "over": 46
+          },
+          "overall_intra": {
+            "samples": 1349,
+            "over": 42
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 145,
+            "over": 16
+          }
+        },
+        "tpot": {
+          "p50": 0.04261940768641284,
+          "p90": 0.07319686705163321,
+          "p95": 0.09799260062422475,
+          "p99": 0.41454025592337146
+        },
+        "tpot_over_100ms": 74
+      },
+      "candidate": {
+        "requests": 1564,
+        "gates": {
+          "fast_intra": {
+            "samples": 1232,
+            "over": 55
+          },
+          "overall_intra": {
+            "samples": 1349,
+            "over": 38
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 145,
+            "over": 16
+          }
+        },
+        "tpot": {
+          "p50": 0.041890128176423354,
+          "p90": 0.07233942950488595,
+          "p95": 0.09998535123874538,
+          "p99": 0.42118369689745494
+        },
+        "tpot_over_100ms": 78
+      },
+      "gates": {
+        "fast_intra": {
+          "fixed": [
+            "biomaster:canon:8ItUI0m1ejX7qAsNP_EvX:llm:3",
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:4",
+            "biomaster:canon:lc_20260924_002:llm:0006",
+            "biomaster:canon:lc_20260924_008:llm:0015",
+            "biomaster:canon:lc_20260924_050:llm:0011",
+            "biomaster:canon:lc_20260924_050:llm:0025",
+            "biomaster:canon:lc_20260924_053:llm:0020",
+            "biomaster:canon:lc_20260924_088:llm:0009",
+            "biomaster:canon:lc_20260924_093:llm:0056",
+            "biomaster:canon:lc_20260924_093:llm:0060",
+            "biomaster:canon:lc_20260924_103:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_106:llm:0037",
+            "biomaster:canon:lc_20260924_117:llm:0005",
+            "biomaster:canon:lc_20260924_124:llm:0019",
+            "biomaster:canon:lc_20260924_134:llm:0008",
+            "biomaster:canon:lc_20260924_134:llm:0020",
+            "biomaster:canon:lc_20260924_134:llm:0024",
+            "biomaster:canon:lc_20260924_140:llm:0004",
+            "biomaster:canon:lc_20260924_205:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0032",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:1",
+            "scimaster:canon:lc_20260924_225:llm:0001",
+            "scimaster:canon:lc_20260924_241:llm:0022",
+            "scimaster:canon:lc_20260924_244:llm:0001",
+            "scimaster:canon:lc_20260924_248:llm:0021",
+            "scimaster:canon:lc_20260924_248:llm:0024",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_278:llm:0004",
+            "scimaster:canon:lc_20260924_278:llm:0005",
+            "scimaster:canon:lc_20260924_287:llm:0006",
+            "scimaster:canon:lc_20260924_294:llm:0002",
+            "scimaster:canon:lc_20260924_303:llm:0002",
+            "scimaster:canon:lc_20260924_305:llm:0001"
+          ],
+          "regressed": [
+            "biomaster:canon:8ItUI0m1ejX7qAsNP_EvX:llm:2",
+            "biomaster:canon:Lwu_zY1WufTe5ezfpl-__:llm:4",
+            "biomaster:canon:lc_20260924_008:llm:0011",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_048:llm:0012",
+            "biomaster:canon:lc_20260924_048:llm:0034",
+            "biomaster:canon:lc_20260924_053:llm:0033",
+            "biomaster:canon:lc_20260924_070:llm:0006",
+            "biomaster:canon:lc_20260924_070:llm:0011",
+            "biomaster:canon:lc_20260924_071:llm:0003",
+            "biomaster:canon:lc_20260924_082:llm:0004",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_086:llm:0015",
+            "biomaster:canon:lc_20260924_093:llm:0064",
+            "biomaster:canon:lc_20260924_096:llm:0009",
+            "biomaster:canon:lc_20260924_103:llm:0029",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0019",
+            "biomaster:canon:lc_20260924_110:llm:0008",
+            "biomaster:canon:lc_20260924_127:llm:0001",
+            "biomaster:canon:lc_20260924_127:llm:0027",
+            "biomaster:canon:lc_20260924_133:llm:0007",
+            "biomaster:canon:lc_20260924_134:llm:0003",
+            "biomaster:canon:lc_20260924_182:llm:0002",
+            "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:2",
+            "biomaster:canon:member-v5-subagent-d73e7dcb2b3202895c6291ea:llm:1",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:6",
+            "biomaster:canon:oR1Sqi2ol7caHCcHIKmDV:llm:2",
+            "scimaster:canon:Q7oPuTfEt_Wv0POyq9XL0:llm:2",
+            "scimaster:canon:lc_20260924_224:llm:0029",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_244:llm:0016",
+            "scimaster:canon:lc_20260924_248:llm:0007",
+            "scimaster:canon:lc_20260924_248:llm:0014",
+            "scimaster:canon:lc_20260924_248:llm:0016",
+            "scimaster:canon:lc_20260924_252:llm:0015",
+            "scimaster:canon:lc_20260924_253:llm:0015",
+            "scimaster:canon:lc_20260924_267:llm:0003",
+            "scimaster:canon:lc_20260924_283:llm:0013",
+            "scimaster:canon:lc_20260924_289:llm:0007",
+            "scimaster:canon:lc_20260924_291:llm:0001",
+            "scimaster:canon:lc_20260924_294:llm:0005",
+            "scimaster:canon:lc_20260924_307:llm:0005"
+          ]
+        },
+        "overall_intra": {
+          "fixed": [
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:4",
+            "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:2",
+            "biomaster:canon:lc_20260924_008:llm:0006",
+            "biomaster:canon:lc_20260924_031:llm:0006",
+            "biomaster:canon:lc_20260924_043:llm:0008",
+            "biomaster:canon:lc_20260924_050:llm:0010",
+            "biomaster:canon:lc_20260924_053:llm:0020",
+            "biomaster:canon:lc_20260924_078:llm:0024",
+            "biomaster:canon:lc_20260924_093:llm:0055",
+            "biomaster:canon:lc_20260924_103:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_134:llm:0008",
+            "biomaster:canon:lc_20260924_134:llm:0024",
+            "biomaster:canon:lc_20260924_135:llm:0019",
+            "biomaster:canon:lc_20260924_140:llm:0004",
+            "biomaster:canon:lc_20260924_140:llm:0006",
+            "biomaster:canon:lc_20260924_182:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0019",
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:2",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:1",
+            "biomaster:canon:member-v5-subagent-e724b2561951c1f0d7b2c4a9:llm:2",
+            "scimaster:canon:eKZYIN2qdrKD1EkQU06YR:llm:2",
+            "scimaster:canon:lc_20260924_224:llm:0028",
+            "scimaster:canon:lc_20260924_241:llm:0022",
+            "scimaster:canon:lc_20260924_241:llm:0041",
+            "scimaster:canon:lc_20260924_244:llm:0001",
+            "scimaster:canon:lc_20260924_248:llm:0024",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_252:llm:0010",
+            "scimaster:canon:lc_20260924_267:llm:0006",
+            "scimaster:canon:lc_20260924_278:llm:0004",
+            "scimaster:canon:lc_20260924_278:llm:0012",
+            "scimaster:canon:lc_20260924_310:llm:0003"
+          ],
+          "regressed": [
+            "biomaster:canon:8ItUI0m1ejX7qAsNP_EvX:llm:2",
+            "biomaster:canon:Lwu_zY1WufTe5ezfpl-__:llm:4",
+            "biomaster:canon:lc_20260924_011:llm:0003",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_070:llm:0006",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_086:llm:0015",
+            "biomaster:canon:lc_20260924_093:llm:0064",
+            "biomaster:canon:lc_20260924_096:llm:0009",
+            "biomaster:canon:lc_20260924_103:llm:0029",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0019",
+            "biomaster:canon:lc_20260924_110:llm:0008",
+            "biomaster:canon:lc_20260924_127:llm:0001",
+            "biomaster:canon:lc_20260924_134:llm:0003",
+            "biomaster:canon:member-v5-subagent-b07fae37a055b8dc5486f876:llm:2",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:2",
+            "biomaster:canon:member-v5-subagent-e6f2a89298d811061c8a0bad:llm:2",
+            "biomaster:canon:member-v5-subagent-ef1bebdf8a01a69a964a7416:llm:2",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_241:llm:0031",
+            "scimaster:canon:lc_20260924_244:llm:0004",
+            "scimaster:canon:lc_20260924_248:llm:0008",
+            "scimaster:canon:lc_20260924_253:llm:0008",
+            "scimaster:canon:lc_20260924_265:llm:0001",
+            "scimaster:canon:lc_20260924_283:llm:0013",
+            "scimaster:canon:lc_20260924_288:llm:0003",
+            "scimaster:canon:lc_20260924_291:llm:0001",
+            "scimaster:canon:lc_20260924_307:llm:0005"
+          ]
+        },
+        "turn_start": {
+          "fixed": [
+            "biomaster:canon:lc_20260924_082:llm:0006"
+          ],
+          "regressed": [
+            "biomaster:canon:lc_20260924_008:llm:0035"
+          ]
+        },
+        "chain_start": {
+          "fixed": [
+            "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:1"
+          ],
+          "regressed": [
+            "biomaster:canon:uRPMwERcBo2EyAD15ZGtH:llm:1"
+          ]
+        }
+      }
+    },
+    "130ez1->130ezf": {
+      "common": 1588,
+      "baseline": {
+        "requests": 1588,
+        "gates": {
+          "fast_intra": {
+            "samples": 1252,
+            "over": 47
+          },
+          "overall_intra": {
+            "samples": 1369,
+            "over": 43
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 149,
+            "over": 16
+          }
+        },
+        "tpot": {
+          "p50": 0.04260283250104242,
+          "p90": 0.07368142247871785,
+          "p95": 0.09807510147661422,
+          "p99": 0.41454025592337146
+        },
+        "tpot_over_100ms": 76
+      },
+      "candidate": {
+        "requests": 1588,
+        "gates": {
+          "fast_intra": {
+            "samples": 1252,
+            "over": 55
+          },
+          "overall_intra": {
+            "samples": 1369,
+            "over": 57
+          },
+          "turn_start": {
+            "samples": 70,
+            "over": 1
+          },
+          "chain_start": {
+            "samples": 149,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.041711186445082114,
+          "p90": 0.07440139712441875,
+          "p95": 0.09501531974779903,
+          "p99": 0.44247877400304225
+        },
+        "tpot_over_100ms": 73
+      },
+      "gates": {
+        "fast_intra": {
+          "fixed": [
+            "biomaster:canon:8ItUI0m1ejX7qAsNP_EvX:llm:3",
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:4",
+            "biomaster:canon:lc_20260924_008:llm:0006",
+            "biomaster:canon:lc_20260924_008:llm:0015",
+            "biomaster:canon:lc_20260924_031:llm:0006",
+            "biomaster:canon:lc_20260924_050:llm:0011",
+            "biomaster:canon:lc_20260924_050:llm:0025",
+            "biomaster:canon:lc_20260924_053:llm:0020",
+            "biomaster:canon:lc_20260924_088:llm:0009",
+            "biomaster:canon:lc_20260924_093:llm:0056",
+            "biomaster:canon:lc_20260924_093:llm:0060",
+            "biomaster:canon:lc_20260924_103:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_106:llm:0022",
+            "biomaster:canon:lc_20260924_106:llm:0037",
+            "biomaster:canon:lc_20260924_117:llm:0005",
+            "biomaster:canon:lc_20260924_124:llm:0019",
+            "biomaster:canon:lc_20260924_134:llm:0008",
+            "biomaster:canon:lc_20260924_134:llm:0020",
+            "biomaster:canon:lc_20260924_134:llm:0024",
+            "biomaster:canon:lc_20260924_140:llm:0006",
+            "biomaster:canon:lc_20260924_213:llm:0032",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:1",
+            "scimaster:canon:eKZYIN2qdrKD1EkQU06YR:llm:2",
+            "scimaster:canon:lc_20260924_225:llm:0001",
+            "scimaster:canon:lc_20260924_241:llm:0022",
+            "scimaster:canon:lc_20260924_244:llm:0001",
+            "scimaster:canon:lc_20260924_248:llm:0021",
+            "scimaster:canon:lc_20260924_267:llm:0006",
+            "scimaster:canon:lc_20260924_278:llm:0005",
+            "scimaster:canon:lc_20260924_287:llm:0006",
+            "scimaster:canon:lc_20260924_299:llm:0008",
+            "scimaster:canon:lc_20260924_303:llm:0002",
+            "scimaster:canon:lc_20260924_305:llm:0001",
+            "scimaster:canon:lc_20260924_310:llm:0003"
+          ],
+          "regressed": [
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:6",
+            "biomaster:canon:lc_20260924_003:llm:0004",
+            "biomaster:canon:lc_20260924_004:llm:0002",
+            "biomaster:canon:lc_20260924_004:llm:0003",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_053:llm:0015",
+            "biomaster:canon:lc_20260924_053:llm:0025",
+            "biomaster:canon:lc_20260924_085:llm:0001",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0002",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_110:llm:0021",
+            "biomaster:canon:lc_20260924_110:llm:0023",
+            "biomaster:canon:lc_20260924_117:llm:0037",
+            "biomaster:canon:lc_20260924_117:llm:0040",
+            "biomaster:canon:lc_20260924_121:llm:0011",
+            "biomaster:canon:lc_20260924_122:llm:0004",
+            "biomaster:canon:lc_20260924_124:llm:0001",
+            "biomaster:canon:lc_20260924_124:llm:0005",
+            "biomaster:canon:lc_20260924_124:llm:0020",
+            "biomaster:canon:lc_20260924_127:llm:0010",
+            "biomaster:canon:lc_20260924_127:llm:0011",
+            "biomaster:canon:lc_20260924_127:llm:0015",
+            "biomaster:canon:lc_20260924_129:llm:0010",
+            "biomaster:canon:lc_20260924_130:llm:0012",
+            "biomaster:canon:lc_20260924_131:llm:0001",
+            "biomaster:canon:lc_20260924_134:llm:0003",
+            "biomaster:canon:lc_20260924_134:llm:0031",
+            "biomaster:canon:lc_20260924_159:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0027",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "scimaster:canon:lc_20260924_224:llm:0003",
+            "scimaster:canon:lc_20260924_236:llm:0001",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_241:llm:0040",
+            "scimaster:canon:lc_20260924_244:llm:0012",
+            "scimaster:canon:lc_20260924_244:llm:0015",
+            "scimaster:canon:lc_20260924_265:llm:0009",
+            "scimaster:canon:lc_20260924_278:llm:0008",
+            "scimaster:canon:lc_20260924_283:llm:0008",
+            "scimaster:canon:lc_20260924_287:llm:0013",
+            "scimaster:canon:lc_20260924_291:llm:0001",
+            "scimaster:canon:lc_20260924_308:llm:0003"
+          ]
+        },
+        "overall_intra": {
+          "fixed": [
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:4",
+            "biomaster:canon:lc_20260924_008:llm:0006",
+            "biomaster:canon:lc_20260924_008:llm:0041",
+            "biomaster:canon:lc_20260924_031:llm:0006",
+            "biomaster:canon:lc_20260924_050:llm:0010",
+            "biomaster:canon:lc_20260924_053:llm:0020",
+            "biomaster:canon:lc_20260924_093:llm:0055",
+            "biomaster:canon:lc_20260924_103:llm:0018",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_134:llm:0008",
+            "biomaster:canon:lc_20260924_134:llm:0024",
+            "biomaster:canon:lc_20260924_135:llm:0019",
+            "biomaster:canon:lc_20260924_140:llm:0006",
+            "biomaster:canon:lc_20260924_182:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0019",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:1",
+            "scimaster:canon:eKZYIN2qdrKD1EkQU06YR:llm:2",
+            "scimaster:canon:lc_20260924_224:llm:0028",
+            "scimaster:canon:lc_20260924_241:llm:0022",
+            "scimaster:canon:lc_20260924_241:llm:0041",
+            "scimaster:canon:lc_20260924_244:llm:0001",
+            "scimaster:canon:lc_20260924_267:llm:0006",
+            "scimaster:canon:lc_20260924_278:llm:0012",
+            "scimaster:canon:lc_20260924_299:llm:0008",
+            "scimaster:canon:lc_20260924_310:llm:0003"
+          ],
+          "regressed": [
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:3",
+            "biomaster:canon:NG-6e4q79ECb9ZYRibfcB:llm:6",
+            "biomaster:canon:lc_20260924_002:llm:0006",
+            "biomaster:canon:lc_20260924_003:llm:0004",
+            "biomaster:canon:lc_20260924_004:llm:0002",
+            "biomaster:canon:lc_20260924_004:llm:0003",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_053:llm:0015",
+            "biomaster:canon:lc_20260924_085:llm:0001",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_117:llm:0037",
+            "biomaster:canon:lc_20260924_117:llm:0040",
+            "biomaster:canon:lc_20260924_121:llm:0007",
+            "biomaster:canon:lc_20260924_121:llm:0011",
+            "biomaster:canon:lc_20260924_124:llm:0001",
+            "biomaster:canon:lc_20260924_127:llm:0010",
+            "biomaster:canon:lc_20260924_127:llm:0011",
+            "biomaster:canon:lc_20260924_127:llm:0015",
+            "biomaster:canon:lc_20260924_130:llm:0012",
+            "biomaster:canon:lc_20260924_134:llm:0031",
+            "biomaster:canon:lc_20260924_135:llm:0005",
+            "biomaster:canon:lc_20260924_213:llm:0027",
+            "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:3",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:2",
+            "biomaster:canon:member-v5-subagent-e6f2a89298d811061c8a0bad:llm:2",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "scimaster:canon:gY02rW_VpGnx_-P2QKDjz:llm:2",
+            "scimaster:canon:lc_20260924_224:llm:0003",
+            "scimaster:canon:lc_20260924_224:llm:0010",
+            "scimaster:canon:lc_20260924_233:llm:0003",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_241:llm:0040",
+            "scimaster:canon:lc_20260924_244:llm:0012",
+            "scimaster:canon:lc_20260924_248:llm:0008",
+            "scimaster:canon:lc_20260924_265:llm:0001",
+            "scimaster:canon:lc_20260924_287:llm:0013",
+            "scimaster:canon:lc_20260924_291:llm:0001",
+            "scimaster:canon:lc_20260924_294:llm:0002"
+          ]
+        },
+        "turn_start": {
+          "fixed": [
+            "biomaster:canon:lc_20260924_082:llm:0006"
+          ],
+          "regressed": []
+        },
+        "chain_start": {
+          "fixed": [
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:1",
+            "biomaster:canon:member-v5-subagent-81153130b3016b3e0382ee23:llm:0",
+            "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:4",
+            "biomaster:canon:member-v5-subagent-b07fae37a055b8dc5486f876:llm:0",
+            "biomaster:canon:member-v5-subagent-cf6c4e2ad57ddac6b56febef:llm:2",
+            "biomaster:canon:member-v5-subagent-d73e7dcb2b3202895c6291ea:llm:0",
+            "biomaster:canon:member-v5-subagent-ef1bebdf8a01a69a964a7416:llm:0",
+            "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:1"
+          ],
+          "regressed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:1",
+            "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:1",
+            "scimaster:canon:a9zWdpRfqikUJh_A1Yn7o:llm:1"
+          ]
+        }
+      }
+    },
+    "130ezf->130ezh": {
+      "common": 1362,
+      "baseline": {
+        "requests": 1362,
+        "gates": {
+          "fast_intra": {
+            "samples": 1065,
+            "over": 39
+          },
+          "overall_intra": {
+            "samples": 1171,
+            "over": 45
+          },
+          "turn_start": {
+            "samples": 59,
+            "over": 1
+          },
+          "chain_start": {
+            "samples": 132,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.04138761271341081,
+          "p90": 0.07425262440334666,
+          "p95": 0.10099107425154771,
+          "p99": 0.4437838013937378
+        },
+        "tpot_over_100ms": 70
+      },
+      "candidate": {
+        "requests": 1362,
+        "gates": {
+          "fast_intra": {
+            "samples": 1065,
+            "over": 20
+          },
+          "overall_intra": {
+            "samples": 1171,
+            "over": 19
+          },
+          "turn_start": {
+            "samples": 59,
+            "over": 2
+          },
+          "chain_start": {
+            "samples": 132,
+            "over": 11
+          }
+        },
+        "tpot": {
+          "p50": 0.05173189182897484,
+          "p90": 0.08968038493259387,
+          "p95": 0.12719798575731078,
+          "p99": 0.4850923215754289
+        },
+        "tpot_over_100ms": 104
+      },
+      "gates": {
+        "fast_intra": {
+          "fixed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:2",
+            "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:2",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_053:llm:0015",
+            "biomaster:canon:lc_20260924_053:llm:0025",
+            "biomaster:canon:lc_20260924_085:llm:0001",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0002",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_121:llm:0011",
+            "biomaster:canon:lc_20260924_124:llm:0001",
+            "biomaster:canon:lc_20260924_124:llm:0005",
+            "biomaster:canon:lc_20260924_124:llm:0020",
+            "biomaster:canon:lc_20260924_127:llm:0010",
+            "biomaster:canon:lc_20260924_127:llm:0011",
+            "biomaster:canon:lc_20260924_127:llm:0015",
+            "biomaster:canon:lc_20260924_130:llm:0012",
+            "biomaster:canon:lc_20260924_131:llm:0001",
+            "biomaster:canon:lc_20260924_134:llm:0003",
+            "biomaster:canon:lc_20260924_140:llm:0004",
+            "biomaster:canon:lc_20260924_159:llm:0001",
+            "biomaster:canon:lc_20260924_205:llm:0001",
+            "biomaster:canon:lc_20260924_213:llm:0027",
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:2",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "scimaster:canon:lc_20260924_236:llm:0001",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_248:llm:0024",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_265:llm:0001",
+            "scimaster:canon:lc_20260924_265:llm:0009",
+            "scimaster:canon:lc_20260924_278:llm:0008",
+            "scimaster:canon:lc_20260924_283:llm:0008",
+            "scimaster:canon:lc_20260924_294:llm:0002"
+          ],
+          "regressed": [
+            "biomaster:canon:lc_20260924_031:llm:0006",
+            "biomaster:canon:lc_20260924_088:llm:0009",
+            "biomaster:canon:lc_20260924_088:llm:0029",
+            "biomaster:canon:lc_20260924_096:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_106:llm:0042",
+            "biomaster:canon:lc_20260924_127:llm:0007",
+            "biomaster:canon:lc_20260924_213:llm:0006",
+            "scimaster:canon:lc_20260924_241:llm:0023",
+            "scimaster:canon:lc_20260924_248:llm:0021",
+            "scimaster:canon:lc_20260924_266:llm:0003",
+            "scimaster:canon:lc_20260924_278:llm:0005",
+            "scimaster:canon:lc_20260924_287:llm:0006",
+            "scimaster:canon:lc_20260924_289:llm:0007",
+            "scimaster:canon:lc_20260924_292:llm:0002"
+          ]
+        },
+        "overall_intra": {
+          "fixed": [
+            "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:2",
+            "biomaster:canon:chatq-wf-78bdRQOHLngRLPL3GYE6R:llm:2",
+            "biomaster:canon:lc_20260924_002:llm:0006",
+            "biomaster:canon:lc_20260924_043:llm:0008",
+            "biomaster:canon:lc_20260924_043:llm:0014",
+            "biomaster:canon:lc_20260924_053:llm:0015",
+            "biomaster:canon:lc_20260924_078:llm:0024",
+            "biomaster:canon:lc_20260924_085:llm:0001",
+            "biomaster:canon:lc_20260924_086:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0018",
+            "biomaster:canon:lc_20260924_121:llm:0007",
+            "biomaster:canon:lc_20260924_121:llm:0011",
+            "biomaster:canon:lc_20260924_124:llm:0001",
+            "biomaster:canon:lc_20260924_127:llm:0010",
+            "biomaster:canon:lc_20260924_127:llm:0011",
+            "biomaster:canon:lc_20260924_127:llm:0015",
+            "biomaster:canon:lc_20260924_130:llm:0012",
+            "biomaster:canon:lc_20260924_135:llm:0005",
+            "biomaster:canon:lc_20260924_140:llm:0004",
+            "biomaster:canon:lc_20260924_213:llm:0027",
+            "biomaster:canon:med2J3cyNqpq_tjoqbvaV:llm:2",
+            "biomaster:canon:member-v5-subagent-83e46799b45d609665e9916a:llm:3",
+            "biomaster:canon:member-v5-subagent-b24bee416b01720e606db92a:llm:2",
+            "biomaster:canon:member-v5-subagent-e724b2561951c1f0d7b2c4a9:llm:2",
+            "biomaster:canon:member-v5-subagent-ff4faba4bcd086f58275440c:llm:5",
+            "biomaster:canon:oR1Sqi2ol7caHCcHIKmDV:llm:1",
+            "scimaster:canon:gY02rW_VpGnx_-P2QKDjz:llm:2",
+            "scimaster:canon:lc_20260924_224:llm:0003",
+            "scimaster:canon:lc_20260924_224:llm:0010",
+            "scimaster:canon:lc_20260924_233:llm:0003",
+            "scimaster:canon:lc_20260924_236:llm:0002",
+            "scimaster:canon:lc_20260924_248:llm:0008",
+            "scimaster:canon:lc_20260924_248:llm:0024",
+            "scimaster:canon:lc_20260924_252:llm:0001",
+            "scimaster:canon:lc_20260924_252:llm:0010",
+            "scimaster:canon:lc_20260924_265:llm:0001",
+            "scimaster:canon:lc_20260924_294:llm:0002"
+          ],
+          "regressed": [
+            "biomaster:canon:lc_20260924_048:llm:0008",
+            "biomaster:canon:lc_20260924_088:llm:0009",
+            "biomaster:canon:lc_20260924_106:llm:0014",
+            "biomaster:canon:lc_20260924_106:llm:0042",
+            "biomaster:canon:lc_20260924_127:llm:0007",
+            "biomaster:canon:lc_20260924_213:llm:0006",
+            "scimaster:canon:lc_20260924_224:llm:0028",
+            "scimaster:canon:lc_20260924_266:llm:0003",
+            "scimaster:canon:lc_20260924_278:llm:0005",
+            "scimaster:canon:lc_20260924_292:llm:0002",
+            "scimaster:canon:lc_20260924_308:llm:0003"
+          ]
+        },
+        "turn_start": {
+          "fixed": [
+            "biomaster:canon:lc_20260924_135:llm:0024"
+          ],
+          "regressed": [
+            "biomaster:canon:lc_20260924_127:llm:0022",
+            "scimaster:canon:lc_20260924_294:llm:0008"
+          ]
+        },
+        "chain_start": {
+          "fixed": [],
+          "regressed": []
+        }
+      }
+    }
+  },
+  "workload_limits": {
+    "scope": "metadata budgets, not measured GPU work or formal workload",
+    "quality_status": "DIAGNOSTIC_CANDIDATE_NOT_REPRESENTATIVE",
+    "public_source_chain_budget": 30912302,
+    "v3_annotation_budget": 24127301,
+    "budget_ratio": 0.7805080643945572,
+    "synthesized_new_tokens": 12151265,
+    "target_new_tokens": 18936266
+  }
+}
