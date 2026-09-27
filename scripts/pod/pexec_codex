@@ -10,8 +10,17 @@ deny='(bohr|trisol|inference|kill|pkill|killall|shutdown|reboot|halt|systemctl|p
 if echo "$c" | grep -qiE "$deny"; then echo "REFUSED by pexec_codex policy (no stop / no kill / no writes outside /tmp/ax/codex / no engine requests): $c" >&2; exit 3; fi
 case "${PEXEC_TRANSPORT:-gpu}" in
   gpu)
-    D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"
-    PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c" ;;
+    # Same route as pread: local -> gssh -> GPU box (its bohr login) -> pod. Sourcing common.sh here would run bohr with the
+    # local container's login instead, which expires separately (2026-09-26: every window snapshot failed for hours this way).
+    inner="mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c"
+    if [ -d /sjtu/linhang/arena/repo ]; then
+      # Already on the GPU box (fetch_level runs this script there over gssh): use its bohr login directly.
+      D="$(cd "$(dirname "$0")" && pwd)"; source "$D/common.sh"
+      PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec "$inner"
+    else
+      G="$(cd "$(dirname "$0")/../.." && pwd)/scripts/gssh"
+      GSSH_TIMEOUT=$(( ${PEXEC_TIMEOUT:-600} + 60 )) "$G" "cd /sjtu/linhang/arena/repo && source scripts/pod/common.sh >/dev/null 2>&1 && PEXEC_TIMEOUT=${PEXEC_TIMEOUT:-600} bexec $(printf '%q' "$inner")"
+    fi ;;
   local)
     timeout "${PEXEC_TIMEOUT:-600}" bohr trisol inference exec "${L2_SERVICE_ID:-2102486579267252224}" --team arena -- bash -c "mkdir -p /tmp/ax/codex && cd /tmp/ax/codex && export CUDA_VISIBLE_DEVICES='' && $c" ;;
   *) echo 'PEXEC_TRANSPORT must be gpu or local' >&2; exit 2 ;;
