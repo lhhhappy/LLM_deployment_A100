@@ -218,7 +218,8 @@
     "job": "130ezf-v3_n34_S1dcp_combo_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "S5 候选：合并引擎 791453ca（128p + 本地续算都开）、S1 设置 + dcp 2、N34、30 分钟窗口。问题：两机制在稳态的表现（turn/overall/fast、TPOT>0.10、host 命中）",
-    "status": "已发布（130eze2 之后）"
+    "status": "已闭合",
+    "verdict": "同 1588 条对 130ez1：**chain 16→11（修 8 新 3）**、turn 2→1；代价 overall 43→57（修 25 新 39）、fast 47→55（修 35 新 43）；TPOT>0.10 76→73、均值 56.0 对 55.6 ms、p95 94.9 对 98.0；冒烟 12/12。新增的 overall 坏例是暖的链内请求（缓存 60–97%、新算 3–13k），到达在 175–600 s，TTFT 5–24 s 而参照里 0.6–4 s（16 条在开场尾段、23 条在稳态），疑为 128p 的生产者优先/READY 预留把它们压后（Codex 正在处理的边缘取舍）。四门余量看：overall/fast 远离 5% 门，chain 是唯一紧的门，所以合并引擎作为 S5 有 MTP 臂成立"
   },
   {
     "job": "130ezg-v3_open_S1dcp_combo_on_n38",
