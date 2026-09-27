@@ -1,0 +1,570 @@
+{
+  "scope": "metadata accounting; no body re-render or formal representativeness claim",
+  "datasets": {
+    "v3": {
+      "requests": 5601,
+      "chains": 311,
+      "original_requests": 722,
+      "synthetic_requests": 4879,
+      "global_prompt_relative_error": -0.022650468929878986,
+      "global_synthetic_new_relative_error": -0.3583072291020838,
+      "chains_with_synthetic_requests": 245,
+      "per_chain_abs_synthetic_error_median": 0.48296406628188415,
+      "per_chain_abs_synthetic_error_over": {
+        "0.1": 214,
+        "0.2": 190,
+        "0.5": 117
+      },
+      "output_total_delta": 3491,
+      "output_conflict_chains": 3,
+      "stored_summary_mismatches": [],
+      "most_underfilled_chains": [
+        {
+          "version": "v3",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:3",
+          "requests": 2,
+          "original_requests": 1,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 72208,
+          "actual_synthetic_new_tokens": 631,
+          "synthetic_new_relative_error": -0.9912613560824285,
+          "source_prompt_sum": 144552,
+          "prompt_sum": 144965,
+          "source_output_sum": 60,
+          "output_sum": 60,
+          "prompt_relative_error": 0.0028571033261386436
+        },
+        {
+          "version": "v3",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:7",
+          "requests": 3,
+          "original_requests": 1,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 127159,
+          "actual_synthetic_new_tokens": 1405,
+          "synthetic_new_relative_error": -0.9889508410729874,
+          "source_prompt_sum": 278693,
+          "prompt_sum": 228868,
+          "source_output_sum": 865,
+          "output_sum": 865,
+          "prompt_relative_error": -0.1787809525176448
+        },
+        {
+          "version": "v3",
+          "chain_id": "scimaster:canon:f3a891a7-7359-41f5-bda0-2259574e37b0:40",
+          "requests": 7,
+          "original_requests": 5,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 223293,
+          "actual_synthetic_new_tokens": 2888,
+          "synthetic_new_relative_error": -0.9870663209325863,
+          "source_prompt_sum": 1565991,
+          "prompt_sum": 1569847,
+          "source_output_sum": 3418,
+          "output_sum": 3418,
+          "prompt_relative_error": 0.0024623385447297697
+        },
+        {
+          "version": "v3",
+          "chain_id": "scimaster:canon:f3a891a7-7359-41f5-bda0-2259574e37b0:37",
+          "requests": 4,
+          "original_requests": 1,
+          "synthetic_requests": 3,
+          "target_synthetic_new_tokens": 254012,
+          "actual_synthetic_new_tokens": 3617,
+          "synthetic_new_relative_error": -0.985760515251248,
+          "source_prompt_sum": 1011480,
+          "prompt_sum": 1011017,
+          "source_output_sum": 3504,
+          "output_sum": 3504,
+          "prompt_relative_error": -0.0004577450864080568
+        },
+        {
+          "version": "v3",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:6",
+          "requests": 7,
+          "original_requests": 1,
+          "synthetic_requests": 6,
+          "target_synthetic_new_tokens": 118606,
+          "actual_synthetic_new_tokens": 2932,
+          "synthetic_new_relative_error": -0.9752794968214087,
+          "source_prompt_sum": 804049,
+          "prompt_sum": 802294,
+          "source_output_sum": 1922,
+          "output_sum": 1922,
+          "prompt_relative_error": -0.002182702795476388
+        }
+      ],
+      "internal_reset": {
+        "count": 121,
+        "synthetic": 118,
+        "edges": {
+          "append-only": 121
+        },
+        "expected_new_p50": 1126,
+        "expected_new_p95": 2238
+      },
+      "guard_required_manifest_fields_missing": [],
+      "stored_check": {
+        "status": null,
+        "complete_pass": null,
+        "rendered_prompts": null
+      }
+    },
+    "v3g": {
+      "requests": 5601,
+      "chains": 311,
+      "original_requests": 722,
+      "synthetic_requests": 4879,
+      "global_prompt_relative_error": -0.022650468929878986,
+      "global_synthetic_new_relative_error": -0.3583072291020838,
+      "chains_with_synthetic_requests": 245,
+      "per_chain_abs_synthetic_error_median": 0.48296406628188415,
+      "per_chain_abs_synthetic_error_over": {
+        "0.1": 214,
+        "0.2": 190,
+        "0.5": 117
+      },
+      "output_total_delta": 3491,
+      "output_conflict_chains": 3,
+      "stored_summary_mismatches": [],
+      "most_underfilled_chains": [
+        {
+          "version": "v3g",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:3",
+          "requests": 2,
+          "original_requests": 1,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 72208,
+          "actual_synthetic_new_tokens": 631,
+          "synthetic_new_relative_error": -0.9912613560824285,
+          "source_prompt_sum": 144552,
+          "prompt_sum": 144965,
+          "source_output_sum": 60,
+          "output_sum": 60,
+          "prompt_relative_error": 0.0028571033261386436
+        },
+        {
+          "version": "v3g",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:7",
+          "requests": 3,
+          "original_requests": 1,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 127159,
+          "actual_synthetic_new_tokens": 1405,
+          "synthetic_new_relative_error": -0.9889508410729874,
+          "source_prompt_sum": 278693,
+          "prompt_sum": 228868,
+          "source_output_sum": 865,
+          "output_sum": 865,
+          "prompt_relative_error": -0.1787809525176448
+        },
+        {
+          "version": "v3g",
+          "chain_id": "scimaster:canon:f3a891a7-7359-41f5-bda0-2259574e37b0:40",
+          "requests": 7,
+          "original_requests": 5,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 223293,
+          "actual_synthetic_new_tokens": 2888,
+          "synthetic_new_relative_error": -0.9870663209325863,
+          "source_prompt_sum": 1565991,
+          "prompt_sum": 1569847,
+          "source_output_sum": 3418,
+          "output_sum": 3418,
+          "prompt_relative_error": 0.0024623385447297697
+        },
+        {
+          "version": "v3g",
+          "chain_id": "scimaster:canon:f3a891a7-7359-41f5-bda0-2259574e37b0:37",
+          "requests": 4,
+          "original_requests": 1,
+          "synthetic_requests": 3,
+          "target_synthetic_new_tokens": 254012,
+          "actual_synthetic_new_tokens": 3617,
+          "synthetic_new_relative_error": -0.985760515251248,
+          "source_prompt_sum": 1011480,
+          "prompt_sum": 1011017,
+          "source_output_sum": 3504,
+          "output_sum": 3504,
+          "prompt_relative_error": -0.0004577450864080568
+        },
+        {
+          "version": "v3g",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:6",
+          "requests": 7,
+          "original_requests": 1,
+          "synthetic_requests": 6,
+          "target_synthetic_new_tokens": 118606,
+          "actual_synthetic_new_tokens": 2932,
+          "synthetic_new_relative_error": -0.9752794968214087,
+          "source_prompt_sum": 804049,
+          "prompt_sum": 802294,
+          "source_output_sum": 1922,
+          "output_sum": 1922,
+          "prompt_relative_error": -0.002182702795476388
+        }
+      ],
+      "internal_reset": {
+        "count": 121,
+        "synthetic": 118,
+        "edges": {
+          "append-only": 121
+        },
+        "expected_new_p50": 1126,
+        "expected_new_p95": 2238
+      },
+      "guard_required_manifest_fields_missing": [
+        "artifacts",
+        "max_context_tokens"
+      ],
+      "stored_check": {
+        "status": null,
+        "complete_pass": null,
+        "rendered_prompts": null
+      }
+    },
+    "v4": {
+      "requests": 5601,
+      "chains": 311,
+      "original_requests": 722,
+      "synthetic_requests": 4879,
+      "global_prompt_relative_error": -0.020950590748492925,
+      "global_synthetic_new_relative_error": -0.05817287315250008,
+      "chains_with_synthetic_requests": 245,
+      "per_chain_abs_synthetic_error_median": 0.28247827145291304,
+      "per_chain_abs_synthetic_error_over": {
+        "0.1": 186,
+        "0.2": 151,
+        "0.5": 76
+      },
+      "output_total_delta": 3491,
+      "output_conflict_chains": 3,
+      "stored_summary_mismatches": [],
+      "most_underfilled_chains": [
+        {
+          "version": "v4",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:3",
+          "requests": 2,
+          "original_requests": 1,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 72208,
+          "actual_synthetic_new_tokens": 631,
+          "synthetic_new_relative_error": -0.9912613560824285,
+          "source_prompt_sum": 144552,
+          "prompt_sum": 144965,
+          "source_output_sum": 60,
+          "output_sum": 60,
+          "prompt_relative_error": 0.0028571033261386436
+        },
+        {
+          "version": "v4",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:7",
+          "requests": 3,
+          "original_requests": 1,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 127159,
+          "actual_synthetic_new_tokens": 1405,
+          "synthetic_new_relative_error": -0.9889508410729874,
+          "source_prompt_sum": 278693,
+          "prompt_sum": 228868,
+          "source_output_sum": 865,
+          "output_sum": 865,
+          "prompt_relative_error": -0.1787809525176448
+        },
+        {
+          "version": "v4",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:6",
+          "requests": 7,
+          "original_requests": 1,
+          "synthetic_requests": 6,
+          "target_synthetic_new_tokens": 118606,
+          "actual_synthetic_new_tokens": 2932,
+          "synthetic_new_relative_error": -0.9752794968214087,
+          "source_prompt_sum": 804049,
+          "prompt_sum": 802294,
+          "source_output_sum": 1922,
+          "output_sum": 1922,
+          "prompt_relative_error": -0.002182702795476388
+        },
+        {
+          "version": "v4",
+          "chain_id": "scimaster:canon:3pk26ybwMD6LFS_4mXYz0:0",
+          "requests": 4,
+          "original_requests": 1,
+          "synthetic_requests": 3,
+          "target_synthetic_new_tokens": 139984,
+          "actual_synthetic_new_tokens": 3741,
+          "synthetic_new_relative_error": -0.9732755172019659,
+          "source_prompt_sum": 407051,
+          "prompt_sum": 64352,
+          "source_output_sum": 1039,
+          "output_sum": 1039,
+          "prompt_relative_error": -0.8419067880928925
+        },
+        {
+          "version": "v4",
+          "chain_id": "biomaster:canon:Q5X6tzK9EK7duAccJ6855:0",
+          "requests": 14,
+          "original_requests": 13,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 2411,
+          "actual_synthetic_new_tokens": 69,
+          "synthetic_new_relative_error": -0.9713811696391539,
+          "source_prompt_sum": 513647,
+          "prompt_sum": 550331,
+          "source_output_sum": 14949,
+          "output_sum": 14949,
+          "prompt_relative_error": 0.07141869805527912
+        }
+      ],
+      "internal_reset": {
+        "count": 121,
+        "synthetic": 118,
+        "edges": {
+          "append-only": 121
+        },
+        "expected_new_p50": 1126,
+        "expected_new_p95": 2116
+      },
+      "guard_required_manifest_fields_missing": [],
+      "stored_check": {
+        "status": "STRUCTURAL_OK",
+        "complete_pass": false,
+        "rendered_prompts": 0
+      }
+    },
+    "v5": {
+      "requests": 5601,
+      "chains": 311,
+      "original_requests": 722,
+      "synthetic_requests": 4879,
+      "global_prompt_relative_error": -0.020950590748492925,
+      "global_synthetic_new_relative_error": -0.05817287315250008,
+      "chains_with_synthetic_requests": 245,
+      "per_chain_abs_synthetic_error_median": 0.28247827145291304,
+      "per_chain_abs_synthetic_error_over": {
+        "0.1": 186,
+        "0.2": 151,
+        "0.5": 76
+      },
+      "output_total_delta": 3491,
+      "output_conflict_chains": 3,
+      "stored_summary_mismatches": [],
+      "most_underfilled_chains": [
+        {
+          "version": "v5",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:3",
+          "requests": 2,
+          "original_requests": 1,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 72208,
+          "actual_synthetic_new_tokens": 631,
+          "synthetic_new_relative_error": -0.9912613560824285,
+          "source_prompt_sum": 144552,
+          "prompt_sum": 144965,
+          "source_output_sum": 60,
+          "output_sum": 60,
+          "prompt_relative_error": 0.0028571033261386436
+        },
+        {
+          "version": "v5",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:7",
+          "requests": 3,
+          "original_requests": 1,
+          "synthetic_requests": 2,
+          "target_synthetic_new_tokens": 127159,
+          "actual_synthetic_new_tokens": 1405,
+          "synthetic_new_relative_error": -0.9889508410729874,
+          "source_prompt_sum": 278693,
+          "prompt_sum": 228868,
+          "source_output_sum": 865,
+          "output_sum": 865,
+          "prompt_relative_error": -0.1787809525176448
+        },
+        {
+          "version": "v5",
+          "chain_id": "biomaster:canon:cfc2174d81f348bbae623:6",
+          "requests": 7,
+          "original_requests": 1,
+          "synthetic_requests": 6,
+          "target_synthetic_new_tokens": 118606,
+          "actual_synthetic_new_tokens": 2932,
+          "synthetic_new_relative_error": -0.9752794968214087,
+          "source_prompt_sum": 804049,
+          "prompt_sum": 802294,
+          "source_output_sum": 1922,
+          "output_sum": 1922,
+          "prompt_relative_error": -0.002182702795476388
+        },
+        {
+          "version": "v5",
+          "chain_id": "scimaster:canon:3pk26ybwMD6LFS_4mXYz0:0",
+          "requests": 4,
+          "original_requests": 1,
+          "synthetic_requests": 3,
+          "target_synthetic_new_tokens": 139984,
+          "actual_synthetic_new_tokens": 3741,
+          "synthetic_new_relative_error": -0.9732755172019659,
+          "source_prompt_sum": 407051,
+          "prompt_sum": 64352,
+          "source_output_sum": 1039,
+          "output_sum": 1039,
+          "prompt_relative_error": -0.8419067880928925
+        },
+        {
+          "version": "v5",
+          "chain_id": "biomaster:canon:Q5X6tzK9EK7duAccJ6855:0",
+          "requests": 14,
+          "original_requests": 13,
+          "synthetic_requests": 1,
+          "target_synthetic_new_tokens": 2411,
+          "actual_synthetic_new_tokens": 69,
+          "synthetic_new_relative_error": -0.9713811696391539,
+          "source_prompt_sum": 513647,
+          "prompt_sum": 550331,
+          "source_output_sum": 14949,
+          "output_sum": 14949,
+          "prompt_relative_error": 0.07141869805527912
+        }
+      ],
+      "internal_reset": {
+        "count": 121,
+        "synthetic": 118,
+        "edges": {
+          "append-only": 121
+        },
+        "expected_new_p50": 1126,
+        "expected_new_p95": 2116
+      },
+      "guard_required_manifest_fields_missing": [
+        "set",
+        "artifacts",
+        "max_context_tokens"
+      ],
+      "stored_check": {
+        "status": null,
+        "complete_pass": null,
+        "rendered_prompts": null
+      }
+    }
+  },
+  "inputs": [
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3/requests.jsonl",
+      "sha256": "31f4d7521b623dedd43e9d44efbcc3af0890cea138d0ee9f7c9ee7b20a777305",
+      "bytes": 5895302
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3/chains.jsonl",
+      "sha256": "daa0215190d1e6b8e151a9755f2ce5df63065eda2a63ec40a6ec37ca0f0bcab2",
+      "bytes": 408464
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3/manifest.json",
+      "sha256": "771b473bae506b2f69112499f1bdc45bb1dccc47a03babde74e9a231b8745114",
+      "bytes": 310953
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3/cohort.json",
+      "sha256": "9215bf71885fa111e1d80b4c02f19a8a49139b2576654463d35be7f4788cb476",
+      "bytes": 357120
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3g/requests.jsonl",
+      "sha256": "1b14aab254218d4f56aa5a978e1e024073aac74d97744e1c2e0e1a6c9f147ace",
+      "bytes": 6436063
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3g/chains.jsonl",
+      "sha256": "daa0215190d1e6b8e151a9755f2ce5df63065eda2a63ec40a6ec37ca0f0bcab2",
+      "bytes": 408464
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3g/manifest.json",
+      "sha256": "9c7d28964fe07439481ef3a32037c239c6529d147e4ac7decf3bb38f4113bf93",
+      "bytes": 1156
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v3g/cohort.json",
+      "sha256": "a64380c63dfc018bc20741dc2b19ec41f62a7e25547af48707e4e6449143d461",
+      "bytes": 328696
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v4/requests.jsonl",
+      "sha256": "04b3d49aca95532cae814a9964f05d90146e340c589c85af11b3921b937f3620",
+      "bytes": 5894754
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v4/chains.jsonl",
+      "sha256": "03b1f637a53b433ef358bcca3beb954301db95ab284206bf3c10b6974887f463",
+      "bytes": 408491
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v4/manifest.json",
+      "sha256": "a7531897555ea9c4496ec086840b628858ec57371ed47b2a2ab898cea148a0a1",
+      "bytes": 319386
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v4/cohort.json",
+      "sha256": "4b145ad7e5add82260591eef9f21b4f397e79911c99cc384ca3abeb3e026ca85",
+      "bytes": 357103
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v5/requests.jsonl",
+      "sha256": "22917b5926f85a1c8ee38899be836c39579d50b090c87507ef77b5256e022855",
+      "bytes": 6325504
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v5/chains.jsonl",
+      "sha256": "03b1f637a53b433ef358bcca3beb954301db95ab284206bf3c10b6974887f463",
+      "bytes": 408491
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v5/manifest.json",
+      "sha256": "4ab0139f3a7dcf77b8b52630e7750343e49833344c5c9290cc2397a9b56829bc",
+      "bytes": 300454
+    },
+    {
+      "path": "/workspace/Agentic_science_challenge/cache/s1-dev-longchain-v5/cohort.json",
+      "sha256": "4b145ad7e5add82260591eef9f21b4f397e79911c99cc384ca3abeb3e026ca85",
+      "bytes": 357103
+    }
+  ],
+  "probes": [
+    {
+      "tool": "rebudget",
+      "scope": "disposable fixture only; out equals parent",
+      "exit_code": 1,
+      "parent_requests_changed": true,
+      "failure_class": "SameFileError",
+      "parent_receipt_matches_modified_input": null,
+      "original_set": "fixture-parent",
+      "recorded_parent_set": null
+    },
+    {
+      "tool": "regap",
+      "scope": "disposable fixture only; out equals parent",
+      "exit_code": 0,
+      "parent_requests_changed": true,
+      "failure_class": null,
+      "parent_receipt_matches_modified_input": true,
+      "original_set": "fixture-parent",
+      "recorded_parent_set": "fixture-derived"
+    }
+  ],
+  "v3_to_v4_cohort": {
+    "same_chain_set": true,
+    "equal_positions": 29,
+    "common_prefix_members": {
+      "26": 8,
+      "34": 12,
+      "38": 12
+    }
+  },
+  "v5_replay_guard_probe": {
+    "accepted": false,
+    "exception": "ValueError",
+    "message": "requires a generated artifact with a simple manifest set name"
+  }
+}
