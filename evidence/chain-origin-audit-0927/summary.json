@@ -1,0 +1,50 @@
+{
+  "scope": "public 722-request prefix sample, not source database or formal replay",
+  "source": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+  "serving_requests": 722,
+  "replay_heads": 311,
+  "head_phases": {
+    "session_start": 104,
+    "context_reset": 20,
+    "intra": 115,
+    "turn_start": 72
+  },
+  "head_edge_types": {
+    "chain-head": 104,
+    "append-only": 53,
+    "system-tools-changed": 148,
+    "compact-rebuild": 6
+  },
+  "head_gates_seconds": {
+    "30.0": 311
+  },
+  "all_gates_seconds": {
+    "30.0": 314,
+    "3.0": 388,
+    "15.0": 20
+  },
+  "strata": {
+    "source_mid_session_annotation": {
+      "n": 207,
+      "nonempty_top_level_system": 207,
+      "first_message_role=user": 207,
+      "has_assistant_message": 135,
+      "source_cache_read_positive": 196,
+      "source_cache_read_missing": 1
+    },
+    "source_session_start_annotation": {
+      "n": 104,
+      "nonempty_top_level_system": 104,
+      "first_message_role=user": 104,
+      "has_assistant_message": 0,
+      "source_cache_read_positive": 81,
+      "source_cache_read_missing": 10
+    }
+  },
+  "interpretation": [
+    "Origin classification follows source annotations; message roles do not identify origin.",
+    "system is a separate body field; the original Renderer prepends it to messages.",
+    "Positive source cache reads do not prove prior turns in this session.",
+    "Source cache reads are not the actual cache hits of the formal replay."
+  ]
+}

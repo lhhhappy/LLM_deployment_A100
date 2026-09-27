@@ -5,12 +5,16 @@ Default off. Two mutually exclusive modes use the existing numerical kernel in
 
 - `SGLANG_AX_DSA_SPARSE_TRITON=1`: all TileLang sparse-attention calls; still refuses DCP.
 - `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1`: only ordinary `ForwardMode.EXTEND` calls with full KV and no LSE.
-  DCP is allowed in this mode because 116 has already gathered and remapped KV before the call. Local extend,
+  DCP is allowed in this mode because 116 has already gathered and remapped KV before the call. DCP local-extend,
   target verify, draft-extend-v2, mixed mode and decode retain their existing kernels. Ordinary draft-model
   EXTEND, if used, has the same full-KV contract and is included.
 
-The prefill-only integration is a **candidate, not GPU-validated as of 2026-09-27**. The historical operator
-measurements below are not a new DCP or TP8 result. See the [integration report](../../notes/reports/prefill-sm80-0927.md).
+The prefill-only integration is a **single-GPU-validated candidate as of 2026-09-27; TP8 is pending**.
+The current suite passes 15 tests, and all nine contiguous full-KV cost cases pass the fp32 reference checks
+with no post-warmup Triton loads. At 8192 query rows, measured attention speedups range from 1.32× at 262k
+context to 1.99× for the first chunk. These are synthetic operator results without DCP collectives or real
+weights. See the [integration report](../../notes/reports/prefill-sm80-0927.md) for the new measurements;
+the older results below remain a separate historical experiment.
 
 ## Prefill-only integration
 
@@ -19,11 +23,30 @@ branch returns before reaching it. `_forward_tilelang` also requires `return_lse
 nor the absence of an LSE alone is used to infer the phase. This keeps DCP local-extend output/merge and all
 speculative partial calls intact. The backend warms the same local-head variants as ordinary prefill, not the
 DCP-gathered head count used by partial attention. Both switches unset preserves the old tensor operations.
+Here, **partial means attention over a rank's KV shard with an LSE merge**, not a chunk of a long prompt.
+Ordinary chunked-prefill continuation remains eligible when it is `ForwardMode.EXTEND` with full KV, including
+later chunks with a nonempty prefix. `MIXED` batches remain excluded.
+
+With MTP enabled, `EagleDraftWorker._draft_extend_for_prefill` in `eagle_worker_v2.py` forwards the ordinary prefill batch through
+the draft runner; eligible draft prefill changes kernels too. It must be held constant in the OFF/ON setup,
+and target/draft spans must be reported separately. This does not change draft-decode or draft-extend-v2.
 
 The mechanism token is `118=on:prefill` only after a suitable prefill backend passes the guards and warmup.
 The first actual use per backend additionally logs `[ax] 118 route=full_kv_prefill tokens=... heads=... width=...
-dcp=...`. It is an entry receipt, not a replay/batch counter. Unsupported dtype, RoPE tail, HiSparse and
-deterministic inference keep their startup guards. Both switches together fail startup.
+dcp=...`. It records the first dispatch attempt per backend, not a successful-batch or graph-replay count.
+For jobs using `dev_ladder_template.sh`, put **`118=on` in `G_EXPECT`**. Its expectation syntax rejects colons;
+its comparison accepts `on:<suffix>`, including the actual `118=on:prefill` state. Keep the old all-phase flag
+explicitly off. The emitted state still distinguishes prefill-only mode; it is not renamed to `118=on`.
+
+When the DCP local-extend policy is enabled, use window deltas from `[ax-dcp-local]` `gather_kv` batches and
+query/prefix tokens, separated by target/draft role and rank, to quantify full-KV eager traffic. These counters
+include warmup and also cover `MIXED`, so they are not exact 118 kernel-launch counts. The entry receipt,
+mechanism state and trace identify the actual kernel; the counters quantify the surrounding route traffic.
+Without that policy the counters are absent. Cross-check ordinary EXTEND spans and kernel traces.
+
+Unsupported dtype, RoPE tail, HiSparse and deterministic inference keep their startup guards. Both switches
+together fail startup. There is no online output comparison or numerical fallback: a kernel exception
+propagates instead of retrying TileLang; finite but incorrect values are not guaranteed to raise an exception.
 
 No numerical kernel, persistent tensor, DCP collective, index mapping or scheduler policy changes in this mode.
 At 8192 query rows it removes the 8192 × 2112 × 4-byte padding copy (66 MiB); the attention output is unchanged
@@ -31,6 +54,9 @@ in size. Short ordinary extends can use the existing split buffers, up to about 
 occupancy. Actual process peak, graph pool and KV capacity still require measurement.
 
 Local dispatch contracts: `python3 -B -m unittest discover -s scripts/tests -p test_dsa_triton_prefill.py`.
+These execute the source `ForwardMode`, `_should_return_dsa_dcp_lse` and `uses_local_extend` definitions,
+including ordinary chunk continuation and stale local metadata during speculative phases; GPU kernels and
+index tensors remain test doubles. Forcing the source LSE gate to either constant is rejected by the test.
 The GPU suite now includes prefill-only startup/dispatch and fresh-process warmup coverage. The new
 [`bench_prefill_sparse.py`](../../scripts/analysis/bench_prefill_sparse.py) uses contiguous full KV, 8k–262k
 contexts, 333–16384 query rows and a four-request batch; it checks an fp32 reference and records paired eager
@@ -81,8 +107,8 @@ tokens, padded to 2112).
   - target verify and draft extend (`forward_extend` with the decode backend);
   - decode and draft decode.
 
-  With the switch off, the base code runs unchanged; the only addition is the flag test. The LSE output is kept
-  for the drop-in contract, but serving never requests it because DCP is refused.
+  This list describes all-phase mode. Prefill-only mode uses the narrower contract above. With both switches
+  off, the base tensor operations are unchanged. Partial DCP calls requesting LSE retain the original kernel.
 - **Startup (`_ax118_init`).** It acts only when the switch is on and a DSA backend is `tilelang`.
   - It refuses to start with a `ValueError` that names the reason for each of these cases:
     - not CUDA;
@@ -112,8 +138,8 @@ tokens, padded to 2112).
   served row is affected, for three reasons:
   - Every real query row contains its own token (tail or complete group), so it always has a valid index.
   - A fully masked row is a padding row from `_pad_topk_indices`, whose output is discarded.
-  - Nothing in the served path relies on the NaN. The only `nan_to_num` calls are on the DCP paths, which 118
-    refuses.
+  - Nothing in the selected full-KV path relies on the NaN. Partial DCP branches and their `nan_to_num`
+    handling remain outside prefill-only dispatch; all-phase mode still refuses DCP.
 - **Out-of-range indices.** An index ≥ pool size is masked like -1. The function docstring says so, and the
   kernel does not check for it. TileLang zero-fills that KV row and still counts it with logit 0: its generated
   gather is `cp_async_gs_conditional` on `0 <= idx < seq_len_kv`, and its mask is `idx >= 0`. Pool locations are
@@ -190,7 +216,8 @@ Served means `_forward_tilelang` with the switch off, including its padding copy
 - **No 8-card run.** Nothing has been measured with real weights or real top-k locality, and TP8 timing inside a
   full prefill or decode step is unmeasured. The MTP draft layer and the breakable prefill graph (170) are
   untested. DCP partial attention in all-phase mode and HiSparse are refused; the kernel's 64-head path is checked
-  only against fp32. The new full-KV prefill-only DCP integration has local dispatch tests, but no new GPU result.
+  only against fp32. The new full-KV prefill-only integration now has GPU dispatch, warmup and synthetic
+  cost-matrix evidence, but has not run DCP communication with real weights on TP8.
 - **Single-buffered gathers.** Each program still waits for its own gather. True KV double buffering (2 × 32 KiB
   per program) is a possible next step and has not been tried.
 - **Timing locality.** Timing uses randomly selected groups, which have poor locality. Phase 1's correlated
@@ -202,8 +229,11 @@ Served means `_forward_tilelang` with the switch off, including its padding copy
   - Both come from single-card kernel times; whether they turn into TTFT, TPOT or N is for the pod to show.
 
 ## What the TP8 pod run must check
-- **Mechanism line.** Add `118=on` to `G_EXPECT` and set `G_ENV=SGLANG_AX_DSA_SPARSE_TRITON=1`. The engine must
-  start (no `ValueError`) and print `118=on`.
+- **Mechanism line.** For the current DCP candidate, set `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1` and
+  `SGLANG_AX_DSA_SPARSE_TRITON=0`; use `118=on` in `G_EXPECT`, which accepts the emitted
+  `118=on:prefill`. Check that emitted state and the `route=full_kv_prefill` entry receipt, then quantify
+  full-KV traffic with the route counters described above. All-phase non-DCP experiments also use `118=on`
+  in `G_EXPECT`, but emit plain `118=on` and use the old flag.
 - **Triton version.** Every measurement here used Triton 3.7.1. Record the image's version; the kernel relies on
   `do_not_specialize`, and on the specialization rules that the warmup test checks.
 - **Capability smoke.** It must pass: this is the first real-weight check of the outputs.
@@ -211,4 +241,6 @@ Served means `_forward_tilelang` with the switch off, including its padding copy
 - **KV pool.** `max_total_num_tokens` must be unchanged against the same commit with the switch off.
 - **Profile.** A TP8 prefill profile like L081p must show the sparse-attention kernel time drop, and the time of a
   whole 8192-token chunk.
-- **Timed replay.** At N30, compare cold-prefill TTFT, TPOT and chunk throughput against official A.
+- **Timed replay.** Hold engine, DCP/MTP configuration, dataset, dispatch window and concurrency fixed across
+  OFF/ON. Include opening heads, steady-state arrivals and context resets; compare per-ID TTFT, TPOT and all
+  SLO gates. A historical official-A run is not a same-engine control for the new integration.
