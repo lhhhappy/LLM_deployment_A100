@@ -273,19 +273,22 @@
     "job": "130ezm7-v3_open_S5b_118off_n34",
     "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
     "what": "118 prefill-only 探针 OFF 孪生：Codex 引擎 3caadef4（=791453ca + 默认关的 full-KV prefill Triton 路由），开关未设，S5b 配置 N34 开场 600 s；应等于 130ezh 的开场",
-    "status": "跑（16:45 UTC 起）"
+    "status": "已闭合（446 条排空）",
+    "verdict": "chain 11/69、turn 0、fast 7、overall 6、TPOT>0.10 79；ezm8 的基线"
   },
   {
     "job": "130ezm8-v3_open_S5b_118prefill_n34",
     "ref": "130ezm7-v3_open_S5b_118off_n34",
     "what": "118 prefill-only ON（SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，机制 token 118=on）：开场 chain 与各链首 TTFT、每 10 s 块数；核对 8 rank 路由收据、冒烟、无晚编译、max_total_num_tokens 不变",
-    "status": "已发布（130ezm7 之后）"
+    "status": "已闭合（464 条排空）",
+    "verdict": "chain 11=11（修1/新1）、fast 7→4、overall 6→4、TPOT>0.10 79→72；第 32 个冷头 TTFT −7.5%；收据/冒烟/KV 均合格。开场 chain 不动：产能尾巴，−8% 不够翻转"
   },
   {
     "job": "130ezm9-tp8_prefill_profile_118off / 130ezma-…118prefill",
     "ref": "130ezc（592 ms/8k 目标 + 27 ms 草稿）",
     "what": "同引擎 OFF/ON 单请求剖析（49k 提示 8k/16k 块，带 MTP）：目标模型每块 ms 与 DSA 内核占比的变化（Codex 单算子实测每次调用 10.5→5.3 ms）",
-    "status": "已发布（130ezm8 之后）"
+    "status": "ezm9 已闭合，ezma 16k 在跑",
+    "verdict": "8k 目标块 588→541 ms（−8.1%），草稿 26.8→22.6 ms；dsa 核由未分类 116 ms 换成 Triton 70 ms"
   },
   {
     "job": "130ezmb-v5g_n26_S1_40m",
