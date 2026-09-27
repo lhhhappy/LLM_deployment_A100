@@ -242,6 +242,25 @@
     "verdict": "同 1362 条对 130ezf（同引擎有 MTP）：chain 11=11、turn 1→2、overall 45→19（修 37 新 11）、fast 39→20（修 34 新 15）；TPOT>0.10 70→104（7.6%），稳态（第 600 s 后 915 条）均值 42→54 ms、p95 66→86 ms、超 0.10 的 4→25（2.7%）；1800 s 内完成 1361→1331（−2%）。对 130ez1（46757 配置）：chain 16→11、turn 2=2、overall 38→19、fast 42→20、TPOT>0.10 74→104。冒烟 12/12（平均输出 1616 token）。结论：S5b = 合并引擎去 MTP 在本地四门上全面优于 46757 配置（chain −5、overall/fast 减半、turn 持平），代价只有 TPOT；线上负载轻，TPOT 估 40–45 ms。作为 S5 去 MTP 臂成立"
   },
   {
+    "job": "130ezk-v3g_n34_S1dcp_combo_nomtp_30m",
+    "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
+    "what": "S5b 配置在真实间隔数据 v3g 上（N34 30 分钟）：稳态并发像线上时，100k 以上链首是否仍贴 30 s 线",
+    "status": "已闭合",
+    "verdict": "对 ezh 同 1163 条：chain 11=11、turn 2→1、overall 17→14、fast 19→11、TPOT>0.10 99→81、均值 72→58 ms。稳态在跑 17–19 条（v3 上 28–33）、KV 22%；稳态 86 个 chain 门样本 0 超时，两条 252k 大头入批后 21–24 s（10.7–11.9k tok/s，交错少）。结论：线上般的并发下本地稳态不会超时；线上稳态超时需要更慢的通道或更重的冷活（v4 验证后者）"
+  },
+  {
+    "job": "130ezl-v4_n26_S4_full",
+    "ref": "线上 46758 @N26（chain p95 41.1 s、turn 9.4、overall 2.36、fast 1.42、tpot 25.7/47.8）",
+    "what": "用户批准的校准：46758 配置（6976639e，本地续算开，MTP，running 48）在 v4 整集 N26 回放，原 harness 完整判分。问题：本地 chain 门是否像线上（p95、超标条数、开场/稳态分布）",
+    "status": "已发布（约 3 小时）"
+  },
+  {
+    "job": "130ezm-v4_n34_S1dcp_combo_nomtp_30m",
+    "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
+    "what": "S5b 在 v4 上 N34 30 分钟：有了来源级的改写重算，稳态链首是否超时、其他门如何",
+    "status": "已发布（130ezl 之后）"
+  },
+  {
     "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb/130eze（130eze 因 G_EXPECT 写成 spec=none 在机制核对中止，改 spec=- 重发）",
