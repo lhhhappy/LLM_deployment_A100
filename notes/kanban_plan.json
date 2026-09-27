@@ -300,25 +300,25 @@
     "job": "130ezmc-v5g_n26_S1_nomtp_40m",
     "ref": "130ezmb-v5g_n26_S1_40m",
     "what": "S1 + 去 MTP（唯一改动：去掉 5 个 speculative 参数）——下一次上传的单变量候选",
-    "status": "已发布（130ezmb 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezmd-v5g_n26_S6_40m",
     "ref": "130ezmb-v5g_n26_S1_40m",
     "what": "S6 候选：S1 设置（无 DCP，running 32）在引擎 450e8580 上 + 去 MTP + 128p + 类别冻结 + 131 interval 1",
-    "status": "已发布（130ezmc 之后；131/MTP 四臂改到它之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezme-v5g_n26_chainmax16k_40m",
     "ref": "130ezmd-v5g_n26_S6_40m / 130ezmc-v5g_n26_S1_nomtp_40m",
     "what": "保 chain 不保 fast 的合并臂：S6（S1 设置、无 DCP、去 MTP、128p、131）+ 132 链首优先排序 + 稳态冷块 6144→16384 + 短命中预留 8192→2048 + 124 成本系数 1.27→1.05（去 MTP 后大头实测 20–23 s，旧系数判 27 s 提前判死）。引擎 c1fa4877。判定：chain 条数与稳态分档优先，fast/overall/turn/TPOT>0.10 作为代价报告",
-    "status": "待发布（链路断，排在 130ezmd 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezmf-v5g_n26_chainmax32k_40m",
     "ref": "130ezme-v5g_n26_chainmax16k_40m",
     "what": "同上但冷块 32768（--max-prefill-tokens 32768）：大头再省固定成本，看显存/冒烟与 fast 代价",
-    "status": "待发布（130ezme 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezm5-v4_n26_S5a_light_40m",
@@ -338,13 +338,13 @@
     "job": "130ezr-v4_n26_S5a_full_40m",
     "ref": "130ezm6-v4_n26_S5b_40m",
     "what": "全量 MTP（3 步/4 候选，历次提交的设置）同协议，放在最弱与无 MTP 之间比较",
-    "status": "已发布（130ezq 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezs-v4_n26_S5b_wait600_40m",
     "ref": "130ezm6-v4_n26_S5b_40m",
     "what": "没救的冷链首不再插队：124 冷请求饥饿上限 120→600 s（暖保持 120）",
-    "status": "已发布（130ezr 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezo-v4_n26_S5b_40m",
@@ -356,13 +356,13 @@
     "job": "130ezp-v4_n26_S5b_risk1_40m",
     "ref": "130ezo-v4_n26_S5b_40m",
     "what": "131 链首风险期少插 decode：interval 1（风险期每块后 1 轮 decode 而非 2）",
-    "status": "已发布（130ezo 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130ezq-v4_n26_S5b_risk0_40m",
     "ref": "130ezo-v4_n26_S5b_40m",
     "what": "131 interval 0（风险期不插 decode）：看大头入批后时间的最大收益与 TPOT>0.10 的代价",
-    "status": "已发布（130ezp 之后）"
+    "status": "已撤（改到 v5g-tail 上做：130ezn*；旧 v5g 的 gap 中位 7.3 s、>60 s 440 个已超源 raw，不再作主数据）"
   },
   {
     "job": "130eze2-v3_n34_S1dcp_w2_nomtp_30m",
@@ -370,5 +370,29 @@
     "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb/130eze（130eze 因 G_EXPECT 写成 spec=none 在机制核对中止，改 spec=- 重发）",
     "status": "已闭合",
     "verdict": "同 1369 条对 130ez1：chain 16→15（修 1 新 0）、turn 2→1、overall 38→20（修 32 新 14）、fast 42→23（修 39 新 20）；TPOT>0.10 74→96（5.4%→7.0%），稳态（第 600 s 后到达的 924 条）均值 42→54 ms、p95 69→81 ms、超 0.10 的 3→19；1800 s 内完成 1337 对 1368（−2%）；输出 token 完全相同（预算固定）。KV 池 2.22M→3.13M，稳态只用 46%。冒烟 12/12。结论：开场不变，稳态三门减半，代价是 TPOT 上一档但离 5% 门仍有距离（线上负载轻，估 40–45 ms）；用户判断代价可接受，列为 S5 的去 MTP 臂（130ezh 在合并引擎上验证）"
+  },
+  {
+    "job": "130ezn1-tail_n26_S1_40m",
+    "ref": "130ezmb-v5g_n26_S1_40m（旧 v5g 同配置）/ 线上 46676",
+    "what": "v5g-tail（Codex c9c14153，fable 复核通过：v5 + 239 条尾部 gap 延长，P50/P90 不变，P95/P99 33/245 s）上的 S1 锚点：46676 配置（f546934e，MTP，无 DCP，running 32），N26 2400 s 派发+排空。判定：本数据上 chain 的开场/稳态分布，作为后面三臂的同数据对照",
+    "status": "待插入（130ezmb 之后）"
+  },
+  {
+    "job": "130ezn2-tail_n26_S6_40m",
+    "ref": "130ezn1-tail_n26_S1_40m",
+    "what": "S6 = S1 设置去 MTP + 128p + 冻结分类 + 131 链首风险期 interval 1（450e8580）：chain 优先组合，先取收益后消融",
+    "status": "待插入"
+  },
+  {
+    "job": "130ezn3-tail_n26_chainmax16k_40m",
+    "ref": "130ezn2-tail_n26_S6_40m / 130ezn1",
+    "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价",
+    "status": "待插入"
+  },
+  {
+    "job": "130ezn4-tail_n26_chainmax32k_40m",
+    "ref": "130ezn3-tail_n26_chainmax16k_40m",
+    "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价",
+    "status": "待插入"
   }
 ]
