@@ -37,14 +37,19 @@ v5g-tail 规则：从 v5 出发，只接受“合成、非链首、原 gap >v5 �
 `/workspace/Agentic_science_challenge/build/worktrees/longchain-repair-0927`。
 报告 `notes/reports/longchain-incremental-repair-0927.md`，新入口 `scripts/longchain/finalize_v5g.py`，发布契约 `longchain_metadata.py`。
 12 项针对性 CPU 回归已通过；修复后的 rebudget /regap 真实 5,601 行分别与旧 v5 /v3g 完全一致。
-开发机结构验收在 `.../longchain-repair-0927/validation/v5g-tail-structure.{json,txt,log}`。
+主候选在 Pod 的全量结构验收已经完成：`STRUCTURAL_OK`，5,601 请求/正文，0 错误、7/7 文件摘要一致。
+完整报告在 Pod `codex/longchain-repair-0927/validation/v5g-tail-structure.{json,txt}`；
+本地 [pod-review-receipt.json](../../evidence/longchain-incremental-repair-0927/pod-review-receipt.json) 保存摘要与复核收据。
+未重做全量 token/LCP 渲染；本次正确性依据是完整正文摘要、冻结标签不变和原构建记录，不能写成独立 `VALID`。
+GPU 首次 checker 无完成报告，已由 Pod 补跑覆盖；两侧三套发布收据已核对一致。
 **以实际收据为准：有错误、缺正文、重复 ID、错 body_ref，或部署收据不一致，先修，不开测。**
 
 重点复核：
 
 1. 三组只发生允许的元数据变化；原 722 个公开请求正文/预算不动，cohort 不重新抽样，gap 不改 chain 标签。
 2. body shard 共享正确、清单完整；原 token/LCP/正文完全不变的增量证据成立。结构验收不能说成新做了全量 token 重渲染。
-3. 用原 `build_gap_plan` 再报告有效 gap 分布与每链封顶；上表是 requests 内的间隔，不能略过后一步。
+3. 原 `build_gap_plan` 已实际运行：v5 /tail 无链压缩，上表值即有效 gap；旧 v5g 有 1 条链压缩，
+   有效链中总等待 122,275.427 秒，分位数和 >60 秒计数不变。请复核验收收据内的 `effective_gap`。
 4. 接受它作为敏感性实验，不接受“已复原正式负载”的断言。v4 的逐链合成新增量仍有明显误差，详见报告。
 
 补充开场口径：207 个公开切段链首本来保留非零 gap，原 harness 会等；最长 62.202 秒的头在 v4 第 26 位。

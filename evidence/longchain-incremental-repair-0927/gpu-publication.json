@@ -1,0 +1,92 @@
+{
+  "v5": {
+    "root": "/sjtu/linhang/arena/codex/longchain-repair-0927/data/s1-dev-longchain-v5-review-0927",
+    "set": "s1-dev-longchain-v5-review-0927",
+    "rows": 5601,
+    "chains": 311,
+    "status": "BUILT_UNVALIDATED",
+    "request_values_equal_to_existing": true,
+    "changes_from_v4": {
+      "max_output_i": 4835
+    },
+    "requests_sha256": "9826b9441eb11cf2294249f4ca1fc6b2bc0d977539097b4372506c9d5bd5f1bd",
+    "cohort_sha256": "ff1dccae1087a798",
+    "gap_seconds": {
+      "count": 5290,
+      "p50": 2.653,
+      "p90": 12.551,
+      "p95": 22.11,
+      "p99": 33.21,
+      "mean": 5.647388468809074,
+      "over60": 18,
+      "total": 29874.685
+    },
+    "body_refs": {
+      "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+    }
+  },
+  "v5g": {
+    "root": "/sjtu/linhang/arena/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-review-0927",
+    "set": "s1-dev-longchain-v5g-review-0927",
+    "rows": 5601,
+    "chains": 311,
+    "status": "BUILT_UNVALIDATED",
+    "request_values_equal_to_existing": true,
+    "changes_from_v4": {
+      "max_output_i": 4835,
+      "replay_gap_ms": 3806,
+      "gap_regap_factor": 3806
+    },
+    "requests_sha256": "97a81094142bcd25dead7681d44dc508b85870cd5d8c1eb4a1f9e72277276f6c",
+    "cohort_sha256": "ff1dccae1087a798",
+    "gap_seconds": {
+      "count": 5290,
+      "p50": 7.319,
+      "p90": 50.904,
+      "p95": 99.846,
+      "p99": 310.0,
+      "mean": 23.115084688090736,
+      "over60": 440,
+      "total": 122278.798
+    },
+    "body_refs": {
+      "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+    }
+  },
+  "v5g-tail": {
+    "root": "/sjtu/linhang/arena/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927",
+    "set": "s1-dev-longchain-v5g-tail-review-0927",
+    "rows": 5601,
+    "chains": 311,
+    "status": "BUILT_UNVALIDATED",
+    "request_values_equal_to_existing": false,
+    "request_values_equal_to_plan": true,
+    "changes_from_v4": {
+      "max_output_i": 4835,
+      "gap_regap_factor": 239,
+      "replay_gap_ms": 239
+    },
+    "tail_rule": {
+      "kind": "tail-only-gap-sensitivity",
+      "threshold_ms": 12551,
+      "changed_requests": 239,
+      "rule": "synthetic non-head; old gap > v5 P90; duration proposal > max(old gap,60s); keep all other gaps",
+      "limitation": "event placement remains synthetic; no claim of recovered source timing"
+    },
+    "requests_sha256": "6170fd8204db4de8be4f99861d8cfa20ba36eab8b3317b8a3cd1343c5aef8ebb",
+    "cohort_sha256": "ff1dccae1087a798",
+    "gap_seconds": {
+      "count": 5290,
+      "p50": 2.653,
+      "p90": 12.551,
+      "p95": 33.21,
+      "p99": 245.467,
+      "mean": 11.239144990548203,
+      "over60": 250,
+      "total": 59455.077
+    },
+    "body_refs": {
+      "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+    }
+  }
+}

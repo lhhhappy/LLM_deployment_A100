@@ -117,7 +117,17 @@ python3 -B scripts/longchain/finalize_v5g.py \
 
 本轮 SSH 已恢复，GPU 与 Pod 都已完成发布；Pod 路径位于已经核验的 tmpfs，额外内容只含元数据、脚本和验收报告。
 原先本机的 `METADATA_ONLY_INCOMPLETE` 文件只保留为构建演练，不作为最终交付目录。
-实际验收结果以开发机 `validation/v5g-tail-structure.json` 及后续 review 为准；未启动新性能测试。
+Pod 原 checker 已完成主候选的全量结构验收：311 链、5,601 请求、5,601 正文，0 错误；
+7/7 清单文件摘要一致，没有缺失或重复。收据是 `STRUCTURAL_OK`，不是独立全量 token/LCP 重渲染的 `VALID`。
+完整报告保留在 Pod `codex/longchain-repair-0927/validation/v5g-tail-structure.json`；
+[本地验收收据](../../evidence/longchain-incremental-repair-0927/pod-review-receipt.json) 记录其摘要、大小与检查结果。
+开发机第一次检查没有留下完成报告，未把进程消失视为通过；Pod 补跑完成后 SSH 回传中断，
+随后直接读取已写出的报告确认完成。GPU/Pod 三版 requests、cohort、正文摘要和改动计数逐项一致。
+
+另直接调用原 `s1_loadgen.build_gap_plan`（每链 3,600 秒封顶）核验实际等待：v5 和 v5g-tail 都没有链触发压缩，
+有效链中等待分别仍为 29,874.685 /59,455.077 秒；旧 v5g 有 1 条链触发，122,278.798→122,275.427 秒，
+上表分位数与 >60 秒计数不变。可复算脚本是 [check_longchain_gap_plan.py](../../scripts/analysis/check_longchain_gap_plan.py)，
+结果一并放在验收收据。此检查没有运行模型、修改 harness 或启动新性能测试。
 
 ## 6. 验证与交付边界
 
