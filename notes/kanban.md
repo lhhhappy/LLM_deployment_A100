@@ -23,23 +23,13 @@
 | 130eezy-dcp_stack2_w2_n38_60m | DCP W2 N38（running 48）：N38 的失败形态（KV 墙还是 TPOT 尾） | 130ee5-dcp_stack2_w2_n34_60m (同 3182 条) | 已闭合 | 18→22 ↑ (修1/新5) | 3→7 ↑ (修2/新6) | 89→88 ↓ (修64/新63) | 91→102 ↑ (修78/新89) | 78→78 = | 排空 3373、冒烟 12/12。整窗 chain 23/311（p95 53.8 s；15 big_cold、4 family_rider、3 mid、1 reset）、turn 7/123（5 条冷多轮）、overall 90/2939、fast 103/2684、TPOT>0.10 80（2.4%，前 120 s 到达的 38 条里 37 条慢，之后 ≤1%）。对 W2 N34 同 3182 条：chain 18→22、turn 3→7、fast 91→102、overall 89→88。full_kv_usage p95 = 98.2%、running 峰值 37、同时解码 30.4：W2 在 N38 撞到池子边，稳态开始新增 chain/turn；正式允许 24/341，开场就占约 20，W4 要把稳态的那几条拿掉才有余量 |
 | 130eezz-dcp_stack2_w4_n38_60m | DCP W4 N38（--dcp-size 4，池约 ×2.56；冒烟门先过） | 130eezy-dcp_stack2_w2_n38_60m (同 3348 条) | 已闭合 | 22→22 = (修1/新1) | 7→7 = (修5/新5) | 90→76 ↓ (修71/新57) | 103→76 ↓ (修94/新67) | 78→69 ↓ | 排空 3361；冒烟 11/12（第 2 题错）。对 W2 N38 同 3348 条：chain 22=22、turn 7=7（各换了 5 条）、overall 90→76、fast 103→76、TPOT>0.10 78→69、均值 52.7→53.1 ms；产能账相同（D 30.3→30.6、W 1.89→1.78）。池 3.63M 用 43–61%、无排队，但只换来 fast/overall 各减二三十条：N38 剩下的 chain/turn 是开场吞吐和通道，不是容量。输出长度由 harness 钉死（3348 条全到 max_output），不能用它验数值；W4 数值仍以 11/12 存疑，不作候选 |
 | 130ee-dcp_stack2_w1_n30_60m | DCP 对照 W1（--dcp-size 1，同引擎）N30 60 分钟；对 112 看新栈本身有没有变化 | 112-v3_n30_124_125x_117_60m (同 3078 条) | 已闭合 | 26→21 ↓ (修12/新7) | 24→31 ↑ (修13/新20) | 448→452 ↑ (修302/新306) | 508→514 ↑ (修342/新348) | 35→35 = | 排空 3105、冒烟 12/12。对 112 同 3078 条：chain 26→21、turn 24→31、overall 448→452、fast 508→514、TPOT>0.10 35=35，修/新各约 300 条——新栈（DCP 三补丁，dcp=1）与旧引擎无系统差别；池 1.36M 峰值 99%、排队 6–9、host 回载 388–560 GiB/2 min，旧形态原样复现 |
-| 130eezzy-cap_full_S1dcp_w2 | 能力复核（只测最可疑的候选引擎）：S1+DCP2 跑公开 AIME26（30）+ GPQA-Diamond（197）；过线即可，S1 参照只在它失败时再跑 | — | 130eezzy-cap_full_S1dcp_w2: monitor retry: pexec_codex exit 1: Error: vouch session expired: the refresh token is no lon |  |  |  |  |  |  |
-| 130ef-v3_n30_A_warm15_fixes_60m | 基线：A′ + 修正引擎 f546934e（46676 引擎）60 分钟 | 130b-v3_n30_A_warm15_60m | 130ef-v3_n30_A_warm15_fixes_60m: monitor retry: pexec_codex exit 1: Error: vouch session expired: the refresh token is n |  |  |  |  |  |  |
-| 130ez1-v3_n34_S1dcp_w2_60m | 下一次提交候选：S1 设置（warm 15、MAX_SLOW 80）+ DCP2，引擎 e464d8ab = f546934e + DCP 三补丁，N34 running 48 | 130ez2-v3_n34_S1dcp_w1_60m | 待发布（130ef 之后） |  |  |  |  |  |  |
-| 130ez2-v3_n34_S1dcp_w1_60m | 同引擎 dcp=1 对照（N34） | 130ee5-dcp_stack2_w2_n34_60m | 待发布 |  |  |  |  |  |  |
-| 130ez3-v3_n30_S1dcp_w2_60m | S1 + DCP2 在 N30 对 S1 参照：给线上 46676→下一次提交的差值一个本地对应 | 130ef-v3_n30_A_warm15_fixes_60m | 待发布 |  |  |  |  |  |  |
+| 130eezzy-cap_full_S1dcp_w2 | 能力复核（只测最可疑的候选引擎）：S1+DCP2 跑公开 AIME26（30）+ GPQA-Diamond（197）；过线即可，S1 参照只在它失败时再跑 | — | 130eezzy-cap_full_S1dcp_w2: monitor retry: pexec_codex exit 1: Error: vouch session expired: the refresh token is no lon |  |  |  |  |  | CAP_FULL aime=28/30（93.3 分；2 道在 60000 token 截断无答案）gpqa=178/197（90.4 分；6 道截断、13 道答错），errors 0，wall 3369 s；冒烟 12/12。两科都过 90 但 GPQA 贴线，按规则加跑 S1 引擎同题参照（130ef5）分清是引擎还是题集/提示词 |
+| 130ez1-v3_n34_S1dcp_w2_60m | 46757 的配置在 N34：S1 设置（warm 15、MAX_SLOW 80）+ dcp 2，running 48；也是下面所有旋钮的对照 | 130ee5-dcp_stack2_w2_n34_60m | running |  |  |  |  |  |  |
 | 130ez4-v3_open_S1dcp_local_offa_n34 | Codex 本地续算路径探针 OFF-a（引擎 6976639e，S1+dcp2，N34 开场） | — | 已发布（能力复核之后、按名字在 130ez3 后） |  |  |  |  |  |  |
 | 130ez5-v3_open_S1dcp_local_on_n34 | 同上 ON（SGLANG_AX_DCP_LOCAL_EXTEND=1） | 130ez4-v3_open_S1dcp_local_offa_n34 | 已发布 |  |  |  |  |  |  |
 | 130ez6-v3_open_S1dcp_local_offb_n34 | 同上 OFF-b（A/A 噪声） | 130ez4-v3_open_S1dcp_local_offa_n34 | 已发布 |  |  |  |  |  |  |
-| 130f-v3_n30_A_warm15_nomtp_60m | A′ 去掉 MTP | 130b-v3_n30_A_warm15_60m | 排队中 |  |  |  |  |  |  |
-| 130g-v3g_n30_base_60m | 底座换成 v3g 数据（真实间隔） | 111-v3_n30_base_60m | 排队中 |  |  |  |  |  |  |
-| 130h-v3g_n30_A_warm15_60m | A′ 在 v3g 上 | 130g-v3g_n30_base_60m | 排队中 |  |  |  |  |  |  |
-| 136-v3_n34_base48_60m | N34 底座（上限 48） | 111-v3_n30_base_60m | 排队中（明天） |  |  |  |  |  |  |
-| 137-v3_n34_124_125x_117_48_60m | A 在 N34 | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 138-v3_n34_124_122_117_48_60m | N34：125x 换 122 | 137-v3_n34_124_125x_117_48_60m | 排队中 |  |  |  |  |  |  |
-| 139-v3_n34_base48_mamba256_60m | KDA 状态池 418→256 | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 140-v3_n34_base48_mem089_60m | 显存比例 0.87→0.89（钉住状态池） | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 141-v3_n34_base48_hicache96_60m | 主机层 64→96 GB | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 142-v3_n34_base48_nomtp_60m | 去掉 MTP（钉住状态池） | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 143-v3_n34_base48_writeback_60m | 主机层 write_back（独占式） | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
-| 144-v3_n34_base48_ssmbf16_60m | KDA 状态 bf16 | 136-v3_n34_base48_60m | 排队中 |  |  |  |  |  |  |
+| 130ez7-v3_n34_S1dcp_w2_pdi1_60m | 探索：prefill-decode-interval 2→1（稳态 prefill 更频繁，用 TPOT 换 chain/turn） | 130ez1-v3_n34_S1dcp_w2_60m | 已发布 |  |  |  |  |  |  |
+| 130ez8-v3_n34_S1dcp_w2_high8_60m | 探索：BACKLOG_HIGH_S 15→8（更早进积压模式） | 130ez1-v3_n34_S1dcp_w2_60m | 已发布 |  |  |  |  |  |  |
+| 130ez9-v3_n34_S1dcp_w2_slow250_60m | 探索：MAX_SLOW 80→250（护栏不锁死） | 130ez1-v3_n34_S1dcp_w2_60m | 已发布 |  |  |  |  |  |  |
+| 130eza-v3_n34_S1dcp_w2_multi5_60m | 探索：K3 分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 f2b6425e = e464d8ab + 9be15822 | 130ez1-v3_n34_S1dcp_w2_60m | 已发布 |  |  |  |  |  |  |
+| 130ezb-v3_n34_S1dcp_w2_nomtp_60m | 探索：DCP 引擎去掉 MTP（KDA 池钉 418） | 130ez1-v3_n34_S1dcp_w2_60m | 已发布 |  |  |  |  |  |  |

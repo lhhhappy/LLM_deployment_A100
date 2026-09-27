@@ -132,34 +132,10 @@
     "verdict": "CAP_FULL aime=28/30（93.3 分；2 道在 60000 token 截断无答案）gpqa=178/197（90.4 分；6 道截断、13 道答错），errors 0，wall 3369 s；冒烟 12/12。两科都过 90 但 GPQA 贴线，按规则加跑 S1 引擎同题参照（130ef5）分清是引擎还是题集/提示词"
   },
   {
-    "job": "130ef-v3_n30_A_warm15_fixes_60m",
-    "ref": "130b-v3_n30_A_warm15_60m",
-    "what": "基线：A′ + 修正引擎 f546934e（46676 引擎）60 分钟",
-    "status": "已发布"
-  },
-  {
-    "job": "130ef5-cap_full_S1",
-    "ref": "130eezzy-cap_full_S1dcp_w2",
-    "what": "能力复核参照：S1 引擎（f546934e，无 DCP）同题同提示词",
-    "status": "已发布（130ef 之后）"
-  },
-  {
     "job": "130ez1-v3_n34_S1dcp_w2_60m",
-    "ref": "130ez2-v3_n34_S1dcp_w1_60m",
-    "what": "下一次提交候选：S1 设置（warm 15、MAX_SLOW 80）+ DCP2，引擎 e464d8ab = f546934e + DCP 三补丁，N34 running 48",
-    "status": "待发布（130ef 之后）"
-  },
-  {
-    "job": "130ez2-v3_n34_S1dcp_w1_60m",
     "ref": "130ee5-dcp_stack2_w2_n34_60m",
-    "what": "同引擎 dcp=1 对照（N34）",
-    "status": "待发布"
-  },
-  {
-    "job": "130ez3-v3_n30_S1dcp_w2_60m",
-    "ref": "130ef-v3_n30_A_warm15_fixes_60m",
-    "what": "S1 + DCP2 在 N30 对 S1 参照：给线上 46676→下一次提交的差值一个本地对应",
-    "status": "待发布"
+    "what": "46757 的配置在 N34：S1 设置（warm 15、MAX_SLOW 80）+ dcp 2，running 48；也是下面所有旋钮的对照",
+    "status": "running"
   },
   {
     "job": "130ez4-v3_open_S1dcp_local_offa_n34",
@@ -180,75 +156,39 @@
     "status": "已发布"
   },
   {
-    "job": "130f-v3_n30_A_warm15_nomtp_60m",
-    "ref": "130b-v3_n30_A_warm15_60m",
-    "what": "A′ 去掉 MTP",
-    "status": "排队中"
+    "job": "130ez6z-v3_open_S1dcp_w2_freeze_n34",
+    "ref": "130ez4-v3_open_S1dcp_local_offa_n34",
+    "what": "124 类别首见冻结（FREEZE_CLASS=1，引擎 741f3eda）：家族兄弟不再因前缀变热被降级；对 OFF-a 探针",
+    "status": "已发布（130ez6 之后）"
   },
   {
-    "job": "130g-v3g_n30_base_60m",
-    "ref": "111-v3_n30_base_60m",
-    "what": "底座换成 v3g 数据（真实间隔）",
-    "status": "排队中"
+    "job": "130ez7-v3_n34_S1dcp_w2_pdi1_60m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：prefill-decode-interval 2→1（稳态 prefill 更频繁，用 TPOT 换 chain/turn）",
+    "status": "已发布"
   },
   {
-    "job": "130h-v3g_n30_A_warm15_60m",
-    "ref": "130g-v3g_n30_base_60m",
-    "what": "A′ 在 v3g 上",
-    "status": "排队中"
+    "job": "130ez8-v3_n34_S1dcp_w2_high8_60m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：BACKLOG_HIGH_S 15→8（更早进积压模式）",
+    "status": "已发布"
   },
   {
-    "job": "136-v3_n34_base48_60m",
-    "ref": "111-v3_n30_base_60m",
-    "what": "N34 底座（上限 48）",
-    "status": "排队中（明天）"
+    "job": "130ez9-v3_n34_S1dcp_w2_slow250_60m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：MAX_SLOW 80→250（护栏不锁死）",
+    "status": "已发布"
   },
   {
-    "job": "137-v3_n34_124_125x_117_48_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "A 在 N34",
-    "status": "排队中"
+    "job": "130eza-v3_n34_S1dcp_w2_multi5_60m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：K3 分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 f2b6425e = e464d8ab + 9be15822",
+    "status": "已发布"
   },
   {
-    "job": "138-v3_n34_124_122_117_48_60m",
-    "ref": "137-v3_n34_124_125x_117_48_60m",
-    "what": "N34：125x 换 122",
-    "status": "排队中"
-  },
-  {
-    "job": "139-v3_n34_base48_mamba256_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "KDA 状态池 418→256",
-    "status": "排队中"
-  },
-  {
-    "job": "140-v3_n34_base48_mem089_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "显存比例 0.87→0.89（钉住状态池）",
-    "status": "排队中"
-  },
-  {
-    "job": "141-v3_n34_base48_hicache96_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "主机层 64→96 GB",
-    "status": "排队中"
-  },
-  {
-    "job": "142-v3_n34_base48_nomtp_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "去掉 MTP（钉住状态池）",
-    "status": "排队中"
-  },
-  {
-    "job": "143-v3_n34_base48_writeback_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "主机层 write_back（独占式）",
-    "status": "排队中"
-  },
-  {
-    "job": "144-v3_n34_base48_ssmbf16_60m",
-    "ref": "136-v3_n34_base48_60m",
-    "what": "KDA 状态 bf16",
-    "status": "排队中"
+    "job": "130ezb-v3_n34_S1dcp_w2_nomtp_60m",
+    "ref": "130ez1-v3_n34_S1dcp_w2_60m",
+    "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）",
+    "status": "已发布"
   }
 ]
