@@ -230,7 +230,7 @@ class ChainRiskConfig:
     interval: int = 0            # decode rounds armed after a chunk of an at-risk request (0 = none)
     margin_s: float = 8.0        # at risk when the optimistic projection is within margin_s of the budget, either side
     min_remaining: int = 32768   # only requests with at least this much prefill work left after the current chunk
-    chunk: int = 8192            # chunk assumed by the cost model
+    chunk: int = 0               # 0 = this batch's planned cold cap; positive = explicit model override
 
 
 def chain_risk_config(configured_interval: int) -> Optional[ChainRiskConfig]:
@@ -239,24 +239,28 @@ def chain_risk_config(configured_interval: int) -> Optional[ChainRiskConfig]:
         return None
     cfg = ChainRiskConfig(interval=int(raw), margin_s=float(_env("SGLANG_AX_CHAIN_RISK_MARGIN_S", "8")),
                           min_remaining=int(_env("SGLANG_AX_CHAIN_RISK_MIN_REMAINING", "32768")),
-                          chunk=int(_env("SGLANG_AX_CHAIN_RISK_CHUNK", "8192")))
-    if not (0 <= cfg.interval < configured_interval and cfg.margin_s >= 0 and cfg.min_remaining >= 0 and cfg.chunk > 0):
+                          chunk=int(_env("SGLANG_AX_CHAIN_RISK_CHUNK", "0")))
+    if not (0 <= cfg.interval < configured_interval and cfg.margin_s >= 0 and cfg.min_remaining >= 0 and cfg.chunk >= 0):
         raise ValueError(f"[ax] 131: invalid chain-risk config {cfg} for --prefill-decode-interval {configured_interval} "
                          "(the risk interval must be below the configured interval)")
     return cfg
 
 
-def chain_risk_interval(req, remaining: int, waited_s: float, dl: DeadlineConfig, cfg: ChainRiskConfig) -> Optional[int]:
+def chain_risk_interval(req, remaining: int, waited_s: float, dl: DeadlineConfig, cfg: ChainRiskConfig,
+                        *, chunk: Optional[int] = None, inflight_s: float = 0.0) -> Optional[int]:
     """Decode rounds to arm after this request's chunk, or None when it is not at risk.
 
     At risk = cold class (124), at least cfg.min_remaining tokens of prefill left after the current chunk, and
-    the optimistic projection (waited so far + arrival offset + serving the rest alone at the cost model's
+    the optimistic projection (waited so far + arrival offset + current batch + serving the rest alone at the cost model's
     rate) inside [budget - margin, budget + margin]. Below the window the request is comfortable; above it,
     it is hopeless and interrupting it costs nothing at the gate, so decode keeps its rounds.
     """
     if remaining < cfg.min_remaining or not deadline_cold(req, dl):
         return None
-    projected = waited_s + dl.arrival_offset_s + service_s(remaining, cfg.chunk, dl)
+    model_chunk = cfg.chunk or chunk
+    if model_chunk is None or model_chunk <= 0 or inflight_s < 0:
+        raise ValueError("[ax] 131 needs a positive planned chunk and a non-negative current-batch cost")
+    projected = waited_s + dl.arrival_offset_s + inflight_s + service_s(remaining, model_chunk, dl)
     budget = budget_s(req, dl)
     if budget - cfg.margin_s < projected <= budget + cfg.margin_s:
         return cfg.interval

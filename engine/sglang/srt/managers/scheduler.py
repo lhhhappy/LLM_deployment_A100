@@ -1328,6 +1328,7 @@ class Scheduler(
         m115_local = local_extend_mechanism_tokens(
             getattr(self.tp_worker, "model_runner", None)
         )
+        risk_cfg = self._ax_chain_risk_cfg()
         items = {
             "101": m101,
             "117": self._ax_humming_report(),
@@ -1341,7 +1342,9 @@ class Scheduler(
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
             "128p": "on" if getattr(self, "_ax_prefix_tracker", None) else "off:SGLANG_AX_PREFIX_PRODUCER_unset",
-            "131": "on" if self._ax_chain_risk_cfg() is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
+            "131": "on" if risk_cfg is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
+            "131_sync": "rank0" if risk_cfg is not None else "off",
+            "131_chunk": (str(risk_cfg.chunk) if risk_cfg.chunk else "auto") if risk_cfg is not None else "off",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1977,9 +1980,15 @@ class Scheduler(
             backlog = getattr(self, "_ax_admission_cfg", (None, None))[1]
             if backlog is not None and self._ax_backlog_relieved:
                 interval = backlog.relaxed_interval  # [ax] 125
-            risk = self._ax_chain_risk_interval(batch)  # [ax] 131
-            if risk is not None and risk < interval:
-                interval = risk
+            if self._ax_chain_risk_cfg() is not None:
+                # 131 reads rank-local clocks and the classification frozen by
+                # rank 0's admission plan. Only rank 0 may choose the cadence;
+                # every request-group rank enters, even when no request is at risk.
+                def decide_interval():
+                    risk = self._ax_chain_risk_interval(batch)
+                    return interval if risk is None else min(interval, risk)
+
+                interval = self._ax_rank0_decide(decide_interval)
             self._prefill_decode_interval_remaining = interval
 
     def _ax_chain_risk_cfg(self):
@@ -2002,6 +2011,12 @@ class Scheduler(
             return None
         deadline = self._ax_admission_cfgs()[0]
         now = time.perf_counter()
+        chunk = getattr(batch, "_ax_chain_risk_chunk", None)
+        # Arming happens BEFORE this batch's forward. Its tokens have already
+        # been removed from `left` below, but their execution time is still due.
+        # All requests wait for this batch, including its READY/ordinary riders.
+        current_tokens = batch.extend_num_tokens or 0
+        inflight_s = ax_deadline.service_s(current_tokens, max(current_tokens, 1), deadline)
         best = None
         for req in batch.reqs:
             ts = req.time_stats
@@ -2009,7 +2024,8 @@ class Scheduler(
             waited = max(0.0, now - start) if start else 0.0
             # prefix_indices covers the chunks scheduled before this one; extend_input_len is this chunk.
             left = max(0, req.seqlen - len(req.prefix_indices) - (getattr(req, "extend_input_len", 0) or 0))
-            r = ax_deadline.chain_risk_interval(req, left, waited, deadline, cfg)
+            r = ax_deadline.chain_risk_interval(req, left, waited, deadline, cfg,
+                                               chunk=chunk, inflight_s=inflight_s)
             if r is not None and (best is None or r < best):
                 best = r
         if best is not None:
@@ -4698,6 +4714,14 @@ class Scheduler(
             self.spec_algorithm,
             chunked_req=batch_chunked_req,
         )
+
+        if self._ax_chain_risk_cfg() is not None:
+            # Capture this batch's final planned cap (after 125/126/READY),
+            # not a fixed 8k or a short last fragment caused by role alignment.
+            new_batch._ax_chain_risk_chunk = min(
+                chunked_prefill_size, self.max_prefill_tokens,
+                adder.ax_protect[0] if adder.ax_protect else chunked_prefill_size,
+            )
 
         new_batch.contains_last_prefill_chunk = (
             batch_chunked_req is None or len(can_run_list) != 1
