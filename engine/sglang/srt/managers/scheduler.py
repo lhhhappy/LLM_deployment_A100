@@ -111,7 +111,8 @@ from sglang.srt.layers.quantization.fp8_utils import initialize_fp8_gemm_config
 from sglang.srt.layers.quantization.unquant import initialize_bf16_gemm_config
 from sglang.srt.lora.lora_drainer import LoRADrainer
 from sglang.srt.lora.lora_overlap_loader import LoRAOverlapLoader
-from sglang.srt.managers import ax_deadline
+from sglang.srt.managers import ax_deadline, ax_prefix_producer
+from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.managers.disagg_service import maybe_create_ascend_config_store
 from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
 from sglang.srt.managers.io_struct import (
@@ -1334,6 +1335,7 @@ class Scheduler(
             "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
+            "128p": "on" if getattr(self, "_ax_prefix_tracker", None) else "off:SGLANG_AX_PREFIX_PRODUCER_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1500,6 +1502,19 @@ class Scheduler(
             family = ax_deadline.family_config()
             if family and not deadline:
                 raise ValueError("[ax] 128 ranks families inside 124's order; set SGLANG_AX_DEADLINE_TIERS=1")
+            producer = ax_prefix_producer.config()
+            if producer:
+                if not deadline or blocker is not None:
+                    raise ValueError("[ax-prefix] requires 124 and 120's supported scheduler/cache path")
+                if family:
+                    raise ValueError("[ax-prefix] mutually exclusive with SGLANG_AX_DEADLINE_FAMILY")
+                if self.schedule_policy != "lpm" or self.enable_priority_scheduling:
+                    raise ValueError("[ax-prefix] requires LPM without priority scheduling")
+                if self._ax_pace() is not None or self.min_free_slots_delayer is not None:
+                    raise ValueError("[ax-prefix] does not support pace or min-free-slot delay")
+                logger.info("[ax-prefix] on: %s; trace is bounded per flush; native allocation is authoritative", producer)
+            self._ax_prefix_tracker = ax_prefix_producer.Tracker(producer) if producer else None
+            self._ax_prefix_applied_sequence = 0
             self._ax_family_cfg = family
             self._ax_family_shared = {}
             self._ax_family_last = (0.0, None)
@@ -1526,6 +1541,9 @@ class Scheduler(
             self._ax_family_last = (0.0, None)
         if getattr(self, "_ax_reserve_state", None) is not None:
             self._ax_reserve_state = (None, frozenset(), frozenset())
+        if getattr(self, "_ax_prefix_tracker", None) is not None:
+            self._ax_prefix_tracker.reset()
+            self._ax_prefix_applied_sequence = 0
 
     def _ax_family_plan(self, cfg, deadline):
         """[ax] 128 (request-plane rank 0): families among the waiting cold requests from block hashes of their
@@ -1591,7 +1609,19 @@ class Scheduler(
             family = getattr(self, "_ax_family_cfg", None)
             if family is not None:
                 work, family_held = self._ax_family_plan(family, deadline)
-            ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
+            producer = getattr(self, "_ax_prefix_tracker", None)
+            if producer is not None:
+                _, short, grid = adder.ax_protect
+                slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+                ranked, held, family_held = producer.prepare(
+                    self.waiting_queue, cont, running_batch.reqs, held,
+                    getattr(self.policy, "ax_prefix_held_by", {}), now, waited,
+                    deadline, round_budget, grid, short,
+                    lambda r: r is cont or (slots > 0 and adder._request_total_tokens(
+                        r, r.seqlen - len(r.prefix_indices)) < adder.rem_total_tokens),
+                    held_depth=getattr(self.policy, "ax_prefix_held_depth", {}))
+            else:
+                ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
             order = [r.rid for r in ranked]
             if cont is not None and self.get_num_allocatable_reqs(
                 len(running_batch.reqs), running_batch=running_batch
@@ -1608,7 +1638,8 @@ class Scheduler(
                     budget = adder.ax_complete_waiter_budget(head) if adder is not None else round_budget
                     if budget <= 0:
                         continue
-                    park = ax_deadline.should_park(
+                    parking_decision = producer.should_park if producer is not None else ax_deadline.should_park
+                    park = parking_decision(
                         cont, cont_left, waited(cont), head, head_waited,
                         budget, kv_room, rounds, parked_s, deadline,
                     )
@@ -1640,6 +1671,145 @@ class Scheduler(
             stats["log_t"] = now
             logger.info("[ax-124/125] parks=%d relief_rounds=%d", stats["parks"], stats["relief_rounds"])
         return order, park, relieved
+
+    def _ax_prefix_plan(self, running_batch, round_budget, kv_room, adder):
+        """Rank-0 two-phase plan: native matches -> dependencies/order -> seats.
+
+        With 126, ordinary short-hit demand is reserved after the final order;
+        READY uses its own authoritative transaction and never 126's blacklist.
+        """
+        order, park, relieved = self._ax_admission_plan(running_batch, round_budget, kv_room, adder)
+        tracker = self._ax_prefix_tracker
+        cont = self.chunked_req
+        grid = adder.ax_protect[2]
+        demand = self._ax_demand_cap_max() is not None
+        cold_floor = max(grid, _ax_sched_protect_config()[0] // grid * grid) if demand else grid
+        floor = 0
+        if cont is not None and not park:
+            floor = min(adder.ceil_paged_tokens(cont.seqlen - len(cont.prefix_indices)),
+                        max(cold_floor, math.ceil(tracker.cfg.min_progress / grid) * grid),
+                        adder.ax_protect[0])
+        reserve_kv = 0
+        if floor:
+            reserve_kv = floor + self.page_size + adder._mamba_gap_budget_for_req(cont)
+            if cont.seqlen - len(cont.prefix_indices) <= floor:
+                reserve_kv = adder._request_total_tokens(cont, floor)
+        slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+        if adder.prefill_max_requests is not None:
+            slots = min(slots, adder.prefill_max_requests)
+        slots -= int(cont is not None and not park)
+        by_id = {r.rid: r for r in self.waiting_queue}
+        ready, preview = [], []
+        tokens, kv, mamba_slots = 0, 0, 0
+        for rid in order:
+            req = by_id[rid]
+            if not tracker.ready(rid):
+                # Never jump a higher-ranked runnable short waiter or the
+                # selected parking rescue. Long waiters cannot join a partial.
+                if park or cont is None or (adder._ax_short_hit(req) and adder.ax_complete_waiter_budget(req)):
+                    break
+                continue
+            reason = adder.ax_prefix_preview(req, floor + tokens, reserve_kv + kv)
+            if slots <= len(ready) or running_batch.batch_is_full:
+                reason = "request_slots"
+            if (adder.rem_mamba_slots is not None and adder._mamba_gap_budget_for_req(req)
+                    and adder.rem_mamba_slots <= mamba_slots):
+                reason = "mamba_slots"
+            preview.append((rid, reason))
+            if reason != "ready":
+                continue
+            match = ax_prefix_readiness.view(req)
+            needed = adder.ceil_paged_tokens(req.seqlen - match.device)
+            ready.append((rid, match.device, needed))
+            tokens += needed
+            kv += adder._request_total_tokens(req, needed)
+            mamba_slots += int(bool(adder._mamba_gap_budget_for_req(req)))
+            if len(ready) >= tracker.cfg.max_ready:
+                break
+        ordinary_reserve = 0
+        if demand:
+            ordinary_reserve = self._ax_short_hit_reserve(
+                min(adder.rem_chunk_tokens, adder.rem_input_tokens) - tokens,
+                cold_floor, adder.ax_protect[1],
+                requests=[by_id[rid] for rid in order if not tracker.ready(rid)
+                          and rid not in tracker.wait_prefix])
+        return dict(version=tracker.VERSION, epoch=tracker.epoch, sequence=tracker.sequence,
+                    order=order, park=park, relieved=relieved, ready=ready, preview=preview,
+                    continuation=cont.rid if cont else None, floor=floor, reserve_kv=reserve_kv,
+                    wait_prefix=sorted(tracker.wait_prefix),
+                    demand=demand, cold_floor=cold_floor, ordinary_reserve=ordinary_reserve,
+                    reserved_tokens=tokens, cold_cap=adder.ax_protect[0], queue=len(order))
+
+    def _ax_prefix_consensus(self, value):
+        # All ranks enter once per planned READY attempt, even after local COW
+        # rejection. A differing live match rejects the seat on *every* rank.
+        from sglang.srt.managers.ax_rank0_decision import same_decision
+
+        return same_decision(self.dp_tp_cpu_group, value)
+
+    def _ax_prefix_cleanup(self, req, had_mamba):
+        req.kv.mamba_cow_src_index = None
+        req.kv.mamba_needs_clear = False
+        if not had_mamba and req.kv.holds_mamba:
+            self.tree_cache.req_to_token_pool.mamba_allocator.free(req.kv.mamba_pool_idx.unsqueeze(-1))
+            req.kv.mamba_pool_idx = None
+
+    def _ax_prefix_admit_ready(self, adder, plan, running_batch):
+        """Attempt complete tails before charging the continuation.
+
+        The unspent seat needs no rollback. Failed COW/rematch/admission frees
+        only a newly allocated request state; the continuation runs below in
+        this same scheduling pass with the original cap and live KV budget.
+        """
+        attempts = {rid for rid, reason in plan["preview"] if reason != "ready"}
+        results = [(rid, "preview_" + reason) for rid, reason in plan["preview"] if reason != "ready"]
+        by_id = {r.rid: r for r in self.waiting_queue}
+        for rid, expected_prefix, expected_tokens in plan["ready"]:
+            req = by_id[rid]
+            attempts.add(rid)
+            had_mamba = req.kv.holds_mamba
+            req._ax_prefix_reserving = True
+            reason = "ready"
+            added = False
+            try:
+                try:
+                    req.init_next_round_input(self.tree_cache)
+                except ax_prefix_readiness.ReservationUnavailable as exc:
+                    reason = str(exc)
+                # Pin before preview: locking removes evictable capacity and
+                # must be included in the gate that protects producer progress.
+                with adder._lock_node(req.last_node) if reason == "ready" else nullcontext():
+                    if reason == "ready":
+                        reason = adder.ax_prefix_preview(req, plan["floor"], plan["reserve_kv"])
+                        match = ax_prefix_readiness.view(req)
+                        if match is None or match.device < expected_prefix:
+                            reason = "match_regressed"
+                        slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+                        if adder.prefill_max_requests is not None:
+                            slots = min(slots, adder.prefill_max_requests)
+                        if len(adder.can_run_list) + int(bool(plan["floor"])) >= slots:
+                            reason = "request_slots"
+                    signature = (rid, reason, len(req.prefix_indices), req.host_hit_length,
+                                 getattr(req, "mamba_host_hit_length", 0))
+                    if not self._ax_prefix_consensus(signature):
+                        reason = "rank_match_disagreement"
+                    if reason == "ready":
+                        # has_chunked_req=True also forbids 101's tail role split
+                        # when no continuation exists: this is a COMPLETE seat.
+                        res = adder.add_one_req(req, has_chunked_req=True,
+                                                truncation_align_size=self.truncation_align_size)
+                        added = bool(adder.can_run_list and adder.can_run_list[-1] is req)
+                        reason = "admitted" if added else "adder_" + res.name.lower()
+                    if not self._ax_prefix_consensus((rid, added, req.extend_range.end if added else 0)):
+                        raise RuntimeError("[ax-prefix] authoritative admission differs across TP ranks")
+            finally:
+                req._ax_prefix_reserving = False
+                if not added:
+                    self._ax_prefix_cleanup(req, had_mamba)
+            if added and (adder.new_chunked_req is req or req.extend_range.end != req.seqlen):
+                raise RuntimeError("[ax-prefix] READY reservation created a partial request")
+            results.append((rid, reason))
+        return attempts, results
 
     def _ax_pace_now(self) -> float:
         # Every TP rank must take the same decision: agree on one clock (max over ranks). Only called
@@ -1745,7 +1915,7 @@ class Scheduler(
         cap = max(grid, (budget - reserve) // grid * grid)
         return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
 
-    def _ax_short_hit_reserve(self, budget: int, min_cold: int, short: int) -> int:
+    def _ax_short_hit_reserve(self, budget: int, min_cold: int, short: int, requests=None) -> int:
         """[ax] 122/126: tokens to keep free for the waiting complete short hits (device prefix hit, no host
         load-back, 0 < new tokens <= `short`), page-rounded, in queue order (prefix matched by calc_priority this
         round). A hit is reserved only if it fits beside a cold chunk of `min_cold` tokens; otherwise it can never
@@ -1760,11 +1930,12 @@ class Scheduler(
         """
         cont = self.chunked_req.rid if self.chunked_req is not None else None
         last_cont, last_reserved, blocked = getattr(self, "_ax_reserve_state", (None, frozenset(), frozenset()))
-        waiting = {req.rid for req in self.waiting_queue}
+        requests = self.waiting_queue if requests is None else requests
+        waiting = {req.rid for req in requests}
         blocked = (blocked | last_reserved) & waiting if cont == last_cont else frozenset()
         reserve = 0
         reserved = []
-        for req in self.waiting_queue:
+        for req in requests:
             if req.rid in blocked:
                 continue
             new = req.seqlen - len(req.prefix_indices)
@@ -4196,7 +4367,16 @@ class Scheduler(
             # [ax] 126 with 125: while relieved, 125's cold cap is the maximum the demand-sized cap may reach, so
             # the waiting short hits keep their seat beside the cold chunk in the opening as well (run 109: warm
             # turn starts waited 18-23 s for the lane while relief ran 8192-token cold chunks with no room left).
-            ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect, cap_max=relieved_cap or None)
+            if self._ax_prefix_tracker is None:
+                ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect, cap_max=relieved_cap or None)
+            else:
+                # 128p finalizes 126's reservation after rank-0 ordering. Start
+                # with the allowed maximum, so a rejected READY seat can be
+                # returned to the continuation in this very pass.
+                floor, short, grid = ax_protect
+                budget = min(chunked_prefill_size, self.max_prefill_tokens) // grid * grid
+                maximum = (relieved_cap or self._ax_demand_cap_max()) // grid * grid
+                ax_protect = (max(floor, min(maximum, budget)), short, grid)
         elif relieved_cap:
             _, short, grid = ax_protect
             budget = min(chunked_prefill_size, self.max_prefill_tokens) // grid * grid
@@ -4224,6 +4404,7 @@ class Scheduler(
 
         deadline, backlog = self._ax_admission_cfgs()
         ax_park = False
+        ax_prefix_plan = None
         if deadline is not None or backlog is not None:
             # [ax] 124/125: decided on request-plane rank 0 (rank-local clocks and stamps) and applied on
             # every rank. Reached under identical control flow: waiting requests or a continuation exist.
@@ -4231,9 +4412,21 @@ class Scheduler(
             # adder's candidate-specific complete-fit budget, including KV.
             round_budget = min(chunked_prefill_size, ax_protect[0]) if ax_protect else chunked_prefill_size
             kv_room = int(adder.rem_total_tokens)
-            order, ax_park, self._ax_backlog_relieved = self._ax_rank0_decide(
-                lambda: self._ax_admission_plan(running_batch, round_budget, kv_room, adder=adder)
-            )
+            if self._ax_prefix_tracker is not None:
+                ax_prefix_plan = self._ax_rank0_decide(
+                    lambda: self._ax_prefix_plan(running_batch, round_budget, kv_room, adder))
+                if (ax_prefix_plan["version"] != self._ax_prefix_tracker.VERSION
+                        or ax_prefix_plan["epoch"] != self._ax_prefix_tracker.epoch
+                        or ax_prefix_plan["sequence"] != self._ax_prefix_applied_sequence + 1
+                        or ax_prefix_plan["continuation"] != (self.chunked_req.rid if self.chunked_req else None)):
+                    raise RuntimeError("[ax-prefix] stale plan or different continuation across TP ranks")
+                self._ax_prefix_applied_sequence = ax_prefix_plan["sequence"]
+                order, ax_park, self._ax_backlog_relieved = (
+                    ax_prefix_plan["order"], ax_prefix_plan["park"], ax_prefix_plan["relieved"])
+            else:
+                order, ax_park, self._ax_backlog_relieved = self._ax_rank0_decide(
+                    lambda: self._ax_admission_plan(running_batch, round_budget, kv_room, adder=adder)
+                )
             if order is not None:
                 by_id = {r.rid: r for r in self.waiting_queue}
                 if (len(by_id) != len(self.waiting_queue) or len(order) != len(self.waiting_queue)
@@ -4246,7 +4439,7 @@ class Scheduler(
             # When parking, leave the adder's continuation unset so a complete
             # waiter can run. Count the park only after admission succeeds;
             # otherwise resume this owner below in the same scheduling pass.
-            if not ax_park:
+            if not ax_park and ax_prefix_plan is None:
                 if deadline is not None:
                     self.chunked_req._ax_parked_rounds = 0
                 self.chunked_req = adder.add_chunked_req(self.chunked_req)
@@ -4268,9 +4461,28 @@ class Scheduler(
         mamba_allocator = getattr(self.req_to_token_pool, "mamba_allocator", None)
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_begin(len(self.waiting_queue))
+        prefix_attempts, prefix_results = set(), []
+        if ax_prefix_plan is not None:
+            prefix_attempts, prefix_results = self._ax_prefix_admit_ready(adder, ax_prefix_plan, running_batch)
+            if ax_prefix_plan["demand"]:
+                cap, short, grid = adder.ax_protect
+                remaining = min(adder.rem_chunk_tokens, adder.rem_input_tokens)
+                cap = max(ax_prefix_plan["cold_floor"], min(cap,
+                    (remaining - ax_prefix_plan["ordinary_reserve"]) // grid * grid))
+                adder.ax_protect = (cap, short, grid)
+            if self.chunked_req is not None and not ax_park:
+                self.chunked_req._ax_parked_rounds = 0
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
         # Get requests from the waiting queue to a new prefill batch
         for req in self.waiting_queue:
+            if req.rid in prefix_attempts:
+                continue  # no second COW/allocation attempt in this pass
+            if ax_prefix_plan is not None and req.rid in ax_prefix_plan["wait_prefix"]:
+                prefix_results.append((req.rid, "wait_prefix"))
+                continue
             if adder.chunk_budget_exhausted():
+                if ax_prefix_plan is not None:
+                    prefix_results.append((req.rid, "queue_stop_chunk_budget"))
                 break
 
             if self.enable_lora and not self._can_schedule_lora_req(req, running_loras):
@@ -4297,6 +4509,8 @@ class Scheduler(
                     not self.enable_priority_preemption
                     or not adder.preempt_to_schedule(req)
                 ):
+                    if ax_prefix_plan is not None:
+                        prefix_results.append((req.rid, "queue_stop_request_slots"))
                     break
 
             if self.enable_hicache_storage:
@@ -4334,6 +4548,9 @@ class Scheduler(
                 has_chunked_req=(self.chunked_req is not None),
                 truncation_align_size=self.truncation_align_size,
             )
+            if ax_prefix_plan is not None:
+                added = bool(adder.can_run_list and adder.can_run_list[-1] is req)
+                prefix_results.append((req.rid, "ordinary_admitted" if added else "ordinary_" + res.name.lower()))
 
             if self.enable_lora:
                 running_loras.add(req.lora_id)
@@ -4391,6 +4608,11 @@ class Scheduler(
                 self._ax_park_start = 0.0
                 running_batch.batch_is_full = batch_was_full
                 self.chunked_req = adder.add_chunked_req(self.chunked_req)
+
+        if ax_prefix_plan is not None:
+            self._ax_rank0_decide(lambda: self._ax_prefix_tracker.log(
+                logger, time.perf_counter(), ax_prefix_plan, prefix_results,
+                [req.rid for req in adder.can_run_list]))
 
         # Update waiting queue
         can_run_list: List[Req] = adder.can_run_list
@@ -5037,6 +5259,11 @@ class Scheduler(
                 self.process_batch_result_disagg_prefill(batch, result)
             else:
                 self.batch_result_processor.process_batch_result_prefill(batch, result)
+                prefix_tracker = getattr(self, "_ax_prefix_tracker", None)
+                if prefix_tracker is not None:
+                    for req in batch.reqs:
+                        if req.output_ids and req is not batch.chunked_req:
+                            prefix_tracker.note_prefill_finished(req, logger)
         elif batch.forward_mode.is_prebuilt():
             self.batch_result_processor.process_batch_result_prebuilt(batch)
         elif batch.forward_mode.is_idle():

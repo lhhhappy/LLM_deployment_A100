@@ -209,6 +209,10 @@ class MambaComponent(TreeComponent):
                 self.cache.dec_lock_ref(
                     result.best_match_node, lock_result.to_dec_params()
                 )
+                if dst_index is None and getattr(req, "_ax_prefix_reserving", False):
+                    from sglang.srt.mem_cache.ax_prefix_readiness import ReservationUnavailable
+
+                    raise ReservationUnavailable("mamba_cow_slots")
                 assert dst_index is not None, "Can not alloc mamba cache"
             req.kv.mamba_pool_idx = dst_index[0]
         req.kv.mamba_cow_src_index = src_index

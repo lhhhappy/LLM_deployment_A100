@@ -70,6 +70,7 @@ from sglang.srt.mem_cache.multi_ended_allocator import (
     UnifiedMambaTokenToKVPoolAllocator,
 )
 from sglang.srt.mem_cache.radix_cache import RadixCache, RadixKey, TreeNode
+from sglang.srt.mem_cache import ax_prefix_readiness
 
 if TYPE_CHECKING:
     from sglang.srt.mem_cache.allocator import BaseTokenToKVPoolAllocator
@@ -160,6 +161,12 @@ def match_prefix_for_req(
     # this request's SWA ring. No-op for other layouts.
     reprefill_tail = tree_cache.swa_reprefill_tail_tokens()
     key_limit = max(0, len(token_ids) - reprefill_tail) if reprefill_tail else None
+    if ax_prefix_readiness.ENABLED and ax_prefix_readiness.eligible(req):
+        # Match exactly the consumer admission limit (including the final
+        # logits token). Merely clipping a longer match's length could claim a
+        # checkpoint at a split where no KDA state actually exists.
+        admission_limit = req._compute_max_prefix_len(len(token_ids))
+        key_limit = admission_limit if key_limit is None else min(key_limit, admission_limit)
 
     match_result = tree_cache.match_prefix(
         MatchPrefixParams(
@@ -202,6 +209,8 @@ def match_prefix_for_req(
         req.mamba_branching_seqlen = match_result.mamba_branching_seqlen
     if match_result.cache_protected_len is not None:
         req.kv.cache_protected_len = match_result.cache_protected_len
+    if ax_prefix_readiness.ENABLED:
+        ax_prefix_readiness.capture(req, match_result, max_len)
     return match_result
 
 
@@ -255,6 +264,11 @@ class SchedulePolicy:
     ) -> None:
         policy = self._determine_active_policy(waiting_queue)
         self.ax_held = set()  # [ax] 124 keeps LPM's in-batch prefix-sharing holdbacks last
+        if ax_prefix_readiness.ENABLED:
+            self.ax_prefix_held_by = {}
+            self.ax_prefix_held_depth = {}
+            for req in waiting_queue:
+                req._ax_prefix_match = None  # never reuse a previous round's match
 
         # Populate req.num_matched_prefix_tokens at schedule time. Cache-aware policies
         # set it in _compute_prefix_matches; do the same full match for
@@ -363,6 +377,7 @@ class SchedulePolicy:
         """
         temporary_deprioritized: Set[int] = set()
         self.waiting_queue_radix_tree.reset()
+        prefix_representatives = [] if ax_prefix_readiness.ENABLED else None
 
         for r in waiting_queue:
             prefix_ids = r.origin_input_ids + r.output_ids
@@ -399,6 +414,10 @@ class SchedulePolicy:
                     >= IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD
                 ):
                     temporary_deprioritized.add(r.rid)
+                    if prefix_representatives is not None:
+                        self.ax_prefix_held_by[r.rid] = ax_prefix_readiness.held_owner(
+                            r, prefix_representatives, len(in_batch_matching_prefixes))
+                        self.ax_prefix_held_depth[r.rid] = len(in_batch_matching_prefixes)
                 else:
                     # Insert with a dummy key
                     self.waiting_queue_radix_tree.insert(
@@ -411,6 +430,8 @@ class SchedulePolicy:
                             value=torch.empty(len(prefix_ids), dtype=torch.bool),
                         )
                     )
+                    if prefix_representatives is not None and len(prefix_representatives) < 64:
+                        prefix_representatives.append(r)
         return temporary_deprioritized
 
     @staticmethod
@@ -1138,6 +1159,31 @@ class PrefillAdder:
             if not device_short:
                 budget = min(budget, cap)
         return int(budget) if compute <= budget else 0
+
+    def ax_prefix_preview(self, req, reserve_tokens=0, reserve_kv=0):
+        """Read-only complete-device-tail check, including a continuation floor.
+
+        Used again while the consumer's native cache lock is held, after COW.
+        A successful preview neither allocates nor promises admission.
+        """
+        match = ax_prefix_readiness.view(req)
+        if match is None:
+            return "no_native_match"
+        reason = match.reason(req.seqlen, self.ax_protect[1])
+        if reason != "ready":
+            return reason
+        needed = self.ceil_paged_tokens(req.seqlen - match.device)
+        if needed > min(self.rem_chunk_tokens, self.rem_input_tokens) - reserve_tokens:
+            return "round_budget"
+        gap = self._mamba_gap_budget_for_req(req)
+        if self.rem_mamba_slots is not None and gap and self.rem_mamba_slots <= 0:
+            return "mamba_slots"
+        if (self._request_total_tokens(req, needed) + reserve_kv >= self.rem_total_tokens
+                or needed + self.page_size + gap + reserve_kv >= self.cur_rem_tokens):
+            return "kv_budget"
+        if self.prefill_max_requests is not None and len(self.can_run_list) >= self.prefill_max_requests:
+            return "prefill_slots"
+        return "ready"
 
     def add_chunked_req(self, req: Req):
         if self.dllm_config is not None:

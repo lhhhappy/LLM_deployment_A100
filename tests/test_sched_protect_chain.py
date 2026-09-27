@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import ast
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from enum import Enum, auto
 from functools import lru_cache
 import hashlib
@@ -142,7 +142,7 @@ def compile_nodes(path, names, ns):
 
 def load_source(root=CANDIDATE):
     ns = dict(Union=Union, Enum=Enum, auto=auto, math=math, os=os, random=random, time=time,
-              lru_cache=lru_cache, contextmanager=contextmanager, Counter=Counter,
+              lru_cache=lru_cache, contextmanager=contextmanager, nullcontext=nullcontext, Counter=Counter,
               logger=logging.getLogger('p120'), _IS_HIP=False, PREFILL_TILE_BUDGET=0,
               PREFILL_TILE_BUDGET_MODE='compact', CLIP_MAX_NEW_TOKENS=4096,
               IGNORE_EOS_RESERVE_TOKENS=1, _ROLE_BOUNDARY_SCAN_WINDOW=32768,
@@ -178,6 +178,7 @@ def load_source(root=CANDIDATE):
              '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits',
              '_ax_humming_report', '_ax_scatter_report', '_ax_admission_cfgs', '_ax_admission_plan',
              '_ax_family_plan', '_ax_flush_admission_state',
+             '_ax_prefix_plan', '_ax_prefix_consensus', '_ax_prefix_cleanup', '_ax_prefix_admit_ready',
              '_ax_demand_cap_max', '_ax_demand_limits', '_ax_short_hit_reserve'}
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
@@ -190,6 +191,18 @@ def load_source(root=CANDIDATE):
         spec = importlib.util.spec_from_file_location('ax_deadline', deadline)
         ns['ax_deadline'] = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(ns['ax_deadline'])
+    readiness = root / 'srt/mem_cache/ax_prefix_readiness.py'
+    if readiness.exists():
+        spec = importlib.util.spec_from_file_location('ax_prefix_readiness', readiness)
+        ns['ax_prefix_readiness'] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ns['ax_prefix_readiness'])
+        managers, cache = ModuleType('sglang.srt.managers'), ModuleType('sglang.srt.mem_cache')
+        managers.ax_deadline = ns['ax_deadline']
+        cache.ax_prefix_readiness = ns['ax_prefix_readiness']
+        spec = importlib.util.spec_from_file_location('ax_prefix_producer', root / 'srt/managers/ax_prefix_producer.py')
+        ns['ax_prefix_producer'] = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'sglang.srt.managers': managers, 'sglang.srt.mem_cache': cache}):
+            spec.loader.exec_module(ns['ax_prefix_producer'])
     ns.setdefault('sys', sys)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
@@ -211,6 +224,7 @@ def make_scheduler(root=CANDIDATE, waiting=(), chunk=None, running=(), budget=81
                  'enable_dynamic_chunking', 'is_mixed_chunk', 'enable_overlap'):
         setattr(s, name, False)
     s.ps = NS(pp_size=1, tp_size=1, tp_rank=0)
+    s.schedule_policy = 'lpm'
     s.dllm_config = None
     s.disaggregation_mode = 'null'
     s.chunked_prefill_size = budget

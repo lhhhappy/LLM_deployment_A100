@@ -36,6 +36,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 117 | FP8 MoE via Humming W8A16 on sm80 (takes precedence over 111) | no | `SGLANG_AX_SM80_FP8_MOE_HUMMING` (0) | dev box only |
 | 118 | DSA sparse attention through a Triton kernel instead of TileLang (prefill, verify, draft, decode) | no | `SGLANG_AX_DSA_SPARSE_TRITON` (off) | not run on 8 cards |
 | 128 | family leader ranking inside 124: waiting cold requests sharing an uncached prefix (256-token block hashes) form a family; the leader ranks by work per rider, riders wait for it | no | `SGLANG_AX_DEADLINE_FAMILY` (0), needs 124 | CPU only; N34 opening probe pending |
+| 128p | [Tracked prefix producers and READY sibling admission](docs/128-prefix-producer.md), an alternative to old 128 | no | `SGLANG_AX_PREFIX_PRODUCER` (0), needs 124/120; excludes old 128 | CPU + TP2/DCP2/MTP/HiCache diagnostic; independent review and TP8 N34 pending |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |
@@ -49,8 +50,9 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 172 | Marlin MoE clamped-SwiGLU fusion | no | `SGLANG_AX_MOE_FUSE_SWIGLU` (0) | 057 dev N22: TPOT mean −1.6%, mixed TTFT; one run |
 | 180 | HiCache host tier for GLM DSA; keeps 120/122 on with the host tier | no | `--enable-hierarchical-cache --hicache-size N` (off) | 059/060 used the old version (120 silently off); 063s full N30 with 122 queued; GPU restore correctness still unverified |
 
-124 (short-hit reserve) was not migrated: it conflicts with 122/123, and 122 has its own short-hit reserve. Its patch remains in
-git history (the `patches/` directory was removed after the migration).
+The current [124](docs/124-deadline-admission.md) implements deadline admission and bounded continuation parking.
+[125](docs/125-opening-mode.md) controls backlog relief; [126](docs/126-demand-cold-cap.md) reserves short-hit demand.
+The older pre-migration patch also numbered 124 is historical and is not the current 124 dependency of 128/128p.
 
 ## Default-off audit (2026-09-24, by reading `git diff official-A-0923a HEAD`)
 - 118, 122, 123, 171, 172: identical when off.

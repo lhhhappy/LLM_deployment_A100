@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from sglang.srt.dllm.config import DllmConfig
 from sglang.srt.managers import ax_chunk_alignment
+from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.model_executor.forward_batch_info import ForwardBatch
 from sglang.srt.runtime_context import (
     get_disagg,
@@ -1469,6 +1470,8 @@ class Req(ReqDllmMixin):
                 match_result = zero_match_result(
                     tree_cache, match_result, extra_key=self.extra_key
                 )
+            if ax_prefix_readiness.ENABLED:
+                ax_prefix_readiness.capture(self, match_result, self._compute_max_prefix_len(input_len))
             (
                 self.prefix_indices,
                 self.last_node,

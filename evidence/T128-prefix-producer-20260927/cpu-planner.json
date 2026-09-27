@@ -1,0 +1,58 @@
+{
+  "validity": "CPU_DIAGNOSTIC",
+  "python": "3.10.12",
+  "tokens_per_request": 201024,
+  "representation": "array('q')",
+  "results": [
+    {
+      "candidates": 34,
+      "samples": [
+        {
+          "first_ms": 39.10095803439617,
+          "steady_ms": 0.22001386581299204,
+          "prompt_bytes": 54678528,
+          "pairs": 561
+        },
+        {
+          "first_ms": 39.17629102943465,
+          "steady_ms": 0.21305696767133972,
+          "prompt_bytes": 54678528,
+          "pairs": 561
+        },
+        {
+          "first_ms": 29.889333003666252,
+          "steady_ms": 0.20791803253814578,
+          "prompt_bytes": 54678528,
+          "pairs": 561
+        }
+      ],
+      "first_median_ms": 39.10095803439617,
+      "steady_median_ms": 0.21305696767133972
+    },
+    {
+      "candidates": 64,
+      "samples": [
+        {
+          "first_ms": 68.44150001415983,
+          "steady_ms": 0.534070834207038,
+          "prompt_bytes": 102924288,
+          "pairs": 2016
+        },
+        {
+          "first_ms": 79.19541699811816,
+          "steady_ms": 0.534144431973497,
+          "prompt_bytes": 102924288,
+          "pairs": 2016
+        },
+        {
+          "first_ms": 56.80016701808199,
+          "steady_ms": 0.5317597009707242,
+          "prompt_bytes": 102924288,
+          "pairs": 2016
+        }
+      ],
+      "first_median_ms": 68.44150001415983,
+      "steady_median_ms": 0.534070834207038
+    }
+  ]
+}

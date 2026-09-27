@@ -1,0 +1,218 @@
+{
+  "validity": "DIAGNOSTIC",
+  "requests": 21,
+  "same_tokens": 21,
+  "max_logprob_abs": 0.0,
+  "checks": [
+    {
+      "case": "warmup",
+      "index": 0,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warmup",
+      "index": 1,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warmup",
+      "index": 2,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warmup",
+      "index": 3,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warmup",
+      "index": 4,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_0",
+      "index": 0,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_0",
+      "index": 1,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_0",
+      "index": 2,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_0",
+      "index": 3,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_0",
+      "index": 4,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_0",
+      "index": 0,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_0",
+      "index": 1,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_0",
+      "index": 2,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_1",
+      "index": 0,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_1",
+      "index": 1,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_1",
+      "index": 2,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_1",
+      "index": 3,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "cold_family_1",
+      "index": 4,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_1",
+      "index": 0,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_1",
+      "index": 1,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    },
+    {
+      "case": "warm_repeat_1",
+      "index": 2,
+      "same_tokens": true,
+      "logprob_max_abs": 0.0,
+      "lengths": [
+        16,
+        16
+      ]
+    }
+  ]
+}

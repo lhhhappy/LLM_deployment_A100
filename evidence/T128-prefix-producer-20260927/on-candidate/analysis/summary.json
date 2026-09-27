@@ -1,0 +1,25 @@
+{
+  "validity": "DIAGNOSTIC",
+  "decisions": 17,
+  "epochs": {
+    "1": 5,
+    "2": 6,
+    "3": 6
+  },
+  "dependents": 9,
+  "reserved_seats": 9,
+  "ready_admissions": 9,
+  "prefill_finish_records": 12,
+  "ready_to_admit_ms": [
+    6.47219642996788,
+    6.47219642996788,
+    6.47219642996788,
+    6.853051483631134,
+    6.853051483631134,
+    6.853051483631134,
+    6.146572530269623,
+    6.146572530269623,
+    6.146572530269623
+  ],
+  "limitations": "Explicit trace window only. Server completion stamps exclude HTTP/network delay; no SLO verdict."
+}
