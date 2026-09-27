@@ -45,7 +45,7 @@
 ## 数据集 v5g：s1-dev-longchain-v5g（2026-09-27，fable）
 
 - = v5（长输出尾）+ v3g 的间隔规则（`scripts/longchain/regap.py`：每条链的累计等待按主办方 chains.jsonl 的真实链时长回填，单个 gap ≤310 s、链 ≤3600 s，与原 harness 规则一致）。间隔 p50/p90/p95/max = 6.9/49.1/98.0/310 s，累计 34.1 h（v4/v5 为 2.6/12.1/21.4/301 s、8.5 h；用户核对的真实相邻间隔 p95 约 92 s、累计约为 v4 的 3.5 倍）。正文、cohort（ff1dccae1087a798）、输出预算与 v5 相同；requests.jsonl sha256 cfb58cd24adac24a…；set 标签 s1-dev-longchain-v5g，bodies 指向 v4 的文件。
-- 含义：真实间隔让同时活跃的上下文减少（v3g 实测在跑 17–19 条、KV 22%），本地不再出现线上没有的 KV 墙；这是判断稳态机制的默认数据集。DCP 在本地"特别好"正是因为 v3 的短间隔造出了 KV 墙，线上没有这堵墙。
+- 含义：真实间隔让同时活跃的上下文减少（v3g 实测在跑 17–19 条、KV 22%），本地不再出现线上没有的 KV 墙。但它把中位等待拉到 7.3 s、>60 s 的等待 440 个（源库 raw 只有 340 个），压力超过源数据，2026-09-27 起只作强压力参照；稳态机制的默认数据集改为下面的 v5g-tail。DCP 在本地"特别好"正是因为 v3 的短间隔造出了 KV 墙，线上没有这堵墙。
 
 ## 数据集 v5g-tail：s1-dev-longchain-v5g-tail-review-0927（2026-09-27，Codex c9c14153，fable 独立复核通过）
 - 位置：Pod `/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927`（同目录还有 v5-review 对照与 v5g-review 强压力参照），开发机 `/sjtu/linhang/arena/codex/longchain-repair-0927/data/`；收据 `publication.json`；requests sha 6170fd82…、cohort ff1dccae1087a798（与 v4/v5/v5g 相同）。
