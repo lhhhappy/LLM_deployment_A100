@@ -25,6 +25,33 @@ def req(rid, prompt, matched=0, output=0):
 
 
 class Estimates(unittest.TestCase):
+    def test_freeze_class_keeps_a_chain_start_cold_after_its_prefix_gets_cached(self):
+        # 130d/130ee5 family riders: a 36k chain start waited 20 s; while it waited, its leader cached 32k of its prefix.
+        r = req('rider', 36000, matched=0)
+        other = req('cold22k', 22000, matched=0)
+        live = ax.DeadlineConfig(warm_budget_s=15.0)
+        # warm_multi_budget_s=15 too: the class is frozen, the size tier still follows the live remaining work.
+        frozen = ax.DeadlineConfig(warm_budget_s=15.0, warm_multi_budget_s=15.0, freeze_class=True)
+        self.assertEqual(ax.budget_s(r, frozen), 30.0)              # first sight: cold
+        r.num_matched_prefix_tokens = 32768                         # leader ran; only 3k tokens of work remain
+        self.assertEqual(ax.budget_s(r, live), 3.0)                 # live class: warm, 3 s budget -> hopeless at 20 s
+        self.assertLess(ax.slack_s(r, ax.remaining_tokens(r), 20.0, CHUNK, live), 0)
+        self.assertEqual([x.rid for x in ax.tier_order([r, other], lambda q: 20.0, set(), CHUNK, live)], ['cold22k', 'rider'])
+        self.assertEqual(ax.budget_s(r, frozen), 30.0)              # frozen: still a chain start, and now the cheapest one
+        self.assertGreater(ax.slack_s(r, ax.remaining_tokens(r), 20.0, CHUNK, frozen), 0)
+        self.assertEqual([x.rid for x in ax.tier_order([r, other], lambda q: 20.0, set(), CHUNK, frozen)], ['rider', 'cold22k'])
+        # A request first seen warm stays warm; the starvation bound follows the frozen class too.
+        w = req('warm', 36000, matched=30000)
+        self.assertEqual(ax.budget_s(w, frozen), 15.0)
+        w.num_matched_prefix_tokens = 0
+        self.assertEqual(ax.budget_s(w, frozen), 15.0)
+        self.assertTrue(ax.is_starved(w, frozen.max_wait_warm_s + 1, frozen))
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_FREEZE_CLASS': '1'}, clear=False):
+            self.assertTrue(ax.deadline_config().freeze_class)
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1'}, clear=False):
+            os.environ.pop('SGLANG_AX_DEADLINE_FREEZE_CLASS', None)
+            self.assertFalse(ax.deadline_config().freeze_class)
+
     def test_warm_budget_is_tiered_by_rounds_only_when_configured(self):
         # Default: every warm request over fast_tokens gets warm_budget_s, as before this option existed.
         one_round = req('one', 100000, matched=94000)     # 6000 remaining: fits one 8192 round

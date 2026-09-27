@@ -43,6 +43,13 @@ class DeadlineConfig:
     warm_multi_tokens: int = 8192
     warm_multi_budget_s: float = 5.0
     cold_hit_ratio: float = 0.5
+    # Freeze the deadline class at first sight: a request judged cold (a chain or turn start) when the scheduler first ranks
+    # it keeps the cold budget for its whole wait, even when its prefix becomes cached meanwhile (a family rider whose leader
+    # ran, or a prefix restored from the host tier). Without this, run 130d/130ee5: a 36k chain start that waited 20 s with
+    # 16k cached was rescuable (budget 30 s, slack +7.4) and ranked ahead of a 22k cold head; once 32k of it was cached it
+    # counted as warm (budget 3 s, slack -17.8), fell to the hopeless tier behind every rescuable cold head, and missed the
+    # 30 s gate although only 3k tokens of work remained. The harness judges it as a chain start regardless. Default off.
+    freeze_class: bool = False
     # Service estimate load * (chunks * fixed + tokens * per_token); defaults measured on run 071 with
     # 8192-token chunks (0.12-0.15 s per chunk, 66-70 us/token, loaded/pure execution p50 1.27). Other
     # chunk sizes or decode cadences need their own values.
@@ -77,6 +84,7 @@ def deadline_config() -> Optional[DeadlineConfig]:
         warm_multi_tokens=int(_env("SGLANG_AX_DEADLINE_WARM_MULTI_TOKENS", "8192")),
         warm_multi_budget_s=float(_env("SGLANG_AX_DEADLINE_WARM_MULTI_S", _env("SGLANG_AX_DEADLINE_WARM_S", "5"))),
         cold_hit_ratio=float(_env("SGLANG_AX_DEADLINE_COLD_HIT_RATIO", "0.5")),
+        freeze_class=_env("SGLANG_AX_DEADLINE_FREEZE_CLASS", "0") == "1",
         fixed_s=float(_env("SGLANG_AX_DEADLINE_FIXED_S", "0.13")),
         per_token_s=float(_env("SGLANG_AX_DEADLINE_PER_TOKEN_S", "0.000068")),
         load_factor=float(_env("SGLANG_AX_DEADLINE_LOAD", "1.27")),
@@ -102,6 +110,16 @@ def is_cold(req, hit_ratio: float = 0.5) -> bool:
     return req.num_matched_prefix_tokens < hit_ratio * len(req.origin_input_ids)
 
 
+def deadline_cold(req, cfg: DeadlineConfig) -> bool:
+    """The class the deadline budget uses: the live hit ratio, or with cfg.freeze_class the class at first sight."""
+    if not cfg.freeze_class:
+        return is_cold(req, cfg.cold_hit_ratio)
+    frozen = getattr(req, "_ax_deadline_cold", None)
+    if frozen is None:
+        frozen = req._ax_deadline_cold = is_cold(req, cfg.cold_hit_ratio)
+    return frozen
+
+
 def remaining_tokens(req) -> int:
     """Prefill work left of a waiting request, as 123 counts it: prompt + output so far - matched prefix.
 
@@ -112,7 +130,7 @@ def remaining_tokens(req) -> int:
 
 
 def budget_s(req, cfg: DeadlineConfig) -> float:
-    if is_cold(req, cfg.cold_hit_ratio):
+    if deadline_cold(req, cfg):
         return cfg.cold_budget_s
     remaining = remaining_tokens(req)
     if remaining <= cfg.fast_tokens:
@@ -133,7 +151,7 @@ def slack_s(req, work: int, waited_s: float, chunk: int, cfg: DeadlineConfig) ->
 
 
 def is_starved(req, waited_s: float, cfg: DeadlineConfig) -> bool:
-    limit = cfg.max_wait_s if is_cold(req, cfg.cold_hit_ratio) else cfg.max_wait_warm_s
+    limit = cfg.max_wait_s if deadline_cold(req, cfg) else cfg.max_wait_warm_s
     return waited_s > limit
 
 

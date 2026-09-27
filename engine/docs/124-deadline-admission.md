@@ -90,3 +90,14 @@ queued behind them (chain 26->30, overall 448->512, fast 506->554), while the re
 saved were one-round turn starts (turn 24->16). Setting WARM_S=15 with WARM_MULTI_S=5 keeps the rescue for the
 one-round class and leaves the multi-round class where the 5 s budget put it. Unset, the order is unchanged.
 
+## Deadline class frozen at first sight (follow-up, 2026-09-27)
+
+`SGLANG_AX_DEADLINE_FREEZE_CLASS=1` (default off): the cold/warm class that selects the budget is decided when the scheduler
+first ranks a request and kept for its whole wait. Codex's plan review (notes/reports/dcp-chain-plan-review-0927.md) found
+with the real functions that a 36k chain start waiting 20 s was rescuable with 16k cached (budget 30 s, slack +7.4, ranked
+ahead of a 22k cold head) and hopeless once 32k was cached (warm, budget 3 s, slack -17.8, ranked behind every rescuable cold
+head) although only 3k tokens of work remained: family riders whose leader ran while they waited are demoted exactly when they
+become cheap, which is the shape of the 4 family-rider chain misses in every opening probe. The harness judges such a request
+as a chain start (30 s) regardless. With the class frozen it stays cold, keeps the 30 s budget, and its small remaining work
+puts it first inside the rescuable tier. 125's backlog estimate and 128's candidate filter still use the live class.
+
