@@ -13,19 +13,22 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "engine/sglang/srt/layers/attention/dsa_backend.py"
+MODE_SOURCE = ROOT / "engine/sglang/srt/model_executor/forward_batch_info.py"
+LOCAL_SOURCE = ROOT / "engine/sglang/srt/layers/dcp/local_extend.py"
 
 
-class Mode(enum.Enum):
-    EXTEND = 1
-    MIXED = 2
-    TARGET_VERIFY = 3
-    DRAFT_EXTEND_V2 = 4
+def execute_definitions(path, nodes, namespace):
+    source = "from __future__ import annotations\n" + ast.unparse(ast.Module(body=nodes, type_ignores=[]))
+    exec(compile(source, str(path), "exec"), namespace)
+    return namespace
 
-    def is_target_verify(self):
-        return self == Mode.TARGET_VERIFY
 
-    def is_draft_extend_v2(self):
-        return self == Mode.DRAFT_EXTEND_V2
+Mode = execute_definitions(
+    MODE_SOURCE,
+    [n for n in ast.parse(MODE_SOURCE.read_text()).body
+     if isinstance(n, ast.ClassDef) and n.name == "ForwardMode"],
+    {"IntEnum": enum.IntEnum, "auto": enum.auto},
+)["ForwardMode"]
 
 
 class Tensor:
@@ -51,9 +54,12 @@ def methods(namespace):
                and n.name == "DeepseekSparseAttnBackend")
     wanted = {"forward_extend", "_ax118_init", "_forward_tilelang"}
     nodes = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name in wanted]
-    nodes += [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "ax118_state"]
-    source = "from __future__ import annotations\n" + ast.unparse(ast.Module(body=nodes, type_ignores=[]))
-    exec(compile(source, str(SOURCE), "exec"), namespace)
+    nodes += [n for n in tree.body if isinstance(n, ast.FunctionDef)
+              and n.name in {"ax118_state", "_should_return_dsa_dcp_lse"}]
+    execute_definitions(SOURCE, nodes, namespace)
+    local_nodes = [n for n in ast.parse(LOCAL_SOURCE.read_text()).body
+                   if isinstance(n, ast.FunctionDef) and n.name == "uses_local_extend"]
+    execute_definitions(LOCAL_SOURCE, local_nodes, namespace)
     return namespace
 
 
@@ -100,63 +106,74 @@ class Routing(unittest.TestCase):
                     self.assertFalse(warmed)
 
     def test_real_extend_call_site(self):
-        # Full-KV prefill, speculative partials and local extend all share
-        # forward_extend. Test that the full-KV call alone supplies the opt-in.
+        # Execute the real mode predicates and both real route gates. In
+        # particular, an ordinary later prefill chunk remains full-KV EXTEND;
+        # stale local metadata must not change speculative index mapping.
+        cases = []
         for dcp in (False, True):
-            for mode in Mode:
-                for local in ((False, True) if dcp and mode == Mode.EXTEND else (False,)):
-                    with self.subTest(dcp=dcp, mode=mode, local=local):
-                        records = []
-                        gathered = Tensor((65536, 1, 512), "gathered")
-                        sharded = Tensor((40000, 1, 512), "pool")
-                        table = Tensor((33, 2051), "virtual_indices")
-                        ns = methods({
-                            "torch": NS(nan_to_num=lambda x, **kw: x), "math": __import__("math"),
-                            "ForwardMode": Mode, "TopkTransformMethod": NS(PAGED=1),
-                            "get_parallel": lambda: NS(dcp_enabled=dcp, attn_dcp_size=2, attn_dcp_rank=0),
-                            "_DSA_TRITON_PREFILL": False,
-                            "concat_mla_absorb_q_general": lambda q, r: q,
-                            "_ax116_dcp_extend_rows": lambda *a: (gathered, table),
-                            "_should_return_dsa_dcp_lse": lambda **kw: dcp and (
-                                mode in (Mode.TARGET_VERIFY, Mode.DRAFT_EXTEND_V2) or local),
-                            "_ax116_dcp_local_indices": lambda x, **kw: x,
-                        })
+            for mode in (Mode.EXTEND, Mode.MIXED, Mode.TARGET_VERIFY, Mode.DRAFT_EXTEND_V2):
+                for local_tag in ((False, True) if dcp else (False,)):
+                    for prefix in ((0, 8192) if mode == Mode.EXTEND and not local_tag else (8192,)):
+                        cases.append((dcp, mode, local_tag, prefix))
+        for dcp, mode, local_tag, prefix in cases:
+            with self.subTest(dcp=dcp, mode=mode, local_metadata=local_tag, prefix=prefix):
+                local = dcp and local_tag and mode in (Mode.EXTEND, Mode.MIXED)
+                partial = dcp and (mode in (Mode.TARGET_VERIFY, Mode.DRAFT_EXTEND_V2) or local)
+                records = []
+                gathered = Tensor((65536, 1, 512), "gathered")
+                sharded = Tensor((40000, 1, 512), "pool")
+                table = Tensor((33, 2051), "virtual_indices")
+                local_indices = Tensor((33, 2051), "local_extend_indices")
+                partial_indices = Tensor((33, 2051), "speculative_partial_indices")
+                ns = methods({
+                    "torch": NS(nan_to_num=lambda x, **kw: x), "math": __import__("math"),
+                    "ForwardMode": Mode, "TopkTransformMethod": NS(PAGED=1),
+                    "get_parallel": lambda: NS(dcp_enabled=dcp, attn_dcp_size=2, attn_dcp_rank=0),
+                    "_DSA_TRITON_PREFILL": False,
+                    "concat_mla_absorb_q_general": lambda q, r: q,
+                    "_ax116_dcp_extend_rows": lambda *a: (gathered, table),
+                    "_ax116_dcp_local_indices": lambda x, **kw: partial_indices,
+                })
 
-                        def record(**kw):
-                            records.append(kw)
-                            out = Tensor((1, 33, 8, 512))
-                            return (out, "lse") if kw["return_lse"] else out
+                def record(**kw):
+                    records.append(kw)
+                    out = Tensor((1, 33, 8, 512))
+                    return (out, "lse") if kw["return_lse"] else out
 
-                        backend = NS(
-                            dsa_prefill_impl="tilelang", dsa_decode_impl="tilelang",
-                            _resolve_kpool_tail_backend=lambda t, b: b,
-                            _check_kpool_tail_backend=lambda *a: None,
-                            use_mha=False, forward_metadata=NS(), use_fused_topk=True,
-                            token_to_kv_pool=NS(get_key_buffer=lambda layer: sharded),
-                            get_topk_transform_method=lambda mode: 1,
-                            _pad_topk_indices=lambda indices, rows: indices,
-                            _get_fused_topk_page_table=lambda t: table,
-                            hisparse_coordinator=None, dsa_index_kpool=4, dcp_topk_column_stride=1,
-                            _forward_tilelang=record,
-                        )
-                        layer = NS(is_cross_attention=False, layer_id=0,
-                                   tp_q_head_num=8, v_head_dim=512, head_dim=512, scaling=512**-.5)
-                        fb = NS(forward_mode=mode, attn_dcp_metadata=NS(dcp_kv_buffer=gathered))
-                        stubs = {
-                            "sglang.srt.layers.dcp.local_extend": NS(uses_local_extend=lambda fb: local),
-                            "sglang.kernels.ops.attention.dcp_local_indices": NS(local_dcp_indices=lambda x, **kw: x),
-                        }
-                        with patch.dict(sys.modules, stubs):
-                            ns["forward_extend"](
-                                backend, Tensor((33, 8, 512)), None, None, layer, fb,
-                                q_rope=Tensor((33, 8, 0)), topk_indices=table)
-                        self.assertEqual(len(records), 1)
-                        call = records[0]
-                        self.assertEqual(call.get("is_prefill", False), mode == Mode.EXTEND and not local)
-                        if dcp and mode in (Mode.EXTEND, Mode.MIXED) and not local:
-                            self.assertIs(call["kv_cache"], gathered)
-                        else:
-                            self.assertIs(call["kv_cache"], sharded)
+                backend = NS(
+                    dsa_prefill_impl="tilelang", dsa_decode_impl="tilelang",
+                    _resolve_kpool_tail_backend=lambda t, b: b,
+                    _check_kpool_tail_backend=lambda *a: None,
+                    use_mha=False, forward_metadata=NS(), use_fused_topk=True,
+                    token_to_kv_pool=NS(get_key_buffer=lambda layer: sharded),
+                    get_topk_transform_method=lambda mode: 1,
+                    _pad_topk_indices=lambda indices, rows: indices,
+                    _get_fused_topk_page_table=lambda t: table,
+                    hisparse_coordinator=None, dsa_index_kpool=4, dcp_topk_column_stride=1,
+                    _forward_tilelang=record,
+                )
+                layer = NS(is_cross_attention=False, layer_id=0,
+                           tp_q_head_num=8, v_head_dim=512, head_dim=512, scaling=512**-.5)
+                fb = NS(forward_mode=mode, extend_prefix_lens_cpu=[prefix],
+                        attn_dcp_metadata=NS(dcp_kv_buffer=gathered, dcp_local_extend=local_tag)
+                        if dcp else None)
+                stubs = {
+                    "sglang.srt.layers.dcp.local_extend": NS(uses_local_extend=ns["uses_local_extend"]),
+                    "sglang.kernels.ops.attention.dcp_local_indices": NS(local_dcp_indices=lambda x, **kw: local_indices),
+                }
+                with patch.dict(sys.modules, stubs):
+                    ns["forward_extend"](
+                        backend, Tensor((33, 8, 512)), None, None, layer, fb,
+                        q_rope=Tensor((33, 8, 0)), topk_indices=table)
+                self.assertEqual(len(records), 1)
+                call = records[0]
+                self.assertEqual(call.get("is_prefill", False), mode == Mode.EXTEND and not local)
+                self.assertEqual(call["return_lse"], partial)
+                self.assertIs(call["page_table_1"], local_indices if local else partial_indices if partial else table)
+                if dcp and mode in (Mode.EXTEND, Mode.MIXED) and not local:
+                    self.assertIs(call["kv_cache"], gathered)
+                else:
+                    self.assertIs(call["kv_cache"], sharded)
 
     def test_wrapper_uses_explicit_route_and_never_partial_lse(self):
         for enabled in (False, True):
