@@ -306,6 +306,18 @@
     "status": "已发布（130ezmc 之后；131/MTP 四臂改到它之后）"
   },
   {
+    "job": "130ezme-v5g_n26_chainmax16k_40m",
+    "ref": "130ezmd-v5g_n26_S6_40m / 130ezmc-v5g_n26_S1_nomtp_40m",
+    "what": "保 chain 不保 fast 的合并臂：S6（S1 设置、无 DCP、去 MTP、128p、131）+ 132 链首优先排序 + 稳态冷块 6144→16384 + 短命中预留 8192→2048 + 124 成本系数 1.27→1.05（去 MTP 后大头实测 20–23 s，旧系数判 27 s 提前判死）。引擎 c1fa4877。判定：chain 条数与稳态分档优先，fast/overall/turn/TPOT>0.10 作为代价报告",
+    "status": "待发布（链路断，排在 130ezmd 之后）"
+  },
+  {
+    "job": "130ezmf-v5g_n26_chainmax32k_40m",
+    "ref": "130ezme-v5g_n26_chainmax16k_40m",
+    "what": "同上但冷块 32768（--max-prefill-tokens 32768）：大头再省固定成本，看显存/冒烟与 fast 代价",
+    "status": "待发布（130ezme 之后）"
+  },
+  {
     "job": "130ezm5-v4_n26_S5a_light_40m",
     "ref": "130ezm6-v4_n26_S5b_40m",
     "what": "最弱 MTP（NEXTN 1 步/2 候选）：S5b 配置的其他一切不变，v4、N26、40 分钟。用户假设：MTP 一直全开是线上差档的原因，最弱 MTP 能少打扰通道又保住 TPOT",
