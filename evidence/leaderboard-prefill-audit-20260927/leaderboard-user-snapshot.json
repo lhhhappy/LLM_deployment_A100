@@ -1,0 +1,115 @@
+{
+  "source": "User-provided leaderboard snapshot, received 2026-09-27; not independently refreshed",
+  "rows": [
+    {
+      "rank": 1,
+      "name": "张正明",
+      "n_at_slo": 34,
+      "tpot_mean": 0.05033918142626096,
+      "tpm_all": 1547204.5,
+      "tpm_decode": 19142.533333333333,
+      "aime": 95.4545,
+      "gpqa": 97.4359
+    },
+    {
+      "rank": 2,
+      "name": "王俊杰",
+      "n_at_slo": 30,
+      "tpot_mean": 0.04620439761566815,
+      "tpm_all": 1557557.15,
+      "tpm_decode": 19433.983333333337,
+      "aime": 97.7273,
+      "gpqa": 97.4359
+    },
+    {
+      "rank": 3,
+      "name": "赵宇兵",
+      "n_at_slo": 30,
+      "tpot_mean": 0.047403851357956106,
+      "tpm_all": 1600217.1333333333,
+      "tpm_decode": 19730.416666666668,
+      "aime": 100,
+      "gpqa": 98.0769
+    },
+    {
+      "rank": 4,
+      "name": "Jinbo hu",
+      "n_at_slo": 30,
+      "tpot_mean": 0.048988198765612834,
+      "tpm_all": 1618302.45,
+      "tpm_decode": 20135.266666666663,
+      "aime": 100,
+      "gpqa": 98.0769
+    },
+    {
+      "rank": 5,
+      "name": "CalvinCao",
+      "n_at_slo": 30,
+      "tpot_mean": 0.060170230383555734,
+      "tpm_all": 1444879.066666667,
+      "tpm_decode": 17973.666666666668,
+      "aime": 100,
+      "gpqa": 95.5128
+    },
+    {
+      "rank": 6,
+      "name": "林杭",
+      "n_at_slo": 26,
+      "tpot_mean": 0.025099119361062804,
+      "tpm_all": 1687455.2666666666,
+      "tpm_decode": 18899.95,
+      "aime": 97.7273,
+      "gpqa": 98.0769
+    },
+    {
+      "rank": 7,
+      "name": "bohr5b58c6",
+      "n_at_slo": 26,
+      "tpot_mean": 0.03348473845184752,
+      "tpm_all": 1737429.4666666666,
+      "tpm_decode": 20178.516666666663,
+      "aime": 100,
+      "gpqa": 98.7179
+    },
+    {
+      "rank": 8,
+      "name": "Cui Yaning",
+      "n_at_slo": 26,
+      "tpot_mean": 0.040360365791700846,
+      "tpm_all": 1605516.7833333334,
+      "tpm_decode": 20118.6,
+      "aime": 100,
+      "gpqa": 96.1538
+    },
+    {
+      "rank": 9,
+      "name": "Mingjun Xu",
+      "n_at_slo": 26,
+      "tpot_mean": 0.0410406658333509,
+      "tpm_all": 1592998.4166666667,
+      "tpm_decode": 19800.816666666666,
+      "aime": 100,
+      "gpqa": 98.0769
+    },
+    {
+      "rank": 10,
+      "name": "张思远",
+      "n_at_slo": 26,
+      "tpot_mean": 0.04438817365761593,
+      "tpm_all": 1542246.5833333333,
+      "tpm_decode": 19507.95,
+      "aime": 97.7273,
+      "gpqa": 98.0769
+    },
+    {
+      "rank": 11,
+      "name": "ADJHD",
+      "n_at_slo": 26,
+      "tpot_mean": 0.05419378504435909,
+      "tpm_all": 1446266.183333333,
+      "tpm_decode": 18292.75,
+      "aime": 97.7273,
+      "gpqa": 94.2308
+    }
+  ]
+}

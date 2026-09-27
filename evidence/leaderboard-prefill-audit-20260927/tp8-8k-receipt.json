@@ -1,0 +1,87 @@
+{
+  "tag": "tp8_8k",
+  "rid": "biomaster:canon:member-v5-subagent-cfae8adc9bc2962e50c7a6e0:llm:1",
+  "frozen_glm_tokens": 49143,
+  "rendered_tokens": 49143,
+  "profiled_wall_s": 8.727454816922545,
+  "flush_response": {
+    "success": true,
+    "message": "Cache flushed."
+  },
+  "stop_response": "Stop profiling. This will take some time.\n",
+  "response_meta": {
+    "id": "tp8-profile-tp8_8k",
+    "finish_reason": {
+      "type": "length",
+      "length": 1
+    },
+    "prompt_tokens": 49143,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790489643.6118622,
+    "prefill_finished_time": 1790489647.349506,
+    "queue_time": 0.0026221275329589844,
+    "reasoning_tokens": 0,
+    "completion_tokens": 1,
+    "cached_tokens": 0,
+    "weight_versions": [
+      {
+        "version": "default",
+        "start": 0,
+        "end": 1
+      }
+    ],
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 3.8515794007107615,
+    "request_received_ts": 1790489643.5099578,
+    "api_server_dispatch_finish_ts": 1790489643.6075563,
+    "request_finished_ts": 1790489647.3615372,
+    "response_sent_to_client_ts": 1790489647.3617911
+  },
+  "traces": [
+    {
+      "name": "tp8_8k-tp8_8k-TP-0.trace.json.gz",
+      "bytes": 4540974
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-1.trace.json.gz",
+      "bytes": 4551720
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-2.trace.json.gz",
+      "bytes": 4547600
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-3.trace.json.gz",
+      "bytes": 4556046
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-4.trace.json.gz",
+      "bytes": 4546870
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-5.trace.json.gz",
+      "bytes": 4556278
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-6.trace.json.gz",
+      "bytes": 4549211
+    },
+    {
+      "name": "tp8_8k-tp8_8k-TP-7.trace.json.gz",
+      "bytes": 4553363
+    }
+  ],
+  "ranks": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "scope": "single cold request; profiled; not a replay or performance verdict"
+}

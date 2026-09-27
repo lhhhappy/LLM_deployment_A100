@@ -1,0 +1,33 @@
+{
+  "source": "Read with scripts/pod/pread cat; excerpt of TP0 ledger plus arithmetic against receipt.json",
+  "remote_ledger": "/tmp/ax/runs/130ezc-tp8_prefill_profile_dcp2/tp8_8k/ledger-rank0-rank1.json",
+  "remote_receipt": "/tmp/ax/runs/130ezc-tp8_prefill_profile_dcp2/tp8_8k/receipt.json",
+  "classes": {
+    "extend>=8k": {
+      "n": 10,
+      "mean_new_toks": 8192,
+      "mean_gpu_span_ms": 309.41132197265625
+    },
+    "extend2k-8k": {
+      "n": 2,
+      "mean_new_toks": 8183,
+      "mean_gpu_span_ms": 309.035361328125
+    }
+  },
+  "measurement": {
+    "prompt_tokens": 49143,
+    "recorded_extend_steps": 12,
+    "annotated_token_total": 98286,
+    "annotation_prompt_ratio": 2,
+    "extend_span_sum_s": 3.7121839423828122,
+    "physical_8k_chunks": 6,
+    "average_paired_extend_span_ms": 618.6973237304687,
+    "first_batch_to_prefill_finish_s": 3.7376437187194824,
+    "first_batch_to_prefill_rate": 13148.12317553809,
+    "gpu_window_s": 3.7490782998046877,
+    "gpu_window_input_rate": 13108.021777662034,
+    "request_received_to_first_s": 3.839548110961914,
+    "e2e_latency_s": 3.8515794007107615
+  },
+  "scope": "Single profiled cold request; model-forward annotation token sums are not unique request input tokens. No mixed-load slowdown or stage-specific duration is established."
+}
