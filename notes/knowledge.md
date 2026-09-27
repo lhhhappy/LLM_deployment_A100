@@ -61,6 +61,7 @@
 
 ## 主办方的相位人群与本地 chain 桶的错配（2026-09-27 核实，改变判据）
 - 公开 722 行（`s1-dev/data/dev-combined-v1/requests.jsonl`）：session_start 104 条，prompt p50 18.6k / p95 34k / max 52k，全未命中；turn_start 92 条约 35k 全未命中（15 s 门）；context_reset 23 条 prompt 68k–230k、未命中 ~2k（缓存在时）；intra 503 条里未命中 ≥50k 占 10.5%、≥100k 占 3.6%（最大 257k），承担 43% / 23% 的全部未命中 token，门 5 s——到达即判死。
+- 决定性字段 `edge_type`：公开 722 行里 `chain-head` 恰好 104 条，全是 session_start、chain_index 0，prompt p50 18.6k / max 52k；开发集是链前缀抽样，207 条链公开的前缀从链中间开始（chain_index 37、56、109、153…），它们真正的小链首线上存在但没有公开。链中边：append-only 441（上下文延续、可命中）、system-tools-changed 148（20%：系统提示或工具变了，前缀断裂，整段 40k–257k 重算——这就是巨型 intra）、unexplained-break 23、compact-rebuild 6。
 - 我们的 cohort（311 链）只有 104 条链以 session_start 开头；其余 207 条以公开的链中行开头（115 条 intra、20 条 reset、72 条 turn_start），其中 intra 切段头 p50 65k、31 条 ≥100k。harness 按 cohort idx 0 判 chain，所以本地 chain 桶里混进了 135 条线上会按 5 s（intra）判的巨型请求。
 - 按主办方相位重判：所有本地 chain 漏都是切段头；session_start 链首 + reset 的桶在所有配置下 0 条超 30 s（p95 15–18 s）。本地 chain 结果不能用来给线上 chain 排序，直到数据把切段链补上小头。
 - 线上 chain 失败人群只能是小链首和 reset：它们等在巨型 intra 后面（单 chunked_req，停车只救一轮内能算完的等待者）或 reset 遇到缓存被淘汰。
