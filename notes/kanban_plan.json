@@ -394,5 +394,11 @@
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价",
     "status": "待插入"
+  },
+  {
+    "job": "130ezn5-tail_n26_chainmax16k_118_40m",
+    "ref": "130ezn3-tail_n26_chainmax16k_40m",
+    "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核",
+    "status": "待发布（ezn1–ezn4 入队后由本地循环插入，名字排在 ezn4 之后）"
   }
 ]
