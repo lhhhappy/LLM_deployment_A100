@@ -418,7 +418,8 @@
     "job": "130ezn6-tail_n26_chainmax16k_short8192_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m（同 ID）",
     "what": "保 fast 变体：chain-max 16k 唯一改动短命中预留 2048→8192（线上 S1 的值）。问题：ezn3 的 fast 漏 100 条里 86% 是等待，预留缩小是否是主因；chain 6 能保住多少。判定：chain 条数与稳态分档优先，fast/overall 回落多少作为提交前的风险判断",
-    "status": "跑（23:22 UTC 起）"
+    "status": "第 15 分钟由 fable 停止（无闭合 raw）",
+    "verdict": "同分钟对 ezn3：chain 8（ezn3 第 19 分钟 6）、fast 17/32、overall 9/35、TPOT>0.10 50（7.7%）。预留放回 8192 让短暖命中拿回通道，开场冷头反而多漏 2 条，fast 并没有明显回落——审阅者核出的 fast 根因是 KV 墙而不是预留；按\"没有明显改善就停\"的规则提前停，把 Pod 让给 ezn8（KDA 池钉住）"
   },
   {
     "job": "130ezn7-tail_n34_chainmax16k_40m",
