@@ -383,13 +383,14 @@
     "job": "130ezn2-tail_n26_S6_40m",
     "ref": "130ezn1-tail_n26_S1_40m",
     "what": "S6 = S1 设置去 MTP + 128p + 冻结分类 + 131 链首风险期 interval 1（450e8580）：chain 优先组合，先取收益后消融。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "跑（20:03 UTC 起）"
+    "status": "已闭合（1547 条排空，wall 2582 s）",
+    "verdict": "harness p95：chain 41.3、turn 24.0、overall 5.7、fast 5.0 s。对 ezn1（S1）同 1547 条：chain 10→8（开场 10→8，稳态 0）、turn 5=5、overall 47→75、fast 55→75、TPOT>0.10 52→73、均值 39.7→50.2 ms。去 MTP 后大头入批后 249k 25.2→19.7 s、165k 15.9→14.7 s。S6 对 S1 的 chain −2 全在开场（去 MTP 不插 decode + 131/128p）。它是 ezn2a 与 chain-max 三臂的同数据对照"
   },
   {
     "job": "130ezn3-tail_n26_chainmax16k_40m",
     "ref": "130ezn2-tail_n26_S6_40m / 130ezn1",
     "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "已入队（pending，名字序）"
+    "status": "跑（20:53 UTC 起；chunk 16384、CHAIN_FIRST=1、LOAD 1.05、SHORT 2048、冷块 16384 已核；冒烟 12/12）"
   },
   {
     "job": "130ezn4-tail_n26_chainmax32k_40m",
@@ -408,6 +409,6 @@
     "ref": "130ezn2-tail_n26_S6_40m（跨提交对照：450e8580 → 873031fd 只多默认关的 132/118/128g 代码，fable 已审）",
     "what": "128g（Codex 873031fd）：原生 LPM 批内前缀去优先只在“新增可复用量上界 > 0”时保留；上界 = 共享长度按消费者 logits/logprob/SWA 裁剪后向下对齐真实缓存页与 KDA checkpoint 网格（本配置 64）再减已在显存的前缀；上界为 0 的 hold 释放（仍插入模拟树给深前缀兄弟当代表）。S6 设置 + SGLANG_AX_LPM_REUSE_GUARD=1，显式 118/132/local_extend=0。判定：同 pack 短冷头（如 19k）首次入批轮次与 TTFT、chain 条数（开场/稳态、修/新）、深前缀复用是否保住、其他门与 TPOT 代价；决策日志 lpm_hold 的 keep/release 计数",
     "status": "已闭合（1551 条排空，wall 2582 s）",
-    "verdict": "harness p95：chain 38.3、turn 20.8、overall 5.4、fast 4.6 s。对 ezn1（S1，同数据）同 1551 条：**chain 10→8（修 3 新 1）**、turn 5=5（修1/新1）、overall 46→81、fast 57→78、TPOT>0.10 52→74、均值 39.8→49.4 ms。修好的 3 条开场头：34.4k、1.7k（S1 里等了 48.9 s 才入批）、79.0k；新坏 1 条是稳态 1277 s 的 context_reset（80k 提示、命中 78.6k、只需算 1.3k）在显存墙下等了 37.8 s 才入批（S1 里 16.6 s）。128g 计数：保留 32 / 零收益释放 31。大头入批后：249k 25.2→20.3 s、165k 15.9→14.1（去 MTP）。排空少 303 条（无 MTP 解码慢）。归因要等 ezn2（纯 S6）：它第 9 分钟已 8 条，开场 −3 可能主要是 S6 的"
+    "verdict": "harness p95：chain 38.3、turn 20.8、overall 5.4、fast 4.6 s。对 ezn1（S1，同数据）同 1551 条：**chain 10→8（修 3 新 1）**、turn 5=5（修1/新1）、overall 46→81、fast 57→78、TPOT>0.10 52→74、均值 39.8→49.4 ms。修好的 3 条开场头：34.4k、1.7k（S1 里等了 48.9 s 才入批）、79.0k；新坏 1 条是稳态 1277 s 的 context_reset（80k 提示、命中 78.6k、只需算 1.3k）在显存墙下等了 37.8 s 才入批（S1 里 16.6 s）。128g 计数：保留 32 / 零收益释放 31。大头入批后：249k 25.2→20.3 s、165k 15.9→14.1（去 MTP）。排空少 303 条（无 MTP 解码慢）。归因要等 ezn2（纯 S6）：它第 9 分钟已 8 条，开场 −3 可能主要是 S6 的。**对 ezn2（纯 S6，同 1542 条）：chain 8=8（修 1 新 1）、turn 5=5、overall 74→81、fast 75→78、TPOT>0.10 73→74。** 修好的是开场 79.0k 头（frozen 未命中只 1.6k 的家族兄弟：S6 等 49.1 s、S6+128g 等 23.1 s），新坏的是稳态 1315 s 的 80k reset（S6 5.7 s、S6+128g 等 37.8 s）。结论：128g 在 N26/v5g-tail/S6 上没有可测的 chain 净收益（机制在动：释放 31 次），两条换手要 Codex 按决策日志归因；不进候选"
   }
 ]
