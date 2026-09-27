@@ -49,11 +49,41 @@ fi
 # LADDER_DOWN only if explicitly set; old note:
 # highest passing level (same logic as the formal climb: pass -> +4, fail -> -4, stop).
 UP=${LADDER_UP:-${LADDER:-18 22 26}}; DOWN=${LADDER_DOWN:-}
+# Opening profile under load (diagnostic only). With G_OPEN_PROFILE_LEN_S set, a watcher waits until the engine reports
+# at least G_OPEN_PROFILE_QUEUE_MIN (default 20) waiting requests (the opening burst of a level), sleeps
+# G_OPEN_PROFILE_START_S (default 8) seconds, then runs the torch profiler on every rank for G_OPEN_PROFILE_LEN_S seconds
+# through /start_profile and /stop_profile. Trace export stalls the engine, so the level's gate numbers are not comparable
+# with unprofiled runs; the value is the rank0/rank1 execution-time ledger, printed as OPEN_PROFILE_LEDGER lines.
+open_profile_watch() {
+  local out=$1 t=0 q=""
+  while [ $t -lt 1200 ]; do
+    q=$(curl -s -m 3 http://127.0.0.1:$PORT/metrics | awk '/^sglang:num_queue_reqs/ {print $NF; exit}'); q=${q%.*}
+    if [ -n "$q" ] && [ "$q" -ge "${G_OPEN_PROFILE_QUEUE_MIN:-20}" ] 2>/dev/null; then break; fi
+    sleep 1; t=$((t+1))
+  done
+  if [ $t -ge 1200 ]; then echo "OPEN_PROFILE trigger not seen (queue never reached ${G_OPEN_PROFILE_QUEUE_MIN:-20})"; return 0; fi
+  sleep "${G_OPEN_PROFILE_START_S:-8}"
+  mkdir -p "$out/traces"
+  echo "OPEN_PROFILE start $(date -u +%FT%TZ) queue_at_trigger=$q len_s=$G_OPEN_PROFILE_LEN_S"
+  curl -s -m 30 -X POST http://127.0.0.1:$PORT/start_profile -H 'Content-Type: application/json' \
+    -d "{\"output_dir\":\"$out/traces\",\"profile_id\":\"open\",\"profile_prefix\":\"open\",\"activities\":[\"CPU\",\"GPU\"],\"with_stack\":false,\"record_shapes\":false,\"merge_profiles\":false}" > "$out/profile_start.txt"
+  sleep "$G_OPEN_PROFILE_LEN_S"
+  curl -s -m 900 -X POST http://127.0.0.1:$PORT/stop_profile > "$out/profile_stop.txt"
+  echo "OPEN_PROFILE stop $(date -u +%FT%TZ)"
+}
+open_profile_ledger() {
+  local out=$1
+  ls "$out"/traces/*TP-0*.trace.json.gz "$out"/traces/*TP-1*.trace.json.gz >/dev/null 2>&1 || { echo "OPEN_PROFILE no rank0/rank1 traces"; return 0; }
+  python3 -B "$AX/verify_kit/prof_ledger.py" "$out"/traces/*TP-0*.trace.json.gz "$out"/traces/*TP-1*.trace.json.gz \
+      --json "$out/ledger-rank0-rank1.json" > "$out/ledger-rank0-rank1.txt" 2> "$out/ledger.err" || echo "OPEN_PROFILE ledger failed (see ledger.err)"
+  sed 's/^/OPEN_PROFILE_LEDGER /' "$out/ledger-rank0-rank1.txt"
+}
 run_level() {  # $1 = N ; returns 0 if formal-est pass
   local N=$1
   local out=$RUN_DIR/N$N; mkdir -p $out; local extra=""; [ $first = 1 ] || extra="--skip-warmup"; first=0
   python3 $AX/verify_kit/metrics_sampler.py $out/metrics.jsonl 10 & local msp=$!
   nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used --format=csv,noheader -l 5 > $out/gpu_util.csv 2>/dev/null & local gsp=$!
+  local wp=""; if [ -n "${G_OPEN_PROFILE_LEN_S:-}" ]; then open_profile_watch "$out" & wp=$!; fi
   local runner=("$AX/verify_kit/run_dev_checked.py")
   if [ "${G_WARMUP_PROFILE:-original}" != original ]; then
     # Each short-warmup level currently requires its own verified receipt.
@@ -74,6 +104,7 @@ run_level() {  # $1 = N ; returns 0 if formal-est pass
   local rdrc=$?
   printf "%s\n" "$rdrc" > "$out/rundev_exit_code"
   kill $msp $gsp 2>/dev/null
+  if [ -n "$wp" ]; then wait $wp 2>/dev/null; open_profile_ledger "$out"; fi
   curl -sf http://127.0.0.1:$PORT/v1/models >/dev/null || { echo "LEVEL N=$N status=ENGINE_DEAD"; return 3; }
   if [ -n "${G_MEASURE_SECONDS:-}" ]; then
     python3 "$AX/verify_kit/timed_score.py" "$out" --harness-dir "$S1/harness" --data-root "$DATA_ROOT"
