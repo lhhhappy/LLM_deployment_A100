@@ -1,6 +1,6 @@
 # Prefill 执行层：118 的 DCP 普通续算入口
 
-2026-09-27，Codex。状态：候选实现和本地路由合同完成，GPU/TP8 待测，交 Fable 独立审查。
+2026-09-27，Codex。状态：候选实现、CPU 合同和单卡 GPU 矩阵完成，TP8 待测，交 Fable 独立审查。
 分支 `codex/prefill-sm80-0927`，基于组合引擎 `791453ca` 的独立 worktree。当前未改准入、排序、缓存或队列。
 
 ## 为什么先做这里
@@ -8,9 +8,13 @@
 目标仍是提高正式 N@SLO，重点降低开场和稳态冷 chain 的 prefill 执行时间。没有把“快 10% 少一条
 chain”当作结论：同样的省时落在不同请求和不同等待位置，过门收益可以不同。
 
-Fable 报送的修正 TP8 账本：单请求目标模型 8k 块 592 ms，负载下 584 ms；TileLang DSA `main_kernel`
-占目标块 kernel 时间 21.7%，mHC 三核合计约 13.9%，all-reduce 11.7%。这是协作者提供的已修正摘要；本轮
-尚未重算原 trace。原先目标/草稿混合的 ledger 均值不能使用。原 trace 入口见本报告末尾。
+本轮用现行 `scripts/pod/verify/prof_ledger.py` 在 Pod CPU 上重算两份 rank0 原 trace：单请求目标模型
+完整 8k 块 591.9 ms（5 块），负载下 584.1 ms（28 块）；草稿独立列为 27.1 / 25.1 ms。负载窗口
+98.7% 在 extend、decode 为 0%，开场几乎没有 decode 时间可再交换。原先目标/草稿混合的均值不能使用。
+[重算账本](../../evidence/prefill-sm80-0927/profile-ledger.json) 保留各形状的 span、busy 与计数。
+其粗粒度 kernel 分类会漏掉匿名 DSA/Humming 核，不能把 `other` 或 `kda` 百分比直接当作真实算子归因。
+Fable 人工映射的目标块摘要仍是：DSA `main_kernel` 21.7%、mHC 三核约 13.9%、all-reduce 11.7%；
+本轮独立重算确认的是完整块时间与执行阶段，未将上述人工分类冒充本脚本输出。
 
 **本轮 GPU0 实测，未推进成生产改动：** 113 indexer 在 114 已分摊 query rows 后，8192-token/TP8
 对应每卡 1024 行。固定 tile 的 LOOP 4→8，在 128k 上下文约 2.130→2.034 ms，在 256k 上下文约
@@ -54,25 +58,48 @@ CodeGraph 用于定位 `_forward_tilelang` 的 `forward_extend` / `forward_decod
 输出仍为 64 MiB，不能把输出也算成节省。小行数普通 EXTEND 会使用既有 split 临时缓冲，按历史 A100
 324 个驻留 program 的测量上限约 5.1 MiB。真实 KV 池、启动 kernel 代码开销和 graph pool 的变化均待实测。
 
-## 已验证与尚未验证
+## GPU 新测量（2026-09-27，开发机，不是 TP8）
 
 已验证：新增 3 项 CPU 测试运行真实源码提取的方法，覆盖 27 个路由/启动组合；原 10 项 DCP local-extend
 合同通过；Python 语法、shell 语法和 diff 空白检查通过。CPU 测试使用 kernel recorder，不能证明 GPU 数值。
 
-GPU 新测量尚未执行：约 21:00 UTC 起，本会话与 Fable 对同一 GPU SSH 入口均收到 publickey 认证拒绝。
-Fable 已报用户处理；没有因此停止、重启或部署 Pod 服务。
+用户恢复 SSH 后，在独立目录使用 GPU0 完成测试与成本矩阵。A100-SXM4-80GB、torch 2.13.0+cu130、
+Triton 3.7.1、TileLang 0.1.12，候选执行代码为 `3caadef4`。没有停止、重启或部署 Pod 服务。
 
-准备了以下可执行检查，**本轮均未报通过**：
+本轮结果：
 
-- [GPU 118 测试](../../tests/gpu/test_dsa_sparse_118.py)：新增 prefill-only 启动/实际 wrapper 路由，以及新进程中
-  21 种行数、两种 index width、连续/切片索引表不再触发额外 Triton load 的检查。
+- [GPU 118 测试](../../tests/gpu/test_dsa_sparse_118.py)：15 项通过（152.4 秒），包括 14 个数值形状、4 个
+  CUDA graph 形状、路由/启动守卫、负例以及两次新进程预热；两次都是预热加载 14 个 kernel，此后
+  21 种行数 × 两种 width × 连续/切片索引表额外加载为 0。
 - [普通 prefill 成本曲线](../../scripts/analysis/bench_prefill_sparse.py)：复用既有 fp32 oracle，完整连续 KV，
   8k–262k 上下文、333–16384 query rows、四请求混合批。交替测 OFF/ON 的 eager GPU 时间、墙钟和临时峰值，
   保留全部样本；包含 kpool 边界与请求边界的参考行。合成索引不能替代真实 top-k 局部性。
 - [开发机运行入口](../../scripts/analysis/run_prefill_devbox.sh)：使用现成 m0 环境，GPU0，源码和全部新增缓存限于
   `/sjtu/linhang/arena/codex/prefill-sm80-0927`。不会安装第二套环境或修改共享开发源码。
 
-上传候选的 `engine/sglang`、两个分析脚本及 `tests/gpu/test_dsa_sparse_118.py` 后，在开发机运行：
+成本矩阵 9 个形状全部通过 fp32 参考界限；ON 的平均误差不超过 OFF 的 1.25 倍加 1e-7。
+实际为同进程真实 wrapper OFF/ON 随机交替 5 轮、每轮 5 次；L2 在每次计时前清理，保留所有样本。
+以下是 eager CUDA event 的中位数，包含原 wrapper 的 padding；没有 DCP collective 或真实 top-k。
+
+| 上下文 / 新算行数 | OFF ms | ON ms | 单次算子加速比 |
+| --- | ---: | ---: | ---: |
+| 首块 8192 / 8192 | 10.525 | 5.277 | 1.99× |
+| 16384 / 8192 | 10.603 | 6.023 | 1.76× |
+| 49152 / 8192 | 11.252 | 6.485 | 1.74× |
+| 131072 / 8192 | 11.637 | 8.316 | 1.40× |
+| 262144 / 8192 | 12.242 | 9.298 | 1.32× |
+| 49152 / 1024 | 2.625 | 1.120 | 2.34× |
+| 30011 / 333 | 1.551 | 0.598 | 2.59× |
+| 49152 / 16384 | 21.711 | 12.747 | 1.70× |
+| 四请求混合 / 合计 8192 | 11.382 | 7.556 | 1.51× |
+
+8k 行时 ON 的临时峰值增量为 64 MiB（输出），OFF 通常为 130.25 MiB（16384 上下文一组为 131.00 MiB）；
+16k 行为 128 对 260.5 MiB。未新增持久张量。成本矩阵预热单个 width 加载 9 个核，此后额外加载 0。
+部分 eager 样本有 host/launch 长尾，全部保留；表中位数不能充当服务尾延迟。更长上下文时节省变小，也不能
+用 49k 的加速比代表 262k。完整日志为 [GPU suite](../../evidence/prefill-sm80-0927/118-prefill-tests.log) 与
+[成本矩阵](../../evidence/prefill-sm80-0927/118-prefill-cost.jsonl)。
+
+复现（候选源码已上传到独立目录）：
 
 ```bash
 PREFILL_ROOT=/sjtu/linhang/arena/codex/prefill-sm80-0927
@@ -92,13 +119,30 @@ TP8 先查真实能力冒烟、8 个 rank 的入口与无晚编译、KV 池/显�
 forward，不把 draft 平均进去。再用同数据、同派发窗口的开场和含稳态冷段首探针，逐 ID 核 TTFT 与所有 SLO 门。
 不能把历史 118 的 decode 加速写成这个 prefill-only 开关的收益。
 
-后续执行层方向：在当前 TP8 成本曲线证实后，再动 mHC 的大块 post/归一化与通信。119 的大块 scatter 候选
-已经存在，应先区分其收益与新增 kernel 的收益；不重复开发已有机制，不把孤立算子百分比直接相加。
+负载验证还须区分源会话起点与回放链首；用户新提供的是源业务历史缓存统计，不是正式运行缓存。
+参见 [链首来源核实](chain-origin-audit-0927.md)。本候选按执行阶段生效，稳态普通 prefill 同样覆盖，
+不依赖开场计时、固定请求 ID 或源会话标签。
+
+## mHC post 探索：本轮不推进生产改动
+
+在 GPU1 用 [独立算子探针](../../scripts/analysis/bench_mhc_post.py) 对现行 TileLang post 做了直接 Triton
+读写原型。它没有接入引擎，不改变运行开关。简单逐项 FMA 与原核有少量末位差异；把首个乘加改为
+`fma(post, x, mix0 * residual0)` 再依次加入其余 residual，在本次 8192/128 行、H4096 的全输出比较中
+逐位相等，且 64 个参考行满足独立 float64 误差界限。这个局部结果不代表所有输入逐位等价。
+
+关键负结果：8k 行 TileLang 为 0.3648 ms，最好的两个直接读写原型为 0.3656 / 0.3660 ms，没有大块收益。
+128 行有较短计时，但 eager 波动显著，不能拿来声称目标大块提速。因此本轮不增加 mHC 生产旋钮；
+后续应关注 post/pre 融合减少中间张量搬运，而不是仅重写同一 post 的存取。原始两次测量：
+[初始表达式](../../evidence/prefill-sm80-0927/mhc-post-probe.jsonl)、
+[调整乘加顺序](../../evidence/prefill-sm80-0927/mhc-post-fma2-probe.jsonl)。
+
+119 的大块 scatter 候选已经存在，应先区分其收益与新增 kernel 的收益；不重复开发已有机制，
+不把孤立算子百分比直接相加。当前最直接可交 TP8 的仍是 118 prefill 入口。
 
 Fable 提供的原 trace：
 
 - `/tmp/ax/runs/130ezc-tp8_prefill_profile_dcp2/tp8_8k/traces/*TP-{0..7}*.trace.json.gz`
 - `/tmp/ax/runs/130ezd5-v3_open_S1dcp_profile_n34/N34/traces/`
 
-两目录中的旧 ledger 混合了 target/draft，应使用现行 `scripts/pod/verify/prof_ledger.py` 重算；本报告不把旧
-ledger 当作修正数字的原始证据。队列安排仍由共享 queue 与任务入队者管理，本提交没有新增 Pod 任务。
+两目录中的旧 ledger 混合了 target/draft；本轮重算文件在 Pod `/tmp/ax/codex/prefill118-profile-ledger.json`，
+只对上述两个 rank0 trace 作 CPU 分析。队列安排仍由共享 queue 与任务入队者管理，本提交没有新增 Pod 任务。

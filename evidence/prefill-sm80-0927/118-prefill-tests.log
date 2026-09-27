@@ -1,0 +1,57 @@
+test_replay_with_fresh_inputs (__main__.CudaGraph.test_replay_with_fresh_inputs) ... {"M": 1, "case": "decode_M1", "kind": "graph", "replays": 3, "splits": 16, "status": "PASS"}
+{"M": 32, "case": "decode_32x1", "kind": "graph", "replays": 3, "splits": 8, "status": "PASS"}
+{"M": 128, "case": "verify_32x4", "kind": "graph", "replays": 3, "splits": 2, "status": "PASS"}
+{"M": 512, "case": "prefill_512", "kind": "graph", "replays": 3, "splits": 1, "status": "PASS"}
+ok
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+test_off_is_served_on_is_118 (__main__.Dispatch.test_off_is_served_on_is_118) ... /sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/utils/deprecated.py:34: DeprecationWarning: T.symbolic(...) is deprecated, use T.dynamic(...) instead and will be removed in v0.1.9
+  deprecated_warning(method_name, new_method_name, phaseout_version)
+/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/cache/kernel_cache.py:394: DeprecationWarning: `tl.disable_tma_lower` is deprecated and will be removed in v0.1.10. Use `T.copy(..., disable_tma=True)` per-copy instead.
+  kernel = JITKernel(
+/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/utils/deprecated.py:34: DeprecationWarning: T.symbolic(...) is deprecated, use T.dynamic(...) instead and will be removed in v0.1.9
+  deprecated_warning(method_name, new_method_name, phaseout_version)
+/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/cache/kernel_cache.py:394: DeprecationWarning: `tl.disable_tma_lower` is deprecated and will be removed in v0.1.10. Use `T.copy(..., disable_tma=True)` per-copy instead.
+  kernel = JITKernel(
+ok
+test_prefill_state_report (__main__.Dispatch.test_prefill_state_report) ... ok
+test_prefill_switch_does_not_replace_partial_or_decode_calls (__main__.Dispatch.test_prefill_switch_does_not_replace_partial_or_decode_calls) ... ok
+test_state_report (__main__.Dispatch.test_state_report) ... ok
+test_dropped_mask_is_rejected (__main__.NegativeControl.test_dropped_mask_is_rejected) ... {"bound": 293.9886169433594, "defect": "mask_dropped", "kind": "negative_control"}
+ok
+test_off_by_one_row_is_rejected (__main__.NegativeControl.test_off_by_one_row_is_rejected) ... {"bound": 7.125100612640381, "defect": "off_by_one_row", "kind": "negative_control"}
+ok
+test_cases (__main__.Numerics.test_cases) ... {"M": 1024, "case": "prefill_long", "heads": 8, "kind": "numerics", "served_bound": 0.05179864540696144, "served_lse_max_abs": 2.86102294921875e-06, "served_max_abs": 0.0010403096675872803, "served_mean_abs": 8.170724322553724e-05, "splits": 1, "triton_bound": 0.05179864540696144, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.0010403096675872803, "triton_mean_abs": 8.164926839526743e-05, "triton_vs_served_max_abs": 0.001953125}
+{"M": 1000, "case": "prefill_first_chunk", "heads": 8, "kind": "numerics", "served_bound": 0.3664053976535797, "served_lse_max_abs": 2.384185791015625e-06, "served_max_abs": 0.007883071899414062, "served_mean_abs": 0.00016663888527546078, "splits": 1, "triton_bound": 0.3664053976535797, "triton_lse_max_abs": 2.384185791015625e-06, "triton_max_abs": 0.007883071899414062, "triton_mean_abs": 0.00016571309242863208, "triton_vs_served_max_abs": 0.00390625}
+{"M": 128, "case": "prefill_group_boundary", "heads": 8, "kind": "numerics", "served_bound": 0.04289361461997032, "served_lse_max_abs": 2.86102294921875e-06, "served_max_abs": 0.0008870065212249756, "served_mean_abs": 8.22290894575417e-05, "splits": 2, "triton_bound": 0.04289361461997032, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.0008870065212249756, "triton_mean_abs": 8.131193317240104e-05, "triton_vs_served_max_abs": 0.0009765625}
+{"M": 333, "case": "prefill_odd_M", "heads": 8, "kind": "numerics", "served_bound": 0.048927441239356995, "served_lse_max_abs": 2.86102294921875e-06, "served_max_abs": 0.000979691743850708, "served_mean_abs": 8.164142491295934e-05, "splits": 1, "triton_bound": 0.048927441239356995, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.000979691743850708, "triton_mean_abs": 8.156241528922692e-05, "triton_vs_served_max_abs": 0.0009765625}
+{"M": 128, "case": "verify_32x4", "heads": 8, "kind": "numerics", "served_bound": 0.054288387298583984, "served_lse_max_abs": 1.9073486328125e-06, "served_max_abs": 0.0011231005191802979, "served_mean_abs": 8.192356472136453e-05, "splits": 2, "triton_bound": 0.04480122774839401, "triton_lse_max_abs": 1.9073486328125e-06, "triton_max_abs": 0.0009056031703948975, "triton_mean_abs": 8.10249475762248e-05, "triton_vs_served_max_abs": 0.001953125}
+{"M": 32, "case": "decode_32x1", "heads": 8, "kind": "numerics", "served_bound": 0.047298166900873184, "served_lse_max_abs": 1.9073486328125e-06, "served_max_abs": 0.0009827911853790283, "served_mean_abs": 8.211721433326602e-05, "splits": 8, "triton_bound": 0.046698637306690216, "triton_lse_max_abs": 1.9073486328125e-06, "triton_max_abs": 0.0009703338146209717, "triton_mean_abs": 7.914329034974799e-05, "triton_vs_served_max_abs": 0.001953125}
+{"M": 1, "case": "decode_M1", "heads": 8, "kind": "numerics", "served_bound": 0.3436029255390167, "served_lse_max_abs": 9.5367431640625e-07, "served_max_abs": 0.0075397491455078125, "served_mean_abs": 0.0007547400891780853, "splits": 16, "triton_bound": 0.3436029255390167, "triton_lse_max_abs": 9.5367431640625e-07, "triton_max_abs": 0.0075397491455078125, "triton_mean_abs": 0.0007547400891780853, "triton_vs_served_max_abs": 0.0}
+{"M": 257, "case": "holes_and_empty_tiles", "heads": 8, "kind": "numerics", "served_bound": 0.056800197809934616, "served_lse_max_abs": 1.9073486328125e-06, "served_max_abs": 0.0010521113872528076, "served_mean_abs": 9.281743405153975e-05, "splits": 1, "triton_bound": 0.056800197809934616, "triton_lse_max_abs": 1.9073486328125e-06, "triton_max_abs": 0.0010521113872528076, "triton_mean_abs": 9.268601570511237e-05, "triton_vs_served_max_abs": 0.0009765625}
+{"M": 64, "case": "pool_boundary", "heads": 8, "kind": "numerics", "splits": 4, "triton_bound": 0.05454038456082344, "triton_lse_max_abs": 1.9073486328125e-06, "triton_max_abs": 0.001055896282196045}
+{"M": 20, "case": "masked_rows", "heads": 8, "kind": "numerics", "served_bound": 0.031224878504872322, "served_lse_max_abs": 1.9073486328125e-06, "served_max_abs": 0.0006249994039535522, "served_mean_abs": 8.233205153374001e-05, "splits": 16, "triton_bound": 0.030047429725527763, "triton_lse_max_abs": 1.9073486328125e-06, "triton_max_abs": 0.0005960166454315186, "triton_mean_abs": 7.826634828234091e-05, "triton_vs_served_max_abs": 0.0009765625}
+{"M": 8, "case": "peaky_last_split", "heads": 8, "kind": "numerics", "served_bound": 0.2863115668296814, "served_lse_max_abs": 0.00048828125, "served_max_abs": 0.0078008174896240234, "served_mean_abs": 0.00045200734166428447, "splits": 16, "triton_bound": 0.2863115668296814, "triton_lse_max_abs": 0.00048828125, "triton_max_abs": 0.0078008174896240234, "triton_mean_abs": 0.0004452400899026543, "triton_vs_served_max_abs": 0.0078125}
+/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/utils/deprecated.py:34: DeprecationWarning: T.symbolic(...) is deprecated, use T.dynamic(...) instead and will be removed in v0.1.9
+  deprecated_warning(method_name, new_method_name, phaseout_version)
+/sjtu/linhang/arena/env/m0/lib/python3.12/site-packages/tilelang/cache/kernel_cache.py:394: DeprecationWarning: `tl.disable_tma_lower` is deprecated and will be removed in v0.1.10. Use `T.copy(..., disable_tma=True)` per-copy instead.
+  kernel = JITKernel(
+{"M": 200, "case": "width_2048_kpool1", "heads": 8, "kind": "numerics", "served_bound": 0.03629688173532486, "served_lse_max_abs": 1.9073486328125e-06, "served_max_abs": 0.000684097409248352, "served_mean_abs": 8.167316991603002e-05, "splits": 1, "triton_bound": 0.03629688173532486, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.000684097409248352, "triton_mean_abs": 8.157693810062483e-05, "triton_vs_served_max_abs": 0.0009765625}
+{"M": 37, "case": "heads64_split", "heads": 64, "kind": "numerics", "splits": 1, "triton_bound": 0.046356674283742905, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.0009552240371704102}
+{"M": 300, "case": "heads64", "heads": 64, "kind": "numerics", "splits": 1, "triton_bound": 0.05163237452507019, "triton_lse_max_abs": 2.86102294921875e-06, "triton_max_abs": 0.0010120570659637451}
+ok
+test_index_at_pool_size_counts_as_masked (__main__.Numerics.test_index_at_pool_size_counts_as_masked) ... ok
+test_nan_input_is_not_hidden (__main__.Numerics.test_nan_input_is_not_hidden) ... ok
+test_engages_with_switch_and_a_tilelang_impl (__main__.Startup.test_engages_with_switch_and_a_tilelang_impl) ... ok
+test_prefill_mode_accepts_dcp_but_keeps_other_guards (__main__.Startup.test_prefill_mode_accepts_dcp_but_keeps_other_guards) ... ok
+test_refuses_outside_the_envelope (__main__.Startup.test_refuses_outside_the_envelope) ... ok
+test_backend_warmup_covers_every_serving_shape (__main__.Warmup.test_backend_warmup_covers_every_serving_shape) ... {"kind": "warmup", "loaded_after_warmup": 0, "loaded_in_warmup": 14}
+ok
+test_prefill_mode_warmup_covers_every_serving_shape (__main__.Warmup.test_prefill_mode_warmup_covers_every_serving_shape) ... {"kind": "warmup", "loaded_after_warmup": 0, "loaded_in_warmup": 14}
+ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 152.388s
+
+OK
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

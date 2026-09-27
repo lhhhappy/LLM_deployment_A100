@@ -1,0 +1,244 @@
+[
+  {
+    "trace": "/tmp/ax/runs/130ezc-tp8_prefill_profile_dcp2/tp8_8k/traces/tp8_8k-tp8_8k-TP-0.trace.json.gz",
+    "window_s": 3.7490782998046877,
+    "gpu_annotation_count": 25,
+    "logical_step_count": 13,
+    "between_extend": {
+      "n": 0,
+      "mean_annotated_gap_ms": null,
+      "max_annotated_gap_ms": null,
+      "total_no_kernel_gap_ms": 0.0,
+      "mean_no_kernel_gap_ms": null
+    },
+    "timeline": {
+      "extend_gpu_span": 0.9901590859215191,
+      "extend_draft_gpu_span": 0.04335583910193152,
+      "decode_gpu_span": 0.0,
+      "other_gpu_span": 0.003347381335624888,
+      "outside_steps": 0.006493532742855912
+    },
+    "classes": {
+      "extend2k-8k": {
+        "n": 1,
+        "mean_new_toks": 8183.0,
+        "mean_gpu_span_ms": 590.175431640625,
+        "mean_kernel_busy_ms": 561.460927734375,
+        "idle_in_span_share": 0.048654183767743,
+        "mean_cpu_span_ms": 585.8946220703125,
+        "us_per_new_token": 72.12213511433765,
+        "kernel_share": {
+          "other": 0.502,
+          "mhc_norm": 0.136,
+          "comm": 0.125,
+          "gemm": 0.106,
+          "kda": 0.097,
+          "moe": 0.033,
+          "dsa_attn": 0.001
+        }
+      },
+      "extend>=8k": {
+        "n": 5,
+        "mean_new_toks": 8192.0,
+        "mean_gpu_span_ms": 591.8928150390625,
+        "mean_kernel_busy_ms": 559.9742400390625,
+        "idle_in_span_share": 0.05392627548265394,
+        "mean_cpu_span_ms": 587.4685384765625,
+        "us_per_new_token": 72.25254089832306,
+        "kernel_share": {
+          "other": 0.503,
+          "mhc_norm": 0.138,
+          "comm": 0.122,
+          "gemm": 0.108,
+          "kda": 0.095,
+          "moe": 0.033,
+          "dsa_attn": 0.0
+        }
+      },
+      "extend_draft": {
+        "n": 6,
+        "mean_new_toks": 8190.5,
+        "mean_gpu_span_ms": 27.0907392578125,
+        "mean_kernel_busy_ms": 24.325978190104166,
+        "idle_in_span_share": 0.10205557852803981,
+        "mean_cpu_span_ms": 16.50199137369792,
+        "us_per_new_token": 3.3075806431612844,
+        "kernel_share": {
+          "other": 0.618,
+          "gemm": 0.128,
+          "comm": 0.107,
+          "kda": 0.106,
+          "mhc_norm": 0.023,
+          "moe": 0.017,
+          "dsa_attn": 0.001
+        }
+      },
+      "target_verify": {
+        "n": 1,
+        "mean_new_toks": 0.0,
+        "mean_gpu_span_ms": 12.5495947265625,
+        "mean_kernel_busy_ms": 12.40177734375,
+        "idle_in_span_share": 0.01177865787965482,
+        "mean_cpu_span_ms": 2.0145771484375,
+        "us_per_new_token": null,
+        "kernel_share": {
+          "other": 0.443,
+          "gemm": 0.247,
+          "mhc_norm": 0.139,
+          "kda": 0.072,
+          "comm": 0.067,
+          "moe": 0.028,
+          "dsa_attn": 0.003
+        }
+      }
+    },
+    "top_kernels_ms": {
+      "main_kernel": 723.1,
+      "void humming<MmaOpClass, Shape<0u, 512u, 4096u>, Shape<128u, 256u, 64u>, Shape<64u, 64u, 6": 492.1,
+      "ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)": 383.0,
+      "void humming<MmaOpClass, Shape<0u, 4096u, 256u>, Shape<128u, 256u, 64u>, Shape<64u, 64u, 6": 356.9,
+      "ampere_bf16_s16816gemm_bf16_128x256_ldg8_f2f_stages_64x3_tn": 198.4,
+      "mhc_post_tilelang_kernel": 186.9,
+      "void sglang::device::marlin::Marlin<__nv_bfloat16, 2814749767172868l, 256, 4, 16, 4, false": 170.5,
+      "mhc_pre_gemm_sqrsum_tilelang_kernel": 162.9,
+      "mhc_pre_big_fuse_with_norm_tilelang_kernel": 110.4,
+      "moe_fused_mul_sum_kernel": 100.2,
+      "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_32x5_tn": 70.9,
+      "chunk_gated_delta_rule_fwd_kernel_h_blockdim64": 57.1,
+      "ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<4096ul>)": 44.8,
+      "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_64x3_tn": 35.5,
+      "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:": 30.8,
+      "ampere_s16816gemm_bf16_128x256_ldg8_stages_64x3_tn": 27.9,
+      "_prefill": 26.0,
+      "act_and_mul_kernel": 22.6,
+      "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespa": 19.6,
+      "chunk_kda_fwd_kernel_inter_solve_fused": 19.6,
+      "_causal_conv1d_fwd_kernel": 17.9,
+      "chunk_kda_fwd_kernel_intra_sub_chunk": 17.7,
+      "chunk_gla_fwd_kernel_o": 17.2,
+      "_recompute_w_u_fwd_kernel": 16.5,
+      "void at::native::index_elementwise_kernel<128, 4, at::native::gpu_index_kernel<at::native:": 16.5
+    }
+  },
+  {
+    "trace": "/tmp/ax/runs/130ezd5-v3_open_S1dcp_profile_n34/N34/traces/open-open-TP-0.trace.json.gz",
+    "window_s": 20.025750962890626,
+    "gpu_annotation_count": 70,
+    "logical_step_count": 70,
+    "between_extend": {
+      "n": 0,
+      "mean_annotated_gap_ms": null,
+      "max_annotated_gap_ms": null,
+      "total_no_kernel_gap_ms": 0.0,
+      "mean_no_kernel_gap_ms": null
+    },
+    "timeline": {
+      "extend_gpu_span": 0.987219611030167,
+      "extend_draft_gpu_span": 0.04393246808418665,
+      "decode_gpu_span": 0.0,
+      "other_gpu_span": 0.0,
+      "outside_steps": 0.012780388969833023
+    },
+    "classes": {
+      "extend2k-8k": {
+        "n": 5,
+        "mean_new_toks": 5059.8,
+        "mean_gpu_span_ms": 419.706163671875,
+        "mean_kernel_busy_ms": 381.42410488281246,
+        "idle_in_span_share": 0.09121157157699333,
+        "mean_cpu_span_ms": 417.18323769531247,
+        "us_per_new_token": 82.9491607715473,
+        "kernel_share": {
+          "other": 0.501,
+          "comm": 0.146,
+          "mhc_norm": 0.129,
+          "gemm": 0.101,
+          "kda": 0.091,
+          "moe": 0.03,
+          "dsa_attn": 0.001
+        }
+      },
+      "extend<2k": {
+        "n": 2,
+        "mean_new_toks": 880.0,
+        "mean_gpu_span_ms": 217.92430126953124,
+        "mean_kernel_busy_ms": 131.37005859375,
+        "idle_in_span_share": 0.3971757264864646,
+        "mean_cpu_span_ms": 217.69200830078125,
+        "us_per_new_token": 247.64125144264915,
+        "kernel_share": {
+          "other": 0.428,
+          "comm": 0.326,
+          "gemm": 0.079,
+          "mhc_norm": 0.075,
+          "kda": 0.072,
+          "moe": 0.018,
+          "dsa_attn": 0.003
+        }
+      },
+      "extend>=8k": {
+        "n": 28,
+        "mean_new_toks": 8192.0,
+        "mean_gpu_span_ms": 584.1304996512278,
+        "mean_kernel_busy_ms": 557.5731836983816,
+        "idle_in_span_share": 0.04546469661951025,
+        "mean_cpu_span_ms": 579.6148426339286,
+        "us_per_new_token": 71.30499263320651,
+        "kernel_share": {
+          "other": 0.503,
+          "mhc_norm": 0.137,
+          "comm": 0.122,
+          "gemm": 0.107,
+          "kda": 0.097,
+          "moe": 0.033,
+          "dsa_attn": 0.001
+        }
+      },
+      "extend_draft": {
+        "n": 35,
+        "mean_new_toks": 7326.714285714285,
+        "mean_gpu_span_ms": 25.1365904296875,
+        "mean_kernel_busy_ms": 22.5388513671875,
+        "idle_in_span_share": 0.10334492538940154,
+        "mean_cpu_span_ms": 15.704675027901786,
+        "us_per_new_token": 3.4308135201476495,
+        "kernel_share": {
+          "other": 0.613,
+          "gemm": 0.126,
+          "comm": 0.117,
+          "kda": 0.104,
+          "mhc_norm": 0.023,
+          "moe": 0.016,
+          "dsa_attn": 0.002
+        }
+      }
+    },
+    "top_kernels_ms": {
+      "main_kernel": 3737.3,
+      "void humming<MmaOpClass, Shape<0u, 512u, 4096u>, Shape<128u, 256u, 64u>, Shape<64u, 64u, 6": 2445.1,
+      "ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)": 2019.7,
+      "void humming<MmaOpClass, Shape<0u, 4096u, 256u>, Shape<128u, 256u, 64u>, Shape<64u, 64u, 6": 1765.4,
+      "ampere_bf16_s16816gemm_bf16_128x256_ldg8_f2f_stages_64x3_tn": 997.7,
+      "mhc_post_tilelang_kernel": 972.9,
+      "void sglang::device::marlin::Marlin<__nv_bfloat16, 2814749767172868l, 256, 4, 16, 4, false": 869.2,
+      "mhc_pre_gemm_sqrsum_tilelang_kernel": 841.6,
+      "mhc_pre_big_fuse_with_norm_tilelang_kernel": 571.1,
+      "moe_fused_mul_sum_kernel": 522.6,
+      "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_32x5_tn": 342.9,
+      "chunk_gated_delta_rule_fwd_kernel_h_blockdim64": 295.9,
+      "ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<4096ul>)": 264.8,
+      "_prefill": 222.2,
+      "ampere_bf16_s16816gemm_bf16_128x128_ldg8_f2f_stages_64x3_tn": 187.3,
+      "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:": 177.5,
+      "ampere_s16816gemm_bf16_128x256_ldg8_stages_64x3_tn": 138.2,
+      "void humming<MmaOpClass, Shape<0u, 512u, 4096u>, Shape<64u, 256u, 64u>, Shape<32u, 64u, 64": 127.7,
+      "act_and_mul_kernel": 116.6,
+      "chunk_kda_fwd_kernel_inter_solve_fused": 104.9,
+      "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespa": 101.5,
+      "ampere_bf16_s16816gemm_bf16_256x128_ldg8_f2f_stages_64x3_tn": 97.2,
+      "_causal_conv1d_fwd_kernel": 93.7,
+      "void humming<MmaOpClass, Shape<0u, 4096u, 256u>, Shape<64u, 256u, 64u>, Shape<32u, 64u, 64": 93.1,
+      "chunk_kda_fwd_kernel_intra_sub_chunk": 91.9
+    }
+  }
+]
