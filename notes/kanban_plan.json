@@ -380,25 +380,31 @@
   {
     "job": "130ezn2-tail_n26_S6_40m",
     "ref": "130ezn1-tail_n26_S1_40m",
-    "what": "S6 = S1 设置去 MTP + 128p + 冻结分类 + 131 链首风险期 interval 1（450e8580）：chain 优先组合，先取收益后消融",
+    "what": "S6 = S1 设置去 MTP + 128p + 冻结分类 + 131 链首风险期 interval 1（450e8580）：chain 优先组合，先取收益后消融。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
     "status": "待插入"
   },
   {
     "job": "130ezn3-tail_n26_chainmax16k_40m",
     "ref": "130ezn2-tail_n26_S6_40m / 130ezn1",
-    "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价",
+    "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
     "status": "待插入"
   },
   {
     "job": "130ezn4-tail_n26_chainmax32k_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
-    "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价",
+    "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
     "status": "待插入"
   },
   {
     "job": "130ezn5-tail_n26_chainmax16k_118_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
-    "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核",
+    "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
     "status": "待发布（ezn1–ezn4 入队后由本地循环插入，名字排在 ezn4 之后）"
+  },
+  {
+    "job": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
+    "ref": "130ezn2-tail_n26_S6_40m（跨提交对照：450e8580 → 873031fd 只多默认关的 132/118/128g 代码，fable 已审）",
+    "what": "128g（Codex 873031fd）：原生 LPM 批内前缀去优先只在“新增可复用量上界 > 0”时保留；上界 = 共享长度按消费者 logits/logprob/SWA 裁剪后向下对齐真实缓存页与 KDA checkpoint 网格（本配置 64）再减已在显存的前缀；上界为 0 的 hold 释放（仍插入模拟树给深前缀兄弟当代表）。S6 设置 + SGLANG_AX_LPM_REUSE_GUARD=1，显式 118/132/local_extend=0。判定：同 pack 短冷头（如 19k）首次入批轮次与 TTFT、chain 条数（开场/稳态、修/新）、深前缀复用是否保住、其他门与 TPOT 代价；决策日志 lpm_hold 的 keep/release 计数",
+    "status": "已发布（ezn2 之后）"
   }
 ]
