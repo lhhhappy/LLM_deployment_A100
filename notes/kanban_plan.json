@@ -174,6 +174,12 @@
     "verdict": "**chain 16→11（修 7 新 2）**，turn 0=0，overall 24→22，fast 22=22，TPOT>0.10 69→66；A/A 噪声 0。修好的 7 条全是 biomaster 家族：4 条兄弟等待 40–43 s→5–7 s，35k/36k/19.6k 成员 40–60 s→4–19 s；新增的 2 条是被挤后移的贴线大冷链首（42.7k 24.0→31.3 s、50.6k 28.5→35.9 s）。统计：dependency 12、ready 7、reserved 7、dependent_admitted 12、fallback_hold_timeout 5。机制按设计生效；净 −5 与本地续算路径的 −5 是同一家族的两条不同路，能否叠加要合并后测"
   },
   {
+    "job": "130ez6zzzz-v3_open_S1dcp_combo_on_n34",
+    "ref": "130ez6zz-v3_open_S1dcp_prefix_off_n34",
+    "what": "合并：128p + 本地续算路径（引擎 791453ca = c0fcd486 + f34c7ac4 + 6976639e），两个 −5 能否叠加",
+    "status": "已发布（130ez7 之后插入，排在 130ez8 前）"
+  },
+  {
     "job": "130ez7-v3_n34_S1dcp_w2_pdi1_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：prefill-decode-interval 2→1（稳态 prefill 更频繁，用 TPOT 换 chain/turn）",
