@@ -639,7 +639,7 @@ class ProtectTests(unittest.TestCase):
 
 
 # HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.
-TREE_180 = tree_dir('HEAD')
+TREE_180 = ROOT / 'engine/sglang'  # include the working candidate, not only its last commit
 
 
 class HiCacheTierTests(unittest.TestCase):
@@ -709,7 +709,12 @@ class HiCacheTierTests(unittest.TestCase):
         dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_AX_DSA_SPARSE_TRITON_PREFILL': False, '_ax118_engaged': False}
         compile_nodes(TREE_180 / 'srt/layers/attention/dsa_backend.py', {'ax118_state'}, dsa_ns)
         dsa.ax118_state = dsa_ns['ax118_state']
+        local = ModuleType('sglang.srt.layers.dcp.local_extend')
+        local_ns = {}
+        compile_nodes(TREE_180 / 'srt/layers/dcp/local_extend.py', {'local_extend_mechanism_tokens'}, local_ns)
+        local.local_extend_mechanism_tokens = local_ns['local_extend_mechanism_tokens']
         mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy,
+                                        'sglang.srt.layers.dcp.local_extend': local,
                                         'sglang.srt.layers.attention.dsa_backend': dsa})
         mods.start()
         self.addCleanup(mods.stop)
@@ -727,7 +732,14 @@ class HiCacheTierTests(unittest.TestCase):
                                 '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
                                 '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset', '128=off:SGLANG_AX_DEADLINE_FAMILY_unset',
-                                '140=off', '180=off:no_hierarchical_cache'])
+                                '128p=off:SGLANG_AX_PREFIX_PRODUCER_unset',
+                                '128g=off:SGLANG_AX_LPM_REUSE_GUARD_unset',
+                                '131=off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset',
+                                '140=off', '180=off:no_hierarchical_cache',
+                                'dcp_local=off', 'dcp_local_max=0', 'dcp_local_large=0'])
+        s.policy.ax_lpm_reuse_grid = 128
+        self.assertIn(' 128g=on:128 ', s._ax_mechanism_report())
+        s.policy.ax_lpm_reuse_grid = None
         s.enable_hierarchical_cache = True
         dsa_ns['_AX_DSA_SPARSE_TRITON'] = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):

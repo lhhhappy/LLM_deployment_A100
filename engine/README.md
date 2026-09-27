@@ -37,6 +37,7 @@ numbered-patch stack on 2026-09-24 (user decision). A run or submission is ident
 | 118 | Triton DSA sparse attention; optional full-KV prefill-only route compatible with DCP | no | `SGLANG_AX_DSA_SPARSE_TRITON` or `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL` (both off; exclusive) | prefill route: 15 GPU tests and 9 synthetic cost cases pass; TP8 pending |
 | 128 | family leader ranking inside 124: waiting cold requests sharing an uncached prefix (256-token block hashes) form a family; the leader ranks by work per rider, riders wait for it | no | `SGLANG_AX_DEADLINE_FAMILY` (0), needs 124 | CPU only; N34 opening probe pending |
 | 128p | [Tracked prefix producers and READY sibling admission](docs/128-prefix-producer.md), an alternative to old 128 | no | `SGLANG_AX_PREFIX_PRODUCER` (0), needs 124/120; excludes old 128 | CPU + TP2/DCP2/MTP/HiCache diagnostic; independent review and TP8 N34 pending |
+| 128g | [Reject native LPM holds with zero possible reusable gain](docs/128-lpm-reuse-guard.md) | no | `SGLANG_AX_LPM_REUSE_GUARD` (0), LPM | real policy/radix + scheduler CPU reproduction; TP8 pending |
 | 120 | protect chain: cold-chunk cap while others wait, short hits share the batch, decode turn | yes | `SGLANG_AX_SCHED_PROTECT` (1), `_COLD_CAP`, `_SHORT_TOKENS` | yes |
 | 121 | also cap continuations while decoding | yes | — | only inside official A |
 | 122 | TPOT-paced prefill budget (Sarathi-style) | no | `SGLANG_AX_PACE_TPOT` (off) | 048 dev N22: fast passes, overall/chain fail; 061s full N30 timed replay in progress |

@@ -418,6 +418,10 @@ class Tracker:
                 effective_held=req.rid in effective_held, work=self.work.get(req.rid),
                 received=rec.received if rec else None,
                 due_in=round(rec.due - now, 6) if rec else None))
+            hold_check = getattr(req, "_ax_lpm_hold_check", None)
+            if hold_check is not None:
+                self.rows[-1]["lpm_hold"] = hold_check
+                self.stats["lpm_hold_" + hold_check["decision"]] += 1
         return ranked, effective_held, wait_prefix
 
     def starved(self, req, waited, deadline):

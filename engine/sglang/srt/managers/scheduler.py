@@ -1341,6 +1341,8 @@ class Scheduler(
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
             "128p": "on" if getattr(self, "_ax_prefix_tracker", None) else "off:SGLANG_AX_PREFIX_PRODUCER_unset",
+            "128g": (f"on:{self.policy.ax_lpm_reuse_grid}" if getattr(self.policy, "ax_lpm_reuse_grid", None) is not None
+                     else "off:SGLANG_AX_LPM_REUSE_GUARD_unset"),
             "131": "on" if self._ax_chain_risk_cfg() is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
             "140": "on" if dual else "off",
             "180": m180,

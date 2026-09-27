@@ -1,0 +1,69 @@
+{
+  "scope": "DIAGNOSTIC: observed trace windows, no full-cohort score",
+  "limitations": "Snapshot intervals are not continuous holds or causal delay. Threshold columns are sensitivity counts, not proof of the active cache grid. Neither a counterfactual schedule nor saved chain counts are predicted.",
+  "target": "scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0",
+  "inputs": [
+    {
+      "label": "off",
+      "level": "/workspace/Agentic_science_challenge/evidence/L130ezm7-v3_open_S5b_118off_n34/N34",
+      "raw_rows": 446,
+      "raw_sha256": "188ba82275dc3cc34cc2d9e4d5b658b7c7d62787c91fb5eb0f4651878ff53cb1",
+      "server_sha256": "31071846c091bb08ed2bab7f2a30647a23eb960de26bd52cce60e7e14517c74a",
+      "decision_epochs": {
+        "1": 2,
+        "2": 230
+      },
+      "target": {
+        "label": "off",
+        "req_id": "scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0",
+        "prompt": 19335,
+        "cached": 0,
+        "ttft_s": 25.42046356201172,
+        "wait_to_forward_s": 23.429900646209717,
+        "forward_to_first_s": 1.990562915802002,
+        "observed_decisions": 49,
+        "effective_held_decisions": 43,
+        "first_unheld_sequence": 45,
+        "admitted_sequence": 50,
+        "max_held_depth": 58,
+        "held_depth_below_64_samples": 43,
+        "observed_intervals_below_64_s": 20.76296200044453,
+        "held_depth_below_128_samples": 43,
+        "observed_intervals_below_128_s": 20.76296200044453,
+        "held_depth_below_256_samples": 43,
+        "observed_intervals_below_256_s": 20.76296200044453
+      }
+    },
+    {
+      "label": "on",
+      "level": "/workspace/Agentic_science_challenge/evidence/L130ezm8-v3_open_S5b_118prefill_n34/N34",
+      "raw_rows": 464,
+      "raw_sha256": "529de1609a6b532528a7a770b1fd4e20d8b3a15fbbee035233d5b44d1ec2a06f",
+      "server_sha256": "9009d05cdbb25c2a0b93177a9287682eb5b54103ce5c2b58effe7a7c988a1089",
+      "decision_epochs": {
+        "1": 2,
+        "2": 246
+      },
+      "target": {
+        "label": "on",
+        "req_id": "scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0",
+        "prompt": 19335,
+        "cached": 0,
+        "ttft_s": 32.255382776260376,
+        "wait_to_forward_s": 30.400761604309082,
+        "forward_to_first_s": 1.854621171951294,
+        "observed_decisions": 69,
+        "effective_held_decisions": 61,
+        "first_unheld_sequence": 64,
+        "admitted_sequence": 71,
+        "max_held_depth": 58,
+        "held_depth_below_64_samples": 61,
+        "observed_intervals_below_64_s": 27.082438999786973,
+        "held_depth_below_128_samples": 61,
+        "observed_intervals_below_128_s": 27.082438999786973,
+        "held_depth_below_256_samples": 61,
+        "observed_intervals_below_256_s": 27.082438999786973
+      }
+    }
+  ]
+}

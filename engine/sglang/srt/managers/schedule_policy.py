@@ -258,12 +258,39 @@ class SchedulePolicy:
 
         # It is used to find the matching prefix for in-batch prefix caching.
         self.waiting_queue_radix_tree = RadixCache.create_simulated()
+        self.ax_lpm_reuse_grid = self._ax_lpm_reuse_guard_config()
+
+    def _ax_lpm_reuse_guard_config(self):
+        """128g: reject native holds whose *maximum* reusable gain is zero.
+
+        The simulated tree has one-token pages, unlike the real KV/KDA tree.
+        A positive bound is only permission to keep the native hold; it is
+        never evidence that the producer has published a usable checkpoint.
+        """
+        if os.environ.get("SGLANG_AX_LPM_REUSE_GUARD", "0") != "1":
+            return None
+        if (self.policy != CacheAwarePolicy.LPM
+                or IN_BATCH_PREFIX_CACHING_CHECK_THRESHOLD < 0):
+            raise ValueError("[ax] 128g requires LPM with in-batch prefix caching")
+        cache = self.tree_cache
+        core = getattr(cache, "tree_core", cache)
+        if getattr(core, "is_eagle", False):
+            raise ValueError("[ax] 128g does not support a bigram radix tree")
+        grid = cache.page_size
+        if not isinstance(grid, int) or grid <= 0:
+            raise ValueError("[ax] 128g requires a positive cache page size")
+        if cache.supports_mamba() and cache.enable_mamba_extra_buffer:
+            grid = mamba_checkpoint_grid(grid)
+        return grid
 
     def calc_priority(
         self, waiting_queue: List[Req], running_batch: Optional[ScheduleBatch] = None
     ) -> None:
         policy = self._determine_active_policy(waiting_queue)
         self.ax_held = set()  # [ax] 124 keeps LPM's in-batch prefix-sharing holdbacks last
+        if getattr(self, "ax_lpm_reuse_grid", None) is not None:
+            for req in waiting_queue:
+                req._ax_lpm_hold_check = None
         if ax_prefix_readiness.ENABLED:
             self.ax_prefix_held_by = {}
             self.ax_prefix_held_depth = {}
@@ -378,6 +405,7 @@ class SchedulePolicy:
         temporary_deprioritized: Set[int] = set()
         self.waiting_queue_radix_tree.reset()
         prefix_representatives = [] if ax_prefix_readiness.ENABLED else None
+        reuse_grid = getattr(self, "ax_lpm_reuse_grid", None)
 
         for r in waiting_queue:
             prefix_ids = r.origin_input_ids + r.output_ids
@@ -409,17 +437,32 @@ class SchedulePolicy:
                         self.waiting_queue_radix_tree, match_result, extra_key=extra_key
                     )
                 in_batch_matching_prefixes = match_result.device_indices
-                if (
+                hold = (
                     len(in_batch_matching_prefixes)
                     >= IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD
-                ):
+                )
+                if hold and reuse_grid is not None:
+                    # Bound by the consumer's logits/logprob and SWA limits,
+                    # then by the *real* cache grid (including DCP widening).
+                    limit = min(r._compute_max_prefix_len(len(prefix_ids)),
+                                len(prefix_ids) - self.tree_cache.swa_reprefill_tail_tokens())
+                    upper = max(0, min(len(in_batch_matching_prefixes), limit))
+                    upper = upper // reuse_grid * reuse_grid
+                    gain = max(0, upper - len(r.prefix_indices))
+                    hold = gain > 0
+                    r._ax_lpm_hold_check = dict(
+                        shared=len(in_batch_matching_prefixes), grid=reuse_grid,
+                        reuse_upper=upper, gain_upper=gain,
+                        decision="keep" if hold else "release_zero_gain")
+                if hold:
                     temporary_deprioritized.add(r.rid)
                     if prefix_representatives is not None:
                         self.ax_prefix_held_by[r.rid] = ax_prefix_readiness.held_owner(
                             r, prefix_representatives, len(in_batch_matching_prefixes))
                         self.ax_prefix_held_depth[r.rid] = len(in_batch_matching_prefixes)
                 else:
-                    # Insert with a dummy key
+                    # Also insert a zero-gain release: it can be the useful
+                    # deep-prefix representative for a later sibling.
                     self.waiting_queue_radix_tree.insert(
                         InsertParams(
                             key=RadixKey(
