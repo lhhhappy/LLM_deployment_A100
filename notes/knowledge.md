@@ -46,3 +46,16 @@
 
 - = v5（长输出尾）+ v3g 的间隔规则（`scripts/longchain/regap.py`：每条链的累计等待按主办方 chains.jsonl 的真实链时长回填，单个 gap ≤310 s、链 ≤3600 s，与原 harness 规则一致）。间隔 p50/p90/p95/max = 6.9/49.1/98.0/310 s，累计 34.1 h（v4/v5 为 2.6/12.1/21.4/301 s、8.5 h；用户核对的真实相邻间隔 p95 约 92 s、累计约为 v4 的 3.5 倍）。正文、cohort（ff1dccae1087a798）、输出预算与 v5 相同；requests.jsonl sha256 cfb58cd24adac24a…；set 标签 s1-dev-longchain-v5g，bodies 指向 v4 的文件。
 - 含义：真实间隔让同时活跃的上下文减少（v3g 实测在跑 17–19 条、KV 22%），本地不再出现线上没有的 KV 墙；这是判断稳态机制的默认数据集。DCP 在本地"特别好"正是因为 v3 的短间隔造出了 KV 墙，线上没有这堵墙。
+
+## 数据集 v5g-tail：s1-dev-longchain-v5g-tail-review-0927（2026-09-27，Codex c9c14153，fable 独立复核通过）
+- 位置：Pod `/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927`（同目录还有 v5-review 对照与 v5g-review 强压力参照），开发机 `/sjtu/linhang/arena/codex/longchain-repair-0927/data/`；收据 `publication.json`；requests sha 6170fd82…、cohort ff1dccae1087a798（与 v4/v5/v5g 相同）。
+- 规则：从 v5 出发，只把 239 条"合成、非 cohort 链首、原等待 >12.551 s（v5 链中 P90）、旧 v5g 提案 >max(60 s,原值)"的等待改成旧 v5g 的提案（≤310 s）；其余字段逐字段不变，正文链接 v4 分片。链中等待 P50/P90 2.653/12.551 s 不变，P95/P99 33.2/245.5 s，>60 s 250 个（源库 raw 340 个为上界），总和 59,455 s（v5 29,875、旧 v5g 122,279）；harness 每链 3600 s 封顶后 v5/tail 无链被压缩。
+- 边界：有限假设的敏感性臂，不是复原源逐请求时间，也不是全量 token 重渲染的 VALID（结构 checker 0 错误）。旧 v5g 把中位拉到 7.3 s、>60 s 440 个已超源，不再作主数据。
+
+## 118 prefill-only Triton 稀疏注意力：TP8 实测（2026-09-27）
+- 单请求 49k 剖析（带 MTP）：8k 目标块 GPU 588→541 ms（−8.1%，72→66 µs/token），16k 块 1085→989 ms（−8.8%），草稿块 26.8→22.6 / 50.1→42.0 ms；未分类内核 50%→33%、dsa_attn 0→13%。N34 开场探针同 446 条：chain 11=11、fast 7→4、overall 6→4、TPOT>0.10 79→72；稳态 ≥100k 冷头入批后 −4%…−18%。
+- 数值：Codex 算子级 15 项测试误差在界内但非逐位相等，未做全模型 logits 等价；12/12 冒烟通过；进候选引擎前需能力复核（AIME/GPQA）。路由只作用于普通 full-KV EXTEND（有无 DCP 都生效）。
+
+## 原生 LPM in-batch 前缀去优先会把同 pack 冷链首压到队尾（2026-09-27，Codex 日志核实，机制待 CPU 复现）
+- 118 探针 ON 臂里 19.3k 冷头从 seq3 到 seq63 一直 held=true（held_by 轮换、held_depth 58，state=ORDINARY），seq64 放行时 due_in 2.9 s 且 50.6k 头已成 chunked_req，31.1 s 才入批（OFF 臂 seq45 放行、23.6 s 入批）。128p 的 8 s max_hold 只约束它自己的依赖。推断：同 pack 冷头共享几十 token 系统前缀（>32 token 阈值）触发去优先，而共享前缀短于 KDA 可复用 checkpoint 网格 256、永远进不了缓存，hold 无收益。Codex 在 codex/lpm-reuse-guard-0927 做可复用粒度门（默认关）。
+
