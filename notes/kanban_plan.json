@@ -279,7 +279,8 @@
     "job": "130ezm6-v4_n26_S5b_40m",
     "ref": "",
     "what": "v4 稳态协议基线：S5b（无 MTP），引擎 450e8580（131 关），N26 40 分钟；也是 ezm5/ezr/ezp/ezq/ezs 的同 ID 参照",
-    "status": "已发布（130ezm5 之后）"
+    "status": "已闭合",
+    "verdict": "同 1601 条对 130ezm5（最弱 MTP）：chain 8=8、turn 6→4(ezm5)、overall 25 对 41、fast 22 对 37、TPOT>0.10 64=64、均值 52.1 对 45.8 ms；稳态 127 项 chain 门两边都 0 超时（无 MTP 15–20 s 1 条、20–30 s 2 条）；252k 头入批后 23.3 s（最弱 25.0、全量 27.6），211k 头 20.0 s（最弱 22.3）。结论：无 MTP 在 chain 相关量（大头执行）和 overall/fast 上都优于最弱 MTP，代价 TPOT 均值 +6 ms；S5b 保持无 MTP"
   },
   {
     "job": "130ezr-v4_n26_S5a_full_40m",
