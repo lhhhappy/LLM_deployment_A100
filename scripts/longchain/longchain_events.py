@@ -478,10 +478,12 @@ class EventCompiler:
                                        "stripped_indices": stripped,
                                        "stripped_sha256": lc.digest([messages[i] for i in stripped])})
             if item.get("rewrite"):
+                # v4 top-up: the build may raise a planned rewrite's target above its template's so the
+                # chain's new-token total reaches the source's; v3 never sets step_target for turn starts.
                 history, receipt["divergence"] = self.diverge_to_target(
-                    history, stripped, block, self.step_shape(item), lc.tool_schemas(current).get("Read")
+                    history, stripped, block, item.get("step_target") or self.step_shape(item), lc.tool_schemas(current).get("Read")
                     if "Read" in lc.available_tools(current) else None, f"{prefix}_{step:04d}_t", force=not stripped)
-            receipt.update(step_target_tokens=self.step_shape(item))
+            receipt.update(step_target_tokens=item.get("step_target") or self.step_shape(item))
             return {**current, "messages": history + block}, receipt, None
         pool = self.pool(target, current)
         # Size: the template's new tokens, scaled

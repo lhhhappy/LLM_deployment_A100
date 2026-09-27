@@ -28,6 +28,7 @@ import sys
 
 REPO = Path(__file__).resolve().parents[2]
 VERSION = "source-event-longchain-v3"
+VERSION_TOPUP = "source-event-longchain-v4"  # v3 rules + rewrite top-up (--rewrite-topup)
 # Lower bound of the factor that scales continuation growth down to the chain's frozen prompt total.
 GROWTH_SCALE_MIN = 1 / 16
 
@@ -483,7 +484,7 @@ def build(args):
     dest.mkdir(parents=True)
     (dest / "bodies").mkdir()
     (dest / "samples").mkdir()
-    manifest = {"generator": VERSION, "status": "BUILDING", "set": args.set, "seed": args.seed,
+    manifest = {"generator": VERSION_TOPUP if args.rewrite_topup else VERSION, "status": "BUILDING", "set": args.set, "seed": args.seed,
                 "quality_status": "DIAGNOSTIC_CANDIDATE_NOT_REPRESENTATIVE",
                 "implementation": implementation_receipt(args.harness_dir),
                 "source_root": str(root), "selected_chain_ids": chosen,
@@ -583,6 +584,7 @@ def build(args):
             # close with narration, a pressure rebuild) cancels the last planned continuation rewrite ahead.
             target_rewrites, rewrites = sum(item["rewrite"] for item in plan), 0
             new_tokens = prompt_tokens = 0
+            topups = 0
             for offset, (item, budget) in enumerate(zip(plan, budgets)):
                 step = len(original) + offset
                 before_body = current_body
@@ -597,6 +599,17 @@ def build(args):
                     cost = sum(shapes[j] * (len(plan) - j) for j in rest)
                     scale = min(1.0, max(GROWTH_SCALE_MIN, headroom / cost)) if cost else 1.0
                     item = {**item, "growth_scale": scale, "step_target": max(1, round(shapes[offset] * scale))}
+                if args.rewrite_topup and item.get("rewrite") and item["kind"] in ("intra", "turn_start"):
+                    # v4: share the chain's remaining new-token deficit over the planned rewrites still ahead
+                    # (this one included). A rewrite recomputes a suffix of the history, so it adds new tokens
+                    # without growing the prompt; diverge_to_target caps the recompute at the whole history.
+                    ahead = [j for j in range(offset, len(plan)) if plan[j].get("rewrite") and plan[j]["kind"] in ("intra", "turn_start")]
+                    planned_rest = sum(plan[j].get("step_target") or shapes[j] for j in range(offset, len(plan)))
+                    deficit = new_token_budget - new_tokens - planned_rest
+                    if deficit > 0 and ahead:
+                        base = item.get("step_target") or compiler.step_shape(item)
+                        item = {**item, "step_target": int(base + deficit / len(ahead)), "topup_tokens": int(deficit / len(ahead))}
+                        topups += 1
                 try:
                     current_body, event_receipt, donor = compiler.event(item, target, before_body, prefix, step, usage, room)
                     current_body["req_id"] = rid
@@ -702,7 +715,7 @@ def build(args):
                        # Targets are the source chain's totals minus its public requests: the synthesized part.
                        "synthesized_new_tokens": new_tokens, "target_new_tokens": new_token_budget,
                        "synthesized_prompt_tokens": prompt_tokens, "target_prompt_tokens": prompt_budget,
-                       "synthesized_rewrites": rewrites, "target_rewrites": target_rewrites,
+                       "synthesized_rewrites": rewrites, "target_rewrites": target_rewrites, "rewrite_topups": topups,
                        "new_tokens_relative_error": new_tokens / new_token_budget - 1 if new_token_budget else None,
                        "output_sum": out_chain["max_output_i_sum"], "source_output_sum": target["max_output_i_sum"],
                        "source_output_residual": budget_residual, "phases": phase_counts, "source_phases": target["phases"],
@@ -933,6 +946,9 @@ def main(argv=None):
     bp.add_argument("--chains", type=int, default=311)
     bp.add_argument("--seed", type=int, default=20260924)
     bp.add_argument("--max-context-tokens", type=int, default=524288)
+    bp.add_argument("--rewrite-topup", action="store_true",
+                    help="v4: raise planned rewrites' recompute targets (earlier divergence, never past the first tool call) "
+                         "so each chain's synthesized new tokens reach the source's sum_uncached_expected; v3 never scales up")
     bp.add_argument("--read-corpus", default=str(REPO / "build/base_exact"),
                     help="frozen source tree whose text files follow the public tool-result text as Read filler")
     pp = sub.add_parser("polish", help="apply reviewed edits consistently, re-render, and freeze a new dataset")
