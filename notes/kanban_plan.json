@@ -294,7 +294,8 @@
     "job": "130ezmb-v5g_n26_S1_40m",
     "ref": "线上 46676 @N26（chain 37.0、turn 5.4、overall 2.7、fast 1.9、tpot 25.2）",
     "what": "v5g 协议（v5 长输出尾 + 主办方链时长的真实间隔）S1 基线：46676 的配置（f546934e，无 DCP，running 32，全量 MTP），N26 40 分钟",
-    "status": "已发布（130ezma 之后）"
+    "status": "已闭合（1593 条排空，wall 2440 s）",
+    "verdict": "harness p95：chain 43.8 s、turn 21.3、overall 3.5、fast 2.6；超标 chain 10（全在开场 25 个链首里；稳态 125 个 chain 门样本无一 >30 s，20–30 s 仅 1）、turn 5、overall 46、fast 43、TPOT>0.10 41（均值 31.5 ms）。稳态 ≥100k 冷头入批后 10–25 s（248k：25.2 s，MTP interval 2）。旧 v5g 的强间隔也复现不出线上的稳态 chain 漏；host 层满、110 s 回载 74 GiB 是它的稳态形态。作为 ezn1（同配置、v5g-tail）的纯数据对照"
   },
   {
     "job": "130ezmc-v5g_n26_S1_nomtp_40m",
@@ -375,36 +376,36 @@
     "job": "130ezn1-tail_n26_S1_40m",
     "ref": "130ezmb-v5g_n26_S1_40m（旧 v5g 同配置）/ 线上 46676",
     "what": "v5g-tail（Codex c9c14153，fable 复核通过：v5 + 239 条尾部 gap 延长，P50/P90 不变，P95/P99 33/245 s）上的 S1 锚点：46676 配置（f546934e，MTP，无 DCP，running 32），N26 2400 s 派发+排空。判定：本数据上 chain 的开场/稳态分布，作为后面三臂的同数据对照",
-    "status": "待插入（130ezmb 之后）"
+    "status": "跑（18:20 UTC 起，DATA_READY v5g-tail）"
   },
   {
     "job": "130ezn2-tail_n26_S6_40m",
     "ref": "130ezn1-tail_n26_S1_40m",
     "what": "S6 = S1 设置去 MTP + 128p + 冻结分类 + 131 链首风险期 interval 1（450e8580）：chain 优先组合，先取收益后消融。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "待插入"
+    "status": "已入队（pending，名字序）"
   },
   {
     "job": "130ezn3-tail_n26_chainmax16k_40m",
     "ref": "130ezn2-tail_n26_S6_40m / 130ezn1",
     "what": "chain-max 16k：S6 + 132 链首优先 + 稳态冷块 16384 + 短命中预留 2048 + 124 系数 1.05（c1fa4877）。判定：chain 条数（开场/稳态、修/新）优先，fast/overall/turn/TPOT 作为代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "待插入"
+    "status": "已入队（pending，名字序）"
   },
   {
     "job": "130ezn4-tail_n26_chainmax32k_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "同上但冷块 32768、--max-prefill-tokens 32768：大头再省固定成本；看显存/冒烟/fast 代价。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "待插入"
+    "status": "已入队（pending，名字序）"
   },
   {
     "job": "130ezn5-tail_n26_chainmax16k_118_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "待发布（ezn1–ezn4 入队后由本地循环插入，名字排在 ezn4 之后）"
+    "status": "已入队（pending，名字序）"
   },
   {
     "job": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
     "ref": "130ezn2-tail_n26_S6_40m（跨提交对照：450e8580 → 873031fd 只多默认关的 132/118/128g 代码，fable 已审）",
     "what": "128g（Codex 873031fd）：原生 LPM 批内前缀去优先只在“新增可复用量上界 > 0”时保留；上界 = 共享长度按消费者 logits/logprob/SWA 裁剪后向下对齐真实缓存页与 KDA checkpoint 网格（本配置 64）再减已在显存的前缀；上界为 0 的 hold 释放（仍插入模拟树给深前缀兄弟当代表）。S6 设置 + SGLANG_AX_LPM_REUSE_GUARD=1，显式 118/132/local_extend=0。判定：同 pack 短冷头（如 19k）首次入批轮次与 TTFT、chain 条数（开场/稳态、修/新）、深前缀复用是否保住、其他门与 TPOT 代价；决策日志 lpm_hold 的 keep/release 计数",
-    "status": "已发布（ezn2 之后）"
+    "status": "已入队（pending，名字序）"
   }
 ]
