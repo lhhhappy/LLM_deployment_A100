@@ -59,3 +59,9 @@
 ## 原生 LPM in-batch 前缀去优先会把同 pack 冷链首压到队尾（2026-09-27，Codex 日志核实，机制待 CPU 复现）
 - 118 探针 ON 臂里 19.3k 冷头从 seq3 到 seq63 一直 held=true（held_by 轮换、held_depth 58，state=ORDINARY），seq64 放行时 due_in 2.9 s 且 50.6k 头已成 chunked_req，31.1 s 才入批（OFF 臂 seq45 放行、23.6 s 入批）。128p 的 8 s max_hold 只约束它自己的依赖。推断：同 pack 冷头共享几十 token 系统前缀（>32 token 阈值）触发去优先，而共享前缀短于 KDA 可复用 checkpoint 网格 256、永远进不了缓存，hold 无收益。Codex 在 codex/lpm-reuse-guard-0927 做可复用粒度门（默认关）。
 
+## 主办方的相位人群与本地 chain 桶的错配（2026-09-27 核实，改变判据）
+- 公开 722 行（`s1-dev/data/dev-combined-v1/requests.jsonl`）：session_start 104 条，prompt p50 18.6k / p95 34k / max 52k，全未命中；turn_start 92 条约 35k 全未命中（15 s 门）；context_reset 23 条 prompt 68k–230k、未命中 ~2k（缓存在时）；intra 503 条里未命中 ≥50k 占 10.5%、≥100k 占 3.6%（最大 257k），承担 43% / 23% 的全部未命中 token，门 5 s——到达即判死。
+- 我们的 cohort（311 链）只有 104 条链以 session_start 开头；其余 207 条以公开的链中行开头（115 条 intra、20 条 reset、72 条 turn_start），其中 intra 切段头 p50 65k、31 条 ≥100k。harness 按 cohort idx 0 判 chain，所以本地 chain 桶里混进了 135 条线上会按 5 s（intra）判的巨型请求。
+- 按主办方相位重判：所有本地 chain 漏都是切段头；session_start 链首 + reset 的桶在所有配置下 0 条超 30 s（p95 15–18 s）。本地 chain 结果不能用来给线上 chain 排序，直到数据把切段链补上小头。
+- 线上 chain 失败人群只能是小链首和 reset：它们等在巨型 intra 后面（单 chunked_req，停车只救一轮内能算完的等待者）或 reset 遇到缓存被淘汰。
+
