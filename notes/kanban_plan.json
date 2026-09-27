@@ -199,15 +199,15 @@
     "status": "已发布"
   },
   {
-    "job": "130eza-v3_n34_S1dcp_w2_multi5_30m",
+    "job": "130ezd-v3_n34_S1dcp_w2_multi5_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
-    "what": "探索：K3 分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 f2b6425e = e464d8ab + 9be15822",
+    "what": "探索：K3 分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 f2b6425e = e464d8ab + 9be15822；原 130eza，改排到 prefill 剖析之后",
     "status": "已发布"
   },
   {
-    "job": "130ezb-v3_n34_S1dcp_w2_nomtp_30m",
+    "job": "130eze-v3_n34_S1dcp_w2_nomtp_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
-    "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）",
+    "what": "探索：DCP 引擎去掉 MTP（KDA 池钉 418）；原 130ezb，改排到 prefill 剖析之后",
     "status": "已发布"
   }
 ]
