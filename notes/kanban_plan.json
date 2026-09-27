@@ -270,6 +270,24 @@
     "verdict": "对 130ezh 同 385 条：chain 11=11、turn 0→1、overall 6→11、fast 5→17、TPOT>0.10 71→100，600 s 内完成 354 对 378。write_back 更差（异步回写在开场反而更占资源），否决"
   },
   {
+    "job": "130ezm7-v3_open_S5b_118off_n34",
+    "ref": "130ezh-v3_n34_S1dcp_combo_nomtp_30m",
+    "what": "118 prefill-only 探针 OFF 孪生：Codex 引擎 3caadef4（=791453ca + 默认关的 full-KV prefill Triton 路由），开关未设，S5b 配置 N34 开场 600 s；应等于 130ezh 的开场",
+    "status": "跑（16:45 UTC 起）"
+  },
+  {
+    "job": "130ezm8-v3_open_S5b_118prefill_n34",
+    "ref": "130ezm7-v3_open_S5b_118off_n34",
+    "what": "118 prefill-only ON（SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，机制 token 118=on）：开场 chain 与各链首 TTFT、每 10 s 块数；核对 8 rank 路由收据、冒烟、无晚编译、max_total_num_tokens 不变",
+    "status": "已发布（130ezm7 之后）"
+  },
+  {
+    "job": "130ezm9-tp8_prefill_profile_118off / 130ezma-…118prefill",
+    "ref": "130ezc（592 ms/8k 目标 + 27 ms 草稿）",
+    "what": "同引擎 OFF/ON 单请求剖析（49k 提示 8k/16k 块，带 MTP）：目标模型每块 ms 与 DSA 内核占比的变化（Codex 单算子实测每次调用 10.5→5.3 ms）",
+    "status": "已发布（130ezm8 之后）"
+  },
+  {
     "job": "130ezmb-v5g_n26_S1_40m",
     "ref": "线上 46676 @N26（chain 37.0、turn 5.4、overall 2.7、fast 1.9、tpot 25.2）",
     "what": "v5g 协议（v5 长输出尾 + 主办方链时长的真实间隔）S1 基线：46676 的配置（f546934e，无 DCP，running 32，全量 MTP），N26 40 分钟",
