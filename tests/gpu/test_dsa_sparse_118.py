@@ -272,15 +272,34 @@ class Dispatch(unittest.TestCase):
 
         cls.backend = dsa_backend
 
-    def call(self, switch, q, kv, idx, return_lse):
+    def call(self, switch, q, kv, idx, return_lse, *, prefill_switch=False, is_prefill=False):
         prev = self.backend._AX_DSA_SPARSE_TRITON
+        prev_prefill = self.backend._AX_DSA_SPARSE_TRITON_PREFILL
         self.backend._AX_DSA_SPARSE_TRITON = switch
+        self.backend._AX_DSA_SPARSE_TRITON_PREFILL = prefill_switch
         try:
             return self.backend.DeepseekSparseAttnBackend._forward_tilelang(
-                None, q_all=q, kv_cache=kv, v_head_dim=D, page_table_1=idx, sm_scale=SM_SCALE,
-                return_lse=return_lse)
+                NS(_ax118_prefill_seen=True), q_all=q, kv_cache=kv, v_head_dim=D,
+                page_table_1=idx, sm_scale=SM_SCALE,
+                return_lse=return_lse, is_prefill=is_prefill)
         finally:
             self.backend._AX_DSA_SPARSE_TRITON = prev
+            self.backend._AX_DSA_SPARSE_TRITON_PREFILL = prev_prefill
+
+    def test_prefill_switch_does_not_replace_partial_or_decode_calls(self):
+        q, kv, idx = masked_rows()
+        for is_prefill in (False, True):
+            for return_lse in (False, True):
+                with self.subTest(is_prefill=is_prefill, return_lse=return_lse):
+                    got = self.call(False, q, kv, idx, return_lse,
+                                    prefill_switch=True, is_prefill=is_prefill)
+                    use_triton = is_prefill and not return_lse
+                    want = triton118(q, kv, idx) if use_triton else served(q, kv, idx, return_lse)
+                    if return_lse:
+                        self.assertTrue(torch.equal(got[1], want[1][0]))
+                        got, want = got[0], want[0]
+                    self.assertTrue(torch.equal(got.isnan(), want.isnan()))
+                    self.assertTrue(torch.equal(got.nan_to_num(), want.nan_to_num()))
 
     def test_off_is_served_on_is_118(self):
         q, kv, idx = masked_rows()
@@ -308,6 +327,14 @@ class Dispatch(unittest.TestCase):
             self.assertEqual(self.backend.ax118_state(), "on")
         finally:
             self.backend._AX_DSA_SPARSE_TRITON, self.backend._ax118_engaged = prev
+
+    def test_prefill_state_report(self):
+        with patch.object(self.backend, "_AX_DSA_SPARSE_TRITON", False), \
+                patch.object(self.backend, "_AX_DSA_SPARSE_TRITON_PREFILL", True), \
+                patch.object(self.backend, "_ax118_engaged", False):
+            self.assertEqual(self.backend.ax118_state(), "off:no_tilelang_dsa_prefill")
+            self.backend._ax118_engaged = True
+            self.assertEqual(self.backend.ax118_state(), "on:prefill")
 
 
 def graph_replay(make):
@@ -371,9 +398,11 @@ loaded = []  # Triton loads each specialization onto the device once per process
 knobs.runtime.kernel_load_start_hook.add(lambda module, function, name, *_: loaded.append(name))
 ours = lambda: len([n for n in loaded if "sparse_attention" in n])
 b._AX_DSA_SPARSE_TRITON = True
+b._AX_DSA_SPARSE_TRITON_PREFILL = False
 b.get_parallel = lambda: NS(dcp_enabled=False)
 b.get_exec = lambda: NS(deterministic=NS(enable_deterministic_inference=False))
 cfg = dict(CFG, device_sm_major=torch.cuda.get_device_capability()[0])
+MODE_SETUP
 for kpool in (4, 1):  # warm up through the backend's own code, as at server start
     b.DeepseekSparseAttnBackend._ax118_init(NS(**dict(cfg, dsa_index_kpool=kpool)))
 warm = ours()
@@ -384,23 +413,36 @@ for kpool in (4, 1):
         q = torch.randn(M, cfg["num_q_heads"], 512, device="cuda").to(torch.bfloat16)
         buf = torch.randint(0, 1 << 16, (M, width + 61), device="cuda", dtype=torch.int32)
         for idx in (buf[:, :width].contiguous(), buf[:, :width]):  # packed and a column slice of a wider table
-            k.sparse_attention_fwd(q, pool[: 1000 + M], idx, 0.04, 512)
+            if b._AX_DSA_SPARSE_TRITON_PREFILL:
+                b.DeepseekSparseAttnBackend._forward_tilelang(
+                    NS(_ax118_prefill_seen=True), q, pool[:1000 + M], 512, idx, 0.04,
+                    is_prefill=True)
+            else:
+                k.sparse_attention_fwd(q, pool[: 1000 + M], idx, 0.04, 512)
 torch.cuda.synchronize()
 print(warm, ours() - warm)
 """
 
 
 class Warmup(unittest.TestCase):
-    def test_backend_warmup_covers_every_serving_shape(self):
+    def run_probe(self, mode_setup=""):
         """In a fresh process: after the backend's warmup at the GLM TP8 config, no call with the indexer's output
         shape (any M, pool size or index row stride) compiles or loads another specialization."""
-        probe = NO_RECOMPILE_PROBE.replace("CFG", repr(GLM_TP8))  # repr(torch.bfloat16) is "torch.bfloat16"
+        probe = NO_RECOMPILE_PROBE.replace("CFG", repr(GLM_TP8)).replace("MODE_SETUP", mode_setup)
         res = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True, env=os.environ)
         self.assertEqual(res.returncode, 0, res.stderr[-3000:])
         warm, late = map(int, res.stdout.split()[-2:])
         emit(kind="warmup", loaded_in_warmup=warm, loaded_after_warmup=late)
         self.assertEqual(warm, 5 + 4 + 5)  # 5 split counts per width; the 4 combine kernels do not depend on it
         self.assertEqual(late, 0)
+
+    def test_backend_warmup_covers_every_serving_shape(self):
+        self.run_probe()
+
+    def test_prefill_mode_warmup_covers_every_serving_shape(self):
+        self.run_probe("b._AX_DSA_SPARSE_TRITON = False\n"
+                       "b._AX_DSA_SPARSE_TRITON_PREFILL = True\n"
+                       "b.get_parallel = lambda: NS(dcp_enabled=True)")
 
 
 class Startup(unittest.TestCase):
@@ -413,11 +455,13 @@ class Startup(unittest.TestCase):
 
         cls.b = dsa_backend
 
-    def init(self, switch=True, cuda=True, dcp=False, deterministic=False, **overrides):
+    def init(self, switch=True, cuda=True, dcp=False, deterministic=False,
+             prefill_switch=False, **overrides):
         cfg = dict(GLM_TP8, device_sm_major=torch.cuda.get_device_capability()[0])
         cfg = NS(**dict(cfg, **overrides))
         exec_ctx = NS(deterministic=NS(enable_deterministic_inference=deterministic))
         with patch.object(self.b, "_AX_DSA_SPARSE_TRITON", switch), patch.object(self.b, "_ax118_engaged", False), \
+                patch.object(self.b, "_AX_DSA_SPARSE_TRITON_PREFILL", prefill_switch), \
                 patch.object(self.b, "is_cuda", lambda: cuda), \
                 patch.object(self.b, "get_parallel", lambda: NS(dcp_enabled=dcp)), \
                 patch.object(self.b, "get_exec", lambda: exec_ctx):
@@ -439,6 +483,17 @@ class Startup(unittest.TestCase):
         for reason, kw in cases.items():
             with self.subTest(reason), self.assertRaisesRegex(ValueError, "118.*got: .*" + re.escape(reason)):
                 self.init(**kw)
+
+    def test_prefill_mode_accepts_dcp_but_keeps_other_guards(self):
+        self.assertTrue(self.init(switch=False, prefill_switch=True, dcp=True))
+        self.assertFalse(self.init(switch=False, prefill_switch=True, dcp=True,
+                                   dsa_prefill_impl="flashmla_sparse"))
+        with self.assertRaisesRegex(ValueError, "mutually exclusive"):
+            self.init(prefill_switch=True)
+        for kw in (dict(kv_cache_dtype=torch.float8_e4m3fn), dict(qk_rope_head_dim=64),
+                   dict(hisparse_coordinator=object()), dict(deterministic=True)):
+            with self.subTest(kw=kw), self.assertRaises(ValueError):
+                self.init(switch=False, prefill_switch=True, dcp=True, **kw)
 
 
 # ----------------------------------------------------------------------------- timing (--bench)
