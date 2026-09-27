@@ -1,7 +1,40 @@
 # 118 — DSA sparse attention through a Triton kernel on A100 (candidate)
 
-Default off. `SGLANG_AX_DSA_SPARSE_TRITON=1` routes every TileLang sparse-attention call to
-`srt/layers/attention/dsa/sparse_attention_triton.py`.
+Default off. Two mutually exclusive modes use the existing numerical kernel in
+`srt/layers/attention/dsa/sparse_attention_triton.py`:
+
+- `SGLANG_AX_DSA_SPARSE_TRITON=1`: all TileLang sparse-attention calls; still refuses DCP.
+- `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1`: only ordinary `ForwardMode.EXTEND` calls with full KV and no LSE.
+  DCP is allowed in this mode because 116 has already gathered and remapped KV before the call. Local extend,
+  target verify, draft-extend-v2, mixed mode and decode retain their existing kernels. Ordinary draft-model
+  EXTEND, if used, has the same full-KV contract and is included.
+
+The prefill-only integration is a **candidate, not GPU-validated as of 2026-09-27**. The historical operator
+measurements below are not a new DCP or TP8 result. See the [integration report](../../notes/reports/prefill-sm80-0927.md).
+
+## Prefill-only integration
+
+`forward_extend` supplies `is_prefill=True` only at its ordinary full-KV call site. The earlier partial-attention
+branch returns before reaching it. `_forward_tilelang` also requires `return_lse=False`; neither a request length
+nor the absence of an LSE alone is used to infer the phase. This keeps DCP local-extend output/merge and all
+speculative partial calls intact. The backend warms the same local-head variants as ordinary prefill, not the
+DCP-gathered head count used by partial attention. Both switches unset preserves the old tensor operations.
+
+The mechanism token is `118=on:prefill` only after a suitable prefill backend passes the guards and warmup.
+The first actual use per backend additionally logs `[ax] 118 route=full_kv_prefill tokens=... heads=... width=...
+dcp=...`. It is an entry receipt, not a replay/batch counter. Unsupported dtype, RoPE tail, HiSparse and
+deterministic inference keep their startup guards. Both switches together fail startup.
+
+No numerical kernel, persistent tensor, DCP collective, index mapping or scheduler policy changes in this mode.
+At 8192 query rows it removes the 8192 × 2112 × 4-byte padding copy (66 MiB); the attention output is unchanged
+in size. Short ordinary extends can use the existing split buffers, up to about 5.1 MiB at the measured A100/H8
+occupancy. Actual process peak, graph pool and KV capacity still require measurement.
+
+Local dispatch contracts: `python3 -B -m unittest discover -s scripts/tests -p test_dsa_triton_prefill.py`.
+The GPU suite now includes prefill-only startup/dispatch and fresh-process warmup coverage. The new
+[`bench_prefill_sparse.py`](../../scripts/analysis/bench_prefill_sparse.py) uses contiguous full KV, 8k–262k
+contexts, 333–16384 query rows and a four-request batch; it checks an fp32 reference and records paired eager
+time, peak temporary allocation and late Triton loads. It does not execute DCP collectives.
 
 ## Why
 GLM-5.3-Flash runs absorbed-MLA sparse attention in its 11 DSA layers, plus one in the MTP draft layer. On A100 the
@@ -56,7 +89,7 @@ tokens, padded to 2112).
     - below sm80;
     - a non-bf16 KV cache;
     - `qk_rope_head_dim != 0`;
-    - DCP (it all-gathers q to 64 heads, and is not validated);
+    - DCP in all-phase mode (partial-attention heads/LSE merge are not validated with 118);
     - HiSparse (not validated);
     - deterministic inference.
   - It then compiles and loads every kernel specialization serving can launch: 5 split counts and 4 combine
@@ -66,8 +99,10 @@ tokens, padded to 2112).
   - Direct calls without a warmup warm up on first use; inside graph capture that fails an assertion.
 - **Report.** The `[ax] mechanisms:` line shows one of:
   - `118=on`;
+  - `118=on:prefill`;
   - `118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset`;
   - `118=off:no_tilelang_dsa_backend` (switch on, but no DSA backend in the process uses TileLang);
+  - `118=off:no_tilelang_dsa_prefill` (prefill-only switch on, but no TileLang prefill backend engaged);
   - `118=off:no_dsa_backend` (the process never imported the DSA backend; the report never imports it).
 
 ## Semantics compared with TileLang
@@ -154,7 +189,8 @@ Served means `_forward_tilelang` with the switch off, including its padding copy
 ## Not validated
 - **No 8-card run.** Nothing has been measured with real weights or real top-k locality, and TP8 timing inside a
   full prefill or decode step is unmeasured. The MTP draft layer and the breakable prefill graph (170) are
-  untested. DCP and HiSparse are refused; the kernel's 64-head path is checked only against fp32.
+  untested. DCP partial attention in all-phase mode and HiSparse are refused; the kernel's 64-head path is checked
+  only against fp32. The new full-KV prefill-only DCP integration has local dispatch tests, but no new GPU result.
 - **Single-buffered gathers.** Each program still waits for its own gather. True KV double buffering (2 × 32 KiB
   per program) is a possible next step and has not been tried.
 - **Timing locality.** Timing uses randomly selected groups, which have poor locality. Phase 1's correlated
