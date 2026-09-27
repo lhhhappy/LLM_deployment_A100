@@ -129,13 +129,19 @@
     "job": "130eezzy-cap_full_S1dcp_w2",
     "ref": "",
     "what": "能力复核（只测最可疑的候选引擎）：S1+DCP2 跑公开 AIME26（30）+ GPQA-Diamond（197）；过线即可，S1 参照只在它失败时再跑",
-    "status": "running：就绪 195 s，冒烟 12/12（平均 4332 token），AIME26+GPQA 全量进行中"
+    "verdict": "CAP_FULL aime=28/30（93.3 分；2 道在 60000 token 截断无答案）gpqa=178/197（90.4 分；6 道截断、13 道答错），errors 0，wall 3369 s；冒烟 12/12。两科都过 90 但 GPQA 贴线，按规则加跑 S1 引擎同题参照（130ef5）分清是引擎还是题集/提示词"
   },
   {
     "job": "130ef-v3_n30_A_warm15_fixes_60m",
     "ref": "130b-v3_n30_A_warm15_60m",
     "what": "基线：A′ + 修正引擎 f546934e（46676 引擎）60 分钟",
     "status": "已发布"
+  },
+  {
+    "job": "130ef5-cap_full_S1",
+    "ref": "130eezzy-cap_full_S1dcp_w2",
+    "what": "能力复核参照：S1 引擎（f546934e，无 DCP）同题同提示词",
+    "status": "已发布（130ef 之后）"
   },
   {
     "job": "130ez1-v3_n34_S1dcp_w2_60m",

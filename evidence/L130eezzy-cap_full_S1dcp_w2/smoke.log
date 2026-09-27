@@ -1,0 +1,13 @@
+{"i": 0, "want": 864, "got": "864", "ok": true, "finish": "stop", "completion_tokens": 1733, "secs": 21.3, "reasoning_chars": 2488}
+{"i": 1, "want": 270, "got": "270", "ok": true, "finish": "stop", "completion_tokens": 731, "secs": 13.8, "reasoning_chars": 624}
+{"i": 2, "want": 738, "got": "738", "ok": true, "finish": "stop", "completion_tokens": 14442, "secs": 94.7, "reasoning_chars": 30609}
+{"i": 3, "want": 249, "got": "249", "ok": true, "finish": "stop", "completion_tokens": 632, "secs": 13.0, "reasoning_chars": 791}
+{"i": 4, "want": 100, "got": "100", "ok": true, "finish": "stop", "completion_tokens": 1707, "secs": 22.4, "reasoning_chars": 2382}
+{"i": 5, "want": 132, "got": "132", "ok": true, "finish": "stop", "completion_tokens": 430, "secs": 11.5, "reasoning_chars": 419}
+{"i": 6, "want": 649, "got": "649", "ok": true, "finish": "stop", "completion_tokens": 1949, "secs": 22.6, "reasoning_chars": 2770}
+{"i": 7, "want": 1024, "got": "1024", "ok": true, "finish": "stop", "completion_tokens": 849, "secs": 15.7, "reasoning_chars": 951}
+{"i": 8, "want": 115, "got": "115", "ok": true, "finish": "stop", "completion_tokens": 27105, "secs": 141.9, "reasoning_chars": 49381}
+{"i": 9, "want": 266, "got": "266", "ok": true, "finish": "stop", "completion_tokens": 1032, "secs": 16.6, "reasoning_chars": 1274}
+{"i": 10, "want": 810, "got": "810", "ok": true, "finish": "stop", "completion_tokens": 767, "secs": 14.5, "reasoning_chars": 832}
+{"i": 11, "want": 73, "got": "73", "ok": true, "finish": "stop", "completion_tokens": 610, "secs": 13.0, "reasoning_chars": 638}
+CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=4332

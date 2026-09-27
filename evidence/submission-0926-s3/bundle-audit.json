@@ -1,0 +1,12 @@
+{
+ "attempt_id": 46757,
+ "arm": "C",
+ "submission_sha256": "b86686cfdd961ff470e21ddb26887e5dd355e648583b47b771852c2128af0f7c",
+ "bundle_sha256": "e30ad24d7cf57485dcea6e83666e1ea13f9fd182d718c29c37ac791711673981",
+ "bundle_bytes": 112191,
+ "bundle_copies_identical": true,
+ "note": "outputs/ also carried a stale Dockerfile and manifest.json left by another session's earlier draft in build/submit_0926_C; the platform deploys from submission.json (three identical copies), so they are inert.",
+ "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926c",
+ "image_id": 166139,
+ "engine_commit": "e464d8abe63f60f93fcaf3d0fc5a86c81d70747e"
+}

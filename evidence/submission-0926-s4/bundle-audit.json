@@ -1,0 +1,13 @@
+{
+ "attempt_id": 46758,
+ "arm": "D",
+ "submission_sha256": "d69712598d0127d94cd63f021c713bdf835ee714aa76b60638de7b10ffbac0a5",
+ "bundle_sha256": "c141029236eb98b73dba5cf2c34bb78c0c38ed6f9b76e48375620a0d8a10e466",
+ "bundle_bytes": 12443,
+ "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0926d",
+ "image_id": 166140,
+ "engine_commit": "6976639e4f51cee80d9e7480ad6399a3e60de5e3",
+ "env_diff_vs_46757": {
+  "SGLANG_AX_DCP_LOCAL_EXTEND": "1"
+ }
+}

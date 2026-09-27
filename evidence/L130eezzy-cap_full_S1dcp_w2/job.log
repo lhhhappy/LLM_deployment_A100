@@ -1,0 +1,33 @@
+DATA_READY v3 chains=311 requests=5601 Nnone admission_seconds=600 warmup=rep16-v1
+STORAGE_READY {"workspace": "/dev/shm/arena-runtime/ax", "mount": "/dev/shm", "filesystem": "tmpfs", "flags": "rw,relatime", "tmpfs_free_bytes": 724396564480, "cgroup_headroom_bytes": 656629448704, "exec_check": true, "cache_aliases": [{"path": "/root/.cache", "target": "/dev/shm/arena-runtime/ax/cache/legacy-root/cache"}, {"path": "/root/.triton", "target": "/dev/shm/arena-runtime/ax/cache/legacy-root/triton"}, {"path": "/root/.nv", "target": "/dev/shm/arena-runtime/ax/cache/legacy-root/nv"}, {"path": "/root/.tilelang", "target": "/dev/shm/arena-runtime/ax/cache/legacy-root/tilelang"}]}
+CUDA_CACHE_PATH=/dev/shm/arena-runtime/ax/cache/cuda
+FLASHINFER_WORKSPACE_BASE=/dev/shm/arena-runtime/ax/cache/flashinfer
+HF_HOME=/dev/shm/arena-runtime/ax/cache/huggingface
+HF_HUB_CACHE=/dev/shm/arena-runtime/ax/cache/huggingface/hub
+HUMMING_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/humming
+HUMMING_TMP_DIR=/dev/shm/arena-runtime/ax/tmp/humming
+NUMBA_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/numba
+PIP_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/pip
+PYTHONPYCACHEPREFIX=/dev/shm/arena-runtime/ax/cache/pycache
+SGLANG_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/sglang
+SGLANG_JIT_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/sglang/jit
+TEMP=/dev/shm/arena-runtime/ax/tmp
+TILELANG_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/tilelang
+TMP=/dev/shm/arena-runtime/ax/tmp
+TMPDIR=/dev/shm/arena-runtime/ax/tmp
+TORCHINDUCTOR_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/inductor
+TORCH_EXTENSIONS_DIR=/dev/shm/arena-runtime/ax/cache/torch_extensions
+TRITON_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/triton
+UV_CACHE_DIR=/dev/shm/arena-runtime/ax/cache/uv
+VLLM_CACHE_ROOT=/dev/shm/arena-runtime/ax/cache/vllm
+XDG_CACHE_HOME=/dev/shm/arena-runtime/ax/cache
+ENGINE_COMMIT e464d8abe63f60f93fcaf3d0fc5a86c81d70747e
+ENGINE_READY after 195s
+ENGINE_STARTED: e464d8abe63f60f93fcaf3d0fc5a86c81d70747e | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --dcp-size 2 --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 --max-mamba-cache-size 418 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=8192 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_DCP_COMPACT_TOPK=1 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_SCHED_COLD_CAP=6144 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 
+MECHANISMS OK expected=[117=on 118=off 119=off 120=on 122=off 123=off 124=on 125=on 126=off 140=off 180=on spec=EAGLE dcp=2 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1] engine=[101=off:role_ids_unset 117=on:43_layers 118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset 119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset 120=on 122=off:SGLANG_AX_PACE_TPOT_unset 123=off:SGLANG_AX_SRPT_AGING_unset 124=on 125=on 126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset 128=off:SGLANG_AX_DEADLINE_FAMILY_unset 140=off 180=on | spec=EAGLE dcp=2 | requested: SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]
+[2026-09-26 22:55:05 TP7] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1187584, KV size: 1.42 GB
+[2026-09-26 22:55:24 TP0] max_total_num_tokens=1187584, chunked_prefill_size=8192, max_prefill_tokens=16384, max_running_requests=32, context_len=1048576, available_gpu_mem=8.04 GB
+PRECHECK (info only) kv_tokens=1187584 commit=e464d8abe63f60f93fcaf3d0fc5a86c81d70747e args=[--dcp-size 2 --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 --max-running-requests 32 --cuda-graph-max-bs 32 --prefill-decode-interval 2 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 --max-mamba-cache-size 418] env=[SGLANG_AX_DCP_COMPACT_TOPK=1 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=8192 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_FUSED_KDA_VERIFY=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_SCHED_COLD_CAP=6144 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_BACKLOG_COLD_CAP=8192 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_FP8_MOE_HUMMING=1]
+CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=4332
+CAP_FULL aime=28/30 gpqa=178/197 errors=0 truncated=8 mean_tokens aime=20205 gpqa=10564 wall=3369s
+LADDER none: capability-only job
