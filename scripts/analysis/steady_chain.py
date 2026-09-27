@@ -55,6 +55,34 @@ def reading(D, ids, opening_s, giant):
         giants.append((v.get('req_id'), v['t_recv_s'] - t0, unc, v.get('ttft_s') or 0, wait, ex))
     return opening, steady, bins, giants
 
+def organizer_split(D, ids, opening_s):
+    """Chain-bucket items split by the organizer's phase label of the head. Online, a chain head is a
+    session_start (public: p50 18.6k, max 52k tokens) or a context reset; our cohorts also start chains at
+    public mid-chain rows (intra/turn_start segment heads, often 100k+), which online are intra/turn requests
+    with 5 s / 15 s gates. The organizer-like bucket (session_start heads + resets) is what the online chain
+    gate judges; misses on segment heads only tell how giants behave."""
+    items = [(rid, D[rid]) for rid in ids if bucket(D[rid]) == 'chain']
+    def kind(v):
+        return ('head:' + str(v.get('phase'))) if v.get('idx_in_chain') == 0 else 'reset'
+    tot = {}; miss = {}
+    for _, v in items:
+        k = kind(v); tot[k] = tot.get(k, 0) + 1
+        if (v.get('ttft_s') or 0) > 30: miss[k] = miss.get(k, 0) + 1
+    org = [(rid, v) for rid, v in items if v.get('phase') in ('session_start', 'context_reset')]
+    t0 = min((v.get('client_dispatch_at_s') or 0) for v in D.values())
+    def stats(grp):
+        if not grp: return 'n=0'
+        tt = sorted((v.get('ttft_s') or 0) for _, v in grp)
+        w = sorted(((v.get('t_exec_start_s') or 0) - (v.get('t_recv_s') or 0)) for _, v in grp)
+        e = sorted(((v.get('t_first_token_s') or 0) - (v.get('t_exec_start_s') or 0)) for _, v in grp)
+        q = lambda a, x: a[min(len(a) - 1, int(x * len(a)))]
+        return (f'n={len(grp)} over30={sum(1 for t in tt if t > 30)} ttft p50/p95={q(tt, .5):.1f}/{q(tt, .95):.1f}'
+                f' wait p95={q(w, .95):.1f} exec p95={q(e, .95):.1f}')
+    op = [(r, v) for r, v in org if (v.get('client_dispatch_at_s') or 0) - t0 < opening_s]
+    st = [(r, v) for r, v in org if (v.get('client_dispatch_at_s') or 0) - t0 >= opening_s]
+    return tot, miss, stats(op), stats(st)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('run'); ap.add_argument('--ref'); ap.add_argument('--opening-s', type=float, default=60.0)
@@ -86,6 +114,11 @@ def main():
     else:
         print(f'   steady cold heads >= {a.giant} uncached: ttft = wait + after-entry')
         for rid, t, unc, ttft, wait, ex in ga: print(f'     t={t:6.0f}s unc={unc:7d} ttft {ttft:5.1f} = {wait:4.1f} + {ex:5.1f}')
+
+    for tag, D_ in (('run', A),) + ((('ref', B),) if B else ()):
+        tot, miss, sop, sst = organizer_split(D_, ids, a.opening_s)
+        print(f'   {tag}  chain misses by head kind {miss} of {tot}')
+        print(f'   {tag}  organizer-like bucket (session_start heads + resets): opening {sop} | steady {sst}')
 
 if __name__ == '__main__':
     main()
