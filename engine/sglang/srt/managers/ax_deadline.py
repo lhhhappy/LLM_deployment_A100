@@ -211,6 +211,51 @@ def should_park(continuation, continuation_left: int, continuation_waited_s: flo
 
 
 @dataclass(frozen=True)
+class ChainRiskConfig:
+    """[ax] 131: chain-risk decode interval.
+
+    While a cold request in the prefill lane can still make its budget but only just, arm fewer decode
+    rounds after its chunks so the lane is not interrupted (runs 130ez1..ezi: the same 252k chain start
+    took 21.6-29.5 s after batch entry depending only on how many decode rounds were interleaved). Off
+    unless SGLANG_AX_CHAIN_RISK_INTERVAL is set; needs 124 for the budget and the cost model.
+    """
+    interval: int = 0            # decode rounds armed after a chunk of an at-risk request (0 = none)
+    margin_s: float = 8.0        # at risk when the optimistic projection is within margin_s of the budget, either side
+    min_remaining: int = 32768   # only requests with at least this much prefill work left after the current chunk
+    chunk: int = 8192            # chunk assumed by the cost model
+
+
+def chain_risk_config(configured_interval: int) -> Optional[ChainRiskConfig]:
+    raw = _env("SGLANG_AX_CHAIN_RISK_INTERVAL", "")
+    if raw == "":
+        return None
+    cfg = ChainRiskConfig(interval=int(raw), margin_s=float(_env("SGLANG_AX_CHAIN_RISK_MARGIN_S", "8")),
+                          min_remaining=int(_env("SGLANG_AX_CHAIN_RISK_MIN_REMAINING", "32768")),
+                          chunk=int(_env("SGLANG_AX_CHAIN_RISK_CHUNK", "8192")))
+    if not (0 <= cfg.interval < configured_interval and cfg.margin_s >= 0 and cfg.min_remaining >= 0 and cfg.chunk > 0):
+        raise ValueError(f"[ax] 131: invalid chain-risk config {cfg} for --prefill-decode-interval {configured_interval} "
+                         "(the risk interval must be below the configured interval)")
+    return cfg
+
+
+def chain_risk_interval(req, remaining: int, waited_s: float, dl: DeadlineConfig, cfg: ChainRiskConfig) -> Optional[int]:
+    """Decode rounds to arm after this request's chunk, or None when it is not at risk.
+
+    At risk = cold class (124), at least cfg.min_remaining tokens of prefill left after the current chunk, and
+    the optimistic projection (waited so far + arrival offset + serving the rest alone at the cost model's
+    rate) inside [budget - margin, budget + margin]. Below the window the request is comfortable; above it,
+    it is hopeless and interrupting it costs nothing at the gate, so decode keeps its rounds.
+    """
+    if remaining < cfg.min_remaining or not deadline_cold(req, dl):
+        return None
+    projected = waited_s + dl.arrival_offset_s + service_s(remaining, cfg.chunk, dl)
+    budget = budget_s(req, dl)
+    if budget - cfg.margin_s < projected <= budget + cfg.margin_s:
+        return cfg.interval
+    return None
+
+
+@dataclass(frozen=True)
 class BacklogConfig:
     # Enter relief when the cold backlog needs more than high_s at the recent prefill rate, leave
     # below low_s. While relieved: the cold chunk cap is cold_cap (0 keeps 120's cap) and

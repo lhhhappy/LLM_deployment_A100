@@ -179,7 +179,8 @@ def load_source(root=CANDIDATE):
              '_ax_humming_report', '_ax_scatter_report', '_ax_admission_cfgs', '_ax_admission_plan',
              '_ax_family_plan', '_ax_flush_admission_state',
              '_ax_prefix_plan', '_ax_prefix_consensus', '_ax_prefix_cleanup', '_ax_prefix_admit_ready',
-             '_ax_demand_cap_max', '_ax_demand_limits', '_ax_short_hit_reserve'}
+             '_ax_demand_cap_max', '_ax_demand_limits', '_ax_short_hit_reserve',
+             '_ax_chain_risk_cfg', '_ax_chain_risk_interval'}  # 131 (off in these tests; the arm hook calls it)
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)

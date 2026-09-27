@@ -1341,6 +1341,7 @@ class Scheduler(
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
             "128p": "on" if getattr(self, "_ax_prefix_tracker", None) else "off:SGLANG_AX_PREFIX_PRODUCER_unset",
+            "131": "on" if self._ax_chain_risk_cfg() is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1976,7 +1977,48 @@ class Scheduler(
             backlog = getattr(self, "_ax_admission_cfg", (None, None))[1]
             if backlog is not None and self._ax_backlog_relieved:
                 interval = backlog.relaxed_interval  # [ax] 125
+            risk = self._ax_chain_risk_interval(batch)  # [ax] 131
+            if risk is not None and risk < interval:
+                interval = risk
             self._prefill_decode_interval_remaining = interval
+
+    def _ax_chain_risk_cfg(self):
+        """[ax] 131: read once; refuses to start without 124, which supplies the budget and the cost model."""
+        cfg = getattr(self, "_ax_chain_risk_cfg_", False)
+        if cfg is False:
+            cfg = ax_deadline.chain_risk_config(self.prefill_decode_interval)
+            if cfg is not None and self._ax_admission_cfgs()[0] is None:
+                raise ValueError("[ax] 131 needs 124 (SGLANG_AX_DEADLINE_TIERS=1) for its budget and cost model")
+            self._ax_chain_risk_cfg_ = cfg
+            self._ax_chain_risk_stats = dict(rounds=0, log_t=0.0)
+            if cfg is not None:
+                logger.info("[ax] 131 chain-risk interval: %s (configured interval %d)", cfg, self.prefill_decode_interval)
+        return cfg
+
+    def _ax_chain_risk_interval(self, batch: ScheduleBatch) -> Optional[int]:
+        """[ax] 131: the reduced decode interval when a cold request in this extend batch is at risk, else None."""
+        cfg = self._ax_chain_risk_cfg()
+        if cfg is None:
+            return None
+        deadline = self._ax_admission_cfgs()[0]
+        now = time.perf_counter()
+        best = None
+        for req in batch.reqs:
+            ts = req.time_stats
+            start = getattr(ts, "scheduler_recv_time", 0.0) or getattr(ts, "wait_queue_entry_time", 0.0)
+            waited = max(0.0, now - start) if start else 0.0
+            # prefix_indices covers the chunks scheduled before this one; extend_input_len is this chunk.
+            left = max(0, req.seqlen - len(req.prefix_indices) - (getattr(req, "extend_input_len", 0) or 0))
+            r = ax_deadline.chain_risk_interval(req, left, waited, deadline, cfg)
+            if r is not None and (best is None or r < best):
+                best = r
+        if best is not None:
+            st = self._ax_chain_risk_stats
+            st["rounds"] += 1
+            if now - st["log_t"] > 30.0:
+                st["log_t"] = now
+                logger.info("[ax-131] risk rounds=%d interval=%d", st["rounds"], best)
+        return best
 
     def init_metrics_reporter(
         self, tp_rank: int, pp_rank: int, dp_rank: Optional[int]

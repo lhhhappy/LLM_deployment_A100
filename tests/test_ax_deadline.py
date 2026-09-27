@@ -374,3 +374,32 @@ class WarmStarvationBound(unittest.TestCase):
         with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '1', 'SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S': '10'}):
             cfg = ax.deadline_config()
         self.assertEqual((cfg.max_wait_s, cfg.max_wait_warm_s), (120.0, 10.0))
+
+
+class ChainRisk(unittest.TestCase):
+    """[ax] 131: the cost model is 124's (0.13 s/chunk + 68 us/token, x1.27); budgets cold 30 s."""
+    RISK = ax.ChainRiskConfig(interval=1, margin_s=8.0, min_remaining=32768, chunk=8192)
+
+    def test_giant_that_can_still_make_it_gets_the_risk_interval(self):
+        # 252k cold head after its first chunk: 200k left, ~21 s of work alone, waited 2 s -> projected ~24 s
+        r = req('giant', 252000, matched=0)
+        self.assertEqual(ax.chain_risk_interval(r, 200000, 2.0, CFG, self.RISK), 1)
+
+    def test_comfortable_and_hopeless_requests_keep_the_configured_interval(self):
+        r = req('mid', 90000, matched=0)
+        self.assertIsNone(ax.chain_risk_interval(r, 60000, 0.0, CFG, self.RISK))       # ~7 s projected: comfortable
+        g = req('late', 252000, matched=0)
+        self.assertIsNone(ax.chain_risk_interval(g, 200000, 25.0, CFG, self.RISK))     # ~47 s projected: hopeless
+        self.assertIsNone(ax.chain_risk_interval(g, 20000, 20.0, CFG, self.RISK))      # below min_remaining
+        w = req('warm', 252000, matched=200000)
+        self.assertIsNone(ax.chain_risk_interval(w, 50000, 20.0, CFG, self.RISK))      # warm class: not a chain start
+
+    def test_config_is_off_by_default_and_must_be_below_the_configured_interval(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop('SGLANG_AX_CHAIN_RISK_INTERVAL', None)
+            self.assertIsNone(ax.chain_risk_config(2))
+        with patch.dict(os.environ, {'SGLANG_AX_CHAIN_RISK_INTERVAL': '1'}):
+            self.assertEqual(ax.chain_risk_config(2).interval, 1)
+        with patch.dict(os.environ, {'SGLANG_AX_CHAIN_RISK_INTERVAL': '2'}):
+            with self.assertRaises(ValueError):
+                ax.chain_risk_config(2)
