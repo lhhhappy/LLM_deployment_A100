@@ -4,7 +4,7 @@
 
 | Job | 要回答的问题与对照 | 当前状态 |
 | --- | --- | --- |
-| 队列顺序（fable，22:55 UTC）：`130ezn5`（chain-max 16k + 118，在跑，约 23:40 闭合）→ `130ezn6`（chain-max 16k 保 fast 变体：预留 2048→8192，单变量对 ezn3）→ `130ezn7`（chain-max 16k 在 N34，running 48）。已闭合（见 experiments.md 130ez 表）：ezmb、ezn1（S1 锚点）、ezn2（S6）、ezn2a（S6+128g：无净收益）、ezn3（chain-max 16k：chain 10→6 对 S1，p95 24.8 s，fast 代价）、ezn4（32k：不比 16k 好）。 | 目的：ezn6 决定上传配置里预留取多少（线上 fast 只有 1.9 s 对 3 s 的余量），ezn7 决定这套配置能不能冲 N30/N34。 | ezn5 在跑；ezn6/ezn7 待发布循环插入 |
+| 队列顺序（fable，23:35 UTC）：`130ezn6`（chain-max 16k 预留 8192，在跑）→ `130ezn8`（chain-max 16k + KDA 池钉 400 槽，单变量对 ezn3）→ `130ezn9`（S1 在 N30 锚点）→ `130ezna`（chain-max 16k + 钉池 在 N30，对 ezn9 同 ID）。已撤 ezn7（N34）。已闭合：ezn5（chain-max+118：chain 6=6、fast 101→79、overall 70→49、TPOT>0.10 67→58）。Codex 在 codex/fix-chainmax-0927 修 131 的 P1（各 rank 本地时钟/冻结分类只在 rank0 更新，可能给不同 rank 不同 decode interval；改为 rank0 决定并广播）——上传候选必须用修后的引擎并至少跑一次 N26 同 ID 验证。 | 判据（审阅者 3 建议，采纳）：上传前 S1 与候选各一窗 N30，同 ID 比 fast 是否在余量内、稳态 TPOT>0.10 是否远离 5%（p95 门无余量）、链首漏对 S1 的变化。 | ezn6 在跑；ezn8/ezn9/ezna 待发布循环插入 |
 | `130ezl-v4_n26_S4_full`（第 43 分钟停，结论见 experiments/ledger）（fable） | 用户批准的 v4 校准：46758 配置整集 N26（对线上 41.1 s 的 chain p95，约 3 小时，完整判分）；随后 S5b 在 v4 上 N34 30 分钟对 130ezh | 已发布（queue-after 等 130ezk） |
 | `130ezi-v3_n38_S1dcp_combo_nomtp_30m`（fable） | S5b（合并引擎 791453ca：128p + 本地续算，去 MTP，池 3.13M）在 N38 的 30 分钟窗口：稳态池峰值/排队/驱逐、四门与 TPOT>0.10，对 130ezh（同引擎 N34） | 跑（11:10 UTC 起） |
 | `130ezj-v3_open_S1dcp_combo_nomtp_chunk16k_n34`（fable） | 单旋钮开场探针：S5b 配置把开场 prefill 块 8k→16k（--chunked-prefill-size 16384 + SGLANG_AX_BACKLOG_COLD_CAP=16384，稳态的 SCHED_COLD_CAP 6144 不变），对 130ezh 前 600 s 同 ID；看开场 chain 11 能否再少 | 发布者 queue-after-…095324 等 130ezi 结束 |

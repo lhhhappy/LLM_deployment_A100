@@ -404,7 +404,8 @@
     "job": "130ezn5-tail_n26_chainmax16k_118_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m",
     "what": "chain-max 16k + 118 prefill Triton 稀疏注意力（合并引擎 cfd25d0f = c1fa4877[131+132] ∪ Codex 3caadef4/c6973930，代码文件不重叠；SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，token 118=on）。判定：对 ezn3 同 ID 的 chain 增量（118 单请求实测目标块 −8%），冒烟 12/12、8 rank 收据、KV 不变；数值非逐位相等，进候选前另做能力复核。[18:30 修正：G_EXPECT 的 dcp_local_max 512→0（Codex 指出：本地续算未开时引擎打印 max=0，512 是从 S5b 任务继承的，会在开测前 MISMATCH）]",
-    "status": "跑（22:32 UTC 起；118=on；第 7 分钟 chain 6）"
+    "status": "已闭合（1613 条排空，wall 2556 s）",
+    "verdict": "对 ezn3（chain-max 16k，同 1572 条）：chain 6=6（同一批切段巨头）、turn 5→6、**overall 70→49、fast 101→79、TPOT>0.10 67→58**、均值 48.1→46.9 ms；harness p95 chain 23.3（ezn3 24.8）、fast 3.7（4.8）、overall 4.1（5.0）；大头入批后 −1.4 s（249k 17.6→16.1）。118 是纯成本下降，帮 fast/overall/TPOT，chain 条数不动；进候选前要 AIME/GPQA 能力复核"
   },
   {
     "job": "130ezn2a-tail_n26_S6_lpm_guard_on_40m",
@@ -417,12 +418,30 @@
     "job": "130ezn6-tail_n26_chainmax16k_short8192_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m（同 ID）",
     "what": "保 fast 变体：chain-max 16k 唯一改动短命中预留 2048→8192（线上 S1 的值）。问题：ezn3 的 fast 漏 100 条里 86% 是等待，预留缩小是否是主因；chain 6 能保住多少。判定：chain 条数与稳态分档优先，fast/overall 回落多少作为提交前的风险判断",
-    "status": "待发布（ezn5 之后）"
+    "status": "跑（23:22 UTC 起）"
   },
   {
     "job": "130ezn7-tail_n34_chainmax16k_40m",
     "ref": "130ezn3（N26 同配置）/ 130ezh（v3 N34 S5b）",
     "what": "chain-max 16k 在 N34（running/graph 48）的诊断：34 个头的开场漏几条、稳态 10–30 s 档、fast 形态与显存墙；判断这套配置能不能作为冲 N30/N34 的上传候选",
-    "status": "待发布（ezn6 之后）"
+    "status": "已撤（换成 N26 的 KDA 池钉住臂 + N30 配对；N34 诊断等 N30 有结论再做）"
+  },
+  {
+    "job": "130ezn8-tail_n26_chainmax16k_mamba400_40m",
+    "ref": "130ezn3-tail_n26_chainmax16k_40m（同 ID）",
+    "what": "单变量：chain-max 16k + --max-mamba-cache-size 400。事实：去 MTP 后引擎把 KDA 状态池自动放到 779 槽（13.4 GB/卡，S1 带 MTP 时 411 槽 9.6 GB），峰值只用约 110 槽，KV 池因此 1.37M→1.26M 并在第 30 分钟后撞墙（KV 99%、110 s 回载 168 GiB）；审阅者核出 chain-max 多出的 fast 漏有 47/101 发生在 KV≥93% 时（那里漏率 17% 对其他时段 6%，S1 两处都是 5%）。预期：池约 1.8M、无墙、fast/overall 回落、等空间的 reset 不再超时；风险：KDA 槽不够时的驱逐/重算",
+    "status": "已发布（ezn6 之后）"
+  },
+  {
+    "job": "130ezn9-tail_n30_S1_40m",
+    "ref": "线上 46676 的 N30 失败档（chain p95 未公布、仅知失败）",
+    "what": "S1（线上配置）在 N30 的锚点：开场 30 个头的漏数、稳态碰撞（到达时有 ≥50k 在算的链首数与等待）、tpot>0.10 占比、fast 余量",
+    "status": "已发布（ezn8 之后）"
+  },
+  {
+    "job": "130ezna-tail_n30_chainmax16k_mamba400_40m",
+    "ref": "130ezn9-tail_n30_S1_40m（同 ID）",
+    "what": "上传候选在 N30：对 S1 同 ID 看三样——fast 是否在余量内、稳态 TPOT>0.10 是否远离 5%（p95 门无余量）、链首漏对 S1 的变化；决定明天上传的配置",
+    "status": "已发布（ezn9 之后）"
   }
 ]
