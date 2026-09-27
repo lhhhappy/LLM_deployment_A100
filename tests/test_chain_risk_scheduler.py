@@ -118,7 +118,31 @@ class ChainRiskScheduler(unittest.TestCase):
                 s._arm_prefill_decode_interval(b)
                 self.assertEqual(s._prefill_decode_interval_remaining, 2 if mode == 'off' else 0)
 
+    def test_132_without_124_fails_loudly(self):
+        with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_TIERS': '0'}):
+            s, _, _ = self.pair()
+            with self.assertRaisesRegex(ValueError, '132 needs 124'):
+                s._ax_admission_cfgs()
 
+    def test_runtime_receipt_reports_effective_risk_and_chain_first(self):
+        for on in (False, True):
+            with self.subTest(on=on):
+                with patch.dict(os.environ, {'SGLANG_AX_DEADLINE_CHAIN_FIRST': str(int(on))}):
+                    s, ns, _ = self.pair()
+                    if not on:
+                        s._ax_chain_risk_cfg_ = None
+                    ns['get_spec'] = lambda: NS(speculative_algorithm=None)
+                    ns['get_parallel'] = lambda: NS(dcp_size=1)
+                    policy = ModuleType('sglang.srt.managers.schedule_policy')
+                    policy._ax_srpt_aging = lambda: None
+                    policy._role_boundary_token_ids = lambda: ()
+                    local = ModuleType('sglang.srt.layers.dcp.local_extend')
+                    local.local_extend_mechanism_tokens = lambda _: 'dcp_local=off'
+                    with patch.dict(sys.modules, {policy.__name__: policy, local.__name__: local}):
+                        tokens = dict(p.split('=', 1) for p in s._ax_mechanism_report().split() if '=' in p)
+                    self.assertEqual(tokens['132'].split(':')[0], 'on' if on else 'off')
+                    self.assertEqual(tokens['131_sync'], 'rank0' if on else 'off')
+                    self.assertEqual(tokens['131_chunk'], 'auto' if on else 'off')
 
     def reserve_run(self, hits=(512,), demand=True, relieved=False):
         env = {'SGLANG_AX_PREFIX_PRODUCER': '1', 'SGLANG_AX_PREFIX_TRACE_S': '0',

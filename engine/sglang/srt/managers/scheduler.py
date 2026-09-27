@@ -1345,6 +1345,7 @@ class Scheduler(
             "131": "on" if risk_cfg is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
             "131_sync": "rank0" if risk_cfg is not None else "off",
             "131_chunk": (str(risk_cfg.chunk) if risk_cfg.chunk else "auto") if risk_cfg is not None else "off",
+            "132": "on" if deadline and deadline.chain_first else "off:SGLANG_AX_DEADLINE_CHAIN_FIRST_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1499,6 +1500,8 @@ class Scheduler(
         cfgs = getattr(self, "_ax_admission_cfg", None)
         if cfgs is None:
             deadline = ax_deadline.deadline_config()
+            if os.environ.get("SGLANG_AX_DEADLINE_CHAIN_FIRST", "0") == "1" and deadline is None:
+                raise ValueError("[ax] 132 needs 124 (SGLANG_AX_DEADLINE_TIERS=1)")
             backlog = ax_deadline.backlog_config(self.prefill_decode_interval)
             blocker = self._ax_sched_protect_blocker()
             if (deadline or backlog) and blocker is not None:

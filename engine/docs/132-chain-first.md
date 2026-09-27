@@ -11,6 +11,10 @@ contention, the 30 s line. The user's rule: between a chain start and a warm req
 (rescuable) is split: cold requests (124's `deadline_cold`) first, then warm ones, each group shortest remaining
 work first. Starved requests stay first, hopeless ones stay behind, held-back ones stay last. Off = 124's order.
 
+Startup rejects `SGLANG_AX_DEADLINE_CHAIN_FIRST=1` without 124, rather than silently ignoring it. The effective
+mechanism receipt includes `132=on` or `132=off:SGLANG_AX_DEADLINE_CHAIN_FIRST_unset`; candidate jobs require
+`132=on` in `G_EXPECT`. This reports the resolved deadline config, not just a requested environment variable.
+
 ## Cost
 Warm requests wait behind cold heads: fast/overall/turn misses rise locally; online they have margin. Judge every
 run on all gates together.
