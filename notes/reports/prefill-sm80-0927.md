@@ -1,6 +1,7 @@
 # Prefill 执行层：118 的 DCP 普通续算入口
 
-2026-09-27，Codex。状态：候选实现、CPU 合同和单卡 GPU 矩阵完成，TP8 待测，交 Fable 独立审查。
+2026-09-27，Codex。状态：候选实现、CPU 合同和单卡 GPU 矩阵完成，TP8 待测。
+Fable 独立审查未发现引擎代码缺陷；其指出的任务模板、范围表述和 CPU 测试覆盖问题已在本报告修正。
 分支 `codex/prefill-sm80-0927`，基于组合引擎 `791453ca` 的独立 worktree。当前未改准入、排序、缓存或队列。
 
 ## 为什么先做这里
@@ -38,17 +39,25 @@ CodeGraph 用于定位 `_forward_tilelang` 的 `forward_extend` / `forward_decod
 
 普通 DCP prefill 的实际路径：`forward_extend` → 已有 `_ax116_dcp_extend_rows` → 完整 KV 和重映射后的索引
 → `_forward_tilelang`。TP8/DP1/CP1 下本卡 8 头；DCP 大小不会改变 `attn_tp_size`，普通 prefill 没有 Q 头聚合。
-局部续算和 target verify/draft-extend-v2 则提前进入 partial/LSE 分支；decode 有独立调用。
+DCP local-extend 和 target verify/draft-extend-v2 则提前进入 partial/LSE 分支；decode 有独立调用。
+这里 partial 指每个 DCP rank 的部分 KV 注意力结果，需要 LSE 合并；**不指长提示被切成多个 prefill 块**。
+普通分块续算（包括已有前缀的后续块）只要仍是完整 KV 的 `ForwardMode.EXTEND`，就会选新入口。
 
 新增默认关闭的 `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1`：
 
 - 只有普通 `ForwardMode.EXTEND` 的完整 KV 调用显式传 `is_prefill=True`；wrapper 还要求 `return_lse=False`。
-- 本地续算、partial/LSE、verify、draft-extend-v2、MIXED 和 decode 不选新入口。普通草稿模型 EXTEND 若走完整
-  KV 路径，同样适用；不能笼统声称所有草稿前向都保持原核。
+- DCP local-extend、partial/LSE、verify、draft-extend-v2、MIXED 和 decode 不选新入口。
+- `eagle_worker_v2.py` 中 `EagleDraftWorker._draft_extend_for_prefill` 使用普通 prefill batch 执行草稿模型；符合完整 KV EXTEND
+  条件的草稿 prefill 同样切换。S5b 无 MTP；带 MTP 的剖析必须同提交、同 MTP 设置做 OFF/ON，目标与草稿分开计时。
 - 旧的 all-phase 开关仍拒绝 DCP；两个开关同时设置时报错。dtype、RoPE、HiSparse、确定性模式的守卫保留。
 - 继续在后端初始化时预热本卡头数的全部 split 变体，不将预热移入 forward。
 - 机制行报 `118=on:prefill`；首次真实进入时每个 backend 记一行 `118 route=full_kv_prefill`，带 tokens、heads、
-  index width 和 DCP 状态。它证明入口被走到，不能作为 CUDA graph replay 次数。
+  index width 和 DCP 状态。它只记录首次派发尝试，不能作为成功 batch 数或 CUDA graph replay 次数。
+- 开启 local-extend policy 时，`[ax-dcp-local]` 的 `gather_kv` batches/query_tokens/prefix_tokens 按时间窗取
+  增量，并分 target/draft、rank 报告。计数包含预热和 MIXED，不等于 118 核调用数；实际核仍由机制行、
+  入口日志和 trace 共同确认。policy 关闭时该统计不存在。
+- 只有启动配置守卫，没有逐 batch 在线数值比对或数值回退。kernel 抛异常时向上传播，不重试 TileLang；
+  有限但错误的输出不保证触发异常，正确性仍须靠数值测试及真实权重冒烟确认。
 
 关闭两个开关后张量运算沿用原路径。没有改 kernel 数学、top-k、owner 公式、DCP gather/LSE 通信或调度策略。
 
@@ -60,8 +69,11 @@ CodeGraph 用于定位 `_forward_tilelang` 的 `forward_extend` / `forward_decod
 
 ## GPU 新测量（2026-09-27，开发机，不是 TP8）
 
-已验证：新增 3 项 CPU 测试运行真实源码提取的方法，覆盖 27 个路由/启动组合；原 10 项 DCP local-extend
-合同通过；Python 语法、shell 语法和 diff 空白检查通过。CPU 测试使用 kernel recorder，不能证明 GPU 数值。
+已验证：3 项 CPU 测试通过，修正后覆盖 32 个路由/启动组合。初版将 LSE 门写成手工副本，不能检测真实门漂移；
+按 Fable 意见改为执行源码中的 `ForwardMode`、`_should_return_dsa_dcp_lse` 和 `uses_local_extend`，同时检查
+普通后续块以及 verify/draft 阶段复用旧 local metadata 时的 LSE 与索引路由。临时把真实 LSE 门替换为恒 false / true，
+分别有 6 / 8 个路由断言捕获缺陷，说明测试不再绕过真实门。原 10 项 DCP local-extend 合同此前通过。
+CPU 测试仍使用张量和 kernel recorder，不能证明 GPU 数值；本次只改测试与说明，没有重跑未变更的 GPU 数值核。
 
 用户恢复 SSH 后，在独立目录使用 GPU0 完成测试与成本矩阵。A100-SXM4-80GB、torch 2.13.0+cu130、
 Triton 3.7.1、TileLang 0.1.12，候选执行代码为 `3caadef4`。没有停止、重启或部署 Pod 服务。
@@ -111,9 +123,13 @@ bash "$PREFILL_ROOT/scripts/analysis/run_prefill_devbox.sh" "$PREFILL_ROOT" \
 
 ## Fable 复核与 TP8 接口
 
-先独立核普通 EXTEND 与 partial 分支的边界、预热头数、OFF 路径和机制行。候选环境仅增加
-`SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1`，旧 `SGLANG_AX_DSA_SPARSE_TRITON=0`；ON 的 `G_EXPECT`
-包含精确 token `118=on:prefill`。仍保持已选对照的 DCP、MTP、running、块大小、数据与派发窗口，避免混合归因。
+Fable 已完成普通 EXTEND 与 DCP partial 分支、预热、OFF 路径的独立代码审查，并安排同引擎 OFF/ON 开场
+和单请求剖析。候选环境增加 `SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1`，旧开关
+`SGLANG_AX_DSA_SPARSE_TRITON=0`；**ON 的 `G_EXPECT` 写 `118=on`，引擎实际输出仍是 `118=on:prefill`**。
+此前要求把 `118=on:prefill` 放进 `G_EXPECT` 的说明是错的：模板 token 正则拒绝冒号，而 `on` 比较接受 `on:*`。
+本轮直接运行原模板的匹配循环，确认 `118=on` 接受新状态、带冒号期望返回 INVALID、`118=off` 拒绝新状态；
+[验证记录](../../evidence/prefill-sm80-0927/review-followup.txt)。不改已排任务或共享模板。
+仍保持已选对照的 DCP、MTP、running、块大小、数据与派发窗口，避免混合归因。
 
 TP8 先查真实能力冒烟、8 个 rank 的入口与无晚编译、KV 池/显存；用同一 49k 提示/8k 块测目标层与整个
 forward，不把 draft 平均进去。再用同数据、同派发窗口的开场和含稳态冷段首探针，逐 ID 核 TTFT 与所有 SLO 门。
