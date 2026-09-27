@@ -123,14 +123,21 @@ _IS_GFX95 = is_gfx95_supported()
 # target verify, draft extend/decode, decode) runs the Triton kernel in
 # dsa/sparse_attention_triton.py instead. Default off.
 _AX_DSA_SPARSE_TRITON = get_bool_env_var("SGLANG_AX_DSA_SPARSE_TRITON")
+# [ax] 118: opt into only ordinary full-KV EXTEND calls. DCP's gathered
+# prefill has the same local-head contract; its partial/LSE calls do not.
+_AX_DSA_SPARSE_TRITON_PREFILL = get_bool_env_var(
+    "SGLANG_AX_DSA_SPARSE_TRITON_PREFILL"
+)
 # Set once a backend in this process has validated and warmed up the 118 kernel.
 _ax118_engaged = False
 
 
 def ax118_state() -> str:
     """[ax] 118 effective state for the scheduler's mechanism report."""
-    if not _AX_DSA_SPARSE_TRITON:
+    if not (_AX_DSA_SPARSE_TRITON or _AX_DSA_SPARSE_TRITON_PREFILL):
         return "off:SGLANG_AX_DSA_SPARSE_TRITON_unset"
+    if _AX_DSA_SPARSE_TRITON_PREFILL:
+        return "on:prefill" if _ax118_engaged else "off:no_tilelang_dsa_prefill"
     return "on" if _ax118_engaged else "off:no_tilelang_dsa_backend"
 
 
@@ -3265,6 +3272,7 @@ class DeepseekSparseAttnBackend(
                 sm_scale=layer.scaling,
                 v_head_dim=layer.v_head_dim,
                 return_lse=False,
+                is_prefill=forward_batch.forward_mode == ForwardMode.EXTEND,
             )
         elif dsa_impl in ("flashmla_sparse", "flashmla_sparse_q8"):
             if topk_transform_method == TopkTransformMethod.RAGGED:
@@ -4194,12 +4202,22 @@ class DeepseekSparseAttnBackend(
     def _ax118_init(self) -> None:
         """[ax] 118: with the switch on and a TileLang DSA impl, check the supported
         envelope and load every Triton kernel variant now, before CUDA-graph capture.
-        Anything outside the envelope refuses to start instead of falling back to
-        TileLang: DCP and HiSparse are not validated, and deterministic inference is
-        excluded because the split count (and so the summation order) depends on the
-        batch size."""
+        The prefill-only mode accepts DCP: its only call site is full-KV EXTEND,
+        after the existing DCP gather/remap. Partial attention, local extend,
+        verify and decode keep TileLang. All-phase mode still refuses DCP.
+        Deterministic inference is excluded because the split count (and so the
+        summation order) depends on the batch size."""
         global _ax118_engaged
-        if not _AX_DSA_SPARSE_TRITON or "tilelang" not in (
+        if _AX_DSA_SPARSE_TRITON and _AX_DSA_SPARSE_TRITON_PREFILL:
+            raise ValueError(
+                "118: SGLANG_AX_DSA_SPARSE_TRITON and "
+                "SGLANG_AX_DSA_SPARSE_TRITON_PREFILL are mutually exclusive"
+            )
+        if not (_AX_DSA_SPARSE_TRITON or _AX_DSA_SPARSE_TRITON_PREFILL):
+            return
+        if _AX_DSA_SPARSE_TRITON_PREFILL and self.dsa_prefill_impl != "tilelang":
+            return
+        if "tilelang" not in (
             self.dsa_prefill_impl,
             self.dsa_decode_impl,
         ):
@@ -4209,7 +4227,7 @@ class DeepseekSparseAttnBackend(
             (self.device_sm_major < 8, f"sm{self.device_sm_major}x"),
             (self.kv_cache_dtype != torch.bfloat16, f"{self.kv_cache_dtype} KV cache"),
             (self.qk_rope_head_dim != 0, f"qk_rope_head_dim={self.qk_rope_head_dim}"),
-            (get_parallel().dcp_enabled, "DCP"),
+            (get_parallel().dcp_enabled and _AX_DSA_SPARSE_TRITON, "DCP"),
             (self.hisparse_coordinator is not None, "HiSparse"),
             (
                 get_exec().deterministic.enable_deterministic_inference,
@@ -4219,9 +4237,10 @@ class DeepseekSparseAttnBackend(
         reasons = [reason for unsupported, reason in checks if unsupported]
         if reasons:
             raise ValueError(
-                "SGLANG_AX_DSA_SPARSE_TRITON=1 (118) supports CUDA sm80+ with a bf16 KV "
-                "cache and qk_rope_head_dim=0, without DCP, HiSparse or deterministic "
-                f"inference; got: {', '.join(reasons)}."
+                "Triton sparse attention (118) supports CUDA sm80+ with a bf16 KV "
+                "cache and qk_rope_head_dim=0, without HiSparse or deterministic "
+                "inference (DCP requires the PREFILL-only switch); "
+                f"got: {', '.join(reasons)}."
             )
         from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
             warmup_sparse_attention_fwd,
@@ -4244,12 +4263,25 @@ class DeepseekSparseAttnBackend(
         page_table_1: torch.Tensor,
         sm_scale: float,
         return_lse: bool = False,
+        is_prefill: bool = False,
     ) -> torch.Tensor:
-        if _AX_DSA_SPARSE_TRITON:  # [ax] 118: takes the unpadded table, masks -1 itself
+        use_prefill_triton = (
+            _AX_DSA_SPARSE_TRITON_PREFILL and is_prefill and not return_lse
+        )
+        if _AX_DSA_SPARSE_TRITON or use_prefill_triton:
+            # [ax] 118: takes the unpadded table, masks -1 itself. is_prefill is
+            # passed only by ordinary full-KV EXTEND, never a partial/LSE call.
             from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
                 sparse_attention_fwd,
             )
 
+            if use_prefill_triton and not getattr(self, "_ax118_prefill_seen", False):
+                self._ax118_prefill_seen = True
+                logger.info(
+                    "[ax] 118 route=full_kv_prefill tokens=%d heads=%d width=%d dcp=%s",
+                    q_all.shape[0], q_all.shape[1], page_table_1.shape[-1],
+                    get_parallel().dcp_enabled,
+                )
             result = sparse_attention_fwd(
                 q=q_all,
                 kv=kv_cache,
