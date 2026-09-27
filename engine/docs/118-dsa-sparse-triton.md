@@ -74,7 +74,7 @@ tokens, padded to 2112).
 
 - **Pod profile (measured).** One cold 49,143-token prefill in 8192-token chunks was profiled on TP8 (rank 0). The
   TileLang kernel (`main_kernel`) took 718.7 ms of about 3.93 s of kernel time, or 18%. That is 6 chunks × 12
-  calls × about 10 ms ([L081p](../../evidence/L081p-tp8_prefill_profile_8k_16k/tp8_8k/ledger-rank0-rank1.json);
+  calls × about 10 ms ([L081p](/workspace/Agentic_science_challenge/evidence/L081p-tp8_prefill_profile_8k_16k/tp8_8k/ledger-rank0-rank1.json);
   the ledger's `dsa_attn` class misses this kernel name).
 - **Dev box, phase 1 (measured).** One call on 8192 rows takes 9.96 ms. No other TileLang launch configuration
   went below 9.7 ms: block_I 16/32/64, 1–4 stages, 128/256 threads, with or without the O stage.
