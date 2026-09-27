@@ -135,7 +135,7 @@
     "job": "130ez1-v3_n34_S1dcp_w2_60m",
     "ref": "130ee5-dcp_stack2_w2_n34_60m",
     "what": "46757 的配置在 N34：S1 设置（warm 15、MAX_SLOW 80）+ dcp 2，running 48；也是下面所有旋钮的对照",
-    "status": "running"
+    "verdict": "排空、冒烟 12/12。对 A 调度的 W2 N34（130ee5）同 3202 条：chain 18→17、turn 3→4、overall 90→92、fast 92→100、TPOT>0.10 78→79，产能账相同（D 27.3、W 1.57、池 p95 95%）：46757 的 S1 设置（warm 15、MAX_SLOW 80）在 DCP2 上与 A 设置无差别，池子够时 warm 15 s 没有 130b 那种代价。chain 17 = 9 big_cold + 4 family_rider + 2 mid + 2 reset，全在开场。作为后面旋钮的对照"
   },
   {
     "job": "130ez4-v3_open_S1dcp_local_offa_n34",
@@ -160,6 +160,18 @@
     "ref": "130ez4-v3_open_S1dcp_local_offa_n34",
     "what": "124 类别首见冻结（FREEZE_CLASS=1，引擎 741f3eda）：家族兄弟不再因前缀变热被降级；对 OFF-a 探针",
     "status": "已发布（130ez6 之后）"
+  },
+  {
+    "job": "130ez6zz-v3_open_S1dcp_prefix_off_n34",
+    "ref": "130ez6z-v3_open_S1dcp_w2_freeze_n34",
+    "what": "Codex 共享前缀生产者/兄弟准入机制（c0fcd486 = 741f3eda + 128p）OFF 臂：S1+dcp2、freeze=1、N34 开场",
+    "status": "已发布（130ez6z 之后）"
+  },
+  {
+    "job": "130ez6zzz-v3_open_S1dcp_prefix_on_n34",
+    "ref": "130ez6zz-v3_open_S1dcp_prefix_off_n34",
+    "what": "同上 ON（SGLANG_AX_PREFIX_PRODUCER=1，带逐决策 trace）：看家族兄弟的 chain 超时是否消失",
+    "status": "已发布"
   },
   {
     "job": "130ez7-v3_n34_S1dcp_w2_pdi1_60m",
