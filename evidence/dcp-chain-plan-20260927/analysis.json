@@ -1,0 +1,180 @@
+{
+  "runs": {
+    "130ee5": {
+      "source": "/workspace/Agentic_science_challenge/evidence/L130ee5-dcp_stack2_w2_n34_60m/N34",
+      "scope": "DRAINED diagnostic; not full cohort",
+      "integrity": "Unique raw IDs; raw/run counts and drain receipt agree. No independent dispatch-ID ledger checked.",
+      "stats": {
+        "completed": 3218,
+        "errors": 0,
+        "ttft": {
+          "fast_intra": {
+            "n": 2573,
+            "over": 93,
+            "p95_s": 2.0428409576416016
+          },
+          "overall_intra": {
+            "n": 2819,
+            "over": 90,
+            "p95_s": 3.502715826034546
+          },
+          "turn_start": {
+            "n": 117,
+            "over": 3,
+            "p95_s": 12.323574304580688
+          },
+          "chain_start": {
+            "n": 282,
+            "over": 18,
+            "p95_s": 38.931132793426514
+          }
+        },
+        "tpot": {
+          "n": 3218,
+          "mean_s": 0.04782100722910825,
+          "p95_s": 0.08002554160805467,
+          "over_0.10": 78
+        }
+      },
+      "chain_misses": {
+        "total": 18,
+        "opening_arrivals_0_to_10s": 16,
+        "later_arrivals": 2,
+        "first_selection_wait_over30": 15,
+        "selection_to_first_token_over30": 1,
+        "window_allowed_over": 20
+      },
+      "server_lines_read": 12238,
+      "opening_policy": [
+        {
+          "line": 1142,
+          "relative_s": 0.08420610427856445,
+          "text": "[2026-09-26 17:11:22 TP0] [ax-125] relief on: cold backlog 193073 tokens at 5801 tok/s, slow 0/0"
+        },
+        {
+          "line": 1388,
+          "relative_s": 90.08420610427856,
+          "text": "[2026-09-26 17:12:52 TP0] [ax-125] relief off: cold backlog 58812 tokens at 13325 tok/s, slow 0/0"
+        },
+        {
+          "line": 1420,
+          "relative_s": 100.08420610427856,
+          "text": "[2026-09-26 17:13:02 TP0] [ax-125] relief on: cold backlog 111926 tokens at 7346 tok/s, slow 34/37"
+        },
+        {
+          "line": 1436,
+          "relative_s": 105.08420610427856,
+          "text": "[2026-09-26 17:13:07 TP0] [ax-125] relief off: cold backlog 56630 tokens at 12025 tok/s, slow 37/37"
+        },
+        {
+          "line": 1469,
+          "relative_s": 114.08420610427856,
+          "text": "[2026-09-26 17:13:16 TP0] [ax-125] relief on: cold backlog 251859 tokens at 9922 tok/s, slow 43/50"
+        },
+        {
+          "line": 1527,
+          "relative_s": 133.08420610427856,
+          "text": "[2026-09-26 17:13:35 TP0] [ax-125] relief off: cold backlog 60613 tokens at 12647 tok/s, slow 50/50"
+        }
+      ]
+    },
+    "130eezy": {
+      "source": "/workspace/Agentic_science_challenge/evidence/L130eezy-dcp_stack2_w2_n38_60m/N38",
+      "scope": "DRAINED diagnostic; not full cohort",
+      "integrity": "Unique raw IDs; raw/run counts and drain receipt agree. No independent dispatch-ID ledger checked.",
+      "stats": {
+        "completed": 3373,
+        "errors": 0,
+        "ttft": {
+          "fast_intra": {
+            "n": 2684,
+            "over": 103,
+            "p95_s": 2.477043628692627
+          },
+          "overall_intra": {
+            "n": 2939,
+            "over": 90,
+            "p95_s": 3.5175986289978027
+          },
+          "turn_start": {
+            "n": 123,
+            "over": 7,
+            "p95_s": 15.279892683029175
+          },
+          "chain_start": {
+            "n": 311,
+            "over": 23,
+            "p95_s": 53.761887550354004
+          }
+        },
+        "tpot": {
+          "n": 3373,
+          "mean_s": 0.05271395063849102,
+          "p95_s": 0.0829181364647685,
+          "over_0.10": 80
+        }
+      },
+      "chain_misses": {
+        "total": 23,
+        "opening_arrivals_0_to_10s": 19,
+        "later_arrivals": 4,
+        "first_selection_wait_over30": 18,
+        "selection_to_first_token_over30": 2,
+        "window_allowed_over": 22
+      },
+      "server_lines_read": 12512,
+      "opening_policy": [
+        {
+          "line": 1137,
+          "relative_s": 0.25157642364501953,
+          "text": "[2026-09-26 20:41:11 TP0] [ax-125] relief on: cold backlog 304717 tokens at 4636 tok/s, slow 0/0"
+        },
+        {
+          "line": 1460,
+          "relative_s": 121.25157642364502,
+          "text": "[2026-09-26 20:43:12 TP0] [ax-125] relief off: cold backlog 63803 tokens at 13198 tok/s, slow 0/0"
+        },
+        {
+          "line": 1483,
+          "relative_s": 130.25157642364502,
+          "text": "[2026-09-26 20:43:21 TP0] [ax-125] relief on: cold backlog 226227 tokens at 9940 tok/s, slow 37/38"
+        },
+        {
+          "line": 1524,
+          "relative_s": 144.25157642364502,
+          "text": "[2026-09-26 20:43:35 TP0] [ax-125] relief off: cold backlog 62482 tokens at 12800 tok/s, slow 38/38"
+        }
+      ]
+    }
+  },
+  "counterexamples": {
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/dcp-prefill-local-kv/engine/sglang/srt/managers/ax_deadline.py",
+    "scope": "Synthetic states through real functions; not observed run decisions",
+    "cache_growth": [
+      {
+        "matched": 16000,
+        "remaining": 20000,
+        "budget_s": 30.0,
+        "slack_s": 7.377500000000001,
+        "order": [
+          "family_waiter",
+          "other_cold"
+        ]
+      },
+      {
+        "matched": 32000,
+        "remaining": 4000,
+        "budget_s": 3.0,
+        "slack_s": -17.910539999999997,
+        "order": [
+          "other_cold",
+          "family_waiter"
+        ]
+      }
+    ],
+    "family_leader_with_native_holdback": [
+      "other_cold",
+      "family_waiter"
+    ]
+  }
+}
