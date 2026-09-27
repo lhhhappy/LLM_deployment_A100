@@ -30,6 +30,6 @@ assert len(ids) == len(set(ids)) == 5601
 assert hashlib.sha256((root/'requests.jsonl').read_bytes()).hexdigest() == '04b3d49aca95532cae814a9964f05d90146e340c589c85af11b3921b937f3620'
 shards = [os.path.join(dp, f) for dp, _, files in os.walk(root/'bodies') for f in files if f.endswith('.jsonl.gz')]
 assert shards and all(os.path.isfile(p) for p in shards), 'body shards not visible to harness os.walk'
-print('DATA_READY v3 chains=311 requests=%d N%s admission_seconds=%s warmup=rep16-v1' % (len(ids), level, seconds), flush=True)
+print('DATA_READY v4 chains=311 requests=%d N%s admission_seconds=%s warmup=rep16-v1' % (len(ids), level, seconds), flush=True)
 DATA
 source "$AX/bin/scripts/pod/jobs/dev_ladder_template.sh"
