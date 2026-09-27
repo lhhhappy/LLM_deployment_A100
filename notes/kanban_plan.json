@@ -204,7 +204,8 @@
     "job": "130ezd-v3_n34_S1dcp_w2_multi5_30m",
     "ref": "130ez1-v3_n34_S1dcp_w2_60m",
     "what": "探索：K3 分级 warm 预算（单轮 15 s / 多轮 5 s），引擎 f2b6425e = e464d8ab + 9be15822；原 130eza，改排到 prefill 剖析之后",
-    "status": "已发布"
+    "status": "第 14 分钟停（无 raw）",
+    "verdict": "同刻对照 130ez1（14 分钟截断）：chain 16=16、turn 0→1、overall 20→27、fast 28→22、TPOT>0.10 71→67、均值 69.7→70.6 ms，全在噪声内；分级预算对开场 chain 无作用，稳态也看不到 turn 收益。按用户授权提前停，把 8 卡让给负载下开场剖析 130ezd5。无效，不进任何臂"
   },
   {
     "job": "130ezd5-v3_open_S1dcp_profile_n34",
