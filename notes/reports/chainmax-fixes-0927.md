@@ -20,4 +20,4 @@
 
 ## 候选
 
-[镜像、配置与 46676 差异](../../evidence/submission-0927-chainmax-nopin/README.md)。16k、无 MTP/DCP，128p+131+132，118/126 关；按 chain 第一的决定去掉 Mamba400，其余配置不变，使用原镜像 0927a。fable 负责 eznb 修后引擎 TP8 验证；正式尚未上传，用户确认后方可提交。钉池臂的两个新增 chain 坏例见[逐决策归因](chainmax-pin400-held-0928.md)，多轮抢占缺口仍未解决。
+[最终配置与 46676 差异](../../evidence/submission-0927-chainmax-final/README.md)。16k、无 MTP、默认 DCP1、不钉池，128p+131+132，118/126 关；cold600/warm120、浅前缀 held 阈值4096、running/graph48。使用原镜像0927a，fable 已将 eznb 同步为相同性能配置，负责修后引擎 TP8 验证。正式尚未上传，用户确认后方可提交。钉池臂的两个新增 chain 坏例见[逐决策归因](chainmax-pin400-held-0928.md)，多轮抢占缺口仍未解决。

@@ -1,6 +1,6 @@
 # Chain-max 16k / Mamba400：历史臂，已撤下
 
-2026-09-28 UTC，Codex。按 chain 第一的决定撤掉钉池，**当前交付见[不钉池版本](../submission-0927-chainmax-nopin/README.md)**。本目录保留 400 臂与共用镜像的构建证据，不能用这里的配置上传。
+2026-09-28 UTC，Codex。按 chain 第一的决定撤掉钉池，**当前交付见[FINAL](../submission-0927-chainmax-final/README.md)**。本目录保留 400 臂与共用镜像的构建证据，不能用这里的配置上传。
 
 - 引擎 **20a58da9**，分支 `codex/fix-chainmax-0927`；131 修复 `b3f8c3c0`，132 收据/依赖守卫 `20a58da9`。
 - 镜像 **registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0927a**，构建 **166567**，平台 status=2。FROM 0925a，无新增安装依赖；包内源文件验证由构建中的 Python 执行。

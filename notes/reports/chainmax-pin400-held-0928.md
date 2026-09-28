@@ -41,9 +41,9 @@
 
 ## 交付与下一步
 
-按 chain 第一的决定，当前候选只撤掉 `--max-mamba-cache-size 400`，镜像与引擎保持不变，见[不钉池交付](../../evidence/submission-0927-chainmax-nopin/README.md)。不把未验证的排序改动混入候选。
+按 chain 第一的最终决定，候选撤掉钉池，加入 cold600/warm120、held4096 与 running/graph48，镜像与引擎保持不变，见[FINAL 交付](../../evidence/submission-0927-chainmax-final/README.md)。这是用户选择的组合，性能收益尚待验证，不能拆成单旋钮结论。
 
-后续最小机制探针可只设现有 `IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD=4096`：避免为 58/413 token 的浅共享把可救请求放到最后，保留 ≥4k 的原生深前缀 held 与 128p 自己的依赖发现。它会牺牲一部分浅共享、改变代表顺序，收益必须同条件实测；**本次候选没有加入这个 env**。旧 128g 的“可复用上界为零才释放”覆盖不了 413 深度在 256 网格上仍有非零收益的情况。
+FINAL 采纳现有 `IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD=4096`：避免为 58/413 token 的浅共享把可救请求放到最后，保留 ≥4k 的原生深前缀 held 与 128p 自己的依赖发现。它会牺牲一部分浅共享、改变代表顺序，收益必须实测。旧 128g 的“可复用上界为零才释放”覆盖不了 413 深度在 256 网格上仍有非零收益的情况。
 
 更完整的修正应按在线可观测的等待时间、剩余计算和共享收益决定 held 是否值得继续，并支持块边界上的多轮抢占与恢复。目标是整轮更多 chain 过门，不使用 cohort 的请求 ID、开场时间或隐藏相位制定特例；所有请求仍完整执行。当前 131 修复解决了 rank 一致性和成本口径，尚未实现这部分抢占。
 

@@ -1,0 +1,8 @@
+{
+  "cold_max_wait_s": 600.0,
+  "warm_max_wait_s": 120.0,
+  "dcp_default": 1,
+  "deadline_validation": "actual deadline_config() with candidate env, CPU only",
+  "dcp_validation": "ServerArgs.dcp_size source default",
+  "tp8_runtime_validated": false
+}

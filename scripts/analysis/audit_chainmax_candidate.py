@@ -45,7 +45,7 @@ def flags(command):
     return prefix, result
 
 
-def validate_candidate(candidate, baseline, job, image_url, *, pinned=True):
+def validate_candidate(candidate, baseline, job, image_url, *, pinned=True, final_variant=False):
     assert set(candidate) == {'image', 'command', 'env', 'model_name'}
     assert candidate['image'] == image_url
     assert candidate['model_name'] == 'default'
@@ -62,10 +62,15 @@ def validate_candidate(candidate, baseline, job, image_url, *, pinned=True):
                      '--dcp-size': '1', '--log-level-http': 'warning'})
     if pinned:
         expected['--max-mamba-cache-size'] = '400'
+    if final_variant:
+        del expected['--dcp-size']
+        expected.update({'--max-running-requests': '48', '--cuda-graph-max-bs': '48'})
     assert actual == expected, 'unexpected command difference from 46676'
     _, job_args = flags(assignment(job, 'G_ARGS'))
-    assert all(actual.get(k) == v and k in actual for k, v in job_args.items()), 'N30 arguments differ'
-    assert actual['--max-running-requests'] == '32' and actual['--cuda-graph-max-bs'] == '32'
+    capacity_keys = ('--max-running-requests', '--cuda-graph-max-bs')
+    for k, v in job_args.items():
+        assert k in actual and actual[k] == v, f'N30 argument differs: {k}'
+    assert all(actual[k] == ('48' if final_variant else '32') for k in capacity_keys)
     job_env = dict(item.split('=', 1) for item in shlex.split(assignment(job, 'G_ENV')))
     env = {**baseline['env'], **job_env,
            'SGLANG_AX_PREFIX_TRACE_S': '0', 'SGLANG_AX_PREFIX_TRACE_ROUNDS': '0',
@@ -78,6 +83,10 @@ def validate_candidate(candidate, baseline, job, image_url, *, pinned=True):
             'SGLANG_AX_SCHED_SHORT_TOKENS': '2048', 'SGLANG_AX_SCHED_COLD_CAP_MAX': '0',
             'SGLANG_AX_DSA_SPARSE_TRITON': '0', 'SGLANG_AX_DEADLINE_FAMILY': '0',
             'SGLANG_AX_BACKLOG_MAX_SLOW': '80', 'SGLANG_AX_DEADLINE_TIERS': '1'}
+    if final_variant:
+        must.update({'SGLANG_AX_DEADLINE_MAX_WAIT_S': '600',
+                     'SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S': '120',
+                     'IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD': '4096'})
     assert all(env.get(k) == v for k, v in must.items()), 'candidate performance contract changed'
     expected_mechs = dict(p.split('=', 1) for p in assignment(job, 'G_EXPECT').split())
     for k, v in {'132': 'on', '131': 'on', '131_sync': 'rank0', '131_chunk': 'auto',
@@ -91,25 +100,43 @@ def validate_candidate(candidate, baseline, job, image_url, *, pinned=True):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--evidence', type=Path, required=True)
-    ap.add_argument('--unpinned-from', type=Path,
+    variants = ap.add_mutually_exclusive_group()
+    variants.add_argument('--unpinned-from', type=Path,
                     help='Reuse the reviewed image receipt; require removal of only the 400-slot flag')
+    variants.add_argument('--final-from', type=Path,
+                    help='Derive FINAL from NOPIN: cold600/warm120, hold4096, running/graph48, default DCP1')
     args = ap.parse_args()
     out = args.evidence
     candidate = json.loads((out / 'submission.json').read_text())
     baseline = json.loads((out / 'baseline-46676.json').read_text())
     job = (out / 'n30-job-reviewed.sh').read_text()
-    image_dir = args.unpinned_from or out
+    prior_dir = args.final_from or args.unpinned_from
+    reviewed = json.loads((prior_dir / 'config-audit.json').read_text()) if prior_dir else None
+    image_dir = (Path(reviewed['image_verification_source']) if args.final_from
+                 else args.unpinned_from or out)
     image = json.loads((image_dir / 'build-receipt.json').read_text())
     assert image['ok'] and image['data']['status'] == 2
-    actual, job_args, job_env = validate_candidate(candidate, baseline, job, image['data']['imageUrl'],
-                                                   pinned=args.unpinned_from is None)
+    actual, job_args, job_env = validate_candidate(
+        candidate, baseline, job, image['data']['imageUrl'],
+        pinned=prior_dir is None, final_variant=bool(args.final_from))
     commit = assignment(job, 'G_COMMIT')
-    if args.unpinned_from:
-        previous = (image_dir / 'submission.json').read_bytes()
-        flag = b' --max-mamba-cache-size 400'
-        assert previous.count(flag) == 1
-        assert (out / 'submission.json').read_bytes() == previous.replace(flag, b''), 'extra edit beyond removing pool pin'
-        reviewed = json.loads((image_dir / 'config-audit.json').read_text())
+    if prior_dir:
+        previous = (prior_dir / 'submission.json').read_bytes()
+        if args.final_from:
+            expected = json.loads(previous)
+            for before, after in ((' --max-running-requests 32', ' --max-running-requests 48'),
+                                  (' --cuda-graph-max-bs 32', ' --cuda-graph-max-bs 48'),
+                                  (' --dcp-size 1', '')):
+                assert expected['command'].count(before) == 1
+                expected['command'] = expected['command'].replace(before, after)
+            expected['env'].update({'SGLANG_AX_DEADLINE_MAX_WAIT_S': '600',
+                                    'SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S': '120',
+                                    'IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD': '4096'})
+            assert candidate == expected, 'extra edit beyond the final configuration decision'
+        else:
+            flag = b' --max-mamba-cache-size 400'
+            assert previous.count(flag) == 1
+            assert (out / 'submission.json').read_bytes() == previous.replace(flag, b''), 'extra edit beyond removing pool pin'
         assert reviewed['status'] == 'PASS' and reviewed['engine_commit'] == commit
         assert reviewed['image'] == candidate['image']
         image_checks = {k: reviewed[k] for k in (
@@ -127,24 +154,33 @@ def main():
                   image_build_id=image['data']['id'], **image_checks,
                   image_verification_source=str(image_dir),
                   only_removed_pool_pin=bool(args.unpinned_from),
+                  final_variant=bool(args.final_from),
                   runtime_receipt_status='PENDING_TP8; expected-mechanisms.txt is an expectation, not an observed log',
                   candidate_sha256=hashlib.sha256((out/'submission.json').read_bytes()).hexdigest(),
                   formal_vs_job={'performance_args_match': True,
-                    'explicit_default_args': {'--dcp-size': '1'},
+                    'validation_boundary': ('N30 with running/graph48 can validate startup/capture and shared mechanisms; N34+ performance still requires its own run'
+                                            if args.final_from else 'matching performance configuration'),
+                    'explicit_default_args': {} if args.final_from else {'--dcp-size': '1'},
+                    'implicit_default_args': {'--dcp-size': '1'} if args.final_from else {},
                     'logging_args': {'--log-level-http': 'warning'},
                     'explicit_default_env': {'SGLANG_AX_DCP_LOCAL_EXTEND': '0'},
                     'logging_env': {k: {'job': job_env[k], 'formal': candidate['env'][k]}
                                    for k in ('SGLANG_AX_PREFIX_TRACE_S','SGLANG_AX_PREFIX_TRACE_ROUNDS')}},
                   diff=rows)
     (out/'config-audit.json').write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
-    pool = '不钉 Mamba 池' if args.unpinned_from else 'Mamba400'
+    pool = 'FINAL：不钉池 / running48' if args.final_from else '不钉 Mamba 池' if args.unpinned_from else 'Mamba400'
+    comparison = ('与已更新的 eznb 性能配置一致：cold600、warm120、hold4096、running/graph=48；DCP两边均未传参数，源码默认1。'
+                  if args.final_from else '与复核过的 N30 job：性能参数一致；DCP=1 与本地续算关闭显式固定。')
     md = [f'# 46676 → chain-max 16k / {pool}：逐项配置核对', '',
           '**离线检查 PASS；正式未上传。TP8 候选机制行和 N30 结果尚待运行。**', '',
           f'引擎 `{commit}`；镜像 `{candidate["image"]}`，构建 `{image["data"]["id"]}`。', '',
-          '与复核过的 N30 job：性能参数一致；DCP=1 与本地续算关闭显式固定。正式关闭逐请求前缀决策日志、HTTP access INFO，保留启动机制行、30 秒摘要和错误；未改正文、thinking 或输出预算。', '',
+          comparison + '正式关闭逐请求前缀决策日志、HTTP access INFO，保留启动机制行、30 秒摘要和错误；未改正文、thinking 或输出预算。', '',
           '`SHORT_TOKENS=2048` 是准入阈值，126 关闭，**不是保证预留 2048 token**。', '']
     if args.unpinned_from:
         md += ['相对 400 版逐字节只删除 ` --max-mamba-cache-size 400`；其余配置不变。复用已审镜像收据，没有重建镜像或重复源文件核验。', '']
+    if args.final_from:
+        md += ['**与 NOPIN 版的最终差异**：cold 饥饿上限600秒，warm显式120秒（不显式设置会继承600）；原生前缀hold阈值4096；running/cuda graph上限32→48；去掉显式DCP1。其余不变，复用已审镜像。', '',
+               '**并发与验证边界**：running上限扩展的直接准入收益出现在实际并发超过32时（下一评测档N34及以上）。但48档CUDA graph捕获和静态缓冲在启动时建立，不能说整个改动只影响N34以上。eznb已同步使用48/48，可验证这套启动配置与捕获；N30结果仍不能代替N34及以上的性能验证。没有实测数据时不量化显存增量。', '']
     md += ['| 类别 | 字段 | 46676 原始值 | 候选值 | 变化 |',
            '|---|---|---|---|---|']
     for row in rows:

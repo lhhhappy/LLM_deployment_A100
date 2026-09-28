@@ -1,0 +1,8 @@
+{
+  "dry_run_only": true,
+  "official_upload": false,
+  "bundle": "build/submit_0927_CHAINMAX_FINAL.zip",
+  "all_output_copies_match": true,
+  "candidate_sha256": "e158d3c5484b27689bbeef14ee2fde0efa5e580a23f60b982b01ec182f3d8af1",
+  "root_submission_role": "CLI envelope metadata, not the challenge submission"
+}
