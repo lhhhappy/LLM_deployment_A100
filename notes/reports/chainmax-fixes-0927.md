@@ -20,4 +20,4 @@
 
 ## 候选
 
-[镜像、配置与 46676 差异](../../evidence/submission-0927-chainmax400/README.md)。Mamba400、16k、无 MTP/DCP，128p+131+132，118/126 关；fable 已把待运行的 130ezna 换为修后引擎。正式尚未上传，等候修后实测与最终复核。
+[镜像、配置与 46676 差异](../../evidence/submission-0927-chainmax-nopin/README.md)。16k、无 MTP/DCP，128p+131+132，118/126 关；按 chain 第一的决定去掉 Mamba400，其余配置不变，使用原镜像 0927a。fable 负责 eznb 修后引擎 TP8 验证；正式尚未上传，用户确认后方可提交。钉池臂的两个新增 chain 坏例见[逐决策归因](chainmax-pin400-held-0928.md)，多轮抢占缺口仍未解决。

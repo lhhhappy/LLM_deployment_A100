@@ -1,0 +1,7 @@
+arm,source,source_line,req_id,idx_in_chain,phase,prompt_tokens,cached_tokens,ttft_s,queue_time_s,ttft_source
+off,evidence/L130ezn3-tail_n26_chainmax16k_40m/N26/raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790542453.jsonl,2,biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:0,0,turn_start,35399,1280,21.869441270828247,17.849804639816284,server
+off,evidence/L130ezn3-tail_n26_chainmax16k_40m/N26/raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790542453.jsonl,12,biomaster:canon:member-v5-subagent-8ccca07f782fc340b6c65eb4:llm:2,0,intra,56351,1280,29.13404941558838,24.192975282669067,server
+off,evidence/L130ezn3-tail_n26_chainmax16k_40m/N26/raw_s1-dev-longchain-v5g-tail-review-0927_N26_1790542453.jsonl,37,scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1,0,intra,222738,0,44.911898136138916,28.024588584899902,server
+on,evidence/L130ezn8-tail_n26_chainmax16k_mamba400_40m/window/raw.jsonl,2,biomaster:canon:member-v5-subagent-fd7f89e59914a9160dab9369:llm:0,0,turn_start,35399,256,43.63196921348572,39.4533371925354,server
+on,evidence/L130ezn8-tail_n26_chainmax16k_mamba400_40m/window/raw.jsonl,12,biomaster:canon:member-v5-subagent-8ccca07f782fc340b6c65eb4:llm:2,0,intra,56351,256,48.24574565887451,43.2900869846344,server
+on,evidence/L130ezn8-tail_n26_chainmax16k_mamba400_40m/window/raw.jsonl,37,scimaster:canon:z9-JbTlHSeEgAkoO6zYyY:llm:1,0,intra,222738,0,40.15674662590027,23.25425124168396,server

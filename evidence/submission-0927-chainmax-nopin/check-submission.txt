@@ -1,0 +1,10 @@
+OK    submission fields match task.md schema
+OK    image is a non-empty string
+OK    first token is an executable: python3
+OK    no shell operators / expansions
+OK    --served-model-name == model_name == 'default'
+OK    env: 38 string->string entries
+OK    SGLANG_OPT_USE_TOPK_V2=0 set
+OK    all 27 flags exist in local sglang source (525 known)
+OK    trace: session_start + 2 message line(s) (user, assistant)
+=> 0 error(s), 0 warning(s)
