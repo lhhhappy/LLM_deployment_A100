@@ -1,0 +1,261 @@
+{
+  "scope": "common_ID_diagnostic",
+  "n_common": 1674,
+  "before": {
+    "source": "/workspace/Agentic_science_challenge/evidence/L130eznf-tail_rot150_n30_124m_off_40m/N30",
+    "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790572950.jsonl",
+    "receipt": "evidence/T124m-tp8-0928/off/timed_verdict.json",
+    "status": "DRAINED",
+    "full_cohort_complete": false,
+    "rows": 1689,
+    "errors": 0,
+    "flush_success": true,
+    "first_dispatch_at_s": 1790572950.6749156,
+    "admission_seconds": 2400.0,
+    "events": {},
+    "plan_records": [],
+    "harness_p95": {
+      "fast_intra(uncached_expected<=4096,<=3s)": 17.563137531280518,
+      "overall_intra(<=5s)": 16.92676544189453,
+      "turn_start(<=15s)": 25.614114999771118,
+      "chain_start(<=30s)": 31.663106203079224
+    }
+  },
+  "after": {
+    "source": "/workspace/Agentic_science_challenge/evidence/L130ezne-tail_rot150_n30_124m_on_40m/N30",
+    "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790569827.jsonl",
+    "receipt": "evidence/T124m-tp8-0928/on/timed_verdict.json",
+    "status": "DRAINED",
+    "full_cohort_complete": false,
+    "rows": 1679,
+    "errors": 0,
+    "flush_success": true,
+    "first_dispatch_at_s": 1790569827.240083,
+    "admission_seconds": 2400.0,
+    "events": {},
+    "plan_records": [],
+    "harness_p95": {
+      "fast_intra(uncached_expected<=4096,<=3s)": 14.427516222000122,
+      "overall_intra(<=5s)": 13.973222494125366,
+      "turn_start(<=15s)": 27.23916721343994,
+      "chain_start(<=30s)": 30.09210705757141
+    }
+  },
+  "before_only": [
+    "biomaster:canon:lc_20260924_002:llm:0005",
+    "biomaster:canon:lc_20260924_075:llm:0005",
+    "biomaster:canon:lc_20260924_093:llm:0014",
+    "biomaster:canon:lc_20260924_093:llm:0015",
+    "biomaster:canon:lc_20260924_093:llm:0016",
+    "biomaster:canon:lc_20260924_093:llm:0017",
+    "biomaster:canon:lc_20260924_093:llm:0018",
+    "biomaster:canon:lc_20260924_093:llm:0019",
+    "biomaster:canon:lc_20260924_114:llm:0008",
+    "biomaster:canon:lc_20260924_134:llm:0003",
+    "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:3",
+    "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:4",
+    "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:5",
+    "scimaster:canon:lc_20260924_244:llm:0006",
+    "scimaster:canon:lc_20260924_244:llm:0007"
+  ],
+  "after_only": [
+    "biomaster:canon:lc_20260924_008:llm:0002",
+    "biomaster:canon:lc_20260924_042:llm:0025",
+    "biomaster:canon:lc_20260924_042:llm:0026",
+    "scimaster:canon:lc_20260924_224:llm:0068",
+    "scimaster:canon:lc_20260924_229:llm:0001"
+  ],
+  "bucket_source": "/workspace/Agentic_science_challenge/s1-dev/harness/s1_common.py",
+  "gates": {
+    "fast_intra(uncached_expected<=4096,<=3s)": {
+      "before": {
+        "n": 1228,
+        "over_limit": 238,
+        "p95": 17.563137531280518
+      },
+      "after": {
+        "n": 1228,
+        "over_limit": 241,
+        "p95": 14.427516222000122
+      }
+    },
+    "overall_intra(<=5s)": {
+      "before": {
+        "n": 1369,
+        "over_limit": 200,
+        "p95": 16.92676544189453
+      },
+      "after": {
+        "n": 1369,
+        "over_limit": 194,
+        "p95": 13.973222494125366
+      }
+    },
+    "turn_start(<=15s)": {
+      "before": {
+        "n": 66,
+        "over_limit": 8,
+        "p95": 25.614114999771118
+      },
+      "after": {
+        "n": 66,
+        "over_limit": 11,
+        "p95": 27.23916721343994
+      }
+    },
+    "chain_start(<=30s)": {
+      "before": {
+        "n": 239,
+        "over_limit": 14,
+        "p95": 31.663106203079224
+      },
+      "after": {
+        "n": 239,
+        "over_limit": 12,
+        "p95": 30.09210705757141
+      }
+    }
+  },
+  "tpot": {
+    "before": {
+      "n": 1674,
+      "over_010": 76,
+      "mean": 0.05504796119270893,
+      "p95": 0.09453727994114161
+    },
+    "after": {
+      "n": 1674,
+      "over_010": 96,
+      "mean": 0.056642600002341593,
+      "p95": 0.10892469378301452
+    }
+  },
+  "chain_changes": [
+    {
+      "req_id": "biomaster:canon:lc_20260924_083:llm:0009",
+      "phase": "context_reset",
+      "idx_in_chain": 9,
+      "edge_type": "append-only",
+      "glm_tokens": 153248,
+      "uncached_expected": 2116,
+      "before_ttft_s": 6.903561353683472,
+      "before_queue_time_s": 6.154903173446655,
+      "before_prompt_tokens": 153248,
+      "before_cached_tokens": 151040,
+      "before_dispatch_s": 756.0767188072205,
+      "before_miss": false,
+      "after_ttft_s": 56.46779489517212,
+      "after_queue_time_s": 55.69305062294006,
+      "after_prompt_tokens": 153248,
+      "after_cached_tokens": 151040,
+      "after_dispatch_s": 752.0427038669586,
+      "after_miss": true,
+      "change": "new_miss"
+    },
+    {
+      "req_id": "biomaster:canon:lc_20260924_098:llm:0005",
+      "phase": "context_reset",
+      "idx_in_chain": 5,
+      "edge_type": "append-only",
+      "glm_tokens": 22639,
+      "uncached_expected": 1622,
+      "before_ttft_s": 35.08916163444519,
+      "before_queue_time_s": 34.5527138710022,
+      "before_prompt_tokens": 22639,
+      "before_cached_tokens": 20992,
+      "before_dispatch_s": 1287.2033030986786,
+      "before_miss": true,
+      "after_ttft_s": 1.3468143939971924,
+      "after_queue_time_s": 0.884631872177124,
+      "after_prompt_tokens": 22639,
+      "after_cached_tokens": 20992,
+      "after_dispatch_s": 1250.0260643959045,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "biomaster:canon:member-v5-subagent-2f79d0356a87c796a247bf1f:llm:9",
+      "phase": "intra",
+      "idx_in_chain": 0,
+      "edge_type": "system-tools-changed",
+      "glm_tokens": 52749,
+      "uncached_expected": 52749,
+      "before_ttft_s": 32.20997667312622,
+      "before_queue_time_s": 29.495344400405884,
+      "before_prompt_tokens": 52749,
+      "before_cached_tokens": 33536,
+      "before_dispatch_s": 2045.4629001617432,
+      "before_miss": true,
+      "after_ttft_s": 8.764410495758057,
+      "after_queue_time_s": 7.062240839004517,
+      "after_prompt_tokens": 52749,
+      "after_cached_tokens": 33536,
+      "after_dispatch_s": 2068.952751159668,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "biomaster:canon:member-v5-subagent-dda45b2eabbc873ba958b7bd:llm:0",
+      "phase": "turn_start",
+      "idx_in_chain": 0,
+      "edge_type": "system-tools-changed",
+      "glm_tokens": 35314,
+      "uncached_expected": 35314,
+      "before_ttft_s": 59.66496253013611,
+      "before_queue_time_s": 59.16593098640442,
+      "before_prompt_tokens": 35314,
+      "before_cached_tokens": 33024,
+      "before_dispatch_s": 607.8652408123016,
+      "before_miss": true,
+      "after_ttft_s": 5.161699056625366,
+      "after_queue_time_s": 4.023514032363892,
+      "after_prompt_tokens": 35314,
+      "after_cached_tokens": 33792,
+      "after_dispatch_s": 607.4992761611938,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "scimaster:canon:ON3NogRUDeSnyV9NamiP6:llm:0",
+      "phase": "session_start",
+      "idx_in_chain": 0,
+      "edge_type": "chain-head",
+      "glm_tokens": 15859,
+      "uncached_expected": 15859,
+      "before_ttft_s": 5.057861566543579,
+      "before_queue_time_s": 3.8002548217773438,
+      "before_prompt_tokens": 15859,
+      "before_cached_tokens": 13312,
+      "before_dispatch_s": 817.0779550075531,
+      "before_miss": false,
+      "after_ttft_s": 51.66769742965698,
+      "after_queue_time_s": 51.27676320075989,
+      "after_prompt_tokens": 15859,
+      "after_cached_tokens": 13312,
+      "after_dispatch_s": 822.4233374595642,
+      "after_miss": true,
+      "change": "new_miss"
+    },
+    {
+      "req_id": "scimaster:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1",
+      "phase": "intra",
+      "idx_in_chain": 0,
+      "edge_type": "append-only",
+      "glm_tokens": 202917,
+      "uncached_expected": 1306,
+      "before_ttft_s": 31.663106203079224,
+      "before_queue_time_s": 2.8298237323760986,
+      "before_prompt_tokens": 202917,
+      "before_cached_tokens": 3840,
+      "before_dispatch_s": 1037.847458600998,
+      "before_miss": true,
+      "after_ttft_s": 22.55206298828125,
+      "after_queue_time_s": 2.226811170578003,
+      "after_prompt_tokens": 202917,
+      "after_cached_tokens": 3840,
+      "after_dispatch_s": 1047.7680945396423,
+      "after_miss": false,
+      "change": "improved"
+    }
+  ]
+}

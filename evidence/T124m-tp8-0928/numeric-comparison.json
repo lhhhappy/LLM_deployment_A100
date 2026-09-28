@@ -1,0 +1,70 @@
+{
+  "status": "NUMERICAL_REVIEW_REQUIRED",
+  "cases": [
+    {
+      "case": "grid_minus",
+      "role": "A",
+      "common_conditioning_steps": 7,
+      "off_off_max_logprob_delta": 1.2748064994812012,
+      "on_off_max_logprob_delta": 0.9482758045196533,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "grid_minus",
+      "role": "B",
+      "common_conditioning_steps": 0,
+      "off_off_max_logprob_delta": null,
+      "on_off_max_logprob_delta": null,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "grid_exact",
+      "role": "A",
+      "common_conditioning_steps": 12,
+      "off_off_max_logprob_delta": 0.46373987197875977,
+      "on_off_max_logprob_delta": 0.34394049644470215,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "grid_exact",
+      "role": "B",
+      "common_conditioning_steps": 0,
+      "off_off_max_logprob_delta": null,
+      "on_off_max_logprob_delta": null,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "grid_plus",
+      "role": "A",
+      "common_conditioning_steps": 8,
+      "off_off_max_logprob_delta": 0.2593264579772949,
+      "on_off_max_logprob_delta": 0.5517317056655884,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "grid_plus",
+      "role": "B",
+      "common_conditioning_steps": 0,
+      "off_off_max_logprob_delta": null,
+      "on_off_max_logprob_delta": null,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "prefix_fork",
+      "role": "A",
+      "common_conditioning_steps": 2,
+      "off_off_max_logprob_delta": 0.08073186874389648,
+      "on_off_max_logprob_delta": 0.04766702651977539,
+      "within_observed_off_envelope": false
+    },
+    {
+      "case": "prefix_fork",
+      "role": "B",
+      "common_conditioning_steps": 0,
+      "off_off_max_logprob_delta": null,
+      "on_off_max_logprob_delta": null,
+      "within_observed_off_envelope": false
+    }
+  ],
+  "scope": "output evidence only; not full KV/KDA tensor equality or an SLO verdict"
+}
