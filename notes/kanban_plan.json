@@ -465,30 +465,33 @@
     "job": "130eznd-tail_rot150_n30_chainmax16k_fix_133_40m",
     "ref": "130eznb（同 ID）",
     "what": "133 按精确 TPOT 截止时间分配 decode（引擎 1bdaf4a6 = 20a58da9 + 133，SGLANG_AX_DECODE_BUDGET=1）：每个 decoder 的 slack = 首 token 时刻 + 0.09×(n−1) − now − 剩余×35 ms；下一块放得下就立刻 prefill（interval 0），否则 decode 到最紧的完成（≤64 轮）；可救冷头在等且允许额未用完时花掉 5% 允许额。判定：chain（开场/稳态）先看，TPOT>0.10 条数须在允许额内，server.log 的 [ax-133] 计数",
-    "status": "已发布（eznc 之后）"
+    "status": "已闭合（1680 条排空）",
+    "verdict": "**chain 12→18 对 eznb（同 1673 条；开场 8→12、稳态 4→6）：变坏，否决现配置**；turn 11→9；overall/fast 持平；TPOT>0.10 83→27（1.6%）、均值 55→46 ms——它把 TPOT 保得太好、把通道让给 decode 太多，链首多等。闭环效应：开场 60 s 内链首 34 个（eznb 30），短链更快结束让新链首更早进来。可调（spend 提到 1.0、margin 0.95、只在 rounds 小时保护），但按 chain 第一现在不进候选"
   },
   {
     "job": "130ezne-tail_rot150_n30_124m_on_40m",
     "ref": "130eznf（同引擎 OFF）/ 130eznb（上传配置）同 ID",
     "what": "124m 多轮停车 + 可救者抢占（Codex c4d01e56，SGLANG_AX_MULTI_ROUND_PARK=1）：A 判死且 B 可救、都超过一块时 A 停车（保留 KV/KDA/行）、B 连续算到 prefill 完成再恢复；最多一条停车；rank0 广播 + 共识；租约 1.5×估计。判定：chain 净减少（开场/稳态、救回/新坏 ID），[ax-124m] 的 yield/rollback/decline/resume 计数，无 RuntimeError；容量导致的 rollback 数",
-    "status": "已发布（eznd 之后）"
+    "status": "已闭合（1679 条排空）",
+    "verdict": "对 eznf（同引擎 OFF，同 1674 条）：**chain 14→12（稳态 5→3，开场 9=9）**，turn 8→11，overall 200→194，fast 238→241，TPOT>0.10 76→96；harness p95 chain 30.1 s（OFF 31.7）。方向对、幅度小（−2，接近噪声），turn +3 是代价；机制事件计数见台账。状态探针 ezndz/eznfz 均 STATE_PASS，数值配对待 Codex"
   },
   {
     "job": "130eznf-tail_rot150_n30_124m_off_40m",
     "ref": "130eznb（同配置、引擎 20a58da9）",
     "what": "同引擎 c4d01e56 关开关：核 124m 代码默认关时与 eznb 无差异，也是 ezne 的严格同引擎对照",
-    "status": "已发布（ezne 之后）"
+    "status": "已闭合（1689 条排空）",
+    "verdict": "对 eznb（20a58da9）同 1675 条：chain 12→14（开场 8→9、稳态 4→5）、turn 11→8、overall 209→201、fast 248→238、TPOT 83→77——默认关的 c4d01e56 与 20a58da9 在 ±2 条噪声内一致"
   },
   {
     "job": "130ezndz-tp8_124m_state_on",
     "ref": "130eznfz-tp8_124m_state_off（同输入两次，数值噪声参照）",
     "what": "124m 固定输入状态探针 ON（Codex 工具提交 f81cb498/f6290940，引擎 c4d01e56；仅探针把冷预算缩到 8 s 触发救援）：实测 yield/resume、196608±1 长度、部分命中、暂停 A/活动 B 的 abort（按服务端 yield/resume/terminal 先后判位置）、忙时 flush 拒绝/排空后成功；无 yield 判 INVALID；STATE_PASS ≠ 数值通过，数值对 OFF 两次的噪声看",
-    "status": "已发布（eznd 之后、ezne 之前）"
+    "status": "已闭合：124M_PROBE STATE_PASS（数值配对待 Codex）"
   },
   {
     "job": "130eznfz-tp8_124m_state_off",
     "ref": "—",
     "what": "同输入 OFF 两次：数值噪声参照与 abort/flush 基线",
-    "status": "已发布（eznf 之后）"
+    "status": "已闭合：124M_PROBE STATE_PASS（数值配对待 Codex）"
   }
 ]
