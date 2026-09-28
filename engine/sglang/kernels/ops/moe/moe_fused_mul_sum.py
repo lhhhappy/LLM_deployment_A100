@@ -1,9 +1,137 @@
+from functools import lru_cache
+
 import torch
 import triton
 import triton.language as tl
 from torch._subclasses.fake_tensor import FakeTensor
 
-from sglang.srt.utils import get_device_capability
+from sglang.srt.utils import get_bool_env_var, get_device_capability
+
+
+# [ax] 117 follow-up: read once at import, before serving or graph capture. The
+# disabled path retains the native heuristic and launch without device probes.
+_AX_SM80_MOE_REDUCE = get_bool_env_var("SGLANG_AX_SM80_MOE_REDUCE", "false")
+
+
+@lru_cache(maxsize=16)
+def _is_sm80_device(device: torch.device) -> bool:
+    # CUDA tensors carry an explicit index. Do not cache the current device's
+    # capability globally: a process can use more than one kind of GPU.
+    return (
+        device.type == "cuda"
+        and device.index is not None
+        and torch.version.hip is None
+        and torch.cuda.get_device_capability(device) == (8, 0)
+    )
+
+
+def _supported_sm80_reduce_scale(scale) -> bool:
+    return scale is None or (type(scale) in (int, float) and scale in (1.0, 2.5))
+
+
+def _can_use_sm80_moe_reduce(
+    inputs, topk_weights, outputs, expert_map, routed_scaling_factor, is_ep
+) -> bool:
+    num_tokens, top_k, size = inputs.shape
+    return (
+        type(num_tokens) is int
+        and num_tokens >= 4096
+        and type(top_k) is int
+        and top_k == 9
+        and type(size) is int
+        and size == 4096
+        and not is_ep
+        and expert_map is None
+        and inputs.dtype == torch.bfloat16
+        and topk_weights.dtype == torch.float32
+        and outputs.dtype == torch.bfloat16
+        and outputs.layout == torch.strided
+        and outputs.is_contiguous()
+        and inputs.device == topk_weights.device == outputs.device
+        and not isinstance(topk_weights, FakeTensor)
+        and not isinstance(outputs, FakeTensor)
+        and _supported_sm80_reduce_scale(routed_scaling_factor)
+        and _is_sm80_device(inputs.device)
+    )
+
+
+@triton.jit
+def _moe_fused_mul_sum_sm80_kernel(
+    inputs_ptr,
+    topk_weights_ptr,
+    outputs_ptr,
+    num_tokens,
+    routed_scaling_factor: tl.constexpr,
+):
+    # One CTA owns one token and 1024 columns. Adjacent CTAs visit adjacent
+    # column tiles of that token. No persistent loop or cross-CTA reduction.
+    pid = tl.program_id(0)
+    offs_m = (pid // 4).to(tl.int64) + tl.arange(0, 1)
+    offs_k = (pid % 4) * 1024 + tl.arange(0, 1024)
+    m_mask = offs_m < num_tokens
+    acc = tl.zeros((1, 1024), dtype=tl.float32)
+    for n in tl.static_range(9):
+        weight = tl.load(
+            topk_weights_ptr + offs_m * 9 + n, mask=m_mask, other=0.0
+        ).to(tl.float32)
+        if routed_scaling_factor != 1.0:
+            weight = weight * routed_scaling_factor
+        value = tl.load(
+            inputs_ptr + (offs_m[:, None] * 9 + n) * 4096 + offs_k[None, :],
+            mask=m_mask[:, None],
+            other=0.0,
+            cache_modifier=".cg",
+        ).to(tl.float32)
+        # Preserve the native serial FP32 FMA order and final BF16 rounding.
+        acc += value * weight[:, None]
+    tl.store(
+        outputs_ptr + offs_m[:, None] * 4096 + offs_k[None, :],
+        acc.to(outputs_ptr.dtype.element_ty),
+        mask=m_mask[:, None],
+    )
+
+
+@lru_cache(maxsize=16)
+def _warmup_sm80_moe_reduce(device: torch.device, scale: float) -> None:
+    # Compile both integer-divisibility specializations using only one row.
+    # The grid, not num_tokens, bounds this nonpersistent kernel's accesses;
+    # four CTAs touch only row 0 even with a representative large num_tokens.
+    # Keep no GPU tensors in the cache, and do not allocate a full MoE workspace.
+    with torch.cuda.device(device):
+        inputs = torch.zeros((1, 9, 4096), dtype=torch.bfloat16, device=device)
+        weights = torch.zeros((1, 9), dtype=torch.float32, device=device)
+        outputs = torch.empty((1, 4096), dtype=torch.bfloat16, device=device)
+        for num_tokens in (4096, 4097):
+            _moe_fused_mul_sum_sm80_kernel[(4,)](
+                inputs,
+                weights,
+                outputs,
+                num_tokens,
+                scale,
+                num_warps=4,
+                num_stages=1,
+            )
+
+
+def warmup_sm80_moe_reduce(
+    device: torch.device,
+    dtype: torch.dtype,
+    hidden_size: int,
+    top_k: int,
+    routed_scaling_factor: float | None,
+) -> None:
+    """Compile the opt-in large-prefill reduction at 117's layer-load warmup."""
+    if (
+        _AX_SM80_MOE_REDUCE
+        and dtype == torch.bfloat16
+        and hidden_size == 4096
+        and top_k == 9
+        and _supported_sm80_reduce_scale(routed_scaling_factor)
+        and _is_sm80_device(device)
+    ):
+        _warmup_sm80_moe_reduce(
+            device, 1.0 if routed_scaling_factor is None else float(routed_scaling_factor)
+        )
 
 
 @triton.jit
@@ -189,6 +317,20 @@ def moe_fused_mul_sum(
     assert topk_weights.shape == (num_tokens, top_k)
 
     if not isinstance(inputs, FakeTensor):
+        if _AX_SM80_MOE_REDUCE and _can_use_sm80_moe_reduce(
+            inputs, topk_weights, outputs, expert_map, routed_scaling_factor, is_ep
+        ):
+            _moe_fused_mul_sum_sm80_kernel[(num_tokens * 4,)](
+                inputs,
+                topk_weights,
+                outputs,
+                num_tokens,
+                1.0 if routed_scaling_factor is None else float(routed_scaling_factor),
+                num_warps=4,
+                num_stages=1,
+            )
+            return outputs
+
         BLOCK_M, BLOCK_K, num_warps, num_stages = _heuristic_config(
             num_tokens,
             top_k,
