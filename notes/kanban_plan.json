@@ -458,7 +458,8 @@
     "job": "130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m",
     "ref": "130eznb（同 ID）",
     "what": "上传配置 + KDA 池钉 400（单变量）。问：浅前缀压后阈值 4096 修掉 hold 之后，钉池还伤不伤 chain（ezn8 里伤了 2 条开场）；池 ~1.8M。判定 chain 先看",
-    "status": "已发布（eznb 之后）"
+    "status": "已闭合（1726 条排空，wall 2564 s）",
+    "verdict": "**chain 12→7 对 eznb 同 1687 条（开场 8→7、稳态 4→0）**，turn 11→6，overall 209→21，fast 248→40；TPOT>0.10 83→118（代价）；harness p95 chain 24.2 s（eznb 30.3）、fast 2.3、overall 2.8。浅前缀压后修掉后钉池不再伤 chain；显存墙消失（KV 峰 80%）让稳态 4 条等空间的漏归零。**下一张上传带回 --max-mamba-cache-size 400**"
   },
   {
     "job": "130eznd-tail_rot150_n30_chainmax16k_fix_133_40m",
