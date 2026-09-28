@@ -498,7 +498,7 @@
     "job": "130ezng-cap_full_118_chainmax",
     "ref": "46676 能力分 AIME 44/44、GPQA 152/156",
     "what": "118 的能力复核：引擎 cfd25d0f（118 内核 3caadef4/c6973930）+ 上传参数 + SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1，AIME 2026（30）+ GPQA-Diamond（198）经服务引擎作答，无压测。门：两科 >90 分",
-    "status": "跑（06:40 UTC 起）"
+    "status": "已停（07:29 UTC 用户决定取消能力复核；已跑 43 分钟，200 题约启动 99 题，无结果；118 不进下次上传，无需此结论）"
   },
   {
     "job": "130eznh-tail_rot150_n34_chainmax16k_fix_mamba400_40m",
@@ -517,5 +517,11 @@
     "ref": "130eznc（钉池候选，同 ID）",
     "what": "124m ON + 拒绝原因计数（Codex 6a86d57c = c4d01e56 + [ax-124m-plan] 30 s 汇总，触发条件不变）在钉池候选上：真实 N30 负载里 124m 是否让路、哪个拒绝原因占主导（owner_rescuable / b_too_small / kv_room / held / hostload / batch_full / slot_room / owner_tail / b_late）。chain 先看",
     "status": "已发布（ezni 之后）"
+  },
+  {
+    "job": "130eznk-tail_rot150_n30_chainmax16k_fix_mamba400_scatter_40m",
+    "ref": "130eznc（钉池候选，同 ID）",
+    "what": "单变量：钉池候选 + --enable-attn-tp-input-scattered（现行所有配置都关着，每卡对 mHC/norm/dense 算整块 8k/16k 行；开后每卡只算 1/8 行、多付 reduce-scatter/all-gather）。085 旧引擎实测 chain 23→21、TPOT 33→32 ms、fast +19。问题：在钉池候选上能否买到开场/稳态 chain。chain 先看，fast/overall/TPOT 只记代价；冒烟须 12/12",
+    "status": "已发布（eznj 之后）"
   }
 ]
