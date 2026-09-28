@@ -516,7 +516,7 @@
     "job": "130eznj-tail_rot150_n30_124m_on_mamba400_40m",
     "ref": "130eznc（钉池候选，同 ID）",
     "what": "124m ON + 拒绝原因计数（Codex 6a86d57c = c4d01e56 + [ax-124m-plan] 30 s 汇总，触发条件不变）在钉池候选上：真实 N30 负载里 124m 是否让路、哪个拒绝原因占主导（owner_rescuable / b_too_small / kv_room / held / hostload / batch_full / slot_room / owner_tail / b_late）。chain 先看",
-    "status": "已发布（ezni 之后）"
+    "status": "已停（13:52 UTC，第 22 分钟；问题已答，无闭合 raw）。同 956 条 ID 对 eznc：chain 7→8（持续 7、新坏 1：53k 的 reset 29.0→30.4 s；8 条尾巴一律慢约 1.2 s）、turn 修 2/新 2、fast 修 18/新 16、overall 修 11/新 4；仍是零次 [ax-124m] 让路。计数（52 段 30 s 汇总，1836 次计划）：结果 no_owner 894、none 937、batch_full 5；扫描候选 1367 条，拒绝原因 b_too_small 468、owner_tail 415、owner_rescuable 192、b_held 145、b_late 68、b_hostload 68、b_warm 11。读法：一半时间没有可让路的 owner；有候选时多数因块太小或 owner 已到尾段/仍可自救而不让。124m 在这份负载上不会触发，且带一条 chain 代价，不进候选；归 Codex 决定是否继续"
   },
   {
     "job": "130eznk-tail_rot150_n30_chainmax16k_fix_mamba400_scatter_40m",
