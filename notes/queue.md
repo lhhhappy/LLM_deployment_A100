@@ -4,7 +4,7 @@
 
 | Job | 要回答的问题与对照 | 当前状态 |
 | --- | --- | --- |
-| 队列顺序（fable，02:00 UTC）：`130eznb`（上传配置本身，N30 rot150，在跑，约 02:45 闭合）→ `130eznc`（+ KDA 池钉 400，单变量）→ `130eznd`（+ 133 精确 TPOT 截止时间 decode 分配，引擎 1bdaf4a6，单变量）。线上：attempt 47043 已上传（01:51 UTC，chain-max FINAL），Codex 轮询。Codex 在 codex/multiround-preempt-0928 做多轮停车 + 可救者抢占（默认关，SGLANG_AX_MULTI_ROUND_PARK）。 | 判据：同 ID 先比 chain（开场/稳态、按头类型），完整派发结果做判定；TPOT 看 p95 硬门。 | eznb 在跑；eznc/eznd 待发布循环插入 |
+| 队列顺序（fable，03:05 UTC）：`130eznc`（上传配置 + 钉池 400，在跑，约 03:40 闭合）→ `130eznd`（+ 133 decode 预算，引擎 1bdaf4a6）→ `130ezne`（124m 多轮停车 ON，Codex c4d01e56）→ `130eznf`（124m OFF，同引擎对照）。全部 rot150/N30 40 分钟，对 eznb（上传配置本身，chain 17→12 对 S1）同 ID 先比 chain。线上 attempt 47043 排队中。已闭合：ezn9（S1 锚点，chain p95 36.0 s）、eznb。 | 124m 审查通过（见台账 03:05）；133 已提交 1bdaf4a6。 | eznc 在跑；eznd/ezne/eznf 待发布循环插入 |
 | `130ezl-v4_n26_S4_full`（第 43 分钟停，结论见 experiments/ledger）（fable） | 用户批准的 v4 校准：46758 配置整集 N26（对线上 41.1 s 的 chain p95，约 3 小时，完整判分）；随后 S5b 在 v4 上 N34 30 分钟对 130ezh | 已发布（queue-after 等 130ezk） |
 | `130ezi-v3_n38_S1dcp_combo_nomtp_30m`（fable） | S5b（合并引擎 791453ca：128p + 本地续算，去 MTP，池 3.13M）在 N38 的 30 分钟窗口：稳态池峰值/排队/驱逐、四门与 TPOT>0.10，对 130ezh（同引擎 N34） | 跑（11:10 UTC 起） |
 | `130ezj-v3_open_S1dcp_combo_nomtp_chunk16k_n34`（fable） | 单旋钮开场探针：S5b 配置把开场 prefill 块 8k→16k（--chunked-prefill-size 16384 + SGLANG_AX_BACKLOG_COLD_CAP=16384，稳态的 SCHED_COLD_CAP 6144 不变），对 130ezh 前 600 s 同 ID；看开场 chain 11 能否再少 | 发布者 queue-after-…095324 等 130ezi 结束 |

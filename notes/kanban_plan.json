@@ -465,5 +465,17 @@
     "ref": "130eznb（同 ID）",
     "what": "133 按精确 TPOT 截止时间分配 decode（引擎 1bdaf4a6 = 20a58da9 + 133，SGLANG_AX_DECODE_BUDGET=1）：每个 decoder 的 slack = 首 token 时刻 + 0.09×(n−1) − now − 剩余×35 ms；下一块放得下就立刻 prefill（interval 0），否则 decode 到最紧的完成（≤64 轮）；可救冷头在等且允许额未用完时花掉 5% 允许额。判定：chain（开场/稳态）先看，TPOT>0.10 条数须在允许额内，server.log 的 [ax-133] 计数",
     "status": "已发布（eznc 之后）"
+  },
+  {
+    "job": "130ezne-tail_rot150_n30_124m_on_40m",
+    "ref": "130eznf（同引擎 OFF）/ 130eznb（上传配置）同 ID",
+    "what": "124m 多轮停车 + 可救者抢占（Codex c4d01e56，SGLANG_AX_MULTI_ROUND_PARK=1）：A 判死且 B 可救、都超过一块时 A 停车（保留 KV/KDA/行）、B 连续算到 prefill 完成再恢复；最多一条停车；rank0 广播 + 共识；租约 1.5×估计。判定：chain 净减少（开场/稳态、救回/新坏 ID），[ax-124m] 的 yield/rollback/decline/resume 计数，无 RuntimeError；容量导致的 rollback 数",
+    "status": "已发布（eznd 之后）"
+  },
+  {
+    "job": "130eznf-tail_rot150_n30_124m_off_40m",
+    "ref": "130eznb（同配置、引擎 20a58da9）",
+    "what": "同引擎 c4d01e56 关开关：核 124m 代码默认关时与 eznb 无差异，也是 ezne 的严格同引擎对照",
+    "status": "已发布（ezne 之后）"
   }
 ]
