@@ -511,5 +511,11 @@
     "ref": "130eznc（同 ID）",
     "what": "钉池候选 + 133 调参（SPEND 1.0、MARGIN 0.95、MAX_ROUNDS 16）：eznd 的默认 133 保 TPOT 过头（chain 12→18、TPOT>0.10 83→27）；问：能否把 TPOT>0.10 压到 ≤5% 而 chain 不动",
     "status": "已发布（eznh 之后）"
+  },
+  {
+    "job": "130eznj-tail_rot150_n30_124m_on_mamba400_40m",
+    "ref": "130eznc（钉池候选，同 ID）",
+    "what": "124m ON + 拒绝原因计数（Codex 6a86d57c = c4d01e56 + [ax-124m-plan] 30 s 汇总，触发条件不变）在钉池候选上：真实 N30 负载里 124m 是否让路、哪个拒绝原因占主导（owner_rescuable / b_too_small / kv_room / held / hostload / batch_full / slot_room / owner_tail / b_late）。chain 先看",
+    "status": "已发布（ezni 之后）"
   }
 ]

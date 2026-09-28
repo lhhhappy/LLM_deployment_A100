@@ -4,7 +4,7 @@
 
 | Job | 要回答的问题与对照 | 当前状态 |
 | --- | --- | --- |
-| 队列顺序（fable，03:05 UTC）：`130eznc`（上传配置 + 钉池 400，在跑，约 03:40 闭合）→ `130eznd`（+ 133 decode 预算，引擎 1bdaf4a6）→ `130ezndz`（124m 状态探针 ON，约 10 分钟）→ `130ezne`（124m ON 40 分钟）→ `130eznf`（124m OFF）→ `130eznfz`（状态探针 OFF）。发布者已改为 GPU 机上的脱离进程 + 本地看门狗，断网不影响。全部 rot150/N30 40 分钟，对 eznb（上传配置本身，chain 17→12 对 S1）同 ID 先比 chain。线上 attempt 47043 排队中。已闭合：ezn9（S1 锚点，chain p95 36.0 s）、eznb。 | 124m 审查通过（见台账 03:05）；133 已提交 1bdaf4a6。 | eznc 在跑；eznd/ezne/eznf 待发布循环插入 |
+| 队列顺序（fable，07:05 UTC）：`130ezng`（118 能力复核，在跑）→ `130eznh`（钉池候选在 N34 的天花板）→ `130ezni`（钉池候选 + 133 调参，对 eznc）→ `130eznj`（124m ON + 拒绝原因计数 + 钉池，对 eznc）。全部脱离发布者 + 看门狗。已闭合：eznc（钉池：对 eznb chain 12→7，稳态 0）、eznd（133 默认：chain 12→18 否决）、ezne/eznf（124m ON/OFF：零触发，chain 差在噪声内）、探针 ezndz/eznfz STATE_PASS（数值需人工审）。线上 47043 排队中；Codex 备 FINAL+钉池 的 PIN 包。 | 剩余 chain 逐条归因见台账 07:20：候选的 7 条全是开场第 22–29 位的吞吐尾巴。 | ezng 在跑；eznh/ezni/eznj 待插入 |
 | `130ezl-v4_n26_S4_full`（第 43 分钟停，结论见 experiments/ledger）（fable） | 用户批准的 v4 校准：46758 配置整集 N26（对线上 41.1 s 的 chain p95，约 3 小时，完整判分）；随后 S5b 在 v4 上 N34 30 分钟对 130ezh | 已发布（queue-after 等 130ezk） |
 | `130ezi-v3_n38_S1dcp_combo_nomtp_30m`（fable） | S5b（合并引擎 791453ca：128p + 本地续算，去 MTP，池 3.13M）在 N38 的 30 分钟窗口：稳态池峰值/排队/驱逐、四门与 TPOT>0.10，对 130ezh（同引擎 N34） | 跑（11:10 UTC 起） |
 | `130ezj-v3_open_S1dcp_combo_nomtp_chunk16k_n34`（fable） | 单旋钮开场探针：S5b 配置把开场 prefill 块 8k→16k（--chunked-prefill-size 16384 + SGLANG_AX_BACKLOG_COLD_CAP=16384，稳态的 SCHED_COLD_CAP 6144 不变），对 130ezh 前 600 s 同 ID；看开场 chain 11 能否再少 | 发布者 queue-after-…095324 等 130ezi 结束 |
