@@ -1,7 +1,8 @@
-# R37：KDA prefill 融合核与 BV16，转入 TP8 实测
+# R37：KDA prefill TP8 闭合，chain 6=6，保留小幅执行收益
 
 2026-09-28，Codex 开发，GPT-6 Sol 独立源码与原始记录复核。
-状态：**开发机数值、状态、预热和局部性能已验证；TP8 真实模型及 chain 待测。**
+状态：**TP8 40 分钟窗口已排空；共同 1844 条请求中 chain 6=6、修好 0、新坏 0。建议纳入候选，开发冻结。**
+Fable 运行 eznn/ezno 并汇报，Codex 按原 harness 从两份闭合 raw 独立复算；这是窗口诊断，不是完整 cohort 或正式 N@SLO 成绩。
 按用户要求结束本地调参，交付现有候选，不继续扩大形状表或重写其他算子。
 实现与开关见 [170 说明](../../engine/docs/170-kda-sm80-prefill.md)。其他未采用路线见 [R36](R36_prefill_kernel_options_0928.md)。
 
@@ -38,7 +39,7 @@ eager GPU event 包含主机提交造成的 GPU 空档；host enqueue 与纯 cap
 8k 单请求的 BV16 增量只有配对约 1.74%，且有两轮负波动；16k 两组增量约 5.52%/5.04%，九轮都正。此处不把所有形状描述成稳定同幅收益。
 
 收窄后只补 [G 的实例 dispatch 边界门](../../evidence/prefill-kernels-0928/kda-state-dispatch-g.jsonl)，exit 0：8k 单请求传入 BV16、三请求明确回退，默认关闭保留原生。没有重复整套性能矩阵；上表明确引用 F 中被选择的执行路径，不冒称 G 又测了一次完整性能。
-这些比例也不能写成“整模型 prefill 加速 15%”。是否值得上线由下一轮 TP8 块耗时和同 ID chain 对照决定。
+这些比例不能写成“整模型 prefill 加速 15%”。TP8 的同 ID chain 对照与采用判断见下文。
 
 ## 数值、启动与内存
 
@@ -59,7 +60,36 @@ State B 初次 warm 临时 tensor 峰值 2,362,368 B，结束后无保留 tensor
 
 失败也保留：prepare-b 因 Triton 分支里同名变量 BF16→FP32 重绑定而编译失败，c 改用 xf/y 后闭合；state-production-a 因测试 mock 的 16 MiB 引用迟到 GC，内存基线断言失败，b 在测量前清理测试引用后闭合。两者均不计性能成绩。BV8 比 BV16 慢，局部图包含输入 staging 后 16k 不赚，均不采用。
 
-## TP8 实操交付
+## TP8 实测与采用判断
+
+生产提交 `3c1ca80f` 已摘为 `bf6b66fa`，其父 `78e2bed3` 是 eznn 基线（钉池 + 118 + attention-TP 输入分片 + MoE 调参）。ezno 仅增加本报告的三个开关与实现。
+
+两轮都是 N30、2400 秒派发后排空，`cohort_sha256=b78593bdea138f58`、`workload_hash=97175a1e2ea92d15` 相同。eznn 完成 1844 条，ezno 完成 1869 条，共同 ID 为 1844；两边请求 ID 无重复，完成数等于派发数，flush 成功、runner 退出 0，输出 token 数均满足冻结预算，错误 0。下面只比较共同 ID。
+
+| 指标 | eznn | ezno |
+| --- | ---: | ---: |
+| chain 超标（252 条链首） | 6 | 6；修好 0、新坏 0 |
+| chain p95 | 19.309 s | 18.422 s |
+| TPOT p95 | 95.543 ms | 94.627 ms |
+| TPOT 均值 | 51.691 ms | 51.282 ms |
+| TPOT > 100 ms | 83 | 83 |
+| fast 超标 | 40 | 28；修好 30、新坏 18 |
+| overall 超标 | 18 | 13；修好 9、新坏 4 |
+| turn 超标 | 4 | 3；修好 1、新坏 0 |
+
+同一批 6 条 chain 尾巴（5 条 intra、1 条 context_reset）各少 1.472–1.868 秒，降幅 2.27–4.09%，仍全在 30 秒门外。Fable 从服务日志报开场前 60 秒 prefill 约 17.6k→18.0k tok/s（约 +2%）；本次独立复算核了请求指标与池观测，没有把该吞吐读数冒称为逐块 GPU 计时。没有同配置重复对照，不能定量声称“一半是噪声”，也不能把 fast/overall 的净减少全部归给新核。
+
+原始 `job.log` 核到两轮真实权重冒烟均为 12/12；ezno 启动日志核到 prepare/state armed 两行。armed 日志不是每个请求命中优化核的计数；本轮没有新增运行时命中计数或整模型逐位对照。开发机的逐位一致范围仍是上文的 kernel/core/状态测试。
+
+两轮 KV 池均为 1,810,112 tokens、21.44 GB，启动报告 `available_gpu_mem=9.58 GB`。测量期 KV used 峰值 1,796,800→1,796,288 tokens（两轮约 99%），Mamba used 峰值 119→118 槽，请求回撤均为 0。没有观察到池容量损失；这也说明 KDA 优化没有解决 KV 高水位，不能记成显存容量优化。
+
+**归因边界。** 若 KDA 占整块 4%，核心耗时降低 10–15%，按相同计时分母的占比账，直接节省为整块 0.4–0.6%，不是 1–2%。CPU logical-length 减少同步没有计入开发机 F 的差值；整机运行形状、CPU 空档及波动也可能影响本轮约 2% 的吞吐差，现有数据不能分摊它们各自的贡献。
+
+**采用判断：带入候选，停止继续打磨这条线。** 理由是同 ID chain 无新增超标、尾部略降，TPOT 硬门没有变差，真实权重冒烟通过，池容量不减且保留原生回退。定位为小幅执行收益，不计作新增 chain 胜场，不据此承诺线上跨档；下一步由实际上传后的正式能力与服务门判断。
+
+[复算结果](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/paired-summary.json)、[逐请求对照](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/paired.csv)、[原始材料与复现](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/README.md)。归档中的 `level_verdict.json` 使用了 `dev-combined-v1` 全量数据根而报 missing/extra，不能作为这次 v5g 窗口的正式成绩；保留原件，不改判为 VALID PASS。
+
+## 冻结交付
 
 在当前同一服务基线、同一池大小、同一负载上只加入这组执行层开关：
 
@@ -70,5 +100,6 @@ SGLANG_AX_KDA_PREFILL_STATE_BV16=1
 ```
 
 默认全关；任何一项可以单独撤回。保留当前 prefill graph 设置，不为了本候选另开 CUDA graph。
-核启动的两个 `[ax] KDA prefill ...` armed 日志、引擎提交、池大小；先 TP8 冒烟，再沿用现有 N30 同 ID 对照，看完整块耗时、chain、TPOT 和实际峰值。
-用户已决定能力门由线上检查，本地不再重复单独全套能力复核。当前没有新增 chain 成绩，也没有据此承诺更高线上档位。
+镜像 `lh-img:0928c` 构建成功，digest 为 `sha256:0c2aea4df2c3e93e7b3afc60ed23eda2ea323badc4f7d899771bce360d264cc6`，engine marker 为 `bf6b66fa`。Codex 核验 Dockerfile 内嵌补丁逐字节等于 `git diff 20a58da9 bf6b66fa -- engine/sglang`。
+独立候选包 `build/submit_0928_KDA/submission.json` 由现有 0928b 包仅改镜像和上述三个开关生成；[配置副本](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/submission.json)、[构建收据](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/image-build.json)。没有覆盖 Fable 的共享候选包，没有发起正式上传。
+用户已决定能力门由线上检查，本地不再重复单独全套能力复核，也不再追加形状分支或性能调参。

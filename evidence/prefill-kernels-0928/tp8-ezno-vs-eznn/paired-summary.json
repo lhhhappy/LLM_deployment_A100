@@ -1,0 +1,225 @@
+{
+  "scope": "DRAINED fixed-duration diagnostic; common IDs; not a full-cohort verdict",
+  "baseline_total": 1844,
+  "candidate_completed": 1844,
+  "baseline_requests_absent": 0,
+  "same_request_baseline": {
+    "n": 1844,
+    "n_ok": 1844,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 1371,
+        "over": 40,
+        "allowed": 82,
+        "over_rate": 0.029175784099197667,
+        "p95": 2.063180685043335
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 1521,
+        "over": 18,
+        "allowed": 90,
+        "over_rate": 0.011834319526627219,
+        "p95": 2.6377882957458496
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 71,
+        "over": 4,
+        "allowed": 7,
+        "over_rate": 0.056338028169014086,
+        "p95": 15.549582958221436
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 252,
+        "over": 6,
+        "allowed": 19,
+        "over_rate": 0.023809523809523808,
+        "p95": 19.30852174758911
+      }
+    },
+    "tpot": {
+      "n": 1844,
+      "mean": 0.05169084997941394,
+      "p95": 0.095543274073239,
+      "over_0.10": 83
+    },
+    "tokens": {
+      "prompt": 113905450,
+      "cached": 101166848,
+      "uncached": 12738602,
+      "hit_ratio": 0.888165122915541
+    }
+  },
+  "candidate": {
+    "n": 1844,
+    "n_ok": 1844,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 1371,
+        "over": 28,
+        "allowed": 82,
+        "over_rate": 0.020423048869438368,
+        "p95": 1.6561663150787354
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 1521,
+        "over": 13,
+        "allowed": 90,
+        "over_rate": 0.008547008547008548,
+        "p95": 2.1930325031280518
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 71,
+        "over": 3,
+        "allowed": 7,
+        "over_rate": 0.04225352112676056,
+        "p95": 12.167546272277832
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 252,
+        "over": 6,
+        "allowed": 19,
+        "over_rate": 0.023809523809523808,
+        "p95": 18.421743392944336
+      }
+    },
+    "tpot": {
+      "n": 1844,
+      "mean": 0.05128171758731601,
+      "p95": 0.09462698084060793,
+      "over_0.10": 83
+    },
+    "tokens": {
+      "prompt": 113905450,
+      "cached": 101116928,
+      "uncached": 12788522,
+      "hit_ratio": 0.8877268646934804
+    }
+  },
+  "gate_changes": {
+    "fast_intra": {
+      "repaired": 30,
+      "new": 18,
+      "persistent": 10
+    },
+    "overall_intra": {
+      "repaired": 9,
+      "new": 4,
+      "persistent": 9
+    },
+    "turn_start": {
+      "repaired": 1,
+      "new": 0,
+      "persistent": 3
+    },
+    "chain_start": {
+      "repaired": 0,
+      "new": 0,
+      "persistent": 6
+    }
+  },
+  "timing_note": "recv-to-exec is not a pure scheduler timer; exec-to-first is not GPU-only time",
+  "unique_candidate_ttft_bad": 42,
+  "unknown_candidate_timing": 0,
+  "runs": [
+    {
+      "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790594907.jsonl",
+      "raw_sha256": "a05899ec0b4f8786a93166d202936e898c3b2664a4e9ed992113a52471f20a48",
+      "rows": 1844,
+      "dispatched": 1844,
+      "cohort_sha256": "b78593bdea138f58",
+      "workload_hash": "97175a1e2ea92d15",
+      "measured_pool_peaks": {
+        "token_usage": 0.99,
+        "mamba_usage": 0.2975,
+        "kv_used_tokens": 1796800.0,
+        "mamba_used_tokens": 119.0,
+        "num_retracted_reqs": 0.0
+      }
+    },
+    {
+      "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790598252.jsonl",
+      "raw_sha256": "dd6c27d594be136203b747da7993377697cebaf4e7f3e2d0116924a3728fccd2",
+      "rows": 1869,
+      "dispatched": 1869,
+      "cohort_sha256": "b78593bdea138f58",
+      "workload_hash": "97175a1e2ea92d15",
+      "measured_pool_peaks": {
+        "token_usage": 0.99,
+        "mamba_usage": 0.295,
+        "kv_used_tokens": 1796288.0,
+        "mamba_used_tokens": 118.0,
+        "num_retracted_reqs": 0.0
+      }
+    }
+  ],
+  "candidate_unpaired": 25,
+  "all_candidate": {
+    "n": 1869,
+    "n_ok": 1869,
+    "errors": 0,
+    "gates": {
+      "fast": {
+        "limit_s": 3.0,
+        "n": 1394,
+        "over": 28,
+        "allowed": 83,
+        "over_rate": 0.020086083213773313,
+        "p95": 1.699653148651123
+      },
+      "overall": {
+        "limit_s": 5.0,
+        "n": 1545,
+        "over": 13,
+        "allowed": 92,
+        "over_rate": 0.008414239482200648,
+        "p95": 2.2166848182678223
+      },
+      "turn": {
+        "limit_s": 15.0,
+        "n": 71,
+        "over": 3,
+        "allowed": 7,
+        "over_rate": 0.04225352112676056,
+        "p95": 12.167546272277832
+      },
+      "chain": {
+        "limit_s": 30.0,
+        "n": 253,
+        "over": 6,
+        "allowed": 19,
+        "over_rate": 0.023715415019762844,
+        "p95": 18.421743392944336
+      }
+    },
+    "tpot": {
+      "n": 1869,
+      "mean": 0.051048156913175616,
+      "p95": 0.09462698084060793,
+      "over_0.10": 83
+    },
+    "tokens": {
+      "prompt": 115840157,
+      "cached": 102962432,
+      "uncached": 12877725,
+      "hit_ratio": 0.8888319445216222
+    }
+  },
+  "chain_tail_relative_reductions": [
+    0.04092486860826493,
+    0.038930872724530455,
+    0.036124906524299,
+    0.036054957766341524,
+    0.0380821899975762,
+    0.02273538039380061
+  ]
+}

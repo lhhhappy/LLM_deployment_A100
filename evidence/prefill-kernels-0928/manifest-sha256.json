@@ -184,5 +184,14 @@
   "mhc-splitk-a.source.py": "e52a6018a7a676844506331f051f6c4353f7611336b0c5a42db196f9c79afae5",
   "mhc-splitk-a.started": "f62d2f0a1d20587e740c8c6458c15eb6c96319fb928cb5a5a70a607514b41ee0",
   "mhc-splitk-a.stderr": "f3da97fb0df7d77ec86d0b18d427e52e3eadf2e1e89389ecbb30d4c9a5378b30",
-  "mhc-splitk-a.summary.json": "9ae6b7bd9387f3555e2ac833f0f9148a1714979a375dda6af22092db82c1da32"
+  "mhc-splitk-a.summary.json": "9ae6b7bd9387f3555e2ac833f0f9148a1714979a375dda6af22092db82c1da32",
+  "tp8-ezno-vs-eznn/README.md": "7f76da7c2737764f001931f3fe8f34d9f9b282ec4b40fa8647b53c3198c55294",
+  "tp8-ezno-vs-eznn/eznn.tgz": "e8e7cdb3d33550d3115a593560182af8dba09038ea78a104e06d9c20c696bb41",
+  "tp8-ezno-vs-eznn/ezno.tgz": "9fb3a853e75ebb04e9b4dfa026bb7df9a1ee46c2b5e0003bdfc01873baa251ff",
+  "tp8-ezno-vs-eznn/image-build.json": "36c624f26fd27989536c7cd31cc06990d7041d45813c76d561cdb164a7cbe0c2",
+  "tp8-ezno-vs-eznn/paired-summary.json": "be033a38bdd9557178d2e96c16eb2357ae29684a20c5d90381075495b480896c",
+  "tp8-ezno-vs-eznn/paired.csv": "f7bf41aa8e7dcb561bf980d4d4e3f639024d592d5936e211ca26ae2d4e1beea1",
+  "tp8-ezno-vs-eznn/recompute.py": "4747e135316b78e62506ff500da5f66be1731eb0b586e05e33cadc6840bd4874",
+  "tp8-ezno-vs-eznn/source-manifest.json": "3080f06e7df9bdfbbc8dacb981bfe547e6657efbac94691c6e22a5c41477f3c3",
+  "tp8-ezno-vs-eznn/submission.json": "1178f8679349422b113b87af4b1998a3d51083cab880cdda20d03d728db6355d"
 }
