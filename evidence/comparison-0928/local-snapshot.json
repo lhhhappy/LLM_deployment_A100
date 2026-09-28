@@ -1,0 +1,3530 @@
+{
+  "checked_utc": "2026-09-28T23:45:00.622071+00:00",
+  "runs": [
+    {
+      "run": "130eznb-tail_rot150_n30_chainmax16k_fix_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790559367.jsonl",
+          "n_completed": 1689,
+          "n": 30,
+          "raw_sha256": "5eb93b77ff7df0e64e6efe10e53a28232f3e05990caee345eec34cdd727e04cd",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790559368.0670013,
+          "admission_deadline_s": 1790561768.0670013,
+          "drained_at_s": 1790561917.8390372,
+          "completed_by_deadline": 1667,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1689,
+            "n_successful": 1689,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.054904810477327974,
+            "tpot_p95": 0.09838683421217036,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1689,
+              "n_positive_weight": 1689,
+              "sum_weight": 2742.7334,
+              "n_missing_weight": 0,
+              "mean": 0.07859685195946665,
+              "p50": 0.039517894614551026,
+              "p95": 0.16305351378571875,
+              "exceed_rate": 0.08611394749486041
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1240,
+              "n_in_bucket": 1240,
+              "n_missing_or_invalid": 0,
+              "p95": 18.000481128692627,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1240,
+                "n_positive_weight": 1240,
+                "sum_weight": 1675.3016,
+                "n_missing_weight": 0,
+                "mean": 3.6618729826202183,
+                "p50": 0.8754682540893555,
+                "p95": 16.364285945892334,
+                "exceed_rate": 0.18373622994211908
+              },
+              "pass_point": false,
+              "over_limit": 248,
+              "exceed_rate": 0.2,
+              "rate_ci_lower": 0.18145329849249464,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 75,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.18145329849249464,
+                    "allowed_over": 75,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.1819777856362262,
+                    "allowed_over": 74,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.1813157183393741,
+                    "allowed_over": 75,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1385,
+              "n_in_bucket": 1385,
+              "n_missing_or_invalid": 0,
+              "p95": 17.18452501296997,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1385,
+                "n_positive_weight": 1385,
+                "sum_weight": 1897.5004,
+                "n_missing_weight": 0,
+                "mean": 3.6642087658775853,
+                "p50": 0.9906222820281982,
+                "p95": 16.0925190448761,
+                "exceed_rate": 0.13718879848457477
+              },
+              "pass_point": false,
+              "over_limit": 209,
+              "exceed_rate": 0.15090252707581228,
+              "rate_ci_lower": 0.13527980797928546,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 83,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.13527980797928546,
+                    "allowed_over": 83,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.13576309316206606,
+                    "allowed_over": 82,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.13508169209626458,
+                    "allowed_over": 83,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 66,
+              "n_in_bucket": 66,
+              "n_missing_or_invalid": 0,
+              "p95": 19.961899995803833,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 66,
+                "n_positive_weight": 66,
+                "sum_weight": 99.9656,
+                "n_missing_weight": 0,
+                "mean": 5.598354399738496,
+                "p50": 2.4714252948760986,
+                "p95": 19.961899995803833,
+                "exceed_rate": 0.12844418479957107
+              },
+              "pass_point": false,
+              "over_limit": 11,
+              "exceed_rate": 0.16666666666666666,
+              "rate_ci_lower": 0.09637228668116068,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 6,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.09637228668116068,
+                    "allowed_over": 6,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.10468248848172405,
+                    "allowed_over": 6,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.09121148990790656,
+                    "allowed_over": 7,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 238,
+              "n_in_bucket": 238,
+              "n_missing_or_invalid": 0,
+              "p95": 30.30474066734314,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 238,
+                "n_positive_weight": 238,
+                "sum_weight": 745.2674,
+                "n_missing_weight": 0,
+                "mean": 8.578874768438546,
+                "p50": 1.9474151134490967,
+                "p95": 52.03656053543091,
+                "exceed_rate": 0.06838968134122062
+              },
+              "pass_point": false,
+              "over_limit": 12,
+              "exceed_rate": 0.05042016806722689,
+              "rate_ci_lower": 0.029347343448643884,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 18,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.029347343448643884,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.031731378398625436,
+                    "allowed_over": 17,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0270906018459693,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 83,
+          "tokens": {
+            "prompt_tokens": 104192611,
+            "cached_tokens": 92469504,
+            "output_tokens": 1125533
+          }
+        }
+      },
+      "kv_tokens": [
+        "1260160"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: 20a58da99737c70f21c801ff587e94d8f54022be | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790562930.jsonl",
+          "n_completed": 1726,
+          "n": 30,
+          "raw_sha256": "7b5cc4e5f77a7baa7a8df307f0d13ffcfed2bb60739343cc817f58ef7ff33dcf",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790562930.60019,
+          "admission_deadline_s": 1790565330.60019,
+          "drained_at_s": 1790565474.8846946,
+          "completed_by_deadline": 1703,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1726,
+            "n_successful": 1726,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05997777453783776,
+            "tpot_p95": 0.12113953607026921,
+            "passed": false,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1726,
+              "n_positive_weight": 1726,
+              "sum_weight": 2830.806,
+              "n_missing_weight": 0,
+              "mean": 0.0814248102521959,
+              "p50": 0.04130451363586896,
+              "p95": 0.17632110947128035,
+              "exceed_rate": 0.09606776303286062
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1269,
+              "n_in_bucket": 1269,
+              "n_missing_or_invalid": 0,
+              "p95": 2.3291397094726562,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1269,
+                "n_positive_weight": 1269,
+                "sum_weight": 1725.3262,
+                "n_missing_weight": 0,
+                "mean": 0.8222985096724115,
+                "p50": 0.5269114971160889,
+                "p95": 2.3291397094726562,
+                "exceed_rate": 0.033227571690501195
+              },
+              "pass_point": true,
+              "over_limit": 40,
+              "exceed_rate": 0.03152088258471237,
+              "rate_ci_lower": 0.023878340191080392,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 76,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.023878340191080392,
+                    "allowed_over": 76,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.024397223003750572,
+                    "allowed_over": 76,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.023453349395043673,
+                    "allowed_over": 77,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1415,
+              "n_in_bucket": 1415,
+              "n_missing_or_invalid": 0,
+              "p95": 2.823958396911621,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1415,
+                "n_positive_weight": 1415,
+                "sum_weight": 1948.525,
+                "n_missing_weight": 0,
+                "mean": 0.9320881135695613,
+                "p50": 0.5544583797454834,
+                "p95": 2.901585578918457,
+                "exceed_rate": 0.015355512503047177
+              },
+              "pass_point": true,
+              "over_limit": 21,
+              "exceed_rate": 0.014840989399293287,
+              "rate_ci_lower": 0.009965837128985595,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 84,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.009965837128985595,
+                    "allowed_over": 84,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.010404086194273113,
+                    "allowed_over": 84,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.00955369331468615,
+                    "allowed_over": 85,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 68,
+              "n_in_bucket": 68,
+              "n_missing_or_invalid": 0,
+              "p95": 17.341136693954468,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 68,
+                "n_positive_weight": 68,
+                "sum_weight": 101.9656,
+                "n_missing_weight": 0,
+                "mean": 3.2614544162068833,
+                "p50": 0.894141435623169,
+                "p95": 16.551705598831177,
+                "exceed_rate": 0.06865060373302369
+              },
+              "pass_point": false,
+              "over_limit": 7,
+              "exceed_rate": 0.10294117647058823,
+              "rate_ci_lower": 0.0493193842730375,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0493193842730375,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.056779990292020736,
+                    "allowed_over": 6,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.04232649528552829,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": true
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 243,
+              "n_in_bucket": 243,
+              "n_missing_or_invalid": 0,
+              "p95": 24.23439621925354,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 243,
+                "n_positive_weight": 243,
+                "sum_weight": 780.3154,
+                "n_missing_weight": 0,
+                "mean": 6.322501233306746,
+                "p50": 1.1474568843841553,
+                "p95": 25.36712408065796,
+                "exceed_rate": 0.03971419761804009
+              },
+              "pass_point": true,
+              "over_limit": 7,
+              "exceed_rate": 0.02880658436213992,
+              "rate_ci_lower": 0.013596211044684788,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 18,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013596211044684788,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01569255108403956,
+                    "allowed_over": 17,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.011157472005723354,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 122,
+          "tokens": {
+            "prompt_tokens": 107199475,
+            "cached_tokens": 94893824,
+            "output_tokens": 1131841
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: 20a58da99737c70f21c801ff587e94d8f54022be | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.jsonl",
+          "n_completed": 1778,
+          "n": 30,
+          "raw_sha256": "fe0493a65d7825bcaf2d9a48cbf0dcbe1cb9f4b7068c15f6b2874f7b4b472542",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790586238.0471277,
+          "admission_deadline_s": 1790588638.0471277,
+          "drained_at_s": 1790588762.1434996,
+          "completed_by_deadline": 1758,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1778,
+            "n_successful": 1778,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.056347567149460966,
+            "tpot_p95": 0.1139850534600555,
+            "passed": false,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1778,
+              "n_positive_weight": 1778,
+              "sum_weight": 2923.3774,
+              "n_missing_weight": 0,
+              "mean": 0.07558723502146268,
+              "p50": 0.04047419691631377,
+              "p95": 0.16078956376585235,
+              "exceed_rate": 0.0875757608306064
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1312,
+              "n_in_bucket": 1312,
+              "n_missing_or_invalid": 0,
+              "p95": 2.488415241241455,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1312,
+                "n_positive_weight": 1312,
+                "sum_weight": 1796.1464,
+                "n_missing_weight": 0,
+                "mean": 0.841665927656842,
+                "p50": 0.5125167369842529,
+                "p95": 2.4188144207000732,
+                "exceed_rate": 0.03231674210966322
+              },
+              "pass_point": true,
+              "over_limit": 47,
+              "exceed_rate": 0.035823170731707314,
+              "rate_ci_lower": 0.027786192772919764,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 79,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.027786192772919764,
+                    "allowed_over": 79,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.028293573004511907,
+                    "allowed_over": 78,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.02738359341965259,
+                    "allowed_over": 79,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1459,
+              "n_in_bucket": 1459,
+              "n_missing_or_invalid": 0,
+              "p95": 2.9047117233276367,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1459,
+                "n_positive_weight": 1459,
+                "sum_weight": 2020.3452,
+                "n_missing_weight": 0,
+                "mean": 0.9244929886044188,
+                "p50": 0.5370016098022461,
+                "p95": 2.842320203781128,
+                "exceed_rate": 0.012290275938983101
+              },
+              "pass_point": true,
+              "over_limit": 16,
+              "exceed_rate": 0.010966415352981495,
+              "rate_ci_lower": 0.006890403861394853,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 87,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.006890403861394853,
+                    "allowed_over": 87,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.007300483902636542,
+                    "allowed_over": 86,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.006481673229139898,
+                    "allowed_over": 87,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 70,
+              "n_in_bucket": 70,
+              "n_missing_or_invalid": 0,
+              "p95": 18.78606414794922,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 70,
+                "n_positive_weight": 70,
+                "sum_weight": 103.9656,
+                "n_missing_weight": 0,
+                "mean": 3.3584641269003734,
+                "p50": 0.8807840347290039,
+                "p95": 16.54618740081787,
+                "exceed_rate": 0.0673299629877575
+              },
+              "pass_point": false,
+              "over_limit": 7,
+              "exceed_rate": 0.1,
+              "rate_ci_lower": 0.047881158247374114,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.047881158247374114,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.05512983615218576,
+                    "allowed_over": 6,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.041020716607004785,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": true
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 249,
+              "n_in_bucket": 249,
+              "n_missing_or_invalid": 0,
+              "p95": 23.898553609848022,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 249,
+                "n_positive_weight": 249,
+                "sum_weight": 799.0666,
+                "n_missing_weight": 0,
+                "mean": 6.0021777662611315,
+                "p50": 1.1247546672821045,
+                "p95": 25.14756417274475,
+                "exceed_rate": 0.038782249189241544
+              },
+              "pass_point": true,
+              "over_limit": 7,
+              "exceed_rate": 0.028112449799196786,
+              "rate_ci_lower": 0.013266774683802818,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 18,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013266774683802818,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.015312675816060486,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.010882463220793778,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 108,
+          "tokens": {
+            "prompt_tokens": 110303283,
+            "cached_tokens": 97519360,
+            "output_tokens": 1156716
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: 52c694bed9de7e15262cd323a8a54189560c6c23 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznm-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790591008.jsonl",
+          "n_completed": 1827,
+          "n": 30,
+          "raw_sha256": "c200d2cfb9a5d227d688c61b085225b97225b2d0be303e4568d694af92924074",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790591008.4255445,
+          "admission_deadline_s": 1790593408.4255445,
+          "drained_at_s": 1790593520.6844947,
+          "completed_by_deadline": 1808,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1827,
+            "n_successful": 1827,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05301829983421527,
+            "tpot_p95": 0.10332222015974854,
+            "passed": false,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1827,
+              "n_positive_weight": 1827,
+              "sum_weight": 2976.8774,
+              "n_missing_weight": 0,
+              "mean": 0.07019244101464303,
+              "p50": 0.039441805374291206,
+              "p95": 0.13139948842221313,
+              "exceed_rate": 0.08127187233172585
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1355,
+              "n_in_bucket": 1355,
+              "n_missing_or_invalid": 0,
+              "p95": 1.737809419631958,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1355,
+                "n_positive_weight": 1355,
+                "sum_weight": 1841.0214,
+                "n_missing_weight": 0,
+                "mean": 0.7127094448157447,
+                "p50": 0.5105080604553223,
+                "p95": 1.6602494716644287,
+                "exceed_rate": 0.026189918270368828
+              },
+              "pass_point": true,
+              "over_limit": 34,
+              "exceed_rate": 0.025092250922509225,
+              "rate_ci_lower": 0.018512541301138545,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 81,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.018512541301138545,
+                    "allowed_over": 81,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.018992830784895273,
+                    "allowed_over": 80,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.018103345212097808,
+                    "allowed_over": 82,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1504,
+              "n_in_bucket": 1504,
+              "n_missing_or_invalid": 0,
+              "p95": 2.3699958324432373,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1504,
+                "n_positive_weight": 1504,
+                "sum_weight": 2067.5952,
+                "n_missing_weight": 0,
+                "mean": 0.8158856578707967,
+                "p50": 0.5375416278839111,
+                "p95": 2.4421749114990234,
+                "exceed_rate": 0.006155847140678214
+              },
+              "pass_point": true,
+              "over_limit": 9,
+              "exceed_rate": 0.005984042553191489,
+              "rate_ci_lower": 0.0031252646695048886,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 89,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0031252646695048886,
+                    "allowed_over": 89,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.0034846905095471327,
+                    "allowed_over": 89,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0027129159469368187,
+                    "allowed_over": 90,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 71,
+              "n_in_bucket": 71,
+              "n_missing_or_invalid": 0,
+              "p95": 14.036103963851929,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 71,
+                "n_positive_weight": 71,
+                "sum_weight": 104.9656,
+                "n_missing_weight": 0,
+                "mean": 2.8104372411200638,
+                "p50": 0.8575015068054199,
+                "p95": 12.594117879867554,
+                "exceed_rate": 0.02858079218334388
+              },
+              "pass_point": true,
+              "over_limit": 3,
+              "exceed_rate": 0.04225352112676056,
+              "rate_ci_lower": 0.011614290930412233,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.011614290930412233,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017010845195867316,
+                    "allowed_over": 6,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0029840712392914873,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 252,
+              "n_in_bucket": 252,
+              "n_missing_or_invalid": 0,
+              "p95": 20.288675785064697,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 252,
+                "n_positive_weight": 252,
+                "sum_weight": 804.3166,
+                "n_missing_weight": 0,
+                "mean": 5.4253218831430905,
+                "p50": 0.9698538780212402,
+                "p95": 22.92409038543701,
+                "exceed_rate": 0.03681958074718338
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.023809523809523808,
+              "rate_ci_lower": 0.01041868747032268,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 19,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.01041868747032268,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.012360938253219683,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.008012705452022185,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 100,
+          "tokens": {
+            "prompt_tokens": 112949176,
+            "cached_tokens": 100138496,
+            "output_tokens": 1191382
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: 52c694bed9de7e15262cd323a8a54189560c6c23 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznn-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_moetune_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790594907.jsonl",
+          "n_completed": 1844,
+          "n": 30,
+          "raw_sha256": "a05899ec0b4f8786a93166d202936e898c3b2664a4e9ed992113a52471f20a48",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790594908.052832,
+          "admission_deadline_s": 1790597308.052832,
+          "drained_at_s": 1790597464.1203227,
+          "completed_by_deadline": 1824,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1844,
+            "n_successful": 1844,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05169084997941394,
+            "tpot_p95": 0.095543274073239,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1844,
+              "n_positive_weight": 1844,
+              "sum_weight": 2993.8774,
+              "n_missing_weight": 0,
+              "mean": 0.06850845768269731,
+              "p50": 0.03905158405374179,
+              "p95": 0.12333067712655081,
+              "exceed_rate": 0.07571666094276272
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1371,
+              "n_in_bucket": 1371,
+              "n_missing_or_invalid": 0,
+              "p95": 2.063180685043335,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1371,
+                "n_positive_weight": 1371,
+                "sum_weight": 1857.0214,
+                "n_missing_weight": 0,
+                "mean": 0.73170867541665,
+                "p50": 0.49982738494873047,
+                "p95": 1.9467456340789795,
+                "exceed_rate": 0.025528946516179082
+              },
+              "pass_point": true,
+              "over_limit": 40,
+              "exceed_rate": 0.029175784099197667,
+              "rate_ci_lower": 0.022096030697495467,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 82,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.022096030697495467,
+                    "allowed_over": 82,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.022576747320010714,
+                    "allowed_over": 81,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.021699425945500526,
+                    "allowed_over": 83,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1521,
+              "n_in_bucket": 1521,
+              "n_missing_or_invalid": 0,
+              "p95": 2.6377882957458496,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1521,
+                "n_positive_weight": 1521,
+                "sum_weight": 2084.5952,
+                "n_missing_weight": 0,
+                "mean": 0.8375471976676365,
+                "p50": 0.5273199081420898,
+                "p95": 2.5082643032073975,
+                "exceed_rate": 0.01078281289336174
+              },
+              "pass_point": true,
+              "over_limit": 18,
+              "exceed_rate": 0.011834319526627219,
+              "rate_ci_lower": 0.007662666051279722,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 90,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.007662666051279722,
+                    "allowed_over": 90,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.00806257920953671,
+                    "allowed_over": 90,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007273433931629162,
+                    "allowed_over": 91,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 71,
+              "n_in_bucket": 71,
+              "n_missing_or_invalid": 0,
+              "p95": 15.549582958221436,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 71,
+                "n_positive_weight": 71,
+                "sum_weight": 104.9656,
+                "n_missing_weight": 0,
+                "mean": 2.653056733658144,
+                "p50": 0.8440041542053223,
+                "p95": 12.325573444366455,
+                "exceed_rate": 0.03810772291112517
+              },
+              "pass_point": false,
+              "over_limit": 4,
+              "exceed_rate": 0.056338028169014086,
+              "rate_ci_lower": 0.019470451276999215,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.019470451276999215,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.025541446530303182,
+                    "allowed_over": 6,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.011328223239569848,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 252,
+              "n_in_bucket": 252,
+              "n_missing_or_invalid": 0,
+              "p95": 19.30852174758911,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 252,
+                "n_positive_weight": 252,
+                "sum_weight": 804.3166,
+                "n_missing_weight": 0,
+                "mean": 5.16350570360025,
+                "p50": 0.9180293083190918,
+                "p95": 20.391182899475098,
+                "exceed_rate": 0.03681958074718338
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.023809523809523808,
+              "rate_ci_lower": 0.01041868747032268,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 19,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.01041868747032268,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.012360938253219683,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.008012705452022185,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 83,
+          "tokens": {
+            "prompt_tokens": 113905450,
+            "cached_tokens": 101166848,
+            "output_tokens": 1212025
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: 78e2bed34e50f310cb08b82e386fdc859e8a2e44 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130ezno-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m",
+      "levels": {
+        "N30": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790598252.jsonl",
+          "n_completed": 1869,
+          "n": 30,
+          "raw_sha256": "dd6c27d594be136203b747da7993377697cebaf4e7f3e2d0116924a3728fccd2",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790598252.932987,
+          "admission_deadline_s": 1790600652.932987,
+          "drained_at_s": 1790600799.565978,
+          "completed_by_deadline": 1847,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1869,
+            "n_successful": 1869,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.051048156913175616,
+            "tpot_p95": 0.09462698084060793,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1869,
+              "n_positive_weight": 1869,
+              "sum_weight": 3021.8552,
+              "n_missing_weight": 0,
+              "mean": 0.0678317722919116,
+              "p50": 0.03867602109324274,
+              "p95": 0.1321604648057717,
+              "exceed_rate": 0.07084158102611932
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1394,
+              "n_in_bucket": 1394,
+              "n_missing_or_invalid": 0,
+              "p95": 1.699653148651123,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1394,
+                "n_positive_weight": 1394,
+                "sum_weight": 1880.0214,
+                "n_missing_weight": 0,
+                "mean": 0.6763994529304448,
+                "p50": 0.48016905784606934,
+                "p95": 1.6217432022094727,
+                "exceed_rate": 0.017655543708172683
+              },
+              "pass_point": true,
+              "over_limit": 28,
+              "exceed_rate": 0.020086083213773313,
+              "rate_ci_lower": 0.014312533671991447,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 83,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.014312533671991447,
+                    "allowed_over": 83,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.014771422648182111,
+                    "allowed_over": 83,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.013905386099093309,
+                    "allowed_over": 84,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1545,
+              "n_in_bucket": 1545,
+              "n_missing_or_invalid": 0,
+              "p95": 2.2166848182678223,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1545,
+                "n_positive_weight": 1545,
+                "sum_weight": 2108.5952,
+                "n_missing_weight": 0,
+                "mean": 0.761624046136717,
+                "p50": 0.4974827766418457,
+                "p95": 2.1930325031280518,
+                "exceed_rate": 0.008110992569839862
+              },
+              "pass_point": true,
+              "over_limit": 13,
+              "exceed_rate": 0.008414239482200648,
+              "rate_ci_lower": 0.004984038257768714,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 92,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.004984038257768714,
+                    "allowed_over": 92,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.005359039384066824,
+                    "allowed_over": 91,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.004591844256536905,
+                    "allowed_over": 92,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 71,
+              "n_in_bucket": 71,
+              "n_missing_or_invalid": 0,
+              "p95": 12.167546272277832,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 71,
+                "n_positive_weight": 71,
+                "sum_weight": 104.9656,
+                "n_missing_weight": 0,
+                "mean": 2.5784994899598326,
+                "p50": 0.7997827529907227,
+                "p95": 11.6405770778656,
+                "exceed_rate": 0.02858079218334388
+              },
+              "pass_point": true,
+              "over_limit": 3,
+              "exceed_rate": 0.04225352112676056,
+              "rate_ci_lower": 0.011614290930412233,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.011614290930412233,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017010845195867316,
+                    "allowed_over": 6,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0029840712392914873,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 253,
+              "n_in_bucket": 253,
+              "n_missing_or_invalid": 0,
+              "p95": 18.421743392944336,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 253,
+                "n_positive_weight": 253,
+                "sum_weight": 808.2944,
+                "n_missing_weight": 0,
+                "mean": 4.927599697897548,
+                "p50": 0.8670592308044434,
+                "p95": 18.962588787078857,
+                "exceed_rate": 0.03663838324254133
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.023715415019762844,
+              "rate_ci_lower": 0.010377309813200595,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 19,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.010377309813200595,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.012311887250309865,
+                    "allowed_over": 18,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007980276268169412,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 83,
+          "tokens": {
+            "prompt_tokens": 115840157,
+            "cached_tokens": 102962432,
+            "output_tokens": 1223479
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznq-tail_rot150_n34_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790605927.jsonl",
+          "n_completed": 1960,
+          "n": 34,
+          "raw_sha256": "6125d6629e69f4766eb514222bbac5032e3f80d17f4793b2b5b9b8e01f94db86",
+          "full_cohort_complete": false,
+          "admission_seconds": 2400.0,
+          "first_dispatch_at_s": 1790605927.7768698,
+          "admission_deadline_s": 1790608327.7768698,
+          "drained_at_s": 1790608440.3649144,
+          "completed_by_deadline": 1935,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 1960,
+            "n_successful": 1960,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05745948162525796,
+            "tpot_p95": 0.10332160601737322,
+            "passed": false,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 1960,
+              "n_positive_weight": 1960,
+              "sum_weight": 3206.213,
+              "n_missing_weight": 0,
+              "mean": 0.0764423532829122,
+              "p50": 0.042259133298254946,
+              "p95": 0.17038211853207436,
+              "exceed_rate": 0.078173845592916
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 1453,
+              "n_in_bucket": 1453,
+              "n_missing_or_invalid": 0,
+              "p95": 2.3927347660064697,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1453,
+                "n_positive_weight": 1453,
+                "sum_weight": 1974.7166,
+                "n_missing_weight": 0,
+                "mean": 0.7658404914266947,
+                "p50": 0.5000350475311279,
+                "p95": 2.0809803009033203,
+                "exceed_rate": 0.03332549085777676
+              },
+              "pass_point": true,
+              "over_limit": 55,
+              "exceed_rate": 0.03785271851342051,
+              "rate_ci_lower": 0.029976707208582844,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 87,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.029976707208582844,
+                    "allowed_over": 87,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.030439593715722132,
+                    "allowed_over": 86,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.029617715436066824,
+                    "allowed_over": 87,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 1618,
+              "n_in_bucket": 1618,
+              "n_missing_or_invalid": 0,
+              "p95": 2.8444125652313232,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 1618,
+                "n_positive_weight": 1618,
+                "sum_weight": 2235.3372,
+                "n_missing_weight": 0,
+                "mean": 0.8916282463415653,
+                "p50": 0.522742748260498,
+                "p95": 2.9948842525482178,
+                "exceed_rate": 0.013558759725378346
+              },
+              "pass_point": true,
+              "over_limit": 21,
+              "exceed_rate": 0.012978986402966625,
+              "rate_ci_lower": 0.008713179216014427,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 96,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.008713179216014427,
+                    "allowed_over": 96,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.0090966409606824,
+                    "allowed_over": 95,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.008350685499720185,
+                    "allowed_over": 96,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 74,
+              "n_in_bucket": 74,
+              "n_missing_or_invalid": 0,
+              "p95": 15.122212171554565,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 74,
+                "n_positive_weight": 74,
+                "sum_weight": 107.9656,
+                "n_missing_weight": 0,
+                "mean": 3.056313950154578,
+                "p50": 1.332127571105957,
+                "p95": 13.438187599182129,
+                "exceed_rate": 0.03704883777795891
+              },
+              "pass_point": false,
+              "over_limit": 4,
+              "exceed_rate": 0.05405405405405406,
+              "rate_ci_lower": 0.018672100532357433,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 7,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.018672100532357433,
+                    "allowed_over": 7,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.024496099770568373,
+                    "allowed_over": 6,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.010816741437236273,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 268,
+              "n_in_bucket": 268,
+              "n_missing_or_invalid": 0,
+              "p95": 21.565000772476196,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 268,
+                "n_positive_weight": 268,
+                "sum_weight": 862.9102,
+                "n_missing_weight": 0,
+                "mean": 5.509195044700844,
+                "p50": 1.0270473957061768,
+                "p95": 21.651208639144897,
+                "exceed_rate": 0.034319445986384214
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.022388059701492536,
+              "rate_ci_lower": 0.009793867695042285,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 19,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.009793867695042285,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011620213547926521,
+                    "allowed_over": 19,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.00752352440471965,
+                    "allowed_over": 20,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 102,
+          "tokens": {
+            "prompt_tokens": 119525817,
+            "cached_tokens": 105953536,
+            "output_tokens": 1275304
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {}
+    },
+    {
+      "run": "130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790611844.jsonl",
+          "n_completed": 2889,
+          "n": 34,
+          "raw_sha256": "2cae57aad570d3b3f3c4cde71e0f8a88ce2930bbcefbecb0802b260b73f87a62",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790611844.3795137,
+          "admission_deadline_s": 1790615444.3795137,
+          "drained_at_s": 1790615520.6839724,
+          "completed_by_deadline": 2863,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2889,
+            "n_successful": 2889,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.052819568487487915,
+            "tpot_p95": 0.08584188471118417,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2889,
+              "n_positive_weight": 2889,
+              "sum_weight": 4539.0168,
+              "n_missing_weight": 0,
+              "mean": 0.06705097986008685,
+              "p50": 0.041825222755127615,
+              "p95": 0.1182698493823409,
+              "exceed_rate": 0.06289846735090296
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2185,
+              "n_in_bucket": 2185,
+              "n_missing_or_invalid": 0,
+              "p95": 3.2661919593811035,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2185,
+                "n_positive_weight": 2185,
+                "sum_weight": 2864.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.9432857000353875,
+                "p50": 0.5382590293884277,
+                "p95": 3.1193325519561768,
+                "exceed_rate": 0.052238712702231224
+              },
+              "pass_point": false,
+              "over_limit": 119,
+              "exceed_rate": 0.05446224256292906,
+              "rate_ci_lower": 0.046695617185580324,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.046695617185580324,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.047013926852072827,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.046476988579213126,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2447,
+              "n_in_bucket": 2447,
+              "n_missing_or_invalid": 0,
+              "p95": 3.5076799392700195,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2447,
+                "n_positive_weight": 2447,
+                "sum_weight": 3276.7314,
+                "n_missing_weight": 0,
+                "mean": 1.0581297923255337,
+                "p50": 0.5656912326812744,
+                "p95": 3.862703323364258,
+                "exceed_rate": 0.029530342340540944
+              },
+              "pass_point": true,
+              "over_limit": 62,
+              "exceed_rate": 0.025337147527584796,
+              "rate_ci_lower": 0.020334074824660667,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.020334074824660667,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.020612661681380776,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.020111786050455424,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 14.322225332260132,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 2.6927814859550723,
+                "p50": 0.9330368041992188,
+                "p95": 12.087831020355225,
+                "exceed_rate": 0.02705829032192601
+              },
+              "pass_point": true,
+              "over_limit": 4,
+              "exceed_rate": 0.038834951456310676,
+              "rate_ci_lower": 0.013372093397034136,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013372093397034136,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017552157218569845,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007522359926559433,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 339,
+              "n_in_bucket": 339,
+              "n_missing_or_invalid": 0,
+              "p95": 17.8081636428833,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 339,
+                "n_positive_weight": 339,
+                "sum_weight": 1114.4564,
+                "n_missing_weight": 0,
+                "mean": 4.747650506804971,
+                "p50": 1.0497808456420898,
+                "p95": 17.8081636428833,
+                "exceed_rate": 0.02912146226626721
+              },
+              "pass_point": true,
+              "over_limit": 7,
+              "exceed_rate": 0.02064896755162242,
+              "rate_ci_lower": 0.009730320720251633,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.009730320720251633,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011233654308703985,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007944812916649419,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 108,
+          "tokens": {
+            "prompt_tokens": 184814432,
+            "cached_tokens": 165465856,
+            "output_tokens": 1937849
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 3 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.08584188471118417,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 268,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [
+            "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1"
+          ],
+          "chain_repaired_ids": []
+        }
+      }
+    },
+    {
+      "run": "130eznr1-tail_rot150_n34_kda_night_mtplite1_1h_ladder",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790616071.jsonl",
+          "n_completed": 3214,
+          "n": 34,
+          "raw_sha256": "dd9055edfe95a887f401db9285c6ac3faf5032893df80805080bf318d428a16c",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790616071.5500774,
+          "admission_deadline_s": 1790619671.5500774,
+          "drained_at_s": 1790619834.5018532,
+          "completed_by_deadline": 3194,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 3214,
+            "n_successful": 3214,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.04259475876643235,
+            "tpot_p95": 0.07433159961917643,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 3214,
+              "n_positive_weight": 3214,
+              "sum_weight": 5001.7182,
+              "n_missing_weight": 0,
+              "mean": 0.05636358549946043,
+              "p50": 0.032596033098848745,
+              "p95": 0.10210033067812523,
+              "exceed_rate": 0.05027492352527977
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2445,
+              "n_in_bucket": 2445,
+              "n_missing_or_invalid": 0,
+              "p95": 10.204998016357422,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2445,
+                "n_positive_weight": 2445,
+                "sum_weight": 3180.3352,
+                "n_missing_weight": 0,
+                "mean": 2.3252567239413597,
+                "p50": 0.7386534214019775,
+                "p95": 9.213027477264404,
+                "exceed_rate": 0.14609397147822656
+              },
+              "pass_point": false,
+              "over_limit": 357,
+              "exceed_rate": 0.1460122699386503,
+              "rate_ci_lower": 0.13437942322703295,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.13437942322703295,
+                    "allowed_over": 140,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.13465702595259954,
+                    "allowed_over": 139,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.1342657744338645,
+                    "allowed_over": 141,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2734,
+              "n_in_bucket": 2734,
+              "n_missing_or_invalid": 0,
+              "p95": 9.855944395065308,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2734,
+                "n_positive_weight": 2734,
+                "sum_weight": 3619.9606,
+                "n_missing_weight": 0,
+                "mean": 2.393739647586417,
+                "p50": 0.7845275402069092,
+                "p95": 8.872365474700928,
+                "exceed_rate": 0.08723708208315858
+              },
+              "pass_point": false,
+              "over_limit": 246,
+              "exceed_rate": 0.08997805413313825,
+              "rate_ci_lower": 0.0811217372354488,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 156,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0811217372354488,
+                    "allowed_over": 156,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.08137707905933228,
+                    "allowed_over": 155,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.08097640184881016,
+                    "allowed_over": 156,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 116,
+              "n_in_bucket": 116,
+              "n_missing_or_invalid": 0,
+              "p95": 17.6784725189209,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 116,
+                "n_positive_weight": 116,
+                "sum_weight": 160.829,
+                "n_missing_weight": 0,
+                "mean": 3.7806801673350217,
+                "p50": 1.5385713577270508,
+                "p95": 15.929271936416626,
+                "exceed_rate": 0.06217784106100268
+              },
+              "pass_point": false,
+              "over_limit": 10,
+              "exceed_rate": 0.08620689655172414,
+              "rate_ci_lower": 0.04751648351668805,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 10,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.04751648351668805,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.05222844130978783,
+                    "allowed_over": 9,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.04334284628271966,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": true
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 364,
+              "n_in_bucket": 364,
+              "n_missing_or_invalid": 0,
+              "p95": 21.883131980895996,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 364,
+                "n_positive_weight": 364,
+                "sum_weight": 1220.9286,
+                "n_missing_weight": 0,
+                "mean": 5.381851465586625,
+                "p50": 1.7233469486236572,
+                "p95": 21.426260948181152,
+                "exceed_rate": 0.028219995829403946
+              },
+              "pass_point": true,
+              "over_limit": 9,
+              "exceed_rate": 0.024725274725274724,
+              "rate_ci_lower": 0.012958103094565437,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 25,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.012958103094565437,
+                    "allowed_over": 25,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.014440248942845567,
+                    "allowed_over": 25,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.011337431668324585,
+                    "allowed_over": 26,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 86,
+          "tokens": {
+            "prompt_tokens": 209171560,
+            "cached_tokens": 185324032,
+            "output_tokens": 2205421
+          }
+        }
+      },
+      "kv_tokens": [
+        "1429440"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --speculative-algorithm NEXTN --speculative-draft-model-path /mnt/models --speculative-num-steps 1 --speculative-eagle-topk 1 --speculative-num-draft-tokens 2 --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.07433159961917643,
+          "failed_ttft_gates": [
+            "fast_intra(uncached_expected<=4096,<=3s)",
+            "overall_intra(<=5s)"
+          ],
+          "chain_reference_n": 268,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [
+            "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1"
+          ],
+          "chain_repaired_ids": []
+        }
+      }
+    },
+    {
+      "run": "130ezns-tail_rot150_n34_kda_night_pdi4_1h_ladder",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790620494.jsonl",
+          "n_completed": 2885,
+          "n": 34,
+          "raw_sha256": "46b772d7beb433a082c83600e4ed5af0dde00ccecbc409331f4d22b1a8261d14",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790620494.524461,
+          "admission_deadline_s": 1790624094.524461,
+          "drained_at_s": 1790624167.345494,
+          "completed_by_deadline": 2860,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2885,
+            "n_successful": 2885,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05252216019866211,
+            "tpot_p95": 0.08717234183006503,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2885,
+              "n_positive_weight": 2885,
+              "sum_weight": 4532.039,
+              "n_missing_weight": 0,
+              "mean": 0.06681800220585371,
+              "p50": 0.04161075392033654,
+              "p95": 0.12471022124022797,
+              "exceed_rate": 0.05833868596452943
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2182,
+              "n_in_bucket": 2182,
+              "n_missing_or_invalid": 0,
+              "p95": 3.367227554321289,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2182,
+                "n_positive_weight": 2182,
+                "sum_weight": 2861.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.9861051392056377,
+                "p50": 0.5663793087005615,
+                "p95": 3.0620951652526855,
+                "exceed_rate": 0.05400161664536651
+              },
+              "pass_point": false,
+              "over_limit": 124,
+              "exceed_rate": 0.05682859761686526,
+              "rate_ci_lower": 0.04889284678616235,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.04889284678616235,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.04921173490146477,
+                    "allowed_over": 125,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.048676325546226536,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2444,
+              "n_in_bucket": 2444,
+              "n_missing_or_invalid": 0,
+              "p95": 3.512678623199463,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2444,
+                "n_positive_weight": 2444,
+                "sum_weight": 3273.7314,
+                "n_missing_weight": 0,
+                "mean": 1.0865184622815947,
+                "p50": 0.5979974269866943,
+                "p95": 3.60752010345459,
+                "exceed_rate": 0.027130814702757838
+              },
+              "pass_point": true,
+              "over_limit": 69,
+              "exceed_rate": 0.02823240589198036,
+              "rate_ci_lower": 0.02294102488204778,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.02294102488204778,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.023221462523057696,
+                    "allowed_over": 139,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.022721388180377562,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 14.476999521255493,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 3.0039678640813765,
+                "p50": 1.1668651103973389,
+                "p95": 12.332633256912231,
+                "exceed_rate": 0.02705829032192601
+              },
+              "pass_point": true,
+              "over_limit": 4,
+              "exceed_rate": 0.038834951456310676,
+              "rate_ci_lower": 0.013372093397034136,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013372093397034136,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017552157218569845,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007522359926559433,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 338,
+              "n_in_bucket": 338,
+              "n_missing_or_invalid": 0,
+              "p95": 18.70673108100891,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 338,
+                "n_positive_weight": 338,
+                "sum_weight": 1110.4786,
+                "n_missing_weight": 0,
+                "mean": 4.926762623809094,
+                "p50": 0.9754664897918701,
+                "p95": 18.70673108100891,
+                "exceed_rate": 0.02666832120853117
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.01775147928994083,
+              "rate_ci_lower": 0.00775830585770311,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.00775830585770311,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.009206543868611144,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.005937481822548461,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 102,
+          "tokens": {
+            "prompt_tokens": 184520655,
+            "cached_tokens": 165239040,
+            "output_tokens": 1935339
+          }
+        },
+        "N38": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N38_1790624427.jsonl",
+          "n_completed": 3024,
+          "n": 38,
+          "raw_sha256": "a931ad513652503a3134970f31f9efc29bfc51aaabedc8514a91d9bc9ae400f1",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790624427.523826,
+          "admission_deadline_s": 1790628027.523826,
+          "drained_at_s": 1790628143.5876265,
+          "completed_by_deadline": 2991,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 3024,
+            "n_successful": 3024,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05701387033410635,
+            "tpot_p95": 0.09043616855076404,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 3024,
+              "n_positive_weight": 3024,
+              "sum_weight": 4782.1386,
+              "n_missing_weight": 0,
+              "mean": 0.07336146252169926,
+              "p50": 0.04575081274379045,
+              "p95": 0.1337482653278319,
+              "exceed_rate": 0.06816536015915557
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2291,
+              "n_in_bucket": 2291,
+              "n_missing_or_invalid": 0,
+              "p95": 3.9372754096984863,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2291,
+                "n_positive_weight": 2291,
+                "sum_weight": 3020.4052,
+                "n_missing_weight": 0,
+                "mean": 1.3124404806307666,
+                "p50": 0.6056971549987793,
+                "p95": 3.8220677375793457,
+                "exceed_rate": 0.06600518367535588
+              },
+              "pass_point": false,
+              "over_limit": 164,
+              "exceed_rate": 0.07158446093408992,
+              "rate_ci_lower": 0.06291700818790968,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 132,
+              "evaluable": true,
+              "pass_estimated": false,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.06291700818790968,
+                    "allowed_over": 132,
+                    "pass_estimated": false
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.06322140025367598,
+                    "allowed_over": 131,
+                    "pass_estimated": false
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.06272524490415689,
+                    "allowed_over": 132,
+                    "pass_estimated": false
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2558,
+              "n_in_bucket": 2558,
+              "n_missing_or_invalid": 0,
+              "p95": 4.481305360794067,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2558,
+                "n_positive_weight": 2558,
+                "sum_weight": 3438.0306,
+                "n_missing_weight": 0,
+                "mean": 1.4062086335490516,
+                "p50": 0.6410257816314697,
+                "p95": 4.5287885665893555,
+                "exceed_rate": 0.041447216903770435
+              },
+              "pass_point": true,
+              "over_limit": 112,
+              "exceed_rate": 0.0437842064112588,
+              "rate_ci_lower": 0.037325109404389184,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 146,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.037325109404389184,
+                    "allowed_over": 146,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.03759782561410616,
+                    "allowed_over": 146,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.037129733151100186,
+                    "allowed_over": 147,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 110,
+              "n_in_bucket": 110,
+              "n_missing_or_invalid": 0,
+              "p95": 14.383849382400513,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 110,
+                "n_positive_weight": 110,
+                "sum_weight": 154.829,
+                "n_missing_weight": 0,
+                "mean": 3.0968998287881604,
+                "p50": 0.9415926933288574,
+                "p95": 13.571806192398071,
+                "exceed_rate": 0.025834953400202802
+              },
+              "pass_point": true,
+              "over_limit": 4,
+              "exceed_rate": 0.03636363636363636,
+              "rate_ci_lower": 0.012514679517369086,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.012514679517369086,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01642810820317353,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007005995231986049,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 356,
+              "n_in_bucket": 356,
+              "n_missing_or_invalid": 0,
+              "p95": 22.23009157180786,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 356,
+                "n_positive_weight": 356,
+                "sum_weight": 1189.279,
+                "n_missing_weight": 0,
+                "mean": 5.49347768706444,
+                "p50": 1.410688877105713,
+                "p95": 22.74665117263794,
+                "exceed_rate": 0.041450155934814284
+              },
+              "pass_point": true,
+              "over_limit": 10,
+              "exceed_rate": 0.028089887640449437,
+              "rate_ci_lower": 0.015317257633920736,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 25,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.015317257633920736,
+                    "allowed_over": 25,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.016864610341876623,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.013685648955188449,
+                    "allowed_over": 25,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 125,
+          "tokens": {
+            "prompt_tokens": 191331984,
+            "cached_tokens": 171246336,
+            "output_tokens": 2043331
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 4 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": true,
+          "tpot_p95": 0.08717234183006503,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 268,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [],
+          "chain_repaired_ids": []
+        }
+      }
+    },
+    {
+      "run": "130eznt-tail_rot150_n34_kda_night_relief1_1h_ladder",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790628757.jsonl",
+          "n_completed": 2891,
+          "n": 34,
+          "raw_sha256": "e25ce6cc73501c9c78a4bfd0279ee9124f1f0d0cc8080d29b8fb4f20c68a2f3d",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790628757.3753037,
+          "admission_deadline_s": 1790632357.3753037,
+          "drained_at_s": 1790632427.8687363,
+          "completed_by_deadline": 2866,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2891,
+            "n_successful": 2891,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05131943461155701,
+            "tpot_p95": 0.0886661016202745,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2891,
+              "n_positive_weight": 2891,
+              "sum_weight": 4541.0168,
+              "n_missing_weight": 0,
+              "mean": 0.05834294222463925,
+              "p50": 0.041415177461137806,
+              "p95": 0.12629038417587188,
+              "exceed_rate": 0.062422363202884426
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2187,
+              "n_in_bucket": 2187,
+              "n_missing_or_invalid": 0,
+              "p95": 2.704676866531372,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2187,
+                "n_positive_weight": 2187,
+                "sum_weight": 2866.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.8405805309369997,
+                "p50": 0.5047976970672607,
+                "p95": 2.4996726512908936,
+                "exceed_rate": 0.03727587937962959
+              },
+              "pass_point": true,
+              "over_limit": 92,
+              "exceed_rate": 0.04206675811614083,
+              "rate_ci_lower": 0.035237412766884676,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.035237412766884676,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.03555370910532846,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0350061841088334,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2449,
+              "n_in_bucket": 2449,
+              "n_missing_or_invalid": 0,
+              "p95": 3.034721851348877,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2449,
+                "n_positive_weight": 2449,
+                "sum_weight": 3278.7314,
+                "n_missing_weight": 0,
+                "mean": 0.9562105626261111,
+                "p50": 0.5420644283294678,
+                "p95": 3.01718807220459,
+                "exceed_rate": 0.019329488228282437
+              },
+              "pass_point": true,
+              "over_limit": 48,
+              "exceed_rate": 0.019599836668027767,
+              "rate_ci_lower": 0.0152205724627575,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0152205724627575,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.015494651003512595,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.01499238510993,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 13.787702083587646,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 2.655324131448554,
+                "p50": 1.005587100982666,
+                "p95": 11.764874696731567,
+                "exceed_rate": 0.020293717741444506
+              },
+              "pass_point": true,
+              "over_limit": 3,
+              "exceed_rate": 0.02912621359223301,
+              "rate_ci_lower": 0.007984842607875561,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.007984842607875561,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011699007436591692,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0018721009152463317,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 339,
+              "n_in_bucket": 339,
+              "n_missing_or_invalid": 0,
+              "p95": 18.879212617874146,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 339,
+                "n_positive_weight": 339,
+                "sum_weight": 1114.4564,
+                "n_missing_weight": 0,
+                "mean": 5.013048350825188,
+                "p50": 1.049602746963501,
+                "p95": 18.879212617874146,
+                "exceed_rate": 0.03125254608435108
+              },
+              "pass_point": true,
+              "over_limit": 9,
+              "exceed_rate": 0.02654867256637168,
+              "rate_ci_lower": 0.01391844656371153,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.01391844656371153,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.015509583793761588,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.012186969802071066,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 114,
+          "tokens": {
+            "prompt_tokens": 184971961,
+            "cached_tokens": 165755904,
+            "output_tokens": 1937146
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=1 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.0886661016202745,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 268,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [
+            "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+            "biomaster:canon:member-v5-subagent-4b341feb33056b32c9433b51:llm:7"
+          ],
+          "chain_repaired_ids": []
+        }
+      }
+    },
+    {
+      "run": "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder",
+      "levels": {
+        "N34": {
+          "scope": "fixed_duration_diagnostic",
+          "status": "DRAINED",
+          "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790633004.jsonl",
+          "n_completed": 2891,
+          "n": 34,
+          "raw_sha256": "8a4481841d62a73d50a76013a3f97dd1db73ab3459ae16380352c3494fd43f9a",
+          "full_cohort_complete": false,
+          "admission_seconds": 3600.0,
+          "first_dispatch_at_s": 1790633004.2350612,
+          "admission_deadline_s": 1790636604.2350612,
+          "drained_at_s": 1790636669.7564774,
+          "completed_by_deadline": 2867,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2891,
+            "n_successful": 2891,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.052952595908764985,
+            "tpot_p95": 0.08719472407194023,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2891,
+              "n_positive_weight": 2891,
+              "sum_weight": 4541.0168,
+              "n_missing_weight": 0,
+              "mean": 0.06686740281890323,
+              "p50": 0.0413002078839258,
+              "p95": 0.12583642136983897,
+              "exceed_rate": 0.058989211403049635
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2187,
+              "n_in_bucket": 2187,
+              "n_missing_or_invalid": 0,
+              "p95": 2.896498918533325,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2187,
+                "n_positive_weight": 2187,
+                "sum_weight": 2866.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.9296313521540794,
+                "p50": 0.5141308307647705,
+                "p95": 2.7474355697631836,
+                "exceed_rate": 0.04471398903394092
+              },
+              "pass_point": true,
+              "over_limit": 105,
+              "exceed_rate": 0.04801097393689986,
+              "rate_ci_lower": 0.04071651574510614,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.04071651574510614,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.04103386188881676,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.04049147167409106,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2449,
+              "n_in_bucket": 2449,
+              "n_missing_or_invalid": 0,
+              "p95": 3.233769178390503,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2449,
+                "n_positive_weight": 2449,
+                "sum_weight": 3278.7314,
+                "n_missing_weight": 0,
+                "mean": 1.0340221359976143,
+                "p50": 0.5412328243255615,
+                "p95": 3.2006337642669678,
+                "exceed_rate": 0.02471895075028104
+              },
+              "pass_point": true,
+              "over_limit": 59,
+              "exceed_rate": 0.024091465904450795,
+              "rate_ci_lower": 0.019218387433800256,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.019218387433800256,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.019495992800988664,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.018995001029280808,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 12.944302082061768,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 2.57979403540018,
+                "p50": 0.9872555732727051,
+                "p95": 11.04422402381897,
+                "exceed_rate": 0.020293717741444506
+              },
+              "pass_point": true,
+              "over_limit": 3,
+              "exceed_rate": 0.02912621359223301,
+              "rate_ci_lower": 0.007984842607875561,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.007984842607875561,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011699007436591692,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0018721009152463317,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 339,
+              "n_in_bucket": 339,
+              "n_missing_or_invalid": 0,
+              "p95": 18.5805082321167,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 339,
+                "n_positive_weight": 339,
+                "sum_weight": 1114.4564,
+                "n_missing_weight": 0,
+                "mean": 4.707417217923621,
+                "p50": 0.905104398727417,
+                "p95": 18.5805082321167,
+                "exceed_rate": 0.026573134669063768
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.017699115044247787,
+              "rate_ci_lower": 0.007735338561104671,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.007735338561104671,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.009179305934945991,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.005919653154443422,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_hash_verified": true,
+          "slow_tpot": 102,
+          "tokens": {
+            "prompt_tokens": 184917027,
+            "cached_tokens": 165716480,
+            "output_tokens": 1938795
+          }
+        }
+      },
+      "kv_tokens": [
+        "1810112"
+      ],
+      "smoke": [
+        "12/12"
+      ],
+      "args": [
+        "ENGINE_STARTED: bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2 | --schedule-policy lpm --dsa-prefill-backend tilelang --dsa-decode-backend tilelang --kv-cache-dtype bfloat16 --linear-attn-backend triton --linear-attn-verify-backend triton --max-running-requests 48 --cuda-graph-max-bs 48 --max-mamba-cache-size 400 --enable-attn-tp-input-scattered --prefill-decode-interval 2 --chunked-prefill-size 16384 --enable-hierarchical-cache --hicache-size 64 --hicache-write-policy write_through --mem-fraction-static 0.87 | NCCL_VERSION=2.28.3-1 SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS=154827,154829 SGLANG_AX_ASYNC_TOKENIZE=0 SGLANG_AX_BACKLOG_COLD_CAP=16384 SGLANG_AX_BACKLOG_GATE=0.10 SGLANG_AX_BACKLOG_HIGH_S=15 SGLANG_AX_BACKLOG_INTERVAL=0 SGLANG_AX_BACKLOG_LOW_S=5 SGLANG_AX_BACKLOG_MAX_SLOW=80 SGLANG_AX_BACKLOG_RELIEF=1 SGLANG_AX_CHAIN_RISK_CHUNK=0 SGLANG_AX_CHAIN_RISK_INTERVAL=1 SGLANG_AX_DEADLINE_CHAIN_FIRST=1 SGLANG_AX_DEADLINE_FAMILY=0 SGLANG_AX_DEADLINE_FREEZE_CLASS=1 SGLANG_AX_DEADLINE_LOAD=1.05 SGLANG_AX_DEADLINE_MAX_WAIT_S=600 SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S=120 SGLANG_AX_DEADLINE_TIERS=1 SGLANG_AX_DEADLINE_WARM_S=15 SGLANG_AX_DSA_SPARSE_TRITON=0 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1 SGLANG_AX_INDEXER_ROW_SHARD=1 SGLANG_AX_KDA_DUAL_SNAPSHOT=0 SGLANG_AX_KDA_FUSE_PROJ=0 SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 SGLANG_AX_KDA_PREFILL_PREPARE=1 SGLANG_AX_KDA_PREFILL_STATE_BV16=1 SGLANG_AX_MOE_FUSE_SWIGLU=0 SGLANG_AX_PACE_TPOT=0 SGLANG_AX_PREFIX_PRODUCER=1 SGLANG_AX_PREFIX_TRACE_ROUNDS=2048 SGLANG_AX_PREFIX_TRACE_S=120 SGLANG_AX_SCHED_COLD_CAP=16384 SGLANG_AX_SCHED_COLD_CAP_MAX=0 SGLANG_AX_SCHED_PROTECT=1 SGLANG_AX_SCHED_SHORT_TOKENS=2048 SGLANG_AX_SM80_FP8_MOE_HUMMING=1 SGLANG_AX_SM80_FP8_MOE_MARLIN=1 SGLANG_AX_SM80_INDEXER=1 SGLANG_AX_SM80_MOE_DOWN_TUNE=1 SGLANG_AX_SM80_MOE_REDUCE=0 SGLANG_AX_SM80_MOE_UP_TUNE=1 SGLANG_MAMBA_SSM_DTYPE=float32 SGLANG_OPT_DEEPGEMM_HC_PRENORM=0 SGLANG_OPT_FUSED_KDA_VERIFY=0 "
+      ],
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": true,
+          "tpot_p95": 0.08719472407194023,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 268,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [],
+          "chain_repaired_ids": []
+        }
+      }
+    }
+  ],
+  "running": [
+    "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder.sh"
+  ],
+  "pending": []
+}
