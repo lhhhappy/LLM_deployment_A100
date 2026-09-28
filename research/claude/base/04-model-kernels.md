@@ -1,7 +1,8 @@
 # 04 — Model compute, kernels, MTP and DP-attention (base image, sm80)
 
-> **2026-09-23 更正（8 卡实测 + Fable 审阅）**：MoE 在 A100 走 **Marlin W8A16（补丁 111）**，不是 Triton FP8；DSA 注意力用 **tilelang**（fa3 仅 Hopper，F57）；
-> 冷预填充实测约 **1 万 tok/s**（36k ≈ 3.6s，非 "1–2s"），8 卡 profile：MoE 31.8%、稀疏注意力 17.0%、稠密 GEMM 13.2%、**mHC 11.8%（每卡重复计算全部 token，可用 `--enable-attn-tp-input-scattered` 分散）**、allreduce 11.1%（64MB 消息超过 custom allreduce 8MB 上限→NCCL）、indexer 4.3%、KDA 4.1%。MoE 只到峰值 27–30%（F70）。
+> **2026-09-28 适用范围更正（Codex）**：9月24日“已开启 attention 输入 scatter”的证据是旧 S1/042，不是现行 chain-max。081 未开启，085 曾单独开启；47043 FINAL、eznb/eznc、124m ON/OFF 均未传 `--enable-attn-tp-input-scattered`，运行日志为 False。114 的 indexer 行分片仍开启，两者独立。当前 117 已用 Humming；以下旧 profile 百分比不作为当前瓶颈排序。复核路径、旧实验取舍和开发方向见 [当前 scatter 核对](../../../notes/reports/attention-input-scatter-scope-0928.md)。
+>
+> **历史测量（2026-09-23，8 卡 + Fable 审阅）**：当时 MoE 走 Marlin W8A16（111），DSA 为 tilelang；冷预填充约1万 tok/s（36k约3.6秒），MoE31.8%、稀疏注意力17.0%、稠密GEMM13.2%、mHC11.8%、allreduce11.1%、indexer4.3%、KDA4.1%。这些比例与 F70 的 MoE 27–30% 利用率属于当时形状，不能直接套给当前配置。
 
 2026-09-22, Claude subagent, read-only source map. Paths below are relative to `build/base_exact/sglang/` (the image replica; upstream fe236ea6c3). `S/` = `srt/`, `K/` = `kernels/`. Model facts come from `s1-dev/glm_tok/config.json`. **[V]** means verified in the Python source. **[D]** means derived arithmetic. **[U]** means unverified: it depends on compiled binaries (sgl_kernel, deep_gemm, triton, tilelang) or on runtime. No GPU was used.
 
