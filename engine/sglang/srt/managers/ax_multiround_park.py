@@ -8,6 +8,7 @@ Only rank 0 evaluates ages/costs. All ownership transitions apply its broadcast.
 import json
 import logging
 import time
+from collections import Counter
 from dataclasses import dataclass
 
 from sglang.srt.managers import ax_deadline as dl
@@ -37,7 +38,7 @@ def age_limit(req, cfg):
                else cfg.max_wait_warm_s, 1140.0)
 
 
-def rescue_decision(owner, head, now, chunk, cfg):
+def rescue_decision(owner, head, now, chunk, cfg, stats=None):
     """Pure request-state/cost decision; None means no multi-round rescue.
 
     A one-round waiter remains the existing 124 parking path. Require a cold
@@ -54,11 +55,33 @@ def rescue_decision(owner, head, now, chunk, cfg):
     if owner.inflight_middle_chunks > 0:
         handoff_s += dl.service_s(owner.extend_range.length, chunk, cfg)
     slack_b = dl.slack_s(head, work_b, age_b, chunk, cfg) - handoff_s
-    if (not received(owner) or not received(head) or work_b <= chunk or work_a <= chunk
-            or not dl.deadline_cold(head, cfg) or slack_a >= 0 or slack_b < 0):
+    # Keep the original short-circuit order. Diagnostics must not evaluate
+    # deadline_cold earlier: with freeze_class it mutates the request's class.
+    reason = None
+    if not received(owner) or not received(head):
+        reason = "missing_receive_time"
+    elif work_b <= chunk:
+        reason = "b_too_small"
+    elif work_a <= chunk:
+        reason = "owner_tail"
+    elif not dl.deadline_cold(head, cfg):
+        reason = "b_warm"
+    elif slack_a >= 0:
+        reason = "owner_rescuable"
+    elif slack_b < 0:
+        reason = "b_late"
+    if reason is not None:
+        if stats is not None:
+            stats.reject(reason, a=owner.rid, b=head.rid, a_remaining=work_a,
+                         b_remaining=work_b, a_age=age_a, b_age=age_b,
+                         a_slack=slack_a, b_slack=slack_b, handoff_s=handoff_s,
+                         chunk=chunk)
         return None
     if (age_a + cfg.arrival_offset_s + dl.service_s(work_a + work_b, chunk, cfg)
             + handoff_s + 1.0 >= age_limit(owner, cfg)):
+        if stats is not None:
+            stats.reject("age_limit", a=owner.rid, b=head.rid, a_age=age_a,
+                         a_remaining=work_a, b_remaining=work_b, chunk=chunk)
         return None
     # Finite service lease: 50% model-error allowance, bounded by B's actual
     # deadline. This is a scheduling guard, not a measured speed guarantee.
@@ -68,6 +91,54 @@ def rescue_decision(owner, head, now, chunk, cfg):
                 a_age=age_a, b_age=age_b, a_slack=slack_a, b_slack=slack_b,
                 handoff_s=handoff_s, lease_s=lease_s, lease_end=now + lease_s,
                 chunk=chunk, reason="owner_hopeless_waiter_rescuable")
+
+
+class PlanStats:
+    """Rank-0 CPU counters only; no collective, cache match or policy calls.
+
+    Plan outcomes and candidate rejection counts have different denominators.
+    At most one example per rejection and one line per 30 s of plan activity;
+    flush also closes a nonempty partial window before resetting the epoch.
+    """
+
+    def __init__(self):
+        self.epoch = 0
+        self.clear()
+
+    def clear(self):
+        self.started = None
+        self.outcomes = Counter()
+        self.rejections = Counter()
+        self.examples = {}
+        self.scanned = 0
+
+    def reject(self, reason, **example):
+        self.rejections[reason] += 1
+        if reason not in self.examples:
+            self.examples[reason] = example
+
+    def finish(self, outcome, now):
+        if self.started is None:
+            self.started = now
+        self.outcomes[outcome] += 1
+        if now - self.started >= 30:
+            self.log(now, "periodic")
+
+    def log(self, now, reason):
+        if not self.outcomes:
+            return
+        logger.info("[ax-124m-plan] %s", json.dumps(dict(
+            version=1, epoch=self.epoch, t=now, reason=reason,
+            interval_s=now - self.started, calls=sum(self.outcomes.values()),
+            outcomes=dict(self.outcomes), candidates_scanned=self.scanned,
+            rejections=dict(self.rejections), examples=self.examples), separators=(",", ":")))
+        self.clear()
+
+    def reset(self):
+        # Only rank 0 ever calls plan(), so follower counters stay empty.
+        if self.outcomes:
+            self.log(time.perf_counter(), "flush")
+        self.epoch += 1
 
 
 @dataclass
@@ -109,6 +180,7 @@ class State:
         self.sequence = 0
         self.lease_end = 0.0
         self.chunk = 1
+        self.plan_stats = PlanStats()
 
     def reqs(self):
         return tuple(p.req for p in self.parked)
@@ -120,6 +192,7 @@ class State:
 
     def reset(self):
         assert not self.parked and not self.pending_abort
+        self.plan_stats.reset()
         self.active = None
         self.protect = False
         self.watch.clear()
@@ -189,16 +262,39 @@ class State:
 
     def plan(self, s, adder, running_batch, chunk, prefix_plan):
         """Rank-0 preview; native admission and its rollback remain authoritative."""
+        stats = self.plan_stats
+        # Logging in this function must not use emit(): plan is already inside
+        # rank0_decide, and another collective here would deadlock the ranks.
+        outcome = "none"
+        try:
+            return self._plan(s, adder, running_batch, chunk, prefix_plan, stats)
+        finally:
+            stats.finish(getattr(self, "_plan_outcome", outcome), time.perf_counter())
+
+    def _plan(self, s, adder, running_batch, chunk, prefix_plan, stats):
+        self._plan_outcome = "none"
         a = s.chunked_req
-        if self.parked or a is None or a.output_ids or a.finished():
+        if self.parked:
+            self._plan_outcome = "already_parked"
+            return None
+        if a is None:
+            self._plan_outcome = "no_owner"
+            return None
+        if a.output_ids or a.finished():
+            self._plan_outcome = "owner_finished"
             return None
         if a.beam_group is not None or getattr(a, "session", None):
+            self._plan_outcome = "owner_unsupported"
             return None
-        if (running_batch.batch_is_full
-                or s.get_num_allocatable_reqs(len(running_batch.reqs),
-                                             running_batch=running_batch) <= 0
-                or len(running_batch.reqs) + 2 > s.max_running_requests):
-            # Reserve the parked row in the logical running limit too.
+        if running_batch.batch_is_full:
+            self._plan_outcome = "batch_full"
+            return None
+        if s.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch) <= 0:
+            self._plan_outcome = "slot_room"
+            return None
+        # Reserve the parked row in the logical running limit too.
+        if len(running_batch.reqs) + 2 > s.max_running_requests:
+            self._plan_outcome = "running_limit"
             return None
         held = set(getattr(s.policy, "ax_held", ()))
         if prefix_plan is not None:
@@ -206,16 +302,28 @@ class State:
         cfg = s._ax_admission_cfgs()[0]
         now = time.perf_counter()
         for b in s.waiting_queue[:64]:
-            if (b.rid in held or b.needs_host_load_back() or b.beam_group is not None
-                    or getattr(b, "session", None)):
+            stats.scanned += 1
+            if b.rid in held:
+                stats.reject("b_held", a=a.rid, b=b.rid)
                 continue
-            if adder._request_total_tokens(b, remaining(b)) >= adder.rem_total_tokens:
+            if b.needs_host_load_back():
+                stats.reject("b_hostload", a=a.rid, b=b.rid)
                 continue
-            decision = rescue_decision(a, b, now, chunk, cfg)
+            if b.beam_group is not None or getattr(b, "session", None):
+                stats.reject("b_unsupported", a=a.rid, b=b.rid)
+                continue
+            needed = adder._request_total_tokens(b, remaining(b))
+            room = adder.rem_total_tokens
+            if needed >= room:
+                stats.reject("kv_room", a=a.rid, b=b.rid, needed=needed, available=room,
+                             b_remaining=remaining(b), chunk=chunk)
+                continue
+            decision = rescue_decision(a, b, now, chunk, cfg, stats)
             if decision is not None:
                 decision.update(sequence=self.sequence + 1, a_computed=len(a.prefix_indices),
                                 b_computed=len(b.prefix_indices),
                                 a_inflight=a.inflight_middle_chunks)
+                self._plan_outcome = "selected"
                 return decision
         return None
 

@@ -187,6 +187,57 @@ class MultiRoundTests(unittest.TestCase):
         self.assertEqual(s.waiting_queue, [b])
         self.assertFalse(s._ax_multi_park.parked)
 
+    def test_plan_counters_do_not_classify_held_requests(self):
+        s, ns, a, b = self.scheduler()
+        state = s._ax_multi_park
+        adder = NS(rem_total_tokens=1000000,
+                   _request_total_tokens=lambda req, work: work)
+        # plan() must not read a deadline class for requests excluded by hold:
+        # freeze_class could otherwise change a later admission decision.
+        self.assertFalse(hasattr(b, "_ax_deadline_cold"))
+        s.policy.ax_held = [b.rid]
+        with patch.object(ns["ax_multiround_park"], "logger") as log:
+            state.plan(s, adder, s.running_batch, 16384, None)
+            self.assertEqual(state.plan_stats.rejections["b_held"], 1)
+            self.assertEqual(state.plan_stats.outcomes["none"], 1)
+            self.assertFalse(hasattr(b, "_ax_deadline_cold"))
+            self.clock.return_value = 1030.0
+            state.plan(s, adder, s.running_batch, 16384, None)
+            self.assertEqual(log.info.call_count, 1)
+            self.assertEqual(log.info.call_args.args[0], "[ax-124m-plan] %s")
+        self.assertIs(s.chunked_req, a)
+        self.assertEqual(s.waiting_queue, [b])
+        self.assertFalse(state.parked)
+
+    def test_observed_rescue_decision_matches_unobserved(self):
+        s, ns, a, b = self.scheduler()
+        module = ns["ax_multiround_park"]
+        cfg = s._ax_admission_cfgs()[0]
+        for work, waited in ((35000, 2), (1200, 2), (35000, 40)):
+            with self.subTest(work=work, waited=waited):
+                b = request("B", work, age=waited)
+                plain_a, plain_b = copy.deepcopy(a), copy.deepcopy(b)
+                stats = module.PlanStats()
+                plain = module.rescue_decision(plain_a, plain_b, 1000, 16384, cfg)
+                observed = module.rescue_decision(a, b, 1000, 16384, cfg, stats)
+                self.assertEqual(plain, observed)
+                self.assertEqual(getattr(plain_b, "_ax_deadline_cold", None),
+                                 getattr(b, "_ax_deadline_cold", None))
+
+    def test_150k_owner_with_30s_cold_budget_is_not_dead_at_35k_arrival(self):
+        # ezn9 raw, t_recv differences: B arrived about 8.39 s after A.
+        # Give A all its original work (a pessimistic bound); real progress
+        # only improves its slack. This is a CPU counterfactual, not a replay.
+        a = request("A", 150249, matched=14848, age=8.39)
+        b = request("B", 35296, matched=0, age=0)
+        s, ns, _, _ = self.scheduler(a=a, b=b)
+        stats = ns["ax_multiround_park"].PlanStats()
+        decision = ns["ax_multiround_park"].rescue_decision(
+            a, b, 1000, 16384, s._ax_admission_cfgs()[0], stats)
+        self.assertIsNone(decision)
+        self.assertEqual(stats.rejections, {"owner_rescuable": 1})
+        self.assertGreater(stats.examples["owner_rescuable"]["a_slack"], 9)
+
     def test_lease_and_absolute_age_restore_without_nested_third_partial(self):
         for reason in ("lease", "age"):
             with self.subTest(reason=reason):

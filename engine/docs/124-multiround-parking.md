@@ -1,6 +1,6 @@
 # 124：跨多轮停车与可救冷头抢占
 
-**状态：默认关闭；c4d01e56 经 Fable 独立审查通过，CPU 调度/生命周期测试与 8 进程 Gloo 通过，TP8 状态与 chain 净收益待测。**
+**状态：默认关闭；c4d01e56 经 Fable 独立审查通过，TP8 短状态探针通过。N30 ON 全程零次让路，不能把 chain 14→12 归因于本机制；数值配对仍须复核。新增拒绝原因计数只做观测，待重跑。**
 底为 FINAL 的 `20a58da9` 引擎（交付文档底 `6fa82ab7`）。不改 47043 的镜像、启动参数或当前队列。
 
 开启：`SGLANG_AX_MULTI_ROUND_PARK=1`；机制收据必须含 `124m=on`，关闭为 `124m=off`。
@@ -70,15 +70,15 @@ python3 -B scripts/analysis/verify_multiround_park_gloo.py --source engine/sglan
 
 前者调用真实 scheduler、PrefillAdder、结果回调和生命周期方法的 AST，只有池/请求/GPU 是假件。后者用 8 个真实 Gloo 进程测 root/follower 年龄反向、恢复、单 rank 前置条件失败、分配范围分歧；**均不等于 TP8 数值证明**。
 
-TP8 尚需：
+TP8 验证边界：
 
-1. 同引擎 OFF/ON/OFF 短状态探针；长 A 发射几块后到达 B，必须从日志证实实际 yield 和 resume。覆盖页/256 检查点前后、部分命中/分叉、decoder 并存、暂停 A/B/abort_all、暂停中 flush 拒绝及排空后清池。可用更短的测试专用 124 截止触发机制，两臂完全相同，不把此臂当 SLO。
+1. 已做同引擎 ON 与 OFF 两次重复的短状态探针；实际 yield/resume、页/256 长度边界、部分命中/分叉、暂停 A/B abort、暂停中 flush 拒绝及排空后清池通过。测试专用 124 冷截止 8 s，两臂相同，不把此臂当 SLO。全局 abort_all、强制 lease 到期及完整张量一致性尚未覆盖。
 2. 检查 KV 页不重用、KDA 句柄和状态位置不变、无多余首 token 或重复释放；固定输入的数值与 OFF/OFF 噪声对照。CPU 的 255/256/257 测的是簿记，不能替代真实 kernel 边界。
 3. FINAL 配置仅加 `SGLANG_AX_MULTI_ROUND_PARK=1`、`G_EXPECT+=124m=on`，rot150/N30 相同派发窗口并排空，对 eznb。优先同提交 OFF 孪生；对 eznb 是跨提交默认关闭代码对照，须明确标记。
 
 第一行报告 chain **救回/新增/净减少**，再分开场/稳态与原始头类型；同时报告派发 ID 集合差异、暂停次数/时长、A 最终覆盖率、TPOT p95、fast 代价。闭环中的同 ID 配对仅用于归因，不能替代完整派发与排空。尚无 chain 收益结论，不并入上传候选。
 
-### 固定输入短状态探针（已备，待 TP8 执行）
+### 固定输入短状态探针（ezndz/eznfz 已闭合）
 
 任务入口：[`tp8_124m_state_on.sh`](../../scripts/pod/jobs/tp8_124m_state_on.sh) 与
 [`tp8_124m_state_off.sh`](../../scripts/pod/jobs/tp8_124m_state_off.sh)，客户端
@@ -103,3 +103,16 @@ python3 -B scripts/pod/verify/multiround_park_probe.py compare \
 ```
 
 只有 ON 的逐 token logprob 都落在两次 OFF 的观测范围内，才记 WITHIN_OBSERVED_OFF_NOISE；否则保留原值给独立复核，不设凭空容差、不自动宣称错误。此短测不覆盖高 KV 压力回滚、强制 lease 到期及全局 abort_all；前者还须在 N30 配对中按 rollback/decline、驻留占用与失败请求一起解释。
+
+实测 ON 107.2 s、OFF 150.3 s（不含启动）；ON 共 7 次 yield、6 次 resume、12 个首 token、2 次预期 abort。部分命中实测 4096 token。数值比较为 NUMERICAL_REVIEW_REQUIRED：OFF/OFF 本身也有输出 token 分歧，ON/OFF 不能据此判等。原始收据在 `evidence/T124m-tp8-0928/`。
+
+### 零触发观测：只统计，不调整门槛
+
+`State.plan()` 仍在既有 rank0 决策广播内执行。新增 `[ax-124m-plan]`，每 30 s 有计划活动时一行；真正 flush 额外结清未满 30 s 的窗口并递增 epoch。没有新增 collective、GPU 同步、缓存匹配或策略调用，默认关闭仍不创建 State。日志的计划次数不是 scheduler 总轮数：早于 plan 的 batch/空队列等返回不计入；服务停止前不足 30 s 且未 flush 的尾段可能没有摘要。
+
+- `outcomes` 按计划计数：no_owner、already_parked、owner_finished、owner_unsupported、batch_full、slot_room、running_limit、selected、none。
+- `candidates_scanned` 与 `rejections` 按候选检查次数计数，同一 B 等待多轮会重复计数。首个实际拒绝分支为 b_held、b_hostload、b_unsupported、kv_room、missing_receive_time、b_too_small、owner_tail、b_warm、owner_rescuable、b_late、age_limit。none 表示该计划未找到候选，不与候选拒绝数相加。
+- 每个原因每窗口至多保留一个完整 RID 样本；能实际走到成本判断才记录 slack/age/remaining/handoff。特别不为 held/hostload/KV 拒绝者额外调用 deadline_cold，以免提前冻结类别、把“加日志”变成策略变化。按本数据 RID 长度通常每行数 KiB，不记录正文或逐 token 内容。
+- begin/finish 原有 decline/rollback 是后续事务失败；与 plan 预检拒绝分开。没有 rollback 不能推出 KV 没挡住机会，需看 kv_room/batch_full 等上游计数。
+
+历史 35k 反事实来自 ezn9/S1，而非 eznb/FINAL：同 ID 在 S1 TTFT 36.0 s，在 FINAL 2.49 s、ezne 6.01 s、eznf 2.70 s。其占道者 150249 token、命中14848、TTFT20.30 s，按冷代理使用30 s预算，并非仅因超过 turn 的15 s门就会被124判死。CPU保守重建在 B 到达时给 A 全部150249 token尚未算，余量仍大于9 s，因此成本门返回 owner_rescuable；历史真实 held/KV/首见类别快照未保存，不能补称逐块实测。新计数用于区分实际负载的各类拒绝，不针对该 ID 调门槛。
