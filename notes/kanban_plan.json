@@ -451,7 +451,8 @@
     "job": "130eznb-tail_rot150_n30_chainmax16k_fix_40m",
     "ref": "130ezn9-tail_rot150_n30_S1_40m（同 ID）",
     "what": "**上传配置本身（用户要求本轮带上两项）**：chain-max 16k + 修后引擎 20a58da9，不钉池，+ SGLANG_AX_DEADLINE_MAX_WAIT_S=600 与 MAX_WAIT_WARM_S=120（无救冷请求 600 s 才饥饿提前，warm 显式 120，否则默认继承冷值；规则利用：门只数条数、超时 1200 s）+ IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD=4096（Codex 归因：ezn8 的 35k/56k 头与 ezm8 的 19k 头都被同 pack 巨头按 413 token 浅前缀 held 落到 tier3，所以巨头抢先；4096 保留深前缀家族）。N30、rot150，对 ezn9 同 ID 判组合的 chain；起跑 15 分钟健康即请用户确认上传。running/cuda-graph 48/48 与上传包一致（N30 不触及上限，只验证图捕获与显存）",
-    "status": "跑（01:38 UTC 起）；第 14 分钟健康（机制行 131_sync=rank0、冒烟 12/12、无错误）→ 据此上传 attempt 47043"
+    "status": "已闭合（1689 条排空，wall 2569 s）",
+    "verdict": "**chain 17→12 对 S1（同 1689 条）：开场 11→8、稳态 6→4；修好的包括 224k 头（等 33.0→4.8 s）、199k 头（等 18.7→3.9 s）、110k 头（等 26.8→1.9 s）；新坏 2 条稳态是只需算 1.2k/2.2k 的暖 reset（等 51/35 s，显存墙/持有）和 2 条 200k 头（等 59/35 s + 算 16/22 s）**；turn 13→11；harness p95 chain 30.3 s（S1 36.0），Codex 复算 chain 12/238、CP 允许 18 → 本地 N30 chain 门估计过。代价：overall 88→209、fast 110→248（fast p95 18 s）、TPOT>0.10 66→83、p95 98 ms 贴线。是 attempt 47043 的本地对照"
   },
   {
     "job": "130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m",
