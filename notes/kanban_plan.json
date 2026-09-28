@@ -552,6 +552,6 @@
     "job": "130eznp-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_moetune_kda_133tuned_40m",
     "ref": "130ezno（全候选，同 ID）",
     "what": "单变量：+ 133 decode 预算调参版（引擎 df0a06a0 = bf6b66fa + 1bdaf4a6；SPEND 1.0 / MARGIN 0.95 / MAX_ROUNDS 16，即 ezni 没读到结果的那组）。问题：调度旋钮能否再压 TPOT p95（ezno 94.6 ms）而不新增 chain 超时（开场 6、稳态 0）。任何新增 chain 超时即否决",
-    "status": "已发布（eznj 之后）"
+    "status": "已停、否决（14:25 UTC，第 19 分钟，无闭合 raw）。同 886 条 ID 对 ezno：chain 6→8（新坏 2：15k session_start 0.4→30.6 s、52k 链首 25.1→56.1 s），8 条尾巴全部慢 30–53 s（92k 36.5→64.2，195k 63.3→116.5）；turn 新坏 1；fast 修 14/新 24；overall 修 9/新 17。代价换来的 TPOT：均值 0.049、p95 0.098、超 0.10 占 3.4%（ezno 同期 7.7%）。读法：133 把每个 decoder 的 TPOT 余量都花在插 decode 轮上，开场的 prefill 通道被切碎，链首排队翻倍——与 chain 第一直接冲突，任何调参都改不了这个方向"
   }
 ]
