@@ -111,7 +111,7 @@ from sglang.srt.layers.quantization.fp8_utils import initialize_fp8_gemm_config
 from sglang.srt.layers.quantization.unquant import initialize_bf16_gemm_config
 from sglang.srt.lora.lora_drainer import LoRADrainer
 from sglang.srt.lora.lora_overlap_loader import LoRAOverlapLoader
-from sglang.srt.managers import ax_deadline, ax_prefix_producer
+from sglang.srt.managers import ax_deadline, ax_decode_budget, ax_prefix_producer
 from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.managers.disagg_service import maybe_create_ascend_config_store
 from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
@@ -1346,6 +1346,7 @@ class Scheduler(
             "131_sync": "rank0" if risk_cfg is not None else "off",
             "131_chunk": (str(risk_cfg.chunk) if risk_cfg.chunk else "auto") if risk_cfg is not None else "off",
             "132": "on" if deadline and deadline.chain_first else "off:SGLANG_AX_DEADLINE_CHAIN_FIRST_unset",
+            "133": "on" if self._ax_decode_budget_cfg() is not None else "off:SGLANG_AX_DECODE_BUDGET_unset",
             "140": "on" if dual else "off",
             "180": m180,
         }
@@ -1992,7 +1993,91 @@ class Scheduler(
                     return interval if risk is None else min(interval, risk)
 
                 interval = self._ax_rank0_decide(decide_interval)
+            if self._ax_decode_budget_cfg() is not None:
+                # 133: the fixed cadence (and 125's relief / 131's risk interval) is replaced by the
+                # decode rounds the protected decoders need before the next prefill batch, planned
+                # from their exact TPOT deadlines on rank 0's clock and broadcast (same as 131).
+                def decide_budget():
+                    return self._ax_decode_budget_plan(batch)
+
+                rounds, spent = self._ax_rank0_decide(decide_budget)
+                if spent:
+                    spent = set(spent)
+                    for req in self.running_batch.reqs:
+                        if req.rid in spent and not getattr(req, "_ax_tpot_spent", False):
+                            req._ax_tpot_spent = True
+                            self._ax_decode_budget_state["spent"] += 1
+                interval = rounds
             self._prefill_decode_interval_remaining = interval
+
+    def _ax_decode_budget_cfg(self):
+        """[ax] 133: read once. Exclusive with 122 (both decide when prefill may run against decoders)."""
+        cfg = getattr(self, "_ax_decode_budget_cfg_v", False)
+        if cfg is False:
+            cfg = ax_decode_budget.decode_budget_config()
+            if cfg is not None and self._ax_pace() is not None:
+                raise ValueError("[ax] 133 replaces 122's paced budget; unset SGLANG_AX_PACE_TPOT")
+            self._ax_decode_budget_cfg_v = cfg
+            self._ax_decode_budget_state = dict(started=0, spent=0, plans=0, prefill_now=0,
+                                                rounds_sum=0, log_t=0.0)
+        return cfg
+
+    def _ax_decode_budget_stamp(self, batch: ScheduleBatch) -> None:
+        """[ax] 133: remember when each request produced its first output token (rank-local clock;
+        only rank 0's values enter decisions). Runs on every rank after every decode/extend result."""
+        if self._ax_decode_budget_cfg() is None:
+            return
+        now = time.monotonic()
+        st = self._ax_decode_budget_state
+        for req in batch.reqs:
+            if req.output_ids and getattr(req, "_ax_first_out_t", None) is None:
+                req._ax_first_out_t = now
+                st["started"] += 1
+
+    def _ax_decode_budget_plan(self, batch: ScheduleBatch):
+        """[ax] 133 (rank 0 only): decode rounds to arm and the decoders given up for a waiting chain start."""
+        cfg = self._ax_decode_budget_cfg()
+        st = self._ax_decode_budget_state
+        now = time.monotonic()
+        decoders = []
+        for req in self.running_batch.reqs:
+            if req.finished():
+                continue
+            n = getattr(req.sampling_params, "max_new_tokens", None) or 0
+            t0 = getattr(req, "_ax_first_out_t", None)
+            if n <= 1 or t0 is None or not req.output_ids:
+                continue
+            decoders.append(ax_decode_budget.Decoder(req.rid, t0, len(req.output_ids), n,
+                                                     bool(getattr(req, "_ax_tpot_spent", False))))
+        deadline = self._ax_admission_cfgs()[0]
+        chunk = getattr(batch, "_ax_chain_risk_chunk", None) or min(
+            self.chunked_prefill_size or self.max_prefill_tokens, self.max_prefill_tokens)
+        prefill_cost = (ax_deadline.service_s(chunk, chunk, deadline) if deadline is not None
+                        else cfg.prefill_s)
+        head_slack = None
+        if deadline is not None:
+            pnow = time.perf_counter()
+            for req in self.waiting_queue[:64]:
+                if not ax_deadline.deadline_cold(req, deadline):
+                    continue
+                ts = req.time_stats
+                start = getattr(ts, "scheduler_recv_time", 0.0) or getattr(ts, "wait_queue_entry_time", 0.0)
+                waited = max(0.0, pnow - start) if start else 0.0
+                s = ax_deadline.slack_s(req, ax_deadline.remaining_tokens(req), waited, chunk, deadline)
+                if s >= 0 and (head_slack is None or s < head_slack):
+                    head_slack = s
+        rounds, spent = ax_decode_budget.plan(decoders, now, prefill_cost, head_slack,
+                                              st["started"], st["spent"], cfg)
+        st["plans"] += 1
+        st["prefill_now"] += 1 if rounds == 0 else 0
+        st["rounds_sum"] += rounds
+        if now - st["log_t"] > 30.0:
+            st["log_t"] = now
+            logger.info("[ax-133] plans=%d prefill_now=%d rounds_sum=%d started=%d spent=%d decoders=%d "
+                        "head_slack=%s prefill_cost=%.2f", st["plans"], st["prefill_now"], st["rounds_sum"],
+                        st["started"], st["spent"], len(decoders),
+                        None if head_slack is None else round(head_slack, 1), prefill_cost)
+        return rounds, list(spent)
 
     def _ax_chain_risk_cfg(self):
         """[ax] 131: read once; refuses to start without 124, which supplies the budget and the cost model."""
@@ -5342,6 +5427,8 @@ class Scheduler(
             self.batch_result_processor.process_batch_result_prebuilt(batch)
         elif batch.forward_mode.is_idle():
             self.batch_result_processor.process_batch_result_idle(batch, result)
+        if batch.forward_mode.is_decode() or batch.forward_mode.is_extend():
+            self._ax_decode_budget_stamp(batch)  # [ax] 133
 
         self._record_step_counters(batch, result)
 
