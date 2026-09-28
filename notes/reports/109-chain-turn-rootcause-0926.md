@@ -1,5 +1,7 @@
 # 109 的 chain / turn 超时逐条归因（2026-09-26，Claude）
 
+**已更正（2026-09-27，见 [program-n30-v3.md](../program-n30-v3.md) A6 与 09-27 条目）：** 第 4/5 节提出的两个设计后来都实现并测过，结果与这里的估算不同，归因和坏例分类仍然有效，取采用哪个设计以后续结果为准。**D2 家族领头排序**按这里写的算法（哈希对比等待队列里所有冷请求、并查集分家族）先实现为 `claude/128-family` 分支，独立审查发现它用的家族划分和引擎运行时实际看到的不一致（估算方法本身有误），撤回未合并；正确设计是 Codex 的"共享前缀生产者"（128p，`SGLANG_AX_PREFIX_PRODUCER`，commit `c0fcd486`，TP8 实测把同类家族兄弟的等待从 40–60 s 降到 4–19 s）。**D1-lite**（按等待中 warm 短命中需求缩小冷块）后来实现为 126（`SGLANG_AX_SCHED_COLD_CAP_MAX`），标准对照与家族机制搭配测试后未见可测的 chain 净收益，未采用。
+
 数据：v3 N26 开场探针 103（底座，相当于 46364 配置）、104（+124）、105（+124+125）、109（+124+激进 125），`evidence/L1xx-…/opening/` 下的 `chain.csv`、`paired.csv`（同 ID 配对）、`source/server.log`（TP0 逐批日志）。分桶按 harness：链首或 context_reset 为 chain，其余 phase=turn_start 为 turn，其余为 intra；用 109 全量 453 条核对，与自动报告一致（chain 61 条超 9、turn 21 条超 3）。四次运行共同 436 条 ID。时间轴工具 `scripts/analysis/lane_timeline.py`（新增）。以下"实测"来自这些记录，"推断"另标。
 
 ## 1. chain：109 剩下的 9 条是两类

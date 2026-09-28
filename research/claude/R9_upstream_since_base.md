@@ -1,369 +1,94 @@
-# R9 — Upstream scan since our serving base (SGLang + vLLM, 2026-09-01 → 2026-09-23)
+# R9 — 上游实现与替代引擎：A100 路线筛选
 
-> 这是 09-23 的上游快照，不是当前任务优先级。#38522 已移植为候选补丁 170；A100/SM80 的 110/111 与当前 S0 已解决基础启动问题。下表的 HIGH/MED 表示当时的移植兴趣，不代表已经验证过本负载收益。当前实验结果看根目录 [README](../../README.md)、[补丁索引](../../engine/README.md)和 R19–R21。
+2026-09-24，Codex 覆盖更新。接续 09-23 的上游扫描和 Claude 的源码核验，替换旧的关键词排名表。当前研究范围包含换引擎；“属于另一个代码库”不再是降级理由。历史内容留在 git，原始实验仍在 evidence。
 
-Scope note (VERIFIED): our stated base hash `fe236ea6c3` is **not itself an ancestor of `sgl-project/sglang` main**. It resolves (via GitHub API) to author date 2026-09-01T07:15Z, commit message `fix(modelopt_fp4): skip NVFP4 swiglu-fusion interleave for shared experts with swiglu_limit`, which is the same fix that landed on main as **`32a1d554` / PR #37378** ("fix(modelopt_fp4): ... swiglu_limit", merged 2026-09-05). I used `32a1d554` as the practical diff boundary on main (`git log 32a1d554..origin/main`): **916 commits** total since base, of which **204** touch the path list in the task (GLM-5.3-Flash/Glm5Next, DSA/indexer/kpool, KDA/FLA, unified/mamba mem_cache, scheduler, fp8/marlin quant, speculative/nextn).
+## 1. 先复用什么
 
-Also VERIFIED, and important context: **neither SGLang nor vLLM main had GLM-5.3-Flash support at our 2026-09-01 base.** SGLang's first upstream GLM-5.3-Flash commit is `97c69783` / **PR #36507**, merged 2026-09-06 (5 days after base). vLLM's is `98ed0856` / **PR #53906**, merged 2026-09-04. Whatever GLM-5.3-Flash implementation we're serving from `fe236ea6c3` must be a pre-upstream/custom port — so PR #36507's diff is effectively "the canonical upstream Glm5Next" and is worth a direct structural diff against our own `glm5_next.py`/`configs/glm5_next.py`, independent of anything ranked below.
-
-Clone method: `git clone --filter=blob:none --shallow-since=2026-08-30` for both repos (network via the workspace proxy). Open-PR data via unauthenticated GitHub REST search (`/search/issues`), so results are capped at 100/query and rate-limited; I ran 5 targeted queries and cross-checked totals but did not exhaustively page every one.
-
----
-
-## Backport candidates (ranked, max 15)
-
-Conflict-area codes: **101/105/120** = scheduler/schedule_policy patches, **140** = fla/kda + unified radix cache, **110–113** = dsa indexer, **111** = fp8 moe marlin, **130** = tokenizer_manager, **150** = warmup, **160** = nextn/MTP.
-
-| # | Item | What | Why it matters for 8×A100 GLM-5.3-Flash | Effort | Conflicts |
-|---|---|---|---|---|---|
-| 1 | SGLang **open PR #35429** — "feat(dsa): add SM80 Torch fallbacks and Triton paged-MQA indexer" | VERIFIED (PR body). Adds a correctness-first Torch fallback for paged-MQA indexer logits and sparse-MLA attention on SM80, plus an optimized native Triton paged-MQA indexer, because "the current CUDA DSA path cannot run end-to-end on NVIDIA A100/SM80" (DeepGEMM-only indexer, FA3 asymmetric QK=576/V=512 head dims unsupported on SM80). 2529+/26- across 14 files. | This is upstream explicitly diagnosing **our exact hardware gap** in the DSA indexer/attention path. If our current A100 serving relies on a custom patch to route around this, this PR is the reference fix to diff against (or to backport wholesale if we're still on a slower/incomplete workaround). | High (new codepath; must reconcile with our own dsa_backend patches) | 110–113 |
-| 2 | SGLang **open draft PR #39422** — "[GLM-5.3 Flash] Serving optimizations: KDA/mHC fusion, DSA draft metadata graphs, prefill autotuning" | VERIFIED (PR body, per-commit table). Ten-optimization series from a real benchmark campaign; single largest lever is "Capture pooled DSA draft metadata; enable qualified graphs by default" at **+9.97% geomean throughput**, architecture-neutral (not GB300-specific). Also: register-spill reduction in dense KDA verify (+1.73%), reuse CPU token counts for KDA prefill to skip a sync (+0.63%), autotune GLM FP8 experts on first large target prefill (+1.28%). | Directly the kind of "cold prefill / sync stall" mechanism work the project's strategy memo calls for. The DSA draft-metadata-graph capture item is the best single ROI in this whole scan. | Medium (draft PR, some deferred sub-items depend on other open PRs) | 110–113, 160 |
-| 3 | SGLang merged `e332e1b8` / **PR #39524** (final of a revert saga: `2fd835b9`/#39219 → reverted by `66c7bc83`/#39405 → reapplied as #39524) | VERIFIED via `git show`. "Don't write conv state from the fused KDA verify kernel" — a correctness bug in the fused MTP-verify KDA kernel's conv-state write. | We run NEXTN MTP + KDA; this is exactly the verify-path kernel we depend on. Small diff (~34 lines), high confidence bug fix. | Small | 140, 160 |
-| 4 | SGLang merged `13469c16` / **PR #34820** — "Store mamba prefix-cache checkpoints at the configured SSM state dtype" | VERIFIED via `git show`. Touches `kda_ptx.py`, `kda_triton.py`, `kda_helion.py`, `kda_nvidia.py`, `mamba2_metadata.py`; makes KDA/mamba prefix-cache checkpoints respect a configured state dtype instead of a hardcoded one. | This overlaps directly with the project's own "fp32 dual KDA checkpoints" hypothesis (per `mechanisms-not-tuning` memory). Diff against whatever we've already built here before reinventing it — either we validate our approach or adopt theirs. | Medium | 140 |
-| 5 | SGLang **open PR #38859** — "fix: support FP8 E4M3 inference on SM80" | VERIFIED (PR body). Triton doesn't expose `fp8e4nv` on SM80/SM86; adds shared raw-byte OCP E4M3FN decode + SM80 dtype dispatch, fixes Triton FP8 MoE kernel pointer reinterpretation and TMA-descriptor gating for SM80. 246+/52- across 6 files. | Our MoE is FP8 block-quant (288 experts) on A100 (SM80) — this is precisely the dtype-support gap this PR targets, even though its trigger report was Qwen3.8. | Medium | 111 |
-| 6 | SGLang merged `65ef55e2` / **PR #40024** — "[Scheduler] Add shortest-prefill-first scheduling" | VERIFIED via `git show`. Small, self-contained (`schedule_policy.py` +75, `scheduler.py` +6). | This is the literal mechanism the project's strategy memo hypothesized ("scheduler changes so cold prefills stop monopolising the GPU"). Upstream already built and merged it — compare/merge with our own scheduler patches 101/105/120 rather than re-deriving. | Small, but reconciliation work is real | 101/105/120 (direct) |
-| 7 | SGLang merged `4df5df91` / **PR #32911** — "[Scheduler] Add HRRN schedule policy to significantly reduce TTFT" | VERIFIED via `git show`. Adds Highest-Response-Ratio-Next as an alternative to FCFS/LPM in `schedule_policy.py`/`scheduler.py`/`schedule_batch.py`. | Complementary lever to #6 for the same bottleneck (TTFT under mixed prefill/decode load). Needs to be reconciled against our own scheduler patches, not just layered on top. | Small–medium | 101/105/120 (direct, high conflict) |
-| 8 | SGLang merged `aebae58b` / **PR #39920** — "[Moe] Fix flashinfer_trtllm silently dropping swiglu_limit clamped SwiGLU activation" | VERIFIED via `git show`. 7-line fix in `fp8.py`. | GLM-5 family uses `swiglu_limit`-clamped SwiGLU (the same family of bug our own base commit `fe236ea6c3` was itself fixing, just in the modelopt_fp4 path instead of flashinfer_trtllm). If we ever route through `flashinfer_trtllm` MoE, this is a silent-correctness bug, not just perf. | Trivial | 111 |
-| 9 | SGLang merged `c8eb54c4`/#39688 + `9f21fbc3`/#39695 + `a66451c0`/#38845 — GLM-5.3-Flash KDA-projection/prefill-metadata fusion, KPool planning-sync reduction, KPool metadata fusion | VERIFIED via `git show` (all three touch `glm5_next.py`, `dsa_indexer_kpool.py`, `dsa_backend.py`, `schedule_batch.py`, `forward_batch_info.py`; ~1000+ combined added lines). | These are upstream's own from-scratch optimization of exactly our model's hot path (KDA + DSA kpool). Whether or not we already built equivalents, a structural diff against our `glm5_next.py`/`dsa_backend.py` is needed to know if we're ahead, behind, or diverged. | High (large diffs, must merge concept not just patch) | 140, 110–113 |
-| 10 | vLLM **open PR #56960** — "[Feat][Model] Enable KDA prefill checkpoints for GLM-5.3-Flash" | VERIFIED via API: **still open, not merged**, updated 2026-09-22 (same day as this scan), 307+/11- across 6 files, 2 commits, non-draft. We already used its idea per project history. | Confirms it's still actively developed upstream — worth re-diffing our adaptation against its latest revision, and checking its stated follow-up **open PR #57329** ("[Feat][Mamba2] Enable internal prefill checkpoints"). | Medium (cross-project port — algorithm portable, code is not) | 140 |
-| 11 | vLLM merged `b443c1cc`/#55737 + `238cb2b1`/#55738 — "Use FlashKDA for KDA chunked prefill (1.7-3.8x faster than Triton chunk path)" + "Dense/masked-MHA sparse prefill for NoPE (256,0,256) layout, skip NoPE K concat" | VERIFIED via commit titles + vLLM open-PR cross-refs. Perf-focused rewrite of GLM-5.3-Flash's KDA chunked-prefill and NoPE sparse-prefill hot path. | Large stated speedup (1.7–3.8x) on exactly our prefill hot path. FlashKDA itself needs an SM80-compatibility check before any port; the NoPE dense/masked-MHA restructuring is more directly transferable as a technique. | High (different kernel library; needs SM80 validation) | 140 |
-| 12 | vLLM merged `1768273c` / **#55736** — "[Perf][GLM-5.3-Flash] Decode hot-path cleanups: strided KDA recurrent inputs, NoPE MQA query without concat, no duplicate router GEMM" | VERIFIED via commit title. Multiple independent small decode-path perf fixes. | "No duplicate router GEMM" and "no concat" style fixes are classic redundant-compute bugs likely present in any independently-derived GLM-5.3-Flash port, including possibly ours. | Medium | 140, 110–113 |
-| 13 | vLLM **open PR #47629** (rebase/takeover of #38476) — "TRITON_MLA_SPARSE backend for SM80/SM121 sparse MLA" | VERIFIED (PR body). A full Triton-based sparse-MLA attention backend specifically so DSA models (DeepSeek-V3.2, GLM-5.x) run on SM80/A100 without DeepGEMM/FlashMLA-Sparse. 1808+/9- across 12 files. Multiple independent community forks exist for the same gap (open PR **#56120** "[DS-V4][SM80] portable Triton fallbacks", draft; open PR **#52534**, a Chinese-language from-scratch A100/GLM-5.2 fork, 7489+/31- across 47 files). | Cross-project confirmation that SM80 sparse-MLA/indexer support is a known, still-unsolved-upstream gap with **3 independent implementations in flight** (vLLM #47629/#38476, vLLM #56120, SGLang #35429). Worth comparing all three designs against our own before committing further engineering here — someone may have already solved the exact problem we're solving. | Research/reference only | 110–113 |
-| 14 | SGLang merged `7b67a966` / **PR #39095** — "[DSV4] Chunk the indexer MQA logits by query rows under a free-memory budget" | VERIFIED via `git show`. Adds `mqa_logits_utils.py`, changes `dsa_indexer.py`, `dsv4/indexer.py`, `dsv4/metadata.py` (720+/128- across 6 files). | Reduces indexer-side OOM risk by chunking MQA logits computation — same shared indexer code path GLM-5.3-Flash's DSA uses. Directly relevant if kpool/indexer OOM has been an issue for us on A100's smaller HBM vs. H100/GB300. | Medium | 110–113 |
-| 15 | SGLang merged `a8a4d86b`/#40313 + `d34f7b23`/#40780 — "Remove swa and mamba radix cache" / "Clean up SWA/Mamba radix cache leftovers and drop `SGLANG_ENABLE_UNIFIED_RADIX_TREE`" | VERIFIED via `git show` (deletes `swa_radix_cache.py` outright, 1462 lines; second commit removes the last references to the `SGLANG_ENABLE_UNIFIED_RADIX_TREE` env flag and the old non-unified cache tests). | **Not a backport — a compatibility trap.** If our patch 140 (fla/kda + unified radix cache) still branches on `SGLANG_ENABLE_UNIFIED_RADIX_TREE` or touches `swa_radix_cache.py`, future rebases onto main past `d34f7b23` will silently break or bit-rot that code path. Audit before next rebase. | Small (audit) | 140 (direct) |
-
-**Honorable mentions not in the top 15** (open, smaller scope, worth a look during the DSA/KDA work): SGLang #37535 "Reduce KDA prefill OOM risk with opt-in workspace limits" (open); SGLang #38994 "[Fix][KDA] Rebuild accepted-state lists during CUDA graph capture" (open — matters for MTP+CUDA-graph correctness); SGLang #37625 "Fix incorrect sparse-attention top-k selection when candidate bins overflow" (open, DSA indexer correctness); SGLang #40449/#39431 "drop the hardcoded topk==2048 assert" (open, only matters if we deviate from default DSA top-k width).
-
----
-
-## 1. SGLang main since base (`32a1d554` → `origin/main`, 916 commits total; 204 touch the given path list)
-
-Relevance was auto-tagged by keyword against the given path/topic list, then spot-verified for the ~19 commits marked `VERIFIED` above via `git show`. Everything else is `INFERRED` from commit subject + touched-path pattern, not from reading the diff. AMD/ROCm/NPU/XPU/HIP/MUSA/gfx9x-only commits are tagged low relevance even when their titles say "GLM-5.3-Flash" — they modify AMD/NPU-specific code paths only and are not directly portable to our CUDA/A100 stack, though a few (marked HIGH because "GLM" won the keyword race) may still be worth reading for algorithmic ideas — see the note under the table.
-
-<details>
-<summary>Full 204-row table (click to expand)</summary>
-
-| Hash | Date | PR | Title | Relevance | Basis |
-|---|---|---|---|---|---|
-| `4b44a1cd` | 2026-09-05 | [#37795](https://github.com/sgl-project/sglang/pull/37795) | [Refactor] Let eviction policies take construction parameters | LOW (infra/refactor, indirect) | INFERRED |
-| `514b45fd` | 2026-09-06 | [#30315](https://github.com/sgl-project/sglang/pull/30315) | [AMD][DSV4] Fix unified-KV pool sizing and SWA ring accounting | LOW (non-CUDA HW path; skip) | INFERRED |
-| `f5819b09` | 2026-09-05 | [#38163](https://github.com/sgl-project/sglang/pull/38163) | Revert "[AMD][DSV4] Fix unified-KV pool sizing and SWA ring accounting" | LOW (non-CUDA HW path; skip) | INFERRED |
-| `97c69783` | 2026-09-06 | [#36507](https://github.com/sgl-project/sglang/pull/36507) | GLM-5.3-Flash support (initial upstream port — see scope note above) | HIGH (foundational; diff our model file against this) | VERIFIED |
-| `2e8c03e2` | 2026-09-07 | [#34142](https://github.com/sgl-project/sglang/pull/34142) | Fix inflated row pitch when a CP round-robin shard has a single row | LOW (infra/refactor, indirect) | INFERRED |
-| `15aa2fb8` | 2026-09-07 | [#37124](https://github.com/sgl-project/sglang/pull/37124) | [ROCm] Take the fused DSA metadata kernels and drop redundant work from the absorb path | LOW (non-CUDA HW path) | INFERRED |
-| `30d0eb2c` | 2026-09-07 | [#35629](https://github.com/sgl-project/sglang/pull/35629) | [NPU] Adapt DFlash2 speculative decoding to Ascend NPUs | LOW (non-CUDA HW path; skip) | INFERRED |
-| `c4e52a10` | 2026-09-07 | [#24959](https://github.com/sgl-project/sglang/pull/24959) | XPU: Enable GLM5.1 (GlmMoeDsaForCausalLM) DSA Attention | LOW (non-CUDA HW path) | INFERRED |
-| `f2584891` | 2026-09-07 | [#38138](https://github.com/sgl-project/sglang/pull/38138) | fix: preserve SWA host lock on node split | MED (mem_cache/unified cache churn) | INFERRED |
-| `6e312af8` | 2026-09-07 | [#38204](https://github.com/sgl-project/sglang/pull/38204) | fix: collect prefix hash values iteratively | LOW (infra/refactor, indirect) | INFERRED |
-| `b99175dc` | 2026-09-06 | [#38049](https://github.com/sgl-project/sglang/pull/38049) | [Config] Round 6.4: the runtime reads the bags, not the record | LOW (infra/refactor, indirect) | INFERRED |
-| `aaf9a957` | 2026-09-06 | [#38113](https://github.com/sgl-project/sglang/pull/38113) | [Config] Round 6.5: a namespace declares what it derives, next to what it derives it from | LOW (infra/refactor, indirect) | INFERRED |
-| `b6c31b15` | 2026-09-06 | [#36228](https://github.com/sgl-project/sglang/pull/36228) | [CP V1 Deprecation 3/5] Remove generic prefill CP v1 runtime | LOW (infra/refactor, indirect) | INFERRED |
-| `644841c5` | 2026-09-07 | [#37691](https://github.com/sgl-project/sglang/pull/37691) | [AMD] Support aiter fa mha chunked kv for Kimi-K3 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `a8edafff` | 2026-09-07 | [#38227](https://github.com/sgl-project/sglang/pull/38227) | [AMD][gfx95] DSV4 wo_b (dp-attention): route to tuned bpreshuffle GEMM instead of triton | LOW (non-CUDA HW path; skip) | INFERRED |
-| `b5766336` | 2026-09-07 | [#37926](https://github.com/sgl-project/sglang/pull/37926) | [Perf] Unified memory: close the DCP decode gap on Blackwell | MED (mem_cache/unified cache churn) | INFERRED |
-| `861d40f3` | 2026-09-07 | [#34919](https://github.com/sgl-project/sglang/pull/34919) | Fix DSpark CUDA graph replay with MegaMoE TP attention | MED (fp8/moe/marlin quant path) | INFERRED |
-| `62a4a6ea` | 2026-09-07 | [#37373](https://github.com/sgl-project/sglang/pull/37373) | [NPU] Add NPU arch35 support and enhance DSV4 processing in DeepSeek-V4 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `8392c36b` | 2026-09-07 | [#37165](https://github.com/sgl-project/sglang/pull/37165) | [Bugfix][Mamba] Clear deferred init metadata before speculative decode | MED (mem_cache/unified cache churn) | INFERRED |
-| `6287ebf4` | 2026-09-08 | [#38318](https://github.com/sgl-project/sglang/pull/38318) | [AMD] Fix EAGLE crash when no kv_index_translator is bound on the DSA fp8 read door | LOW (non-CUDA HW path) | INFERRED |
-| `570087ce` | 2026-09-08 | [#38192](https://github.com/sgl-project/sglang/pull/38192) | [AMD][DSV4] Reland unified-KV pool sizing and SWA ring accounting, fully gated | LOW (non-CUDA HW path; skip) | INFERRED |
-| `e9e9e37d` | 2026-09-08 | [#32759](https://github.com/sgl-project/sglang/pull/32759) | [AMD] Restore SWA reprefill-tail on UnifiedRadixCache when HiCache is off | LOW (non-CUDA HW path; skip) | INFERRED |
-| `85d39401` | 2026-09-07 | [#38293](https://github.com/sgl-project/sglang/pull/38293) | [CP V1 Deprecation 3.5/5] Deprecate HIP/NPU/MUSA prefill CP and remove legacy implementation | LOW (non-CUDA HW path; skip) | INFERRED |
-| `792543f9` | 2026-09-08 | [#37143](https://github.com/sgl-project/sglang/pull/37143) | [Scheduler] Make request-timeout aborts rank-consistent to fix TP collective hangs | HIGH (scheduler policy) | INFERRED |
-| `e31e5319` | 2026-09-08 | [#37562](https://github.com/sgl-project/sglang/pull/37562) | HiCache: Reduce the number of `all_reduce` in `check_hicache_events` for PP | MED (mem_cache/unified cache churn) | INFERRED |
-| `86569015` | 2026-09-08 | [#37093](https://github.com/sgl-project/sglang/pull/37093) | [Fix][DSA] Bound prefill Triton specializations for page-table stride | HIGH (KDA/DSA core path) | INFERRED |
-| `b23d8350` | 2026-09-07 | [#38389](https://github.com/sgl-project/sglang/pull/38389) | [Scheduler] Unify per-iteration request intake into ingest_requests() | HIGH (scheduler policy) | INFERRED |
-| `28ebede8` | 2026-09-07 | [#38159](https://github.com/sgl-project/sglang/pull/38159) | [mem_cache] Free hybrid SWA pages by one representative per page on `page_size > 1` | MED (mem_cache/unified cache churn) | INFERRED |
-| `dfd9b5c2` | 2026-09-08 | [#32495](https://github.com/sgl-project/sglang/pull/32495) | [NPU] Enable non-greedy MTP sampling | LOW (non-CUDA HW path; skip) | INFERRED |
-| `92371e98` | 2026-09-08 | [#38094](https://github.com/sgl-project/sglang/pull/38094) | PD disaggregation, isolated transfer, prefill OOM fixed. | LOW (infra/refactor, indirect) | INFERRED |
-| `f8f03910` | 2026-09-08 | [#32207](https://github.com/sgl-project/sglang/pull/32207) | 【NPU】Support EAGLE when PP enabled in prefill nodes | MED (speculative/MTP infra) | INFERRED |
-| `4df5df91` | 2026-09-08 | [#32911](https://github.com/sgl-project/sglang/pull/32911) | [Scheduler] Add HRRN schedule policy to significantly reduce TTFT | HIGH (scheduler policy) | VERIFIED |
-| `52fecfdf` | 2026-09-08 | [#37500](https://github.com/sgl-project/sglang/pull/37500) | support qwen 3.8 flash next | LOW (infra/refactor, indirect) | INFERRED |
-| `559c7fa7` | 2026-09-08 | [#38572](https://github.com/sgl-project/sglang/pull/38572) | Revert "PD disaggregation, isolated transfer, prefill OOM fixed." | LOW (infra/refactor, indirect) | INFERRED |
-| `ed183d45` | 2026-09-08 | [#36229](https://github.com/sgl-project/sglang/pull/36229) | [CP V1 Deprecation 4/5] Canonicalize prefill CP API names | LOW (infra/refactor, indirect) | INFERRED |
-| `78da6251` | 2026-09-09 | [#38462](https://github.com/sgl-project/sglang/pull/38462) | [mem_cache] skip duplicates host evict via environ | MED (mem_cache/unified cache churn) | INFERRED |
-| `13469c16` | 2026-09-09 | [#34820](https://github.com/sgl-project/sglang/pull/34820) | Store mamba prefix-cache checkpoints at the configured SSM state dtype | MED (mem_cache/unified cache churn) | VERIFIED |
-| `6c1d0b1b` | 2026-09-09 | [#38041](https://github.com/sgl-project/sglang/pull/38041) | Revert "[Spec] Publish the final multi-layer EAGLE shared-read event" | MED (speculative/MTP infra) | INFERRED |
-| `bede776c` | 2026-09-10 | [#36713](https://github.com/sgl-project/sglang/pull/36713) | fix(unified-memory): evict Full KV for Mamba byte shortfalls | MED (mem_cache/unified cache churn) | INFERRED |
-| `96d91ef9` | 2026-09-10 | [#38621](https://github.com/sgl-project/sglang/pull/38621) | [Model] Support GLM-5.3 Flash NVFP4 loading | LOW (Blackwell-only quant format, skip on A100) | VERIFIED |
-| `a84ffd13` | 2026-09-10 | [#36899](https://github.com/sgl-project/sglang/pull/36899) | feat: add optimized Domino rollout to DFlash V2 | MED (speculative/MTP infra) | INFERRED |
-| `beaf3d92` | 2026-09-09 | [#36848](https://github.com/sgl-project/sglang/pull/36848) | [HiCache] Replace skip_lock_node_ids with a segment lock protocol | MED (mem_cache/unified cache churn) | INFERRED |
-| `00840301` | 2026-09-09 | [#38522](https://github.com/sgl-project/sglang/pull/38522) | Add Opt-In for GLM-5.3 Flash breakable prefill CUDA graphs | HIGH (GLM-5.3-Flash core mechanism) | INFERRED |
-| `880d6fa6` | 2026-09-09 | [#30805](https://github.com/sgl-project/sglang/pull/30805) | [DSv4] Integrate TRT-LLM DSv4 Attention for SM100/103 | LOW (Hopper/Blackwell-only, skip) | INFERRED |
-| `3ff226ba` | 2026-09-10 | [#38250](https://github.com/sgl-project/sglang/pull/38250) | [NPU]Support GLM5.2 and FP8 DSA&Indexer kvcache for 950 | LOW (non-CUDA HW path) | INFERRED |
-| `fd596a47` | 2026-09-10 | [#35051](https://github.com/sgl-project/sglang/pull/35051) | [XPU][Fix] Pack device-pointer tables as uint64 to avoid 64-bit address overflow | LOW (non-CUDA HW path; skip) | INFERRED |
-| `03e4c065` | 2026-09-10 | [#33922](https://github.com/sgl-project/sglang/pull/33922) | Fix Qwen3.5 GDN multi-item scoring | LOW (infra/refactor, indirect) | INFERRED |
-| `c0b790cf` | 2026-09-10 | [#32114](https://github.com/sgl-project/sglang/pull/32114) | Delete cutlass_mla, non-Marlin GPTQ, AWQ AOT kernel, and Dual Chunk Flash Attention | LOW (we use FP8 block-quant, not GPTQ/AWQ; verified no overlap with our Marlin FP8 MoE path) | VERIFIED |
-| `1b77f498` | 2026-09-10 | [#31470](https://github.com/sgl-project/sglang/pull/31470) | [NVIDIA] Support flashinfer Mega Moe | MED (fp8/moe/marlin quant path) | INFERRED |
-| `8a6ab89b` | 2026-09-10 | [#30575](https://github.com/sgl-project/sglang/pull/30575) | [AMD] Enable Fast Triton Sparse MLA backend | LOW (non-CUDA HW path — but note the Triton sparse-MLA technique itself may be portable, cf. vLLM #47629) | INFERRED |
-| `908226fe` | 2026-09-10 | [#37306](https://github.com/sgl-project/sglang/pull/37306) | [Rust TreeCore] Support external cache linker | LOW (infra/refactor, indirect) | INFERRED |
-| `cc7e43ad` | 2026-09-10 | [#38481](https://github.com/sgl-project/sglang/pull/38481) | [HiCache] Account for newly pinned ancestors in load-back quota | MED (mem_cache/unified cache churn) | INFERRED |
-| `fd7743e0` | 2026-09-10 | [#36631](https://github.com/sgl-project/sglang/pull/36631) | [Sampling] Support sampling masks with overlap scheduling | LOW (infra/refactor, indirect) | INFERRED |
-| `bb15be6d` | 2026-09-10 | [#38169](https://github.com/sgl-project/sglang/pull/38169) | [Spec] Stage Inkling MTP draft metadata before verify | MED (speculative/MTP infra) | INFERRED |
-| `42bbaac2` | 2026-09-10 | [#38566](https://github.com/sgl-project/sglang/pull/38566) | [metrics] Report logical prefill token counts | LOW (infra/refactor, indirect) | INFERRED |
-| `203d7e81` | 2026-09-10 | [#38596](https://github.com/sgl-project/sglang/pull/38596) | Fix KV-canary workspace accounting after graph capture | LOW (infra/refactor, indirect) | INFERRED |
-| `fae8cd84` | 2026-09-10 | [#35599](https://github.com/sgl-project/sglang/pull/35599) | Support NemotronH_Omni_Reasoning_V3 in SGLang | LOW (infra/refactor, indirect) | INFERRED |
-| `3716e496` | 2026-09-11 | [#30548](https://github.com/sgl-project/sglang/pull/30548) | Speculative Decoding support for intel_xpu attention backend on XPU target | LOW (non-CUDA HW path) | INFERRED |
-| `0fadad89` | 2026-09-11 | [#32798](https://github.com/sgl-project/sglang/pull/32798) | DFLASH support added for XPU | LOW (non-CUDA HW path) | INFERRED |
-| `40a84d6d` | 2026-09-11 | [#38356](https://github.com/sgl-project/sglang/pull/38356) | [kv-shard 1/4] Logical-page placement with UnifiedRadixCache | MED (mem_cache/unified cache churn) | INFERRED |
-| `2465ee39` | 2026-09-11 | [#38446](https://github.com/sgl-project/sglang/pull/38446) | [AMD] Fix DeepSeek block-FP8 loading on gfx94x | LOW (non-CUDA HW path; skip) | INFERRED |
-| `a713349f` | 2026-09-11 | [#38835](https://github.com/sgl-project/sglang/pull/38835) | [HiCache] fix: preserve SWA host lock boundaries across splits | MED (mem_cache/unified cache churn) | INFERRED |
-| `17fa5ad3` | 2026-09-11 | [#38993](https://github.com/sgl-project/sglang/pull/38993) | [Refactor] Generalize attention graph variants in the decode runner | LOW (infra/refactor, indirect) | INFERRED |
-| `822e73cc` | 2026-09-11 | [#38269](https://github.com/sgl-project/sglang/pull/38269) | [Unified Cache][AMD] Support DeepSeek-V4 unified KV in direct external linkers | LOW (non-CUDA HW path; skip) | INFERRED |
-| `833bce9d` | 2026-09-12 | [#34432](https://github.com/sgl-project/sglang/pull/34432) | [AMD][DCP 1/N] add dcp support for aiter backend | LOW (non-CUDA HW path; skip) | INFERRED |
-| `6671cfc7` | 2026-09-11 | [#34330](https://github.com/sgl-project/sglang/pull/34330) | [AMD] Fix weight checking for AITER-shuffled block FP8 weights | LOW (non-CUDA HW path; skip) | INFERRED |
-| `b805cc50` | 2026-09-12 | [#37818](https://github.com/sgl-project/sglang/pull/37818) | [Bugfix] Track DFlash Mamba state at checkpoint boundaries | MED (mem_cache/unified cache churn) | INFERRED |
-| `e91c9480` | 2026-09-12 | [#37069](https://github.com/sgl-project/sglang/pull/37069) | feat: support TP>1 Domino rollout for DFlash V2 | MED (speculative/MTP infra) | INFERRED |
-| `a984c783` | 2026-09-12 | [#37565](https://github.com/sgl-project/sglang/pull/37565) | [NPU] Support DFlash speculative decoding for MiMo-V2.5-Pro (mxfp4) | LOW (non-CUDA HW path; skip) | INFERRED |
-| `0a574034` | 2026-09-12 | [#36411](https://github.com/sgl-project/sglang/pull/36411) | [Perf] Optimize Qwen3-VL unique-image serving on H100 | LOW (infra/refactor, indirect) | INFERRED |
-| `6953dae0` | 2026-09-12 | [#38960](https://github.com/sgl-project/sglang/pull/38960) | [Qwen 3.8 Next] Remove unused tokenwise QSA implementation and tests | LOW (infra/refactor, indirect) | INFERRED |
-| `b9cb9649` | 2026-09-12 | [#38482](https://github.com/sgl-project/sglang/pull/38482) | [Unified Tree] Preserve aux LRU recency when splitting nodes | MED (mem_cache/unified cache churn) | INFERRED |
-| `0b415fa5` | 2026-09-12 | [#38577](https://github.com/sgl-project/sglang/pull/38577) | [HiCache][LoRA] Isolate storage pages by extra key | MED (mem_cache/unified cache churn) | INFERRED |
-| `bd45cd50` | 2026-09-12 | [#37584](https://github.com/sgl-project/sglang/pull/37584) | [Unified Tree] Port SWA Branching-Point Caching to the Rust TreeCore | MED (mem_cache/unified cache churn) | INFERRED |
-| `a66451c0` | 2026-09-12 | [#38845](https://github.com/sgl-project/sglang/pull/38845) | [GLM-5.3 Flash] Restore and enable KPool metadata fusion | HIGH (GLM-5.3-Flash core mechanism) | VERIFIED |
-| `206034e5` | 2026-09-12 | [#39180](https://github.com/sgl-project/sglang/pull/39180) | Keep graph-pool borrows on their allocation stream | LOW (infra/refactor, indirect) | INFERRED |
-| `34b29047` | 2026-09-12 | [#39038](https://github.com/sgl-project/sglang/pull/39038) | [Session] Work with PD and Fix empty continuations | LOW (infra/refactor, indirect) | INFERRED |
-| `d6fabb74` | 2026-09-13 | [#37564](https://github.com/sgl-project/sglang/pull/37564) | [AMD][Fix] Fix aiter bpreshuffle GEMM for output sizes it cannot dispatch for qwen3.5 mxfp-attn-fp8-v2 TP4 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `cebca698` | 2026-09-13 | [#39126](https://github.com/sgl-project/sglang/pull/39126) | [Qwen3.8] Enable NVIDIA NVFP4 on DGX Spark with file-backed PLE and PDL router fix | LOW (Blackwell-only quant format) | INFERRED |
-| `a7cf4a6f` | 2026-09-13 | [#37914](https://github.com/sgl-project/sglang/pull/37914) | [Unified Cache][7/N] Support MTP, EAGLE, and DSpark draft KV caches in the external linker | MED (mem_cache/unified cache churn) | INFERRED |
-| `7078e5ff` | 2026-09-13 | [#38486](https://github.com/sgl-project/sglang/pull/38486) | [HiCache] Publish a host store event for storage-prefetch refills | MED (mem_cache/unified cache churn) | INFERRED |
-| `7f1f8c70` | 2026-09-13 | [#35644](https://github.com/sgl-project/sglang/pull/35644) | [mem_cache][10/N] refactor: drop the redundant _component suffix in unified_cache/components | MED (mem_cache/unified cache churn) | INFERRED |
-| `ff228d11` | 2026-09-14 | [#38483](https://github.com/sgl-project/sglang/pull/38483) | [HiCache] Release buffer prefetch anchor locks during storage cleanup | MED (mem_cache/unified cache churn) | INFERRED |
-| `2ec4bbcb` | 2026-09-13 | [#37506](https://github.com/sgl-project/sglang/pull/37506) | [unified-memory] PD disaggregation for every unified pool shape | MED (mem_cache/unified cache churn) | INFERRED |
-| `ca8ecc6a` | 2026-09-14 | [#37382](https://github.com/sgl-project/sglang/pull/37382) | [NPU] Support DSV4 host memory cache management | LOW (non-CUDA HW path; skip) | INFERRED |
-| `bf9773e1` | 2026-09-14 | [#37425](https://github.com/sgl-project/sglang/pull/37425) | HiCache: Add @rank_consensus to various functions | MED (mem_cache/unified cache churn) | INFERRED |
-| `39e14744` | 2026-09-13 | [#39145](https://github.com/sgl-project/sglang/pull/39145) | [Session] Fix image append positions and parent metadata | LOW (infra/refactor, indirect) | INFERRED |
-| `60f6f034` | 2026-09-14 | [#39061](https://github.com/sgl-project/sglang/pull/39061) | Fix MUSA detection in compiled prefill path | LOW (non-CUDA HW path; skip) | INFERRED |
-| `2fd835b9` | 2026-09-14 | [#39219](https://github.com/sgl-project/sglang/pull/39219) | [Fix] Don't write conv state from the fused KDA verify kernel (reverted by #39405, reapplied as #39524) | HIGH (KDA/DSA core path) | VERIFIED |
-| `5200508b` | 2026-09-14 | [#32888](https://github.com/sgl-project/sglang/pull/32888) | [AMD][gfx95] Fill the chunked-prefill compute budget exactly | LOW (non-CUDA HW path; skip) | INFERRED |
-| `66c7bc83` | 2026-09-14 | [#39405](https://github.com/sgl-project/sglang/pull/39405) | [misc] Revert #38346, #33426, #39061 and #39219 | LOW (infra/refactor, indirect) | VERIFIED |
-| `5c2de3f3` | 2026-09-14 | [#39357](https://github.com/sgl-project/sglang/pull/39357) | [PD] Preserve the prefill rank during rebootstrap | LOW (infra/refactor, indirect) | INFERRED |
-| `dad8c074` | 2026-09-14 | [#39318](https://github.com/sgl-project/sglang/pull/39318) | Scope prefetch cache state to the request attempt | LOW (infra/refactor, indirect) | INFERRED |
-| `99060191` | 2026-09-14 | [#36821](https://github.com/sgl-project/sglang/pull/36821) | [KDA] Support ReplaySSM ring-write in the fused chain-verify kernel | HIGH (KDA/DSA core path) | INFERRED |
-| `3f871a24` | 2026-09-14 | [#37482](https://github.com/sgl-project/sglang/pull/37482) | feat(agent sessions): attribute stored KV cache blocks to sessions | LOW (infra/refactor, indirect) | INFERRED |
-| `ebd37705` | 2026-09-14 | [#39332](https://github.com/sgl-project/sglang/pull/39332) | [PD][LoRA] Gate decode admission on adapter slots | LOW (infra/refactor, indirect) | INFERRED |
-| `ddd46001` | 2026-09-15 | [#39516](https://github.com/sgl-project/sglang/pull/39516) | [Fix] HiCache startup ImportError on the pinned kernel wheel | MED (mem_cache/unified cache churn) | INFERRED |
-| `7f5dd192` | 2026-09-15 | [#39283](https://github.com/sgl-project/sglang/pull/39283) | [HiCache] Rework the buffer-mode storage prefetch pipeline and retry bookkeeping | MED (mem_cache/unified cache churn) | INFERRED |
-| `d58342de` | 2026-09-15 | [#39560](https://github.com/sgl-project/sglang/pull/39560) | [Fix] Release NCCL on scheduler exit and let the ASGI server own shutdown | LOW (shutdown path, not hot loop) | INFERRED |
-| `2929a399` | 2026-09-15 | [#36729](https://github.com/sgl-project/sglang/pull/36729) | Use a shared byte budget for unified hybrid-SWA memory | MED (mem_cache/unified cache churn) | INFERRED |
-| `b803cfa0` | 2026-09-15 | [#39329](https://github.com/sgl-project/sglang/pull/39329) | Add external multimodal processors to the Rust frontend | LOW (infra/refactor, indirect) | INFERRED |
-| `4e9e407d` | 2026-09-15 | [#39280](https://github.com/sgl-project/sglang/pull/39280) | [HiCache] Label radix-cache metrics per rank and split the "shrunk" prefetch reason | MED (mem_cache/unified cache churn) | INFERRED |
-| `7eedd57a` | 2026-09-16 | [#37134](https://github.com/sgl-project/sglang/pull/37134) | [ROCm] Fix EAGLE spec-decode verify silently sampling greedy on HIP | LOW (non-CUDA HW path; skip) | INFERRED |
-| `f11cd8ab` | 2026-09-16 | [#35605](https://github.com/sgl-project/sglang/pull/35605) | [XPU] Use torch scaled_mm for XPU block FP8 linear | LOW (non-CUDA HW path; skip) | INFERRED |
-| `4678536d` | 2026-09-16 | [#32618](https://github.com/sgl-project/sglang/pull/32618) | [CPU] Add fp8_per_tensor_scaled_mm_cpu kernel | LOW (non-CUDA HW path; skip) | INFERRED |
-| `3f8eb35e` | 2026-09-16 | [#38935](https://github.com/sgl-project/sglang/pull/38935) | [PD] Do not admit intake-rejected requests to a PD handoff | LOW (infra/refactor, indirect) | INFERRED |
-| `9c8d4641` | 2026-09-16 | [#39720](https://github.com/sgl-project/sglang/pull/39720) | [Fix] Fix GLM5 mHC PP forward | HIGH (GLM-5.3-Flash core mechanism; only matters if we run PP) | INFERRED |
-| `0e528dc9` | 2026-09-16 | [#39426](https://github.com/sgl-project/sglang/pull/39426) | bugfix:fix unifiedcache c128 radix cache management | MED (mem_cache/unified cache churn) | INFERRED |
-| `fc5a979f` | 2026-09-16 | [#39678](https://github.com/sgl-project/sglang/pull/39678) | [misc] Merge FlashInfer autotune caches across spec workers, pad MXFP4 TP shards, drop dead ngram attrs | MED (fp8/moe/marlin quant path) | INFERRED |
-| `cc171fba` | 2026-09-16 | [#35802](https://github.com/sgl-project/sglang/pull/35802) | feat: support custom OTLP trace service name | LOW (infra/refactor, indirect) | INFERRED |
-| `1b78083b` | 2026-09-16 | [#39500](https://github.com/sgl-project/sglang/pull/39500) | [PD] Add optional KV transfer checksums | LOW (infra/refactor, indirect) | INFERRED |
-| `f0bf6525` | 2026-09-17 | [#38526](https://github.com/sgl-project/sglang/pull/38526) | Add Ling-3.0-flash-VL model support | LOW (infra/refactor, indirect) | INFERRED |
-| `46ae84df` | 2026-09-16 | [#39657](https://github.com/sgl-project/sglang/pull/39657) | dsv4.1: Hopper FP8 matmul kernels and tuning | LOW (Hopper-only) | INFERRED |
-| `0443e317` | 2026-09-16 | [#39124](https://github.com/sgl-project/sglang/pull/39124) | fix(kda_prefill): fence shared writes before async proxy reads | HIGH (KDA/DSA core path) | VERIFIED |
-| `4fb9b5b5` | 2026-09-17 | [#32500](https://github.com/sgl-project/sglang/pull/32500) | feat(hicache): support NPU Mamba states with FIA and async IO | LOW (non-CUDA HW path) | INFERRED |
-| `84d7604b` | 2026-09-16 | [#39439](https://github.com/sgl-project/sglang/pull/39439) | [XPU] weekly simple model enablement 2026/09/14 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `33d46376` | 2026-09-17 | [#38504](https://github.com/sgl-project/sglang/pull/38504) | [HiCache] Yield idle scheduler so storage workers can drain | MED (mem_cache/unified cache churn) | INFERRED |
-| `25ce8063` | 2026-09-17 | [#30775](https://github.com/sgl-project/sglang/pull/30775) | Pipeline parallelism x speculative decoding (EAGLE/MTP) compatibility | MED (speculative/MTP infra) | INFERRED |
-| `6460082c` | 2026-09-17 | [#39115](https://github.com/sgl-project/sglang/pull/39115) | [Mamba] Fix checkpoint depth for prefixes that end off the radix page | MED (mem_cache/unified cache churn) | INFERRED |
-| `3401b752` | 2026-09-16 | [#39666](https://github.com/sgl-project/sglang/pull/39666) | dsv4.1: Engram module and request history support | LOW (infra/refactor, indirect) | INFERRED |
-| `aebae58b` | 2026-09-17 | [#39920](https://github.com/sgl-project/sglang/pull/39920) | [Moe] Fix flashinfer_trtllm silently dropping swiglu_limit clamped SwiGLU activation | MED (fp8/moe/marlin quant path) | VERIFIED |
-| `2d08cc5e` | 2026-09-17 | [#38184](https://github.com/sgl-project/sglang/pull/38184) | [AMD][Spec] Enable GDN ReplaySSM target-verify on ROCm | LOW (non-CUDA HW path; skip) | INFERRED |
-| `e970453b` | 2026-09-17 | [#38420](https://github.com/sgl-project/sglang/pull/38420) | [NPU]Refactor weight processing and add NPUSwigluLimit activation | LOW (non-CUDA HW path; skip) | INFERRED |
-| `1a90ae67` | 2026-09-17 | [#34012](https://github.com/sgl-project/sglang/pull/34012) | Add Agentic-Aware Tail-Optimized LRU eviction to the unified radix cache | MED (mem_cache/unified cache churn) | VERIFIED |
-| `6ca866ea` | 2026-09-17 | [#39050](https://github.com/sgl-project/sglang/pull/39050) | [HiCache][Perf] fix: batch HiCache D2H submits per step for hybrid pools | MED (mem_cache/unified cache churn) | INFERRED |
-| `a9fb1c32` | 2026-09-17 | [#39427](https://github.com/sgl-project/sglang/pull/39427) | dsv4(npu): support prefill context parallelism with interleave and zigzag | LOW (non-CUDA HW path) | INFERRED |
-| `1f60ddef` | 2026-09-18 | [#28403](https://github.com/sgl-project/sglang/pull/28403) | [PD] Introduce runtime role switching between prefill and decode | LOW (infra/refactor, indirect) | INFERRED |
-| `4f52a275` | 2026-09-18 | [#35123](https://github.com/sgl-project/sglang/pull/35123) | [AMD] Fix DSV4 FP4 dequant path for AITER on ROCm | LOW (non-CUDA HW path; skip) | INFERRED |
-| `f65c70bb` | 2026-09-17 | [#40033](https://github.com/sgl-project/sglang/pull/40033) | [Kernel] Move CUDA and ROCm speculative kernels to JIT | MED (speculative/MTP infra) | INFERRED |
-| `f447bb70` | 2026-09-17 | [#39680](https://github.com/sgl-project/sglang/pull/39680) | [Kernel] Coalesce the KDA CuTe DSL decode state transpose: ~3x faster, bit-identical | LOW (CuTe DSL is SM90+/Hopper; not runnable on SM80 — verify before assuming applicability) | VERIFIED |
-| `65ef55e2` | 2026-09-17 | [#40024](https://github.com/sgl-project/sglang/pull/40024) | [Scheduler] Add shortest-prefill-first scheduling | HIGH (scheduler policy — see ranked list #6) | VERIFIED |
-| `f86f6008` | 2026-09-18 | [#39415](https://github.com/sgl-project/sglang/pull/39415) | [NPU] Adapt hicache for K3 hybrid models | LOW (non-CUDA HW path; skip) | INFERRED |
-| `8ac39c66` | 2026-09-18 | [#39589](https://github.com/sgl-project/sglang/pull/39589) | [NPU] support kimi k3 on A5 and improve performance | LOW (non-CUDA HW path; skip) | INFERRED |
-| `6c7c5e78` | 2026-09-18 | [#39823](https://github.com/sgl-project/sglang/pull/39823) | [NPU] Run arch35 block-FP8 dense linears on the native MXFP8 GEMM | LOW (non-CUDA HW path; skip) | INFERRED |
-| `1b200ffa` | 2026-09-18 | [#40039](https://github.com/sgl-project/sglang/pull/40039) | [Quant] Serve 32-wide-K ue8m0 block-FP8 linears through the FlashInfer MXFP8 GEMMs | MED (fp8/moe/marlin quant path) | INFERRED |
-| `a6cf0581` | 2026-09-18 | [#38798](https://github.com/sgl-project/sglang/pull/38798) | dsv4.1: remaining model and runtime integration | LOW (DeepSeek-V4.1, not GLM) | INFERRED |
-| `191172fa` | 2026-09-18 | [#39980](https://github.com/sgl-project/sglang/pull/39980) | [Unified Tree] fix: exempt host-locked aux nodes from the sanity_check host-LRU check | MED (mem_cache/unified cache churn) | INFERRED |
-| `248c202b` | 2026-09-18 | [#39859](https://github.com/sgl-project/sglang/pull/39859) | Use runtime token widths for Triton speculative verification | MED (speculative/MTP infra) | INFERRED |
-| `da2f4349` | 2026-09-18 | [#39502](https://github.com/sgl-project/sglang/pull/39502) | [Spec] Add explicit prefill shared-read capability for plugins | MED (speculative/MTP infra) | INFERRED |
-| `6a9c7001` | 2026-09-18 | [#40007](https://github.com/sgl-project/sglang/pull/40007) | [Logprob] Borrow graph-pool memory for input logprob logits construction | LOW (infra/refactor, indirect) | INFERRED |
-| `f5a14347` | 2026-09-18 | [#40239](https://github.com/sgl-project/sglang/pull/40239) | [HiCache] Document transfer arguments | LOW (docs) | INFERRED |
-| `a0534f8c` | 2026-09-18 | [#40042](https://github.com/sgl-project/sglang/pull/40042) | [HiCache] Stop arming a prefetch retry for a too-short storage span | MED (mem_cache/unified cache churn) | INFERRED |
-| `6cc9090d` | 2026-09-18 | [#40075](https://github.com/sgl-project/sglang/pull/40075) | [mem_cache] Release up to `owned_kv_len` on radix cache insert | MED (mem_cache/unified cache churn) | INFERRED |
-| `0e5347db` | 2026-09-18 | [#40030](https://github.com/sgl-project/sglang/pull/40030) | Support MXFP8 and deferred route weighting in DeepEP v2 | LOW (MXFP8/DeepEP v2, not our quant format) | INFERRED |
-| `81a199f5` | 2026-09-18 | [#40013](https://github.com/sgl-project/sglang/pull/40013) | [HiCache] Read the in-flight buffer backup's node id from its snapshot in sanity_check | MED (mem_cache/unified cache churn) | INFERRED |
-| `5e4b94b1` | 2026-09-18 | [#40005](https://github.com/sgl-project/sglang/pull/40005) | [MM] Skip VMM error gathers for text-only requests | LOW (infra/refactor, indirect) | INFERRED |
-| `5931fd60` | 2026-09-18 | [#39477](https://github.com/sgl-project/sglang/pull/39477) | Support unified memory page-envelope transfers in PD | MED (mem_cache/unified cache churn) | INFERRED |
-| `afe71f4b` | 2026-09-18 | [#40068](https://github.com/sgl-project/sglang/pull/40068) | Read process groups through the runtime context | LOW (infra/refactor, indirect) | INFERRED |
-| `fa7e83fd` | 2026-09-18 | [#40070](https://github.com/sgl-project/sglang/pull/40070) | Name the two widths of the WORLD group | LOW (infra/refactor, indirect) | INFERRED |
-| `986959e3` | 2026-09-19 | [#40197](https://github.com/sgl-project/sglang/pull/40197) | [Refactor] Deduplicate kernel helpers and remove unused code | LOW (infra/refactor, indirect) | INFERRED |
-| `929230a6` | 2026-09-19 | [#39088](https://github.com/sgl-project/sglang/pull/39088) | Fix GLM-OCR MTP multimodal embeddings and positions | LOW (GLM-OCR, different model) | INFERRED |
-| `5e9342d1` | 2026-09-19 | [#38792](https://github.com/sgl-project/sglang/pull/38792) | [PP][DeepSeek V4] Overlap communication and optimize SM120 prefill | LOW (Blackwell SM120) | INFERRED |
-| `8189e389` | 2026-09-18 | [#40003](https://github.com/sgl-project/sglang/pull/40003) | [PD] Skip singleton transfer-status all-reduces | LOW (infra/refactor, indirect) | INFERRED |
-| `6e1338dd` | 2026-09-18 | [#40262](https://github.com/sgl-project/sglang/pull/40262) | Fix prefetch attempt cleanup on abort | LOW (infra/refactor, indirect) | INFERRED |
-| `3a5f52e1` | 2026-09-18 | [#40071](https://github.com/sgl-project/sglang/pull/40071) | Record a process's placement at publish, not at group build | LOW (infra/refactor, indirect) | INFERRED |
-| `7b67a966` | 2026-09-20 | [#39095](https://github.com/sgl-project/sglang/pull/39095) | [DSV4] Chunk the indexer MQA logits by query rows under a free-memory budget | HIGH (KDA/DSA core path — see ranked list #14) | VERIFIED |
-| `7a6c652c` | 2026-09-19 | [#40135](https://github.com/sgl-project/sglang/pull/40135) | [HiCache] Auto-size the host pool to fit available host memory | MED (mem_cache/unified cache churn) | INFERRED |
-| `8139a174` | 2026-09-19 | [#40006](https://github.com/sgl-project/sglang/pull/40006) | [Scheduler] Count complete prefill bursts and their tokens | HIGH (scheduler policy) | INFERRED |
-| `3a64faa1` | 2026-09-20 | [#39378](https://github.com/sgl-project/sglang/pull/39378) | Fix disagg PP MTP for GLM-5.2 | MED (GLM-5.2, adjacent model; only matters if PD+PP+MTP) | INFERRED |
-| `e9300f64` | 2026-09-20 | [#39565](https://github.com/sgl-project/sglang/pull/39565) | [Unified Cache][9/N] add opt-in MLA load deduplication for Mooncake Linker | MED (mem_cache/unified cache churn) | INFERRED |
-| `02070392` | 2026-09-20 | [#36700](https://github.com/sgl-project/sglang/pull/36700) | [PP + HiCache] Add PP Prefetch Tickets for eager cross-stage storage prefetch | MED (mem_cache/unified cache churn) | INFERRED |
-| `59dd2fc7` | 2026-09-19 | [#39837](https://github.com/sgl-project/sglang/pull/39837) | [2/N] [Kernel] Fuse padding-preserving HiSparse slot translation | LOW (infra/refactor, indirect) | INFERRED |
-| `c8eb54c4` | 2026-09-20 | [#39688](https://github.com/sgl-project/sglang/pull/39688) | Fuse GLM-5.3-Flash KDA projections and prefill metadata | HIGH (GLM-5.3-Flash core mechanism — see ranked list #9) | VERIFIED |
-| `9f21fbc3` | 2026-09-20 | [#39695](https://github.com/sgl-project/sglang/pull/39695) | [GLM-5.3-Flash] Reduce KPool planning synchronization and overlap indexer preparation | HIGH (GLM-5.3-Flash core mechanism — see ranked list #9) | VERIFIED |
-| `99a44c88` | 2026-09-19 | [#38740](https://github.com/sgl-project/sglang/pull/38740) | Add out-of-tree DFlash extension points | LOW (infra/refactor, indirect) | INFERRED |
-| `f4c25635` | 2026-09-20 | [#40045](https://github.com/sgl-project/sglang/pull/40045) | [kimi k3][pd disagg] support pp prefill + dcp decode with dspark | LOW (Kimi-K3, not GLM) | INFERRED |
-| `a8a4d86b` | 2026-09-20 | [#40313](https://github.com/sgl-project/sglang/pull/40313) | Remove swa and mamba radix cache | MED (compatibility trap — see ranked list #15) | VERIFIED |
-| `9f3d2759` | 2026-09-20 | [#37870](https://github.com/sgl-project/sglang/pull/37870) | [HiCache] Fix sparse hybrid transfer layer IDs | MED (mem_cache/unified cache churn) | INFERRED |
-| `2fa6b94e` | 2026-09-20 | [#39200](https://github.com/sgl-project/sglang/pull/39200) | [Perf] Fuse the glm5_next mHC attn->MLP boundary | HIGH (GLM-5.3-Flash core mechanism) | INFERRED |
-| `b63f8416` | 2026-09-21 | [#29189](https://github.com/sgl-project/sglang/pull/29189) | [Feature] Gigachat 3.5 support | LOW (infra/refactor, indirect) | INFERRED |
-| `3c71bb01` | 2026-09-22 | [#37889](https://github.com/sgl-project/sglang/pull/37889) | [AMD] Enable GLM DSA prefill top-k to the v2 kernel | LOW (non-CUDA HW path) | INFERRED |
-| `7a6191c4` | 2026-09-21 | [#40256](https://github.com/sgl-project/sglang/pull/40256) | Preallocate HiCache MHA staging before post-capture KV sizing | MED (mem_cache/unified cache churn) | INFERRED |
-| `632919e4` | 2026-09-22 | [#37762](https://github.com/sgl-project/sglang/pull/37762) | [AMD] Fix DeepSeek-R1-MXFP4 accuracy with AITER FP8 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `0db1a93a` | 2026-09-21 | [#40339](https://github.com/sgl-project/sglang/pull/40339) | State the draft's whole topology in its scope, and read the rest from the context | LOW (infra/refactor, indirect) | INFERRED |
-| `65be3fa7` | 2026-09-21 | [#40341](https://github.com/sgl-project/sglang/pull/40341) | A runner and the objects it builds freeze the placement they describe | LOW (infra/refactor, indirect) | INFERRED |
-| `970e946e` | 2026-09-21 | [#40343](https://github.com/sgl-project/sglang/pull/40343) | Retire the per-runner parallel record | LOW (infra/refactor, indirect) | INFERRED |
-| `bccf691b` | 2026-09-21 | [#40345](https://github.com/sgl-project/sglang/pull/40345) | Bringing the parallel runtime up becomes a phase, not a side effect | LOW (infra/refactor, indirect) | INFERRED |
-| `11e661fd` | 2026-09-21 | [#39175](https://github.com/sgl-project/sglang/pull/39175) | [Fix] Don't free the multi-CTAs KV counter the decode graphs captured | MED (DSA-adjacent correctness fix for captured decode graphs) | INFERRED |
-| `e0c2e8dc` | 2026-09-22 | [#39987](https://github.com/sgl-project/sglang/pull/39987) | [AMD] Tune Qwen3.5 TP4 GDN recurrent launch on gfx950 | LOW (non-CUDA HW path; skip) | INFERRED |
-| `f532ad1f` | 2026-09-21 | [#40607](https://github.com/sgl-project/sglang/pull/40607) | Fix GLM-5.3 forget-gate shape for nvCUTEDSL verify | LOW (nvCUTEDSL is Blackwell-only) | INFERRED |
-| `acac4dd9` | 2026-09-21 | [#40632](https://github.com/sgl-project/sglang/pull/40632) | [Refactor] Clean up parallel runtime comments | LOW (infra/refactor, indirect) | INFERRED |
-| `02290251` | 2026-09-21 | [#40499](https://github.com/sgl-project/sglang/pull/40499) | [Spec][PP] Launch extend microbatches before the spec output exchange | MED (speculative/MTP infra) | INFERRED |
-| `00986c81` | 2026-09-22 | [#40310](https://github.com/sgl-project/sglang/pull/40310) | Support GLM-5.3-Flash hybrid attention CPU offload and PD index mapping | MED (GLM-5.3-Flash, CPU offload — only relevant if we use HiCache-style host offload) | INFERRED |
-| `50669876` | 2026-09-21 | [#37507](https://github.com/sgl-project/sglang/pull/37507) | [unified-memory] Hierarchical cache for every unified pool shape | MED (mem_cache/unified cache churn) | INFERRED |
-| `9fdb7173` | 2026-09-21 | [#33778](https://github.com/sgl-project/sglang/pull/33778) | Avoid materializing GDN QKV tensors during target verification | LOW (GDN is Qwen3.5's linear attn, not KDA — check if shared code path before assuming relevance) | INFERRED |
-| `61d0cf20` | 2026-09-21 | [#32673](https://github.com/sgl-project/sglang/pull/32673) | [Spec] Windowed draft-decode attention for built-in EAGLE / MTP drafts | HIGH (MTP infra, directly relevant to NEXTN) | INFERRED |
-| `042b6a48` | 2026-09-22 | [#39338](https://github.com/sgl-project/sglang/pull/39338) | [AMD] [GLM-5.3-Flash Day 0] Enable zero-RoPE MHA prefill on ROCm | LOW (non-CUDA HW path — despite "Day 0" naming) | INFERRED |
-| `e332e1b8` | 2026-09-22 | [#39524](https://github.com/sgl-project/sglang/pull/39524) | [Fix] Don't write conv state from the fused KDA verify kernel (final reapply of #39219) | HIGH (KDA/DSA core path — see ranked list #3) | VERIFIED |
-| `90cf4717` | 2026-09-22 | [#39340](https://github.com/sgl-project/sglang/pull/39340) | [AMD] [GLM-5.3-Flash Day 0] Support non-2048 top-k widths in the DSA page-table transform | LOW (non-CUDA HW path — but note vLLM/SGLang open issues on the same topk!=2048 assumption, see honorable mentions) | INFERRED |
-| `b44e2486` | 2026-09-21 | [#38546](https://github.com/sgl-project/sglang/pull/38546) | [AMD] [GLM-5.3-Flash Day 0] Enable FP8 and Quark MXFP4 MoE on gfx950 | LOW (non-CUDA HW path) | INFERRED |
-| `4c81cd1b` | 2026-09-22 | [#40685](https://github.com/sgl-project/sglang/pull/40685) | [KDA] Fix missing beta sigmoid in PTX prefill | HIGH (correctness bug in the PTX KDA prefill kernel) | INFERRED |
-| `367e3700` | 2026-09-22 | [#40111](https://github.com/sgl-project/sglang/pull/40111) | avoid host sync in DSpark prefill slot expansion | LOW (DSpark, not our indexer path) | INFERRED |
-| `790551c3` | 2026-09-22 | [#35872](https://github.com/sgl-project/sglang/pull/35872) | [AMD] Skip full-vocab softmax in EAGLE topk==1 draft on ROCm | LOW (non-CUDA HW path; skip) | INFERRED |
-| `debbb5cd` | 2026-09-22 | [#40557](https://github.com/sgl-project/sglang/pull/40557) | [AMD] Drop the redundant scale zero-fill before AITER per-tensor FP8 quant | LOW (non-CUDA HW path; skip) | INFERRED |
-| `6fd98c98` | 2026-09-22 | [#40501](https://github.com/sgl-project/sglang/pull/40501) | [Qwen3.8-Next] Pipeline-parallel serving and PD-prefill MTP for Qwen4-Exp | LOW (Qwen, not GLM) | INFERRED |
-| `91c329cc` | 2026-09-22 | [#40707](https://github.com/sgl-project/sglang/pull/40707) | Take the model config out of the parallel group build, and finish retiring the parallel getters | LOW (infra/refactor, indirect) | INFERRED |
-| `6f4c2b9b` | 2026-09-23 | [#40680](https://github.com/sgl-project/sglang/pull/40680) | [HiCache] Demote internal-node mamba states on write_back eviction | MED (mem_cache/unified cache churn) | INFERRED |
-| `d6cc283d` | 2026-09-22 | [#38547](https://github.com/sgl-project/sglang/pull/38547) | [AMD] [GLM-5.3-Flash Day 0] Enable zero-RoPE TileLang DSA on gfx950 | LOW (non-CUDA HW path) | INFERRED |
-| `077c3199` | 2026-09-23 | [#39778](https://github.com/sgl-project/sglang/pull/39778) | [AMD] [GLM-5.3-Flash Day 0] Enable speculative decoding (MTP) on ROCm | LOW (non-CUDA HW path) | INFERRED |
-| `3afdde5f` | 2026-09-23 | [#39341](https://github.com/sgl-project/sglang/pull/39341) | [AMD] [GLM-5.3-Flash Day 0] Enable the k-pool DSA indexer on gfx950 | LOW (non-CUDA HW path) | INFERRED |
-| `c19dc43c` | 2026-09-23 | [#39779](https://github.com/sgl-project/sglang/pull/39779) | [AMD] [GLM-5.3-Flash Day 0] Load the MXFP4 MTP draft layer | LOW (non-CUDA HW path) | INFERRED |
-| `b77833c5` | 2026-09-22 | [#40357](https://github.com/sgl-project/sglang/pull/40357) | [MM] Keep scheduler padding in packed token arrays | MED (scheduler-adjacent, multimodal padding) | INFERRED |
-| `d34f7b23` | 2026-09-22 | [#40780](https://github.com/sgl-project/sglang/pull/40780) | [mem_cache] Clean up SWA/Mamba radix cache leftovers and drop SGLANG_ENABLE_UNIFIED_RADIX_TREE | MED (compatibility trap — see ranked list #15) | VERIFIED |
-| `4ce23542` | 2026-09-22 | [#40787](https://github.com/sgl-project/sglang/pull/40787) | [HiCache] Remove the unused HiRadixCache | MED (mem_cache/unified cache churn) | INFERRED |
-
-</details>
-
-## 2. Open (unmerged) SGLang PRs mentioning GLM-5.3 / Glm5Next / KDA / DSA indexer / sm80 / A100 / kpool
-
-Via GitHub search API, 3 queries (`is:pr is:open GLM-5.3`: 96 total; `is:pr is:open (sm80 OR A100 OR Ampere)`: 97 total; `is:pr is:open (KDA OR indexer OR kpool)`: 379 total). Not exhaustive — showing the ones judged most relevant from the top-20/25 of each query, deduplicated.
-
-| # | Title | Notes |
+| 旧研究 | 继续有效的部分 | 修正与补查 |
 |---|---|---|
-| [#35429](https://github.com/sgl-project/sglang/pull/35429) | feat(dsa): add SM80 Torch fallbacks and Triton paged-MQA indexer | **Top candidate #1 above.** |
-| [#39422](https://github.com/sgl-project/sglang/pull/39422) | [GLM-5.3 Flash] Serving optimizations: KDA/mHC fusion, DSA draft metadata graphs, prefill autotuning | **Top candidate #2 above.** Draft, updated 2026-09-16. |
-| [#38859](https://github.com/sgl-project/sglang/pull/38859) | fix: support FP8 E4M3 inference on SM80 | **Top candidate #5 above.** |
-| [#33589](https://github.com/sgl-project/sglang/pull/33589) | Let Ampere use the MXFP4 Marlin MoE path | MXFP4-only; not our quant format, low priority. |
-| [#33278](https://github.com/sgl-project/sglang/pull/33278) | Support MXFP8 dense Marlin W8A16 on SM80/SM90 | Not our quant format (we're FP8 block-quant), low priority. |
-| [#37946](https://github.com/sgl-project/sglang/pull/37946) | fix(moe): support N64 Marlin tiles for INT4 expert shards | INT4, not our path. |
-| [#38092](https://github.com/sgl-project/sglang/pull/38092) | [NVFP4 MoE] Skip dead blockscale_swizzled allocation on Marlin fallback (SM80-SM90x), saves ~3.5 GiB/GPU | NVFP4-specific, likely not our quant format; the memory-saving pattern may still be instructive for our FP8 Marlin path. |
-| [#37832](https://github.com/sgl-project/sglang/pull/37832) | Skip doomed CUDA JIT on pre-Ampere GPUs; align supports_fp8 with CUTLASS | Small (154 lines); marginal for us since A100 is Ampere, not pre-Ampere, but worth a skim for the `supports_fp8()`/CUTLASS alignment logic. |
-| [#34299](https://github.com/sgl-project/sglang/pull/34299) | [KDA] Add zero-copy native prefill checkpoints and packed decode | Large (6465+/120-), GB300-benchmarked but the checkpoint/packed-decode mechanism overlaps our own KDA checkpoint work; updated as recently as 2026-09-22 (still active). |
-| [#38469](https://github.com/sgl-project/sglang/pull/38469) | fix: bound the DSA kpool ragged MQA logits allocation | DSA/kpool correctness, worth a look alongside #35429/#39095. |
-| [#40449](https://github.com/sgl-project/sglang/pull/40449) | [dsa] drop the hardcoded topk==2048 assert in the prefill index transform | Only matters if we ever deviate from default DSA top-k=2048. |
-| [#39431](https://github.com/sgl-project/sglang/pull/39431) | [Fix][DSA] transform_index: support non-2048 topk widths and guard out-of-range indices | Same topic as #40449, appears to be a competing/earlier fix — check which one is active. |
-| [#37535](https://github.com/sgl-project/sglang/pull/37535) | Reduce KDA prefill OOM risk with opt-in workspace limits | Honorable mention above; directly useful if we've hit KDA prefill OOM on A100's 80GB. |
-| [#38994](https://github.com/sgl-project/sglang/pull/38994) | [Fix][KDA] Rebuild accepted-state lists during CUDA graph capture | Honorable mention above; MTP + CUDA graph correctness. |
-| [#37625](https://github.com/sgl-project/sglang/pull/37625) | Fix incorrect sparse-attention top-k selection when candidate bins overflow | DSA indexer correctness bug, worth checking against our top-k width. |
-| [#37289](https://github.com/sgl-project/sglang/pull/37289) | [Kernel] Fix cross-iteration s_beta WAR race in Blackwell KDA prefill | Blackwell-only per title — likely not applicable to our SM80 KDA prefill kernel, but the race-condition *class* (cross-iteration WAR hazard on shared prefill state) is worth checking for on our Triton/PTX KDA prefill path too. |
+| 原 R9 底包溯源 | fe236ea6c3 不是当时 SGLang main 的祖先；底包是 GLM-5.3-Flash 早期定制实现 | 不能按日期直接升级，需比较实际模型和缓存路径 |
+| 原 R9 SM80 核验 | vLLM #55737 的 FlashKDA 已查快路径仅 capability.major∈{9,10,12}；SGLang #35429 的 decode/indexer 与 Torch attention fallback 没有优于 110–113 的证据 | 沿用排除结果，不把 1.7–3.8× 宣称为 A100 可得收益 |
+| [R10](R10_prefill_fixed_overhead.md) | TP1 替身的小块 eager 前向有大量 host 间隙；170 已有实现基础 | TP1 dummy 不能代表当前 TP8 各组件占比；170 v2 还需 TP8 数值复验 |
+| [R17](../codex/R17_nextn_sm80.md) | MTP 的 draft、verify、状态提交和显存约束 | 正式 A 已通过 N14，保留 MTP；原“等 MTP 实测再看”已过时 |
+| [R18](../codex/R18_cache_loss_and_capacity.md)、[R20](../codex/R20_true_lcp_attribution.md) | token 前缀与 KDA 状态位置必须同时有效；扩状态池会占内存 | 8% 是所测运行的相邻同链缺口占比，不是所有缓存优化的理论上限 |
+| [R19](../codex/R19_progress_and_cache_review.md)、[R21](../codex/R21_N22_tpot_failures.md) | 核对评分、cohort、逐请求记录和执行窗口重合 | 不同配置、不同 N 的正式/本地差值不能当测试集偏差倍数 |
 
-## 3. vLLM since 2026-09-01: commits about GLM-5.3-Flash / Glm5Next / KDA checkpoints / sm80 / A100 / MTP
+原扫描约覆盖 SGLang 916 个提交（204 个路径匹配）、vLLM 1204 个提交，多数只检查标题或路径，开放 PR 搜索未穷尽分页。旧 HIGH/MED/LOW 不是现行结论；本页也不是对所有引擎的穷尽测试。网页与源码均为时间快照。
 
-vLLM's `main` moved **1204 commits** in this window. Below is the filtered set (44 commits) from `--grep` on GLM/KDA/sm80/A100/marlin/scheduler plus fp8.py touches; not the full unfiltered log.
+## 2. 引擎对照：哪条有真实起点
 
-| Hash | Date | PR | Title | Relevance |
-|---|---|---|---|---|
-| `3ba9907a` | 2026-09-01 | [#54697](https://github.com/vllm-project/vllm/pull/54697) | [Kimi-K3] Overlap low-M TP8 KDA projections | HIGH (KDA linear-attn path) |
-| `f4e61361` | 2026-09-02 | [#54859](https://github.com/vllm-project/vllm/pull/54859) | [Kimi-K3] Bump FlashKDA to fix unstable inverse | HIGH (KDA linear-attn path) |
-| `29af8bd6` | 2026-09-03 | [#55266](https://github.com/vllm-project/vllm/pull/55266) | [XPU][UT] skip GLM-5.3-Flash test on XPU | LOW |
-| `5690b02c` | 2026-09-04 | [#51392](https://github.com/vllm-project/vllm/pull/51392) | [Quantization] Support online quantization with partially pre-quantized checkpoints | MED (fp8/moe/marlin quant path) |
-| `78300cda` | 2026-09-04 | [#55214](https://github.com/vllm-project/vllm/pull/55214) | [Bugfix][Docs] Package glm5next nvidia subtree and fix its docstrings | LOW |
-| `98ed0856` | 2026-09-04 | [#53906](https://github.com/vllm-project/vllm/pull/53906) | [Model] add GLM-5.3-Flash support (vLLM's first upstream Glm5Next) | LOW (reference only — separate codebase) |
-| `a69e75b9` | 2026-09-04 | [#54921](https://github.com/vllm-project/vllm/pull/54921) | Fast Start | LOW |
-| `8369affa` | 2026-09-05 | [#55119](https://github.com/vllm-project/vllm/pull/55119) | [Feat] Add EPLB support for GLM-5.3-Flash | LOW (EPLB not confirmed in our stack) |
-| `f2e2936f` | 2026-09-06 | [#55511](https://github.com/vllm-project/vllm/pull/55511) | [Kernel] Add fused MoE tuned config for E=256,N=512 on NVIDIA A100 80GB PCIe | MED — note E=256 vs our 288 experts, config not directly reusable but confirms A100 MoE tuning is an active upstream concern |
-| `a69402aa` | 2026-09-07 | [#55364](https://github.com/vllm-project/vllm/pull/55364) | [Perf] Integrate FlashInfer KDA kernels | HIGH (KDA linear-attn path) |
-| `bfb443a6` | 2026-09-08 | [#55924](https://github.com/vllm-project/vllm/pull/55924) | [Kimi Bug] Fix kda ima `Triton Error [CUDA]: an illegal memory access was encountered` | HIGH (Triton KDA correctness bug — worth checking our Triton KDA path for the same class of bug) |
-| `e41a17e6` | 2026-09-08 | [#52263](https://github.com/vllm-project/vllm/pull/52263) | [ROCm][Quantization] Support AMD Quark per-block FP8 for fused MoE layers | LOW (ROCm) |
-| `1768273c` | 2026-09-10 | [#55736](https://github.com/vllm-project/vllm/pull/55736) | [Perf][GLM-5.3-Flash] Decode hot-path cleanups: strided KDA recurrent inputs, NoPE MQA query without concat, no duplicate router GEMM | HIGH — top candidate #12 above |
-| `828f4f19` | 2026-09-10 | [#55239](https://github.com/vllm-project/vllm/pull/55239) | [ROCm][Bugfix] Route GLM-5.3-Flash MTP through ragged sparse MLA | LOW (ROCm-specific route, but confirms GLM-5.3 MTP + sparse-MLA interaction is a known fragile spot) |
-| `86aca661` | 2026-09-10 | [#56159](https://github.com/vllm-project/vllm/pull/56159) | [Kimi K3 Perf] Avoid KDA mixed-batch gather/scatter, 5.2%~7.7% E2E Throughput Improvement | HIGH (KDA batch-mixing perf technique) |
-| `9521c60b` | 2026-09-10 | [#54038](https://github.com/vllm-project/vllm/pull/54038) | [ROCm][Perf] Kimi-K3 Fused kernels for KDA prefill reland | LOW (ROCm) |
-| `06e57f62` | 2026-09-11 | [#56526](https://github.com/vllm-project/vllm/pull/56526) | [ROCm][Kimi-K3] Fix non-contiguous state_indices crash and GPU-sync assert in fused KDA/MLA prefill | LOW (ROCm, but correctness-bug class worth checking on CUDA path) |
-| `0c1e89ce` | 2026-09-11 | [#55426](https://github.com/vllm-project/vllm/pull/55426) | [Bugfix][Kimi-K3] Fix KDA projection overlap on Hopper | LOW (Hopper-specific) |
-| `9d88ceb0` | 2026-09-11 | [#56485](https://github.com/vllm-project/vllm/pull/56485) | [KDA] Update flashKDA to support bf16 checkpoint state | HIGH (relates directly to #56960 KDA prefill checkpoints, item #10 above) |
-| `238cb2b1` | 2026-09-14 | [#55738](https://github.com/vllm-project/vllm/pull/55738) | [Perf][GLM-5.3-Flash] Dense/masked-MHA sparse prefill for the NoPE (256, 0, 256) layout + skip the NoPE K concat | HIGH — top candidate #11 above |
-| `b443c1cc` | 2026-09-14 | [#55737](https://github.com/vllm-project/vllm/pull/55737) | [Perf][GLM-5.3-Flash] Use FlashKDA for KDA chunked prefill (1.7-3.8x faster than the Triton chunk path) | HIGH — top candidate #11 above |
-| `9446ea16` | 2026-09-15 | [#53458](https://github.com/vllm-project/vllm/pull/53458) | [Bugfix][Spec Decode] Only create draft_id_to_target_id when draft vocab differs | MED (MTP/spec infra) |
-| `c8d1cf07` | 2026-09-15 | [#56176](https://github.com/vllm-project/vllm/pull/56176) | [ROCm][Bugfix] Enable Load and Inference of GLM-5.3-Flash Quark MXFP4 Checkpoint | LOW (ROCm, MXFP4) |
-| `2bdbbc80` | 2026-09-16 | [#55884](https://github.com/vllm-project/vllm/pull/55884) | [BugFix] Fix is_supported of cutlass FP8 linear (selected and fails on A100) | MED — direct A100 FP8 correctness bug in vLLM's cutlass dispatch; check whether SGLang's analogous `supports_fp8()` gating (cf. open PR #37832) has the same class of bug |
-| `4fe9e6f6` | 2026-09-16 | [#55358](https://github.com/vllm-project/vllm/pull/55358) | [Refactor][GLM-5.3-Flash] Move sparse_attn_indexer_kpool into the model folder and split AMD/NVIDIA | MED (organizational, but confirms an NVIDIA-specific kpool indexer path exists separately from AMD) |
-| `8c1557a7` | 2026-09-16 | [#52136](https://github.com/vllm-project/vllm/pull/52136) | Add `pydocstyle` to the `ruff` rules | LOW |
-| `f730a93d` | 2026-09-16 | [#56758](https://github.com/vllm-project/vllm/pull/56758) | [Scheduler] Add --max-num-active-seqs to cap RUNNING admission | HIGH (scheduler policy, comparable to SGLang's HRRN/shortest-prefill-first work) |
-| `08633cb5` | 2026-09-17 | [#55867](https://github.com/vllm-project/vllm/pull/55867) | [Qwen3.8-Flash-Next] Enable FP8 TP with FlashInfer TRTLLM MoE | LOW (Qwen, not GLM) |
-| `667b26e5` | 2026-09-17 | [#57192](https://github.com/vllm-project/vllm/pull/57192) | [Bugfix][ROCm][GLM-5.3-Flash] Apply deferred tilelang.jit already on attribute access | LOW (ROCm) |
-| `d12c2768` | 2026-09-17 | [#57425](https://github.com/vllm-project/vllm/pull/57425) | [Bugfix][ROCm] Alias SparseAttnIndexerKpool.forward_cuda to forward_native (GLM-5.3-Flash boot crash) | LOW (ROCm boot crash) |
-| `e0050f28` | 2026-09-17 | [#57252](https://github.com/vllm-project/vllm/pull/57252) | [Bugfix][ROCm] Add record_logical_topk_ready to ROCMAiterMLASparseImpl (GLM-5.3-Flash boot crash) | LOW (ROCm boot crash) |
-| `2bbdfcfc` | 2026-09-18 | [#57327](https://github.com/vllm-project/vllm/pull/57327) | [Perf][GLM5.3-Flash] Use cooperative top-k for small GLM decode batches | MED (small-batch decode DSA top-k perf; relevant to low-concurrency A100 decode) |
-| `70df48dc` | 2026-09-18 | [#57317](https://github.com/vllm-project/vllm/pull/57317) | [Bugfix][KV Cache][GLM-5.3-Flash] Disable slot mapping kernel for the kpool tail buffer | MED (kpool tail-buffer correctness) |
-| `36fa72d2` | 2026-09-19 | [#57701](https://github.com/vllm-project/vllm/pull/57701) | [GLM5.3 Perf] Size the GLM-5 sparse indexer decode workspace, 3072 MiB GPU memory saved | MED (3GB/GPU is meaningful on 80GB A100s; check our indexer workspace sizing) |
-| `bf01fc4a` | 2026-09-20 | [#57546](https://github.com/vllm-project/vllm/pull/57546) | [GLM-5.3-Flash] Route kpool indexer top-k through the shared SparseIndexerTopk dispatcher | MED (kpool indexer refactor) |
-| `db1bfdd4` | 2026-09-20 | [#57477](https://github.com/vllm-project/vllm/pull/57477) | [Bugfix][GLM-5.3-Flash] Address kpool tail blocks by the padded indexer stride in the NVIDIA prefill seed kernel | MED — explicitly NVIDIA path, kpool tail-block correctness |
-| `e5fce7b5` | 2026-09-20 | [#57421](https://github.com/vllm-project/vllm/pull/57421) | [Core][Kernel] Share persistent workspaces for Marlin and Humming | MED (Marlin workspace sharing, generic perf/memory win) |
-| `f648eed2` | 2026-09-20 | [#56810](https://github.com/vllm-project/vllm/pull/56810) | [Bugfix][KV Offload] Skip non-prefix-cacheable groups in SimpleCPUOffload (GLM-5.3-Flash kpool tail and QSA) | LOW (only relevant if we use vLLM-style CPU KV offload) |
-| `3df4ae15` | 2026-09-21 | [#57783](https://github.com/vllm-project/vllm/pull/57783) | [Core][KDA] Generalize Mamba prefill checkpoint builder and exporter | HIGH — follow-up to #56960, item #10 above |
-| `96791737` | 2026-09-21 | [#51052](https://github.com/vllm-project/vllm/pull/51052) | [KVConnector][MoRIIO] Transfer hybrid mamba/KDA recurrent state in READ mode | LOW (disagg-transport specific, only relevant if we use a MoRIIO-style connector) |
-| `c64b15cd` | 2026-09-21 | [#57951](https://github.com/vllm-project/vllm/pull/57951) | [Scheduler] Soften Long Prefill Tokens Threshhold | HIGH (scheduler policy — comparable bottleneck to SGLang's shortest-prefill-first work) |
-| `382970ee` | 2026-09-22 | [#50592](https://github.com/vllm-project/vllm/pull/50592) | [Kimi-K3][AMD] Return KDA and MLA projection outputs directly | LOW (AMD/Kimi-K3) |
-| `91d7324c` | 2026-09-22 | [#55385](https://github.com/vllm-project/vllm/pull/55385) | [perf] wire FA and FlashMLA for sm90 GLM5Next NoPE SparseMLA | LOW (SM90-gated per title, not SM80) |
-| `c9b34fdb` | 2026-09-22 | [#58061](https://github.com/vllm-project/vllm/pull/58061) | [Bugfix][GLM-5.3-Flash] Run the dense MLP layers on the sequence-parallel shard | LOW (sequence-parallel specific) |
+赛规允许其他引擎，要求同样的 /generate、真实时间/token 计数及 /flush_cache。**有底包、跑通接口、通过双 90、通过某个并发档，是四种不同证据。** 依据：[task.md](../../llm-challenge-arena-v1/task.md) 引擎适配、基镜像与示例提交。
 
-**PR #56960 status (explicitly requested)**: VERIFIED via API — **[#56960](https://github.com/vllm-project/vllm/pull/56960) "[Feat][Model] Enable KDA prefill checkpoints for GLM-5.3-Flash" is still OPEN, not merged**, `merged: false`, non-draft, created 2026-09-15, **last updated 2026-09-22** (actively maintained, not stale), 2 commits, +307/-11 across 6 files. Its stated problem: in `mamba-cache-mode=align`, KDA persists state only at the end of a prefill chunk, so the scheduler splits prefill at a cache boundary (e.g. a 1159-token prompt gets split 1152+7) purely to get a reusable checkpoint, costing an extra scheduling iteration/forward pass — the fix lets the state be checkpointed inside a chunk without the split. Follow-up work continues in a generalized form at **[#57783](https://github.com/vllm-project/vllm/pull/57783)** "[Core][KDA] Generalize Mamba prefill checkpoint builder and exporter" (merged 2026-09-21) and bf16-checkpoint support landed separately at **[#56485](https://github.com/vllm-project/vllm/pull/56485)** (merged 2026-09-11). A related open PR referencing it is **[#57329](https://github.com/vllm-project/vllm/pull/57329)** "[Feat][Mamba2] Enable internal prefill checkpoints".
+| 路线 | 已有证据 | 尚缺证据 | 优先级 |
+|---|---|---|---|
+| 当前 SGLang + 补丁 | 正式 A 已过双 90、N14，源码和回放齐全 | 没证明执行层接近硬件上限 | 保留精确 A 作对照，继续机制优化 |
+| **主办方 vLLM sm80 backport** | 题面明确 8×A100 实测部署、MTP、prefix、流式计数与 flush | 没有可对照的双 90/N@SLO 成绩；graph 的实际捕获覆盖待查 | **首个替代引擎对照** |
+| 官方主线 vLLM 底包 | 主办方另有镜像；上游有模型 recipe | 上游 NVIDIA recipe 前提是 Hopper 或更新架构，不能等同 sm80 backport | 分开审阅，不混用命令与依赖 |
+| TokenSpeed | 主办方有 A100 底包；有 GLM-5.3-Flash recipe、C++ 控制路径 | 已查性能示例不证明本负载收益；该镜像实际 SM80 后端待查 | 第二引擎候选，先筛兼容性 |
+| TensorRT-LLM | 支持表有 GLM-5/5.2/5.3 的 GlmMoeDsaForCausalLM | 已查表中没找到 Flash 的 Glm5Next，不能混同架构；缺本模型 sm80 路径证据 | 暂缓整引擎移植，可借鉴算子 |
+| Dynamo | 有 GLM-5.3-Flash 聚合/PD recipe | recipe 底层是 vLLM，示例为 H200/GB200 | 部署和状态传输参考，不算独立 kernel 引擎 |
+| KTransformers | 主办方有底包，项目有原生 FP8 模型教程 | 已查教程是 SGLang+KT 的 CPU/GPU 路线，列 SM89/SM120、≥350GB RAM；未证明 A100 延迟收益 | 容量与分层 prefill 备选 |
+| Transformers | 主办方有底包，可做功能参考 | 本轮无本负载 TP8 吞吐优势证据 | 暂不占完整压测队列 |
 
-## 4. Open vLLM PRs about A100/sm80 SM80 support for DSA/sparse-MLA/indexer
+一手来源：[vLLM recipe](https://recipes.vllm.ai/zai-org/GLM-5.3-Flash)、[TokenSpeed](https://github.com/lightseekorg/tokenspeed)及[模型 recipe](https://lightseek.org/tokenspeed/recipes/models#glm-5-3-flash)、[TensorRT-LLM 支持表](https://nvidia.github.io/TensorRT-LLM/models/supported-models.html)、[Dynamo recipe](https://docs.nvidia.com/dynamo/dev/recipes/glm-5-3-flash)、[KTransformers 教程](https://github.com/kvcache-ai/ktransformers/blob/main/doc/en/kt-kernel/GLM-5.3-Flash-Tutorial.md)。
 
-Cross-project confirmation that this is a live, still-unsolved gap upstream, with **multiple independent implementations in flight**:
+**vLLM 的三份实现不能混淆：**
 
-| PR | Title | State/Notes |
+- 题面 backport 是 prod-20675/vllm-backport:260918-sm80，主办方已验证接口和缓存。示例只有 16 个序列槽、graph 只捕到 16；这是接口范例，不是 N26 推荐配置。
+- 主办方官方底包 arena-vllm-glm53:260918 是另一份镜像，题面明确不能混用启动参数。
+- 公开 [wtdcode/vllm-backport](https://github.com/wtdcode/vllm-backport) 可参考 SM80/Marlin/混合缓存实现，但尚未证明与题面镜像等价。其 4×A100 示例是 AWQ 4bit，不能证明原始 FP8 的 TP4 显存够用。
+
+vLLM 也可能继续用 FP8 权重、BF16 计算的 Marlin；换引擎不会消除 A100 无原生 FP8 MMA 的约束。社区 backport 的 LMCache 示例还涉及状态对齐与 1152-token chunk，不能只看 offload 命中而忽略额外前向次数。
+
+## 3. 借实现，不一定换整个引擎
+
+### KDA 投影融合：现有条件可能挡住可用路径
+
+本底包 [glm5_next.py](../../build/base_exact/sglang/srt/models/glm5_next.py) 的 do_fuse_qkvbfg 要求 quant_config 为 None，且 head shard 与 TP 相同。当前 KDA 投影实际在 BF16 不量化清单中，但模型级 FP8 配置不为空，因此走分开的模块。底包已经有 MergedColumnParallelRepeatedLinear 和 ColumnParallelBatchedLinear，不必从头实现所有 GEMM。
+
+已读 vLLM [common/kda.py](../../refs/vllm-pr56960/vllm/models/glm5next/common/kda.py)，参考 commit 为 7565389f848994d5271986f74aab2af7ede0cbab：KDA 初始化显式保留 BF16；q/k/v/b/f_a/g_a 合为一次投影，f_a/g_a 分片跨 TP 复制。这不是题面镜像源码等价证明。
+
+**候选是我们当前输入侧 4 次投影→1 次**，因为 q/k/v 早已合并；不能照抄上游“6→1”算增量收益。先验证权重加载、复制分片、f/g 第二级投影、scatter 的非整齐行数、MTP/graph 和状态输出，再测实际 T(c,P,B)。这是可执行的优化线索，尚无新 GPU 收益数据。
+
+### Graph 与元数据
+
+170 v2 的 scatter 修复已有 TP2 证据，真实 TP8 仍待数值复验；旧 v1 的 TP8 错误不能视为自动消失。其价值首先在小块固定成本，不能当成 16k 加速承诺。
+
+[SGLang #39422](https://github.com/sgl-project/sglang/pull/39422) 的 DSA draft metadata graph 可单独筛选。原核验已经说明收益来自 4×GB300、decode 密集负载，不沿用加速百分比；正式 A 现有 MTP，值得重查其覆盖路径。同组少同步、launcher 缓存和布局优化须查是否已存在；Triton FP8 MoE autotune 不直接适用于 111 Marlin。
+
+### MoE：切分结构与大块实现都要看
+
+当前 TP8 将 routed expert intermediate=2048 切成每卡 256。EP8 可使每卡约 36 个 routed experts 保留完整 intermediate，改变 GEMM 形状与分派方式；它可能只通过一个 flag 开启，但属于执行结构变化。收益需连同负载不均、dispatch/combine、共享专家和通信一起测。
+
+**待验证的正确性风险：** [111](../../engine/docs/111-sm80-fp8-moe-marlin.md) 未向 MarlinMoeQuantInfo 传 expert_map/global_num_experts；[StandardDispatcher](../../build/base_exact/sglang/srt/layers/moe/token_dispatcher/standard.py) 在 EP 下可能已把非本地专家映射为 -1；[Marlin 包装](../../build/base_exact/sglang/srt/layers/moe/fused_moe_triton/fused_marlin_moe.py) 却依 expert_map 是否存在决定 EP 标志及部分输出清零。须检查 -1 的排序、跳过和归零契约，直接补一遍映射可能二次映射。**尚未运行复现，也不是当前 TP8/EP1 成绩受此 bug 影响的证据。**
+
+另一候选是大块 prefill 选择性反量化 BF16 grouped GEMM，decode 保留 Marlin。保留 FP8 时，全专家 BF16 副本额外约 35.56GiB/rank；单 MoE 层 BF16 缓冲约 1.69GiB/rank，双缓冲约 3.39GiB/rank。先测反量化+GEMM+同步总成本，扣除 KV/状态池损失。[显存推算](../../evidence/cost-audit-20260924/cost-estimates.json)不含所有其他缓冲。旧 F70 INT8 W8A8 负面结果沿用，没有新形状/kernel 假设不重复测试。
+
+### DSA、布局与通信
+
+114 已在适用形状下拆 indexer 行，S1 已开 attention 输入 scatter 及相应 reduce-scatter，不能把旧全量冗余重复算成未来收益。DCP 的 041 行数错误是独立正确性支线，修好不自动证明更快。
+
+先列实际 collective 的形状、字节、流和依赖，再决定融合/重叠。16k×4096×BF16=128MiB，不是每条通信都可泛称 64MB。图、融合、布局与通信会互改关键路径，不同基线测得的省时不能相加。
+
+## 4. 拓扑、精度与“物理上限”的边界
+
+- 当前 FP8 权重和状态池下，4+4 两个完整 TP4 实例不满足显存账：专家约 71.12GiB/rank，另有 KDA 投影、状态、KV、graph 等。不是证明所有缩池/量化/offload 的 TP4 都不可能。PD 还需传 KV、KPool、KDA/conv 状态并维护缓存连续性。
+- 量化/状态压缩改变容量、成本和误差，可研究，但须从题面指定权重和行为出发；社区 checkpoint 的硬件结果不是我们双 90 的证明。原生 Blackwell NVFP4 快路径不适用于 A100。
+- 22ms decode 不是已证明的带宽下限。均匀独立路由仅作反例，B=32 每层预计访问约 171/288 个 routed experts，不是必读全部专家。需测真实专家分布、HBM 流量、KDA/通信及 MTP 每步产出。
+- 排队是延迟发生的位置，不是机制归因。算得贵也会造成排队；缓存修复也会减少其他请求的等待。调度可通过批形成、减少空转及尾延迟控制提高 N@SLO，即使孤立算子吞吐没变。
+- 新 blocking.py 的窗口重合支持长冷链首是重点排查对象，但不能把窗口当 GPU 独占，也不能把估计成本的残差当已测 interleave。详见[复核](../../notes/codex-分析-阻塞归因与执行路线.md)。
+
+## 5. 当前筛选顺序
+
+| 对照 | 第一阶段问题 | 进入完整回放的依据 |
 |---|---|---|
-| [#47629](https://github.com/vllm-project/vllm/pull/47629) | [Attention] TRITON_MLA_SPARSE backend for SM80/SM121 sparse MLA (rebase & takeover of #38476) | Open, non-draft, 1808+/9- across 12 files. Explicit goal: let DSA sparse-MLA models (DeepSeek-V3.2, GLM-5.x) run where DeepGEMM/FlashMLA-Sparse are unavailable — SM80 (A100/A800) and SM121. |
-| [#38476](https://github.com/vllm-project/vllm/pull/38476) | [Feature] TRITON_MLA_SPARSE backend for SM8x/11x/12x DSA Sparse MLA Support | Original PR (vllm-project/vllm) that #47629 rebases/takes over. |
-| [#56120](https://github.com/vllm-project/vllm/pull/56120) | [DS-V4][SM80] portable Triton fallbacks so DeepSeek-V4 runs on Ampere/Ada | Draft, 6350+/119- across 21 files. Goal: mainline DeepSeek-V4 build/run on SM8.x without forking, via capability-gated Triton fallbacks for sparse MLA (FlashMLA/DeepGEMM-only today), fp8 einsum (DeepGEMM-only), and mHC. Same architecture family as GLM-5.3-Flash (DeepSeek-common lineage) — technique directly transferable. |
-| [#55177](https://github.com/vllm-project/vllm/pull/55177) | Fix/dsv4 sparse mla portability | Open, related to #56120. |
-| [#55184](https://github.com/vllm-project/vllm/pull/55184) | Fix/dsv4 pre-sm90 (software fp8) sparse mla omnibus | Open — explicitly "pre-sm90 (software fp8)", i.e. our exact A100 situation. |
-| [#52534](https://github.com/vllm-project/vllm/pull/52534) | 魔改vllm: 支持A100 (SM_80) 部署GLM-5.2 ("Modded vLLM: support A100 (SM_80) deployment of GLM-5.2") | Open, community fork PR, 7489+/31- across 47 files. New Triton MLA-sparse backend, Triton MQA-logits kernel, Triton sparse-MLA kernel, indexer adapted for A100. Chinese-authored, worth reading directly — this is someone else's from-scratch solution to almost exactly our problem (GLM-5.2 not 5.3, but same DSA architecture family). |
-| [#55810](https://github.com/vllm-project/vllm/pull/55810) | [BugFix] Group GLM-5 hybrid KV cache specs (indexer/state roles) correctly | Open, small (38+/10-). Documents that GLM-5.3 hybrids mix 34 KDA layers with 11 sparse-MLA layers whose caches carry 3 roles (MLA latent, kpool indexer K-pool, compressor state) and that upstream KV-cache-spec grouping mishandles this mix — good structural reference for our own KV-cache accounting. |
-| [#57496](https://github.com/vllm-project/vllm/pull/57496) | [CPU] Add KDA backend for GLM5Next | Open — CPU backend, low relevance but confirms KDA backend is being generalized/abstracted upstream (may ease future portability work). |
-| [#57687](https://github.com/vllm-project/vllm/pull/57687) | [Draft][CPU][GLM5Next] Add sparse MLA / KeyPool backend | Draft, CPU — low relevance. |
+| 已排的正式 A@devN14、B@devN10 与 S1 混合 profile（044r/045r/046r；旧044/045缺121已作废） | 校准同档差异，确认当前 TP8 执行账 | 状态以 queue/pod 为准，不新增重复任务 |
+| **首个引擎：主办方 vLLM backport vs 精确 A** | 同模型/协议/flush/计数、正确性、graph 覆盖、成本与内存；记录启动成本 | 接口与数值成立，再同档完整比较；跨引擎先评整体，随后归因 |
+| **首个局部改造：BF16 KDA 投影融合** | 加载/TP 分片/状态一致性、实际调用数与 T(c,P,B) | TP8 正确、同条件收益超出重复测量波动 |
+| 既有候选 170 v2 | TP8 数值、小块成本、捕获内存 | 先有省时证据，再让调度采用新成本曲线 |
+| MoE 结构与大块双实现，分别对照 | EP -1/共享专家契约；总成本与显存 | 不以缓存损失换孤立 GEMM 的好看数字 |
+| 第二引擎：TokenSpeed A100 底包 | 实际 Glm5Next/SM80 后端、混合状态及接口 | 可运行证据齐备再占完整档 |
 
----
+所有完整回放仍如实报告 11 门；双 90 是最终新实现候选的必要验证，12 题冒烟仅用于排错。开发集不是 N26 预测器。CPU/单算子筛选通过后由 Claude 统一安排 8 卡对照，正式提交按用户安排。
 
-## Caveats / what wasn't done
-
-- Open-PR search used the **unauthenticated** GitHub REST search API (rate-limited to 10 req/min-ish, capped at 100 results per query, no deep paging). Totals (96 / 97 / 379 for SGLang; large numbers for vLLM) mean there are more matches than shown — the tables above are a judgment-ranked sample of the first ~20–25 hits per query, not an exhaustive list.
-- For the 204-row SGLang path-matched table, only 19 commits were actually opened with `git show`/`git show --stat` (marked VERIFIED); the rest are INFERRED from commit subject and the path filter that surfaced them, which is a much weaker signal — treat LOW/MED tags on INFERRED rows as a starting triage, not a final verdict.
-- I did not check out any tree state or run a structural diff of our actual serving source against upstream `glm5_next.py`/`dsa_backend.py`/`kda_backend.py` — that comparison (called out above for candidates #1, #4, #9, #10) is the natural next step and needs our current source, which isn't in this scan's scope/directory.
-- vLLM's full commit log (1204 commits) was filtered by `--grep` on GLM/KDA/sm80/A100/marlin/scheduler-path keywords rather than walked exhaustively; a commit that touches the same files without those words in its subject would be missed.
-
----
-
-## Claude 核验结论（2026-09-23，逐项看源码/PR，开发机 2×A100 已确认可用：bf16 matmul 241 TFLOPS）
-| 候选 | 结论 | 依据 |
-|---|---|---|
-| #39524 KDA 融合验证写回卷积状态（竞态） | **底包有此缺陷**（`fused_kda_conv_recurrent_verify.py:325-333`），但该 kernel 仅在 `SGLANG_OPT_FUSED_KDA_VERIFY=1` 时启用，默认 False（`environ.py:1211`）；默认路径由 `update_mamba_state_after_mtp_verify` 从中间窗口提交，正确。**不移植**；`dev_b160_mtp_n6.sh` 显式写死 `=0` 防误开 | VERIFIED 源码 |
-| vLLM #55737 FlashKDA 预填充 1.7–3.8× | 仅 capability.major ∈ {9,10,12}，**A100 不可用** | VERIFIED diff |
-| #39422 十项优化（+10% 主要来自 DSA 草稿元数据 graph） | 测于 4×GB300、1000/1000 decode 密集负载；最大项只在 MTP decode 生效；mHC/RMSNorm 为 GB300 调优；FP8 专家 autotune 针对 Triton FP8 MoE（我们用 Marlin）。对预填充主导的本负载价值低；**待 160 MTP 实测后再评估** DSA 草稿元数据 graph 与 KDA 预填充少同步（+0.63%） | VERIFIED PR 正文 |
-| #35429 上游 SM80 DSA | 设计同我们 112 decode（查询×页、软件 e4m3、bf16 dot）；**无预填充 kernel**、注意力仍是 torch 回退 → 不优于 110–113（113 预填充约 185 TFLOPS、tilelang 注意力）。**不移植** | VERIFIED PR 文件列表与正文 |
-| #38859 SM80 FP8 E4M3（Triton FP8 MoE 走字节解码） | 与 111 Marlin W8A16 同目标；Marlin 通常更快。**仅当 8 卡 profile 显示 MoE 为瓶颈时再对比** | INFERRED |
-| #40024 SPF / #32911 HRRN 调度 | 与 120 同目标，机制不同；**120 A/B 后作为对照组**考虑 | VERIFIED |
-| #34820、#39688/#39695/#38845 | 与 140、KPool 元数据相关的小幅优化；底包是早于上游的 GLM-5.3 分支，结构差异大，移植成本需逐项看；**低优先级** | INFERRED |
-
-**截至本次快照的结论**：当时没有证实可在 A100 直接带来大幅冷预填充收益的现成项。此后 170 已移植 #38522，INT8 W8A8 方向经 F70 降级；后续选择应由完整开发集 A/B 的 11 门结果决定。
+本轮没有新增 GPU 性能数据、入队或正式提交。网页快照与获取时间在 [engine-survey-20260924](../../evidence/engine-survey-20260924/)，总体进展看 [queue](../../notes/queue.md) 和 [codex-分析](../../notes/codex-分析-2026-09-24.md)。

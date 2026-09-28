@@ -1,5 +1,7 @@
 # DCP（解码上下文并行）上 8 卡：计划、风险与难点（fable，2026-09-26）
 
+**已过时（2026-09-28）：** 本文是 8 卡验证前的计划（目标 DCP8、估算 ×3.45–4.45），实际做出并反复验证、两次正式提交的是 `--dcp-size 2`（不是本文设想的 DCP8），KV 池实测增益约 ×1.7（1.40M→2.38M，N30），且本地测到的容量收益不对应线上的墙，没有带来 chain 判定提升；MTP 兼容性也已解决（不是本文说的"未上过 8 卡"）。现行结论见 [knowledge.md](knowledge.md)、[program-n30-v3.md](program-n30-v3.md)、[R34 §3](../research/claude/R34_kv_capacity_options.md)。
+
 目标：拆掉 N34+ 的显存墙。MLA 潜向量 KV 在 TP8 下每卡各存一份完整拷贝（12,716 B/token/卡）；DCP 按 token 把它分到 8 张卡，每卡只存 1/8，KV 池等效 ×3.45（MTP 草稿层仍复制）到 ×4.45（无 MTP）。现成代码：115/116（`engine/docs/115-dcp-sm80.md`），开发机 TP2+DCP2 数值验证通过（相对 L∞ ≤ 2e-3/5.2e-3，含 CUDA graph decode），未上过 8 卡。业界证据见 [R34 §3](../research/claude/R34_kv_capacity_options.md)、[R35](../research/claude/R35_kv_capacity_survey.md)。
 
 ## 收益（估算）

@@ -1,7 +1,7 @@
 # 04 — Model compute, kernels, MTP and DP-attention (base image, sm80)
 
 > **2026-09-23 更正（8 卡实测 + Fable 审阅）**：MoE 在 A100 走 **Marlin W8A16（补丁 111）**，不是 Triton FP8；DSA 注意力用 **tilelang**（fa3 仅 Hopper，F57）；
-> 冷预填充实测约 **1 万 tok/s**（36k ≈ 3.6s，非 "1–2s"），8 卡 profile：MoE 31.8%、稀疏注意力 17.0%、稠密 GEMM 13.2%、**mHC 11.8%（每卡重复计算全部 token，可用 `--enable-attn-tp-input-scattered` 分散）**、allreduce 11.1%（64MB 消息超过 custom allreduce 8MB 上限→NCCL）、indexer 4.3%、KDA 4.1%。MoE 只到峰值 27–30%（F70）。
+> **2026-09-24 Codex 复核**：旧冷探针约 1 万 tok/s（36k ≈ 3.6s）仅代表当时路径；旧 profile 百分比不能作为当前 S1 的瓶颈排序。S1 已启用 attention 输入 scatter 及相应 reduce-scatter，114 已拆 indexer 行，不能重复计算这些收益。16k×4096×BF16=128MiB；实际通信字节由各调用形状决定。F70 的 MoE 27–30% 也是特定形状测量，不是全模型 MFU。详见 [成本复核](../../../notes/codex-分析-2026-09-24.md#10-对prefill效率是根的逐项复核与可改代码)及[更新的路线筛选](../R9_upstream_since_base.md)。
 
 2026-09-22, Claude subagent, read-only source map. Paths below are relative to `build/base_exact/sglang/` (the image replica; upstream fe236ea6c3). `S/` = `srt/`, `K/` = `kernels/`. Model facts come from `s1-dev/glm_tok/config.json`. **[V]** means verified in the Python source. **[D]** means derived arithmetic. **[U]** means unverified: it depends on compiled binaries (sgl_kernel, deep_gemm, triton, tilelang) or on runtime. No GPU was used.
 
@@ -21,7 +21,7 @@
 - **Decode [V]: Triton `fused_sigmoid_gating_delta_rule_update(is_kda=True)`** (`kernels/kda_triton.py:124-156`). GLM sets `lower_bound`, so the packed-decode fast path is skipped: it requires `lower_bound is None` (`kda_backend.py:652-655`). Decode goes through `kernel_dispatcher.decode` (`:688`) instead. The K3 fully fused decode (`:590`) runs only for kimi_k3.
 - **conv1d [V].** Prefill uses Triton `causal_conv1d_fn` in one packed call over the qkv width (`kda_backend.py:756`). Decode uses Triton `causal_conv1d_update` (`:642`) (`K/ops/mamba/causal_conv1d_triton.py`).
 - **State dtypes [V].** The SSM state is fp32 by default and the conv state is bf16 (`S/configs/mamba_utils.py:47-104`). They can be overridden with `SGLANG_MAMBA_SSM_DTYPE` / `SGLANG_MAMBA_CONV_DTYPE` (`environ.py:1268-1269`). The per-chunk `h` is allocated in `k`'s dtype, which is bf16 (`fla/chunk_delta_h.py:349`). An extend-time track snapshot is copied from `h` and then `.to(fp32)` (`S/layers/attention/hybrid_linear_attn_backend.py:874`). That means mid-prompt checkpoints are BF16-rounded, while the end-of-prompt final state stays fp32.
-- **Per-token prefill cost [D].** KDA projections are about 136 M MACs per token per layer, or 34 MFLOP/token per rank at TP8. The chunked recurrence is about 64 heads × ~160 kFLOP ≈ 10 MFLOP/token per layer, or about 1.3 MFLOP/rank. KDA prefill is therefore GEMM-dominated (BF16 cuBLAS). The Triton chunk kernels mainly add launch and memory overhead, including writing `h` at 256 KB per 64-token chunk per layer per rank. The mamba state per slot is 34×(64/8)×128×128×4 B = 17.8 MiB/rank at TP8.
+- **Per-token prefill cost [D].** KDA projections are about 136 M MACs per token per layer, or 34 MFLOP/token per rank at TP8. The chunked recurrence is about 64 heads × ~160 kFLOP ≈ 10 MFLOP/token per layer, or about 1.3 MFLOP/rank. KDA prefill is therefore GEMM-dominated (BF16 cuBLAS). The Triton chunk kernels mainly add launch and memory overhead, including writing `h` at 256 KB per 64-token chunk per layer per rank. The mamba state per slot is 34×(64/8)×128×128×4 B = 17.0 MiB/rank at TP8.
 
 ## 3. MLA/DSA on sm80
 
@@ -42,8 +42,8 @@
   - The lazy strategy is supported through `mamba_lazy_spec_prepare` (`S/managers/schedule_batch.py:3228-3270`, window check at `:1987-1997`), called from `spec_prepare_for_decode` (`spec_utils.py:1096-1104`).
   - The `extra_buffer` validator requires `mamba_track_interval ≥ num_draft_tokens` and `% page_size == 0` (`S/arg_groups/mamba_hook.py:119-122`). The default is 256, which is fine.
   - ReplaySSM-spec is incompatible with extra_buffer (`spec_utils.py:951-956`).
-- **Memory [D].** `intermediate_ssm` is `[34, S+1, D, 8, 128, 128]` fp32 (`S/mem_cache/memory_pool.py:737-749`), about 17.8 MiB × D per spec slot per rank. With D=4 and 48 slots that is about 3.4 GiB/rank.
-- **TPOT effect [D/U].** Decode is bound by reading expert weights; at batch ≥ ~32 nearly all 289 experts are touched, about 38 GB/rank per step. Verifying 4 tokens costs roughly one step, so with acceptance of 2-2.5 TPOT could fall by 1.5-2×. The task hard gate is tpot_p95 ≤0.10 without statistical slack (task.md:519,577). S0 measured 0.219 at dev N18 and 0.296 at dev N22, both failing it (F96). The risks are extra verify work competing with prefill (TTFT), the 48-request cap, the scratch memory, and no A100 validation. There is also a reported NextN crash at TP8 (#37548, R1).
+- **Memory [D].** `intermediate_ssm` is `[34, S+1, D, 8, 128, 128]` fp32 (`S/mem_cache/memory_pool.py:737-749`), about 17.0 MiB × D per spec slot per rank. With D=4 and 48 slots that is about 3.2 GiB/rank (48 active slots; the S+1 allocation adds one slot).
+- **TPOT effect [D/U, corrected 09-24].** Expert bandwidth is a candidate bottleneck, not a proven physical limit. Under a uniform independent routing example, B=32 touches about 171/288 routed experts per layer in expectation; it does not imply reading every expert. Verify cost and acceptance require measurement, so neither 38GB/rank/step nor a 1.5–2× MTP speedup follows from batch size alone. Formal A with MTP has now passed both capability gates and N14; this is combination evidence, not isolated MTP gain. See [submissions](../../../notes/submissions.md) and [R17](../../codex/R17_nextn_sm80.md).
 
 ## 5. DP attention (`--enable-dp-attention --dp-size 8`)
 
@@ -69,7 +69,7 @@
 ## 7. Where time goes
 
 - **[D] Prefill.** Active weights are about 16.5 B parameters (MoE ≈ 9.5 B, KDA projections ≈ 4.6 B, MLA ≈ 1.3 B, dense ≈ 0.45 B, head 0.63 B), or about 33 GFLOP/token. Sparse MLA adds about 3 GFLOP/token (11 layers × topk 2048 × 64 heads). The indexer grows with context: about 0.8 GFLOP/token at 36k and about 6 at 257k. This sentence describes a mixed base-image estimate; the working S0 instead uses 111 Marlin W8A16 for FP8 MoE, 110 tilelang DSA indexer, and BF16 KDA. The older 40–60% MFU estimate was not observed: F70 measured MoE at only 27–30% of peak, and F76 measured roughly 10k token/s whole-service cold prefill (36k tokens about 3.6 s). mHC adds 90 small calls per forward.
-- **[D] Decode.** Decode is bound by expert weight bandwidth, plus about 17.8 MiB×2 of KDA state traffic per request per step and about 90 Triton KDA/conv launches per step (captured in graphs).
+- **[D/U] Decode.** Measure expert weight traffic, KDA state traffic, launch/graph cost and collectives before declaring a bottleneck. KDA SSM state alone is 34×8×128×128×4 bytes = 17.0MiB/rank/request at TP8; a read+write is approximately twice that before other traffic. Graph capture does not eliminate the kernels or communication.
 - **Hooks [V].**
   - `/start_profile` accepts `num_steps`, `profile_by_stage`, `profile_stages`, `activities` and `merge_profiles` (`S/entrypoints/http_server.py:1171`, `S/managers/io_struct.py:2110-2135`), with output to `SGLANG_TORCH_PROFILER_DIR` (`environ.py:448`).
   - `--enable-layerwise-nvtx-marker` (`server_args.py:1933`), `--enable-metrics`, `--enable-request-time-stats-logging` and `--expert-distribution-recorder-mode` (`:2474`).
@@ -79,4 +79,4 @@
 
 The sections above explain the base source. S0 runs with 110/111 and tilelang DSA backends; fa3 is Hopper-only for this model's path on A100 (F57). The earlier suggestion to select fa3 or tune an unworkable FP8 Triton MoE path is obsolete. `SGLANG_OPT_USE_TOPK_V2=0` remains required on A100 (task.md:424).
 
-The [patch inventory](../../../engine/README.md) records current mechanisms and their 8-card evidence. Candidate 114 divides indexer prefill rows; 115 adds DCP on sm80; 160 brings NEXTN; 170 adds opt-in breakable prefill CUDA graph. The candidate labels are not claims of scoring benefit. Compare complete dev levels with the harness scorer and check output/ability before promotion.
+The [patch inventory](../../../engine/README.md) records current mechanisms and their 8-card evidence. 114 divides indexer prefill rows and is included in S1; 115 adds DCP on sm80 but 041 failed on TP8 row padding; 160 brings NEXTN and is included in formal A/B; 170 adds opt-in breakable prefill CUDA graph with v2 TP8 revalidation still pending. The candidate labels are not claims of scoring benefit. Compare complete dev levels with the harness scorer and check output/ability before promotion.

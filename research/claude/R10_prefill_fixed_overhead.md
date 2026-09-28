@@ -41,7 +41,7 @@
   - `stack`：带 Python 调用栈，用于归因。它把 host 时间拉长约 1.6 倍，只用来看比例。
 - **统计：** 当时的 trace 分析只统计 `step[EXTEND…]` 这个 GPU annotation 窗口，从而排除 overlap 调度顺带跑的一个 decode step；一次性分析器已清理。
   - "CPU-starved gap" 的定义：下一个 kernel 的 launch 调用结束时刻 ≥ 前一个 kernel 的结束时刻。
-  - profiler 本身有开销：45 层时 profiler 下的 step 为 251ms，不开 profiler 时 e2e 为 212ms（`prof45/profile_summary.json`）。所以绝对值要按约 0.8 倍理解，比例不受影响。
+  - profiler 本身有开销：45 层时 profiler 下的 step 为 251ms，不开 profiler 时 e2e 为 212ms（`prof45/profile_summary.json`）。因此这两种采集方式不能直接比绝对值；约 0.8 只是该样本的比值，没有证明所有阶段等比例变化，也不能声称比例不受影响。
 
 ## 2. 成本探针（Q1）
 
@@ -133,7 +133,7 @@ stack 模式下的细分（`prof8/pytree_sched_P98304_P0.txt`；数值被放大�
 - kpool plan 上 GPU（`_kpool_plan_to_gpu`）：1.4ms；
 - metrics `report_prefill_stats`：1.8ms，由 `--enable-metrics` 引入。
 
-这些合计约 15ms/块，并且都在关键路径上。原因是 GPU 在饿着等 CPU，overlap 调度没有东西可以重叠。
+这些是该 TP1 替身样本的阶段时间，不能直接作为当前 TP8 每块固定开销；是否在关键路径、能否与其他工作重叠，需要看对应运行的流和依赖。
 
 ## 4. host 时间花在哪里
 
@@ -164,7 +164,7 @@ tilelang/tvm eager dispatch 被单独列出，是因为它每次调用都要走 
 
 结论（实测）：**没有单一热点**。开销是约 100µs/kernel 的通用 Python dispatch，乘以约 52 kernel/层，再乘以 45 层。
 
-## 5. 把约 150ms/块归到各类（真机 TP8，c 在 1–2k）
+## 5. 约 150ms/块的解释：TP1 实测与 TP8 推断，不能当 TP8 归因表
 
 | 类别 | 量级 | 依据 |
 |---|---|---|
@@ -185,8 +185,8 @@ tilelang/tvm eager dispatch 被单独列出，是因为它每次调用都要走 
 
 ## 6. 修法排序（推断）
 
-1. **prefill CUDA graph（上限最高）。** 当前 `Breakable CUDA graph is incompatible with KDA hybrid linear attention`（见 `logs/server_key_lines.txt`）。
-   - 需要把 KDA 的 extend 和 mamba state 追踪做成 graph-safe，并清掉 forward 内的 56 次 stream sync 和 110 次 memcpy（D2H 会打断 graph）。
+1. **prefill CUDA graph（小块固定成本候选）。** 这是 T51 时底包的 KDA 限制；后续已有 170 v2 的 TP2 修复证据，真实 TP8 数值与性能仍待复验，不能继续按“尚无实现”估工。
+   - 需要 KDA extend 与状态追踪满足图执行契约。T51 的 sync/memcpy 次数是线索，不代表每次调用都必须删除；应区分图外元数据、真正同步与可捕获拷贝，并核对 170 已覆盖的部分。
    - 预期：c≤2048 的块从约 215ms 降到约 GPU 时间：100ms（P=98k）/ 76ms（P=0），再加真机 allreduce。c=256 的地板会从 181ms 大幅下降（graph 下 GPU 耗时未测）。c=16384 的块收益很小（GPU-bound）。
    - 意义：小块变便宜，才可以用小块来保护 TPOT。
 2. **不用 graph 时的逐模块减 host。** 可行方向：

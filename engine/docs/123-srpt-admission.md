@@ -29,5 +29,13 @@ validate DMA, GPU state restoration, MTP numerics, TP8 agreement or performance.
 
 8 cards: historical 037c → 037d (old S1 + 122, then only 123 aging=2000) reduced chain failures 33 → 23, with CP
 allowance 22. TPOT p95 was .1424 → .1466, so both full N22 runs failed. This is a useful lead, not evidence for the
-current host64/MTP baseline. Current-baseline single-variable validation is pending after 071.
+current host64/MTP baseline.
 See [experiment records](../../notes/experiments.md) and [R26](../../research/codex/R26_n30_slo_levers.md).
+
+**2026-09-28 update: superseded, not "pending".** 123's single-request shortest-remaining-first idea was folded into
+124 (deadline-tiered admission, `SGLANG_AX_DEADLINE_TIERS`) as one tier of its order, then extended with family-aware
+ranking on top of that (128p, `SGLANG_AX_PREFIX_PRODUCER`) once same-pack cold requests turned out to need
+group-level rather than per-request ordering (job 104, 2026-09-26: 124 alone reached 13/27 chain misses in the first
+minute against a shortest-remaining-first estimate of 7, because sibling requests share a prefix the single-request
+estimate cannot see). No further standalone 123 validation is
+planned; see the "124" and "128p" rows in [engine/README.md](../README.md) and [program-n30-v3.md](../../notes/program-n30-v3.md).
