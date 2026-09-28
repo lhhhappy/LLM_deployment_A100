@@ -1,0 +1,140 @@
+{
+  "name": "kda-state-memory-a",
+  "status": "PASS",
+  "exit": 0,
+  "started": "2026-09-28T11:44:25Z",
+  "finished": "2026-09-28T11:44:34Z",
+  "complete": {
+    "incremental_allocated_bytes": 0,
+    "incremental_driver_bytes": 0,
+    "incremental_reserved_bytes": 0,
+    "kind": "native_memory_complete",
+    "passed": true,
+    "repeat_driver_bytes": 0,
+    "scope": "One process/device; BV16 increment after loading matching native BV32 signatures"
+  },
+  "stages": {
+    "native_bv32_12_signatures": {
+      "counts": {
+        "compiled": 0,
+        "disk_hits": 12,
+        "jit_misses": 12,
+        "module_loads": 12
+      },
+      "kind": "native_memory_stage",
+      "loaded_variants": [
+        4,
+        8
+      ],
+      "memory_after": {
+        "allocated": 0,
+        "driver_free": 84434747392,
+        "driver_total": 84987740160,
+        "reserved": 23068672
+      },
+      "memory_before": {
+        "allocated": 0,
+        "driver_free": 84537507840,
+        "driver_total": 84987740160,
+        "reserved": 0
+      },
+      "memory_delta": {
+        "allocated": 0,
+        "driver_free": -102760448,
+        "driver_total": 0,
+        "reserved": 23068672
+      },
+      "seconds": 0.6576188541948795,
+      "stage": "native_bv32_12_signatures",
+      "temporary_peak_bytes": 2362368
+    },
+    "bv16_after_native": {
+      "counts": {
+        "compiled": 0,
+        "disk_hits": 12,
+        "jit_misses": 12,
+        "module_loads": 12
+      },
+      "kind": "native_memory_stage",
+      "loaded_variants": [
+        8,
+        16
+      ],
+      "memory_after": {
+        "allocated": 0,
+        "driver_free": 84434747392,
+        "driver_total": 84987740160,
+        "reserved": 23068672
+      },
+      "memory_before": {
+        "allocated": 0,
+        "driver_free": 84434747392,
+        "driver_total": 84987740160,
+        "reserved": 23068672
+      },
+      "memory_delta": {
+        "allocated": 0,
+        "driver_free": 0,
+        "driver_total": 0,
+        "reserved": 0
+      },
+      "seconds": 0.026552440598607063,
+      "stage": "bv16_after_native",
+      "temporary_peak_bytes": 2362368
+    },
+    "bv16_cached_repeat": {
+      "counts": {
+        "compiled": 0,
+        "disk_hits": 0,
+        "jit_misses": 0,
+        "module_loads": 0
+      },
+      "kind": "native_memory_stage",
+      "loaded_variants": [
+        8,
+        16
+      ],
+      "memory_after": {
+        "allocated": 0,
+        "driver_free": 84434747392,
+        "driver_total": 84987740160,
+        "reserved": 23068672
+      },
+      "memory_before": {
+        "allocated": 0,
+        "driver_free": 84434747392,
+        "driver_total": 84987740160,
+        "reserved": 23068672
+      },
+      "memory_delta": {
+        "allocated": 0,
+        "driver_free": 0,
+        "driver_total": 0,
+        "reserved": 0
+      },
+      "seconds": 0.0005052778869867325,
+      "stage": "bv16_cached_repeat",
+      "temporary_peak_bytes": 0
+    }
+  },
+  "source_snapshot_checks": {
+    "engine/sglang/kernels/ops/attention/fla/kda_state_sm80.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": true,
+    "engine/sglang/kernels/ops/attention/fla/kda.py": true,
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": true,
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": true,
+    "tests/gpu/test_kda_state_sm80.py": true
+  },
+  "source_sha256": {
+    "engine/sglang/kernels/ops/attention/fla/kda_state_sm80.py": "6c2d6c6fea8e9eaf7db6f4184f79b1d7f5583d41119a51872c944295f15d1a4e",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": "628163702a7f0c58d1837d00ea32d9725a0cff9cfc4245348907542af3252196",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "8d6a7b30c05dc16cf7566a7c703f9e3b00cfcaf2b3061abad297de52619a5681",
+    "engine/sglang/kernels/ops/attention/fla/kda.py": "b9c3cf3ff0bab6b5138dac34aa8dc30ccccddee52870621f1caf81df3ae589ae",
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "00c5930bd801311987d60a2a766c7754aa597673794c9be20ebdc7f269937ab5",
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "bab56ca95a7dd098d443ec0f0228c32ee00846a3bfe7cd0448c344c721ef5193",
+    "tests/gpu/test_kda_state_sm80.py": "ad9b3dd915de2f0e4b133dab2cc60e6451941e47b83450abfb482f90174c642b"
+  },
+  "receipt_sha256": "ffdbfd3372143a4fa71871084b4f6a9244e8c405a3d2cb89f856fbdd09662561",
+  "interpretation": "After matching native BV32 warm, no additional device allocation was observed for BV16 in this process. CUDA may reuse internal driver pools; this is not proof of zero module storage. All 12 loads were disk cache hits, not cold compiler timing."
+}

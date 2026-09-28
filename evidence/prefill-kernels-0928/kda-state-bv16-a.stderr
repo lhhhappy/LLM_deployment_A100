@@ -1,0 +1,18 @@
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+USDT:2026-09-28 11:07:26 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:26 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:26 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:26 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:27 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:27 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:28 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:28 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:29 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:29 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:29 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:29 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:30 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:30 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 11:07:30 228144:228144 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 11:07:30 228144:228144 SyncActivityProfilerHandler.cpp:59] profiler_stop

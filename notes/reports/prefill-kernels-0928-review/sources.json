@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "scope": "Offline report archive; no GPU execution or production edits",
+  "source_audits": [
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-next-0928/sol-pr-audit.md",
+      "source_sha256": "79fcfe131d7b5c2f802dae38c9912eadd3c25125ee4041374e0ef0c38ab8f30c",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/sol-pr-audit.md",
+      "archive_sha256": "7fe5b72f6aa112d2e31907740c1064e22f1fe921dd21ffafc1c300fbf1943d49",
+      "transform": "insert snapshot banner; rewrite local Markdown links only"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-next-0928/moe-architecture-audit.md",
+      "source_sha256": "5ef4fc44325dd04060419f441bc4e56a1c3bd4c0d2398fcd080c510735f4a4fb",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/moe-architecture-audit.md",
+      "archive_sha256": "42a4ad3c347fd32a68a84565a8a16f5d3ea9ec84216fc19d043bd3e2d8805679",
+      "transform": "insert snapshot banner; rewrite local Markdown links only"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-next-0928/scale-fold-review.md",
+      "source_sha256": "b10b7928e185b19e87058baf8b0288339acbf19cfbef496a5db2b6c847d6c895",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/scale-fold-review.md",
+      "archive_sha256": "17b3ae5361b533170a4e2a0c76049343816346ffb2a5178c6c4be9c10b479a5c",
+      "transform": "insert snapshot banner; rewrite local Markdown links only"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-next-0928/mhc-splitk-review.md",
+      "source_sha256": "4fb932de37d5cc1c7304b39da8bff9cc4a3a2bd7b4a49fff0af2d400687bd747",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/mhc-splitk-review.md",
+      "archive_sha256": "b3272079710d872be42b3b791484d7ca0c7e6a592d4203be8a73e384d3a235e1",
+      "transform": "insert snapshot banner; rewrite local Markdown links only"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-next-0928/probe-review.md",
+      "source_sha256": "56b2923e66adaaca00dc68ce6ea4afa50c856556b1a4fe427c605fa0a57d6ed3",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/probe-review.md",
+      "archive_sha256": "4ccb9595b457f9192b4d55d4dfa217306ea845187743cc3b36801e1f1a3d5f15",
+      "transform": "insert snapshot banner; rewrite local Markdown links only"
+    }
+  ],
+  "supporting_sources": [
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-dev-0928/humming-source/humming_kernels-0.1.12/humming/csrc/launcher/tensor.h",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/sources/humming-0.1.12/humming/csrc/launcher/tensor.h",
+      "sha256": "b334efcfeed39bb1aed1a29b0412043e895c321a6e68c99f1d69777ec041edd7"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-dev-0928/humming-source/humming_kernels-0.1.12/humming/utils/smem.py",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/sources/humming-0.1.12/humming/utils/smem.py",
+      "sha256": "8cac9cf8e741b6f860d98947f729749aacbb35edaf9c3d1875ad9a341794c740"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-dev-0928/humming-source/humming_kernels-0.1.12/humming/tune/sm8x.py",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/sources/humming-0.1.12/humming/tune/sm8x.py",
+      "sha256": "421d6e7a31f8390fc793b974d87670ee302cc8dd02d091e65bdc6faf8d012d12"
+    },
+    {
+      "source_path": "/workspace/Agentic_science_challenge/build/scratch/kernel-dev-0928/humming-source/humming_kernels-0.1.12/LICENSE",
+      "archive_path": "notes/reports/prefill-kernels-0928-review/sources/humming-0.1.12/LICENSE",
+      "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c"
+    }
+  ],
+  "evidence_sha256": {
+    "evidence/moe-scale-fold-0928/README.md": "d5ccc3d874abdc4a04b1717c65f0c5870a62c0264d7df6bb64b41b54f21a2926",
+    "evidence/moe-scale-fold-0928/archive-receipt.json": "64af55b32acc88784ef75078a478bb01412c021d243bb0f100bc327c0d3a0fab",
+    "evidence/moe-scale-fold-0928/receipts.tar.gz": "21354aaca4f31ecaa1785d6597d244e78fe6799cf96180b273e3c8edd5ef8d09",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-0928.manifest.json": "a959184dd159eed6845cf1702ed5d4de44495e53af923e1d5dc14a464a5edf7f",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.finished": "11de64db12548bd98d29453833e731418a3afdffc2201ffb8089e719204f9530",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.jsonl": "f589f154c56f552627592eae6aec374c869702c9f4db6a98efe14689b1d0c2d0",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.probe.py": "5b14e3a4a5c6a0a7f80f7c757f9795af6d57dd3d98ab6f278c6f0c2804542ef1",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.started": "93ce4c5d0495a73004bf08a8a9b306f06ffde294d7ff6ebf817215c796ba4f6a",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-a.stderr": "7508738b8c8905868ea9f2621767afdde43f9d91d54df325e5b6eb5ecd5d9533",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.finished": "278d32386fd286d53b25db8dc55251c90932bb059d8c01b6b9203eb4a8448987",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.jsonl": "015ecc2858b2e7eb0a788ea6475342a9859c9d83510a3a89068ef188f6c8ea88",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.probe.py": "9a3af57c62830620d6aa2cff6c91903c25f6ba37aadf6b281dcee48ebf1c7faf",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.started": "03febc8da7b43e63cd70552a3acaa696fec743b874ab74946903711dc04edab6",
+    "evidence/moe-scale-fold-0928/results/moe-scale-fold-b.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/moe-scale-fold-0928/scripts/analysis/bench_moe_scale_fold_sm80.py": "9a3af57c62830620d6aa2cff6c91903c25f6ba37aadf6b281dcee48ebf1c7faf",
+    "evidence/moe-scale-fold-0928/scripts/analysis/prepare_humming_scale_fold_probe.py": "9b584f218d28cc57fd9cd776dde2b878a348176d643473bb8f5aa22693d95422",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.finished": "1f97af4a55c765c6c0ea29abb27de7f93874e4aac5c7f9fd7ecb69d7b9ec04df",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.jsonl": "5ce6cc77766b93db877d8b5c460e3e7d15df8a8625d35237a79d51e7ce13c585",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.source.py": "f5bbd4c0c64b35e1b68f3f2ef0f52405f315a27d4f8a781d4a4d75647070cb22",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.started": "12c44260f13247d98076d24d6bc1bc1d9cfc77d580717e8d3918e9ebc1f4b7c9",
+    "evidence/prefill-kernels-0928/indexer-tiles-a.stderr": "daac04792bc5cfa8ef5afdc8ccdf5dd9572257a89793c89ffd2f770625ac6757",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.finished": "7d80b5da236609b8f8c5aa12ae5420457b5ef56750c1c53af49192925fa10152",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.jsonl": "8692d81f3300fadcdc6ebdc26216b7706d4f70d96e1e42d53a639e9ba99fecea",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.source.py": "f89230298c752296ff7ccfd81b61b49ede3b95c4d4ffd8b0c4d955987df59ce2",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.started": "5c73d8a3ad226fe46992c07963d7e948ecb8e1f83ad720e9bab09ec0c2bb2dfc",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/prefill-kernels-0928/indexer-tiles-b.summary.json": "74b554b84d630d1f6590e2e24026c50453e4b2c6ff81b181e317f890fbd9a28b",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.finished": "be5a03396a0ee2de3986bab2d1d8aca0789b60e0a997fee44d5539f05a52b209",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.identity.json": "0a208627ff9bf70e1fc630e959c4767f6286f2821bcd7eb5c5356b6d932734b7",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.jsonl": "b9640ec4cdb78bea4ce545adf02f4c0df56941437a5b285ef3f792f641dc3ac3",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.source.py": "e52a6018a7a676844506331f051f6c4353f7611336b0c5a42db196f9c79afae5",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.started": "f62d2f0a1d20587e740c8c6458c15eb6c96319fb928cb5a5a70a607514b41ee0",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.stderr": "f3da97fb0df7d77ec86d0b18d427e52e3eadf2e1e89389ecbb30d4c9a5378b30",
+    "evidence/prefill-kernels-0928/mhc-splitk-a.summary.json": "9ae6b7bd9387f3555e2ac833f0f9148a1714979a375dda6af22092db82c1da32"
+  },
+  "document_sha256": {
+    "research/codex/R36_prefill_kernel_options_0928.md": "17700ef5bcae402b52caa850cbcccd7eb9e487d9f9f1bbaf571c77bff87d12b3",
+    "notes/reports/prefill-kernels-0928-review/README.md": "d34d18723e3cd31377be5e93345c0e8098db9d8815751b2873ace810fea96f94",
+    "notes/reports/prefill-kernels-0928-review/mhc-splitk-review.md": "b3272079710d872be42b3b791484d7ca0c7e6a592d4203be8a73e384d3a235e1",
+    "notes/reports/prefill-kernels-0928-review/moe-architecture-audit.md": "42a4ad3c347fd32a68a84565a8a16f5d3ea9ec84216fc19d043bd3e2d8805679",
+    "notes/reports/prefill-kernels-0928-review/probe-review.md": "4ccb9595b457f9192b4d55d4dfa217306ea845187743cc3b36801e1f1a3d5f15",
+    "notes/reports/prefill-kernels-0928-review/scale-fold-review.md": "17b3ae5361b533170a4e2a0c76049343816346ffb2a5178c6c4be9c10b479a5c",
+    "notes/reports/prefill-kernels-0928-review/sol-pr-audit.md": "7fe5b72f6aa112d2e31907740c1064e22f1fe921dd21ffafc1c300fbf1943d49"
+  },
+  "offline_verification": {
+    "moe_manifest_entries": 156,
+    "moe_raw_bit_records_pass": 16,
+    "moe_stage_identity_and_config_check": "pass",
+    "moe_full_moe_recomputed": [
+      {
+        "rows": 8192,
+        "native_ms": 3.318619966506958,
+        "candidate_ms": 3.229827880859375,
+        "paired_reduction_percent": 2.8462420634484444,
+        "wins": 9
+      },
+      {
+        "rows": 16384,
+        "native_ms": 6.563151836395264,
+        "candidate_ms": 6.421219825744629,
+        "paired_reduction_percent": 1.9670342562686511,
+        "wins": 9
+      }
+    ],
+    "mhc-splitk-a": {
+      "recomputed_timing_rows": 14,
+      "selected": [
+        {
+          "rows": 8192,
+          "phase": null,
+          "variant": "native",
+          "median_ms": 0.8444139957427979,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 8192,
+          "phase": null,
+          "variant": "split4_m32_k128",
+          "median_ms": 0.7692779898643494,
+          "paired_reduction_percent": 9.031187823575108
+        },
+        {
+          "rows": 16384,
+          "phase": null,
+          "variant": "native",
+          "median_ms": 1.5796819925308228,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 16384,
+          "phase": null,
+          "variant": "split4_m32_k128",
+          "median_ms": 1.499027967453003,
+          "paired_reduction_percent": 5.122700930171744
+        }
+      ]
+    },
+    "indexer-tiles-b": {
+      "recomputed_timing_rows": 24,
+      "selected": [
+        {
+          "rows": 1024,
+          "phase": "scorer",
+          "variant": "native",
+          "median_ms": 4.189112186431885,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 1024,
+          "phase": "scorer",
+          "variant": "2_128_16_16_4",
+          "median_ms": 3.9221599102020264,
+          "paired_reduction_percent": 6.354089890781157
+        },
+        {
+          "rows": 1024,
+          "phase": "scorer_topk",
+          "variant": "native",
+          "median_ms": 4.717395782470703,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 1024,
+          "phase": "scorer_topk",
+          "variant": "2_128_16_16_4",
+          "median_ms": 4.451067924499512,
+          "paired_reduction_percent": 5.654618600538749
+        },
+        {
+          "rows": 2048,
+          "phase": "scorer",
+          "variant": "native",
+          "median_ms": 8.116507530212402,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 2048,
+          "phase": "scorer",
+          "variant": "2_128_16_16_4",
+          "median_ms": 7.564228057861328,
+          "paired_reduction_percent": 6.800228448781781
+        },
+        {
+          "rows": 2048,
+          "phase": "scorer_topk",
+          "variant": "native",
+          "median_ms": 9.098451614379883,
+          "paired_reduction_percent": 0.0
+        },
+        {
+          "rows": 2048,
+          "phase": "scorer_topk",
+          "variant": "2_128_16_16_4",
+          "median_ms": 8.544172286987305,
+          "paired_reduction_percent": 6.092856728080467
+        }
+      ]
+    },
+    "indexer_numerical_records_pass": 24,
+    "source_identity_matches": [
+      {
+        "run": "mhc-splitk-a",
+        "path": "engine/sglang/kernels/ops/layernorm/mhc.py",
+        "sha256": "29de652497a4524f69a0d2b13c09ed84cac25de44791161a3face8dff07ba25c"
+      },
+      {
+        "run": "mhc-splitk-a",
+        "path": "scripts/analysis/bench_mhc_splitk_sm80.py",
+        "sha256": "e52a6018a7a676844506331f051f6c4353f7611336b0c5a42db196f9c79afae5"
+      },
+      {
+        "run": "mhc-splitk-a",
+        "path": "evidence/prefill-kernels-0928/mhc-splitk-a.source.py",
+        "sha256": "e52a6018a7a676844506331f051f6c4353f7611336b0c5a42db196f9c79afae5"
+      },
+      {
+        "run": "indexer-tiles-b",
+        "path": "engine/sglang/srt/layers/attention/dsa/sm80_indexer_kernels.py",
+        "sha256": "2c6302f7e9c5403d973bf2ee2bf6834926bb399679d802ef3ffaba39c23822d3"
+      },
+      {
+        "run": "indexer-tiles-b",
+        "path": "scripts/analysis/bench_indexer_tiles_sm80.py",
+        "sha256": "f89230298c752296ff7ccfd81b61b49ede3b95c4d4ffd8b0c4d955987df59ce2"
+      },
+      {
+        "run": "indexer-tiles-b",
+        "path": "evidence/prefill-kernels-0928/indexer-tiles-b.source.py",
+        "sha256": "f89230298c752296ff7ccfd81b61b49ede3b95c4d4ffd8b0c4d955987df59ce2"
+      }
+    ],
+    "relative_local_links_checked": 93,
+    "gpu_execution": "none; offline verification only"
+  },
+  "archived_at_utc": "2026-09-28T11:22:25.248825+00:00"
+}

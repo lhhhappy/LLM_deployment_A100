@@ -1,0 +1,9 @@
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/tests/gpu/test_kda_state_sm80.py", line 326, in <module>
+    main()
+  File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/tests/gpu/test_kda_state_sm80.py", line 302, in main
+    assert after == before, (before, after)
+           ^^^^^^^^^^^^^^^
+AssertionError: (16777216, 0)

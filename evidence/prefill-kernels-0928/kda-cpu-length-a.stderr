@@ -1,0 +1,27 @@
+test_default_off_and_fallbacks_read_original_scalar (__main__.Contracts.test_default_off_and_fallbacks_read_original_scalar) ... ok
+test_normal_mixed_and_physical_padding (__main__.Contracts.test_normal_mixed_and_physical_padding) ... ok
+test_real_metadata_hook_populates_only_when_enabled (__main__.Contracts.test_real_metadata_hook_populates_only_when_enabled) ... ok
+test_unsupported_metadata_is_not_guessed (__main__.Contracts.test_unsupported_metadata_is_not_guessed) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.085s
+
+OK
+/sjtu/linhang/arena/env/sgl/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+USDT:2026-09-28 10:36:54 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:36:54 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:36:54 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:36:54 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:36:55 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:36:55 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:36:55 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:36:55 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:52] profiler_start
+USDT:2026-09-28 10:37:38 213209:213209 SyncActivityProfilerHandler.cpp:59] profiler_stop

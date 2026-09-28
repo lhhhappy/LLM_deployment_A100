@@ -1,0 +1,104 @@
+{
+  "name": "kda-state-production-b",
+  "status": "PASS",
+  "exit": 0,
+  "started": "2026-09-28T11:37:49Z",
+  "finished": "2026-09-28T11:38:06Z",
+  "serving_signature_cases": 13,
+  "matrix_cases": 12,
+  "fresh_graph_replays": 4,
+  "all_candidate_raw_bits": true,
+  "all_serving_and_capture_cache_counts_zero": true,
+  "startup_warm": {
+    "counts": {
+      "compiled": 0,
+      "disk_hits": 12,
+      "jit_misses": 12,
+      "module_loads": 12
+    },
+    "kind": "startup_warm",
+    "loaded_variants": [
+      4,
+      8
+    ],
+    "memory_after": {
+      "allocated": 0,
+      "driver_free": 84438941696,
+      "driver_total": 84987740160,
+      "reserved": 18874368
+    },
+    "memory_before": {
+      "allocated": 0,
+      "driver_free": 84520730624,
+      "driver_total": 84987740160,
+      "reserved": 16777216
+    },
+    "memory_delta": {
+      "allocated": 0,
+      "driver_free": -81788928,
+      "driver_total": 0,
+      "reserved": 2097152
+    },
+    "memory_scope": "tensor allocator plus device-wide free delta including module loads; GPU idle",
+    "retained_tensor_bytes": 0,
+    "seconds": 0.7544897831976414,
+    "temporary_peak_bytes": 2362368
+  },
+  "guard_rejections": {
+    "kind": "shape_fallback",
+    "native_autotuner": true,
+    "rejected": {
+      "fp16": true,
+      "gk_bf16": true,
+      "native_env_override": true,
+      "natural_exp": true,
+      "no_new_value": true,
+      "no_state": true,
+      "not_warmed": true,
+      "offsets_int32": true,
+      "query_int64": true,
+      "rows": true,
+      "scalar_gate": true,
+      "snapshot_int32": true,
+      "snapshot_unpaired": true,
+      "state_bf16": true,
+      "state_inner_stride": true,
+      "too_many_sequences": true,
+      "unaligned": true,
+      "wrong_nt": true
+    }
+  },
+  "source_snapshot_checks": {
+    "engine/sglang/kernels/ops/attention/fla/kda_state_sm80.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": true,
+    "engine/sglang/kernels/ops/attention/fla/kda.py": true,
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": true,
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": true,
+    "tests/gpu/test_kda_state_sm80.py": true
+  },
+  "source_sha256": {
+    "engine/sglang/kernels/ops/attention/fla/kda_state_sm80.py": "6c2d6c6fea8e9eaf7db6f4184f79b1d7f5583d41119a51872c944295f15d1a4e",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": "628163702a7f0c58d1837d00ea32d9725a0cff9cfc4245348907542af3252196",
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": "8d6a7b30c05dc16cf7566a7c703f9e3b00cfcaf2b3061abad297de52619a5681",
+    "engine/sglang/kernels/ops/attention/fla/kda.py": "b9c3cf3ff0bab6b5138dac34aa8dc30ccccddee52870621f1caf81df3ae589ae",
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "00c5930bd801311987d60a2a766c7754aa597673794c9be20ebdc7f269937ab5",
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "bab56ca95a7dd098d443ec0f0228c32ee00846a3bfe7cd0448c344c721ef5193",
+    "tests/gpu/test_kda_state_sm80.py": "88d3d4d2ad99c89441e518a9c4cb5d141fe7be4addbe84ce1d864e5f33a8b4c8"
+  },
+  "file_sha256": {
+    "kda-state-production-b.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "kda-state-production-b.launch.json": "cac60f319893eb8372ba46bcf9b2dff53c5d36da16ec3f1cc0b480b04def0e8c",
+    "receipt.tgz": "e1ec3e903c627e21b475e404c6e5d17d05db02eee18775249658250ac47afbde",
+    "source.sha256": "a95e5018fb43884c7a9013d900fbff047d761a3ef11d964400da6f904fa4d940",
+    "kda-state-production-b.finished": "dbc0f92a6671c07310a878e2406967f23014715771e3b76c22efae40d3ffcce6",
+    "launch.json": "cac60f319893eb8372ba46bcf9b2dff53c5d36da16ec3f1cc0b480b04def0e8c",
+    "kda-state-production-b.source.sha256": "a95e5018fb43884c7a9013d900fbff047d761a3ef11d964400da6f904fa4d940",
+    "kda-state-production-b.started": "5be62553563fd1570c89f6c13f9392f83a38902ef33e362aebd92e1c0c62108f",
+    "kda-state-production-b.stderr": "79c8a6bdea923d4d29d222e427dcbf07c42cb48e104f88c25e194d8224063476",
+    "kda-state-production-b.jsonl": "670b5372e075e875f13cd0f38c0b136ecf8aaa503db95290b66c31f7b8dd32d9"
+  },
+  "scope": "Production recurrence wrappers and startup warm; full core timing belongs to final combination F",
+  "memory_caveat": "Device-wide free delta includes module loads and other lazy CUDA initialization during warm; 12/12 disk-cache hits, not a cold disk compile measurement",
+  "prior_invalid": "kda-state-production-a"
+}

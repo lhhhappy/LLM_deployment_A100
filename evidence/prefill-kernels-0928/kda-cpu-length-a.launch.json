@@ -1,0 +1,19 @@
+{
+  "run": "kda-cpu-length-a",
+  "gpu": 1,
+  "command": [
+    "bash",
+    "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/run_kernel_probe.sh",
+    "kda-cpu-length-a",
+    "1",
+    "tests/test_kda_prefill_cpu_length.py",
+    "--gpu",
+    "--rows",
+    "8192",
+    "16384"
+  ],
+  "source_sha256": {
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "901a408f1e5883183140d998f72b2e09e0e740a24655bb8c98bfeaf5862765e4",
+    "tests/test_kda_prefill_cpu_length.py": "428236ccc6ec42d0d12747d5bfe93ea2c7995fd6ea4b889641acb6c433ab94c4"
+  }
+}

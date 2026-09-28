@@ -1,0 +1,54 @@
+{
+  "archive_verified": {
+    "kda-cpu-length-a": {
+      "files": 8,
+      "completion": {
+        "kind": "gpu_complete",
+        "passed": true,
+        "cases": 4
+      }
+    },
+    "kda-local-graph-a": {
+      "files": 9,
+      "completion": {
+        "kind": "graph_complete",
+        "passed": true,
+        "graph_cases": 4
+      }
+    },
+    "kda-local-graph-b": {
+      "files": 9,
+      "completion": {
+        "kind": "graph_complete",
+        "passed": true,
+        "graph_cases": 4
+      }
+    },
+    "kda-state-bv16-a": {
+      "files": 9,
+      "completion": {
+        "kind": "graph_complete",
+        "passed": true,
+        "graph_cases": 4
+      }
+    },
+    "kda-state-bv8-a": {
+      "files": 9,
+      "completion": {
+        "kind": "graph_complete",
+        "passed": true,
+        "graph_cases": 4
+      }
+    }
+  },
+  "gpu0_released": true,
+  "gpu1_released": true,
+  "best_state_tile": "BV16: 3.00\u20135.04% paired complete-core graph gain; no production recurrence change",
+  "limitations": [
+    "fixed topology local graph diagnostic",
+    "synthetic BF16 activations and random prefix states",
+    "no model projections, TP communication or chain result",
+    "A graph offsets int32; B and state probes preserve native int64",
+    "BV8 negative despite all raw-bit correctness gates passing"
+  ]
+}

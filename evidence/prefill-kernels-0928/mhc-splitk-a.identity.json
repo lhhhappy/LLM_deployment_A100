@@ -1,0 +1,11 @@
+{
+  "probe": "scripts/analysis/bench_mhc_splitk_sm80.py",
+  "sha256": "e52a6018a7a676844506331f051f6c4353f7611336b0c5a42db196f9c79afae5",
+  "engine_source": "engine/sglang/kernels/ops/layernorm/mhc.py",
+  "engine_sha256": "29de652497a4524f69a0d2b13c09ed84cac25de44791161a3face8dff07ba25c",
+  "branch_head": "be392558",
+  "remote_engine_identity": "per-file hashes; not claimed equal to branch HEAD",
+  "gpu": 0,
+  "run": "--rows 8192 16384 --rounds 7 --inner 16",
+  "scope": "synthetic mHC boundary; local diagnostic"
+}

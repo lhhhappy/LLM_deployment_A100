@@ -1,0 +1,120 @@
+[10:35:54] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:35:54] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:36:21] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:36:21] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:36:49] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:36:49] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:16] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:16] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:44] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:44] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:59] : Warning: Data race detected: `sqrsum_partial(by, t)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 0
+  i_OTHER_ = 1
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.
+[10:37:59] : Warning: Data race detected: `out_partial(by, t, j)`is written by multiple threads in loop (i,), Example:
+  bx = 0
+  by = 0
+  i = 1
+  i_OTHER_ = 0
+  j = 0
+  j_OTHER_ = 0
+  num_tokens = 1
+  t = 0
+  tx = 0
+If you believe this is a false positive, pass `PassKey.TL_DISABLE_DATA_RACE_CHECK` to pass key to disable this check.

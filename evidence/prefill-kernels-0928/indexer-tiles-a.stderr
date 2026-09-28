@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_indexer_tiles_sm80.py", line 167, in <module>
+    main()
+  File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_indexer_tiles_sm80.py", line 114, in main
+    assert 'native' in variants
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,7 @@
+{"kind": "environment", "arguments": {"rows": [1024, 2048], "keys": 65536, "rounds": 7, "inner": 8}, "torch": "2.13.0+cu130", "triton": "3.7.1", "gpu": "NVIDIA A100-SXM4-80GB", "source_sha256": "2c6302f7e9c5403d973bf2ee2bf6834926bb399679d802ef3ffaba39c23822d3", "probe_sha256": "f5bbd4c0c64b35e1b68f3f2ef0f52405f315a27d4f8a781d4a4d75647070cb22", "scope": "per-rank 114 rows; FP8 unpack + 113 logits + pooled top-k only"}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "native", "scores_raw_bits": true, "indices_exact": false, "regs": 166, "spills": 0, "shared": 49152}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "4_64_32_4_4", "scores_raw_bits": false, "indices_exact": false, "regs": 160, "spills": 0, "shared": 49152}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "4_128_32_4_4", "scores_raw_bits": false, "indices_exact": false, "regs": 255, "spills": 0, "shared": 65536}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "8_64_32_4_4", "scores_raw_bits": false, "indices_exact": false, "regs": 255, "spills": 6, "shared": 81920}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "4_128_16_8_4", "scores_raw_bits": false, "indices_exact": false, "regs": 255, "spills": 0, "shared": 65536}
+{"kind": "numerics", "rows": 1024, "keys": 65536, "variant": "4_256_32_4_8", "scores_raw_bits": false, "indices_exact": false, "regs": 255, "spills": 0, "shared": 98304}

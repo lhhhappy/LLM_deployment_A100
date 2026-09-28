@@ -1,0 +1,8 @@
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_scale_fold_sm80.py", line 393, in <module>
+[rank0]:     main()
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_scale_fold_sm80.py", line 277, in main
+[rank0]:     core.run_activation(gate, activation)
+[rank0]:     ^^^^^^^^^^^^^^^^^^^
+[rank0]: AttributeError: '_AxFp8HummingRunnerCore' object has no attribute 'run_activation'. Did you mean: 'activation'?
+[rank0]:[W928 10:51:31.448430918 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

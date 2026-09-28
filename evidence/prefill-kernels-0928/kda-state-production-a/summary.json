@@ -1,0 +1,16 @@
+{
+  "name": "kda-state-production-a",
+  "exit": 1,
+  "status": "INVALID_TEST_HARNESS_MEMORY_BASELINE",
+  "reason": "mock call records retained 16MiB until Python GC during warm; allocated comparison was (16777216, 0)",
+  "production_sources_changed_for_retry": false,
+  "source_snapshot_checks": {
+    "engine/sglang/kernels/ops/attention/fla/kda_state_sm80.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h.py": true,
+    "engine/sglang/kernels/ops/attention/fla/chunk_delta_h_snapshot.py": true,
+    "engine/sglang/kernels/ops/attention/fla/kda.py": true,
+    "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": true,
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": true,
+    "tests/gpu/test_kda_state_sm80.py": true
+  }
+}

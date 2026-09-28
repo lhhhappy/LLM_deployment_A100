@@ -1,0 +1,27 @@
+{
+  "name": "kda-state-bv8-a",
+  "gpu": 0,
+  "command": [
+    "bash",
+    "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/run_kernel_probe.sh",
+    "kda-state-bv8-a",
+    "0",
+    "scripts/analysis/bench_kda_graph_sm80.py",
+    "--gpu",
+    "--rows",
+    "8192",
+    "16384",
+    "--rounds",
+    "9",
+    "--inner",
+    "4",
+    "--state-bv",
+    "8"
+  ],
+  "source_sha256": {
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "557315df0e3371338ad358282828f7e274cbee0314548455b8f7a527d46bb2b0",
+    "tests/test_kda_prefill_cpu_length.py": "dd472def176842c2b098bb1b4748f4a8849a78e9651d4863fde89fe624d172cd",
+    "scripts/analysis/bench_kda_graph_sm80.py": "24c55f448e0da7924374e476748f61b96bbbba259c579e169460cb982de6ad1f"
+  },
+  "compatibility": "installed triton Nvidia min_dot_size accepts BF16 M,N>=1,K>=16 via tensorcore padding"
+}

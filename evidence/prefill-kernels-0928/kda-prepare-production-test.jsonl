@@ -1,0 +1,12 @@
+{"gpu": "NVIDIA A100-SXM4-80GB", "kind": "environment", "source_sha256": {"engine/sglang/kernels/ops/attention/fla/kda_prepare_sm80.py": "d216884d6615d3975faad8e6018abfb0337c648b47ff31765589d1aeda5cd159", "engine/sglang/srt/layers/attention/linear/kda_backend.py": "eb6c6299e9c8fef92969f2bbf4247cd205f0a5ba8d31e4bdeae019ce57a4b2b8", "engine/sglang/srt/layers/attention/linear/kernels/kda_triton.py": "7076b1514736adf48acac2832254eaa0114d04d61e2f5cc9ca0a00c50603fdfd", "tests/gpu/test_kda_prepare_sm80.py": "fe5f2475adea69fdd35cbd6bbb3afa45a955ae0f34f66256e68176de0bddd2de"}, "torch": "2.13.0+cu130", "triton": "3.7.1"}
+{"cpu_device": true, "kind": "arm_fallback", "off": true, "unsupported_sm": true}
+{"kind": "extend_contract", "mode": "off", "native_arguments": true}
+{"counts": {"compiled": 1, "disk_hits": 0, "jit_misses": 1}, "kind": "warmup_cache", "loaded_variants": 1}
+{"counts": {"compiled": 0, "disk_hits": 0, "jit_misses": 0}, "kind": "serving_cache", "loaded_variants": 1, "tokens": 8192}
+{"k": true, "kind": "prepare_raw_bits", "q": true, "tokens": 8192, "v_all_65536_patterns": true}
+{"kind": "extend_contract", "mode": "armed", "prepared_arguments": true, "tokens": 8192}
+{"cases": {"contiguous_stride": true, "other_device": true, "other_rows": true, "unaligned_pointer": true, "wrong_dtype": true, "wrong_heads": true}, "kind": "shape_fallback"}
+{"counts": {"compiled": 0, "disk_hits": 0, "jit_misses": 0}, "kind": "serving_cache", "loaded_variants": 1, "tokens": 16384}
+{"k": true, "kind": "prepare_raw_bits", "q": true, "tokens": 16384, "v_all_65536_patterns": true}
+{"kind": "extend_contract", "mode": "armed", "prepared_arguments": true, "tokens": 16384}
+{"kind": "complete", "status": "PASS"}

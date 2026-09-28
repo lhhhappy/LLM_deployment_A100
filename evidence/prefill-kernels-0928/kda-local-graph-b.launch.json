@@ -1,0 +1,24 @@
+{
+  "name": "kda-local-graph-b",
+  "gpu": 0,
+  "command": [
+    "bash",
+    "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/run_kernel_probe.sh",
+    "kda-local-graph-b",
+    "0",
+    "scripts/analysis/bench_kda_graph_sm80.py",
+    "--gpu",
+    "--rows",
+    "8192",
+    "16384",
+    "--rounds",
+    "9",
+    "--inner",
+    "4"
+  ],
+  "source_sha256": {
+    "engine/sglang/srt/layers/attention/linear/kda_backend.py": "557315df0e3371338ad358282828f7e274cbee0314548455b8f7a527d46bb2b0",
+    "tests/test_kda_prefill_cpu_length.py": "dd472def176842c2b098bb1b4748f4a8849a78e9651d4863fde89fe624d172cd",
+    "scripts/analysis/bench_kda_graph_sm80.py": "d14ce1d35ea745742a4deb3897ea3db325e47ebd829b376ee049d342bd1e3cfb"
+  }
+}

@@ -1,0 +1,439 @@
+{
+  "receipt": "kda-local-graph-a",
+  "exit": 0,
+  "correctness_cases": 12,
+  "timing": [
+    {
+      "rows": 8192,
+      "sequences": 1,
+      "snapshots": false,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.194815993309021,
+          "host_ms": 1.1256779544055462,
+          "wall_ms": 1.1988431215286255
+        },
+        "eager_cpu": {
+          "gpu_ms": 0.9814079999923706,
+          "host_ms": 0.8788346312940121,
+          "wall_ms": 0.9855767711997032
+        },
+        "graph_replay": {
+          "gpu_ms": 0.8902559876441956,
+          "host_ms": 0.005791895091533661,
+          "wall_ms": 0.8939006365835667
+        },
+        "graph_staged": {
+          "gpu_ms": 1.0013840198516846,
+          "host_ms": 0.10154582560062408,
+          "wall_ms": 1.0053408332169056
+        }
+      },
+      "gain_vs_native_pct": {
+        "eager_native": 0.0,
+        "eager_cpu": 17.861159752776736,
+        "graph_replay": 25.490117923627054,
+        "graph_staged": 16.189268853158733
+      }
+    },
+    {
+      "rows": 8192,
+      "sequences": 3,
+      "snapshots": true,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.3313039541244507,
+          "host_ms": 1.2943604961037636,
+          "wall_ms": 1.335968729108572
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.2085039615631104,
+          "host_ms": 1.17429718375206,
+          "wall_ms": 1.2130672112107277
+        },
+        "graph_replay": {
+          "gpu_ms": 0.9058560132980347,
+          "host_ms": 0.014851335436105728,
+          "wall_ms": 0.9100651368498802
+        },
+        "graph_staged": {
+          "gpu_ms": 1.0415120124816895,
+          "host_ms": 0.16717379912734032,
+          "wall_ms": 1.0462538339197636
+        }
+      },
+      "gain_vs_native_pct": {
+        "eager_native": 0.0,
+        "eager_cpu": 9.224038746440987,
+        "graph_replay": 31.957235574066733,
+        "graph_staged": 21.76752654756041
+      }
+    },
+    {
+      "rows": 16384,
+      "sequences": 1,
+      "snapshots": false,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 2.030344009399414,
+          "host_ms": 1.7759627662599087,
+          "wall_ms": 2.035164274275303
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.9432719945907593,
+          "host_ms": 1.0301792062819004,
+          "wall_ms": 1.9476651214063168
+        },
+        "graph_replay": {
+          "gpu_ms": 1.8817039728164673,
+          "host_ms": 0.015292782336473465,
+          "wall_ms": 1.8857205286622047
+        },
+        "graph_staged": {
+          "gpu_ms": 2.0904080867767334,
+          "host_ms": 0.18317345529794693,
+          "wall_ms": 2.0949174650013447
+        }
+      },
+      "gain_vs_native_pct": {
+        "eager_native": 0.0,
+        "eager_cpu": 4.288535066252697,
+        "graph_replay": 7.3209286650352094,
+        "graph_staged": -2.9583202205761383
+      }
+    },
+    {
+      "rows": 16384,
+      "sequences": 3,
+      "snapshots": true,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.7276320457458496,
+          "host_ms": 1.5889927744865417,
+          "wall_ms": 1.7320564948022366
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.5999679565429688,
+          "host_ms": 1.1642896570265293,
+          "wall_ms": 1.6046622768044472
+        },
+        "graph_replay": {
+          "gpu_ms": 1.529703974723816,
+          "host_ms": 0.016821548342704773,
+          "wall_ms": 1.5339227393269539
+        },
+        "graph_staged": {
+          "gpu_ms": 1.7494800090789795,
+          "host_ms": 0.2031661570072174,
+          "wall_ms": 1.753928605467081
+        }
+      },
+      "gain_vs_native_pct": {
+        "eager_native": 0.0,
+        "eager_cpu": 7.389541628221307,
+        "graph_replay": 11.456610307120386,
+        "graph_staged": -1.26461901346
+      }
+    }
+  ],
+  "memory": [
+    {
+      "kind": "graph_capture",
+      "logical_rows": 8192,
+      "physical_rows": 8192,
+      "sequences": 1,
+      "chunks": 128,
+      "snapshots": false,
+      "conv_bound": 8192,
+      "memory_before": {
+        "allocated": 70551552,
+        "reserved": 90177536,
+        "free": 84346667008,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 87329792,
+        "reserved": 348127232,
+        "free": 84088717312,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 322473472,
+      "capture_peak_reserved": 348127232,
+      "private_pool_id": [
+        1,
+        0
+      ],
+      "private_pool_segments": 12,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 257949696,
+        "allocated_size": 16777216,
+        "active_size": 16777216
+      },
+      "explicit_persistent_bytes": 70497320,
+      "metadata_bytes": 1064,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 8192,
+      "physical_rows": 8199,
+      "sequences": 3,
+      "chunks": 129,
+      "snapshots": true,
+      "conv_bound": 4096,
+      "memory_before": {
+        "allocated": 73873408,
+        "reserved": 94371840,
+        "free": 84329889792,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 90665984,
+        "reserved": 354418688,
+        "free": 84069842944,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 326057472,
+      "capture_peak_reserved": 354418688,
+      "private_pool_id": [
+        2,
+        0
+      ],
+      "private_pool_segments": 12,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 260046848,
+        "allocated_size": 16791552,
+        "active_size": 16791552
+      },
+      "explicit_persistent_bytes": 73811168,
+      "metadata_bytes": 1136,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 16384,
+      "physical_rows": 16384,
+      "sequences": 1,
+      "chunks": 256,
+      "snapshots": false,
+      "conv_bound": 16384,
+      "memory_before": {
+        "allocated": 137804288,
+        "reserved": 157286400,
+        "free": 84266975232,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 171359744,
+        "reserved": 683671552,
+        "free": 83740590080,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 641646592,
+      "capture_peak_reserved": 683671552,
+      "private_pool_id": [
+        3,
+        0
+      ],
+      "private_pool_segments": 14,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 526385152,
+        "allocated_size": 33554432,
+        "active_size": 33554432
+      },
+      "explicit_persistent_bytes": 137738280,
+      "metadata_bytes": 2088,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 16384,
+      "physical_rows": 16391,
+      "sequences": 3,
+      "chunks": 257,
+      "snapshots": true,
+      "conv_bound": 8192,
+      "memory_before": {
+        "allocated": 141120512,
+        "reserved": 161480704,
+        "free": 84260683776,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 174690304,
+        "reserved": 689963008,
+        "free": 83732201472,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 645224960,
+      "capture_peak_reserved": 689963008,
+      "private_pool_id": [
+        4,
+        0
+      ],
+      "private_pool_segments": 14,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 528482304,
+        "allocated_size": 33568768,
+        "active_size": 33568768
+      },
+      "explicit_persistent_bytes": 141052128,
+      "metadata_bytes": 2160,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    }
+  ],
+  "profile": [
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 7
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 4,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 9
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 4,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 7
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 4,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 9
+      }
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 4,
+        "cudaGraphLaunch": 1
+      }
+    }
+  ]
+}

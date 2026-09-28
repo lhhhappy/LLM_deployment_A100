@@ -1,0 +1,156 @@
+{"kind": "environment", "gpu": "NVIDIA A100-SXM4-80GB", "torch": "2.13.0+cu130", "humming_source": "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/__init__.py", "arguments": {"rows": [8192, 16384], "rounds": 9, "inner": 16}, "comparison": "current 117 up+down/reduce-off versus identical configs plus scale folding", "source_sha256": {"scripts/analysis/bench_moe_scale_fold_sm80.py": "9a3af57c62830620d6aa2cff6c91903c25f6ba37aadf6b281dcee48ebf1c7faf", "scripts/analysis/prepare_humming_scale_fold_probe.py": "9b584f218d28cc57fd9cd776dde2b878a348176d643473bb8f5aa22693d95422", "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "155e916fafd86a96bebb18e12c79add42a2493231c7e7cf341726d574c83333e", "engine/sglang/srt/layers/quantization/fp8_humming_tuning.py": "ef1d15fb6c9dd34f96a2d379071f2d48ed622c23100f7ba65283068571a4b008"}}
+{"kind": "cpu_exact_dyadic_bf16_check", "finite_fp8_patterns": 254, "nonnegative_bf16_scale_patterns": 17280, "tested_pairs": 4389120, "mismatches": 0, "scale_max": 255, "first_overflow_scale": 256, "elapsed_s": 11.144436853006482}
+{"kind": "headers", "paths": {"native": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming_scale_fold_headers/1fec70021765fb32becf11d8b30773eab91e9ea0f14ec64247e90d8f75396102/native", "fold": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming_scale_fold_headers/6922fbc1ac6964b9fbaadf92f45800f286242b673e1da8ec81330bf0b11bf11e/fold"}, "tree_sha256": {"native": "1fec70021765fb32becf11d8b30773eab91e9ea0f14ec64247e90d8f75396102", "fold": "6922fbc1ac6964b9fbaadf92f45800f286242b673e1da8ec81330bf0b11bf11e"}, "changed_headers": ["humming/arith/mainloop_arith.cuh"], "mainloop_sha256": {"native": "315d2c6b0bc965dd77485a15b522c96585b11de15e39a69108cdb3b3de02f75b", "fold": "0ffe071480c1299c41d4068b08141a01bcaf7ac4181bb7773291b790ba96b3d7"}, "installed_source": "/sjtu/linhang/arena/runs/ep8/alt0/hk/humming_kernels-0.1.12/humming/include"}
+{"kind": "layer", "humming": true, "method": "Fp8HummingMoEMethod", "process_s": 1.602, "weight_bytes": 923324416, "load_transient_mb": 1192.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "effective_config", "stage": "w13", "config": {"block_shape": [128, 256, 64], "warp_shape": [64, 64, 64], "use_stream_k": false, "use_f16_accum": false, "num_sms": 108, "num_stages": 4, "num_ctas_per_sm": 1, "num_write_splits": 1}}
+{"kind": "effective_config", "stage": "w2", "config": {"block_shape": [128, 128, 64], "warp_shape": [64, 64, 64], "use_stream_k": false, "use_f16_accum": false, "num_sms": 108, "num_stages": 3, "num_ctas_per_sm": 2, "num_write_splits": 1}}
+{"kind": "scale_contract", "stage": "w13", "dtype": "torch.bfloat16", "min": 0.00048828125, "max": 0.00103759765625, "bytes": 9469952, "sha256": "79c8f7ba813659a5fb7c2a3e4806986ffa78079af732f2ae8ccf5818ad44b695"}
+{"kind": "scale_contract", "stage": "w2", "dtype": "torch.bfloat16", "min": 0.000499725341796875, "max": 0.000949859619140625, "bytes": 4734976, "sha256": "fcaa85a3a2caa51cc7345c81a1a4148ddd626a6589e4fa95508a1fb1f9caa6b1"}
+{"kind": "scale_boundary_dispatch", "cases": ["zero", "min_subnormal", "min_normal", "one", "max_safe_255", "overflow_256", "negative", "infinity", "nan"], "selected": ["fold", "fold", "fold", "fold", "fold", "native", "native", "native", "native"], "guard_scope": "research dispatch, before capture; original tensors unchanged"}
+{"kind": "compile_receipt", "variant": "native", "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/7d80fa72a7dd5611/kernel.cubin", "cubin_sha256": "137c5054edc40b48b53160e1de2389fd8162a571d2da25eb98eef83b677c6dee"}
+{"kind": "gpu_intrinsic_bits", "tested_pairs": 4389120, "bf16_lanes_per_pair": 2, "mismatches": 0, "safe_scale_range": [0, 255], "includes_subnormals": true, "rejected_scale_cases": ["256", "-1", "Inf", "NaN"], "rejected_mismatches": [254, 0, 0, 0], "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/7d80fa72a7dd5611/kernel.cubin", "cubin_sha256": "137c5054edc40b48b53160e1de2389fd8162a571d2da25eb98eef83b677c6dee"}
+{"kind": "private_variant", "variant": "native", "constructor_entries_evicted": 20}
+{"kind": "compile_receipt", "variant": "native", "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/e6309cbf448d9629/kernel.cubin", "cubin_sha256": "5f5d411f93ff25bf1cad2ef71ce639c6fa26b739500a56da609b6a22128be953"}
+{"kind": "compile_receipt", "variant": "native", "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/e93030395c73cffb/kernel.cubin", "cubin_sha256": "fd2fcbbec59053af5377c02f0e791b108b139182e02355b3ed1c9c93729bf784"}
+{"kind": "kernel_identity", "variant": "native", "stage": "w13", "kernel_id": 4257490086115755409, "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/e6309cbf448d9629/kernel.cubin", "cubin_sha256": "5f5d411f93ff25bf1cad2ef71ce639c6fa26b739500a56da609b6a22128be953", "parsed_config": "{\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"use_warp_spec\": false, \"use_mbarrier\": false, \"use_cp_async\": true, \"use_tma\": false, \"use_tma_a\": false, \"use_tma_as\": false, \"use_tma_b\": false, \"use_tma_c\": false, \"use_tma_bs\": false, \"use_tma_bs2\": false, \"use_tma_bzp\": false, \"use_tma_bias\": false, \"reduce_overlap_last_stage_only\": false, \"num_write_splits\": 1, \"multi_cast_size_a\": 1, \"multi_cast_size_b\": 1, \"raster_group_m\": 1, \"use_f16_accum\": false, \"use_batch_invariant\": false, \"use_m_major_input_scale\": false, \"gemm_type\": \"indexed\", \"shape_n\": 512, \"shape_k\": 4096, \"pad_shape_n\": 0, \"pad_shape_k\": 0, \"num_experts\": 289, \"b_dtype\": \"float8e4m3\", \"a_dtype\": \"bfloat16\", \"c_dtype\": \"bfloat16\", \"bs_dtype\": \"bfloat16\", \"as_dtype\": null, \"input_scale_group_size\": 0, \"weight_scale_group_size\": 128, \"weight_scale_group_size_n\": 0, \"weight_scale_type\": \"group\", \"weight_scale_2_type\": \"none\", \"use_int_weight_scale\": false, \"use_fused_e8m0_scale\": false, \"has_zero_point\": false, \"is_fp_zero_point\": false, \"has_bias\": false, \"mma_type\": \"mma\", \"use_packed_k_layout\": false}", "block_shape": [128, 256, 64], "warp_shape": [64, 64, 64], "sass": "cuobjdump unavailable"}
+{"kind": "kernel_identity", "variant": "native", "stage": "w2", "kernel_id": 1032947283392281585, "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/e93030395c73cffb/kernel.cubin", "cubin_sha256": "fd2fcbbec59053af5377c02f0e791b108b139182e02355b3ed1c9c93729bf784", "parsed_config": "{\"block_shape\": [128, 128, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"num_stages\": 3, \"num_ctas_per_sm\": 2, \"use_warp_spec\": false, \"use_mbarrier\": false, \"use_cp_async\": true, \"use_tma\": false, \"use_tma_a\": false, \"use_tma_as\": false, \"use_tma_b\": false, \"use_tma_c\": false, \"use_tma_bs\": false, \"use_tma_bs2\": false, \"use_tma_bzp\": false, \"use_tma_bias\": false, \"reduce_overlap_last_stage_only\": false, \"num_write_splits\": 1, \"multi_cast_size_a\": 1, \"multi_cast_size_b\": 1, \"raster_group_m\": 1, \"use_f16_accum\": false, \"use_batch_invariant\": false, \"use_m_major_input_scale\": false, \"gemm_type\": \"indexed\", \"shape_n\": 4096, \"shape_k\": 256, \"pad_shape_n\": 0, \"pad_shape_k\": 0, \"num_experts\": 289, \"b_dtype\": \"float8e4m3\", \"a_dtype\": \"bfloat16\", \"c_dtype\": \"bfloat16\", \"bs_dtype\": \"bfloat16\", \"as_dtype\": null, \"input_scale_group_size\": 0, \"weight_scale_group_size\": 128, \"weight_scale_group_size_n\": 0, \"weight_scale_type\": \"group\", \"weight_scale_2_type\": \"none\", \"use_int_weight_scale\": false, \"use_fused_e8m0_scale\": false, \"has_zero_point\": false, \"is_fp_zero_point\": false, \"has_bias\": false, \"mma_type\": \"mma\", \"use_packed_k_layout\": false}", "block_shape": [128, 128, 64], "warp_shape": [64, 64, 64], "sass": "cuobjdump unavailable"}
+{"kind": "private_variant", "variant": "fold", "constructor_entries_evicted": 2}
+{"kind": "compile_receipt", "variant": "fold", "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/3e853c726194680e/kernel.cubin", "cubin_sha256": "6259bd9664233cfc8fdfb313f9e31b260d9f5ec19895adfa9db2eec6fc8f1f51"}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w13", "rows": 8192}
+{"kind": "compile_receipt", "variant": "fold", "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/a7d1374de0ece5ca/kernel.cubin", "cubin_sha256": "52972b0a621a50eec675d6aadeccbec41c64dfcdb5c4611f1018eb926da233bf"}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w2_same_activation", "rows": 8192}
+{"kind": "kernel_identity", "variant": "fold", "stage": "w13", "kernel_id": 2706057272843126161, "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/3e853c726194680e/kernel.cubin", "cubin_sha256": "6259bd9664233cfc8fdfb313f9e31b260d9f5ec19895adfa9db2eec6fc8f1f51", "parsed_config": "{\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"use_warp_spec\": false, \"use_mbarrier\": false, \"use_cp_async\": true, \"use_tma\": false, \"use_tma_a\": false, \"use_tma_as\": false, \"use_tma_b\": false, \"use_tma_c\": false, \"use_tma_bs\": false, \"use_tma_bs2\": false, \"use_tma_bzp\": false, \"use_tma_bias\": false, \"reduce_overlap_last_stage_only\": false, \"num_write_splits\": 1, \"multi_cast_size_a\": 1, \"multi_cast_size_b\": 1, \"raster_group_m\": 1, \"use_f16_accum\": false, \"use_batch_invariant\": false, \"use_m_major_input_scale\": false, \"gemm_type\": \"indexed\", \"shape_n\": 512, \"shape_k\": 4096, \"pad_shape_n\": 0, \"pad_shape_k\": 0, \"num_experts\": 289, \"b_dtype\": \"float8e4m3\", \"a_dtype\": \"bfloat16\", \"c_dtype\": \"bfloat16\", \"bs_dtype\": \"bfloat16\", \"as_dtype\": null, \"input_scale_group_size\": 0, \"weight_scale_group_size\": 128, \"weight_scale_group_size_n\": 0, \"weight_scale_type\": \"group\", \"weight_scale_2_type\": \"none\", \"use_int_weight_scale\": false, \"use_fused_e8m0_scale\": false, \"has_zero_point\": false, \"is_fp_zero_point\": false, \"has_bias\": false, \"mma_type\": \"mma\", \"use_packed_k_layout\": false}", "block_shape": [128, 256, 64], "warp_shape": [64, 64, 64], "sass": "cuobjdump unavailable"}
+{"kind": "kernel_identity", "variant": "fold", "stage": "w2", "kernel_id": 214402408846801905, "cubin": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/cache/humming/a7d1374de0ece5ca/kernel.cubin", "cubin_sha256": "52972b0a621a50eec675d6aadeccbec41c64dfcdb5c4611f1018eb926da233bf", "parsed_config": "{\"block_shape\": [128, 128, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"num_stages\": 3, \"num_ctas_per_sm\": 2, \"use_warp_spec\": false, \"use_mbarrier\": false, \"use_cp_async\": true, \"use_tma\": false, \"use_tma_a\": false, \"use_tma_as\": false, \"use_tma_b\": false, \"use_tma_c\": false, \"use_tma_bs\": false, \"use_tma_bs2\": false, \"use_tma_bzp\": false, \"use_tma_bias\": false, \"reduce_overlap_last_stage_only\": false, \"num_write_splits\": 1, \"multi_cast_size_a\": 1, \"multi_cast_size_b\": 1, \"raster_group_m\": 1, \"use_f16_accum\": false, \"use_batch_invariant\": false, \"use_m_major_input_scale\": false, \"gemm_type\": \"indexed\", \"shape_n\": 4096, \"shape_k\": 256, \"pad_shape_n\": 0, \"pad_shape_k\": 0, \"num_experts\": 289, \"b_dtype\": \"float8e4m3\", \"a_dtype\": \"bfloat16\", \"c_dtype\": \"bfloat16\", \"bs_dtype\": \"bfloat16\", \"as_dtype\": null, \"input_scale_group_size\": 0, \"weight_scale_group_size\": 128, \"weight_scale_group_size_n\": 0, \"weight_scale_type\": \"group\", \"weight_scale_2_type\": \"none\", \"use_int_weight_scale\": false, \"use_fused_e8m0_scale\": false, \"has_zero_point\": false, \"is_fp_zero_point\": false, \"has_bias\": false, \"mma_type\": \"mma\", \"use_packed_k_layout\": false}", "block_shape": [128, 128, 64], "warp_shape": [64, 64, 64], "sass": "cuobjdump unavailable"}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w13", "rows": 8192, "case": "scale256_native_fallback"}
+{"kind": "fallback_kernel", "stage": "w13", "selected": "native", "kernel_id": 4257490086115755409}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w2", "rows": 8192, "case": "scale256_native_fallback"}
+{"kind": "fallback_kernel", "stage": "w2", "selected": "native", "kernel_id": 1032947283392281585}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_eager", "rows": 8192}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_fresh_graph", "rows": 8192, "trial": 0, "input_scale": 1}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "graph_vs_fresh_eager", "rows": 8192, "trial": 0}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_fresh_graph", "rows": 8192, "trial": 1, "input_scale": 4}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "graph_vs_fresh_eager", "rows": 8192, "trial": 1}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 0, "graph_ms": 1.090541958808899}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 0, "graph_ms": 1.6439379453659058}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 0, "graph_ms": 3.243000030517578}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 0, "graph_ms": 1.566841959953308}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 0, "graph_ms": 1.157088041305542}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 0, "graph_ms": 3.311497926712036}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 1, "graph_ms": 1.0905359983444214}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 1, "graph_ms": 1.1456979513168335}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 1, "graph_ms": 1.6222879886627197}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 1, "graph_ms": 3.2148780822753906}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 1, "graph_ms": 3.3148319721221924}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 1, "graph_ms": 1.5502140522003174}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 2, "graph_ms": 1.1665400266647339}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 2, "graph_ms": 1.581637978553772}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 2, "graph_ms": 1.6500420570373535}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 2, "graph_ms": 3.3471920490264893}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 2, "graph_ms": 3.19364595413208}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 2, "graph_ms": 1.0922839641571045}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 3, "graph_ms": 1.5583499670028687}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 3, "graph_ms": 1.6439839601516724}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 3, "graph_ms": 1.1642680168151855}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 3, "graph_ms": 1.1125940084457397}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 3, "graph_ms": 3.2229878902435303}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 3, "graph_ms": 3.316122055053711}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 4, "graph_ms": 1.0909520387649536}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 4, "graph_ms": 3.32124400138855}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 4, "graph_ms": 3.2502760887145996}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 4, "graph_ms": 1.5838459730148315}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 4, "graph_ms": 1.1669460535049438}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 4, "graph_ms": 1.65010404586792}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 5, "graph_ms": 1.1075700521469116}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 5, "graph_ms": 1.1748720407485962}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 5, "graph_ms": 3.2241640090942383}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 5, "graph_ms": 3.318619966506958}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 5, "graph_ms": 1.549988031387329}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 5, "graph_ms": 1.6443979740142822}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 6, "graph_ms": 1.1787420511245728}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 6, "graph_ms": 1.653880000114441}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 6, "graph_ms": 3.2352099418640137}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 6, "graph_ms": 1.1000980138778687}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 6, "graph_ms": 1.5664160251617432}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 6, "graph_ms": 3.3490540981292725}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 7, "graph_ms": 1.1536040306091309}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 7, "graph_ms": 3.336509943008423}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 7, "graph_ms": 1.5538820028305054}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 7, "graph_ms": 1.6431879997253418}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 7, "graph_ms": 3.229827880859375}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 7, "graph_ms": 1.0900579690933228}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "fold", "round": 8, "graph_ms": 1.55731201171875}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "fold", "round": 8, "graph_ms": 1.1155879497528076}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "fold", "round": 8, "graph_ms": 3.2303860187530518}
+{"kind": "timing_round", "rows": 8192, "stage": "full_moe", "variant": "native", "round": 8, "graph_ms": 3.2913858890533447}
+{"kind": "timing_round", "rows": 8192, "stage": "w13", "variant": "native", "round": 8, "graph_ms": 1.6208560466766357}
+{"kind": "timing_round", "rows": 8192, "stage": "w2", "variant": "native", "round": 8, "graph_ms": 1.1599459648132324}
+{"kind": "timing", "rows": 8192, "stage": "w13", "native_ms": 1.6439839601516724, "fold_ms": 1.5583499670028687, "paired_reduction_pct": 4.689713844121879, "native_rounds": [1.6439379453659058, 1.6222879886627197, 1.6500420570373535, 1.6439839601516724, 1.65010404586792, 1.6443979740142822, 1.653880000114441, 1.6431879997253418, 1.6208560466766357], "fold_rounds": [1.566841959953308, 1.5502140522003174, 1.581637978553772, 1.5583499670028687, 1.5838459730148315, 1.549988031387329, 1.5664160251617432, 1.5538820028305054, 1.55731201171875]}
+{"kind": "timing", "rows": 8192, "stage": "w2", "native_ms": 1.1642680168151855, "fold_ms": 1.0922839641571045, "paired_reduction_pct": 5.728452654197269, "native_rounds": [1.157088041305542, 1.1456979513168335, 1.1665400266647339, 1.1642680168151855, 1.1669460535049438, 1.1748720407485962, 1.1787420511245728, 1.1536040306091309, 1.1599459648132324], "fold_rounds": [1.090541958808899, 1.0905359983444214, 1.0922839641571045, 1.1125940084457397, 1.0909520387649536, 1.1075700521469116, 1.1000980138778687, 1.0900579690933228, 1.1155879497528076]}
+{"kind": "timing", "rows": 8192, "stage": "full_moe", "native_ms": 3.318619966506958, "fold_ms": 3.229827880859375, "paired_reduction_pct": 2.846242063448445, "native_rounds": [3.311497926712036, 3.3148319721221924, 3.3471920490264893, 3.316122055053711, 3.32124400138855, 3.318619966506958, 3.3490540981292725, 3.336509943008423, 3.2913858890533447], "fold_rounds": [3.243000030517578, 3.2148780822753906, 3.19364595413208, 3.2229878902435303, 3.2502760887145996, 3.2241640090942383, 3.2352099418640137, 3.229827880859375, 3.2303860187530518]}
+{"kind": "eager_timing", "rows": 8192, "gpu_ms": {"native": 3.3747360706329346, "fold": 3.206899881362915}}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w13", "rows": 16384}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "w2_same_activation", "rows": 16384}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_eager", "rows": 16384}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_fresh_graph", "rows": 16384, "trial": 0, "input_scale": 1}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "graph_vs_fresh_eager", "rows": 16384, "trial": 0}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "full_moe_fresh_graph", "rows": 16384, "trial": 1, "input_scale": 4}
+{"kind": "raw_bits", "exact": true, "finite": true, "stage": "graph_vs_fresh_eager", "rows": 16384, "trial": 1}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 0, "graph_ms": 2.2090680599212646}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 0, "graph_ms": 6.511874198913574}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 0, "graph_ms": 3.2049338817596436}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 0, "graph_ms": 2.340601921081543}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 0, "graph_ms": 3.134337902069092}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 0, "graph_ms": 6.42091178894043}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 1, "graph_ms": 6.346921920776367}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 1, "graph_ms": 2.2753939628601074}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 1, "graph_ms": 6.542473793029785}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 1, "graph_ms": 3.0965800285339355}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 1, "graph_ms": 2.2579360008239746}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 1, "graph_ms": 3.3278861045837402}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 2, "graph_ms": 6.462779998779297}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 2, "graph_ms": 2.2749199867248535}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 2, "graph_ms": 2.2221460342407227}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 2, "graph_ms": 3.265903949737549}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 2, "graph_ms": 3.1549439430236816}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 2, "graph_ms": 6.592455863952637}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 3, "graph_ms": 6.522130012512207}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 3, "graph_ms": 2.2046260833740234}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 3, "graph_ms": 6.3902058601379395}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 3, "graph_ms": 3.1103360652923584}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 3, "graph_ms": 2.3438899517059326}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 3, "graph_ms": 3.2950899600982666}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 4, "graph_ms": 6.549098014831543}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 4, "graph_ms": 3.218991994857788}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 4, "graph_ms": 2.3504059314727783}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 4, "graph_ms": 3.1594901084899902}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 4, "graph_ms": 6.429321765899658}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 4, "graph_ms": 2.1875319480895996}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 5, "graph_ms": 2.289088010787964}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 5, "graph_ms": 3.219640016555786}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 5, "graph_ms": 2.2194080352783203}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 5, "graph_ms": 6.439606189727783}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 5, "graph_ms": 6.563151836395264}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 5, "graph_ms": 3.1117780208587646}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 6, "graph_ms": 3.153681993484497}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 6, "graph_ms": 2.266535997390747}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 6, "graph_ms": 2.3385961055755615}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 6, "graph_ms": 3.275736093521118}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 6, "graph_ms": 6.631442070007324}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 6, "graph_ms": 6.311933994293213}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 7, "graph_ms": 3.1053760051727295}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 7, "graph_ms": 6.6392822265625}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 7, "graph_ms": 2.273237943649292}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 7, "graph_ms": 3.2540700435638428}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 7, "graph_ms": 2.2456560134887695}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 7, "graph_ms": 6.421219825744629}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "fold", "round": 8, "graph_ms": 3.11913800239563}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "fold", "round": 8, "graph_ms": 6.481103897094727}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "native", "round": 8, "graph_ms": 2.3001840114593506}
+{"kind": "timing_round", "rows": 16384, "stage": "w13", "variant": "native", "round": 8, "graph_ms": 3.2503321170806885}
+{"kind": "timing_round", "rows": 16384, "stage": "w2", "variant": "fold", "round": 8, "graph_ms": 2.259392023086548}
+{"kind": "timing_round", "rows": 16384, "stage": "full_moe", "variant": "native", "round": 8, "graph_ms": 6.603961944580078}
+{"kind": "timing", "rows": 16384, "stage": "w13", "native_ms": 3.2540700435638428, "fold_ms": 3.11913800239563, "paired_reduction_pct": 3.7260052871177436, "native_rounds": [3.2049338817596436, 3.3278861045837402, 3.265903949737549, 3.2950899600982666, 3.218991994857788, 3.219640016555786, 3.275736093521118, 3.2540700435638428, 3.2503321170806885], "fold_rounds": [3.134337902069092, 3.0965800285339355, 3.1549439430236816, 3.1103360652923584, 3.1594901084899902, 3.1117780208587646, 3.153681993484497, 3.1053760051727295, 3.11913800239563]}
+{"kind": "timing", "rows": 16384, "stage": "w2", "native_ms": 2.3001840114593506, "fold_ms": 2.2221460342407227, "paired_reduction_pct": 3.044005961381008, "native_rounds": [2.340601921081543, 2.2753939628601074, 2.2749199867248535, 2.3438899517059326, 2.3504059314727783, 2.289088010787964, 2.3385961055755615, 2.273237943649292, 2.3001840114593506], "fold_rounds": [2.2090680599212646, 2.2579360008239746, 2.2221460342407227, 2.2046260833740234, 2.1875319480895996, 2.2194080352783203, 2.266535997390747, 2.2456560134887695, 2.259392023086548]}
+{"kind": "timing", "rows": 16384, "stage": "full_moe", "native_ms": 6.563151836395264, "fold_ms": 6.421219825744629, "paired_reduction_pct": 1.9670342562686514, "native_rounds": [6.511874198913574, 6.542473793029785, 6.592455863952637, 6.522130012512207, 6.549098014831543, 6.563151836395264, 6.631442070007324, 6.6392822265625, 6.603961944580078], "fold_rounds": [6.42091178894043, 6.346921920776367, 6.462779998779297, 6.3902058601379395, 6.429321765899658, 6.439606189727783, 6.311933994293213, 6.421219825744629, 6.481103897094727]}
+{"kind": "eager_timing", "rows": 16384, "gpu_ms": {"native": 6.62556791305542, "fold": 6.397428035736084}}
+{"kind": "complete", "scales_unchanged": true, "native_config_cache_unchanged": true, "no_jit_after_prepare": true, "production_files_changed": false}

@@ -1,0 +1,1227 @@
+{
+  "receipt": "kda-local-graph-b",
+  "exit": 0,
+  "correctness_cases": 12,
+  "timing": [
+    {
+      "rows": 8192,
+      "sequences": 1,
+      "snapshots": false,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.2164000272750854,
+          "host_ms": 1.1451896280050278,
+          "wall_ms": 1.2203250080347061
+        },
+        "eager_cpu": {
+          "gpu_ms": 0.9923840165138245,
+          "host_ms": 0.9082104079425335,
+          "wall_ms": 0.996636226773262
+        },
+        "graph_replay": {
+          "gpu_ms": 0.8883519768714905,
+          "host_ms": 0.005741138011217117,
+          "wall_ms": 0.8924556896090508
+        },
+        "graph_staged": {
+          "gpu_ms": 1.0082319974899292,
+          "host_ms": 0.1162942498922348,
+          "wall_ms": 1.0125571861863136
+        }
+      }
+    },
+    {
+      "rows": 8192,
+      "sequences": 3,
+      "snapshots": true,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.3125840425491333,
+          "host_ms": 1.2844493612647057,
+          "wall_ms": 1.3172496110200882
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.5110399723052979,
+          "host_ms": 1.4981613494455814,
+          "wall_ms": 1.5152781270444393
+        },
+        "graph_replay": {
+          "gpu_ms": 0.8002960085868835,
+          "host_ms": 0.015466008335351944,
+          "wall_ms": 0.8057300001382828
+        },
+        "graph_staged": {
+          "gpu_ms": 0.9456480145454407,
+          "host_ms": 0.2517160028219223,
+          "wall_ms": 0.9511620737612247
+        }
+      }
+    },
+    {
+      "rows": 16384,
+      "sequences": 1,
+      "snapshots": false,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.8598239421844482,
+          "host_ms": 1.6475720331072807,
+          "wall_ms": 1.8644127994775772
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.7689839601516724,
+          "host_ms": 1.0102777741849422,
+          "wall_ms": 1.773633062839508
+        },
+        "graph_replay": {
+          "gpu_ms": 1.714128017425537,
+          "host_ms": 0.013999175280332565,
+          "wall_ms": 1.718633808195591
+        },
+        "graph_staged": {
+          "gpu_ms": 1.9347519874572754,
+          "host_ms": 0.19521312788128853,
+          "wall_ms": 1.9391211681067944
+        }
+      }
+    },
+    {
+      "rows": 16384,
+      "sequences": 3,
+      "snapshots": true,
+      "medians": {
+        "eager_native": {
+          "gpu_ms": 1.7289600372314453,
+          "host_ms": 1.5861489810049534,
+          "wall_ms": 1.733529381453991
+        },
+        "eager_cpu": {
+          "gpu_ms": 1.601088047027588,
+          "host_ms": 1.1523663997650146,
+          "wall_ms": 1.6060452908277512
+        },
+        "graph_replay": {
+          "gpu_ms": 1.5275360345840454,
+          "host_ms": 0.01537613570690155,
+          "wall_ms": 1.5316717326641083
+        },
+        "graph_staged": {
+          "gpu_ms": 1.7536159753799438,
+          "host_ms": 0.20324811339378357,
+          "wall_ms": 1.7581731081008911
+        }
+      }
+    }
+  ],
+  "memory": [
+    {
+      "kind": "graph_capture",
+      "logical_rows": 8192,
+      "physical_rows": 8192,
+      "sequences": 1,
+      "chunks": 128,
+      "snapshots": false,
+      "conv_bound": 8192,
+      "memory_before": {
+        "allocated": 70552064,
+        "reserved": 90177536,
+        "free": 84346667008,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 87330304,
+        "reserved": 348127232,
+        "free": 84088717312,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 322473984,
+      "capture_peak_reserved": 348127232,
+      "private_pool_id": [
+        1,
+        0
+      ],
+      "private_pool_segments": 12,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 257949696,
+        "allocated_size": 16777216,
+        "active_size": 16777216
+      },
+      "explicit_persistent_bytes": 70497336,
+      "metadata_bytes": 1080,
+      "native_offsets_dtype": "int64",
+      "graph_offsets_dtype": "torch.int64",
+      "metadata_h2d_copies": 2,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 8192,
+      "physical_rows": 8199,
+      "sequences": 3,
+      "chunks": 129,
+      "snapshots": true,
+      "conv_bound": 4096,
+      "memory_before": {
+        "allocated": 73873920,
+        "reserved": 94371840,
+        "free": 84329889792,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 90666496,
+        "reserved": 354418688,
+        "free": 84069842944,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 326057984,
+      "capture_peak_reserved": 354418688,
+      "private_pool_id": [
+        2,
+        0
+      ],
+      "private_pool_segments": 12,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 260046848,
+        "allocated_size": 16791552,
+        "active_size": 16791552
+      },
+      "explicit_persistent_bytes": 73811200,
+      "metadata_bytes": 1168,
+      "native_offsets_dtype": "int64",
+      "graph_offsets_dtype": "torch.int64",
+      "metadata_h2d_copies": 2,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 16384,
+      "physical_rows": 16384,
+      "sequences": 1,
+      "chunks": 256,
+      "snapshots": false,
+      "conv_bound": 16384,
+      "memory_before": {
+        "allocated": 137804800,
+        "reserved": 157286400,
+        "free": 84266975232,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 171360256,
+        "reserved": 683671552,
+        "free": 83740590080,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 641647104,
+      "capture_peak_reserved": 683671552,
+      "private_pool_id": [
+        3,
+        0
+      ],
+      "private_pool_segments": 14,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 526385152,
+        "allocated_size": 33554432,
+        "active_size": 33554432
+      },
+      "explicit_persistent_bytes": 137738296,
+      "metadata_bytes": 2104,
+      "native_offsets_dtype": "int64",
+      "graph_offsets_dtype": "torch.int64",
+      "metadata_h2d_copies": 2,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    },
+    {
+      "kind": "graph_capture",
+      "logical_rows": 16384,
+      "physical_rows": 16391,
+      "sequences": 3,
+      "chunks": 257,
+      "snapshots": true,
+      "conv_bound": 8192,
+      "memory_before": {
+        "allocated": 141121024,
+        "reserved": 161480704,
+        "free": 84262780928,
+        "total": 84987740160
+      },
+      "memory_after": {
+        "allocated": 174690816,
+        "reserved": 689963008,
+        "free": 83734298624,
+        "total": 84987740160
+      },
+      "capture_peak_allocated": 645225472,
+      "capture_peak_reserved": 689963008,
+      "private_pool_id": [
+        4,
+        0
+      ],
+      "private_pool_segments": 14,
+      "allocator_segment_fields": [
+        "active_size",
+        "address",
+        "allocated_size",
+        "blocks",
+        "device",
+        "frames",
+        "is_expandable",
+        "requested_size",
+        "segment_pool_id",
+        "segment_type",
+        "stream",
+        "total_size"
+      ],
+      "private_pool_bytes": {
+        "total_size": 528482304,
+        "allocated_size": 33568768,
+        "active_size": 33568768
+      },
+      "explicit_persistent_bytes": 141052160,
+      "metadata_bytes": 2192,
+      "native_offsets_dtype": "int64",
+      "graph_offsets_dtype": "torch.int64",
+      "metadata_h2d_copies": 2,
+      "hooks": {
+        "indices": 4,
+        "offsets": 4,
+        "conv": 4
+      },
+      "scope": "one isolated graph; current case only, no all-layer graph pool"
+    }
+  ],
+  "profile": [
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 7
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "total_device_us": 905.9419999999982,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64",
+          "calls": 1,
+          "device_us": 275.93299999999954,
+          "fraction": 0.304581308737204
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 116.41399999999976,
+          "fraction": 0.12850050003201088
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 97.3430000000003,
+          "fraction": 0.10744948352102066
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 86.7829999999999,
+          "fraction": 0.09579310816807265
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 85.88700000000017,
+          "fraction": 0.09480408238055013
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 84.54299999999967,
+          "fraction": 0.09332054369926533
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 81.24699999999984,
+          "fraction": 0.08968234169516372
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 34.36799999999994,
+          "fraction": 0.03793620342141109
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 26.43199999999979,
+          "fraction": 0.029176260731923063
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.951999999999771,
+          "fraction": 0.006569957017115646
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 1,
+          "device_us": 5.727999999999611,
+          "fraction": 0.006322700570234764
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.8479999999999563,
+          "fraction": 0.003143689110340355
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul> >(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.463999999999942,
+          "fraction": 0.0027198209156877005
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 5,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 8192,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "total_device_us": 974.8110000000011,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64",
+          "calls": 1,
+          "device_us": 276.09500000000025,
+          "fraction": 0.2832292618774305
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 115.13500000000022,
+          "fraction": 0.11811007467088501
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 95.19999999999982,
+          "fraction": 0.09765995664800635
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 86.71900000000005,
+          "fraction": 0.0889598086193118
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 86.33500000000004,
+          "fraction": 0.08856588610510134
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 83.55099999999993,
+          "fraction": 0.08570994787707549
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 80.60800000000017,
+          "fraction": 0.08269090110800975
+        },
+        {
+          "name": "Memcpy DtoD (Device -> Device)",
+          "calls": 3,
+          "device_us": 74.17600000000039,
+          "fraction": 0.07609269899498498
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 33.85500000000002,
+          "fraction": 0.03472980916300696
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 25.919999999999618,
+          "fraction": 0.02658976970920475
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.344000000000051,
+          "fraction": 0.0054820883227621
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 1,
+          "device_us": 5.248000000000047,
+          "fraction": 0.0053836076942094845
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.368000000000393,
+          "fraction": 0.00242918883763149
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast>(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast)",
+          "calls": 1,
+          "device_us": 2.175999999999931,
+          "fraction": 0.0022322275805257926
+        },
+        {
+          "name": "Memcpy HtoD (Pinned -> Device)",
+          "calls": 2,
+          "device_us": 2.081000000000131,
+          "fraction": 0.0021347727918541426
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 9
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "total_device_us": 807.7790000000007,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot",
+          "calls": 1,
+          "device_us": 158.5409999999997,
+          "fraction": 0.19626779106661546
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 116.36099999999988,
+          "fraction": 0.14405053857552597
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 95.4960000000001,
+          "fraction": 0.1182204538617617
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 87.27099999999996,
+          "fraction": 0.1080382134222354
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 85.48000000000002,
+          "fraction": 0.10582102282926388
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 84.904,
+          "fraction": 0.10510795650790615
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 80.48599999999988,
+          "fraction": 0.09963863878610339
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 34.85100000000011,
+          "fraction": 0.04314422632923124
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 26.626999999999953,
+          "fraction": 0.03296322385206836
+        },
+        {
+          "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 2, 128, 1, 16, 8>(char*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 128, 1>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+          "calls": 1,
+          "device_us": 15.425000000000182,
+          "fraction": 0.019095569456497593
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 2,
+          "device_us": 7.745000000000346,
+          "fraction": 0.00958801850506183
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.9520000000002256,
+          "fraction": 0.0073683519873631535
+        },
+        {
+          "name": "_store_conv",
+          "calls": 1,
+          "device_us": 3.296000000000049,
+          "fraction": 0.00408032394999133
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.7200000000002547,
+          "fraction": 0.0033672576286338865
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul> >(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.6240000000000236,
+          "fraction": 0.0032484132417406513
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 5,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 8192,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "total_device_us": 891.387999999999,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot",
+          "calls": 1,
+          "device_us": 158.96000000000004,
+          "fraction": 0.17832862905939972
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 114.89199999999983,
+          "fraction": 0.12889112260878535
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 96.90599999999995,
+          "fraction": 0.10871360170879578
+        },
+        {
+          "name": "Memcpy DtoD (Device -> Device)",
+          "calls": 3,
+          "device_us": 87.81700000000001,
+          "fraction": 0.09851714404950493
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 87.04899999999998,
+          "fraction": 0.0976555663751364
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 86.76099999999997,
+          "fraction": 0.09733247474724818
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 83.9769999999994,
+          "fraction": 0.0942092556776617
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 80.23199999999997,
+          "fraction": 0.09000794266918566
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 33.92300000000023,
+          "fraction": 0.03805637948906679
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 25.634999999999764,
+          "fraction": 0.028758520419839388
+        },
+        {
+          "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 2, 128, 1, 16, 8>(char*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 128, 1>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+          "calls": 1,
+          "device_us": 13.794000000000779,
+          "fraction": 0.015474742760729103
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 2,
+          "device_us": 6.592999999999847,
+          "fraction": 0.007396330217593073
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.2159999999998945,
+          "fraction": 0.005851548371752705
+        },
+        {
+          "name": "_store_conv",
+          "calls": 1,
+          "device_us": 2.9760000000001128,
+          "fraction": 0.003338613488178118
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.3359999999997854,
+          "fraction": 0.0026206320928706555
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast>(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast)",
+          "calls": 1,
+          "device_us": 2.17699999999968,
+          "fraction": 0.002442258589973931
+        },
+        {
+          "name": "Memcpy HtoD (Pinned -> Device)",
+          "calls": 2,
+          "device_us": 2.143999999999778,
+          "fraction": 0.002405237674278519
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 7
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "eager_cpu",
+      "total_device_us": 1726.065,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64",
+          "calls": 1,
+          "device_us": 546.2780000000002,
+          "fraction": 0.31648750191910513
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 219.01099999999997,
+          "fraction": 0.12688456112602942
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 162.7529999999997,
+          "fraction": 0.09429135055748172
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 162.5619999999999,
+          "fraction": 0.09418069423805008
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 157.95299999999997,
+          "fraction": 0.09151045876024366
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 157.89000000000033,
+          "fraction": 0.0914739595554051
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 154.2739999999999,
+          "fraction": 0.08937902106815206
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 73.95200000000023,
+          "fraction": 0.04284427295611708
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 70.59299999999985,
+          "fraction": 0.04089822805050786
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 1,
+          "device_us": 8.864000000000033,
+          "fraction": 0.005135380185566611
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 6.207999999999629,
+          "fraction": 0.003596620057761225
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 3.0390000000002146,
+          "fraction": 0.0017606521191265766
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul> >(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.688000000000102,
+          "fraction": 0.001557299406453466
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 5,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 16384,
+      "sequences": 1,
+      "arm": "graph_staged",
+      "total_device_us": 1883.0660000000003,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64",
+          "calls": 1,
+          "device_us": 547.8480000000004,
+          "fraction": 0.2909340405487648
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 216.70599999999968,
+          "fraction": 0.1150814682013268
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 164.89900000000034,
+          "fraction": 0.08756942135857178
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 162.11400000000003,
+          "fraction": 0.08609045036127252
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 159.971,
+          "fraction": 0.08495241271415871
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 158.05000000000018,
+          "fraction": 0.08393226790776327
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 153.60199999999986,
+          "fraction": 0.08157016270274109
+        },
+        {
+          "name": "Memcpy DtoD (Device -> Device)",
+          "calls": 3,
+          "device_us": 148.48100000000022,
+          "fraction": 0.07885066163373998
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 79.42500000000018,
+          "fraction": 0.042178553486707404
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 70.68899999999985,
+          "fraction": 0.037539310889793474
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 1,
+          "device_us": 8.575999999999567,
+          "fraction": 0.004554274783783238
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.856000000000222,
+          "fraction": 0.0031098219605686797
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.5279999999997926,
+          "fraction": 0.0013424914474584493
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast>(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast)",
+          "calls": 1,
+          "device_us": 2.175999999999931,
+          "fraction": 0.0011555622585718878
+        },
+        {
+          "name": "Memcpy HtoD (Pinned -> Device)",
+          "calls": 2,
+          "device_us": 2.144999999999982,
+          "fraction": 0.0011390997447779216
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "counts": {
+        "cudaLaunchKernel": 9
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "eager_cpu",
+      "total_device_us": 1536.804000000001,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot",
+          "calls": 1,
+          "device_us": 311.4949999999999,
+          "fraction": 0.2026901283442779
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 219.04600000000028,
+          "fraction": 0.14253346555578988
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 165.89200000000028,
+          "fraction": 0.10794610112935688
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 164.45100000000002,
+          "fraction": 0.10700844089421938
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 161.76400000000012,
+          "fraction": 0.1052600071316837
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 157.34799999999996,
+          "fraction": 0.10238651122719608
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 154.01899999999978,
+          "fraction": 0.10022032738071977
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 73.25000000000045,
+          "fraction": 0.04766385303526045
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 69.73000000000002,
+          "fraction": 0.04537338528530637
+        },
+        {
+          "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 2, 128, 1, 16, 8>(char*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 128, 1>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+          "calls": 1,
+          "device_us": 33.152000000000044,
+          "fraction": 0.021572041717746716
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 2,
+          "device_us": 11.040999999999713,
+          "fraction": 0.007184390462283873
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 6.432000000000244,
+          "fraction": 0.004185309252188464
+        },
+        {
+          "name": "_store_conv",
+          "calls": 1,
+          "device_us": 3.3600000000001273,
+          "fraction": 0.002186355579501436
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 3.1039999999998145,
+          "fraction": 0.00201977610677732
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul> >(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.7200000000002547,
+          "fraction": 0.0017699068976917375
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    },
+    {
+      "kind": "graph_profile",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "counts": {
+        "cudaMemcpyAsync": 5,
+        "cudaGraphLaunch": 1
+      }
+    },
+    {
+      "kind": "device_breakdown",
+      "rows": 16384,
+      "sequences": 3,
+      "arm": "graph_staged",
+      "total_device_us": 1702.163,
+      "kernels": [
+        {
+          "name": "chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot",
+          "calls": 1,
+          "device_us": 311.5179999999996,
+          "fraction": 0.1830130251920642
+        },
+        {
+          "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#12}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+          "calls": 3,
+          "device_us": 217.183,
+          "fraction": 0.12759236336355567
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_inter_solve_fused",
+          "calls": 1,
+          "device_us": 165.05499999999984,
+          "fraction": 0.09696779920606889
+        },
+        {
+          "name": "_causal_conv1d_fwd_kernel",
+          "calls": 1,
+          "device_us": 164.57400000000007,
+          "fraction": 0.09668521757317018
+        },
+        {
+          "name": "_recompute_w_u_fwd_kernel",
+          "calls": 1,
+          "device_us": 161.82299999999987,
+          "fraction": 0.09506903862908539
+        },
+        {
+          "name": "Memcpy DtoD (Device -> Device)",
+          "calls": 3,
+          "device_us": 161.1199999999999,
+          "fraction": 0.09465603470407939
+        },
+        {
+          "name": "chunk_gla_fwd_kernel_o",
+          "calls": 1,
+          "device_us": 160.3829999999998,
+          "fraction": 0.09422305619379566
+        },
+        {
+          "name": "chunk_kda_fwd_kernel_intra_sub_chunk",
+          "calls": 1,
+          "device_us": 153.375,
+          "fraction": 0.09010594167538596
+        },
+        {
+          "name": "l2norm_fwd_kernel",
+          "calls": 2,
+          "device_us": 78.81500000000005,
+          "fraction": 0.0463028511370533
+        },
+        {
+          "name": "kda_gate_chunk_cumsum_vector_kernel",
+          "calls": 1,
+          "device_us": 68.60699999999997,
+          "fraction": 0.040305775651333024
+        },
+        {
+          "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 2, 128, 1, 16, 8>(char*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 128, 1>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+          "calls": 1,
+          "device_us": 34.75200000000041,
+          "fraction": 0.02041637610499136
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul> >(int, at::native::FillFunctor<c10::BFloat16>, std::array<char*, 1ul>)",
+          "calls": 2,
+          "device_us": 9.82400000000007,
+          "fraction": 0.005771480169643018
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "calls": 1,
+          "device_us": 5.5349999999998545,
+          "fraction": 0.00325174498564465
+        },
+        {
+          "name": "_store_conv",
+          "calls": 1,
+          "device_us": 2.8170000000000073,
+          "fraction": 0.001654953139035455
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sigmoid_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "calls": 1,
+          "device_us": 2.494999999999891,
+          "fraction": 0.001465782066699776
+        },
+        {
+          "name": "Memcpy HtoD (Pinned -> Device)",
+          "calls": 2,
+          "device_us": 2.1440000000006876,
+          "fraction": 0.0012595738480983827
+        },
+        {
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast>(int, at::native::compare_scalar_kernel<int>(at::TensorIteratorBase&, at::native::(anonymous namespace)::OpType, int)::{lambda(int)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithoutCast, at::native::memory::StoreWithoutCast)",
+          "calls": 1,
+          "device_us": 2.143000000000029,
+          "fraction": 0.0012589863602957114
+        }
+      ],
+      "scope": "single warmed profiled call; sum of GPU event durations, not end-to-end time"
+    }
+  ]
+}
