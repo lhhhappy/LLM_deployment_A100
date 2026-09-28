@@ -21,6 +21,7 @@ import pynvml
 import torch
 from torch.nn import Module
 
+from sglang.kernels.ops.moe.moe_fused_mul_sum import warmup_sm80_moe_reduce
 from sglang.srt.environ import envs
 from sglang.srt.layers.moe.moe_runner.humming import (
     HummingMoeQuantInfo,
@@ -32,7 +33,7 @@ from sglang.srt.layers.moe.token_dispatcher.standard import StandardCombineInput
 from sglang.srt.layers.moe.utils import get_moe_a2a_backend, get_moe_runner_backend
 from sglang.srt.layers.quantization.base_config import FusedMoEMethodBase
 from sglang.srt.layers.quantization.humming_utils import prepare_humming_moe_layer
-from sglang.srt.utils import log_info_on_rank0
+from sglang.srt.utils import get_bool_env_var, log_info_on_rank0
 
 if TYPE_CHECKING:
     from sglang.srt.layers.moe import MoeRunnerConfig
@@ -43,6 +44,8 @@ logger = logging.getLogger(__name__)
 
 # Layers served by this method in this process, for the scheduler's mechanism report.
 _HUMMING_LAYERS: list[str] = []
+_AX_SM80_MOE_DOWN_TUNE = get_bool_env_var("SGLANG_AX_SM80_MOE_DOWN_TUNE", "false")
+_AX_SM80_MOE_UP_TUNE = get_bool_env_var("SGLANG_AX_SM80_MOE_UP_TUNE", "false")
 
 # Token counts of the warm-up forwards: 1 builds the GEMM table; the others hit every size range of
 # moe_fused_mul_sum's BLOCK_M heuristic above the decode graph sizes (<= 128, compiled at capture), each
@@ -61,6 +64,66 @@ class _AxFp8HummingRunnerCore(HummingRunnerCore):
     Reuse only concrete shapes; symbolic/fake shapes keep the original path.
     A bounded cache avoids growing with every ragged prefill length.
     """
+
+    def get_humming_gemm_configs(self, humming_gemm_type):
+        if not (_AX_SM80_MOE_DOWN_TUNE or _AX_SM80_MOE_UP_TUNE):
+            return super().get_humming_gemm_configs(humming_gemm_type)
+        key = humming_gemm_type.value
+        if key in self.humming_gemm_configs:
+            return self.humming_gemm_configs[key]
+        configs = super().get_humming_gemm_configs(humming_gemm_type)
+        layer = self.layer
+        if (
+            key != "indexed"
+            or layer.hidden_size != 4096
+            or layer.intermediate_size_per_partition != 256
+            or self.num_experts != 289
+            or self.config.top_k != 9
+            or layer.params_dtype != torch.bfloat16
+            or layer.w2_weight.device.type != "cuda"
+            or torch.version.hip is not None
+        ):
+            return configs
+        from humming import dtypes
+
+        from sglang.srt.layers.quantization.fp8_humming_tuning import (
+            tune_sm80_prefill_down,
+            tune_sm80_prefill_up,
+        )
+
+        eligible = []
+        for enabled, name, tune in (
+            (_AX_SM80_MOE_DOWN_TUNE, "w2", tune_sm80_prefill_down),
+            (_AX_SM80_MOE_UP_TUNE, "w13", tune_sm80_prefill_up),
+        ):
+            if not enabled:
+                continue
+            meta = layer.humming_metas[name]
+            if (
+                meta.a_dtype != dtypes.bfloat16
+                or meta.b_dtype != dtypes.float8e4m3
+                or meta.c_dtype != dtypes.bfloat16
+                or meta.weight_scale_group_size != 128
+                # 117 expands each original 128-row block scale over its N rows.
+                or meta.weight_scale_group_size_n != 0
+                or meta.bs_dtype != dtypes.bfloat16
+            ):
+                continue
+            eligible.append(tune)
+        if not eligible or torch.cuda.get_device_capability(layer.w2_weight.device) != (8, 0):
+            return configs
+        tuned = configs
+        for tune in eligible:
+            tuned = tune(tuned)
+        self.humming_gemm_configs[key] = tuned
+        if tuned is not configs:
+            log_info_on_rank0(
+                logger,
+                "SM80 Humming MoE tuning for 8192–16384 tokens: "
+                f"W2 N128/stages3/CTA2={tuned['w2_tuning_config'] is not configs['w2_tuning_config']}, "
+                f"W13 stream-K off={tuned['w13_tuning_config'] is not configs['w13_tuning_config']}.",
+            )
+        return tuned
 
     def get_buffer_metas(self, hidden_states, topk_ids, gemm_type):
         hidden_shape, topk_shape = hidden_states.shape, topk_ids.shape
@@ -168,6 +231,13 @@ class Fp8HummingMoEMethod(FusedMoEMethodBase):
                 HummingMoeQuantInfo(layer=layer),
                 running_state={},
             )
+        warmup_sm80_moe_reduce(
+            device,
+            layer.params_dtype,
+            layer.hidden_size,
+            top_k,
+            self.runner_core.config.routed_scaling_factor,
+        )
         elapsed = time.perf_counter() - start
         if elapsed > 1.0:
             log_info_on_rank0(
