@@ -522,7 +522,7 @@
     "job": "130eznk-tail_rot150_n30_chainmax16k_fix_mamba400_scatter_40m",
     "ref": "130eznc（钉池候选，同 ID）",
     "what": "单变量：钉池候选 + --enable-attn-tp-input-scattered（现行所有配置都关着，每卡对 mHC/norm/dense 算整块 8k/16k 行；开后每卡只算 1/8 行、多付 reduce-scatter/all-gather）。085 旧引擎实测 chain 23→21、TPOT 33→32 ms、fast +19。问题：在钉池候选上能否买到开场/稳态 chain。chain 先看，fast/overall/TPOT 只记代价；冒烟须 12/12",
-    "status": "已发布（eznj 之后）"
+    "status": "已停（08:50 UTC，第 33 分钟，用第 28 分钟快照判定，无闭合 raw）。chain：同 1239 条 ID 上超标 7=7，同一批 7 个开场链首（52k–195k），首字 42–80 s → 39.5–73.8 s，只快 6–8%，其中等待 35–62 s、执行 4–13 s；其余链首中位 0.74 s 不变。机制本身生效：服务日志实测开场 prefill 速率前 60 s 15.6k 对 14.0k tok/s（+11%）、前 100 s 14.8k 对 13.3k，200 s 后无差别。代价：fast 修 25/新 25，overall 修 13/新 10，turn 修 2/新 0，TPOT p95 0.126 对 0.121，超 0.10 占 6.7% 对 7.1%。读法：分片只减 prefill 的每卡冗余，救不了要等 35 s 以上的尾巴；最小的尾巴要快 29% 才过 30 s，分片+118 合起来约 18% 也不够。不单独作候选；若 118 成立可合成一臂再看 TPOT 代价"
   },
   {
     "job": "130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m",
