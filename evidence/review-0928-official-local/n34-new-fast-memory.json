@@ -1,0 +1,394 @@
+[
+  {
+    "req_id": "biomaster:canon:4Z-YUZOO_NSeqORxCgpbX:llm:11",
+    "dispatch_offset_s": 110.97258639335632,
+    "recv_to_exec_s": 2.1443045139312744,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.64,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:iBtHBu-khBu7IMGLxvyUK:llm:1",
+    "dispatch_offset_s": 96.15888905525208,
+    "recv_to_exec_s": 18.0826256275177,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.71,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:IM26aRmmkaNZw36cflu0e:llm:2",
+    "dispatch_offset_s": 96.96468424797058,
+    "recv_to_exec_s": 17.485991954803467,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.71,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_163:llm:0004",
+    "dispatch_offset_s": 156.8689923286438,
+    "recv_to_exec_s": 5.2919700145721436,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.78,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_241:llm:0017",
+    "dispatch_offset_s": 277.44676446914673,
+    "recv_to_exec_s": 2.247915744781494,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.6,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:member-v5-subagent-b07fae37a055b8dc5486f876:llm:1",
+    "dispatch_offset_s": 277.97030997276306,
+    "recv_to_exec_s": 2.862781524658203,
+    "cached_token_delta": -1792.0,
+    "near_wait_max_token_usage": 0.6,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_038:llm:0007",
+    "dispatch_offset_s": 276.9868993759155,
+    "recv_to_exec_s": 3.612553119659424,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.6,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_192:llm:0002",
+    "dispatch_offset_s": 90.33384799957275,
+    "recv_to_exec_s": 3.5015194416046143,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.71,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_062:llm:0003",
+    "dispatch_offset_s": 433.1004502773285,
+    "recv_to_exec_s": 2.169846296310425,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.85,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0017",
+    "dispatch_offset_s": 442.00506067276,
+    "recv_to_exec_s": 3.6705031394958496,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.85,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_250:llm:0001",
+    "dispatch_offset_s": 441.8887379169464,
+    "recv_to_exec_s": 2.7509958744049072,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.85,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_001:llm:0007",
+    "dispatch_offset_s": 483.278767824173,
+    "recv_to_exec_s": 3.3967552185058594,
+    "cached_token_delta": -256.0,
+    "near_wait_max_token_usage": 0.95,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_133:llm:0006",
+    "dispatch_offset_s": 499.82988262176514,
+    "recv_to_exec_s": 3.2078771591186523,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.95,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_240:llm:0006",
+    "dispatch_offset_s": 499.97500252723694,
+    "recv_to_exec_s": 3.798973560333252,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.95,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_079:llm:0012",
+    "dispatch_offset_s": 508.7460210323334,
+    "recv_to_exec_s": 3.033357620239258,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.97,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_133:llm:0007",
+    "dispatch_offset_s": 506.72541642189026,
+    "recv_to_exec_s": 4.277453184127808,
+    "cached_token_delta": -1280.0,
+    "near_wait_max_token_usage": 0.97,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_097:llm:0009",
+    "dispatch_offset_s": 521.5890734195709,
+    "recv_to_exec_s": 3.391942024230957,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_040:llm:0008",
+    "dispatch_offset_s": 489.6033425331116,
+    "recv_to_exec_s": 2.593479871749878,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.95,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_215:llm:0007",
+    "dispatch_offset_s": 612.3796157836914,
+    "recv_to_exec_s": 3.600586175918579,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.84,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_286:llm:0005",
+    "dispatch_offset_s": 507.2352705001831,
+    "recv_to_exec_s": 3.7699203491210938,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.97,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_097:llm:0014",
+    "dispatch_offset_s": 698.4604833126068,
+    "recv_to_exec_s": 4.226741313934326,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.97,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_294:llm:0005",
+    "dispatch_offset_s": 706.1534893512726,
+    "recv_to_exec_s": 4.69657826423645,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_036:llm:0003",
+    "dispatch_offset_s": 706.3198888301849,
+    "recv_to_exec_s": 3.4721996784210205,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_228:llm:0008",
+    "dispatch_offset_s": 406.202467918396,
+    "recv_to_exec_s": 4.356942176818848,
+    "cached_token_delta": -1024.0,
+    "near_wait_max_token_usage": 0.73,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0024",
+    "dispatch_offset_s": 760.3908743858337,
+    "recv_to_exec_s": 5.924627780914307,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0027",
+    "dispatch_offset_s": 826.2960021495819,
+    "recv_to_exec_s": 3.757599353790283,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.96,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:member-v5-subagent-24b52607025430b3818e78c8:llm:4",
+    "dispatch_offset_s": 835.8441114425659,
+    "recv_to_exec_s": 3.8883445262908936,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_299:llm:0001",
+    "dispatch_offset_s": 835.271329164505,
+    "recv_to_exec_s": 4.038923025131226,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.98,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_056:llm:0001",
+    "dispatch_offset_s": 863.236810207367,
+    "recv_to_exec_s": 2.7863357067108154,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.99,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0035",
+    "dispatch_offset_s": 935.4693193435669,
+    "recv_to_exec_s": 6.203358173370361,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.99,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_056:llm:0005",
+    "dispatch_offset_s": 944.7174768447876,
+    "recv_to_exec_s": 3.1151442527770996,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.99,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0036",
+    "dispatch_offset_s": 953.13392162323,
+    "recv_to_exec_s": 8.146778583526611,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.99,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:member-v5-subagent-cc542b8357a37a446f71d869:llm:1",
+    "dispatch_offset_s": 967.7719781398773,
+    "recv_to_exec_s": 5.630719423294067,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.96,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0038",
+    "dispatch_offset_s": 976.4753413200378,
+    "recv_to_exec_s": 3.0847389698028564,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.96,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_219:llm:0005",
+    "dispatch_offset_s": 967.5262448787689,
+    "recv_to_exec_s": 6.251021146774292,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.96,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_098:llm:0004",
+    "dispatch_offset_s": 937.5694813728333,
+    "recv_to_exec_s": 2.8514816761016846,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.99,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_224:llm:0043",
+    "dispatch_offset_s": 1188.0496439933777,
+    "recv_to_exec_s": 3.606398582458496,
+    "cached_token_delta": 3584.0,
+    "near_wait_max_token_usage": 0.71,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:31",
+    "dispatch_offset_s": 1262.8521423339844,
+    "recv_to_exec_s": 2.510089635848999,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.8,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_239:llm:0027",
+    "dispatch_offset_s": 1263.395673751831,
+    "recv_to_exec_s": 2.8481152057647705,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.8,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "scimaster:canon:lc_20260924_286:llm:0038",
+    "dispatch_offset_s": 1745.2164459228516,
+    "recv_to_exec_s": 3.249236822128296,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.81,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_032:llm:0009",
+    "dispatch_offset_s": 1834.8157968521118,
+    "recv_to_exec_s": 4.160699367523193,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.82,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_093:llm:0005",
+    "dispatch_offset_s": 1909.2315995693207,
+    "recv_to_exec_s": 3.306225538253784,
+    "cached_token_delta": 256.0,
+    "near_wait_max_token_usage": 0.91,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_115:llm:0036",
+    "dispatch_offset_s": 2098.139412879944,
+    "recv_to_exec_s": 0.1820831298828125,
+    "cached_token_delta": -81664.0,
+    "near_wait_max_token_usage": 0.86,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_109:llm:0022",
+    "dispatch_offset_s": 1930.3570561408997,
+    "recv_to_exec_s": 2.530811309814453,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.91,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_134:llm:0005",
+    "dispatch_offset_s": 2099.630048274994,
+    "recv_to_exec_s": 3.346863031387329,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.86,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:member-v5-subagent-8f82f4a2c8503c34894ddcd1:llm:5",
+    "dispatch_offset_s": 2121.803802251816,
+    "recv_to_exec_s": 2.9109177589416504,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.83,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_114:llm:0011",
+    "dispatch_offset_s": 2121.356213569641,
+    "recv_to_exec_s": 3.3668015003204346,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.83,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_191:llm:0005",
+    "dispatch_offset_s": 2144.527894258499,
+    "recv_to_exec_s": 2.9550061225891113,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.82,
+    "note": "includes adjacent metric samples; correlation only"
+  },
+  {
+    "req_id": "biomaster:canon:lc_20260924_207:llm:0018",
+    "dispatch_offset_s": 2122.1333096027374,
+    "recv_to_exec_s": 5.941040754318237,
+    "cached_token_delta": 0.0,
+    "near_wait_max_token_usage": 0.83,
+    "note": "includes adjacent metric samples; correlation only"
+  }
+]

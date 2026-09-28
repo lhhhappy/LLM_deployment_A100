@@ -1,0 +1,37 @@
+{
+  "bundle_sha256": "c64c462b7c94897d4cafde69928b8a6de92f83495a64b26ab7f671444ceb8415",
+  "bundle_size": 14641,
+  "files": [
+    "Dockerfile",
+    "README.md",
+    "arm_manifest.json",
+    "characterization.json",
+    "execution/results/submission.json",
+    "execution/run.log",
+    "logs/run.log",
+    "native_trace/stub-trace.jsonl",
+    "outputs/submission.json",
+    "raw_messages.jsonl",
+    "requirements.txt",
+    "results/submission.json",
+    "src/reproduce.py",
+    "submission.json",
+    "traces/raw_messages.jsonl",
+    "traces/trace.jsonl"
+  ],
+  "identical_submission_members": [
+    "execution/results/submission.json",
+    "outputs/submission.json",
+    "results/submission.json"
+  ],
+  "root_submission_json": "CLI metadata; validated challenge_id, not the service configuration",
+  "submission_sha256": "1178f8679349422b113b87af4b1998a3d51083cab880cdda20d03d728db6355d",
+  "image_digest_from_build_receipt": "sha256:0c2aea4df2c3e93e7b3afc60ed23eda2ea323badc4f7d899771bce360d264cc6",
+  "image_requery_checks": [
+    "id",
+    "url",
+    "status",
+    "Dockerfile identical except removed trailing newline after catalog base64 decoding"
+  ],
+  "engine_patch_exact": true
+}

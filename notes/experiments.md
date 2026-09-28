@@ -582,3 +582,11 @@ raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只�
 | 130eznd（rot150，N30） | 上传配置 + 133 精确 TPOT 截止时间 decode 分配（引擎 1bdaf4a6） | eznb（同 1673 条） | **12→18（开场 8→12，稳态 4→6）变坏** | 11→9 | 248→256 | 208→209 | 83→27 | 排空 1680；TPOT 均值 55→46 ms；保 TPOT 过头，链首多等；否决现配置 |
 | 130eznf（rot150，N30） | 124m 引擎 c4d01e56 关开关（同引擎对照） | eznb（同 1675 条） | 12→14 | 11→8 | 248→238 | 209→201 | 83→77 | 排空 1689；默认关与 20a58da9 在噪声内一致 |
 | 130ezne（rot150，N30） | 124m 多轮停车 + 可救者抢占 ON（Codex c4d01e56） | eznf（同 1674 条） | **14→12（稳态 5→3，开场 9=9）** | 8→11 | 238→241 | 200→194 | 76→96 | 排空 1679；harness p95 chain 30.1（OFF 31.7）；方向对幅度小；探针 ezndz/eznfz STATE_PASS |
+
+
+## 09-28 Codex 原始数据复盘与 eznq 闭合
+
+- **chain 第一：** eznb/eznc/ezno 三者共同 1687 个 ID，chain 12→7→6；修好 6、新坏 0。更正旧“1700 多条共同请求”与混用 TPOT 分母；完整逐臂审计、负例、原始数据和脚本见 [N30 复核](reports/local-today-audit-0928.md)，决策解释见 [综合复盘](reports/0928-official-local-synthesis.md)。
+- **eznq 全候选 N34（0928c 对应配置）闭合：** 2400 秒准入后 DRAINED，1960 派发/完成、0 错误、唯一 ID 集一致、token 合同通过、flush 成功、runner 0，非完整 cohort。chain 6/268；四个 TTFT 估计条数门均通过，TPOT p95 103.322 ms 超 100 ms，无正式 N34 成绩含义。[原始 timed verdict](../evidence/L130eznq-tail_rot150_n34_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m/N34/timed_verdict.json)。
+- 对相同配置 ezno N30，共同 1850 个 ID：chain 修 0/新坏 0/持续 6，TPOT p95 94.744→104.807 ms；fast 修 24/新坏 49/持续 4。新增 49 条 fast 的 recv→exec 中位 0.171→3.472 s、exec→first 0.373→0.406 s；主要增量出现在执行前，不能从这两段计时直接指定调度或 GPU 子机制。KV≥93% 采样占比 3.15%→8.0%，Mamba 使用峰值 118→134/400、回撤 0；只是相关观测。10 分钟后派发人群 TPOT p95 79.132 ms，开场占比影响短窗。[逐请求与汇总](../evidence/review-0928-official-local/README.md)。
+- 正式提交与结果统一见 [submissions.md](submissions.md)；本轮未开新 GPU 实验，未更改引擎或评分规则。

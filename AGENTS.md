@@ -12,7 +12,7 @@
 
 ## 判定优先级：chain 第一（用户多次强调，2026-09-26 / 09-28）
 
-- 线上失败档只有 `chain_start` 门在挂（p95 37–46 s 对 30 s），fast / overall / turn 有 1.5–3 倍余量，tpot 均值有余量。所以任何实验、任何候选**先看 chain**：同一批请求 ID 上的 chain 超标条数，分开场与稳态、按链首类型（session_start / 切段 intra / turn_start / reset）列出修好与新坏。
+- 用户要求任何实验、任何候选**先看 chain**。09-28 官方 47043 已到 N30：chain p95 25.608 s、fast 3.445 s、TPOT p95 59.582 ms；旧的“只有 chain 紧、fast 有 1.5–3 倍余量”已失效，且平台不返回更高失败档的门，不能断言只败在 chain（[复核](notes/reports/0928-official-local-synthesis.md)）。仍按同一准则比较：同一批请求 ID 上的 chain 超标条数，分开场与稳态、按链首类型（session_start / 切段 intra / turn_start / reset）列出修好与新坏。
 - **chain 变差的改动一律否决**，不管它把 fast、overall、TPOT 均值改善了多少；fast / overall 只作为代价记录，不作为采用理由。TPOT 只盯 `tpot_p95 ≤ 0.10` 这道无余量的硬门（本地 p95 约为均值 1.75 倍，均值上限约 0.055）。
 - 汇报和看板的第一句写 chain 的结果；"fast 大幅回落"这类话只能放在代价里。上传候选的取舍同样只按 chain 与硬门。
 

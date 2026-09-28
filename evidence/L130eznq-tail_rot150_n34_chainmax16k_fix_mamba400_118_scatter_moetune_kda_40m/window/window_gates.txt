@@ -1,0 +1,8 @@
+== 130eznq-tail_rot150_n34_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m  (1877 requests, span 38.5 min)
+window(min) state   n   fast o/a  p95   overall o/a  p95   turn o/a  p95   chain o/a  p95    tpot mean/p95 >.10  hit
+-- per window
+    0-25    open  1245   43/57    2.81   18/63    3.08    2/5    14.08    6/14   26.87  0.0647/0.1326  89  0.883
+   25-50    open   632   10/32    1.58    2/35    1.96    2/3    16.38    0/8     5.29  0.0452/0.0728  11  0.898
+-- per cumulative
+    0-25    open  1245   43/57    2.81   18/63    3.08    2/5    14.08    6/14   26.87  0.0647/0.1326  89  0.883
+   25-50    open  1877   53/83    2.39   20/92    2.81    4/7    15.12    6/19   21.57  0.0581/0.1045 100  0.888

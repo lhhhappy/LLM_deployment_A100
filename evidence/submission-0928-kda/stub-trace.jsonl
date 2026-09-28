@@ -1,0 +1,3 @@
+{"type":"session_start","source":"stub"}
+{"role":"user","message":{"content":[{"type":"text","text":"placeholder"}]}}
+{"role":"assistant","message":{"content":[{"type":"text","text":"placeholder"}]}}

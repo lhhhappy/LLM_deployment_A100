@@ -1,0 +1,16 @@
+{
+  "scope": "fixed_duration_diagnostic",
+  "status": "DRAINED",
+  "full_cohort_complete": false,
+  "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N34_1790605927.jsonl",
+  "duration_s": 2400.0,
+  "first_dispatch_at_s": 1790605927.7768698,
+  "admission_deadline_s": 1790608327.7768698,
+  "drained_at_s": 1790608440.3649144,
+  "n_dispatched": 1960,
+  "n_completed": 1960,
+  "outstanding": [],
+  "runner_rc": 0,
+  "cutoff_reached": true,
+  "ledger_sha256": "da5d25246b6ea854baf29071ab330c1efcfcc6e6892689df1c79be4466b74d19"
+}
