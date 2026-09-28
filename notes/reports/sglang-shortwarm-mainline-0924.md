@@ -1,7 +1,7 @@
 # SGLang 组合验证与短预热（2026-09-24）
 
 当前069已完成5601条，VALID FAIL，10/11门通过，仅chain31/29失败；070启动时Pod被平台驱逐，无测量；原service revision2部署中，071尚未入队。
-最新判断与行动见[迭代索引](../iterations/codex.md)，完整067/068/069对照见[实验记录](../experiments.md)。
+**已过时（2026-09-28）：** 09-24 当天的"最新判断"已被后续大量结果取代，现行状态见 [knowledge.md](../knowledge.md)、[experiments.md](../experiments.md)、[program-n30-v3.md](../program-n30-v3.md)（原先指向的"迭代索引"已删除，同属过时状态页）。
 下文保留最初组合定义、统一短预热协议和各检查点原始判断，用于追溯。
 原始正式组合对应已上传attempt46174/镜像0924d/引擎759a6ebb8e31723519ad5daf438e26e24b32501a。
 
