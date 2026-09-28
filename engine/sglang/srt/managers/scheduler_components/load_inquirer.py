@@ -56,6 +56,7 @@ class SchedulerLoadInquirer:
     get_total_prefill_uncached_tokens: Callable
     get_total_prefill_busy_us: Callable
     get_decode_moment_totals: Callable
+    get_parked_reqs: Callable = tuple
 
     def _get_num_pending_tokens(self, chunk_deduct: int = 0) -> int:
         """Get the total number of tokens pending prefill.
@@ -75,7 +76,9 @@ class SchedulerLoadInquirer:
         if self.get_chunked_req() is not None:
             req = self.get_chunked_req()
             num_pending_tokens += req.seqlen - len(req.prefix_indices) - chunk_deduct
-        return num_pending_tokens
+        return num_pending_tokens + sum(
+            max(0, r.seqlen - len(r.prefix_indices)) for r in self.get_parked_reqs()
+        )
 
     def get_num_waiting_uncached_tokens(self) -> int:
         """Estimate input tokens waiting for prefill compute."""
@@ -92,6 +95,8 @@ class SchedulerLoadInquirer:
         cr = self.get_chunked_req()
         if cr is not None:
             num_tokens += max(0, cr.seqlen - len(cr.prefix_indices))
+        num_tokens += sum(max(0, r.seqlen - len(r.prefix_indices))
+                          for r in self.get_parked_reqs())
         return num_tokens
 
     def get_loads(self) -> LoadSnapshot:
@@ -126,13 +131,14 @@ class SchedulerLoadInquirer:
                 for req in queue
             )
 
-        num_waiting_reqs = sum(len(queue) for queue in waiting_queues)
+        parked = self.get_parked_reqs()
+        num_waiting_reqs = sum(len(queue) for queue in waiting_queues) + len(parked)
         num_used_tokens, kv_token_usage = (
             self.pool_stats_observer.get_pool_stats().get_kv_token_stats()
         )
         num_total_tokens = num_used_tokens + sum(
             req.seqlen for queue in pending_token_queues for req in queue
-        )
+        ) + sum(max(0, r.seqlen - len(r.prefix_indices)) for r in parked)
         num_active_tokens = max(0, num_total_tokens - awaiting_kv_tokens)
 
         memory = None
@@ -203,7 +209,7 @@ class SchedulerLoadInquirer:
         queues = QueueMetrics(
             waiting=len(self.get_waiting_queue()),
             grammar=stats.num_grammar_queue_reqs,
-            paused=stats.num_paused_reqs,
+            paused=stats.num_paused_reqs + len(parked),
             retracted=stats.num_retracted_reqs,
             prealloc_ready=decode_prealloc_ready,
         )

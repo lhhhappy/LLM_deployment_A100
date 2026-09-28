@@ -58,6 +58,7 @@ class SchedulerInvariantChecker:
     pool_stats_observer: SchedulerPoolStatsObserver
     get_last_batch: Callable
     get_running_batch: Callable
+    get_parked_reqs: Callable = tuple
     count_req_pool_leak_warnings: int = 0
     count_memory_leak_warnings: int = 0
     recent_busy_msgs: Deque[str] = field(
@@ -264,24 +265,28 @@ class SchedulerInvariantChecker:
 
         full_uncached = 0
         swa_uncached = 0
-        for batch in batches:
-            for req in batch.reqs:
-                if not req.kv.holds_kv:
-                    continue
+        reqs = [r for batch in batches if batch is not None for r in batch.reqs]
+        # During overlap a newly parked Req may also be in last_batch.
+        # Count by identity, never by tensor-backed dataclass equality.
+        seen = {id(r) for r in reqs}
+        reqs.extend(r for r in self.get_parked_reqs() if id(r) not in seen)
+        for req in reqs:
+            if not req.kv.holds_kv:
+                continue
 
-                allocated_len = req.kv.kv_allocated_len
-                if self.page_size > 1:
-                    allocated_len = ceil_align(allocated_len, self.page_size)
-                    assert req.kv.cache_protected_len % self.page_size == 0
+            allocated_len = req.kv.kv_allocated_len
+            if self.page_size > 1:
+                allocated_len = ceil_align(allocated_len, self.page_size)
+                assert req.kv.cache_protected_len % self.page_size == 0
 
-                full_uncached += allocated_len - req.kv.cache_protected_len
-                if self.is_hybrid_swa:
-                    swa_uncached += allocated_len - max(
-                        req.kv.cache_protected_len, req.kv.swa_evicted_seqlen
-                    )
+            full_uncached += allocated_len - req.kv.cache_protected_len
+            if self.is_hybrid_swa:
+                swa_uncached += allocated_len - max(
+                    req.kv.cache_protected_len, req.kv.swa_evicted_seqlen
+                )
 
-                if req.beam_group is not None:
-                    full_uncached += req.beam_group.extra_uncached_tokens()
+            if req.beam_group is not None:
+                full_uncached += req.beam_group.extra_uncached_tokens()
 
         return full_uncached, swa_uncached
 
@@ -337,16 +342,21 @@ class SchedulerInvariantChecker:
         owners: list[tuple[str, Optional[int], int]] = []
         batch = self.get_last_batch()
         if batch is not None:
-            for req in batch.reqs:
-                if not req.kv.holds_kv:
-                    continue
-                _add_owner(
-                    req,
-                    f"req {req.rid}",
-                    req.kv.req_pool_idx,
-                    req.kv.kv_committed_len,
-                    req.kv.kv_allocated_len,
-                )
+            reqs = list(batch.reqs)
+        else:
+            reqs = []
+        seen = {id(r) for r in reqs}
+        reqs.extend(r for r in self.get_parked_reqs() if id(r) not in seen)
+        for req in reqs:
+            if not req.kv.holds_kv:
+                continue
+            _add_owner(
+                req,
+                f"req {req.rid}",
+                req.kv.req_pool_idx,
+                req.kv.kv_committed_len,
+                req.kv.kv_allocated_len,
+            )
         sess = getattr(self.tree_cache, "slots", None)
         if sess:
             for sid, slot in sess.items():

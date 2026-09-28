@@ -373,7 +373,8 @@ class SchedulerBatchResultProcessor:
                 else:
                     # being chunked reqs' prefill is not finished
                     req.inflight_middle_chunks -= 1
-                    # There is only at most one request being currently chunked.
+                    # At most one middle chunk executes in this batch; another
+                    # partial may be parked outside the batch (124m).
                     # Because this request does not finish prefill,
                     # we don't want to stream the request currently being chunked.
                     skip_stream_req = req

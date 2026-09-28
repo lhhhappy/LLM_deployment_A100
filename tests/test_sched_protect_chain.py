@@ -204,6 +204,11 @@ def load_source(root=CANDIDATE):
         ns['ax_prefix_producer'] = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, {'sglang.srt.managers': managers, 'sglang.srt.mem_cache': cache}):
             spec.loader.exec_module(ns['ax_prefix_producer'])
+            multi = root / 'srt/managers/ax_multiround_park.py'
+            if multi.exists():
+                spec = importlib.util.spec_from_file_location('ax_multiround_park', multi)
+                ns['ax_multiround_park'] = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(ns['ax_multiround_park'])
     ns.setdefault('sys', sys)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)

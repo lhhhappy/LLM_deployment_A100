@@ -111,7 +111,7 @@ from sglang.srt.layers.quantization.fp8_utils import initialize_fp8_gemm_config
 from sglang.srt.layers.quantization.unquant import initialize_bf16_gemm_config
 from sglang.srt.lora.lora_drainer import LoRADrainer
 from sglang.srt.lora.lora_overlap_loader import LoRAOverlapLoader
-from sglang.srt.managers import ax_deadline, ax_prefix_producer
+from sglang.srt.managers import ax_deadline, ax_multiround_park, ax_prefix_producer
 from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.managers.disagg_service import maybe_create_ascend_config_store
 from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
@@ -1338,6 +1338,7 @@ class Scheduler(
             "122": m122,
             "123": m123,
             "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
+            "124m": "on" if getattr(self, "_ax_multi_park", None) is not None else "off",
             "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
             "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
             "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
@@ -1508,6 +1509,13 @@ class Scheduler(
                 raise ValueError(f"[ax] 124/125 need 120's protection, which is off: {blocker}")
             if deadline and _ax_srpt_aging() is not None:
                 raise ValueError("[ax] 124 replaces 123's order; unset SGLANG_AX_SRPT_AGING")
+            multi_park = os.environ.get("SGLANG_AX_MULTI_ROUND_PARK", "0") == "1"
+            if multi_park:
+                if (not deadline or blocker is not None or not self.spec_algorithm.is_none()
+                        or not getattr(self, "is_generation", True)
+                        or getattr(self.server_args, "enable_unified_memory", False)):
+                    raise ValueError("[ax-124m] requires 124/120, ordinary generation, no MTP or unified memory")
+                self._ax_multi_park = ax_multiround_park.State()
             if backlog and self._ax_pace() is not None:
                 raise ValueError("[ax] 125 changes the cold cap and fixed decode interval that 122 replaces; "
                                  "unset SGLANG_AX_PACE_TPOT")
@@ -1544,6 +1552,8 @@ class Scheduler(
         125's TPOT guard, relief and open rate interval; 128's pairwise shared-prefix cache; the short-hit reserve
         state shared by 122/126, which remembers RIDs reserved beside the last continuation (the same data is replayed
         with the same RIDs at every level, so a stale entry would stop reserving for a hit that was never refused)."""
+        if getattr(self, "_ax_multi_park", None) is not None:
+            self._ax_multi_park.reset()
         if getattr(self, "_ax_backlog", None) is not None:
             self._ax_backlog.reset()
             self._ax_backlog_relieved = False
@@ -1626,7 +1636,8 @@ class Scheduler(
                 _, short, grid = adder.ax_protect
                 slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
                 ranked, held, family_held = producer.prepare(
-                    self.waiting_queue, cont, running_batch.reqs, held,
+                    self.waiting_queue, cont,
+                    running_batch.reqs + list(ax_multiround_park.parked_reqs(self)), held,
                     getattr(self.policy, "ax_prefix_held_by", {}), now, waited,
                     deadline, round_budget, grid, short,
                     lambda r: r is cont or (slots > 0 and adder._request_total_tokens(
@@ -1635,7 +1646,7 @@ class Scheduler(
             else:
                 ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
             order = [r.rid for r in ranked]
-            if cont is not None and self.get_num_allocatable_reqs(
+            if cont is not None and not ax_multiround_park.parked_reqs(self) and self.get_num_allocatable_reqs(
                 len(running_batch.reqs), running_batch=running_batch
             ) > 0:
                 rounds = getattr(cont, "_ax_parked_rounds", 0)
@@ -1670,7 +1681,8 @@ class Scheduler(
                 first = getattr(req.time_stats, "prefill_finished_time", 0.0)
                 if produced > 1 and first:
                     state.note_tpot(req.rid, (now - first) / (produced - 1))
-            cold = cont_left + sum(
+            cold = cont_left + sum(ax_multiround_park.remaining(r)
+                                   for r in ax_multiround_park.parked_reqs(self)) + sum(
                 ax_deadline.remaining_tokens(r) for r in self.waiting_queue if ax_deadline.is_cold(r)
             )
             was = state.relieved
@@ -2506,6 +2518,18 @@ class Scheduler(
         timeout_s = envs.SGLANG_REQ_RUNNING_TIMEOUT.get()
         if timeout_s <= 0:
             return
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None:
+            expired = self._ax_rank0_decide(lambda: [
+                req.rid for req in multi.reqs()
+                if not req.finished() and
+                0 < req.time_stats.forward_entry_time < time.perf_counter() - timeout_s
+            ])
+            for req in multi.reqs():
+                if req.rid in expired:
+                    multi.pending_abort[req.rid] = req
+            if multi.pending_abort:
+                self.process_pending_chunked_abort()
         if running_batch.is_empty():
             return
 
@@ -3033,6 +3057,7 @@ class Scheduler(
             pool_stats_observer=self.pool_stats_observer,
             get_last_batch=lambda: self.last_batch,
             get_running_batch=lambda: self.running_batch,
+            get_parked_reqs=lambda: ax_multiround_park.parked_reqs(self),
         )
 
     def init_rank_consensus_checker(self) -> None:
@@ -3096,6 +3121,7 @@ class Scheduler(
             get_recent_cache_hit_rate=lambda: self.metrics_reporter.recent_cache_hit_rate,
             get_stats=lambda: self.metrics_reporter.stats,
             get_chunked_req=lambda: self.chunked_req,
+            get_parked_reqs=lambda: ax_multiround_park.parked_reqs(self),
             get_disagg_prefill_bootstrap_queue=lambda: self.disagg_prefill_bootstrap_queue,
             get_disagg_prefill_inflight_queue=lambda: self.disagg_prefill_inflight_queue,
             get_disagg_decode_prealloc_queue=lambda: self.disagg_decode_prealloc_queue,
@@ -4050,6 +4076,17 @@ class Scheduler(
         is excluded from streaming and its logprob offset is still accounted).
         Mirrors ``handle_bootstrap_failure``.
         """
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None and multi.pending_abort:
+            # The prior GPU chunk can still be writing the request's live KDA
+            # slot. Fence before freeing it; its CPU callback drains normally.
+            self.forward_stream.synchronize()
+            for parked in list(multi.pending_abort.values()):
+                if parked in multi.reqs():
+                    self._abort_partial_req(parked)
+                    multi.forget(self, parked, "abort")
+                    self.ipc_channels.send_to_tokenizer.send_output(_make_abort_req(parked), parked)
+                    logger.debug(f"Abort parked prefill request. rid={parked.rid}")
         req = self._pending_chunked_abort_req
         if req is None:
             return
@@ -4065,6 +4102,17 @@ class Scheduler(
             self.abort_request(AbortReq(rid=req.rid))
             return
 
+        if multi is not None:
+            self.forward_stream.synchronize()
+        self._abort_partial_req(req)
+        self.chunked_req = None
+        self._pending_chunked_abort_req = None
+        if multi is not None:
+            multi.forget(self, req, "abort")
+        self.ipc_channels.send_to_tokenizer.send_output(_make_abort_req(req), req)
+        logger.debug(f"Abort chunked prefill request. {req.rid=}")
+
+    def _abort_partial_req(self, req):
         prepare_abort(req, "Aborted")
         req.time_stats.trace_ctx.abort(abort_info={"reason": "Aborted"})
         req.to_finish = None
@@ -4078,11 +4126,6 @@ class Scheduler(
         if self.enable_hicache_storage:
             self.tree_cache.release_aborted_request(req.rid)
         release_kv_cache(req, self.tree_cache, is_insert=False)
-
-        self.chunked_req = None
-        self._pending_chunked_abort_req = None
-        self.ipc_channels.send_to_tokenizer.send_output(_make_abort_req(req), req)
-        logger.debug(f"Abort chunked prefill request. {req.rid=}")
 
     def _build_hisparse_decode_batch(self, reqs):
         """Build a ScheduleBatch for hisparse requests transitioning from staging to decode."""
@@ -4166,6 +4209,14 @@ class Scheduler(
             # stashing would be a no-op.
             if self.chunked_req.extend_range.end > len(self.chunked_req.prefix_indices):
                 self.stash_chunked_request(self.chunked_req)
+
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None:
+            chunked_req_to_exclude.update(multi.reqs())
+            multi.prepare_step(self)
+            chunked_req_to_exclude.update(multi.reqs())
+            if self.chunked_req is not None:
+                chunked_req_to_exclude.add(self.chunked_req)
 
         # HiSparse has its own prefill-to-decode transition; skip last_batch merge.
         if self.enable_hisparse:
@@ -4303,7 +4354,8 @@ class Scheduler(
         beam_width: Optional[int] = None,
         running_batch: Optional[ScheduleBatch] = None,
     ) -> int:
-        pp_budget = get_parallel().pp_max_micro_batch_size - running_bs
+        pp_budget = (get_parallel().pp_max_micro_batch_size - running_bs
+                     - len(ax_multiround_park.parked_reqs(self)))
         available = self.req_to_token_pool.available_size()
 
         active_batch = running_batch or self.running_batch
@@ -4469,6 +4521,11 @@ class Scheduler(
         )
 
         deadline, backlog = self._ax_admission_cfgs()
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None and multi.parked and self.chunked_req is None:
+            # The rescuer's last chunk is in flight. Do not admit a third
+            # partial before its callback allows the parked owner to resume.
+            return None, running_batch
         ax_park = False
         ax_prefix_plan = None
         if deadline is not None or backlog is not None:
@@ -4499,6 +4556,19 @@ class Scheduler(
                         or set(order) != set(by_id)):
                     raise RuntimeError("[ax] 124 request queues differ across TP ranks")
                 self.waiting_queue[:] = [by_id[rid] for rid in order]
+
+        multi_transaction = None
+        if multi is not None:
+            decision = self._ax_rank0_decide(
+                lambda: multi.plan(self, adder, running_batch, round_budget, ax_prefix_plan))
+            multi_transaction = multi.begin(self, decision)
+            if multi_transaction is not None or multi.parked:
+                # The rescue owns the prefill budget until completion; READY
+                # seats and one-round parks must not repeatedly steal it back.
+                ax_park = False
+                if ax_prefix_plan is not None:
+                    ax_prefix_plan.update(ready=[], preview=[], reserved_tokens=0,
+                                          ordinary_reserve=0, demand=False, park=False)
 
         if self.chunked_req is not None:
             self.chunked_req.init_next_round_input()
@@ -4541,6 +4611,8 @@ class Scheduler(
                 self.chunked_req = adder.add_chunked_req(self.chunked_req)
         # Get requests from the waiting queue to a new prefill batch
         for req in self.waiting_queue:
+            if multi_transaction is not None and req is not multi_transaction[1]:
+                continue
             if req.rid in prefix_attempts:
                 continue  # no second COW/allocation attempt in this pass
             if ax_prefix_plan is not None and req.rid in ax_prefix_plan["wait_prefix"]:
@@ -4611,7 +4683,12 @@ class Scheduler(
                     req.swa_host_hit_length = held_swa_tokens
             res = adder.add_one_req(
                 req,
-                has_chunked_req=(self.chunked_req is not None),
+                # Even when the active final chunk returned None, a parked
+                # owner still occupies the other partial position. In
+                # particular, do not role-split a complete warm hit into a
+                # third partial beside that final chunk.
+                has_chunked_req=(self.chunked_req is not None or
+                                 (multi_transaction is None and multi is not None and bool(multi.parked))),
                 truncation_align_size=self.truncation_align_size,
             )
             if ax_prefix_plan is not None:
@@ -4661,6 +4738,9 @@ class Scheduler(
 
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_end()
+
+        if multi_transaction is not None:
+            multi.finish(self, adder, multi_transaction, running_batch, batch_was_full)
 
         if ax_park:
             if adder.can_run_list:
@@ -5333,6 +5413,9 @@ class Scheduler(
                 self.process_batch_result_disagg_prefill(batch, result)
             else:
                 self.batch_result_processor.process_batch_result_prefill(batch, result)
+                multi = getattr(self, "_ax_multi_park", None)
+                if multi is not None:
+                    multi.observe(self)
                 prefix_tracker = getattr(self, "_ax_prefix_tracker", None)
                 if prefix_tracker is not None:
                     for req in batch.reqs:
@@ -5522,6 +5605,7 @@ class Scheduler(
         idle = (
             self.running_batch.is_empty()
             and self.chunked_req is None
+            and not ax_multiround_park.parked_reqs(self)
             and not self.dllm_manager.any_staging_reqs()
             and (self.last_batch is None or self.last_batch.is_empty())
             and (not self.enable_overlap or len(self.result_queue) == 0)
@@ -5920,9 +6004,14 @@ class Scheduler(
             inflight_batches = [*self.running_mbs, *self.mbs]
         return {
             req for batch in inflight_batches if batch is not None for req in batch.reqs
-        }
+        } | set(ax_multiround_park.parked_reqs(self))
 
     def abort_request(self, recv_req: AbortReq):
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None:
+            for req in multi.reqs():
+                if recv_req.abort_all or req.rid.startswith(recv_req.rid):
+                    multi.pending_abort[req.rid] = req
         if (chunked_req := self.chunked_req) is not None:
             if recv_req.abort_all or chunked_req.rid.startswith(recv_req.rid):
                 self._pending_chunked_abort_req = chunked_req
@@ -6112,6 +6201,18 @@ class Scheduler(
             and self.disaggregation_mode != DisaggregationMode.PREFILL
         ):
             retract_reqs.append(self.chunked_req)
+
+        multi = getattr(self, "_ax_multi_park", None)
+        if multi is not None:
+            for req in multi.reqs():
+                if not req.finished() and req not in retract_reqs:
+                    retract_reqs.append(req)
+            # This path drained overlap above. Retraction now owns every row.
+            for req in list(multi.watch.values()):
+                multi.forget(self, req, "retract")
+            multi.parked.clear()
+            multi.pending_abort.clear()
+            multi.reset()
 
         self.last_batch = None
         self.cur_batch_for_debug = None
