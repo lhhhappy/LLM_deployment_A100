@@ -18,6 +18,7 @@ cp scripts/pod/verify/short_warmup_loadgen.py $K/
 cp scripts/pod/verify/timed_run.py scripts/pod/verify/timed_loadgen.py scripts/pod/verify/timed_score.py $K/
 # Public capability sets for cap_full_body.sh (AIME 2026 from MathArena/aime_2026, GPQA-Diamond from an ungated HF copy).
 for f in scripts/pod/verify/capsets/*.jsonl; do [ -f "$f" ] && cp "$f" $K/; done
+cp scripts/pod/verify/multiround_park_probe.py $K/
 if command -v sha256sum >/dev/null 2>&1; then sha256sum $K/* > $K/SHA256SUMS
 else shasum -a 256 $K/* > $K/SHA256SUMS; fi
 ls $K
