@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "error": {
+    "code": "COMMAND_FAILED",
+    "http": 400,
+    "message": "get build log: Get \"https://open.bohrium.com/openapi/v4/sandbox_work/image/166567/build_log\": net/http: TLS handshake timeout",
+    "retryable": false
+  }
+}

@@ -1,0 +1,7 @@
+Dockerfile: build/scratch/image/Dockerfile (64900 bytes, limit 65536)
+ENGINE_SOURCE_VERIFIED 31 5f0191240ba1c0cc69382c782183a89ae6dea414315c73c9b141d7e704235334
+checks OK: payload = diff; image-lh-img-0925a + diff = 20a58da9 (20a58da99737c70f21c801ff587e94d8f54022be)
+
+Not built. To build and register:
+  bohr image build --dockerfile build/scratch/image/Dockerfile --name lh-img:0927a --project-id 4727808 --wait --yes -o json
+Then: git tag image-lh-img-0927a 20a58da99737c70f21c801ff587e94d8f54022be ; use the returned image URL with a unique tag in submission.json.

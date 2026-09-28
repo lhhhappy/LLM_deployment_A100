@@ -1,0 +1,91 @@
+{
+  "status": "dry_run",
+  "bundle": "/workspace/Agentic_science_challenge/build/worktrees/fix-chainmax-0927/build/submit_0927_CHAINMAX400.zip",
+  "bundle_sha256": "f4413bbac9b5cfed8494c54e7042e855635de627bdefc7b1b154a4a6f1cd51c9",
+  "manifest": {
+    "arm_version": "1.1",
+    "paper": {
+      "title": "llm-challenge-arena-v1",
+      "url": ""
+    },
+    "entrypoint": "src/reproduce.py",
+    "environment": {
+      "dependencies": "requirements.txt"
+    },
+    "execution": {
+      "ran_at": "2026-09-28T00:33:17Z",
+      "wall_time_s": 1,
+      "log_path": "execution/run.log",
+      "artifacts": [
+        {
+          "id": "artifact-1",
+          "path": "execution/results/submission.json",
+          "kind": "output",
+          "type": "file",
+          "format": "json"
+        }
+      ]
+    },
+    "expected_outputs": [
+      {
+        "name": "submission.json",
+        "path": "outputs/submission.json",
+        "type": "text",
+        "comparison_method": "harbor_checker",
+        "produced_by": [
+          "artifact-1"
+        ]
+      }
+    ],
+    "characterization": "characterization.json",
+    "trace": "traces/trace.jsonl",
+    "raw_messages": "raw_messages.jsonl",
+    "provenance": {
+      "created_by": "@paper2arm/playground-cli",
+      "created_at": "2026-09-28T00:33:17Z",
+      "challenge_id": "llm-challenge-arena-v1",
+      "task_id": "llm-challenge-arena-v1",
+      "run_id": "local-20260928t003317z-b32fbe35",
+      "model": "gpt-6",
+      "harness": "codex",
+      "declared_model": "gpt-6",
+      "declared_harness": "codex",
+      "detected_model": "",
+      "detected_harness": "",
+      "model_source": "declared",
+      "harness_source": "declared"
+    }
+  },
+  "trace_steps": [
+    {
+      "step_type": "observation",
+      "type": "observation",
+      "step_id": "observation_0_d57c4ec2",
+      "step_order": 1,
+      "title": "stub",
+      "body": "",
+      "timestamp": "2026-09-28T00:33:17Z",
+      "cost_usd": 0
+    },
+    {
+      "step_type": "observation",
+      "type": "observation",
+      "step_id": "observation_1_3fb36032",
+      "step_order": 2,
+      "title": "user",
+      "body": "{\"content\":[{\"type\":\"text\",\"text\":\"placeholder\"}]}",
+      "timestamp": "2026-09-28T00:33:17Z",
+      "cost_usd": 0
+    },
+    {
+      "step_type": "thought",
+      "type": "thought",
+      "step_id": "thought_2_2a1c59b2",
+      "step_order": 3,
+      "title": "assistant",
+      "body": "{\"content\":[{\"type\":\"text\",\"text\":\"placeholder\"}]}",
+      "timestamp": "2026-09-28T00:33:17Z",
+      "cost_usd": 0
+    }
+  ]
+}

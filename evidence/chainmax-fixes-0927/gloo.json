@@ -1,0 +1,573 @@
+{
+  "status": "PASS",
+  "backend": "gloo",
+  "world_size": 8,
+  "gpu_used": false,
+  "scope": "CPU control flow and real transport; not TP8 model execution or latency",
+  "source_sha256": {
+    "scheduler.py": "ca13cbb98c3e322940cf0aada95c4323e0d28bc218c01d413462f910c98f7a42",
+    "ax_deadline.py": "6cd0beabfec58f1ca162ae159911fbca799325c36ad9c1e0f5945d4f9f65118e",
+    "ax_rank0_decision.py": "f78f4b37289b04f602f18c43d878521b6212de00285e76f248a53d0ab47b8964"
+  },
+  "clock_boundary_s": 4.239182400000001,
+  "cases": [
+    {
+      "case": "root_comfortable_peer_at_risk",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 1
+        },
+        {
+          "rank": 1,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        }
+      ]
+    },
+    {
+      "case": "root_at_risk_peer_comfortable",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 1
+        },
+        {
+          "rank": 1,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        }
+      ]
+    },
+    {
+      "case": "root_hopeless_peer_at_risk",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 1
+        },
+        {
+          "rank": 1,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        }
+      ]
+    },
+    {
+      "case": "frozen_class_on_root_only",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 1
+        },
+        {
+          "rank": 1,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 1,
+          "defer": [
+            true,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        }
+      ]
+    },
+    {
+      "case": "125_lower_interval",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 1
+        },
+        {
+          "rank": 1,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 0,
+          "defer": [
+            false,
+            false,
+            false
+          ],
+          "broadcast_entry": 1,
+          "risk_eval": 0
+        }
+      ]
+    },
+    {
+      "case": "131_off",
+      "ranks": [
+        {
+          "rank": 0,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 1,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 2,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 3,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 4,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 5,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 6,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        },
+        {
+          "rank": 7,
+          "interval": 2,
+          "defer": [
+            true,
+            true,
+            false
+          ],
+          "broadcast_entry": 0,
+          "risk_eval": 0
+        }
+      ]
+    }
+  ]
+}

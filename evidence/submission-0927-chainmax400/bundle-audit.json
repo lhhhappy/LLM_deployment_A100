@@ -1,0 +1,43 @@
+{
+  "dry_run_only": true,
+  "official_upload": false,
+  "bundle_sha256": "f4413bbac9b5cfed8494c54e7042e855635de627bdefc7b1b154a4a6f1cd51c9",
+  "submission_copies": {
+    "outputs/submission.json": "b2d2a24e9fbd984b7add3a9cc60cf2199e3bd76af1b1823ce1a3fb611e6ef648",
+    "results/submission.json": "b2d2a24e9fbd984b7add3a9cc60cf2199e3bd76af1b1823ce1a3fb611e6ef648",
+    "execution/results/submission.json": "b2d2a24e9fbd984b7add3a9cc60cf2199e3bd76af1b1823ce1a3fb611e6ef648"
+  },
+  "expected_submission_sha256": "b2d2a24e9fbd984b7add3a9cc60cf2199e3bd76af1b1823ce1a3fb611e6ef648",
+  "all_output_copies_match": true,
+  "root_submission_role": "CLI envelope metadata, not the challenge submission",
+  "root_submission_keys": [
+    "schema_version",
+    "task_id",
+    "challenge_id",
+    "run_id",
+    "created_at",
+    "task_url",
+    "agent",
+    "harness",
+    "artifacts",
+    "privacy"
+  ],
+  "members": [
+    "Dockerfile",
+    "README.md",
+    "arm_manifest.json",
+    "characterization.json",
+    "execution/results/submission.json",
+    "execution/run.log",
+    "logs/run.log",
+    "native_trace/stub-trace.jsonl",
+    "outputs/submission.json",
+    "raw_messages.jsonl",
+    "requirements.txt",
+    "results/submission.json",
+    "src/reproduce.py",
+    "submission.json",
+    "traces/raw_messages.jsonl",
+    "traces/trace.jsonl"
+  ]
+}

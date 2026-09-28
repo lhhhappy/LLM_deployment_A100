@@ -1,0 +1,3 @@
+UPLOAD bytes=334351 resolved=/dev/shm/arena-runtime/ax/codex/chainmax-fixes-0927
+{"status": "PASS", "backend": "gloo", "world_size": 8, "gpu_used": false, "scope": "CPU control flow and real transport; not TP8 model execution or latency"}
+exit_code: 0

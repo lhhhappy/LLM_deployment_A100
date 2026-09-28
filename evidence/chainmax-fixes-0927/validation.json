@@ -1,0 +1,18 @@
+{
+  "engine_commit": "20a58da99737c70f21c801ff587e94d8f54022be",
+  "cpu_unittest": {
+    "count": 129,
+    "result": "PASS",
+    "seconds": 5.267,
+    "command": "PYTHONPATH=tests python3 -B -m unittest test_ax_deadline test_prefix_producer test_demand_cap test_ax_admission_scheduler test_chain_risk_scheduler"
+  },
+  "gloo": {
+    "world_size": 8,
+    "cases": 6,
+    "status": "PASS",
+    "gpu_used": false,
+    "source_matches_frozen_engine": true
+  },
+  "independent_engine_review": "Fable ACK passed; full test_sched_protect_chain has baseline environment import error; not claimed whole-suite pass",
+  "TP8": "PENDING; Fable owns 130ezna"
+}

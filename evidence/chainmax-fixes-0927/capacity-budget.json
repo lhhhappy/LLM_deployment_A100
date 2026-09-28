@@ -1,0 +1,15 @@
+{
+  "observed_utc": "2026-09-27T23:47:28.546633+00:00",
+  "source": "scripts/pod/pread capacity",
+  "resolved_ax": "/dev/shm/arena-runtime/ax",
+  "filesystem": "tmpfs",
+  "available_bytes": 645598224384,
+  "cgroup_limit_bytes": 1620276412416,
+  "cgroup_usage_bytes": 551723094016,
+  "uploaded_source_bytes": 334351,
+  "planned_cpu_memory_upper_budget_gib": 4,
+  "output_budget_kib": 64,
+  "root_disk_payload_bytes": 0,
+  "writes": "/tmp/ax/codex/chainmax-fixes-0927 only; TMPDIR resolved under same directory",
+  "gpu_work": false
+}
