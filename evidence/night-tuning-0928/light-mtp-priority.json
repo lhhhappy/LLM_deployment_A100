@@ -1,0 +1,17 @@
+{
+  "user_request": "prioritize lightweight MTP",
+  "job": "130eznr1-tail_rot150_n34_kda_night_mtplite1_1h_ladder",
+  "after": "130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder",
+  "before": "130ezns-tail_rot150_n34_kda_night_pdi4_1h_ladder",
+  "parameters": {
+    "steps": 1,
+    "topk": 1,
+    "draft_tokens": 2,
+    "dcp": 1
+  },
+  "bundle": "build/queue/queue-after-0928-mtplite-priority",
+  "runtime": "byte-identical to previous frozen bundle",
+  "branch_commit": "3ac1cdac",
+  "remote_log": "/sjtu/linhang/arena/runs/jobs/queue-after-0928-mtplite-priority.log",
+  "status": "detached publisher launched; awaiting current job completion"
+}
