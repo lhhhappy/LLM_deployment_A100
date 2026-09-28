@@ -431,8 +431,8 @@
     "job": "130ezn8-tail_n26_chainmax16k_mamba400_40m",
     "ref": "130ezn3-tail_n26_chainmax16k_40m（同 ID）",
     "what": "单变量：chain-max 16k + --max-mamba-cache-size 400。事实：去 MTP 后引擎把 KDA 状态池自动放到 779 槽（13.4 GB/卡，S1 带 MTP 时 411 槽 9.6 GB），峰值只用约 110 槽，KV 池因此 1.37M→1.26M 并在第 30 分钟后撞墙（KV 99%、110 s 回载 168 GiB）；审阅者核出 chain-max 多出的 fast 漏有 47/101 发生在 KV≥93% 时（那里漏率 17% 对其他时段 6%，S1 两处都是 5%）。预期：池约 1.8M、无墙、fast/overall 回落、等空间的 reset 不再超时；风险：KDA 槽不够时的驱逐/重算",
-    "status": "跑（23:44 UTC 起）；ENGINE_READY 170 s、冒烟 12/12、**max_total_num_tokens 1,810,112**（不钉 1,260,160；S1 带 MTP 1,369,728）",
-    "verdict": "**chain 先判（第 33 分钟，对 ezn3 同 1431 条）：6→8，新坏 2 条全在开场**（35k turn_start 头等 18.4→40.1 s、56k intra 头等 24.5→43.5 s；222k 巨头在 ezn8 里 24.5 s 就入批、ezn3 里 29.2 s，排到了两个可救头前面）；稳态 0 漏、分档相同；TPOT>0.10 65→74。代价面：fast/overall 只有 ezn3 的四分之一（显存墙没了）。按 chain 第一的规则：**带这个排序副作用的钉池不进候选**；N30 上用 ezna（钉）/eznb（不钉）再判"
+    "status": "已闭合（1581 条排空，wall 2568 s）",
+    "verdict": "**chain 6→8（新坏 2 条，全在开场：222k 巨头 24.5 s 入批排到 35k/56k 可救头前）**，稳态 0 漏；turn 5=5；TPOT>0.10 66→75；harness p95 chain 40.2 s（ezn3 24.8）。代价面：fast 101→40、overall 70→21（显存墙没了）。按 chain 第一：钉池不带排序副作用不进候选；N30 三臂再判"
   },
   {
     "job": "130ezn9-tail_rot150_n30_S1_40m",
