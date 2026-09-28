@@ -529,5 +529,11 @@
     "ref": "130eznc（钉池候选，同 ID）",
     "what": "单变量：钉池候选 + 118 prefill Triton 稀疏注意力路由（引擎 52c694be = 20a58da9 + 118 三提交，代码只多 dsa_backend.py；env 加 SGLANG_AX_DSA_SPARSE_TRITON_PREFILL=1）。N26 上 ezn5 对 ezn3：chain 6=6、fast 101→79、每块省 8%。问题：N30 钉池下更便宜的块能否买到开场 chain（剩 7 条是第 22–29 位吞吐尾巴）、把 TPOT p95 拉回 0.10 硬门内。chain 先看；不做单独能力复核（用户 09-28 决定，线上门判）",
     "status": "已发布（eznk 之后）"
+  },
+  {
+    "job": "130eznm-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_40m",
+    "ref": "130eznc（钉池候选，同 ID）",
+    "what": "PIN 之后的候选：钉池候选 + 118 + attention-TP 输入分片（引擎 52c694be，对 eznl 只多分片开关）。单独各 +8–11% 纯 prefill 吞吐、chain 7=7、无 fast/overall/turn 代价。问题：合起来 chain 是否仍 7（不新增）、TPOT p95（硬门，eznc 本地 121 ms）、开场速率是否约 +18%。chain 先看；冒烟 12/12",
+    "status": "已发布（eznl 之后；eznj 改到它之后）"
   }
 ]
