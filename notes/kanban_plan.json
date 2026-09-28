@@ -510,7 +510,7 @@
     "job": "130ezni-tail_rot150_n30_chainmax16k_fix_mamba400_133tuned_40m",
     "ref": "130eznc（同 ID）",
     "what": "钉池候选 + 133 调参（SPEND 1.0、MARGIN 0.95、MAX_ROUNDS 16）：eznd 的默认 133 保 TPOT 过头（chain 12→18、TPOT>0.10 83→27）；问：能否把 TPOT>0.10 压到 ≤5% 而 chain 不动",
-    "status": "已发布（eznh 之后）"
+    "status": "已停（08:13 UTC，第 12 分钟，未看结果；按 chain 第一改序：133 调参不改开场吞吐，chain 不可能低于 eznc 的 7 条，价值最低，让位给内核臂 eznk/eznl，之后若有空档再补跑）"
   },
   {
     "job": "130eznj-tail_rot150_n30_124m_on_mamba400_40m",
