@@ -124,6 +124,48 @@ lvl=0
 for N in $UP; do
   lvl=$((lvl+1))
   rc=0; run_level "$N" || rc=$?
+  if [ "$rc" -eq 0 ] && [ -n "${G_MEASURE_SECONDS:-}" ] && [ "$N" = "${G_TIMED_PROMOTE_FROM:-}" ]; then
+    # Opt-in diagnostic promotion, not a formal/full-cohort PASS. timed_score
+    # returns zero for any drained run, including those whose latency gates fail.
+    python3 - "$RUN_DIR/N$N" "${G_TIMED_PROMOTE_REFERENCE:?missing chain reference}" <<'PROMOTE'
+import hashlib, json, math, sys
+from pathlib import Path
+out, reference = map(Path, sys.argv[1:])
+try:
+    v = json.loads((out/'timed_verdict.json').read_text())
+    assert v['status'] == 'DRAINED' and v['errors'] == 0
+    raw = out/Path(v['raw']).name
+    assert hashlib.sha256(raw.read_bytes()).hexdigest() == v['raw_sha256']
+    rows = [json.loads(s) for s in raw.read_text().splitlines() if s.strip()]
+    by = {r['req_id']:r for r in rows}
+    assert len(by) == len(rows) == v['n_completed'] and not any(r.get('error') for r in rows)
+    ref = json.loads(reference.read_text())['chain']
+    assert ref and all(type(x) is bool for x in ref.values())
+    missing = sorted(set(ref)-set(by))
+    new = sorted(rid for rid, failed in ref.items() if rid in by and not failed and by[rid]['ttft_s'] > 30)
+    repaired = sorted(rid for rid, failed in ref.items() if rid in by and failed and by[rid]['ttft_s'] <= 30)
+    ttft = v['ttft']
+    assert len(ttft) == 4
+    failed_gates = [k for k, g in ttft.items() if not g['evaluable'] or not g['pass_estimated']]
+    tpot = v['tpot']['tpot_p95']
+    assert isinstance(tpot, (float, int)) and math.isfinite(tpot)
+    promote = not (missing or new or failed_gates) and v['tpot']['passed'] is True and tpot <= 0.10
+    result = dict(scope='diagnostic_promotion_only', promote=promote, tpot_p95=tpot,
+                  failed_ttft_gates=failed_gates, chain_reference_n=len(ref),
+                  chain_missing_ids=missing, chain_new_bad_ids=new, chain_repaired_ids=repaired)
+except (AssertionError, KeyError, TypeError, ValueError, OSError) as e:
+    result = dict(scope='diagnostic_promotion_only', promote=False, invalid=str(e))
+    (out/'promotion.json').write_text(json.dumps(result, indent=2)+'\n')
+    print('TIMED_PROMOTION INVALID', str(e), flush=True)
+    sys.exit(2)
+(out/'promotion.json').write_text(json.dumps(result, indent=2)+'\n')
+print('TIMED_PROMOTION', json.dumps(result), flush=True)
+sys.exit(0 if promote else 1)
+PROMOTE
+    promote_rc=$?
+    [ "$promote_rc" -eq 2 ] && exit 2
+    [ "$promote_rc" -eq 0 ] || { echo "LADDER skip higher N: diagnostic gate or paired chain regression"; exit 0; }
+  fi
   [ "$rc" -eq 0 ] && continue
   [ "$rc" -ge 2 ] && exit "$rc"  # INVALID / engine failure must never be swallowed.
   if [ "$lvl" -eq 1 ] && [ -n "$DOWN" ]; then
