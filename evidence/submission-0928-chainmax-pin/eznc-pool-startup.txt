@@ -1,0 +1,9 @@
+[2026-09-28 02:22:49 TP5] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP0] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP6] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP1] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP4] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP2] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP7] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:22:49 TP3] Mamba Cache is allocated. max_mamba_cache_size: 400, conv_state size: 0.23GB, ssm_state size: 6.66GB 
+[2026-09-28 02:23:00 TP0] max_total_num_tokens=1810112, chunked_prefill_size=16384, max_prefill_tokens=16384, max_running_requests=48, context_len=1048576, available_gpu_mem=9.58 GB

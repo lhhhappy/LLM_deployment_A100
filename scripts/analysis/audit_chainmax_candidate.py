@@ -105,24 +105,32 @@ def main():
                     help='Reuse the reviewed image receipt; require removal of only the 400-slot flag')
     variants.add_argument('--final-from', type=Path,
                     help='Derive FINAL from NOPIN: cold600/warm120, hold4096, running/graph48, default DCP1')
+    variants.add_argument('--pin-final-from', type=Path,
+                    help='Reuse FINAL and its image receipt; add only the 400-slot flag')
     args = ap.parse_args()
     out = args.evidence
     candidate = json.loads((out / 'submission.json').read_text())
     baseline = json.loads((out / 'baseline-46676.json').read_text())
     job = (out / 'n30-job-reviewed.sh').read_text()
-    prior_dir = args.final_from or args.unpinned_from
+    prior_dir = args.pin_final_from or args.final_from or args.unpinned_from
+    final_variant = bool(args.final_from or args.pin_final_from)
     reviewed = json.loads((prior_dir / 'config-audit.json').read_text()) if prior_dir else None
-    image_dir = (Path(reviewed['image_verification_source']) if args.final_from
+    image_dir = (Path(reviewed['image_verification_source']) if final_variant
                  else args.unpinned_from or out)
     image = json.loads((image_dir / 'build-receipt.json').read_text())
     assert image['ok'] and image['data']['status'] == 2
     actual, job_args, job_env = validate_candidate(
         candidate, baseline, job, image['data']['imageUrl'],
-        pinned=prior_dir is None, final_variant=bool(args.final_from))
+        pinned=prior_dir is None or bool(args.pin_final_from), final_variant=final_variant)
     commit = assignment(job, 'G_COMMIT')
     if prior_dir:
         previous = (prior_dir / 'submission.json').read_bytes()
-        if args.final_from:
+        if args.pin_final_from:
+            anchor = b' --cuda-graph-max-bs 48'
+            assert previous.count(anchor) == 1 and b'--max-mamba-cache-size' not in previous
+            assert (out / 'submission.json').read_bytes() == previous.replace(
+                anchor, anchor + b' --max-mamba-cache-size 400'), 'extra edit beyond pinning FINAL pool'
+        elif args.final_from:
             expected = json.loads(previous)
             for before, after in ((' --max-running-requests 32', ' --max-running-requests 48'),
                                   (' --cuda-graph-max-bs 32', ' --cuda-graph-max-bs 48'),
@@ -154,30 +162,35 @@ def main():
                   image_build_id=image['data']['id'], **image_checks,
                   image_verification_source=str(image_dir),
                   only_removed_pool_pin=bool(args.unpinned_from),
-                  final_variant=bool(args.final_from),
-                  runtime_receipt_status='PENDING_TP8; expected-mechanisms.txt is an expectation, not an observed log',
+                  only_added_pool_pin=bool(args.pin_final_from),
+                  final_variant=final_variant,
+                  runtime_receipt_status='OFFLINE_ONLY; runtime evidence is recorded separately; expected-mechanisms.txt is not an observed log',
                   candidate_sha256=hashlib.sha256((out/'submission.json').read_bytes()).hexdigest(),
                   formal_vs_job={'performance_args_match': True,
                     'validation_boundary': ('N30 with running/graph48 can validate startup/capture and shared mechanisms; N34+ performance still requires its own run'
-                                            if args.final_from else 'matching performance configuration'),
-                    'explicit_default_args': {} if args.final_from else {'--dcp-size': '1'},
-                    'implicit_default_args': {'--dcp-size': '1'} if args.final_from else {},
+                                            if final_variant else 'matching performance configuration'),
+                    'explicit_default_args': {} if final_variant else {'--dcp-size': '1'},
+                    'implicit_default_args': {'--dcp-size': '1'} if final_variant else {},
                     'logging_args': {'--log-level-http': 'warning'},
                     'explicit_default_env': {'SGLANG_AX_DCP_LOCAL_EXTEND': '0'},
                     'logging_env': {k: {'job': job_env[k], 'formal': candidate['env'][k]}
                                    for k in ('SGLANG_AX_PREFIX_TRACE_S','SGLANG_AX_PREFIX_TRACE_ROUNDS')}},
                   diff=rows)
     (out/'config-audit.json').write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
-    pool = 'FINAL：不钉池 / running48' if args.final_from else '不钉 Mamba 池' if args.unpinned_from else 'Mamba400'
+    pool = 'FINAL + Mamba400 / running48' if args.pin_final_from else 'FINAL：不钉池 / running48' if args.final_from else '不钉 Mamba 池' if args.unpinned_from else 'Mamba400'
     comparison = ('与已更新的 eznb 性能配置一致：cold600、warm120、hold4096、running/graph=48；DCP两边均未传参数，源码默认1。'
                   if args.final_from else '与复核过的 N30 job：性能参数一致；DCP=1 与本地续算关闭显式固定。')
+    if args.pin_final_from:
+        comparison = '与 eznc 性能配置一致：FINAL + Mamba400；cold600、warm120、hold4096、running/graph=48不变，DCP默认1。'
     md = [f'# 46676 → chain-max 16k / {pool}：逐项配置核对', '',
-          '**离线检查 PASS；正式未上传。TP8 候选机制行和 N30 结果尚待运行。**', '',
+          '**离线检查 PASS；本工具不执行上传。TP8 实测与正式状态见本目录 README，机制期望不代替运行收据。**', '',
           f'引擎 `{commit}`；镜像 `{candidate["image"]}`，构建 `{image["data"]["id"]}`。', '',
           comparison + '正式关闭逐请求前缀决策日志、HTTP access INFO，保留启动机制行、30 秒摘要和错误；未改正文、thinking 或输出预算。', '',
           '`SHORT_TOKENS=2048` 是准入阈值，126 关闭，**不是保证预留 2048 token**。', '']
     if args.unpinned_from:
         md += ['相对 400 版逐字节只删除 ` --max-mamba-cache-size 400`；其余配置不变。复用已审镜像收据，没有重建镜像或重复源文件核验。', '']
+    if args.pin_final_from:
+        md += ['相对 47043 的 FINAL 配置逐字节仅在 `--cuda-graph-max-bs 48` 后加入 ` --max-mamba-cache-size 400`；镜像、引擎、env 及其余命令保持原样。124m 计数代码属于另一个实验引擎，不包含在本镜像中。', '']
     if args.final_from:
         md += ['**与 NOPIN 版的最终差异**：cold 饥饿上限600秒，warm显式120秒（不显式设置会继承600）；原生前缀hold阈值4096；running/cuda graph上限32→48；去掉显式DCP1。其余不变，复用已审镜像。', '',
                '**并发与验证边界**：running上限扩展的直接准入收益出现在实际并发超过32时（下一评测档N34及以上）。但48档CUDA graph捕获和静态缓冲在启动时建立，不能说整个改动只影响N34以上。eznb已同步使用48/48，可验证这套启动配置与捕获；N30结果仍不能代替N34及以上的性能验证。没有实测数据时不量化显存增量。', '']

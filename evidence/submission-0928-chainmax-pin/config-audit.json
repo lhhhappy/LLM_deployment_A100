@@ -1,0 +1,557 @@
+{
+  "status": "PASS",
+  "official_upload": false,
+  "engine_commit": "20a58da99737c70f21c801ff587e94d8f54022be",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0927a",
+  "image_build_id": 166567,
+  "payload_equals_engine_diff": true,
+  "platform_dockerfile_matches": true,
+  "platform_removed_final_newline": true,
+  "in_image_source_verified": {
+    "files": 31,
+    "sha256": "5f0191240ba1c0cc69382c782183a89ae6dea414315c73c9b141d7e704235334"
+  },
+  "image_verification_source": "evidence/submission-0927-chainmax400",
+  "only_removed_pool_pin": false,
+  "only_added_pool_pin": true,
+  "final_variant": true,
+  "runtime_receipt_status": "OFFLINE_ONLY; runtime evidence is recorded separately; expected-mechanisms.txt is not an observed log",
+  "candidate_sha256": "63f07ef18c246324066bbb2d327775911db425c72a64920abf12c419ff953d22",
+  "formal_vs_job": {
+    "performance_args_match": true,
+    "validation_boundary": "N30 with running/graph48 can validate startup/capture and shared mechanisms; N34+ performance still requires its own run",
+    "explicit_default_args": {},
+    "implicit_default_args": {
+      "--dcp-size": "1"
+    },
+    "logging_args": {
+      "--log-level-http": "warning"
+    },
+    "explicit_default_env": {
+      "SGLANG_AX_DCP_LOCAL_EXTEND": "0"
+    },
+    "logging_env": {
+      "SGLANG_AX_PREFIX_TRACE_S": {
+        "job": "120",
+        "formal": "0"
+      },
+      "SGLANG_AX_PREFIX_TRACE_ROUNDS": {
+        "job": "2048",
+        "formal": "0"
+      }
+    }
+  },
+  "diff": [
+    {
+      "field": "command",
+      "key": "--chunked-prefill-size",
+      "before": "<unset>",
+      "after": "16384",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--cuda-graph-max-bs",
+      "before": "32",
+      "after": "48",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--dsa-decode-backend",
+      "before": "tilelang",
+      "after": "tilelang",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--dsa-prefill-backend",
+      "before": "tilelang",
+      "after": "tilelang",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--enable-hierarchical-cache",
+      "before": null,
+      "after": null,
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--enable-metrics",
+      "before": null,
+      "after": null,
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--hicache-size",
+      "before": "64",
+      "after": "64",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--hicache-write-policy",
+      "before": "write_through",
+      "after": "write_through",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--host",
+      "before": "0.0.0.0",
+      "after": "0.0.0.0",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--incremental-streaming-output",
+      "before": null,
+      "after": null,
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--kv-cache-dtype",
+      "before": "bfloat16",
+      "after": "bfloat16",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--linear-attn-backend",
+      "before": "triton",
+      "after": "triton",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--linear-attn-verify-backend",
+      "before": "triton",
+      "after": "triton",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--log-level-http",
+      "before": "<unset>",
+      "after": "warning",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--mamba-radix-cache-strategy",
+      "before": "extra_buffer",
+      "after": "extra_buffer",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--max-mamba-cache-size",
+      "before": "<unset>",
+      "after": "400",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--max-running-requests",
+      "before": "32",
+      "after": "48",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--mem-fraction-static",
+      "before": "0.87",
+      "after": "0.87",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--model-path",
+      "before": "/mnt/models",
+      "after": "/mnt/models",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--page-size",
+      "before": "64",
+      "after": "64",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--port",
+      "before": "8000",
+      "after": "8000",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--prefill-decode-interval",
+      "before": "2",
+      "after": "2",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--reasoning-parser",
+      "before": "glm45",
+      "after": "glm45",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--schedule-policy",
+      "before": "lpm",
+      "after": "lpm",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--served-model-name",
+      "before": "default",
+      "after": "default",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--speculative-algorithm",
+      "before": "NEXTN",
+      "after": "<unset>",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--speculative-draft-model-path",
+      "before": "/mnt/models",
+      "after": "<unset>",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--speculative-eagle-topk",
+      "before": "1",
+      "after": "<unset>",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--speculative-num-draft-tokens",
+      "before": "4",
+      "after": "<unset>",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--speculative-num-steps",
+      "before": "3",
+      "after": "<unset>",
+      "changed": true
+    },
+    {
+      "field": "command",
+      "key": "--tool-call-parser",
+      "before": "glm47",
+      "after": "glm47",
+      "changed": false
+    },
+    {
+      "field": "command",
+      "key": "--tp-size",
+      "before": "8",
+      "after": "8",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD",
+      "before": "<unset>",
+      "after": "4096",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_ARENA_ROLE_BOUNDARY_TOKEN_IDS",
+      "before": "154827,154829",
+      "after": "154827,154829",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_ASYNC_TOKENIZE",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_COLD_CAP",
+      "before": "8192",
+      "after": "16384",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_GATE",
+      "before": "0.10",
+      "after": "0.10",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_HIGH_S",
+      "before": "15",
+      "after": "15",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_INTERVAL",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_LOW_S",
+      "before": "5",
+      "after": "5",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_MAX_SLOW",
+      "before": "80",
+      "after": "80",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_BACKLOG_RELIEF",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_CHAIN_RISK_CHUNK",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_CHAIN_RISK_INTERVAL",
+      "before": "<unset>",
+      "after": "1",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DCP_LOCAL_EXTEND",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_CHAIN_FIRST",
+      "before": "<unset>",
+      "after": "1",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_FAMILY",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_FREEZE_CLASS",
+      "before": "<unset>",
+      "after": "1",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_LOAD",
+      "before": "<unset>",
+      "after": "1.05",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_MAX_WAIT_S",
+      "before": "<unset>",
+      "after": "600",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_MAX_WAIT_WARM_S",
+      "before": "<unset>",
+      "after": "120",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_TIERS",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DEADLINE_WARM_S",
+      "before": "15",
+      "after": "15",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_DSA_SPARSE_TRITON",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_INDEXER_ROW_SHARD",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_KDA_DUAL_SNAPSHOT",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_KDA_FUSE_PROJ",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_MOE_FUSE_SWIGLU",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_PACE_TPOT",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_PREFIX_PRODUCER",
+      "before": "<unset>",
+      "after": "1",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_PREFIX_TRACE_ROUNDS",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_PREFIX_TRACE_S",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SCHED_COLD_CAP",
+      "before": "6144",
+      "after": "16384",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SCHED_COLD_CAP_MAX",
+      "before": "<unset>",
+      "after": "0",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SCHED_PROTECT",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SCHED_SHORT_TOKENS",
+      "before": "8192",
+      "after": "2048",
+      "changed": true
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SM80_FP8_MOE_HUMMING",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SM80_FP8_MOE_MARLIN",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_AX_SM80_INDEXER",
+      "before": "1",
+      "after": "1",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_MAMBA_SSM_DTYPE",
+      "before": "float32",
+      "after": "float32",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_OPT_DEEPGEMM_HC_PRENORM",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_OPT_FUSED_KDA_VERIFY",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    },
+    {
+      "field": "env",
+      "key": "SGLANG_OPT_USE_TOPK_V2",
+      "before": "0",
+      "after": "0",
+      "changed": false
+    }
+  ]
+}

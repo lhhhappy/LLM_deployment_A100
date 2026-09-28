@@ -1,0 +1,261 @@
+{
+  "scope": "common_ID_diagnostic",
+  "n_common": 1687,
+  "before": {
+    "source": "/workspace/Agentic_science_challenge/evidence/L130eznb-tail_rot150_n30_chainmax16k_fix_40m/N30",
+    "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790559367.jsonl",
+    "receipt": "evidence/submission-0928-chainmax-pin/before-timed-verdict.json",
+    "status": "DRAINED",
+    "full_cohort_complete": false,
+    "rows": 1689,
+    "errors": 0,
+    "flush_success": true,
+    "first_dispatch_at_s": 1790559368.0670013,
+    "admission_seconds": 2400.0,
+    "events": {},
+    "plan_records": [],
+    "harness_p95": {
+      "fast_intra(uncached_expected<=4096,<=3s)": 18.000481128692627,
+      "overall_intra(<=5s)": 17.18452501296997,
+      "turn_start(<=15s)": 19.961899995803833,
+      "chain_start(<=30s)": 30.30474066734314
+    }
+  },
+  "after": {
+    "source": "/workspace/Agentic_science_challenge/evidence/L130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m/N30",
+    "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790562930.jsonl",
+    "receipt": "evidence/submission-0928-chainmax-pin/after-timed-verdict.json",
+    "status": "DRAINED",
+    "full_cohort_complete": false,
+    "rows": 1726,
+    "errors": 0,
+    "flush_success": true,
+    "first_dispatch_at_s": 1790562930.60019,
+    "admission_seconds": 2400.0,
+    "events": {},
+    "plan_records": [],
+    "harness_p95": {
+      "fast_intra(uncached_expected<=4096,<=3s)": 2.3291397094726562,
+      "overall_intra(<=5s)": 2.823958396911621,
+      "turn_start(<=15s)": 17.341136693954468,
+      "chain_start(<=30s)": 24.23439621925354
+    }
+  },
+  "before_only": [
+    "biomaster:canon:lc_20260924_042:llm:0027",
+    "biomaster:canon:lc_20260924_042:llm:0028"
+  ],
+  "after_only": [
+    "biomaster:canon:lc_20260924_002:llm:0005",
+    "biomaster:canon:lc_20260924_008:llm:0006",
+    "biomaster:canon:lc_20260924_024:llm:0013",
+    "biomaster:canon:lc_20260924_024:llm:0014",
+    "biomaster:canon:lc_20260924_053:llm:0040",
+    "biomaster:canon:lc_20260924_053:llm:0041",
+    "biomaster:canon:lc_20260924_053:llm:0042",
+    "biomaster:canon:lc_20260924_064:llm:0004",
+    "biomaster:canon:lc_20260924_075:llm:0006",
+    "biomaster:canon:lc_20260924_075:llm:0007",
+    "biomaster:canon:lc_20260924_093:llm:0014",
+    "biomaster:canon:lc_20260924_093:llm:0015",
+    "biomaster:canon:lc_20260924_093:llm:0016",
+    "biomaster:canon:lc_20260924_093:llm:0017",
+    "biomaster:canon:lc_20260924_093:llm:0018",
+    "biomaster:canon:lc_20260924_093:llm:0019",
+    "biomaster:canon:lc_20260924_102:llm:0009",
+    "biomaster:canon:lc_20260924_102:llm:0010",
+    "biomaster:canon:lc_20260924_102:llm:0011",
+    "biomaster:canon:lc_20260924_114:llm:0009",
+    "biomaster:canon:lc_20260924_134:llm:0004",
+    "biomaster:canon:lc_20260924_207:llm:0018",
+    "biomaster:canon:ooBbVaDX7t0Yz8_SNUN9v:llm:1",
+    "biomaster:canon:x7EzL7v9pwX7z58HOEPJX:llm:5",
+    "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:1",
+    "scimaster:canon:YM1Suj4E5fA4Bx-ZGQj4c:llm:2",
+    "scimaster:canon:_XiHg9hppWn2KknKrPrj9:llm:0",
+    "scimaster:canon:lc_20260924_224:llm:0066",
+    "scimaster:canon:lc_20260924_224:llm:0067",
+    "scimaster:canon:lc_20260924_224:llm:0068",
+    "scimaster:canon:lc_20260924_229:llm:0001",
+    "scimaster:canon:lc_20260924_236:llm:0003",
+    "scimaster:canon:lc_20260924_244:llm:0007",
+    "scimaster:canon:lc_20260924_244:llm:0008",
+    "scimaster:canon:lc_20260924_244:llm:0009",
+    "scimaster:canon:lc_20260924_296:llm:0002",
+    "scimaster:canon:lc_20260924_296:llm:0003",
+    "scimaster:canon:member-v5-team-member-04fa470d4493fda6c1e9aa02:llm:0",
+    "scimaster:canon:member-v5-team-member-04fa470d4493fda6c1e9aa02:llm:1"
+  ],
+  "bucket_source": "/workspace/Agentic_science_challenge/s1-dev/harness/s1_common.py",
+  "gates": {
+    "fast_intra(uncached_expected<=4096,<=3s)": {
+      "before": {
+        "n": 1238,
+        "over_limit": 248,
+        "p95": 18.000481128692627
+      },
+      "after": {
+        "n": 1238,
+        "over_limit": 40,
+        "p95": 2.4287478923797607
+      }
+    },
+    "overall_intra(<=5s)": {
+      "before": {
+        "n": 1383,
+        "over_limit": 209,
+        "p95": 17.18452501296997
+      },
+      "after": {
+        "n": 1383,
+        "over_limit": 21,
+        "p95": 2.8740053176879883
+      }
+    },
+    "turn_start(<=15s)": {
+      "before": {
+        "n": 66,
+        "over_limit": 11,
+        "p95": 19.961899995803833
+      },
+      "after": {
+        "n": 66,
+        "over_limit": 6,
+        "p95": 16.60399341583252
+      }
+    },
+    "chain_start(<=30s)": {
+      "before": {
+        "n": 238,
+        "over_limit": 12,
+        "p95": 30.30474066734314
+      },
+      "after": {
+        "n": 238,
+        "over_limit": 7,
+        "p95": 24.968912363052368
+      }
+    }
+  },
+  "tpot": {
+    "before": {
+      "n": 1687,
+      "over_010": 83,
+      "mean": 0.05493194533404897,
+      "p95": 0.09838683421217036
+    },
+    "after": {
+      "n": 1687,
+      "over_010": 118,
+      "mean": 0.059995746883132646,
+      "p95": 0.12094148689357098
+    }
+  },
+  "chain_changes": [
+    {
+      "req_id": "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:153",
+      "phase": "intra",
+      "idx_in_chain": 0,
+      "edge_type": "system-tools-changed",
+      "glm_tokens": 234947,
+      "uncached_expected": 234947,
+      "before_ttft_s": 58.27387285232544,
+      "before_queue_time_s": 34.948503255844116,
+      "before_prompt_tokens": 234947,
+      "before_cached_tokens": 33792,
+      "before_dispatch_s": 923.9510107040405,
+      "before_miss": true,
+      "after_ttft_s": 15.782564401626587,
+      "after_queue_time_s": 0.00750422477722168,
+      "after_prompt_tokens": 234947,
+      "after_cached_tokens": 33792,
+      "after_dispatch_s": 882.3555028438568,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "biomaster:canon:lc_20260924_040:llm:0010",
+      "phase": "context_reset",
+      "idx_in_chain": 10,
+      "edge_type": "append-only",
+      "glm_tokens": 82055,
+      "uncached_expected": 1025,
+      "before_ttft_s": 52.03656053543091,
+      "before_queue_time_s": 51.18608736991882,
+      "before_prompt_tokens": 82055,
+      "before_cached_tokens": 80896,
+      "before_dispatch_s": 596.563606262207,
+      "before_miss": true,
+      "after_ttft_s": 1.7130625247955322,
+      "after_queue_time_s": 0.48148560523986816,
+      "after_prompt_tokens": 82055,
+      "after_cached_tokens": 71680,
+      "after_dispatch_s": 597.5017170906067,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "biomaster:canon:lc_20260924_083:llm:0009",
+      "phase": "context_reset",
+      "idx_in_chain": 9,
+      "edge_type": "append-only",
+      "glm_tokens": 153248,
+      "uncached_expected": 2116,
+      "before_ttft_s": 36.64380860328674,
+      "before_queue_time_s": 35.43344020843506,
+      "before_prompt_tokens": 153248,
+      "before_cached_tokens": 151040,
+      "before_dispatch_s": 755.3416392803192,
+      "before_miss": true,
+      "after_ttft_s": 0.7962305545806885,
+      "after_queue_time_s": 0.006095409393310547,
+      "after_prompt_tokens": 153248,
+      "after_cached_tokens": 151040,
+      "after_dispatch_s": 790.5189673900604,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "biomaster:canon:nrjqvLW3RYf1LEX8ayflj:llm:1",
+      "phase": "context_reset",
+      "idx_in_chain": 0,
+      "edge_type": "append-only",
+      "glm_tokens": 53221,
+      "uncached_expected": 1830,
+      "before_ttft_s": 30.30474066734314,
+      "before_queue_time_s": 25.167911291122437,
+      "before_prompt_tokens": 53221,
+      "before_cached_tokens": 1024,
+      "before_dispatch_s": 4.552508115768433,
+      "before_miss": true,
+      "after_ttft_s": 29.010133504867554,
+      "after_queue_time_s": 23.55905055999756,
+      "after_prompt_tokens": 53221,
+      "after_cached_tokens": 1024,
+      "after_dispatch_s": 4.567077398300171,
+      "after_miss": false,
+      "change": "improved"
+    },
+    {
+      "req_id": "scimaster:canon:Gk3UkHQ6BpqSW7SdqZD7i:llm:1",
+      "phase": "intra",
+      "idx_in_chain": 0,
+      "edge_type": "append-only",
+      "glm_tokens": 203233,
+      "uncached_expected": 1295,
+      "before_ttft_s": 75.55076861381531,
+      "before_queue_time_s": 59.07269620895386,
+      "before_prompt_tokens": 203233,
+      "before_cached_tokens": 3072,
+      "before_dispatch_s": 840.9665267467499,
+      "before_miss": true,
+      "after_ttft_s": 15.955406427383423,
+      "after_queue_time_s": 0.0066928863525390625,
+      "after_prompt_tokens": 203233,
+      "after_cached_tokens": 0,
+      "after_dispatch_s": 817.1140501499176,
+      "after_miss": false,
+      "change": "improved"
+    }
+  ]
+}

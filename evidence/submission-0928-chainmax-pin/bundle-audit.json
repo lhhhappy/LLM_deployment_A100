@@ -1,0 +1,13 @@
+{
+  "dry_run_only": true,
+  "official_upload": false,
+  "bundle": "build/submit_0928_CHAINMAX_PIN.zip",
+  "bundle_sha256": "fd5eafc33dae94d054ea4de07fdd145342e8084d7981e6e4bdcdfb4ab55f8afe",
+  "all_output_copies_match": true,
+  "output_copies": [
+    "execution/results/submission.json",
+    "outputs/submission.json",
+    "results/submission.json"
+  ],
+  "root_submission_role": "CLI envelope metadata, not the challenge submission"
+}

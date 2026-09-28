@@ -1,0 +1,16 @@
+{
+  "source": "/workspace/Agentic_science_challenge/evidence/L130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m/N30",
+  "job": "130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m",
+  "engine_commit": "20a58da99737c70f21c801ff587e94d8f54022be",
+  "scope": "fixed_duration_diagnostic",
+  "full_cohort_complete": false,
+  "status": "DRAINED",
+  "completed": 1726,
+  "mechanisms_ok": true,
+  "smoke": "12/12",
+  "kv_tokens": 1810112,
+  "mamba_slots_per_rank": 400,
+  "all_8_ranks_pool_observed": true,
+  "formal_logging_differences": "prefix trace disabled and HTTP log warning; see config-audit.json",
+  "boundary": "Same performance configuration at N30; not an official pass and not N34 evidence"
+}
