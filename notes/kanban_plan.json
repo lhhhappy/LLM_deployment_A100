@@ -450,6 +450,18 @@
     "job": "130eznb-tail_rot150_n30_chainmax16k_fix_40m",
     "ref": "130ezn9-tail_rot150_n30_S1_40m（同 ID）",
     "what": "**上传配置本身（用户要求本轮带上两项）**：chain-max 16k + 修后引擎 20a58da9，不钉池，+ SGLANG_AX_DEADLINE_MAX_WAIT_S=600 与 MAX_WAIT_WARM_S=120（无救冷请求 600 s 才饥饿提前，warm 显式 120，否则默认继承冷值；规则利用：门只数条数、超时 1200 s）+ IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD=4096（Codex 归因：ezn8 的 35k/56k 头与 ezm8 的 19k 头都被同 pack 巨头按 413 token 浅前缀 held 落到 tier3，所以巨头抢先；4096 保留深前缀家族）。N30、rot150，对 ezn9 同 ID 判组合的 chain；起跑 15 分钟健康即请用户确认上传。running/cuda-graph 48/48 与上传包一致（N30 不触及上限，只验证图捕获与显存）",
-    "status": "已发布（ezn9 之后立刻跑）"
+    "status": "跑（01:38 UTC 起）；第 14 分钟健康（机制行 131_sync=rank0、冒烟 12/12、无错误）→ 据此上传 attempt 47043"
+  },
+  {
+    "job": "130eznc-tail_rot150_n30_chainmax16k_fix_mamba400_40m",
+    "ref": "130eznb（同 ID）",
+    "what": "上传配置 + KDA 池钉 400（单变量）。问：浅前缀压后阈值 4096 修掉 hold 之后，钉池还伤不伤 chain（ezn8 里伤了 2 条开场）；池 ~1.8M。判定 chain 先看",
+    "status": "已发布（eznb 之后）"
+  },
+  {
+    "job": "130eznd-tail_rot150_n30_chainmax16k_fix_133_40m",
+    "ref": "130eznb（同 ID）",
+    "what": "133 按精确 TPOT 截止时间分配 decode（引擎 1bdaf4a6 = 20a58da9 + 133，SGLANG_AX_DECODE_BUDGET=1）：每个 decoder 的 slack = 首 token 时刻 + 0.09×(n−1) − now − 剩余×35 ms；下一块放得下就立刻 prefill（interval 0），否则 decode 到最紧的完成（≤64 轮）；可救冷头在等且允许额未用完时花掉 5% 允许额。判定：chain（开场/稳态）先看，TPOT>0.10 条数须在允许额内，server.log 的 [ax-133] 计数",
+    "status": "已发布（eznc 之后）"
   }
 ]
