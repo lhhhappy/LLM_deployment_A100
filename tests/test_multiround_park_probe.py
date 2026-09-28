@@ -18,6 +18,13 @@ SPEC.loader.exec_module(probe)
 
 
 class EvidenceTest(unittest.TestCase):
+    def test_abort_location_uses_server_event_order(self):
+        events = [{"event": "yield", "a": "A", "b": "B"}]
+        terminal = {"event": "terminal", "rid": "A", "reason": "abort"}
+        self.assertEqual(probe.abort_location(events + [terminal], "A"), "parked")
+        events.append({"event": "resume", "rid": "A", "park": None})
+        self.assertEqual(probe.abort_location(events + [terminal], "A"), "active")
+
     def test_fragmented_live_log_and_old_events(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -34,6 +34,21 @@ def save(path, obj):
     path.write_text(json.dumps(obj, indent=2, allow_nan=False) + "\n")
 
 
+def abort_location(events, rid):
+    """Location immediately before the server applies this abort, not when
+    the client sends it (which can race a resume at the next chunk boundary).
+    """
+    parked, active = None, None
+    for e in events:
+        if e["event"] == "yield":
+            parked, active = e["a"], e["b"]
+        elif e["event"] == "resume":
+            parked, active = e.get("park"), e["rid"]
+        elif e["event"] == "terminal" and e.get("rid") == rid and e.get("reason") == "abort":
+            return "parked" if parked == rid else "active" if active == rid else "unknown"
+    return None
+
+
 class Probe:
     def __init__(self, args, http):
         self.args, self.http = args, http
@@ -179,14 +194,16 @@ class Probe:
         case_events = self.events[start_events:]
         for record in results:
             if record["role"] == abort_role:
-                terminated = any(e.get("event") == "terminal" and e.get("rid") == record["rid"]
-                    and e.get("reason") == "abort" for e in case_events)
-                if not terminated or record["meta"].get("finish_reason", {}).get("type") != "abort":
+                location = abort_location(case_events, record["rid"])
+                if (location != ("parked" if abort_role == "A" else "active")
+                        or record["meta"].get("finish_reason", {}).get("type") != "abort"
+                        or record["meta"].get("completion_tokens") != 0):
                     raise RuntimeError("NOT_COVERED: expected paused/active abort was not observed")
             else:
                 self.successful(record)
-        if event and abort_role != "A":
-            if not any(e.get("event") == "resume" and e.get("rid") == a for e in case_events):
+        if event:
+            if abort_role != "A" and not any(
+                    e.get("event") == "resume" and e.get("rid") == a for e in case_events):
                 raise RuntimeError("NOT_COVERED: A never resumed")
             for record in results:
                 if record["role"] != abort_role:
