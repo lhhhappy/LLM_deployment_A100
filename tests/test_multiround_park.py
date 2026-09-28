@@ -225,10 +225,10 @@ class MultiRoundTests(unittest.TestCase):
                                  getattr(b, "_ax_deadline_cold", None))
 
     def test_150k_owner_with_30s_cold_budget_is_not_dead_at_35k_arrival(self):
-        # ezn9 raw, t_recv differences: B arrived about 8.39 s after A.
+        # ezn9 raw, server t_recv difference: B arrived 8.000929 s after A.
         # Give A all its original work (a pessimistic bound); real progress
         # only improves its slack. This is a CPU counterfactual, not a replay.
-        a = request("A", 150249, matched=14848, age=8.39)
+        a = request("A", 150249, matched=14848, age=8.000929355621338)
         b = request("B", 35296, matched=0, age=0)
         s, ns, _, _ = self.scheduler(a=a, b=b)
         stats = ns["ax_multiround_park"].PlanStats()
