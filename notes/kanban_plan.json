@@ -477,5 +477,17 @@
     "ref": "130eznb（同配置、引擎 20a58da9）",
     "what": "同引擎 c4d01e56 关开关：核 124m 代码默认关时与 eznb 无差异，也是 ezne 的严格同引擎对照",
     "status": "已发布（ezne 之后）"
+  },
+  {
+    "job": "130ezndz-tp8_124m_state_on",
+    "ref": "130eznfz-tp8_124m_state_off（同输入两次，数值噪声参照）",
+    "what": "124m 固定输入状态探针 ON（Codex 工具提交 f81cb498/f6290940，引擎 c4d01e56；仅探针把冷预算缩到 8 s 触发救援）：实测 yield/resume、196608±1 长度、部分命中、暂停 A/活动 B 的 abort（按服务端 yield/resume/terminal 先后判位置）、忙时 flush 拒绝/排空后成功；无 yield 判 INVALID；STATE_PASS ≠ 数值通过，数值对 OFF 两次的噪声看",
+    "status": "已发布（eznd 之后、ezne 之前）"
+  },
+  {
+    "job": "130eznfz-tp8_124m_state_off",
+    "ref": "—",
+    "what": "同输入 OFF 两次：数值噪声参照与 abort/flush 基线",
+    "status": "已发布（eznf 之后）"
   }
 ]
