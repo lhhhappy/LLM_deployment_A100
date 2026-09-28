@@ -504,7 +504,7 @@
     "job": "130eznh-tail_rot150_n34_chainmax16k_fix_mamba400_40m",
     "ref": "130eznc（同配置 N30）/ 开场参照 m*≈21/34",
     "what": "下一张候选（上传配置 + 钉池）在 N34 的天花板：开场 34 头漏几条、稳态是否仍 0、TPOT>0.10 占比、KV 峰值。判定 chain 先看",
-    "status": "已发布（ezng 之后）"
+    "status": "已停（08:00 UTC，第 12 分钟；问题已答：N34 在这份数据上没有余量——KV 池 97%（峰 100%）、可淘汰 2%、在跑 27 条、decode 162 tok/s（eznc N30 同期 808）、chain 超标 10（eznc 同期 7）、TPOT 超 0.10 占 16%；无闭合 raw）"
   },
   {
     "job": "130ezni-tail_rot150_n30_chainmax16k_fix_mamba400_133tuned_40m",
