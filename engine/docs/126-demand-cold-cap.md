@@ -55,3 +55,16 @@ beside a cold partial, so the probe measures only the indirect effect on them. I
 `SGLANG_AX_SCHED_COLD_CAP_MAX=6144` (the usual cap, so no hit waiting keeps 109's 6144), `SGLANG_AX_BACKLOG_COLD_CAP=8192`.
 CPU: `tests/test_ax_admission_scheduler.py` `DemandCapUnderRelief` (relieved chunk 8192 − 3008 → 5120 on the grid
 and the hit rides along; without 126 the hit waits). Not validated: TP8 and any performance effect.
+
+## Chain-max 16k follow-up (2026-09-27)
+
+`SHORT_TOKENS=2048` is an eligibility threshold, not a reservation. With a fixed cold cap of 16384 and a 16384
+round, ordinary short hits can still get zero tokens. 128p's READY siblings have a separate admission path and
+do not cover all ordinary warm requests. The fix uses existing 126, without another admission mechanism:
+floor 12288, maximum 16384, relief maximum 16384, short threshold unchanged at 2048. No eligible demand keeps
+the 16k chunk; one 512-token hit leaves a 15872-token cold chunk; two 2048-token hits leave a 12288-token chunk.
+CPU tests execute the real 128p/scheduler/adder path both with and without 125 relief. Reserved tokens do not
+override KV, request-slot or KDA checks. 2049–4096-token hits remain outside this controlled experiment.
+
+This is a separate demand-reservation experiment. The user's pinned-400 upload candidate keeps 126 OFF and
+the original 16384 cold cap / 2048 short threshold. Do not attribute that candidate's results to a warm reserve.
