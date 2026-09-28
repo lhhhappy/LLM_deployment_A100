@@ -1,0 +1,6 @@
+Exact selected lines from the source job.log; startup environment and command intentionally excluded.
+DATA_READY v5g-tail-rot150 chains=311 requests=5601 N30 admission_seconds=2400 warmup=rep16-v1
+ENGINE_COMMIT bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2
+CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=2996
+TIMED_DIAGNOSTIC N=30 admission_seconds=2400 chain_start_interval_s=0 drain_all_admitted=true
+TIMED_DIAGNOSTIC DRAINED 1869 requests; not full-cohort VALID

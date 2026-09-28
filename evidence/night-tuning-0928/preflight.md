@@ -1,0 +1,1 @@
+2026-09-28：引擎 bf6b66fa 固定；四个单参 job 和模板 bash -n 通过；部署 bundle 与已审查源码逐字节一致。promotion 控制：真实 eznq 失败跳过N38、正例允许、TTFT失败跳过、新chain坏例跳过、缺参考ID跳过、raw SHA不符INVALID，6项CPU检查通过。Sol独立复核参数差异、268/6引用、退出控制和N38预热/flush。任务为每档1h派发后排空，诊断晋档而非正式成绩。

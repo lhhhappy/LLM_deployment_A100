@@ -1,0 +1,22 @@
+[
+  {
+    "job": "130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder",
+    "source": "build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_kda_night_pdi3_1h_ladder.sh",
+    "change": "--prefill-decode-interval 2 -> --prefill-decode-interval 3"
+  },
+  {
+    "job": "130ezns-tail_rot150_n34_kda_night_pdi4_1h_ladder",
+    "source": "build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_kda_night_pdi4_1h_ladder.sh",
+    "change": "--prefill-decode-interval 2 -> --prefill-decode-interval 4"
+  },
+  {
+    "job": "130eznt-tail_rot150_n34_kda_night_relief1_1h_ladder",
+    "source": "build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_kda_night_relief1_1h_ladder.sh",
+    "change": "SGLANG_AX_BACKLOG_INTERVAL=0 -> SGLANG_AX_BACKLOG_INTERVAL=1"
+  },
+  {
+    "job": "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder",
+    "source": "build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_kda_night_repeat_1h_ladder.sh",
+    "change": "baseline repeat"
+  }
+]

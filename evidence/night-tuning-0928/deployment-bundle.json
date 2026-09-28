@@ -1,0 +1,63 @@
+{
+  "workflow": "engine_commit_v1",
+  "jobs": [
+    {
+      "name": "130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder.sh",
+      "source": "jobs/130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder.sh",
+      "commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2"
+    },
+    {
+      "name": "130ezns-tail_rot150_n34_kda_night_pdi4_1h_ladder.sh",
+      "source": "jobs/130ezns-tail_rot150_n34_kda_night_pdi4_1h_ladder.sh",
+      "commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2"
+    },
+    {
+      "name": "130eznt-tail_rot150_n34_kda_night_relief1_1h_ladder.sh",
+      "source": "jobs/130eznt-tail_rot150_n34_kda_night_relief1_1h_ladder.sh",
+      "commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2"
+    },
+    {
+      "name": "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder.sh",
+      "source": "jobs/130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder.sh",
+      "commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2"
+    }
+  ],
+  "runtime": [
+    "bin/scripts/pod/lib.sh",
+    "bin/scripts/pod/storage_env.sh",
+    "bin/scripts/pod/jobs/dev_ladder_template.sh",
+    "bin/scripts/longchain/make_prefix_set.py",
+    "verify_kit/aime26.jsonl",
+    "verify_kit/cap_full_body.sh",
+    "verify_kit/cap_smoke_body.sh",
+    "verify_kit/compare_numtrace.py",
+    "verify_kit/gpqa_diamond.jsonl",
+    "verify_kit/install_moe_numtrace.py",
+    "verify_kit/install_numtrace.py",
+    "verify_kit/kernel_combo_cost.py",
+    "verify_kit/level_verdict.py",
+    "verify_kit/metrics_sampler.py",
+    "verify_kit/multiround_park_probe.py",
+    "verify_kit/numcheck.py",
+    "verify_kit/numcheck_baseline_diag.py",
+    "verify_kit/numcheck_cmp.py",
+    "verify_kit/numtrace_helper.py",
+    "verify_kit/oracle110_sm80_deep_gemm.py",
+    "verify_kit/prof_ledger.py",
+    "verify_kit/run_dev_checked.py",
+    "verify_kit/run_verify.sh",
+    "verify_kit/score_formal.py",
+    "verify_kit/short_warmup_loadgen.py",
+    "verify_kit/test_fp8_moe_marlin_sm80.py",
+    "verify_kit/test_kda_snapshot_140.py",
+    "verify_kit/test_mtp_sm80_160.py",
+    "verify_kit/test_sm80_indexer_112.py",
+    "verify_kit/test_sm80_indexer_113.py",
+    "verify_kit/test_sm80_indexer_cache_47.py",
+    "verify_kit/test_tilelang_sparse_sm80.py",
+    "verify_kit/timed_loadgen.py",
+    "verify_kit/timed_run.py",
+    "verify_kit/timed_score.py",
+    "verify_kit/tp8_prefill_profile.py"
+  ]
+}

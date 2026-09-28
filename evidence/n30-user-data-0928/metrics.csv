@@ -1,0 +1,48 @@
+metric,official_47043_n30,local_ezno_n30,unit,note
+chain_ttft_p95,25.60790705680847,18.421743392944336,s,different datasets; do not interpret difference as speedup
+chain_limit_s,30.0,30.0,s,gate target
+chain_n,,253,requests,official per-gate counts not returned
+chain_over,,6,requests,official per-gate counts not returned
+chain_allowed,,19,requests,official per-gate counts not returned
+fast_ttft_p95,3.445377826690674,1.699653148651123,s,different datasets; do not interpret difference as speedup
+fast_limit_s,3.0,3.0,s,gate target
+fast_n,,1394,requests,official per-gate counts not returned
+fast_over,,28,requests,official per-gate counts not returned
+fast_allowed,,83,requests,official per-gate counts not returned
+overall_ttft_p95,4.04367790100514,2.2166848182678223,s,different datasets; do not interpret difference as speedup
+overall_limit_s,5.0,5.0,s,gate target
+overall_n,,1545,requests,official per-gate counts not returned
+overall_over,,13,requests,official per-gate counts not returned
+overall_allowed,,92,requests,official per-gate counts not returned
+turn_ttft_p95,4.9343483448028564,12.167546272277832,s,different datasets; do not interpret difference as speedup
+turn_limit_s,15.0,15.0,s,gate target
+turn_n,,71,requests,official per-gate counts not returned
+turn_over,,3,requests,official per-gate counts not returned
+turn_allowed,,7,requests,official per-gate counts not returned
+tpot_mean,0.03768261275070888,0.051048156913175616,s/token,
+tpot_p95,0.05958173867144616,0.09462698084060793,s/token,
+tpot_over_100ms,,83,requests,official slow count not returned
+tpot_n,,1869,requests,
+completed_requests,,1869,requests,official observed count not returned
+errors,,0,requests,official exact error counts not returned
+configured_N,30,30,concurrency slots,
+n_at_slo,30,,concurrency slots,local fixed-duration diagnostic cannot establish formal n_at_slo
+tpm_all,1727881.8833333333,,tokens/min,official returned metric; local summary null
+tpm_decode,19375.166666666668,,tokens/min,official returned metric; local summary null
+slo_attainment,0.9440715883668904,,ratio,official returned aggregate; do not infer missing bucket counts
+admission_s,,2400,s,
+first_dispatch_to_drained_s,,2546.6329910755157,s,
+run_wall_s,,2545.7814979553223,s,official level duration not returned
+summary_wall_s,,2567,s,different local timer from run_wall_s
+aime26_score,0.9772727272727273,,ratio,local smoke is not this capability test
+aime26_n_correct,43,,questions,local smoke is not this capability test
+aime26_n,44,,questions,local smoke is not this capability test
+gpqa-diamond_score,0.967948717948718,,ratio,local smoke is not this capability test
+gpqa-diamond_n_correct,151,,questions,local smoke is not this capability test
+gpqa-diamond_n,156,,questions,local smoke is not this capability test
+smoke_correct,,12,questions,official full capability assessment is separate
+smoke_n,,12,questions,
+local_tokens_prompt,,115840157,tokens,
+local_tokens_cached,,102962432,tokens,
+local_tokens_uncached,,12877725,tokens,
+local_tokens_hit_ratio,,0.8888319445216222,ratio,
