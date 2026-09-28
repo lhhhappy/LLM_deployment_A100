@@ -4,6 +4,7 @@
 
 | 文件 | 用途 |
 |---|---|
+| [SM80 大块 MoE 执行约束](codex/sm80-moe-prefill-0928.md) | Humming 表边界、scale metadata、stream-K 舍入与 8k/16k 测量边界；117 follow-up 完整 MoE 开发机收益，TP8/chain 待验 |
 | [底包与当前认识](claude/base/00-summary-mainline.md) | 底包来源、S0 与主要约束、过时结论的更正 |
 | [请求入口](claude/base/01-request-path.md)、[调度器](claude/base/02-scheduler.md)、[混合缓存](claude/base/03-hybrid-cache.md)、[模型与算子](claude/base/04-model-kernels.md) | `build/base_exact/sglang` 的源码地图；运行时结论需结合现行补丁与实验 |
 | [上游候选](claude/R9_upstream_since_base.md) | 以底包为起点的上游差异；候选不代表已在本栈验证 |

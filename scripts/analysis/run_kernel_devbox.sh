@@ -9,7 +9,7 @@ export CUDA_VISIBLE_DEVICES=${KERNEL_GPU:-0}
 export CUDA_HOME="$KERNEL_ARENA/env/sgl/lib/python3.12/site-packages/nvidia/cu13"
 export PATH="$KERNEL_ARENA/env/m0/bin:$KERNEL_ARENA/env/sgl/bin:$CUDA_HOME/bin:$PATH"
 export LD_LIBRARY_PATH="$KERNEL_ARENA/env/cuda-compat-13-0/usr/local/cuda-13.0/compat:$CUDA_HOME/lib:$KERNEL_ARENA/cache/T48/deps/z3/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export PYTHONPATH="$KERNEL_ROOT/engine:$KERNEL_ARENA/cache/T48/deps"
+export PYTHONPATH="$KERNEL_ROOT/engine:$KERNEL_ARENA/runs/ep8/alt0/hk/humming_kernels-0.1.12:$KERNEL_ARENA/cache/T48/deps"
 export TMPDIR="$KERNEL_ROOT/cache/tmp" HF_HOME="$KERNEL_ROOT/cache/hf"
 export SGLANG_CACHE_DIR="$KERNEL_ROOT/cache/sglang"
 export SGLANG_JIT_CACHE_DIR="$KERNEL_ROOT/cache/sglang/jit"

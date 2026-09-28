@@ -1,0 +1,79 @@
+{
+  "schema": "closed-probe-manifest-v1",
+  "run": "moe-seven-arm-e",
+  "archive_prefix": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/results",
+  "files": {
+    "moe-seven-arm-e.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "moe-seven-arm-e.finished": {
+      "sha256": "9397e51471577c7d31d89bd6c4bff3e4e701da2eb15ac078af6bae14dd8f9bfd",
+      "bytes": 21
+    },
+    "moe-seven-arm-e.jsonl": {
+      "sha256": "cb8a807550e4a290a3089e080955185d25e1fa0ad351de04a70b46c0c9c8934d",
+      "bytes": 192257
+    },
+    "moe-seven-arm-e.launch.json": {
+      "sha256": "1b09e99e8bf9d512f52f197a21c46b02771e903aaca756558809b6c9f4c0b279",
+      "bytes": 845
+    },
+    "moe-seven-arm-e.source-bench_moe_candidate_sm80.py": {
+      "sha256": "6eb1770b5c2617ca8436282d9515e5ca54806bbf75b9386f774ea6789123f778",
+      "bytes": 32050
+    },
+    "moe-seven-arm-e.source-down_tuning.py": {
+      "sha256": "ef1d15fb6c9dd34f96a2d379071f2d48ed622c23100f7ba65283068571a4b008",
+      "bytes": 2931
+    },
+    "moe-seven-arm-e.source-fp8_humming_moe.py": {
+      "sha256": "155e916fafd86a96bebb18e12c79add42a2493231c7e7cf341726d574c83333e",
+      "bytes": 13565
+    },
+    "moe-seven-arm-e.source-fp8_humming_tuning.py": {
+      "sha256": "ef1d15fb6c9dd34f96a2d379071f2d48ed622c23100f7ba65283068571a4b008",
+      "bytes": 2931
+    },
+    "moe-seven-arm-e.source-fp8_method.py": {
+      "sha256": "155e916fafd86a96bebb18e12c79add42a2493231c7e7cf341726d574c83333e",
+      "bytes": 13565
+    },
+    "moe-seven-arm-e.source-humming_forward.py": {
+      "sha256": "0ebbf281e3bca07d61b113958006ec2efd41d6de4aa640cab5087d53039839d7",
+      "bytes": 4407
+    },
+    "moe-seven-arm-e.source-humming_layer.py": {
+      "sha256": "7444eb85300b6d09d102867d0597dab6ce95a5fedc504a9497792264b6940890",
+      "bytes": 21229
+    },
+    "moe-seven-arm-e.source-probe.py": {
+      "sha256": "6eb1770b5c2617ca8436282d9515e5ca54806bbf75b9386f774ea6789123f778",
+      "bytes": 32050
+    },
+    "moe-seven-arm-e.source-reduce.py": {
+      "sha256": "82766f32d74390c4195a41f0b218a33e60568bd8e3c277bd5c6cee39ff6e84ab",
+      "bytes": 11638
+    },
+    "moe-seven-arm-e.source-reference_helper.py": {
+      "sha256": "9f3160fcbbd39fb5f7df8f9545704078259594dc609f6039faba07a61f05f78f",
+      "bytes": 21819
+    },
+    "moe-seven-arm-e.source-runner.py": {
+      "sha256": "da8b5d99a6a07205e6ca8318821ea5e2938914288bacd8d3adbbdf0fee043a04",
+      "bytes": 33939
+    },
+    "moe-seven-arm-e.started": {
+      "sha256": "02fcd6e4f90306892e7c50aaa616eba349fdd970c71ca820d322e2749b8f2952",
+      "bytes": 21
+    },
+    "moe-seven-arm-e.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "moe-seven-arm-e.summary.json": {
+      "sha256": "c22494ce18c4ef754b41e79e8b05a821b6433b5fb0309b75582c0e6f5d8a915c",
+      "bytes": 92163
+    }
+  }
+}

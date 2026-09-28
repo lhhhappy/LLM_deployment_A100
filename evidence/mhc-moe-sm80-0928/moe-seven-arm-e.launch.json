@@ -1,0 +1,30 @@
+{
+  "run": "moe-seven-arm-e",
+  "gpu": 1,
+  "command": [
+    "bash",
+    "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/run_kernel_probe.sh",
+    "moe-seven-arm-e",
+    "1",
+    "scripts/analysis/bench_moe_candidate_sm80.py",
+    "--include-up",
+    "--rows",
+    "8192",
+    "16384",
+    "--routes",
+    "skew",
+    "--seeds",
+    "5",
+    "--x-scale",
+    "4",
+    "--rounds",
+    "9",
+    "--inner",
+    "16"
+  ],
+  "source_sha256": {
+    "scripts/analysis/bench_moe_candidate_sm80.py": "6eb1770b5c2617ca8436282d9515e5ca54806bbf75b9386f774ea6789123f778",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "155e916fafd86a96bebb18e12c79add42a2493231c7e7cf341726d574c83333e",
+    "engine/sglang/srt/layers/quantization/fp8_humming_tuning.py": "ef1d15fb6c9dd34f96a2d379071f2d48ed622c23100f7ba65283068571a4b008"
+  }
+}

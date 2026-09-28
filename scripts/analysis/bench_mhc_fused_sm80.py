@@ -63,6 +63,51 @@ def post_prenorm(X, R, A, C, FN, R_OUT, MIX, SQR, M,
 
 
 @triton.jit
+def post_prenorm_compact(X, R, A, C, FN, R_OUT, MIX, SQR, M,
+                        H: tl.constexpr, BM: tl.constexpr, BK: tl.constexpr,
+                        SPLITS: tl.constexpr, PRECISION: tl.constexpr):
+    rows = tl.program_id(0).to(tl.int64) * BM + tl.arange(0, BM)
+    split = tl.program_id(1)
+    ks = tl.arange(0, BK)
+    ns = tl.arange(0, 32)
+    valid = rows < M
+    acc = tl.zeros((BM, 32), tl.float32)
+    ss = tl.zeros((BM, BK), tl.float32)
+    # Do not unroll four independent GEMMs into one huge live register set.
+    for block in tl.range(H // (SPLITS * BK), num_stages=1, loop_unroll_factor=1):
+        cols = split * (H // SPLITS) + block * BK + ks
+        x = tl.load(X + rows[:, None] * H + cols[None, :], valid[:, None], 0).to(tl.float32)
+        r0 = tl.load(R + (rows[:, None] * 4 + 0) * H + cols[None, :], valid[:, None], 0).to(tl.float32)
+        r1 = tl.load(R + (rows[:, None] * 4 + 1) * H + cols[None, :], valid[:, None], 0).to(tl.float32)
+        r2 = tl.load(R + (rows[:, None] * 4 + 2) * H + cols[None, :], valid[:, None], 0).to(tl.float32)
+        r3 = tl.load(R + (rows[:, None] * 4 + 3) * H + cols[None, :], valid[:, None], 0).to(tl.float32)
+        for channel in tl.range(4, num_stages=1, loop_unroll_factor=1):
+            cc = tl.load(C + rows * 4 + channel, valid, 0)
+            a0 = tl.load(A + rows * 16 + channel, valid, 0)
+            a1 = tl.load(A + rows * 16 + 4 + channel, valid, 0)
+            a2 = tl.load(A + rows * 16 + 8 + channel, valid, 0)
+            a3 = tl.load(A + rows * 16 + 12 + channel, valid, 0)
+            z = tl.fma(cc[:, None], x, a0[:, None] * r0)
+            z = tl.fma(a1[:, None], r1, z)
+            z = tl.fma(a2[:, None], r2, z)
+            z = tl.fma(a3[:, None], r3, z)
+            zb = z.to(tl.bfloat16)
+            z = zb.to(tl.float32)
+            tl.store(R_OUT + (rows[:, None] * 4 + channel) * H + cols[None, :], zb, valid[:, None])
+            f = tl.load(FN + ns[None, :] * (4 * H) + channel * H + cols[:, None], ns[None, :] < 24, 0)
+            if PRECISION == 'bf16x2':
+                hi = f.to(tl.bfloat16)
+                lo = (f - hi.to(tl.float32)).to(tl.bfloat16)
+                acc = tl.dot(zb, lo, acc)
+                acc = tl.dot(zb, hi, acc)
+            else:
+                acc = tl.dot(z, f, acc, input_precision=PRECISION)
+            ss = tl.fma(z, z, ss)
+    tl.store(MIX + (split * M + rows[:, None]) * 24 + ns[None, :], acc, valid[:, None] & (ns[None, :] < 24))
+    tl.store(SQR + split * M + rows, tl.sum(ss, 1), valid)
+
+
+@triton.jit
 def prenorm_only(R, FN, MIX, SQR, M,
                  H: tl.constexpr, BM: tl.constexpr, BK: tl.constexpr,
                  SPLITS: tl.constexpr, PRECISION: tl.constexpr):
@@ -103,6 +148,7 @@ def main():
     ap.add_argument('--rounds',type=int,default=5)
     ap.add_argument('--calls',type=int,default=5)
     ap.add_argument('--prenorm-only',action='store_true',help='Ablation: keep baseline post, replace prenorm only')
+    ap.add_argument('--compact',action='store_true',help='Avoid unrolling the four-channel post/GEMM loop')
     args=ap.parse_args()
     from sglang.kernels.ops.layernorm.mhc import mhc_post_tilelang, mhc_pre_gemm_sqrsum_tilelang
     import sglang.kernels.ops.layernorm.mhc as mhc_source
@@ -115,7 +161,8 @@ def main():
     ]
     emit(kind='environment',gpu=torch.cuda.get_device_name(),torch=torch.__version__,triton=triton.__version__,
          source=str(source),source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
-         scope='synthetic mHC boundary, no serving integration; final mixing unchanged')
+         probe_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+         arguments=vars(args),scope='synthetic mHC boundary, no serving integration; final mixing unchanged')
     flush=torch.empty(96<<20,device='cuda',dtype=torch.uint8)
     H=4096
     for m in args.rows:
@@ -152,8 +199,9 @@ def main():
                     kernel=prenorm_only[(triton.cdiv(m,bm),sp)](rc,fn,pm,ps,m,H,bm,bk,sp,precision,
                         num_warps=warps,num_stages=2,enable_fp_fusion=False)
                 else:
-                    kernel=post_prenorm[(triton.cdiv(m,bm),sp)](x,r,a,c,fn,rc,pm,ps,m,H,bm,bk,sp,precision,
-                        num_warps=warps,num_stages=2,enable_fp_fusion=False)
+                    op=post_prenorm_compact if args.compact else post_prenorm
+                    kernel=op[(triton.cdiv(m,bm),sp)](x,r,a,c,fn,rc,pm,ps,m,H,bm,bk,sp,precision,
+                        num_warps=warps,num_stages=1 if args.compact else 2,enable_fp_fusion=False)
                 partial_sum[(triton.cdiv(m,32),)](pm,ps,mc,sc,m,sp,32,num_warps=4)
                 return kernel
             kernel=run();torch.cuda.synchronize()

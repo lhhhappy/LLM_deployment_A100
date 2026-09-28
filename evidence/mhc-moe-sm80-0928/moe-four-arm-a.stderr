@@ -1,0 +1,10 @@
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_candidate_sm80.py", line 547, in <module>
+[rank0]:     main()
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_candidate_sm80.py", line 522, in main
+[rank0]:     timing_seed = check_graphs(layer, x, topk, arms, graphs, reference, ids, helper, case, args)
+[rank0]:                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_candidate_sm80.py", line 356, in check_graphs
+[rank0]:     assert replay_vs_eager <= 1.25 * repeat_l2 + 1e-4
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: AssertionError

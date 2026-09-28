@@ -1,0 +1,8 @@
+{
+  "files": {
+    "engine/sglang/kernels/ops/moe/moe_fused_mul_sum.py": "82766f32d74390c4195a41f0b218a33e60568bd8e3c277bd5c6cee39ff6e84ab",
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "d8fb7f1bc4531e8bb9361153ff3e0f22937f77ad6d7eb99062bbcc8840e5dd44",
+    "tests/gpu/test_moe_reduce_117_followup.py": "79ed9a7488bdd0eee1cb313c8d8961563c979976f6a494cd164206a99971e660"
+  },
+  "remote_verified_sha256": "82766f32d74390c4195a41f0b218a33e60568bd8e3c277bd5c6cee39ff6e84ab engine/sglang/kernels/ops/moe/moe_fused_mul_sum.py\nd8fb7f1bc4531e8bb9361153ff3e0f22937f77ad6d7eb99062bbcc8840e5dd44 engine/sglang/srt/layers/quantization/fp8_humming_moe.py\n79ed9a7488bdd0eee1cb313c8d8961563c979976f6a494cd164206a99971e660 tests/gpu/test_moe_reduce_117_followup.py\n"
+}

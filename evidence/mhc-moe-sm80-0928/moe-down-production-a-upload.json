@@ -1,0 +1,8 @@
+{
+  "files": {
+    "engine/sglang/srt/layers/quantization/fp8_humming_moe.py": "518f78a847857caa92229bb899caba31f64171997e3dc8921430cdb5bc43aaa4",
+    "engine/sglang/srt/layers/quantization/fp8_humming_tuning.py": "baa441f12b58dcd0ad7f2c465a14100c45e1f14ef1d10febaa19c7070bfe6c23",
+    "tests/gpu/test_moe_down_tune_117_followup.py": "39a503e89f9f70f4a269c336ec28b65b38aed5706428f3b178644b6e228b9366"
+  },
+  "remote_verified_sha256": "518f78a847857caa92229bb899caba31f64171997e3dc8921430cdb5bc43aaa4 engine/sglang/srt/layers/quantization/fp8_humming_moe.py\nbaa441f12b58dcd0ad7f2c465a14100c45e1f14ef1d10febaa19c7070bfe6c23 engine/sglang/srt/layers/quantization/fp8_humming_tuning.py\n39a503e89f9f70f4a269c336ec28b65b38aed5706428f3b178644b6e228b9366 tests/gpu/test_moe_down_tune_117_followup.py\n"
+}

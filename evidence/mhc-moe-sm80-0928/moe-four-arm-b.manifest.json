@@ -1,0 +1,63 @@
+{
+  "schema": "closed-probe-manifest-v1",
+  "run": "moe-four-arm-b",
+  "archive_prefix": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/results",
+  "files": {
+    "moe-four-arm-b.bench_moe_candidate_sm80.py": {
+      "sha256": "0996a7c1edc9426397ae94b9d72b9414fa8a16eac3375404c89c213aaa002658",
+      "bytes": 28680
+    },
+    "moe-four-arm-b.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "moe-four-arm-b.finished": {
+      "sha256": "8c0994f2bf20ea7a02e40f787d0bebbddfa4d577ff7484856d031d87ca6f9762",
+      "bytes": 21
+    },
+    "moe-four-arm-b.fp8_humming_tuning.py": {
+      "sha256": "4d55560800b6fa7fa71faad45dc6ed540a8e5135710b3d9d6a1bfe396076c80c",
+      "bytes": 2230
+    },
+    "moe-four-arm-b.jsonl": {
+      "sha256": "50489bb9373098b56bf87270a061975bfc36a6e4738e6341250df7fe90dc93ce",
+      "bytes": 137883
+    },
+    "moe-four-arm-b.source-fp8_method.py": {
+      "sha256": "518f78a847857caa92229bb899caba31f64171997e3dc8921430cdb5bc43aaa4",
+      "bytes": 12831
+    },
+    "moe-four-arm-b.source-humming_forward.py": {
+      "sha256": "0ebbf281e3bca07d61b113958006ec2efd41d6de4aa640cab5087d53039839d7",
+      "bytes": 4407
+    },
+    "moe-four-arm-b.source-humming_layer.py": {
+      "sha256": "7444eb85300b6d09d102867d0597dab6ce95a5fedc504a9497792264b6940890",
+      "bytes": 21229
+    },
+    "moe-four-arm-b.source-reduce.py": {
+      "sha256": "82766f32d74390c4195a41f0b218a33e60568bd8e3c277bd5c6cee39ff6e84ab",
+      "bytes": 11638
+    },
+    "moe-four-arm-b.source-reference_helper.py": {
+      "sha256": "9f3160fcbbd39fb5f7df8f9545704078259594dc609f6039faba07a61f05f78f",
+      "bytes": 21819
+    },
+    "moe-four-arm-b.source-runner.py": {
+      "sha256": "da8b5d99a6a07205e6ca8318821ea5e2938914288bacd8d3adbbdf0fee043a04",
+      "bytes": 33939
+    },
+    "moe-four-arm-b.started": {
+      "sha256": "a1588bf854296afb1a44001267717b72a3ccd3be216cbc7a3b13623bd2b545ec",
+      "bytes": 21
+    },
+    "moe-four-arm-b.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "moe-four-arm-b.summary.json": {
+      "sha256": "81a808b346081d918c569fb6d4791895ddb59056212ea8b7b9cac9f5ccb7a527",
+      "bytes": 104208
+    }
+  }
+}

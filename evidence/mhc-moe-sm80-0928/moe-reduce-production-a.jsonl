@@ -1,0 +1,67 @@
+{"kind": "environment", "gpu": "NVIDIA A100-SXM4-80GB", "torch": "2.13.0+cu130", "triton": "3.7.1", "source": "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/engine/sglang/kernels/ops/moe/moe_fused_mul_sum.py"}
+{"kind": "dispatch", "ok": true, "fallback_cases": 19, "default_off": true, "fake": true}
+{"kind": "warmup", "ok": true, "launches": 4, "transient_bytes": 164864, "real_prefill_shapes_without_compilation": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4095, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4095, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4095, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4095, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4095, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4096, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4096, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4096, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4096, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4096, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4097, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4097, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4097, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4097, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 4097, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8192, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8192, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8192, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8192, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8192, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8193, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8193, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8193, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8193, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 8193, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16384, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16384, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16384, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16384, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16384, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16385, "scale": null, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16385, "scale": 1, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16385, "scale": 1.0, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16385, "scale": 2.5, "reused": true}
+{"kind": "identity", "exact": true, "group": "numerics", "rows": 16385, "scale": 2.5, "reused": false}
+{"kind": "identity", "exact": true, "group": "masked_fallback", "route": "ep"}
+{"kind": "identity", "exact": true, "group": "masked_fallback", "route": "expert_map"}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 1.0, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 1.0, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 1.0, "replay": 2}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 2.5, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 2.5, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 4097, "scale": 2.5, "replay": 2}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 1.0, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 1.0, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 1.0, "replay": 2}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 2.5, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 2.5, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 8192, "scale": 2.5, "replay": 2}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 1.0, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 1.0, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 1.0, "replay": 2}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 2.5, "replay": 0}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 2.5, "replay": 1}
+{"kind": "identity", "exact": true, "group": "graph", "rows": 16384, "scale": 2.5, "replay": 2}
+{"kind": "identity", "exact": true, "group": "concurrent_streams", "rows": 4097}
+{"kind": "identity", "exact": true, "group": "concurrent_streams", "rows": 8192}
+{"kind": "layer", "humming": true, "method": "Fp8HummingMoEMethod", "process_s": 2.198, "weight_bytes": 923324416, "load_transient_mb": 1192.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "identity", "exact": true, "group": "humming_down_output", "rows": 4096}
+{"kind": "identity", "exact": true, "group": "humming_down_output", "rows": 4097}
+{"kind": "identity", "exact": true, "group": "humming_down_output", "rows": 8192}
+{"kind": "identity", "exact": true, "group": "humming_down_output", "rows": 16384}
+{"kind": "humming_layer", "ok": true, "checks": 4}
+{"kind": "complete", "groups": ["dispatch", "warmup", "numerics", "graph", "layer"]}

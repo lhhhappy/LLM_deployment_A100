@@ -1,0 +1,9 @@
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_layer_sm80.py", line 109, in <module>
+[rank0]:     if __name__=='__main__':main()
+[rank0]:                             ^^^^^^
+[rank0]:   File "/sjtu/linhang/arena/codex/mhc-moe-sm80-0928/scripts/analysis/bench_moe_layer_sm80.py", line 70, in main
+[rank0]:     assert exact
+[rank0]:            ^^^^^
+[rank0]: AssertionError
+[rank0]:[W928 08:48:15.815917788 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
