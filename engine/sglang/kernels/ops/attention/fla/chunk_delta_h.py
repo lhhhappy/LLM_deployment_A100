@@ -327,6 +327,7 @@ def chunk_gated_delta_rule_fwd_h(
     use_exp2: bool = False,
     snapshot_offsets: Optional[torch.Tensor] = None,
     snapshot_slots: Optional[torch.Tensor] = None,
+    sm80_bv16: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     if snapshot_offsets is not None or os.environ.get("SGLANG_AX_KDA_DUAL_SNAPSHOT", "0") == "1":
         from sglang.kernels.ops.attention.fla.chunk_delta_h_snapshot import (
@@ -338,6 +339,7 @@ def chunk_gated_delta_rule_fwd_h(
             initial_state_indices=initial_state_indices, save_new_value=save_new_value,
             cu_seqlens=cu_seqlens, chunk_indices=chunk_indices, use_exp2=use_exp2,
             snapshot_offsets=snapshot_offsets, snapshot_slots=snapshot_slots,
+            sm80_bv16=sm80_bv16,
         )
     assert not (
         use_exp2 and g is not None
@@ -366,7 +368,22 @@ def chunk_gated_delta_rule_fwd_h(
     def grid(meta):
         return (triton.cdiv(V, meta["BV"]), N * H)
 
-    chunk_gated_delta_rule_fwd_kernel_h_blockdim64[grid](
+    kernel = chunk_gated_delta_rule_fwd_kernel_h_blockdim64
+    launch_options = {}
+    if sm80_bv16:
+        from sglang.kernels.ops.attention.fla.kda_state_sm80 import can_use_state_sm80
+
+        if can_use_state_sm80(
+            k, w, u, g, gk, initial_state, initial_state_indices,
+            cu_seqlens, chunk_offsets, NT,
+            save_new_value=save_new_value, use_exp2=use_exp2,
+        ):
+            # Bypass the one-config Autotuner only for the armed KDA caller.
+            # Benchmarking multiple configs would mutate the live state pool.
+            kernel = kernel.fn
+            launch_options = dict(BV=16, num_warps=4, num_stages=2, num_ctas=1)
+
+    kernel[grid](
         k=k,
         v=u,
         w=w,
@@ -395,5 +412,6 @@ def chunk_gated_delta_rule_fwd_h(
         IS_VARLEN=cu_seqlens is not None,
         NT_BUCKET=(0 if NT <= 32 else (1 if NT <= 128 else 2)),
         USE_EXP2=use_exp2,
+        **launch_options,
     )
     return h, v_new

@@ -5,7 +5,7 @@ import torch
 from sglang.srt.layers.attention.linear.kernels.kernel_backend import (
     LinearAttnKernelBase,
 )
-from sglang.srt.utils import is_cpu, is_npu, is_xpu
+from sglang.srt.utils import get_bool_env_var, is_cpu, is_npu, is_xpu
 
 if not is_cpu():
     from sglang.kernels.ops.attention.fla.fused_recurrent import (
@@ -22,6 +22,45 @@ if not is_cpu():
 
 class TritonKDAKernel(LinearAttnKernelBase):
     """Triton-based kernel for KDA (Kimi Delta Attention) linear attention."""
+
+    def __init__(self):
+        self._ax_prefill_prepare_device = None
+        self._ax_prefill_state_device = None
+
+    def arm_prefill_prepare(self, device):
+        """Called at setup only when this is the selected prefill backend."""
+        self._ax_prefill_prepare_device = None
+        if not get_bool_env_var("SGLANG_AX_KDA_PREFILL_PREPARE", "false"):
+            return False
+        device = torch.device(device)
+        if device.type != "cuda" or torch.cuda.get_device_capability(device) != (8, 0):
+            return False
+        if device.index is None:
+            device = torch.device("cuda", torch.cuda.current_device())
+        from sglang.kernels.ops.attention.fla.kda_prepare_sm80 import (
+            warmup_prepare_sm80,
+        )
+
+        warmup_prepare_sm80(device.index)
+        self._ax_prefill_prepare_device = device
+        return True
+
+    def arm_prefill_state(self, device):
+        """Warm the optional long-prefill recurrence tile at backend setup."""
+        self._ax_prefill_state_device = None
+        if not get_bool_env_var("SGLANG_AX_KDA_PREFILL_STATE_BV16", "false"):
+            return False
+        device = torch.device(device)
+        if device.type != "cuda":
+            return False
+        if device.index is None:
+            device = torch.device("cuda", torch.cuda.current_device())
+        from sglang.kernels.ops.attention.fla.kda_state_sm80 import warmup_state_sm80
+
+        if not warmup_state_sm80(device.index):
+            return False
+        self._ax_prefill_state_device = device
+        return True
 
     # XPU has no tvm_ffi CUDA JIT kernel for KDA packed decode; route XPU to the
     # non-packed Triton decode() path (fused_sigmoid_gating_delta_rule_update),
@@ -233,6 +272,31 @@ class TritonKDAKernel(LinearAttnKernelBase):
         return_intermediate_states: bool = False,
         **kwargs,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
+        use_qk_l2norm = True
+        if self._ax_prefill_prepare_device is not None:
+            from sglang.kernels.ops.attention.fla.kda_prepare_sm80 import (
+                prepare_qkv_if_supported,
+            )
+
+            prepared = prepare_qkv_if_supported(q, k, v, self._ax_prefill_prepare_device)
+            if prepared is not None:
+                q, k, v = prepared
+                use_qk_l2norm = False
+        # At 8k, mixed-request eager execution is host-bound: the extra guarded
+        # recurrence dispatch lost to preparation alone. Keep the selected
+        # cases narrow; the wrapper checks the remaining warmed signature.
+        use_sm80_state = (
+            self._ax_prefill_state_device is not None
+            and self._ax_prefill_state_device == q.device
+            and (
+                q.shape[1] == 16384
+                or (
+                    q.shape[1] == 8192
+                    and query_start_loc is not None
+                    and query_start_loc.numel() == 2
+                )
+            )
+        )
         return chunk_kda(
             q=q,
             k=k,
@@ -241,7 +305,7 @@ class TritonKDAKernel(LinearAttnKernelBase):
             beta=beta,
             initial_state=ssm_states,
             initial_state_indices=cache_indices,
-            use_qk_l2norm_in_kernel=True,
+            use_qk_l2norm_in_kernel=use_qk_l2norm,
             cu_seqlens=query_start_loc,
             A_log=A_log,
             dt_bias=dt_bias,
@@ -250,4 +314,5 @@ class TritonKDAKernel(LinearAttnKernelBase):
             output_intermediate_states=return_intermediate_states,
             snapshot_offsets=kwargs.get("snapshot_offsets"),
             snapshot_slots=kwargs.get("snapshot_slots"),
+            sm80_bv16=use_sm80_state,
         )

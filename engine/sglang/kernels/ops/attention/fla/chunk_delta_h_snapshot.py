@@ -351,6 +351,7 @@ def chunk_gated_delta_rule_fwd_h_snapshot(
     use_exp2: bool = False,
     snapshot_offsets: Optional[torch.Tensor] = None,
     snapshot_slots: Optional[torch.Tensor] = None,
+    sm80_bv16: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     assert not (
         use_exp2 and g is not None
@@ -383,7 +384,21 @@ def chunk_gated_delta_rule_fwd_h_snapshot(
     def grid(meta):
         return (triton.cdiv(V, meta["BV"]), N * H)
 
-    chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot[grid](
+    kernel = chunk_gated_delta_rule_fwd_kernel_h_blockdim64_snapshot
+    launch_options = {}
+    if sm80_bv16:
+        from sglang.kernels.ops.attention.fla.kda_state_sm80 import can_use_state_sm80
+
+        if can_use_state_sm80(
+            k, w, u, g, gk, initial_state, initial_state_indices,
+            cu_seqlens, chunk_offsets, NT,
+            save_new_value=save_new_value, use_exp2=use_exp2,
+            snapshot_offsets=snapshot_offsets, snapshot_slots=snapshot_slots,
+        ):
+            kernel = kernel.fn
+            launch_options = dict(BV=16, num_warps=4, num_stages=2, num_ctas=1)
+
+    kernel[grid](
         k=k,
         v=u,
         w=w,
@@ -415,5 +430,6 @@ def chunk_gated_delta_rule_fwd_h_snapshot(
         NT_BUCKET=(0 if NT <= 32 else (1 if NT <= 128 else 2)),
         USE_EXP2=use_exp2,
         EXPORT_SNAPSHOTS=snapshot_offsets is not None,
+        **launch_options,
     )
     return h, v_new

@@ -19,7 +19,7 @@ from sglang.srt.layers.attention.linear.utils import (
     build_verify_intermediate_state_indices,
 )
 from sglang.srt.layers.radix_linear_attention import RadixLinearAttention
-from sglang.srt.utils import is_cpu, is_cuda, is_npu
+from sglang.srt.utils import get_bool_env_var, is_cpu, is_cuda, is_npu
 from sglang.srt.utils.common import rank0_log
 
 # KDA always uses the triton causal_conv1d_fn (no CUDA override).
@@ -33,14 +33,56 @@ elif is_cpu():
 
     causal_conv1d_update = causal_conv1d_update_cpu
 
-from sglang.srt.model_executor.forward_batch_info import ForwardBatch
+from sglang.srt.model_executor.forward_batch_info import ForwardBatch, ForwardMode
 from sglang.srt.model_executor.model_runner import ModelRunner
 from sglang.srt.runtime_context import (
     get_disagg,
     get_exec,
     get_memory,
+    get_parallel,
     get_spec,
 )
+
+
+_AX_KDA_PREFILL_CPU_LENGTH = get_bool_env_var(
+    "SGLANG_AX_KDA_PREFILL_CPU_LENGTH", "false"
+)
+
+
+def _ax_kda_cpu_logical_tokens(forward_batch, query_start_loc, *, attn_cp_size=1):
+    """Prototype of the CPU-length part of upstream SGLang #39688.
+
+    The host list is the source of extend_seq_lens and its prefix sum. Unlike
+    extend_num_tokens, it retains logical lengths when inputs are padded.
+    Keep TBO's parent-relative offsets and unvalidated CP layouts on the old
+    path. CP metadata may be populated after backend metadata initialization,
+    so the already initialized parallel configuration is also required.
+    Decode/verify graphs use separate metadata and are unchanged.
+    """
+    if forward_batch.forward_mode not in (ForwardMode.EXTEND, ForwardMode.MIXED):
+        return None
+    if getattr(forward_batch, "tbo_parent_token_range", None) is not None:
+        return None
+    if attn_cp_size != 1 or getattr(forward_batch, "attn_cp_metadata", None) is not None:
+        return None
+    lengths = forward_batch.extend_seq_lens_cpu
+    if (
+        not isinstance(lengths, (list, tuple))
+        or len(lengths) != forward_batch.batch_size
+        or query_start_loc is None
+        or query_start_loc.shape != (len(lengths) + 1,)
+        or any(type(length) is not int or length < 0 for length in lengths)
+    ):
+        return None
+    return sum(lengths)
+
+
+def _ax_kda_resolve_logical_tokens(metadata, physical_num_tokens):
+    if _AX_KDA_PREFILL_CPU_LENGTH:
+        count = getattr(metadata, "_ax_cpu_logical_num_tokens", None)
+        if type(count) is int and 0 <= count <= physical_num_tokens:
+            return count
+    return int(metadata.query_start_loc[-1])
 
 
 class KDAKernelDispatcher:
@@ -429,6 +471,19 @@ class KDAAttnBackend(MambaAttnBackendBase):
         self.kernel_dispatcher = KDAKernelDispatcher(
             decode_backend, prefill_backend, verify_backend
         )
+        # Warm only the selected prefill implementation, before graph capture.
+        # The same Triton object can also be an unused fallback for other backends.
+        if self.kernel_dispatcher.extend_kernel is self.kernel_dispatcher.triton_kernel:
+            armed = self.kernel_dispatcher.triton_kernel.arm_prefill_prepare(
+                model_runner.device
+            )
+            if armed:
+                rank0_log("[ax] KDA prefill prepare: sm80 bf16 T=8192/16384 H=8 D=128")
+            state_armed = self.kernel_dispatcher.triton_kernel.arm_prefill_state(
+                model_runner.device
+            )
+            if state_armed:
+                rank0_log("[ax] KDA prefill state: sm80 BV16 8k:N=1 16k:N<=3")
         # One-shot; emitted at the first fused-decode interception below.
         self._fused_override_notice = (
             "K3 fused KDA decode engaged: --linear-attn-decode-backend "
@@ -533,6 +588,16 @@ class KDAAttnBackend(MambaAttnBackendBase):
 
     def init_forward_metadata(self, forward_batch: ForwardBatch):
         super().init_forward_metadata(forward_batch)
+        if _AX_KDA_PREFILL_CPU_LENGTH:
+            # Compute once per live batch, not once per KDA layer. Keep this
+            # experiment local to KDA rather than extending shared metadata.
+            self.forward_metadata._ax_cpu_logical_num_tokens = (
+                _ax_kda_cpu_logical_tokens(
+                    forward_batch,
+                    self.forward_metadata.query_start_loc,
+                    attn_cp_size=get_parallel().attn_cp_size,
+                )
+            )
         if self.forward_metadata.has_mamba_track_mask:
             self.forward_metadata.mamba_track_mask_indices = (
                 forward_batch.mamba_track_mask.nonzero(as_tuple=True)[0]
@@ -737,7 +802,9 @@ class KDAAttnBackend(MambaAttnBackendBase):
         has_initial_state = forward_batch.extend_prefix_lens > 0
 
         physical_num_tokens = mixed_qkv.shape[0]
-        logical_num_tokens = int(query_start_loc[-1])
+        logical_num_tokens = _ax_kda_resolve_logical_tokens(
+            self.forward_metadata, physical_num_tokens
+        )
         if logical_num_tokens < physical_num_tokens:
             mixed_qkv = mixed_qkv[:logical_num_tokens]
             a = a[:, :logical_num_tokens]
