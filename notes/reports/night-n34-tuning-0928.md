@@ -18,3 +18,11 @@
 预计4–8小时测量时间，另加启动、预热与排空。首臂是pdi3；每个通过N34的配置立即测自己的N38，再处理下一个参数。结果按共同ID逐项列chain修好/新坏、fast/overall/turn、TPOT及显存峰值。完整阶段日志及晋档收据保留在各任务runs/N34、N38目录。
 
 发布前检查：4个job shell语法；同固定引擎及数据，分别只改目标参数；晋档控制用真实N34失败收据、正例fixture、TTFT失败、新chain坏例、缺参考ID、raw SHA不符共6项CPU检查通过。另一参与者复核控制流；不修改原评分器。
+
+## 启动收据及 MTP 追加臂
+
+四臂已收到 QUEUED、RUNTIME_DEPLOYED、DONE rc=0；恢复队列后 eznr 引擎170秒就绪、机制检查通过、真实权重冒烟12/12，已进入 N34 3600秒派发。其 KV 容量1810112 tokens，启动报告 available_gpu_mem=9.58 GB（不是运行峰值）。
+
+第五臂 eznv：在原配置 cadence=2、relief=0、dcp=1 上启用 NEXTN，steps=3、topk=1、draft_tokens=4、draft_model=/mnt/models。同样 N34 1h，通过门后 N38 1h。注意引擎政策会随 MTP 关闭角色边界101，G_EXPECT显式检查101=off与spec=EAGLE；结果属于这一组合，不能声称纯投机收益。现有118/KDA/池400组合尚无完整MTP TP8验证，由队列先跑启动、机制与真实权重冒烟。
+
+MTP发布器使用与前四臂逐字一致的冻结运行时，等待eznu结束且队列空闲再发布，不暂停当前试验。DCP本轮保持1：它同时改变容量、分片与通信，先看MTP效果再决定下一臂。含MTP共5–10小时测量，另加启动、预热与排空。
