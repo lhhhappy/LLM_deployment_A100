@@ -449,7 +449,7 @@
   {
     "job": "130eznb-tail_rot150_n30_chainmax16k_fix_40m",
     "ref": "130ezn9-tail_rot150_n30_S1_40m（同 ID）",
-    "what": "**上传配置本身**：chain-max 16k + 修后引擎 20a58da9，不钉池，N30、rot150。作用：修后引擎的 TP8 验证（机制行 132=on 131_sync=rank0 131_chunk=auto、冒烟、开场无挂起）+ 对 S1 的 N30 chain 配对。起跑 15 分钟健康即请用户确认上传，闭合结果作记录",
+    "what": "**上传配置本身（用户要求本轮带上两项）**：chain-max 16k + 修后引擎 20a58da9，不钉池，+ SGLANG_AX_DEADLINE_MAX_WAIT_S=600（无救冷请求 600 s 才饥饿提前，warm 仍 120；规则利用：门只数条数、超时 1200 s）+ IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD=4096（Codex 归因：ezn8 的 35k/56k 头与 ezm8 的 19k 头都被同 pack 巨头按 413 token 浅前缀 held 落到 tier3，所以巨头抢先；4096 保留深前缀家族）。N30、rot150，对 ezn9 同 ID 判组合的 chain；起跑 15 分钟健康即请用户确认上传",
     "status": "已发布（ezn9 之后立刻跑）"
   }
 ]
