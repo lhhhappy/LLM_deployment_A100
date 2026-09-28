@@ -1,0 +1,47 @@
+{
+  "execution_status": "COMPLETED",
+  "evaluation_status": "FAIL",
+  "ALL_PASS": false,
+  "gates": {
+    "coverage=100%": true,
+    "harness_data==0": true,
+    "harness_render==0": true,
+    "engine_error<1%": true,
+    "infra_error<1%": true,
+    "gated_phases_have_samples": true,
+    "fast_intra(uncached_expected<=4096,<=3s)": true,
+    "overall_intra(<=5s)": true,
+    "turn_start(<=15s)": false,
+    "chain_start(<=30s)": true
+  },
+  "measurement_contract": {
+    "server_ttft_coverage=100%": true,
+    "required_for_lane": false,
+    "strict_ttft_basis": false,
+    "auto_enabled_by_lane": false,
+    "ttft_basis_no_conflict": true
+  },
+  "coverage": 1.0,
+  "reference_metrics": {
+    "note": "解释性能的参考指标；**不各自构成 SLO 硬门**。硬门见 rep['gates']。",
+    "not_slo_gates": true,
+    "rpm": 42.278548591630326,
+    "avg_active_occupancy": 21.797161938278677,
+    "configured_N_slots": 30,
+    "cache_hit_ratio": {
+      "p50": 0.9731840131511353,
+      "p90": 0.9943034697048162,
+      "p95": 0.9965067603329645,
+      "p99": 0.9983364694973956
+    },
+    "cache_hit_ratio_p50": 0.9731840131511353,
+    "wall_s": 2523.265427827835,
+    "wall_min": 42.05442379713058,
+    "completed_requests": 1778,
+    "dispatched_requests": 1778
+  }
+}
+
+判定：FAIL
+报告 /tmp/ax/runs/130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m/N30/report_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.json
+      /tmp/ax/runs/130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m/N30/report_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.md

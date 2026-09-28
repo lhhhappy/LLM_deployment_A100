@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "runner_started_s": 1790585964.4207416,
+  "n": 30,
+  "flush_success": true,
+  "runner_rc": 0,
+  "scope": "fixed_duration_diagnostic",
+  "warmup_profile": "rep16-v1",
+  "chain_start_interval_s": 0.0,
+  "short_warmup": {
+    "profile": "rep16-v1",
+    "status": "COMPLETE",
+    "started_s": 1790586130.3751419,
+    "diagnostic_only": true,
+    "n_pairs": 8,
+    "n_requests": 16,
+    "targets": [
+      8192,
+      16384,
+      32768,
+      65536,
+      98304,
+      131072,
+      196608,
+      245760
+    ],
+    "dataset_shape_buckets": 280,
+    "selected_shape_buckets": 11,
+    "missing_shape_buckets": 269,
+    "pairs": [
+      {
+        "chain_id": "scimaster:canon:a5757300-9587-4bfe-bd11-09dd757239bb:2",
+        "req_ids": [
+          "scimaster:canon:member-v5-team-member-ceca73f9db83cd4c914641f1:llm:0",
+          "scimaster:canon:lc_20260924_264:llm:0001"
+        ],
+        "prompt_tokens": [
+          8364,
+          8506
+        ],
+        "output_budgets": [
+          43,
+          310
+        ]
+      },
+      {
+        "chain_id": "scimaster:canon:fbb2ce02-6121-4079-bf81-2f21eecc849a:0",
+        "req_ids": [
+          "scimaster:canon:xaMwenOH4_XzMgPaFyJyr:llm:1",
+          "scimaster:canon:lc_20260924_303:llm:0002"
+        ],
+        "prompt_tokens": [
+          16353,
+          17116
+        ],
+        "output_budgets": [
+          57,
+          49
+        ]
+      },
+      {
+        "chain_id": "scimaster:canon:b30df580-f827-429e-8f1c-ea43dea13d37:1",
+        "req_ids": [
+          "scimaster:canon:lc_20260924_268:llm:0013",
+          "scimaster:canon:lc_20260924_268:llm:0014"
+        ],
+        "prompt_tokens": [
+          32874,
+          34950
+        ],
+        "output_budgets": [
+          321,
+          814
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:ZT1wvvLH3pU2rDwRvjiw7:0",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_104:llm:0052",
+          "biomaster:canon:lc_20260924_104:llm:0053"
+        ],
+        "prompt_tokens": [
+          65552,
+          67252
+        ],
+        "output_budgets": [
+          88,
+          236
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:cfc2174d81f348bbae623:17",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_127:llm:0011",
+          "biomaster:canon:lc_20260924_127:llm:0012"
+        ],
+        "prompt_tokens": [
+          98338,
+          98405
+        ],
+        "output_budgets": [
+          160,
+          480
+        ]
+      },
+      {
+        "chain_id": "scimaster:canon:aceb67b1-c040-4ea2-bae9-23bfeefb67a5:0",
+        "req_ids": [
+          "scimaster:canon:lc_20260924_265:llm:0076",
+          "scimaster:canon:lc_20260924_265:llm:0077"
+        ],
+        "prompt_tokens": [
+          131059,
+          130970
+        ],
+        "output_budgets": [
+          288,
+          366
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:ZT1wvvLH3pU2rDwRvjiw7:1",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_105:llm:0187",
+          "biomaster:canon:lc_20260924_105:llm:0188"
+        ],
+        "prompt_tokens": [
+          196675,
+          196798
+        ],
+        "output_budgets": [
+          210,
+          356
+        ]
+      },
+      {
+        "chain_id": "biomaster:canon:b4fd826f8b534be684537:5",
+        "req_ids": [
+          "biomaster:canon:lc_20260924_117:llm:0214",
+          "biomaster:canon:lc_20260924_117:llm:0215"
+        ],
+        "prompt_tokens": [
+          245200,
+          238890
+        ],
+        "output_budgets": [
+          167,
+          356
+        ]
+      }
+    ],
+    "plan_sha256": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+    "finished_s": 1790586216.9038692,
+    "n_completed": 16,
+    "elapsed_s": 86.52872729301453
+  },
+  "flush_started_s": 1790586217.953343,
+  "flush_http_status": 200,
+  "flush_response": {
+    "success": true,
+    "message": "Cache flushed."
+  },
+  "flush_finished_s": 1790586218.037556,
+  "runner_finished_s": 1790588763.0649147,
+  "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.jsonl",
+  "run": "run_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.json"
+}

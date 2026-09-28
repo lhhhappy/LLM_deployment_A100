@@ -1,0 +1,29 @@
+{
+  "set": "s1-dev-longchain-v5g-tail-rot150",
+  "n": 30,
+  "wall_s": 2544,
+  "base_url": "http://127.0.0.1:30000",
+  "raw": "/tmp/ax/runs/130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m/N30/raw_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.jsonl",
+  "run": "/tmp/ax/runs/130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m/N30/run_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.json",
+  "report": "/tmp/ax/runs/130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m/N30/report_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.json",
+  "score_rc": 0,
+  "ttft_p95_by_gate": {
+    "fast_intra(uncached_expected<=4096,<=3s)": 2.488415241241455,
+    "overall_intra(<=5s)": 2.9047117233276367,
+    "turn_start(<=15s)": 18.78606414794922,
+    "chain_start(<=30s)": 23.898553609848022
+  },
+  "tpm": {
+    "all": null,
+    "input": null,
+    "uncached_input_actual": null,
+    "device_work": null,
+    "decode": null,
+    "expected_uncached_input": null,
+    "cached_input": null
+  },
+  "scope": "fixed_duration_diagnostic",
+  "full_cohort_complete": false,
+  "warmup_profile": "rep16-v1",
+  "chain_start_interval_s": 0.0
+}

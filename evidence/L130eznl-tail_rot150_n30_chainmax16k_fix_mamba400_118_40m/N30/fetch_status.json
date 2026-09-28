@@ -1,0 +1,26 @@
+{
+  "size": 623780,
+  "sha256": "ae70b4d99dc3e8fad3b9084f3b598f69d2f93746da9bb50e5518472d1adf3e3e",
+  "source": "pod",
+  "run": "130eznl-tail_rot150_n30_chainmax16k_fix_mamba400_118_40m",
+  "n": 30,
+  "raw": "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.jsonl",
+  "files": [
+    "flush_evidence.json",
+    "gpu_util.csv",
+    "job.log",
+    "loadgen.log",
+    "metrics.jsonl",
+    "raw_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.jsonl",
+    "run_dev.log",
+    "run_s1-dev-longchain-v5g-tail-rot150_N30_1790586237.json",
+    "rundev_exit_code",
+    "score.log",
+    "server.log",
+    "summary.json",
+    "verdict_exit_code"
+  ],
+  "data_root": "/workspace/Agentic_science_challenge/s1-dev/data/dev-combined-v1",
+  "harness_dir": "/workspace/Agentic_science_challenge/s1-dev/harness",
+  "exit_code": 2
+}
