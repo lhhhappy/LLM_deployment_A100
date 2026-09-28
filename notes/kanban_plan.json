@@ -546,6 +546,12 @@
     "job": "130ezno-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m",
     "ref": "130eznn（钉池 + 118 + 分片 + MoE 调参，同 ID）",
     "what": "单变量：+ Codex SM80 KDA prefill 内核（3c1ca80f；引擎 bf6b66fa = 78e2bed3 + 3c1ca80f；env SGLANG_AX_KDA_PREFILL_CPU_LENGTH=1 PREPARE=1 STATE_BV16=1）。只影响 Triton prefill：prepare 融合限 BF16 [1,T,8,128] T=8k/16k，BV16 递推限 8k N=1、16k N≤3，其余回退原生。开发机合成 KDA 核心：8k 0.951→0.856 ms、16k 1.749→1.490 ms（−15%），输出/快照 rawbits 一致；KDA 只占 8k 块内核时间约 4%，预期整块 <1%。问题：chain（对 eznn）、冒烟、启动两行日志与目标形状命中、TPOT p95、池峰值",
-    "status": "已发布（eznn 之后；eznj 改到它之后）"
+    "status": "已闭合（12:55 UTC，1869 条，0 错误）。同 1844 条 ID 对 eznn：chain 6=6（同 6 条尾巴各快 2–4%）、turn 4→3、overall 18→13、fast 40→28、TPOT>0.10 83=83、均值 51.7→51.3 ms、p95 95.5→94.6 ms；稳态 chain 0=0；开场 prefill 前 60 s 18.0k 对 17.6k tok/s（+2%）；冒烟 12/12，启动两行 KDA 生效。结论：最小的一项无悔提速；候选累计 钉池+118+分片+MoE+KDA（引擎 bf6b66fa）"
+  },
+  {
+    "job": "130eznp-tail_rot150_n30_chainmax16k_fix_mamba400_118_scatter_moetune_kda_133tuned_40m",
+    "ref": "130ezno（全候选，同 ID）",
+    "what": "单变量：+ 133 decode 预算调参版（引擎 df0a06a0 = bf6b66fa + 1bdaf4a6；SPEND 1.0 / MARGIN 0.95 / MAX_ROUNDS 16，即 ezni 没读到结果的那组）。问题：调度旋钮能否再压 TPOT p95（ezno 94.6 ms）而不新增 chain 超时（开场 6、稳态 0）。任何新增 chain 超时即否决",
+    "status": "已发布（eznj 之后）"
   }
 ]
