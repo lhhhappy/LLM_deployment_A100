@@ -1,0 +1,10 @@
+{
+  "schema": "submission-authorization-v1",
+  "authorization": "User explicitly requested online submission of 0928c KDA package in this session.",
+  "engine_commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2",
+  "production_kda_commit": "3c1ca80f",
+  "candidate_sha256": "1178f8679349422b113b87af4b1998a3d51083cab880cdda20d03d728db6355d",
+  "trace_sha256": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f",
+  "image_digest": "sha256:0c2aea4df2c3e93e7b3afc60ed23eda2ea323badc4f7d899771bce360d264cc6",
+  "coordination": "Fable submit-owner notification could not be delivered: registered PID no longer exists. No submission attempt created yet."
+}

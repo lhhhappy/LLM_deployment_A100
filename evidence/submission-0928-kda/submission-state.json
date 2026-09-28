@@ -1,0 +1,12 @@
+{
+  "attempt_id": 47266,
+  "worker_job_id": 25359,
+  "status": "queued",
+  "uploaded_at_utc": "2026-09-28T15:09:01Z",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0928c",
+  "image_digest": "sha256:0c2aea4df2c3e93e7b3afc60ed23eda2ea323badc4f7d899771bce360d264cc6",
+  "engine_commit": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2",
+  "candidate_sha256": "1178f8679349422b113b87af4b1998a3d51083cab880cdda20d03d728db6355d",
+  "bundle_sha256": "c64c462b7c94897d4cafde69928b8a6de92f83495a64b26ab7f671444ceb8415",
+  "result_pending": true
+}

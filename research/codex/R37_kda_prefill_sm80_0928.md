@@ -101,5 +101,5 @@ SGLANG_AX_KDA_PREFILL_STATE_BV16=1
 
 默认全关；任何一项可以单独撤回。保留当前 prefill graph 设置，不为了本候选另开 CUDA graph。
 镜像 `lh-img:0928c` 构建成功，digest 为 `sha256:0c2aea4df2c3e93e7b3afc60ed23eda2ea323badc4f7d899771bce360d264cc6`，engine marker 为 `bf6b66fa`。Codex 核验 Dockerfile 内嵌补丁逐字节等于 `git diff 20a58da9 bf6b66fa -- engine/sglang`。
-独立候选包 `build/submit_0928_KDA/submission.json` 由现有 0928b 包仅改镜像和上述三个开关生成；[配置副本](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/submission.json)、[构建收据](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/image-build.json)。没有覆盖 Fable 的共享候选包，没有发起正式上传。
+独立候选包 `build/submit_0928_KDA/submission.json` 由现有 0928b 包仅改镜像和上述三个开关生成；[配置副本](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/submission.json)、[构建收据](../../evidence/prefill-kernels-0928/tp8-ezno-vs-eznn/image-build.json)。此处原记准备候选、尚未上传。09-28 15:09 UTC 已按用户明确授权正式提交为 **47266 / job 25359**，本轮末次独立查询仍 queued；[上传配置与完整收据](../../evidence/submission-0928-kda/README.md)。平台确认的 ZIP SHA256 与冻结包一致；这次仅创建一个 attempt。正式 N30 属上一版 47043，不能记为新 KDA 成绩。
 用户已决定能力门由线上检查，本地不再重复单独全套能力复核，也不再追加形状分支或性能调参。

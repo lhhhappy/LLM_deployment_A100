@@ -1,0 +1,21 @@
+{
+  "Dockerfile": "c62ffca58bec1d082c32cd633c28c5f06baae18af680dac9efb6f8efeef79691",
+  "Dockerfile.catalog": "4451dbfc2a95dbe64864ca5d0f25613f7a422ade60195396044558a5798e9011",
+  "README.md": "41a507f0ad46477ca468df6ee9873581773c1e925eb2b54b0868be0b4372e76c",
+  "arm_manifest.json": "57ed4baabb94acc90cd7a14912131745b5e078b6af8540ed5ea752889b00af5d",
+  "attempt-47043-current.json": "960ca00d8c8649cd64dd94fbfa919649eae10149812d3451adf87b2c4816066c",
+  "attempt-47266-initial.json": "7dba5acceb4ea9d343a6289c44e9caa8b58466c39c14a2cc0c3f5bde48fe9f5f",
+  "attempt-47266-latest.json": "7dba5acceb4ea9d343a6289c44e9caa8b58466c39c14a2cc0c3f5bde48fe9f5f",
+  "bundle-audit.json": "51127cc2be3eb71e7d85bd8fdb547d5539ab94e39bcba3d1f139de19bfc2fbe2",
+  "dry-run.json": "021da1879e055706de94f71de07d68a64c87d3b22347e6463d987de7f6d7f3a8",
+  "image-build.json": "36c624f26fd27989536c7cd31cc06990d7041d45813c76d561cdb164a7cbe0c2",
+  "image-current.json": "ad68e04340a4301e0bfcbc4e7e24b1c1b3d7f35f955ba283719c97afc83f7565",
+  "preflight.json": "fa72b56391bd4ba23521aa9a6cc43676bd5a72c6483766a6815ee817e93a142e",
+  "stub-trace.jsonl": "f01af593fe61f0380b912518be8cce2a3171708666415249c561dd1b17abdb6f",
+  "submission-state.json": "01635d28aa5018d7e9eb12259c0ea9addd449d7e3abc5d48b638cc4f3e45df55",
+  "submission.json": "1178f8679349422b113b87af4b1998a3d51083cab880cdda20d03d728db6355d",
+  "submission.zip": "c64c462b7c94897d4cafde69928b8a6de92f83495a64b26ab7f671444ceb8415",
+  "upload-exit.json": "ec236c097eaece5b21df37bebcc2f2b8decce758bbe37155d924203735f2d2fb",
+  "upload-receipt.json": "479d737c45b2c3be3b3f6ed3fa75c76b079e97ff67fcf782af16da1c5d951b8f",
+  "upload.log": "5904249242d06c081a4f4c57e2c2a5b65b83bae6e73a1965953a356a385fc738"
+}
