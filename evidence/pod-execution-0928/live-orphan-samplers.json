@@ -1,0 +1,334 @@
+{
+  "before": {
+    "epoch": 1790580505.3290954,
+    "utc": "2026-09-28T07:28:25.329095+00:00",
+    "processes": [
+      {
+        "pid": 83740,
+        "ppid": 1,
+        "cpu_seconds": 55.17,
+        "age_seconds": 247854.2,
+        "rss_bytes": 24297472,
+        "output_argument": "/tmp/ax/runs/072r-chunk_alignment_host64_n30/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/072r-chunk_alignment_host64_n30/N30/metrics.jsonl",
+            "bytes": 285612518,
+            "last_metric_epoch": 1790580496.4
+          }
+        ]
+      },
+      {
+        "pid": 748681,
+        "ppid": 1,
+        "cpu_seconds": 43.46,
+        "age_seconds": 195675.0,
+        "rss_bytes": 24494080,
+        "output_argument": "/tmp/ax/runs/086-cap6144_117_n34_60m/N34/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/086-cap6144_117_n34_60m/N34/metrics.jsonl",
+            "bytes": 223352077,
+            "last_metric_epoch": 1790580496.3
+          }
+        ]
+      },
+      {
+        "pid": 858587,
+        "ppid": 1,
+        "cpu_seconds": 41.75,
+        "age_seconds": 187195.2,
+        "rss_bytes": 24342528,
+        "output_argument": "/tmp/ax/runs/090-k9v2_base_n26/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/090-k9v2_base_n26/N26/metrics.jsonl",
+            "bytes": 213064950,
+            "last_metric_epoch": 1790580496.2
+          }
+        ]
+      },
+      {
+        "pid": 1031204,
+        "ppid": 1,
+        "cpu_seconds": 39.42,
+        "age_seconds": 177683.9,
+        "rss_bytes": 24412160,
+        "output_argument": "/tmp/ax/runs/097-v3_open_base_n26/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/097-v3_open_base_n26/N26/metrics.jsonl",
+            "bytes": 202266534,
+            "last_metric_epoch": 1790580496.4
+          }
+        ]
+      },
+      {
+        "pid": 1097663,
+        "ppid": 1,
+        "cpu_seconds": 38.39,
+        "age_seconds": 173085.9,
+        "rss_bytes": 24453120,
+        "output_argument": "/tmp/ax/runs/108-v3_46364_n26_full/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/108-v3_46364_n26_full/N26/metrics.jsonl",
+            "bytes": 197855105,
+            "last_metric_epoch": 1790580496.3
+          }
+        ]
+      },
+      {
+        "pid": 1566043,
+        "ppid": 1,
+        "cpu_seconds": 31.77,
+        "age_seconds": 142644.0,
+        "rss_bytes": 24317952,
+        "output_argument": "/tmp/ax/runs/130ec-v3_n30_A_warm15_fixes_slow250_60m/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ec-v3_n30_A_warm15_fixes_slow250_60m/N30/metrics.jsonl",
+            "bytes": 164367642,
+            "last_metric_epoch": 1790580496.3
+          }
+        ]
+      },
+      {
+        "pid": 1845857,
+        "ppid": 1,
+        "cpu_seconds": 25.21,
+        "age_seconds": 113334.3,
+        "rss_bytes": 24391680,
+        "output_argument": "/tmp/ax/runs/130ef-v3_n30_A_warm15_fixes_60m/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ef-v3_n30_A_warm15_fixes_60m/N30/metrics.jsonl",
+            "bytes": 129704400,
+            "last_metric_epoch": 1790580496.4
+          }
+        ]
+      },
+      {
+        "pid": 2215194,
+        "ppid": 1,
+        "cpu_seconds": 20.17,
+        "age_seconds": 90098.0,
+        "rss_bytes": 24252416,
+        "output_argument": "/tmp/ax/runs/130ezd-v3_n34_S1dcp_w2_multi5_30m/N34/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezd-v3_n34_S1dcp_w2_multi5_30m/N34/metrics.jsonl",
+            "bytes": 104313435,
+            "last_metric_epoch": 1790580496.6
+          }
+        ]
+      },
+      {
+        "pid": 2540436,
+        "ppid": 1,
+        "cpu_seconds": 15.75,
+        "age_seconds": 69997.3,
+        "rss_bytes": 24481792,
+        "output_argument": "/tmp/ax/runs/130ezl-v4_n26_S4_full/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezl-v4_n26_S4_full/N26/metrics.jsonl",
+            "bytes": 80915272,
+            "last_metric_epoch": 1790580496.4
+          }
+        ]
+      },
+      {
+        "pid": 2716089,
+        "ppid": 1,
+        "cpu_seconds": 6.51,
+        "age_seconds": 28971.9,
+        "rss_bytes": 24248320,
+        "output_argument": "/tmp/ax/runs/130ezn6-tail_n26_chainmax16k_short8192_40m/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezn6-tail_n26_chainmax16k_short8192_40m/N26/metrics.jsonl",
+            "bytes": 33464295,
+            "last_metric_epoch": 1790580496.3
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "epoch": 1790580517.3370838,
+    "utc": "2026-09-28T07:28:37.337084+00:00",
+    "processes": [
+      {
+        "pid": 83740,
+        "ppid": 1,
+        "cpu_seconds": 55.17,
+        "age_seconds": 247866.2,
+        "rss_bytes": 24297472,
+        "output_argument": "/tmp/ax/runs/072r-chunk_alignment_host64_n30/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/072r-chunk_alignment_host64_n30/N30/metrics.jsonl",
+            "bytes": 285635990,
+            "last_metric_epoch": 1790580516.5
+          }
+        ]
+      },
+      {
+        "pid": 748681,
+        "ppid": 1,
+        "cpu_seconds": 43.46,
+        "age_seconds": 195687.0,
+        "rss_bytes": 24494080,
+        "output_argument": "/tmp/ax/runs/086-cap6144_117_n34_60m/N34/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/086-cap6144_117_n34_60m/N34/metrics.jsonl",
+            "bytes": 223375549,
+            "last_metric_epoch": 1790580516.3
+          }
+        ]
+      },
+      {
+        "pid": 858587,
+        "ppid": 1,
+        "cpu_seconds": 41.75,
+        "age_seconds": 187207.2,
+        "rss_bytes": 24342528,
+        "output_argument": "/tmp/ax/runs/090-k9v2_base_n26/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/090-k9v2_base_n26/N26/metrics.jsonl",
+            "bytes": 213088422,
+            "last_metric_epoch": 1790580516.3
+          }
+        ]
+      },
+      {
+        "pid": 1031204,
+        "ppid": 1,
+        "cpu_seconds": 39.42,
+        "age_seconds": 177695.9,
+        "rss_bytes": 24412160,
+        "output_argument": "/tmp/ax/runs/097-v3_open_base_n26/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/097-v3_open_base_n26/N26/metrics.jsonl",
+            "bytes": 202290006,
+            "last_metric_epoch": 1790580516.4
+          }
+        ]
+      },
+      {
+        "pid": 1097663,
+        "ppid": 1,
+        "cpu_seconds": 38.39,
+        "age_seconds": 173097.9,
+        "rss_bytes": 24453120,
+        "output_argument": "/tmp/ax/runs/108-v3_46364_n26_full/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/108-v3_46364_n26_full/N26/metrics.jsonl",
+            "bytes": 197878577,
+            "last_metric_epoch": 1790580516.3
+          }
+        ]
+      },
+      {
+        "pid": 1566043,
+        "ppid": 1,
+        "cpu_seconds": 31.77,
+        "age_seconds": 142656.0,
+        "rss_bytes": 24317952,
+        "output_argument": "/tmp/ax/runs/130ec-v3_n30_A_warm15_fixes_slow250_60m/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ec-v3_n30_A_warm15_fixes_slow250_60m/N30/metrics.jsonl",
+            "bytes": 164391114,
+            "last_metric_epoch": 1790580516.4
+          }
+        ]
+      },
+      {
+        "pid": 1845857,
+        "ppid": 1,
+        "cpu_seconds": 25.21,
+        "age_seconds": 113346.3,
+        "rss_bytes": 24391680,
+        "output_argument": "/tmp/ax/runs/130ef-v3_n30_A_warm15_fixes_60m/N30/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ef-v3_n30_A_warm15_fixes_60m/N30/metrics.jsonl",
+            "bytes": 129727872,
+            "last_metric_epoch": 1790580516.5
+          }
+        ]
+      },
+      {
+        "pid": 2215194,
+        "ppid": 1,
+        "cpu_seconds": 20.18,
+        "age_seconds": 90110.0,
+        "rss_bytes": 24252416,
+        "output_argument": "/tmp/ax/runs/130ezd-v3_n34_S1dcp_w2_multi5_30m/N34/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezd-v3_n34_S1dcp_w2_multi5_30m/N34/metrics.jsonl",
+            "bytes": 104336907,
+            "last_metric_epoch": 1790580516.7
+          }
+        ]
+      },
+      {
+        "pid": 2540436,
+        "ppid": 1,
+        "cpu_seconds": 15.76,
+        "age_seconds": 70009.3,
+        "rss_bytes": 24481792,
+        "output_argument": "/tmp/ax/runs/130ezl-v4_n26_S4_full/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezl-v4_n26_S4_full/N26/metrics.jsonl",
+            "bytes": 80938744,
+            "last_metric_epoch": 1790580516.4
+          }
+        ]
+      },
+      {
+        "pid": 2716089,
+        "ppid": 1,
+        "cpu_seconds": 6.52,
+        "age_seconds": 28983.9,
+        "rss_bytes": 24248320,
+        "output_argument": "/tmp/ax/runs/130ezn6-tail_n26_chainmax16k_short8192_40m/N26/metrics.jsonl",
+        "fds": [
+          {
+            "fd": "3",
+            "target": "/dev/shm/arena-runtime/ax/runs/130ezn6-tail_n26_chainmax16k_short8192_40m/N26/metrics.jsonl",
+            "bytes": 33487767,
+            "last_metric_epoch": 1790580516.4
+          }
+        ]
+      }
+    ]
+  }
+}

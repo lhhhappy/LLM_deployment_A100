@@ -1,0 +1,71 @@
+{
+  "source": "evidence/pod-execution-0928/live-cap-full-results.txt",
+  "sha256": "2a5022251a8fcd8a6e5890afc7f75e3be86680c78c0bb76b1e12f93458b44b5c",
+  "quality_gate_pass": null,
+  "datasets": {
+    "aime": {
+      "attempts": 30,
+      "transport_success": 30,
+      "correct": 25,
+      "error_count": 0,
+      "truncated": 5,
+      "wrong_non_error": 5,
+      "wrong_non_truncated": 0,
+      "error_types": {},
+      "truncated_metadata": [
+        {
+          "id": "aime26-09",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1100.6
+        },
+        {
+          "id": "aime26-10",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1100.6
+        },
+        {
+          "id": "aime26-15",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1100.6
+        },
+        {
+          "id": "aime26-29",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1100.6
+        },
+        {
+          "id": "aime26-30",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1100.0
+        }
+      ]
+    },
+    "gpqa": {
+      "attempts": 197,
+      "transport_success": 109,
+      "correct": 99,
+      "error_count": 88,
+      "truncated": 1,
+      "wrong_non_error": 10,
+      "wrong_non_truncated": 9,
+      "error_types": {
+        "Remote end closed connection without response": 12,
+        "<urlopen error [Errno 111] Connection refused>": 76
+      },
+      "truncated_metadata": [
+        {
+          "id": "gpqa-061",
+          "finish": "length",
+          "completion_tokens": 60000,
+          "secs": 1069.6
+        }
+      ]
+    }
+  },
+  "scope": "INCOMPLETE_CAPABILITY_CHECK"
+}

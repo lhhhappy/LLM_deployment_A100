@@ -1,0 +1,101 @@
+[2026-09-28 07:31:36] INFO:     127.0.0.1:36688 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:36] INFO:     127.0.0.1:36698 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:36] INFO:     127.0.0.1:36710 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:36 TP0] Decode batch, #running-req: 12, #full token: 289344, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 666.82, #queue-req: 0
+[2026-09-28 07:31:36] INFO:     127.0.0.1:36724 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:37] INFO:     127.0.0.1:36728 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:37] INFO:     127.0.0.1:36742 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:37] INFO:     127.0.0.1:36746 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:37] INFO:     127.0.0.1:36752 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:37 TP0] Decode batch, #running-req: 12, #full token: 289856, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 667.00, #queue-req: 0
+[2026-09-28 07:31:38 TP0] Decode batch, #running-req: 12, #full token: 290304, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 667.47, #queue-req: 0
+[2026-09-28 07:31:38] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', 'c3cb9facc3d243a9908f5aa181990d7f', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '3259f1976e0a42fd8223574d6ede0183'].
+[2026-09-28 07:31:39 TP0] Decode batch, #running-req: 12, #full token: 290816, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 669.30, #queue-req: 0
+[2026-09-28 07:31:39 TP0] Decode batch, #running-req: 12, #full token: 291264, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 665.89, #queue-req: 0
+[2026-09-28 07:31:40 TP0] Decode batch, #running-req: 12, #full token: 291712, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 667.40, #queue-req: 0
+[2026-09-28 07:31:41 TP0] Decode batch, #running-req: 12, #full token: 292352, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 667.30, #queue-req: 0
+[2026-09-28 07:31:42 TP0] Decode batch, #running-req: 12, #full token: 292672, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 667.24, #queue-req: 0
+[2026-09-28 07:31:42 TP0] Decode batch, #running-req: 12, #full token: 293184, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 665.31, #queue-req: 0
+[2026-09-28 07:31:42] INFO:     127.0.0.1:37352 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+[2026-09-28 07:31:43 TP0] Prefill batch, #new-seq: 1, #new-token: 320, #cached-token: 0, full token usage: 0.22, mamba usage: 0.06, #running-req: 11, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 38.36
+[2026-09-28 07:31:43 TP0] Decode batch, #running-req: 12, #full token: 280576, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 552.46, #queue-req: 0
+[2026-09-28 07:31:43] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '3259f1976e0a42fd8223574d6ede0183', '11699c348a1643e0b12f0ee754c0aa71'].
+[2026-09-28 07:31:44] INFO:     127.0.0.1:42396 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+[2026-09-28 07:31:44 TP0] Prefill batch, #new-seq: 1, #new-token: 256, #cached-token: 0, full token usage: 0.22, mamba usage: 0.06, #running-req: 11, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 212.88
+[2026-09-28 07:31:44 TP0] Decode batch, #running-req: 12, #full token: 280576, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 559.67, #queue-req: 0
+[2026-09-28 07:31:45 TP0] Decode batch, #running-req: 12, #full token: 281088, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 675.09, #queue-req: 0
+[2026-09-28 07:31:45 TP0] Decode batch, #running-req: 12, #full token: 281536, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.89, #queue-req: 0
+[2026-09-28 07:31:46 TP0] Decode batch, #running-req: 12, #full token: 282048, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.80, #queue-req: 0
+[2026-09-28 07:31:46] INFO:     127.0.0.1:60952 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:46] INFO:     127.0.0.1:60954 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:46] INFO:     127.0.0.1:60970 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:46] INFO:     127.0.0.1:60976 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:46] INFO:     127.0.0.1:60988 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47] INFO:     127.0.0.1:60990 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47] INFO:     127.0.0.1:60996 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47] INFO:     127.0.0.1:32768 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47] INFO:     127.0.0.1:32782 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47] INFO:     127.0.0.1:32798 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:47 TP0] Decode batch, #running-req: 12, #full token: 282624, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 674.05, #queue-req: 0
+[2026-09-28 07:31:48 TP0] Decode batch, #running-req: 12, #full token: 282944, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.69, #queue-req: 0
+[2026-09-28 07:31:48 TP0] Decode batch, #running-req: 12, #full token: 283520, full token usage: 0.22, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 673.78, #queue-req: 0
+[2026-09-28 07:31:48] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '11699c348a1643e0b12f0ee754c0aa71', 'efcdf6ac68e749a5848f8164a20f1402'].
+[2026-09-28 07:31:49 TP0] Decode batch, #running-req: 12, #full token: 283968, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.39, #queue-req: 0
+[2026-09-28 07:31:50 TP0] Decode batch, #running-req: 12, #full token: 284416, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 676.08, #queue-req: 0
+[2026-09-28 07:31:50 TP0] Decode batch, #running-req: 12, #full token: 284928, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 676.30, #queue-req: 0
+[2026-09-28 07:31:51 TP0] Decode batch, #running-req: 12, #full token: 285376, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 677.50, #queue-req: 0
+[2026-09-28 07:31:52 TP0] Decode batch, #running-req: 12, #full token: 285888, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 674.16, #queue-req: 0
+[2026-09-28 07:31:53 TP0] Decode batch, #running-req: 12, #full token: 286464, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.33, #queue-req: 0
+[2026-09-28 07:31:53 TP0] Decode batch, #running-req: 12, #full token: 286784, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 672.27, #queue-req: 0
+[2026-09-28 07:31:53] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '11699c348a1643e0b12f0ee754c0aa71', 'efcdf6ac68e749a5848f8164a20f1402'].
+[2026-09-28 07:31:54 TP0] Decode batch, #running-req: 12, #full token: 287360, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.47, #queue-req: 0
+[2026-09-28 07:31:55 TP0] Decode batch, #running-req: 12, #full token: 287808, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.42, #queue-req: 0
+[2026-09-28 07:31:55 TP0] Decode batch, #running-req: 12, #full token: 288256, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.91, #queue-req: 0
+[2026-09-28 07:31:56 TP0] Decode batch, #running-req: 12, #full token: 288768, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 673.88, #queue-req: 0
+[2026-09-28 07:31:56] INFO:     127.0.0.1:34166 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:56] INFO:     127.0.0.1:34176 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:56] INFO:     127.0.0.1:34188 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:56] INFO:     127.0.0.1:34190 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34194 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34196 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34206 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34216 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34232 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57] INFO:     127.0.0.1:34238 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:31:57 TP0] Decode batch, #running-req: 12, #full token: 289216, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 674.79, #queue-req: 0
+[2026-09-28 07:31:57 TP0] Decode batch, #running-req: 12, #full token: 289728, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 672.59, #queue-req: 0
+[2026-09-28 07:31:58 TP0] Decode batch, #running-req: 12, #full token: 290304, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 673.89, #queue-req: 0
+[2026-09-28 07:31:58] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '11699c348a1643e0b12f0ee754c0aa71', 'efcdf6ac68e749a5848f8164a20f1402'].
+[2026-09-28 07:31:59 TP0] Decode batch, #running-req: 12, #full token: 290624, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 679.30, #queue-req: 0
+[2026-09-28 07:32:00 TP0] Decode batch, #running-req: 12, #full token: 291200, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 674.61, #queue-req: 0
+[2026-09-28 07:32:00 TP0] Decode batch, #running-req: 12, #full token: 291648, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 673.10, #queue-req: 0
+[2026-09-28 07:32:01 TP0] Decode batch, #running-req: 12, #full token: 292096, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 675.47, #queue-req: 0
+[2026-09-28 07:32:02 TP0] Decode batch, #running-req: 12, #full token: 292608, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.32, #queue-req: 0
+[2026-09-28 07:32:02 TP0] Decode batch, #running-req: 12, #full token: 293056, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 672.40, #queue-req: 0
+[2026-09-28 07:32:03 TP0] Decode batch, #running-req: 12, #full token: 293568, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.84, #queue-req: 0
+[2026-09-28 07:32:03] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '11699c348a1643e0b12f0ee754c0aa71', 'efcdf6ac68e749a5848f8164a20f1402'].
+[2026-09-28 07:32:04 TP0] Decode batch, #running-req: 12, #full token: 294144, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.93, #queue-req: 0
+[2026-09-28 07:32:05 TP0] Decode batch, #running-req: 12, #full token: 294464, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 670.03, #queue-req: 0
+[2026-09-28 07:32:05 TP0] Decode batch, #running-req: 12, #full token: 295040, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 674.81, #queue-req: 0
+[2026-09-28 07:32:06 TP0] Decode batch, #running-req: 12, #full token: 295488, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.84, #queue-req: 0
+[2026-09-28 07:32:06] INFO:     127.0.0.1:53714 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:06] INFO:     127.0.0.1:53722 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:06] INFO:     127.0.0.1:53734 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53746 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53750 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53766 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53778 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53792 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53802 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07] INFO:     127.0.0.1:53818 - "GET /metrics HTTP/1.1" 200 OK
+[2026-09-28 07:32:07 TP0] Decode batch, #running-req: 12, #full token: 295936, full token usage: 0.23, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.12, #queue-req: 0
+[2026-09-28 07:32:07 TP0] Decode batch, #running-req: 12, #full token: 296448, full token usage: 0.24, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 672.81, #queue-req: 0
+[2026-09-28 07:32:08 TP0] Decode batch, #running-req: 12, #full token: 296896, full token usage: 0.24, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 671.74, #queue-req: 0
+[2026-09-28 07:32:08] Gracefully exiting... Remaining number of requests 12. Remaining requests remaining_rids=['d37d8be4eece4ea69cb44741d9295a4f', '32af27af4a714a21bff42ee55f6e5be4', '41c7d4effbd0401ca1c51124add02ba5', '8373e9e1bede48dfb57e5ff50fc8ffd2', '2cbd2f80772646d699acf15d9c995e57', 'd3d72100f4214278a7950cda3dcc65c4', '735d6374d0ba4f10abc15418c6598ae4', '55790c9271ba4e249eb434f479f03aed', '6e010bb6fc4c45a88a954afbb0a035a7', 'fff0140e73c846238f84ce91f8ed399e', '11699c348a1643e0b12f0ee754c0aa71', 'efcdf6ac68e749a5848f8164a20f1402'].
+[2026-09-28 07:32:09 TP0] Decode batch, #running-req: 12, #full token: 297408, full token usage: 0.24, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 672.48, #queue-req: 0
+[2026-09-28 07:32:10 TP0] Decode batch, #running-req: 12, #full token: 297984, full token usage: 0.24, mamba num: 43, mamba usage: 0.06, cuda graph: True, gen throughput (token/s): 677.23, #queue-req: 0
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked shared_memory objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+exit_code: 0

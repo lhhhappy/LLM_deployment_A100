@@ -1,0 +1,2 @@
+CAP_FULL aime=25/30 gpqa=99/197 errors=88 truncated=6 mean_tokens aime=19898 gpqa=4714 wall=2745s
+exit_code: 0

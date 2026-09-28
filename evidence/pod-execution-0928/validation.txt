@@ -1,0 +1,7 @@
+130eznb: raw/drain/timestamps/token counts passed; chain p95 30.304740667 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+130eznc: raw/drain/timestamps/token counts passed; chain p95 24.234396219 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+130ezne: raw/drain/timestamps/token counts passed; chain p95 30.092107058 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+130eznf: raw/drain/timestamps/token counts passed; chain p95 31.663106203 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+130ezn3: raw/drain/timestamps/token counts passed; chain p95 24.755746365 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+130ezn5: raw/drain/timestamps/token counts passed; chain p95 23.303087234 matches saved harness; TPOT matches harness q; no selected error markers in measured window
+capability: 227 unique IDs; 88 transport errors; 6 length-truncated; INCOMPLETE_CAPABILITY_CHECK

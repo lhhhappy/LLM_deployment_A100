@@ -1,0 +1,14 @@
+total 1240
+drwxr-xr-x   2 root root     240 Sep 28 07:32 .
+drwxr-xr-x 164 root root    3280 Sep 28 07:31 ..
+-rw-r--r--   1 root root      98 Sep 28 07:32 cap_full.log
+-rw-r--r--   1 root root   40992 Sep 28 07:32 cap_full_results.json
+-rw-r--r--   1 root root    1831 Sep 28 06:46 cap_results.json
+-rw-r--r--   1 root root    1701 Sep 28 06:41 deployment-receipt.json
+-rw-r--r--   1 root root       4 Sep 28 07:29 exit_code
+-rw-r--r--   1 root root    6452 Sep 28 07:32 job.log
+-rw-r--r--   1 root root    1205 Sep 28 06:44 problems.json
+-rw-r--r--   1 root root 1186085 Sep 28 07:32 server.log
+-rw-r--r--   1 root root       8 Sep 28 06:41 server.pid
+-rw-r--r--   1 root root    1645 Sep 28 06:46 smoke.log
+exit_code: 0
