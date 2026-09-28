@@ -1,0 +1,20 @@
+{
+  "checked_utc": "2026-09-28T16:08:45Z",
+  "running": "130eznr-tail_rot150_n34_kda_night_pdi3_1h_ladder",
+  "phase": "N34 timed diagnostic 3600 seconds; engine ready; smoke 12/12",
+  "pending": [
+    "130ezns",
+    "130eznt",
+    "130eznu"
+  ],
+  "mtp_deferred_publisher": {
+    "state": "running; waiting for eznu completion and empty queue",
+    "bundle": "build/queue/queue-after-0928-night-mtp",
+    "remote_log": "/sjtu/linhang/arena/runs/jobs/queue-after-0928-night-mtp.log",
+    "tmux_socket": "/sjtu/linhang/arena/runs/jobs/codex-mtp-0928.sock",
+    "candidate": "130eznv",
+    "published_to_pod": false
+  },
+  "clean_branch": "codex/night-n34-0928",
+  "commit": "1b91122f"
+}
