@@ -1,6 +1,6 @@
 # 124：跨多轮停车与可救冷头抢占
 
-**状态：默认关闭；CPU 调度/生命周期测试与 8 进程 Gloo 通过，TP8 状态与 chain 净收益待测。**
+**状态：默认关闭；c4d01e56 经 Fable 独立审查通过，CPU 调度/生命周期测试与 8 进程 Gloo 通过，TP8 状态与 chain 净收益待测。**
 底为 FINAL 的 `20a58da9` 引擎（交付文档底 `6fa82ab7`）。不改 47043 的镜像、启动参数或当前队列。
 
 开启：`SGLANG_AX_MULTI_ROUND_PARK=1`；机制收据必须含 `124m=on`，关闭为 `124m=off`。
@@ -77,3 +77,29 @@ TP8 尚需：
 3. FINAL 配置仅加 `SGLANG_AX_MULTI_ROUND_PARK=1`、`G_EXPECT+=124m=on`，rot150/N30 相同派发窗口并排空，对 eznb。优先同提交 OFF 孪生；对 eznb 是跨提交默认关闭代码对照，须明确标记。
 
 第一行报告 chain **救回/新增/净减少**，再分开场/稳态与原始头类型；同时报告派发 ID 集合差异、暂停次数/时长、A 最终覆盖率、TPOT p95、fast 代价。闭环中的同 ID 配对仅用于归因，不能替代完整派发与排空。尚无 chain 收益结论，不并入上传候选。
+
+### 固定输入短状态探针（已备，待 TP8 执行）
+
+任务入口：[`tp8_124m_state_on.sh`](../../scripts/pod/jobs/tp8_124m_state_on.sh) 与
+[`tp8_124m_state_off.sh`](../../scripts/pod/jobs/tp8_124m_state_off.sh)，客户端
+[`multiround_park_probe.py`](../../scripts/pod/verify/multiround_park_probe.py)。
+两臂引擎都固定 c4d01e56，均在 FINAL 参数上把 **测试用冷预算设为 8 s**，只有 124m 开关不同。
+该预算让无其他负载的 196k A 也被判不可救，从而确定地尝试救援 33.5k B；是否真的让路仍须看日志。
+合成 token IDs 只用来测驻留状态，不替换比赛数据，不用于能力门或 SLO。
+
+每臂请求阶段上限 240 s，异常清理只取消自己的 RID 前缀；启动另计。按近期约 170 s 启动，一臂预计在 10 分钟内，冷 JIT 或加载变慢时不能保证总墙钟。无需重建镜像；make_kit 已加入客户端。由队列负责人排队，审阅工具不发送 GPU 请求。
+
+- ON：A 长度 196608−1、196608、196608+1；另先算 4097-token 前缀再分叉，要求 A 实际有部分命中。A 首次入批后 1.2 s 发 B，必须看到 `yield`、恢复和每个完整请求唯一的首 token 记录。
+- 暂停 A 与活动 B 分别 abort，检查真实 terminal 记录及另一个请求完成；暂停中 flush 必须拒绝，完全排空后必须成功；abort 后重放长请求。首版不发全局 abort_all。
+- OFF：同输入、同到达触发重复两次。收集输出 IDs、有限 logprobs/top-8 与时间，不采集巨量 input logprobs。ON/OFF 的数值判断独立于状态结果；token 分歧之后不再比较不同条件下的 logprob。
+- 无实际 yield、没命中种子前缀、缺恢复/首 token、错误或请求阶段超时均记 INVALID/NOT_COVERED。STATE_PASS 仅表示以上覆盖通过，**不等于数值通过、完整 KV/KDA 张量相等或 N30 通过**。日志原文和响应留在本次 run，不覆盖旧目录。
+
+两臂闭合后：
+
+```bash
+python3 -B scripts/pod/verify/multiround_park_probe.py compare \
+  --off /path/to/off/probe/receipt.json --on /path/to/on/probe/receipt.json \
+  --out /path/to/numeric-comparison.json
+```
+
+只有 ON 的逐 token logprob 都落在两次 OFF 的观测范围内，才记 WITHIN_OBSERVED_OFF_NOISE；否则保留原值给独立复核，不设凭空容差、不自动宣称错误。此短测不覆盖高 KV 压力回滚、强制 lease 到期及全局 abort_all；前者还须在 N30 配对中按 rollback/decline、驻留占用与失败请求一起解释。
