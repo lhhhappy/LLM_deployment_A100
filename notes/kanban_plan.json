@@ -440,9 +440,9 @@
     "status": "已发布（ezn8 之后）"
   },
   {
-    "job": "130ezna-tail_rot150_n30_chainmax16k_mamba400_40m",
+    "job": "130ezna-tail_rot150_n30_chainmax16k_mamba400_fix_40m",
     "ref": "130ezn9-tail_rot150_n30_S1_40m（同 ID）",
-    "what": "上传候选（chain-max 16k + KDA 池钉 400）在 N30、rot150 上：对 S1 同 ID 看 fast 是否在余量内、稳态 TPOT>0.10 是否远离 5%、链首漏对 S1 的变化",
-    "status": "已发布（ezn9 之后）"
+    "what": "上传候选在 N30、rot150：chain-max 16k + KDA 池钉 400，**引擎换成 Codex 修后的 20a58da9**（131：rank0 广播 decode 间隔、成本模型用本批实际冷块而非固定 8k、计入在飞批成本；132：机制行报告 + 缺 124 明确拒绝；G_EXPECT 加 132=on 131_sync=rank0 131_chunk=auto，G_ENV 显式 CHAIN_RISK_CHUNK=0、SCHED_COLD_CAP_MAX=0）。既是 N30 配对（对 ezn9 同 ID）也是修后引擎的 TP8 验证（有无挂起/错误、机制行）。判定同前：链首漏对 S1、fast 余量、稳态 TPOT>0.10 远离 5%",
+    "status": "已发布（ezn8 之后插入，名字序在 ezn9 之后）"
   }
 ]
