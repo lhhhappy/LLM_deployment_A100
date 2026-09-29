@@ -1,0 +1,47 @@
+[
+  {
+    "job": "130eznw1-tail_rot150_n34_fast5h_short4096.sh",
+    "changes": {
+      "SGLANG_AX_SCHED_SHORT_TOKENS=2048": "SGLANG_AX_SCHED_SHORT_TOKENS=4096"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_fast5h_short4096.sh",
+    "seconds": 3600,
+    "N": 34
+  },
+  {
+    "job": "130eznw2-tail_rot150_n34_fast5h_pdi1risk0.sh",
+    "changes": {
+      "--prefill-decode-interval 2": "--prefill-decode-interval 1",
+      "SGLANG_AX_CHAIN_RISK_INTERVAL=1": "SGLANG_AX_CHAIN_RISK_INTERVAL=0"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_fast5h_pdi1risk0.sh",
+    "seconds": 3600,
+    "N": 34
+  },
+  {
+    "job": "130eznw3-tail_rot150_n34_fast5h_cold12k.sh",
+    "changes": {
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_fast5h_cold12k.sh",
+    "seconds": 3600,
+    "N": 34
+  },
+  {
+    "job": "130eznw4-tail_rot150_n34_fast5h_short4096_cold12k.sh",
+    "changes": {
+      "SGLANG_AX_SCHED_SHORT_TOKENS=2048": "SGLANG_AX_SCHED_SHORT_TOKENS=4096",
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_fast5h_short4096_cold12k.sh",
+    "seconds": 3600,
+    "N": 34
+  },
+  {
+    "job": "130eznw5-tail_rot150_n34_fast5h_control.sh",
+    "changes": {},
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/tail_rot150_n34_fast5h_control.sh",
+    "seconds": 3600,
+    "N": 34
+  }
+]
