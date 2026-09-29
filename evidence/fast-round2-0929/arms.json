@@ -1,0 +1,57 @@
+[
+  {
+    "job": "130eznx1-n38_fast2_cold12k.sh",
+    "N": 38,
+    "seconds": 3600,
+    "changes": {
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/fast_round2_n38_cold12k.sh",
+    "conditional": false
+  },
+  {
+    "job": "130eznx2-n38_fast2_short4096_cold12k.sh",
+    "N": 38,
+    "seconds": 3600,
+    "changes": {
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288",
+      "SGLANG_AX_SCHED_SHORT_TOKENS=2048": "SGLANG_AX_SCHED_SHORT_TOKENS=4096"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/fast_round2_n38_short4096_cold12k.sh",
+    "conditional": false
+  },
+  {
+    "job": "130eznx3-n34_fast2_demand12to16.sh",
+    "N": 34,
+    "seconds": 3600,
+    "changes": {
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288",
+      "SGLANG_AX_SCHED_COLD_CAP_MAX=0": "SGLANG_AX_SCHED_COLD_CAP_MAX=16384",
+      "126=off": "126=on"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/fast_round2_n34_demand12to16.sh",
+    "conditional": false
+  },
+  {
+    "job": "130eznx4-n34_fast2_pool320.sh",
+    "N": 34,
+    "seconds": 3600,
+    "changes": {
+      "--max-mamba-cache-size 400": "--max-mamba-cache-size 320"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/fast_round2_n34_pool320.sh",
+    "conditional": false
+  },
+  {
+    "job": "130eznx5-n38_fast2_demand12to16.sh",
+    "N": 38,
+    "seconds": 3600,
+    "changes": {
+      "SGLANG_AX_SCHED_COLD_CAP=16384": "SGLANG_AX_SCHED_COLD_CAP=12288",
+      "SGLANG_AX_SCHED_COLD_CAP_MAX=0": "SGLANG_AX_SCHED_COLD_CAP_MAX=16384",
+      "126=off": "126=on"
+    },
+    "source": "/workspace/Agentic_science_challenge/build/worktrees/night-n34-0928/scripts/pod/jobs/fast_round2_n38_demand12to16.sh",
+    "conditional": true
+  }
+]

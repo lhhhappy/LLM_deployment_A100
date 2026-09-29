@@ -1,0 +1,284 @@
+{
+  "utc": "2026-09-29T08:42:57.825854+00:00",
+  "hostname": "lh-arena-sess-b-5bb8db8565-ktgp9",
+  "workspace_env": "/dev/shm/arena-runtime",
+  "workspace_entries": [
+    {
+      "name": "archive-receipts",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "bin",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "cache",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "codex",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "data",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "engine",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "engine.sig",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "engine_current.log",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "engine_log_path",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "incoming",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "queue",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "runs",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "runtime-deployment.json",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "s1",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "src",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "staging",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "tmp",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "verify_kit",
+      "is_dir": true,
+      "symlink": false
+    },
+    {
+      "name": "worker.log",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "worker.out",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "worker.pid",
+      "is_dir": false,
+      "symlink": false
+    },
+    {
+      "name": "workspace-layout.json",
+      "is_dir": false,
+      "symlink": false
+    }
+  ],
+  "paths": {
+    "/": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/",
+      "total_bytes": 471952154624,
+      "available_bytes": 198797598720,
+      "free_inodes": 27846136,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/tmp": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/tmp",
+      "total_bytes": 471952154624,
+      "available_bytes": 198797598720,
+      "free_inodes": 27846136,
+      "mount": {
+        "path": "/",
+        "options": "rw,relatime",
+        "filesystem": "overlay",
+        "source": "overlay"
+      }
+    },
+    "/tmp/ax": {
+      "exists": true,
+      "symlink": true,
+      "resolved": "/dev/shm/arena-runtime/ax",
+      "total_bytes": 809601335296,
+      "available_bytes": 588251385856,
+      "free_inodes": 263822805,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/dev/shm": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/dev/shm",
+      "total_bytes": 809601335296,
+      "available_bytes": 588251385856,
+      "free_inodes": 263822805,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/dev/shm/arena-runtime": {
+      "exists": true,
+      "symlink": false,
+      "resolved": "/dev/shm/arena-runtime",
+      "total_bytes": 809601335296,
+      "available_bytes": 588251385856,
+      "free_inodes": 263822805,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/root/.cache": {
+      "exists": true,
+      "symlink": true,
+      "resolved": "/dev/shm/arena-runtime/ax/cache/legacy-root/cache",
+      "total_bytes": 809601335296,
+      "available_bytes": 588251385856,
+      "free_inodes": 263822805,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/root/.triton": {
+      "exists": true,
+      "symlink": true,
+      "resolved": "/dev/shm/arena-runtime/ax/cache/legacy-root/triton",
+      "total_bytes": 809601335296,
+      "available_bytes": 588251385856,
+      "free_inodes": 263822805,
+      "mount": {
+        "path": "/dev/shm",
+        "options": "rw,relatime",
+        "filesystem": "tmpfs",
+        "source": "tmpfs"
+      }
+    },
+    "/workspace": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/workspace"
+    },
+    "/vllm-workspace": {
+      "exists": false,
+      "symlink": false,
+      "resolved": "/vllm-workspace"
+    }
+  },
+  "cgroup": {
+    "memory/memory.limit_in_bytes": "1620276412416",
+    "memory/memory.usage_in_bytes": "1097097256960",
+    "memory/memory.stat": "cache 1061947527168\nrss 33733881856\nrss_huge 11416895488\nshmem 733576605696\nmapped_file 513488068608\ndirty 1622016\nwriteback 1351680\nswap 0\npgpgin 17621520477\npgpgout 17356808644\npgfault 21016728315\npgmajfault 554829\ninactive_anon 562754965504\nactive_anon 204655976448\ninactive_file 1300889600\nactive_file 328378810368\nunevictable 6623232\nhierarchical_memory_limit 1620276412416\nhierarchical_memsw_limit 1620276412416\ntotal_cache 1061947527168\ntotal_rss 33733881856\ntotal_rss_huge 11416895488\ntotal_shmem 733576605696\ntotal_mapped_file 513488068608\ntotal_dirty 1622016\ntotal_writeback 1351680\ntotal_swap 0\ntotal_pgpgin 17621520477\ntotal_pgpgout 17356808644\ntotal_pgfault 21016728315\ntotal_pgmajfault 554829\ntotal_inactive_anon 562754965504\ntotal_active_anon 204655976448\ntotal_inactive_file 1300889600\ntotal_active_file 328378810368\ntotal_unevictable 6623232",
+    "memory/memory.failcnt": "0"
+  },
+  "directory_usage": {
+    "/tmp": {
+      "rc": 0,
+      "stdout": "8192\t/tmp/ax.empty-before-tmpfs-1790317198106411699\n4096\t/tmp/torchinductor_root\n4096\t/tmp/wheels\n1327104\t/tmp/gdrcopy-2.5.1\n5394432\t/tmp\n",
+      "stderr": ""
+    },
+    "/root/.cache": {
+      "rc": 0,
+      "stdout": "4096\t/dev/shm/arena-runtime/ax/cache/legacy-root/cache/sglang\n12288\t/dev/shm/arena-runtime/ax/cache/legacy-root/cache/huggingface\n11190272\t/dev/shm/arena-runtime/ax/cache/legacy-root/cache/pip\n11206656\t/dev/shm/arena-runtime/ax/cache/legacy-root/cache\n",
+      "stderr": ""
+    },
+    "/root/.triton": {
+      "rc": 0,
+      "stdout": "0\t/dev/shm/arena-runtime/ax/cache/legacy-root/triton\n",
+      "stderr": ""
+    },
+    "/dev/shm/arena-runtime": {
+      "rc": 0,
+      "stdout": "220798599168\t/dev/shm/arena-runtime/ax\n220798599168\t/dev/shm/arena-runtime\n",
+      "stderr": ""
+    }
+  },
+  "gpus": {
+    "rc": 0,
+    "stdout": "0, NVIDIA A100-SXM4-80GB, 81920, 75540, 0\n1, NVIDIA A100-SXM4-80GB, 81920, 75328, 0\n2, NVIDIA A100-SXM4-80GB, 81920, 75328, 0\n3, NVIDIA A100-SXM4-80GB, 81920, 75328, 0\n4, NVIDIA A100-SXM4-80GB, 81920, 75326, 0\n5, NVIDIA A100-SXM4-80GB, 81920, 75328, 0\n6, NVIDIA A100-SXM4-80GB, 81920, 75042, 0\n7, NVIDIA A100-SXM4-80GB, 81920, 75328, 0\n",
+    "stderr": ""
+  },
+  "runtime_abi": {
+    "driver": {
+      "rc": 0,
+      "stdout": "580.105.08\n580.105.08\n580.105.08\n580.105.08\n580.105.08\n580.105.08\n580.105.08\n580.105.08\n",
+      "stderr": ""
+    },
+    "libc": {
+      "rc": 0,
+      "stdout": "ldd (Ubuntu GLIBC 2.39-0ubuntu8.8) 2.39\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\nWritten by Roland McGrath and Ulrich Drepper.\n",
+      "stderr": ""
+    },
+    "python": {
+      "rc": 0,
+      "stdout": "Python 3.12.3\n",
+      "stderr": ""
+    },
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo"
+  },
+  "gpu_processes": {
+    "rc": 0,
+    "stdout": "2974830, python3, 494\n2974978, sglang::scheduler_TP0, 74910\n2975111, sglang::scheduler_TP1, 75198\n2975251, sglang::scheduler_TP2, 75198\n2975457, sglang::scheduler_TP3, 75198\n2975664, sglang::scheduler_TP4, 75196\n2975867, sglang::scheduler_TP5, 75198\n2976079, sglang::scheduler_TP6, 74912\n2976287, sglang::scheduler_TP7, 75198\n",
+    "stderr": ""
+  },
+  "limits": "statvfs describes backing filesystems, not Pod ephemeral quota/usage; du includes visible image files"
+}

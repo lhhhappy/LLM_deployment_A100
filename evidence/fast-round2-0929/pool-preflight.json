@@ -1,0 +1,90 @@
+{
+  "files": [
+    "/tmp/ax/runs/130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder/N38/metrics.jsonl",
+    "/tmp/ax/runs/130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder/N34/metrics.jsonl"
+  ],
+  "levels": {
+    "N34": {
+      "samples": 365,
+      "mamba_used_tokens": {
+        "min": 12.0,
+        "max": 145.0
+      },
+      "mamba_available_tokens": {
+        "min": 0.0,
+        "max": 373.0
+      },
+      "mamba_evictable_tokens": {
+        "min": 4.0,
+        "max": 316.0
+      },
+      "mamba_usage": {
+        "min": 0.03,
+        "max": 0.3625
+      },
+      "token_usage": {
+        "min": 0.06,
+        "max": 1.0
+      },
+      "kv_available_tokens": {
+        "min": 320.0,
+        "max": 1745088.0
+      },
+      "num_retracted_reqs": {
+        "min": 0.0,
+        "max": 0.0
+      },
+      "hicache_host_used_tokens": {
+        "min": 33792.0,
+        "max": 3808512.0
+      },
+      "mamba_used_plus_evictable_max": 400.0,
+      "hicache_backup_bytes_total": {
+        "start": 109114597376.0,
+        "end": 2958476091392.0,
+        "delta": 2849361494016.0
+      }
+    },
+    "N38": {
+      "samples": 370,
+      "mamba_used_tokens": {
+        "min": 8.0,
+        "max": 159.0
+      },
+      "mamba_available_tokens": {
+        "min": 0.0,
+        "max": 359.0
+      },
+      "mamba_evictable_tokens": {
+        "min": 5.0,
+        "max": 308.0
+      },
+      "mamba_usage": {
+        "min": 0.02,
+        "max": 0.3975
+      },
+      "token_usage": {
+        "min": 0.08,
+        "max": 1.0
+      },
+      "kv_available_tokens": {
+        "min": 1152.0,
+        "max": 1715840.0
+      },
+      "num_retracted_reqs": {
+        "min": 0.0,
+        "max": 0.0
+      },
+      "hicache_host_used_tokens": {
+        "min": 64000.0,
+        "max": 3808512.0
+      },
+      "mamba_used_plus_evictable_max": 400.0,
+      "hicache_backup_bytes_total": {
+        "start": 3042936504320.0,
+        "end": 6028131647488.0,
+        "delta": 2985195143168.0
+      }
+    }
+  }
+}
