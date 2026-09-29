@@ -1,0 +1,1077 @@
+{
+  "utc": "2026-09-29T08:35:28.204331+00:00",
+  "runs": [
+    {
+      "run": "130eznw1-tail_rot150_n34_fast5h_short4096",
+      "levels": {
+        "N34": {
+          "status": "DRAINED",
+          "n_completed": 2894,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2894,
+            "n_successful": 2894,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05369305933913152,
+            "tpot_p95": 0.08970312175877167,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2894,
+              "n_positive_weight": 2894,
+              "sum_weight": 4544.0168,
+              "n_missing_weight": 0,
+              "mean": 0.06721963606650486,
+              "p50": 0.04148575128056109,
+              "p95": 0.14232682986106693,
+              "exceed_rate": 0.06441961218101129
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2187,
+              "n_in_bucket": 2187,
+              "n_missing_or_invalid": 0,
+              "p95": 2.9579622745513916,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2187,
+                "n_positive_weight": 2187,
+                "sum_weight": 2866.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.833443837533912,
+                "p50": 0.49852991104125977,
+                "p95": 2.493138313293457,
+                "exceed_rate": 0.04122497236158203
+              },
+              "pass_point": true,
+              "over_limit": 107,
+              "exceed_rate": 0.0489254686785551,
+              "rate_ci_lower": 0.041562437201674435,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.041562437201674435,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.04187990591314123,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.04133833670251795,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2449,
+              "n_in_bucket": 2449,
+              "n_missing_or_invalid": 0,
+              "p95": 3.333674192428589,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2449,
+                "n_positive_weight": 2449,
+                "sum_weight": 3278.7314,
+                "n_missing_weight": 0,
+                "mean": 0.9469783959485006,
+                "p50": 0.5277068614959717,
+                "p95": 3.1968307495117188,
+                "exceed_rate": 0.0191730862735508
+              },
+              "pass_point": true,
+              "over_limit": 52,
+              "exceed_rate": 0.021233156390363415,
+              "rate_ci_lower": 0.016667970599149116,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.016667970599149116,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01694348979669256,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.01644156508773977,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 104,
+              "n_in_bucket": 104,
+              "n_missing_or_invalid": 0,
+              "p95": 13.0270676612854,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 104,
+                "n_positive_weight": 104,
+                "sum_weight": 148.829,
+                "n_missing_weight": 0,
+                "mean": 2.6435449757798435,
+                "p50": 0.8565270900726318,
+                "p95": 11.840546369552612,
+                "exceed_rate": 0.026876482405982702
+              },
+              "pass_point": true,
+              "over_limit": 4,
+              "exceed_rate": 0.038461538461538464,
+              "rate_ci_lower": 0.013242481877345225,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013242481877345225,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017382251869944243,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007444006135985875,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 341,
+              "n_in_bucket": 341,
+              "n_missing_or_invalid": 0,
+              "p95": 19.245242834091187,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 341,
+                "n_positive_weight": 341,
+                "sum_weight": 1116.4564,
+                "n_missing_weight": 0,
+                "mean": 5.049057824001542,
+                "p50": 1.0098397731781006,
+                "p95": 19.547455549240112,
+                "exceed_rate": 0.025213344650091125
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.017595307917888565,
+              "rate_ci_lower": 0.0076898095192293285,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0076898095192293285,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.009125310736306189,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.005884315035772029,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_sha256": "286b1fddf0586de0c99dcbddd3e7a3b69de885548bbb1e6cd997e0f655d95211"
+        }
+      },
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.08970312175877167,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 339,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [
+            "biomaster:canon:member-v5-subagent-4b341feb33056b32c9433b51:llm:7"
+          ],
+          "chain_repaired_ids": [
+            "biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:3"
+          ]
+        }
+      },
+      "tail": [
+        "TIMED_DIAGNOSTIC N=34 admission_seconds=3600 chain_start_interval_s=0 drain_all_admitted=true",
+        "TIMED_DIAGNOSTIC DRAINED 2894 requests; not full-cohort VALID",
+        "TIMED_PROMOTION {\"scope\": \"diagnostic_promotion_only\", \"promote\": false, \"tpot_p95\": 0.08970312175877167, \"failed_ttft_gates\": [], \"chain_reference_n\": 339, \"chain_missing_ids\": [], \"chain_new_bad_ids\": [\"biomaster:canon:member-v5-subagent-4b341feb33056b32c9433b51:llm:7\"], \"chain_repaired_ids\": [\"biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:3\"]}",
+        "LADDER skip higher N: diagnostic gate or paired chain regression"
+      ]
+    },
+    {
+      "run": "130eznw2-tail_rot150_n34_fast5h_pdi1risk0",
+      "levels": {
+        "N34": {
+          "status": "DRAINED",
+          "n_completed": 2889,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2889,
+            "n_successful": 2889,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.05408039536080692,
+            "tpot_p95": 0.09008597693845581,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2889,
+              "n_positive_weight": 2889,
+              "sum_weight": 4539.0168,
+              "n_missing_weight": 0,
+              "mean": 0.06817093143040485,
+              "p50": 0.041602538802047694,
+              "p95": 0.12996398128741457,
+              "exceed_rate": 0.0651790493483082
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2185,
+              "n_in_bucket": 2185,
+              "n_missing_or_invalid": 0,
+              "p95": 2.545542001724243,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2185,
+                "n_positive_weight": 2185,
+                "sum_weight": 2864.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.7794205966491519,
+                "p50": 0.47095656394958496,
+                "p95": 2.436933755874634,
+                "exceed_rate": 0.03277578032460331
+              },
+              "pass_point": true,
+              "over_limit": 81,
+              "exceed_rate": 0.037070938215102975,
+              "rate_ci_lower": 0.03065930052511407,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.03065930052511407,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.030974562614908496,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.030422563762065962,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2447,
+              "n_in_bucket": 2447,
+              "n_missing_or_invalid": 0,
+              "p95": 2.755505084991455,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2447,
+                "n_positive_weight": 2447,
+                "sum_weight": 3276.7314,
+                "n_missing_weight": 0,
+                "mean": 0.8958893458897014,
+                "p50": 0.5034735202789307,
+                "p95": 2.83237886428833,
+                "exceed_rate": 0.015865932740169057
+              },
+              "pass_point": true,
+              "over_limit": 40,
+              "exceed_rate": 0.016346546791990192,
+              "rate_ci_lower": 0.012362223764179114,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.012362223764179114,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.012632896027004589,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.01213012214263523,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 12.918869972229004,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 2.4484782581161486,
+                "p50": 0.7893264293670654,
+                "p95": 10.320176362991333,
+                "exceed_rate": 0.013529145160963004
+              },
+              "pass_point": true,
+              "over_limit": 2,
+              "exceed_rate": 0.019417475728155338,
+              "rate_ci_lower": 0.003460984640942273,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.003460984640942273,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.00644659529700827,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.0,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 339,
+              "n_in_bucket": 339,
+              "n_missing_or_invalid": 0,
+              "p95": 16.17325735092163,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 339,
+                "n_positive_weight": 339,
+                "sum_weight": 1114.4564,
+                "n_missing_weight": 0,
+                "mean": 4.422564925451311,
+                "p50": 0.9283411502838135,
+                "p95": 16.17325735092163,
+                "exceed_rate": 0.02912146226626721
+              },
+              "pass_point": true,
+              "over_limit": 7,
+              "exceed_rate": 0.02064896755162242,
+              "rate_ci_lower": 0.009730320720251633,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.009730320720251633,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011233654308703985,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007944812916649419,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_sha256": "a4c601af082bc1384d4b9023d0870f28215885d85f13910991e79aa3331c112d"
+        }
+      },
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.09008597693845581,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 339,
+          "chain_missing_ids": [],
+          "chain_new_bad_ids": [
+            "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1"
+          ],
+          "chain_repaired_ids": []
+        }
+      },
+      "tail": [
+        "TIMED_DIAGNOSTIC N=34 admission_seconds=3600 chain_start_interval_s=0 drain_all_admitted=true",
+        "TIMED_DIAGNOSTIC DRAINED 2889 requests; not full-cohort VALID",
+        "TIMED_PROMOTION {\"scope\": \"diagnostic_promotion_only\", \"promote\": false, \"tpot_p95\": 0.09008597693845581, \"failed_ttft_gates\": [], \"chain_reference_n\": 339, \"chain_missing_ids\": [], \"chain_new_bad_ids\": [\"biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1\"], \"chain_repaired_ids\": []}",
+        "LADDER skip higher N: diagnostic gate or paired chain regression"
+      ]
+    },
+    {
+      "run": "130eznw3-tail_rot150_n34_fast5h_cold12k",
+      "levels": {
+        "N34": {
+          "status": "DRAINED",
+          "n_completed": 2876,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2876,
+            "n_successful": 2876,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.053700300294368224,
+            "tpot_p95": 0.09016906681506547,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2876,
+              "n_positive_weight": 2876,
+              "sum_weight": 4522.664,
+              "n_missing_weight": 0,
+              "mean": 0.06753721295075561,
+              "p50": 0.04178341935730452,
+              "p95": 0.12389294641365393,
+              "exceed_rate": 0.05843171192907543
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2175,
+              "n_in_bucket": 2175,
+              "n_missing_or_invalid": 0,
+              "p95": 2.009411096572876,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2175,
+                "n_positive_weight": 2175,
+                "sum_weight": 2854.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.7855857030389836,
+                "p50": 0.5024468898773193,
+                "p95": 1.849679946899414,
+                "exceed_rate": 0.02804656958655532
+              },
+              "pass_point": true,
+              "over_limit": 64,
+              "exceed_rate": 0.029425287356321838,
+              "rate_ci_lower": 0.023711158305694063,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.023711158305694063,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.0240246436210577,
+                    "allowed_over": 125,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.02346492767194662,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2437,
+              "n_in_bucket": 2437,
+              "n_missing_or_invalid": 0,
+              "p95": 2.570875406265259,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2437,
+                "n_positive_weight": 2437,
+                "sum_weight": 3266.7314,
+                "n_missing_weight": 0,
+                "mean": 0.9414936916717461,
+                "p50": 0.5310232639312744,
+                "p95": 2.871227979660034,
+                "exceed_rate": 0.020381779781465964
+              },
+              "pass_point": true,
+              "over_limit": 46,
+              "exceed_rate": 0.01887566680344686,
+              "rate_ci_lower": 0.0145714948203979,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0145714948203979,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01484610521016372,
+                    "allowed_over": 139,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.01434134157651228,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 102,
+              "n_in_bucket": 102,
+              "n_missing_or_invalid": 0,
+              "p95": 13.97057056427002,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 102,
+                "n_positive_weight": 102,
+                "sum_weight": 146.829,
+                "n_missing_weight": 0,
+                "mean": 2.9101184004201333,
+                "p50": 1.006852388381958,
+                "p95": 12.579836130142212,
+                "exceed_rate": 0.03405321836966812
+              },
+              "pass_point": true,
+              "over_limit": 5,
+              "exceed_rate": 0.049019607843137254,
+              "rate_ci_lower": 0.019511256145851905,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.019511256145851905,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.024061954587784568,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.01385564046767454,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 337,
+              "n_in_bucket": 337,
+              "n_missing_or_invalid": 0,
+              "p95": 18.173983097076416,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 337,
+                "n_positive_weight": 337,
+                "sum_weight": 1109.1036,
+                "n_missing_weight": 0,
+                "mean": 4.946052946411478,
+                "p50": 1.144026756286621,
+                "p95": 20.50580334663391,
+                "exceed_rate": 0.026701382990732336
+              },
+              "pass_point": true,
+              "over_limit": 6,
+              "exceed_rate": 0.017804154302670624,
+              "rate_ci_lower": 0.0077814099484156424,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.0077814099484156424,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.009233943932608606,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.005955418181663164,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_sha256": "4c27a8bfbcde0707575661f829e6ceb0442bd0ed50997baeb126caf87d917651"
+        }
+      },
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.09016906681506547,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 339,
+          "chain_missing_ids": [
+            "biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1",
+            "biomaster:canon:member-v5-subagent-52e65dacbfbe8e8d7343c1bd:llm:4"
+          ],
+          "chain_new_bad_ids": [],
+          "chain_repaired_ids": []
+        }
+      },
+      "tail": [
+        "TIMED_DIAGNOSTIC N=34 admission_seconds=3600 chain_start_interval_s=0 drain_all_admitted=true",
+        "TIMED_DIAGNOSTIC DRAINED 2876 requests; not full-cohort VALID",
+        "TIMED_PROMOTION {\"scope\": \"diagnostic_promotion_only\", \"promote\": false, \"tpot_p95\": 0.09016906681506547, \"failed_ttft_gates\": [], \"chain_reference_n\": 339, \"chain_missing_ids\": [\"biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1\", \"biomaster:canon:member-v5-subagent-52e65dacbfbe8e8d7343c1bd:llm:4\"], \"chain_new_bad_ids\": [], \"chain_repaired_ids\": []}",
+        "LADDER skip higher N: diagnostic gate or paired chain regression"
+      ]
+    },
+    {
+      "run": "130eznw4-tail_rot150_n34_fast5h_short4096_cold12k",
+      "levels": {
+        "N34": {
+          "status": "DRAINED",
+          "n_completed": 2885,
+          "errors": 0,
+          "tpot": {
+            "name": "tpot_p95<=0.10",
+            "limit_s_per_token": 0.1,
+            "n": 2885,
+            "n_successful": 2885,
+            "n_single_token_undefined": 0,
+            "n_missing_or_invalid": 0,
+            "tpot_mean": 0.0542791847659137,
+            "tpot_p95": 0.09516356062245948,
+            "passed": true,
+            "weighted": {
+              "label": "diagnostic_only",
+              "n_valid": 2885,
+              "n_positive_weight": 2885,
+              "sum_weight": 4532.039,
+              "n_missing_weight": 0,
+              "mean": 0.06802566006746794,
+              "p50": 0.04153792842216518,
+              "p95": 0.13056047714274863,
+              "exceed_rate": 0.06435143210373961
+            },
+            "source": "raw tpot_s; client SSE elapsed / (output_tokens - 1)",
+            "quantile_method": "sorted[min(n-1, floor(0.95*n))], as in dev; no CI allowance"
+          },
+          "ttft": {
+            "fast_intra(uncached_expected<=4096,<=3s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 3.0,
+              "n": 2182,
+              "n_in_bucket": 2182,
+              "n_missing_or_invalid": 0,
+              "p95": 1.5042023658752441,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2182,
+                "n_positive_weight": 2182,
+                "sum_weight": 2861.4809999999998,
+                "n_missing_weight": 0,
+                "mean": 0.7429211900573135,
+                "p50": 0.4962303638458252,
+                "p95": 1.4734172821044922,
+                "exceed_rate": 0.016456513253102156
+              },
+              "pass_point": true,
+              "over_limit": 43,
+              "exceed_rate": 0.019706691109074245,
+              "rate_ci_lower": 0.01506928589182234,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 126,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.01506928589182234,
+                    "allowed_over": 126,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01537425193024349,
+                    "allowed_over": 125,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.014812456796158925,
+                    "allowed_over": 127,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "overall_intra(<=5s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 5.0,
+              "n": 2444,
+              "n_in_bucket": 2444,
+              "n_missing_or_invalid": 0,
+              "p95": 2.1808741092681885,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 2444,
+                "n_positive_weight": 2444,
+                "sum_weight": 3273.7314,
+                "n_missing_weight": 0,
+                "mean": 0.9074430050967359,
+                "p50": 0.5276474952697754,
+                "p95": 2.141116142272949,
+                "exceed_rate": 0.017303924200989734
+              },
+              "pass_point": true,
+              "over_limit": 45,
+              "exceed_rate": 0.018412438625204582,
+              "rate_ci_lower": 0.014169458012880668,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 140,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.014169458012880668,
+                    "allowed_over": 140,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.01444286199130709,
+                    "allowed_over": 139,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.013939459871542168,
+                    "allowed_over": 141,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "turn_start(<=15s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 15.0,
+              "n": 103,
+              "n_in_bucket": 103,
+              "n_missing_or_invalid": 0,
+              "p95": 13.371854543685913,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 103,
+                "n_positive_weight": 103,
+                "sum_weight": 147.829,
+                "n_missing_weight": 0,
+                "mean": 2.6945287076511275,
+                "p50": 0.8845596313476562,
+                "p95": 11.908008337020874,
+                "exceed_rate": 0.02705829032192601
+              },
+              "pass_point": true,
+              "over_limit": 4,
+              "exceed_rate": 0.038834951456310676,
+              "rate_ci_lower": 0.013372093397034136,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 9,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.013372093397034136,
+                    "allowed_over": 9,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.017552157218569845,
+                    "allowed_over": 8,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.007522359926559433,
+                    "allowed_over": 10,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            },
+            "chain_start(<=30s)": {
+              "label": "estimated",
+              "method": "one-sided 95% Clopper-Pearson exact binomial lower bound",
+              "limit_s": 30.0,
+              "n": 338,
+              "n_in_bucket": 338,
+              "n_missing_or_invalid": 0,
+              "p95": 19.20218300819397,
+              "weighted": {
+                "label": "diagnostic_only",
+                "n_valid": 338,
+                "n_positive_weight": 338,
+                "sum_weight": 1110.4786,
+                "n_missing_weight": 0,
+                "mean": 4.9001244483694615,
+                "p50": 1.12819504737854,
+                "p95": 20.138670682907104,
+                "exceed_rate": 0.027906526069030057
+              },
+              "pass_point": true,
+              "over_limit": 7,
+              "exceed_rate": 0.020710059171597635,
+              "rate_ci_lower": 0.00975922571037939,
+              "confidence": 0.95,
+              "exceed_rate_limit": 0.05,
+              "allowed_over": 24,
+              "evaluable": true,
+              "pass_estimated": true,
+              "interval_sensitivity": {
+                "diagnostic_only": true,
+                "organizer_method_unknown": true,
+                "methods": {
+                  "clopper_pearson": {
+                    "rate_ci_lower": 0.00975922571037939,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  },
+                  "wilson": {
+                    "rate_ci_lower": 0.011267002191115266,
+                    "allowed_over": 23,
+                    "pass_estimated": true
+                  },
+                  "wald": {
+                    "rate_ci_lower": 0.00796871569946953,
+                    "allowed_over": 24,
+                    "pass_estimated": true
+                  }
+                },
+                "method_sensitive": false
+              }
+            }
+          },
+          "raw_sha256": "e6b51985e470eeb65e72bd7c596ba602460bb727277d41aaedcd395950b3a455"
+        }
+      },
+      "promotion": {
+        "N34": {
+          "scope": "diagnostic_promotion_only",
+          "promote": false,
+          "tpot_p95": 0.09516356062245948,
+          "failed_ttft_gates": [],
+          "chain_reference_n": 339,
+          "chain_missing_ids": [
+            "biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1"
+          ],
+          "chain_new_bad_ids": [
+            "biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1",
+            "biomaster:canon:member-v5-subagent-4b341feb33056b32c9433b51:llm:7"
+          ],
+          "chain_repaired_ids": [
+            "biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:3"
+          ]
+        }
+      },
+      "tail": [
+        "TIMED_DIAGNOSTIC N=34 admission_seconds=3600 chain_start_interval_s=0 drain_all_admitted=true",
+        "TIMED_DIAGNOSTIC DRAINED 2885 requests; not full-cohort VALID",
+        "TIMED_PROMOTION {\"scope\": \"diagnostic_promotion_only\", \"promote\": false, \"tpot_p95\": 0.09516356062245948, \"failed_ttft_gates\": [], \"chain_reference_n\": 339, \"chain_missing_ids\": [\"biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1\"], \"chain_new_bad_ids\": [\"biomaster:canon:2oM-3Qng2FhD3U8RIL7e1:llm:1\", \"biomaster:canon:member-v5-subagent-4b341feb33056b32c9433b51:llm:7\"], \"chain_repaired_ids\": [\"biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:3\"]}",
+        "LADDER skip higher N: diagnostic gate or paired chain regression"
+      ]
+    },
+    {
+      "run": "130eznw5-tail_rot150_n34_fast5h_control",
+      "levels": {},
+      "promotion": {}
+    }
+  ],
+  "queue": {
+    "running": [],
+    "pending": [],
+    "done": [
+      "130eznw4-tail_rot150_n34_fast5h_short4096_cold12k.sh",
+      "130eznw3-tail_rot150_n34_fast5h_cold12k.sh",
+      "130eznw2-tail_rot150_n34_fast5h_pdi1risk0.sh",
+      "130eznw1-tail_rot150_n34_fast5h_short4096.sh"
+    ],
+    "failed": [],
+    "cancelled": [
+      "130eznw5-tail_rot150_n34_fast5h_control.sh"
+    ]
+  },
+  "all_running": []
+}

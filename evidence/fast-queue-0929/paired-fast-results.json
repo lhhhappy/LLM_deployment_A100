@@ -1,0 +1,38 @@
+[
+  {
+    "run": "130eznw1-tail_rot150_n34_fast5h_short4096",
+    "common_fast": 2185,
+    "baseline_fast_bad": 105,
+    "candidate_fast_bad": 107,
+    "repaired": 81,
+    "new_bad": 83,
+    "raw_hashes_verified": true
+  },
+  {
+    "run": "130eznw2-tail_rot150_n34_fast5h_pdi1risk0",
+    "common_fast": 2185,
+    "baseline_fast_bad": 105,
+    "candidate_fast_bad": 81,
+    "repaired": 82,
+    "new_bad": 58,
+    "raw_hashes_verified": true
+  },
+  {
+    "run": "130eznw3-tail_rot150_n34_fast5h_cold12k",
+    "common_fast": 2175,
+    "baseline_fast_bad": 105,
+    "candidate_fast_bad": 64,
+    "repaired": 89,
+    "new_bad": 48,
+    "raw_hashes_verified": true
+  },
+  {
+    "run": "130eznw4-tail_rot150_n34_fast5h_short4096_cold12k",
+    "common_fast": 2182,
+    "baseline_fast_bad": 105,
+    "candidate_fast_bad": 43,
+    "repaired": 87,
+    "new_bad": 25,
+    "raw_hashes_verified": true
+  }
+]

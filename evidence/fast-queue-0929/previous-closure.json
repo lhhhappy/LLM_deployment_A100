@@ -1,0 +1,120 @@
+[
+  {
+    "run": "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder",
+    "N": "N34",
+    "n": 2891,
+    "tpot_mean_ms": 52.952595908764984,
+    "tpot_p95_ms": 87.19472407194023,
+    "ttft": {
+      "fast_intra(uncached_expected<=4096,<=3s)": {
+        "over_limit": 105,
+        "allowed_over": 126,
+        "p95": 2.896498918533325
+      },
+      "overall_intra(<=5s)": {
+        "over_limit": 59,
+        "allowed_over": 140,
+        "p95": 3.233769178390503
+      },
+      "turn_start(<=15s)": {
+        "over_limit": 3,
+        "allowed_over": 9,
+        "p95": 12.944302082061768
+      },
+      "chain_start(<=30s)": {
+        "over_limit": 6,
+        "allowed_over": 24,
+        "p95": 18.5805082321167
+      }
+    },
+    "promotion": {
+      "scope": "diagnostic_promotion_only",
+      "promote": true,
+      "tpot_p95": 0.08719472407194023,
+      "failed_ttft_gates": [],
+      "chain_reference_n": 268,
+      "chain_missing_ids": [],
+      "chain_new_bad_ids": [],
+      "chain_repaired_ids": []
+    }
+  },
+  {
+    "run": "130eznu-tail_rot150_n34_kda_night_repeat_1h_ladder",
+    "N": "N38",
+    "n": 3022,
+    "tpot_mean_ms": 57.75947377827646,
+    "tpot_p95_ms": 96.450251810303,
+    "ttft": {
+      "fast_intra(uncached_expected<=4096,<=3s)": {
+        "over_limit": 145,
+        "allowed_over": 132,
+        "p95": 3.5058205127716064
+      },
+      "overall_intra(<=5s)": {
+        "over_limit": 93,
+        "allowed_over": 146,
+        "p95": 3.9861772060394287
+      },
+      "turn_start(<=15s)": {
+        "over_limit": 5,
+        "allowed_over": 9,
+        "p95": 13.542905807495117
+      },
+      "chain_start(<=30s)": {
+        "over_limit": 9,
+        "allowed_over": 25,
+        "p95": 20.771843671798706
+      }
+    },
+    "promotion": null
+  },
+  {
+    "run": "130eznv-tail_rot150_n34_kda_night_mtp_1h_ladder",
+    "N": "N34",
+    "n": 3268,
+    "tpot_mean_ms": 39.10379421646764,
+    "tpot_p95_ms": 71.56667917628181,
+    "ttft": {
+      "fast_intra(uncached_expected<=4096,<=3s)": {
+        "over_limit": 492,
+        "allowed_over": 143,
+        "p95": 13.801275253295898
+      },
+      "overall_intra(<=5s)": {
+        "over_limit": 400,
+        "allowed_over": 158,
+        "p95": 13.818814992904663
+      },
+      "turn_start(<=15s)": {
+        "over_limit": 13,
+        "allowed_over": 10,
+        "p95": 23.08995747566223
+      },
+      "chain_start(<=30s)": {
+        "over_limit": 12,
+        "allowed_over": 25,
+        "p95": 24.994986295700073
+      }
+    },
+    "promotion": {
+      "scope": "diagnostic_promotion_only",
+      "promote": false,
+      "tpot_p95": 0.0715666791762818,
+      "failed_ttft_gates": [
+        "fast_intra(uncached_expected<=4096,<=3s)",
+        "overall_intra(<=5s)",
+        "turn_start(<=15s)"
+      ],
+      "chain_reference_n": 268,
+      "chain_missing_ids": [],
+      "chain_new_bad_ids": [
+        "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:101",
+        "biomaster:canon:lc_20260924_024:llm:0014",
+        "biomaster:canon:member-v5-subagent-a30d28e39fd03b02fc8e81b8:llm:3",
+        "scimaster:canon:lc_20260924_286:llm:0014",
+        "scimaster:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1"
+      ],
+      "chain_repaired_ids": []
+    }
+  }
+]
