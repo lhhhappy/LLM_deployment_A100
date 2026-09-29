@@ -1,0 +1,20 @@
+{
+  "FAST": {
+    "zip_sha256": "790ddeea8c49a18fc44175ec62855b3a384d38ecff6e7721f889e7dd4f795979",
+    "configs": [
+      "execution/results/submission.json",
+      "outputs/submission.json",
+      "results/submission.json"
+    ],
+    "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0928c"
+  },
+  "PDI4": {
+    "zip_sha256": "81fc08404be584059591c3aea98324f42632f4d3d3cf48088b2133c5b7ec7e7a",
+    "configs": [
+      "execution/results/submission.json",
+      "outputs/submission.json",
+      "results/submission.json"
+    ],
+    "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0928c"
+  }
+}

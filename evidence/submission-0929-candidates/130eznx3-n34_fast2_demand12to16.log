@@ -1,0 +1,6 @@
+CAP_SMOKE correct=12/12 finish=['stop'] mean_completion_tokens=2361
+TIMED_DIAGNOSTIC N=34 admission_seconds=3600 chain_start_interval_s=0 drain_all_admitted=true
+TIMED_DIAGNOSTIC DRAINED 2886 requests; not full-cohort VALID
+TIMED_PROMOTION {"scope": "diagnostic_promotion_only", "promote": false, "tpot_p95": 0.09012418920349963, "failed_ttft_gates": [], "chain_reference_n": 339, "chain_missing_ids": ["biomaster:canon:_DZ30z-3ak49vbtJq5NDn:llm:1"], "chain_new_bad_ids": [], "chain_repaired_ids": []}
+LADDER skip higher N: diagnostic gate or paired chain regression
+exit_code: 0
