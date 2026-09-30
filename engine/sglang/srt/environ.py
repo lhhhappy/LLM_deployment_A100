@@ -1272,6 +1272,7 @@ class Envs:
     SGLANG_DISABLE_FUSED_MAMBA_SLOT_OPS = EnvBool(False)
     # Ordinary prefill: gather tracked slot IDs on device instead of scalar D2H.
     SGLANG_AX_MAMBA_PREFILL_TRACK_GPU = EnvBool(False)
+    SGLANG_AX_MAMBA_ALLOC_GPU_INDEX = EnvBool(False)
     # Opt-in: on the unified radix tree, leave the matched-prefix mamba evictable
     # during decode (it is already COW'd to the request's own slot) and shrink the
     # mamba pool ratio accordingly. Frees one resident slot per running request,

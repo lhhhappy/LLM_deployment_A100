@@ -71,7 +71,7 @@ from sglang.srt.mem_cache.utils import (
     set_mla_kv_scale_buffer_triton,
 )
 from sglang.srt.platforms import current_platform
-from sglang.srt.runtime_context import get_parallel
+from sglang.srt.runtime_context import get_parallel, get_spec
 from sglang.srt.utils import (
     cpu_has_amx_support,
     is_cpu,
@@ -1391,10 +1391,33 @@ class HybridReqToTokenPool(ReqToTokenPool):
                 mamba_ping_pong_track_buffers
             ), "Not enough space for mamba ping pong idx, try to increase --mamba-full-memory-ratio."
         mamba_index_tensor = torch.stack(mamba_indices).to(dtype=torch.int32)
-        self.req_index_to_mamba_index_mapping[select_index] = mamba_index_tensor
+        mapping_index = select_index
+        if (
+            envs.SGLANG_AX_MAMBA_ALLOC_GPU_INDEX.get()
+            and type(self) is HybridReqToTokenPool
+            and self.enable_mamba_extra_buffer
+            and not self.enable_mamba_extra_buffer_lazy
+            and mamba_index_tensor.is_cuda
+            and self.req_index_to_mamba_index_mapping.device
+            == mamba_index_tensor.device
+            and self.req_index_to_mamba_ping_pong_track_buffer_mapping.device
+            == mamba_index_tensor.device
+            and get_parallel().pp_size == 1
+            and get_spec().speculative_algorithm is None
+            and not torch.cuda.is_current_stream_capturing()
+        ):
+            # Both writes use one immutable, freshly allocated index upload.
+            # The pinned allocator fences its source's reuse after async H2D.
+            index_host = torch.tensor(
+                select_index, dtype=torch.int64, pin_memory=True
+            )
+            mapping_index = index_host.to(
+                mamba_index_tensor.device, non_blocking=True
+            )
+        self.req_index_to_mamba_index_mapping[mapping_index] = mamba_index_tensor
         if self.enable_mamba_extra_buffer:
             ping_pong_tensor = torch.stack(mamba_ping_pong_track_buffers)
-            self.req_index_to_mamba_ping_pong_track_buffer_mapping[select_index] = (
+            self.req_index_to_mamba_ping_pong_track_buffer_mapping[mapping_index] = (
                 ping_pong_tensor
             )
         return select_index
