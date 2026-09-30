@@ -128,6 +128,8 @@ _AX_DSA_SPARSE_TRITON = get_bool_env_var("SGLANG_AX_DSA_SPARSE_TRITON")
 _AX_DSA_SPARSE_TRITON_PREFILL = get_bool_env_var(
     "SGLANG_AX_DSA_SPARSE_TRITON_PREFILL"
 )
+# [ax] 181: reuse the caller's complete BF16 decode query. Default off.
+_AX_DSA_QUERY_VIEW = get_bool_env_var("SGLANG_AX_DSA_QUERY_VIEW")
 # Set once a backend in this process has validated and warmed up the 118 kernel.
 _ax118_engaged = False
 
@@ -3559,11 +3561,21 @@ class DeepseekSparseAttnBackend(
                 page_table_1=page_table_1,
             )
         elif dsa_impl == "tilelang":
-            # Cat-skip (HIP-only): when caller passes q_rope=None on HIP, q_all
-            # has already been set to a zero-copy view of q in the else branch
-            # above and we can reuse it directly. The `not _is_hip` clause keeps
-            # CUDA / MUSA paths byte-identical to pre-patch by always re-cat.
-            if q_all is None or not _is_hip:
+            # The BF16 CUDA kernel only reads Q. Its contiguous complete view
+            # needs no copy when there is no separate RoPE tail.
+            reuse_query_view = (
+                _AX_DSA_QUERY_VIEW
+                and not _AX_DSA_SPARSE_TRITON
+                and q_all is not None
+                and q_all.is_cuda
+                and not _is_hip
+                and q_all.is_contiguous()
+                and q_all.data_ptr() % 16 == 0
+                and q_all.dtype == torch.bfloat16
+                and kv_cache.dtype == torch.bfloat16
+                and q_all.shape[-1] == layer.v_head_dim
+            )
+            if q_all is None or (not _is_hip and not reuse_query_view):
                 q_all = concat_mla_absorb_q_general(q_nope, q_rope)
             ax116_lse = _should_return_dsa_dcp_lse(
                 forward_mode=forward_batch.forward_mode,
