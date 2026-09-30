@@ -8,7 +8,7 @@ import torch
 
 from sglang.kernels.ops.quantization.fp8_kernel import is_fp8_fnuz
 from sglang.srt.runtime_context import get_parallel
-from sglang.srt.utils import is_gfx95_supported, is_hip
+from sglang.srt.utils import get_bool_env_var, is_gfx95_supported, is_hip
 
 tilelang.set_log_level("WARNING")
 
@@ -47,6 +47,9 @@ elif hasattr(tilelang.PassConfigKey, "TL_ENABLE_FAST_MATH"):
 _is_hip = is_hip()
 _is_gfx95_supported = is_gfx95_supported()
 _is_fp8_fnuz = is_fp8_fnuz()
+_AX_SM80_DSA_H8_NO_OUTPUT_STAGE = get_bool_env_var(
+    "SGLANG_AX_SM80_DSA_H8_NO_OUTPUT_STAGE"
+)
 
 BF16 = "bfloat16"
 FP8 = "float8_e4m3fnuz" if _is_fp8_fnuz else "float8_e4m3fn"
@@ -1412,9 +1415,12 @@ def tilelang_sparse_fwd(
             if tail_dim == 0
             else sparse_attention_fwd_kernel_v2
         )
+        capability = (
+            torch.cuda.get_device_capability(q.device) if tail_dim == 0 else None
+        )
         sm80_many_heads = (
             tail_dim == 0
-            and torch.cuda.get_device_capability(q.device)[0] < 9
+            and capability[0] < 9
             and (num_heads >= 64 or (num_heads >= 32 and get_parallel().dcp_enabled))
         )
         # [ax] 115: TP8/DCP4 has 32 heads and the default layout needs
@@ -1431,6 +1437,21 @@ def tilelang_sparse_fwd(
                 block_I=64,
                 num_stages=1,
                 stage_output=False,
+            )
+        elif (
+            _AX_SM80_DSA_H8_NO_OUTPUT_STAGE
+            and num_heads == 8
+            and d_v == 512
+            and tail_dim == 0
+            and q.dtype == torch.bfloat16
+            and kv.dtype == torch.bfloat16
+            and capability == (8, 0)
+        ):
+            # v1 writes O_shared but never reads it; Output is copied directly
+            # from acc_o. Keep every generic tiling/pipeline parameter unchanged.
+            kernel = kernel_factory(
+                num_heads, d_v, tail_dim, topk, sm_scale=sm_scale,
+                return_lse=return_lse, stage_output=False,
             )
         else:
             kernel = kernel_factory(
