@@ -21,3 +21,4 @@ credentials*
 data/longchain-*/
 data/s1-dev-longchain/
 build/engine/
+.codegraph/
