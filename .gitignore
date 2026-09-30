@@ -27,5 +27,6 @@ build/engine/
 # Local archives and tool installations
 build/archives/
 build/tools/
+build/worktrees/
 .pytest_cache/
 .ruff_cache/
