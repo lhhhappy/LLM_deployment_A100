@@ -75,3 +75,34 @@ def tune_sm80_prefill_up(configs: dict) -> dict:
         configs, "w13_tuning_config", dict(_NATIVE_DOWN, use_stream_k=True),
         {"use_stream_k": False},
     )
+
+
+def tune_sm80_decode_down(configs: dict) -> dict:
+    """Retune Humming 0.1.12's exact small-M W2 family, without splitting it.
+
+    The native interval counts routed rows: 64 < rows <= 4160. With top-k nine,
+    token batches 8 through 462 use it, including short prefill. Preserve M16
+    because W13 and W2 share expert block indices. Unknown options, families,
+    and intervals keep their original configuration.
+    """
+    key = "w2_tuning_config"
+    native = dict(
+        _NATIVE_DOWN,
+        block_shape=[16, 256, 128],
+        warp_shape=[16, 64, 64],
+    )
+    table = []
+    changed = False
+    for lo, hi, config in configs[key]:
+        normalized = dict(config)
+        for name in ("block_shape", "warp_shape"):
+            shape = normalized.get(name)
+            if isinstance(shape, (tuple, list)):
+                normalized[name] = list(shape)
+        if (lo, hi) == (64, 4160) and normalized == native:
+            config = dict(config, block_shape=[16, 256, 64], num_ctas_per_sm=2)
+            changed = True
+        table.append((lo, hi, config))
+    if not changed:
+        return configs
+    return dict(configs, **{key: table, key + "_str": json.dumps(table)})

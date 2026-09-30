@@ -46,6 +46,9 @@ logger = logging.getLogger(__name__)
 _HUMMING_LAYERS: list[str] = []
 _AX_SM80_MOE_DOWN_TUNE = get_bool_env_var("SGLANG_AX_SM80_MOE_DOWN_TUNE", "false")
 _AX_SM80_MOE_UP_TUNE = get_bool_env_var("SGLANG_AX_SM80_MOE_UP_TUNE", "false")
+_AX_SM80_MOE_DECODE_DOWN_TUNE = get_bool_env_var(
+    "SGLANG_AX_SM80_MOE_DECODE_DOWN_TUNE", "false"
+)
 
 # Token counts of the warm-up forwards: 1 builds the GEMM table; the others hit every size range of
 # moe_fused_mul_sum's BLOCK_M heuristic above the decode graph sizes (<= 128, compiled at capture), each
@@ -66,7 +69,11 @@ class _AxFp8HummingRunnerCore(HummingRunnerCore):
     """
 
     def get_humming_gemm_configs(self, humming_gemm_type):
-        if not (_AX_SM80_MOE_DOWN_TUNE or _AX_SM80_MOE_UP_TUNE):
+        if not (
+            _AX_SM80_MOE_DOWN_TUNE
+            or _AX_SM80_MOE_UP_TUNE
+            or _AX_SM80_MOE_DECODE_DOWN_TUNE
+        ):
             return super().get_humming_gemm_configs(humming_gemm_type)
         key = humming_gemm_type.value
         if key in self.humming_gemm_configs:
@@ -87,6 +94,7 @@ class _AxFp8HummingRunnerCore(HummingRunnerCore):
         from humming import dtypes
 
         from sglang.srt.layers.quantization.fp8_humming_tuning import (
+            tune_sm80_decode_down,
             tune_sm80_prefill_down,
             tune_sm80_prefill_up,
         )
@@ -95,6 +103,7 @@ class _AxFp8HummingRunnerCore(HummingRunnerCore):
         for enabled, name, tune in (
             (_AX_SM80_MOE_DOWN_TUNE, "w2", tune_sm80_prefill_down),
             (_AX_SM80_MOE_UP_TUNE, "w13", tune_sm80_prefill_up),
+            (_AX_SM80_MOE_DECODE_DOWN_TUNE, "w2", tune_sm80_decode_down),
         ):
             if not enabled:
                 continue
@@ -113,15 +122,32 @@ class _AxFp8HummingRunnerCore(HummingRunnerCore):
         if not eligible or torch.cuda.get_device_capability(layer.w2_weight.device) != (8, 0):
             return configs
         tuned = configs
+        prefill_down_tuned = False
+        prefill_up_tuned = False
+        decode_tuned = False
         for tune in eligible:
-            tuned = tune(tuned)
+            previous = tuned
+            tuned = tune(previous)
+            if tuned is not previous:
+                if tune is tune_sm80_decode_down:
+                    decode_tuned = True
+                elif tune is tune_sm80_prefill_down:
+                    prefill_down_tuned = True
+                elif tune is tune_sm80_prefill_up:
+                    prefill_up_tuned = True
         self.humming_gemm_configs[key] = tuned
-        if tuned is not configs:
+        if prefill_down_tuned or prefill_up_tuned:
             log_info_on_rank0(
                 logger,
                 "SM80 Humming MoE tuning for 8192–16384 tokens: "
-                f"W2 N128/stages3/CTA2={tuned['w2_tuning_config'] is not configs['w2_tuning_config']}, "
-                f"W13 stream-K off={tuned['w13_tuning_config'] is not configs['w13_tuning_config']}.",
+                f"W2 N128/stages3/CTA2={prefill_down_tuned}, "
+                f"W13 stream-K off={prefill_up_tuned}.",
+            )
+        if decode_tuned:
+            logger.info(
+                "SM80 Humming MoE small-M W2 tuning engaged: "
+                "64<routed_rows<=4160, M16/N256/K64/stages4/CTA2; "
+                "BF16 activations, FP8 weights, FP32 accumulation."
             )
         return tuned
 
