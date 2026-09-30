@@ -53,6 +53,22 @@ _AX_SM80_KDA_PACKED_DECODE = get_bool_env_var(
     "SGLANG_AX_SM80_KDA_PACKED_DECODE", "false"
 )
 
+_AX_KDA_SHARED_PREFIX_MASK = get_bool_env_var(
+    "SGLANG_AX_KDA_SHARED_PREFIX_MASK", "false"
+)
+
+
+def _ax_kda_extend_prefix_mask(metadata, prefix_lens):
+    # Full graph captures retain the original comparison against their static
+    # prefix input. Eager attention breaks may share this round's read-only mask.
+    if (
+        _AX_KDA_SHARED_PREFIX_MASK
+        and getattr(metadata, "_ax_prefix_mask_source", None) is prefix_lens
+        and not torch.cuda.is_current_stream_capturing()
+    ):
+        return metadata._ax_prefix_mask
+    return prefix_lens > 0
+
 
 def _ax_kda_packed_token_rows(tensor, batch, width):
     # GLM beta is a split view of a wider projection; row pitch can be gapped.
@@ -666,6 +682,23 @@ class KDAAttnBackend(MambaAttnBackendBase):
 
     def init_forward_metadata(self, forward_batch: ForwardBatch):
         super().init_forward_metadata(forward_batch)
+        if _AX_KDA_SHARED_PREFIX_MASK:
+            self.forward_metadata._ax_prefix_mask_source = None
+            mode = forward_batch.forward_mode
+            if (
+                mode.is_extend()
+                and not mode.is_target_verify()
+                and not mode.is_draft_extend_v2()
+                and forward_batch.extend_prefix_lens is not None
+                and forward_batch.extend_prefix_lens.is_cuda
+                and not torch.cuda.is_current_stream_capturing()
+            ):
+                self.forward_metadata._ax_prefix_mask_source = (
+                    forward_batch.extend_prefix_lens
+                )
+                self.forward_metadata._ax_prefix_mask = (
+                    forward_batch.extend_prefix_lens > 0
+                )
         if _AX_KDA_PREFILL_CPU_LENGTH:
             # Compute once per live batch, not once per KDA layer. Keep this
             # experiment local to KDA rather than extending shared metadata.
@@ -901,7 +934,9 @@ class KDAAttnBackend(MambaAttnBackendBase):
             raise RuntimeError(
                 "extend_prefix_lens cannot be None in non-TARGET_VERIFY mode."
             )
-        has_initial_state = forward_batch.extend_prefix_lens > 0
+        has_initial_state = _ax_kda_extend_prefix_mask(
+            self.forward_metadata, forward_batch.extend_prefix_lens
+        )
 
         physical_num_tokens = mixed_qkv.shape[0]
         logical_num_tokens = _ax_kda_resolve_logical_tokens(
