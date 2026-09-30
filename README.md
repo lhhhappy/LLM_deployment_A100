@@ -14,6 +14,7 @@
 | 正式提交和平台回报 | [提交记录](notes/submissions.md) |
 | 源码地图、性能与缓存研究 | [研究索引](research/README.md) |
 | 引擎分支、提交与机制 | [引擎说明](engine/README.md) |
+| 项目迁移、分支归档和恢复 | [仓库整理记录](notes/reports/repository-consolidation-0930.md) |
 | Pod 队列、取证与部署命令 | [Pod 操作说明](scripts/pod/README.md) |
 
 写作与迭代记录统一按 [Notes 规范](notes/README.md)；原始材料的保留、状态和归档按 [证据约定](evidence/README.md)。这里仅维护导航，不复制运行中的分数或第二份计划。历史结论留在 Git 和原始证据中，旧交接页不是现行状态。
