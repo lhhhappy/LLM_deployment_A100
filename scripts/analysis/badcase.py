@@ -7,8 +7,11 @@ Answers, from the raw records and the engine's own batch log lines:
   1. TPOT: how many requests exceed 0.10 s/token, by output length, prompt length and minute (UTC);
   2. for each of those, the prefill batches logged inside its decode window (count, tokens, >=8192-token chunks);
   3. scheduler state at prefill time: how often a big chunk ran while requests were decoding and nothing waited;
-  4. TTFT gate overs (harness buckets via s1_common.in_ttft_gate): queue vs execution split, own uncached tokens vs
-     the frozen expectation (large excess = the request lost its cache), and prefill tokens logged while it waited.
+  4. TTFT gate overs (harness buckets via s1_common.in_ttft_gate): recv-to-exec and exec-to-first intervals,
+     own uncached tokens vs the frozen expectation, and prefill reports before its first token.
+Frozen excess is only a diagnostic: it does not prove cache loss. Check the actual replay predecessor and
+token LCP before attributing a loss. Neither timing interval is a pure GPU timer; exec-to-first may include
+interleaved decode. The CSV's legacy queue field means exec_start minus server receive time.
 Log timestamps are whole seconds (the pod clock matches the raw epoch, T56); window counts are therefore approximate.
 """
 import argparse
@@ -115,9 +118,10 @@ def main():
             continue
         q = [r["t_exec_start_s"] - r["t_recv_s"] for r in over]
         x = [r["t_first_token_s"] - r["t_exec_start_s"] for r in over]
-        lost = [r for r in over if (r["prompt_tokens"] - r["cached_tokens"]) - r["uncached_expected"] > 4096]
-        print(f"  {gate}: {len(over)}/{len(grp)} over | queue p50 {pct(q, .5):.1f}s exec p50 {pct(x, .5):.1f}s | "
-              f"lost cache (>4096 over frozen) {len(lost)}")
+        frozen_excess = [r for r in over if (r["prompt_tokens"] - r["cached_tokens"]) - r["uncached_expected"] > 4096]
+        print(f"  {gate}: {len(over)}/{len(grp)} over | recv-to-exec p50 {pct(q, .5):.1f}s "
+              f"exec-to-first p50 {pct(x, .5):.1f}s | "
+              f"frozen excess >4096 (not verified cache loss) {len(frozen_excess)}")
         for r in over:
             waited = [b for b in meas if r["t_recv_s"] - 1 <= b[0] <= r["t_first_token_s"] + 1]
             details.append(dict(req=r["req_id"], kind=gate, ttft=round(r["ttft_s"], 2),

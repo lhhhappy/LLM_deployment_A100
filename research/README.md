@@ -17,6 +17,7 @@
 | [GLM-5.3-Flash 官方资料](claude/R24_glm53flash_official.md) | 技术报告、博客、模型卡、KDA/DSA/mHC 论文与 SGLang/vLLM 文档的通读，原文存于 [papers/](papers/README.md)。要点：底包 HiCache 在 CUDA 上不搬索引键，搬回后输出会错；每卡 KV 12,716 B/token（FP8 为 7,260）；KDA 状态 17.6 MiB/会话；DCP 官方只验证 GB300 且不支持配 MTP；官方推荐 MTP 5/1/6 |
 | [A100 上的 FP8 MoE 路径](claude/R25_moe_sm80_path.md) | 从 111 到 Marlin 的分发与执行瓶颈；EP8 开发机每层反而慢 13–24%。Humming 候选已实现并做 TP8 服务筛选，当前有效结果看下一行 |
 | [117 Humming 的服务收益](codex/R32_117_humming_effect.md) | 117 相对 081 的单改、A100 FP8 权重执行路径、同 ID N30 短测与前 60 分钟完成量；说明尚未证明 N34 晋档 |
+| [A100 执行工程实操](codex/R34_execution_engineering_0930.md) | TokenSpeed / packed KDA / MonoMoE 的具体合同与硬件边界；MoE 小输入调度、mHC 融合反例及 metadata graph 生命周期，开发机证据不等于服务成绩 |
 | [turn_start 尾部退化](codex/R33_turn_start_regression.md) | 正式 46251→46364 同档 turn p95 上升 62%；本地 069→081 的同 ID 坏例互换，以及为何必须用更接近正式组成的负载校准 |
 | [071 与线上的瓶颈](claude/R30_071_online_bottlenecks.md) | 09-25：chain 门卡在开场冷启动潮（prefill 吞吐墙加 LPM 排序），更正“缓存没接上”说法；分叉点抢占约 9% 重算；主机层 N34 容量瓶颈是当时的预测，须以新实测复核 |
 | [N30→N34 等待归因](codex/R31_n34_waiting_bottleneck.md) | 081/082 同 ID 完整回放：N34 fast 大幅恶化主要发生在准入后、首次执行前；额外重算仅 +0.8%，full-KV 压力与等待相关，但尚未区分资源拒绝与可运行越过 |

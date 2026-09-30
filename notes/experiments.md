@@ -590,3 +590,49 @@ raw跨度1171.7→1147.6s（少约2.1%），TPOT均值少约1.6%；各配置只�
 - **eznq 全候选 N34（0928c 对应配置）闭合：** 2400 秒准入后 DRAINED，1960 派发/完成、0 错误、唯一 ID 集一致、token 合同通过、flush 成功、runner 0，非完整 cohort。chain 6/268；四个 TTFT 估计条数门均通过，TPOT p95 103.322 ms 超 100 ms，无正式 N34 成绩含义。[原始 timed verdict](../evidence/L130eznq-tail_rot150_n34_chainmax16k_fix_mamba400_118_scatter_moetune_kda_40m/N34/timed_verdict.json)。
 - 对相同配置 ezno N30，共同 1850 个 ID：chain 修 0/新坏 0/持续 6，TPOT p95 94.744→104.807 ms；fast 修 24/新坏 49/持续 4。新增 49 条 fast 的 recv→exec 中位 0.171→3.472 s、exec→first 0.373→0.406 s；主要增量出现在执行前，不能从这两段计时直接指定调度或 GPU 子机制。KV≥93% 采样占比 3.15%→8.0%，Mamba 使用峰值 118→134/400、回撤 0；只是相关观测。10 分钟后派发人群 TPOT p95 79.132 ms，开场占比影响短窗。[逐请求与汇总](../evidence/review-0928-official-local/README.md)。
 - 正式提交与结果统一见 [submissions.md](submissions.md)；本轮未开新 GPU 实验，未更改引擎或评分规则。
+
+
+## 09-30 Codex：当前执行组合与同配置波动复核
+
+2026-09-30，Codex；Astra max与6.1 Sol独立raw/SHA复核。chain先看：07对05共同3241请求修好2条、新坏0条；对A1修2/新1，对A2修4/新0。五小修可作为当前底座，本次未分辨出在175/176之上的TPOT平均收益，fast/overall代价保留。
+
+数据固定v5g-tail-rot150（311链/5601请求），requests SHA256 `6170fd8204db4de8be4f99861d8cfa20ba36eab8b3317b8a3cd1343c5aef8ebb`；各臂都是派发3600秒后排空的DRAINED诊断，非完整cohort PASS。47266基线`bf6b66fa`；05/06引擎`400adf7d`开启175 MoE W2与176 DSA页复用；07引擎`ca5d646c`另启178/179/181/182/184，174/177/实验metadata fusion关闭，余下配置保持。07真实权重smoke12/12，KV池1810112token与基线相同。
+
+| 臂 | N | 完成/错 | chain超标/分母 | chain p95(s) | TPOT均值/p95(ms) | fast/overall/turn超标 |
+|---|---:|---:|---:|---:|---:|---:|
+| A1原配置 |42|3133/0|14/368|23.629|61.514/103.602|283/227/7|
+| A2原配置重测 |42|3132/0|17/367|28.943|62.028/105.646|244/195/10|
+|02原配置 |46|3220/0|21/376|34.885|64.988/105.023|441/396/12|
+|05 MoE+DSA |42|3257/0|15/374|26.450|59.804/103.289|252/193/12|
+|06同组合 |46|3328/0|24/379|37.520|62.666/111.278|412/376/12|
+|07五项小修组合 |42|3268/0|13/373|25.134|59.883/103.656|303/244/10|
+
+07全部3268唯一ID=派发ID、0错误，raw SHA `24c7362dfa2e2703b6e094d741f60c8ff6b0da9b1edd6ac14c5fa5c022aecde1`。对05共同3241且输出计数一致，TPOT59.907→59.940ms；对A1完整3133共同，61.514→60.335ms；对A2完整3132共同，62.028→60.314ms。06对02共同3220，TPOT64.988→63.168ms，p95105.023→111.958ms，chain修3/新6。更快均值不能抹去尾部代价，用户最新允许按相对收益与重复波动判断，不要求原本失败的本地绝对门强制通过。
+
+A1/A2共同3108输出计数全相同、236条cached变化；TPOT均值差+0.483ms、中位差+0.044ms。相邻请求的派发差几乎继承前次完成差（残差p05/p95约−1.57/+2.11ms），到达与排队之后放大至几十秒；五个chain新坏均发生稳态、差异主要在admit→首次batch。首token后开场长停顿则两臂稳定存在，不能把两种现象统称GPU波动。缺对应完整系统/批次轨迹，初始扰动来源未知。
+
+证据：[07闭合目录](../evidence/execution-0930/pod/smallfix-n42/)、[07对05](../evidence/execution-0930/smallfix-vs-moe-dsa/paired.json)、[07对A1](../evidence/execution-0930/smallfix-vs-a1/paired.json)、[07对A2](../evidence/execution-0930/smallfix-vs-a2/paired.json)、[06对02](../evidence/execution-0930/moe-dsa-n46-vs-baseline/paired.json)、[独立波动复核](../evidence/execution-0930/repeat-variance-review.json)、[Astra代码/数据与最后两臂建议](../evidence/execution-0930/astra-final4h-review.md)。当前未闭合任务只记[queue.md](queue.md)。
+
+## 09-30 Codex：最后两臂闭合与两包取舍
+
+2026-09-30 08:59 UTC，Codex；Astra max与6.1 Sol独立复核。chain代价先列：09对07共同373个chain，修好2/新坏5；10对06共同324个chain修好5/新坏4、对02修好5/新坏6。用户允许以相对收益选择TPOT候选，不要求本地原本失败的绝对门通过；代价仍完整保留。
+
+两臂使用同一冻结数据/工作负载哈希，源码`ca5d646c`，启用175/176/178/179/181/182/184，174/177/metadata fusion关闭。09相对07仅改`SGLANG_AX_BACKLOG_INTERVAL=0→1`，普通PDI2/risk1/冷块16k保持；10使用同一执行组合，relief0、常态cold16→12k而积压cold16k保持。真实权重冒烟均12/12，KV池1810112tokens、21.44GB不变。09派发3600秒（06:39:16.806–07:39:16.806 UTC）后于07:41:43.444排空；10派发2700秒（07:52:42.148–08:37:42.148）后于08:42:11.022排空。均为DRAINED诊断，非完整5601请求cohort PASS。
+
+| 臂 | N/派发时长 | 完成/错 | chain超标/分母 | chain p95(s) | TPOT均值/p95(ms) | fast/overall/turn超标 |
+|---|---|---:|---:|---:|---:|---:|
+|07执行组合对照|42/60min|3268/0|13/373|25.134|59.883/103.656|303/244/10|
+|09 relief1|42/60min|3273/0|16/374|28.554|57.087/99.442|245/215/5|
+|10常态cold12k|46/45min|2541/0|21/324|39.055|67.006/114.926|271/247/11|
+
+09派发3273=唯一完成3273、0错，raw SHA256 `e84ea78c6992179305d64cd2f8f7f24c532d246e995d749c94afb37d178dd52b`；10派发2541=唯一完成2541、0错，raw SHA256 `955385b9fb46761b6dd1be581f4d5d683a154d9c5cdd1121fc0da20ebcba3aab`。原harness分数、台账、输出计数及冻结meta/gap逐项核验；共同ID输出计数一致不等于raw已证明输出文本/数值逐位相同。
+
+09对07共同3259请求：TPOT均值59.942185→57.151016ms（−2.791168ms，−4.66%）、p95104.193238→99.484830ms；chain修2/新5，fast301→240。开场五条稳定旧停顿由约89–95秒缩到13.06/16.04/22.04/29.50/36.61秒，贡献均值−2.64359ms、约94.7%净收益；双方600秒后稳态2718共同请求均值50.19482→49.91991ms。不能把混合负载均值收益描述成纯decode内核同比加速。
+
+09的chain开场代价有系统性证据：固定51个开场chain均值21.780→24.149秒，11条TTFT增加>5秒、0条改善>5秒，超标11→12；两条新坏在A1/A2/05/07四个旧臂均正常，其中`46ba…:llm:8`从约28秒到44.662秒、admit→首次forward43.132秒；`cde2…:llm:7`从2.2–5.2秒到33.144秒、等待31.321秒。不能把全部新增坏例视为随机波动。对A1/A2完整3133/3132共同ID均值分别61.514→57.445与62.028→57.457ms，chain分别修2/新4与修4/新3。
+
+10与旧02/06时长45/60min不同，整窗67.006ms不能直接与06整窗62.666ms比较；只做`COMMON_ID_DESCRIPTIVE_DIFFERENT_DURATION`描述，没有修改原配对工具或harness。共同2541请求对06：TPOT均值67.766840→67.005882ms（−1.12%）、p95119.770380→114.926183ms；chain22→21但p9538.042011→39.055437秒，fast271→271、overall243→247、turn8→11，逐请求TPOT差中位+0.080ms。对02：均值69.399773→67.005882ms，chain20→21（修5/新6），fast287→271。原08五小修N46未跑，06不含五小修，不能把10差异单独归因cold12k。没有本地N46晋档证据。
+
+最后两包建议为07 BASE+09 TPOT，分别保留relief0与争取TPOT收益；10 CAP保留为容量风险备选。本轮成功构建镜像`lh-img:0930a`，源码`ca5d646c`，三个备选包均通过最终检查、dry-run和ZIP配置核对；尚未创建本轮正式attempt，待用户选定两个具体包。准备和SHA见[decision.json](../evidence/submission-0930-execution/decision.json)，正式上传后记录归[提交记录](submissions.md)。
+
+证据：[09原始闭合目录](../evidence/execution-0930/pod/relief1-n42/)、[10原始闭合目录](../evidence/execution-0930/pod/cold12-n46/)、[09对07](../evidence/execution-0930/relief1-vs-smallfix/paired.json)、[09对A1](../evidence/execution-0930/relief1-vs-a1/paired.json)、[09对A2](../evidence/execution-0930/relief1-vs-a2/paired.json)、[10对06](../evidence/execution-0930/cold12-vs-moe-dsa/paired.json)、[10对02](../evidence/execution-0930/cold12-vs-baseline/paired.json)、[独立最终复核](../evidence/execution-0930/final-results-review.json)、[Astra最终建议](../evidence/execution-0930/astra-final4h-review.md)。

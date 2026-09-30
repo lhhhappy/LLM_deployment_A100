@@ -7,7 +7,7 @@ so every run uses the same denominators. Measured numbers only; no projection to
 """
 import csv, json, sys
 from pathlib import Path
-ROOT = Path('/workspace/Agentic_science_challenge')
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 's1-dev/harness'))
 from s1_common import in_ttft_gate
 LIM = {'chain_start': 30.0, 'fast_intra': 3.0, 'overall_intra': 5.0, 'turn_start': 15.0}

@@ -45,3 +45,18 @@
 
 
 | 47266 | 09-28 15:09 UTC | KDA 全候选：`lh-img:0928c`，引擎 bf6b66fa；47043 + 钉池 400 + 118 prefill + attention-TP 输入分片 + MoE 调参 + 三项 KDA prefill。用户明确授权上传；[冻结配置/校验/收据](../evidence/submission-0928-kda/README.md) | uploaded，worker job 25359，初始及本轮末次独立查询均 queued；能力与正式档位尚未返回 |
+
+| 47606 | 09-29 | 47266 + short4096/cold12k，镜像0928c、引擎bf6b66fa；高并发探索，用户接受N38新增1条chain坏例/缺1参考ID | submitted/queued，job25662；[配置与回执](../evidence/submission-0929-candidates/README.md) |
+| 47607 | 09-29 | 47266仅prefill-decode-interval2→4，镜像0928c、引擎bf6b66fa；低TPOT探索，本地N38 fast未过 | submitted/queued，job25663；[配置与回执](../evidence/submission-0929-candidates/README.md) |
+
+
+## 09-30 最后两次正式提交
+
+Codex：用户在两包选择中选10+09（接受容量风险），两包成功上传；以下状态来自上传回执，不是后续成绩查询。共用成功构建镜像`lh-img:0930a`、干净引擎提交`ca5d646c252688177480c7e67cec0a901e4b7069`。47266底座上启用175/176/178/179/181/182/184，174/177/metadata fusion关闭；BF16 KV、MTP off、running/graph48、Mamba400、host64、普通PDI2/risk1、短阈值2048保持。N42/N46是本地验证档，正式提交的N由平台评估决定。
+
+| Attempt | 上传时间UTC | 本地对应方案／配置 | 上传回执 |
+|---|---|---|---|
+|47798|2026-09-30 09:04:43|10 CAP：常态cold12288、积压cold16384、relief interval0|submitted，worker job25846，回执queued；[冻结配置](../build/submit_0930_CAP/submission.json)、[回执](../evidence/submission-0930-execution/CAP/upload-receipt.json)|
+|47800|2026-09-30 09:05:26|09 TPOT：常态/积压cold16384、relief interval1|submitted，worker job25848，回执queued；[冻结配置](../build/submit_0930_TPOT/submission.json)、[回执](../evidence/submission-0930-execution/TPOT/upload-receipt.json)|
+
+ZIP SHA256分别为`c5d27665b6b829c27926386851c8f05f0f67ff4c4b0f5c34bd3302b96f3e8da2`与`0d0930d413a77789617e6d81f288e2ef52e6636fb922b04e459d5d083c7932c1`，与平台接收值一致。正式N、TPOT及能力分尚未返回，未写预测成绩。[构建收据](../evidence/submission-0930-execution/image-build.json)、[选择与收尾收据](../evidence/submission-0930-execution/decision.json)。07 BASE未提交；用户随后结束工作，追加一小时组合试验尚未入队。

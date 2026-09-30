@@ -124,6 +124,23 @@ class Windows(unittest.TestCase):
         self.assertEqual(state['source_failures'], 0)
         self.assertIsNone(bridge.source_sample(state, None, 'transient', 360))
 
+    def test_bridge_reports_persistent_watcher_failure_once_and_preserves_alerts(self):
+        state = {}
+        failed = (dict(job_state='running', health='retrying', heartbeat=100,
+                       error='Trisol EOF'), dict(phase='measurement', alerts=[]))
+        self.assertIsNone(bridge.watcher_sample(state, failed, 100))
+        self.assertIsNone(bridge.watcher_sample(state, failed, 340))
+        reported = bridge.watcher_sample(state, failed, 400)
+        self.assertEqual(reported[0]['error'], 'watcher cannot read Pod for over 5 minutes')
+        changed = (dict(failed[0], error='different transport error'), failed[1])
+        self.assertEqual(bridge.event_key(*reported, 400),
+                         bridge.event_key(*bridge.watcher_sample(state, changed, 460), 460))
+        alerted = (failed[0], dict(phase='measurement', alerts=['engine error']))
+        self.assertEqual(bridge.watcher_sample(state, alerted, 470)[1]['alerts'], ['engine error'])
+        healthy = (dict(failed[0], health='up', error=None), failed[1])
+        self.assertEqual(bridge.watcher_sample(state, healthy, 480), healthy)
+        self.assertNotIn('watcher_retry_since', state)
+
     def test_only_live_unterminated_last_fragment_ignored(self):
         p=self.out/'raw'
         p.write_text('{"req_id":"a"}\n{"req_id":')

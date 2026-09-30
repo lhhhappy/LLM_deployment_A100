@@ -1,21 +1,33 @@
-== raw_dev-combined-v1_N22_1790194938.jsonl: 722 rows complete; cost model 0.11s/forward + 65us/token (estimate)
--- fast_intra: 13 over | primary cause queue(arrangement) 9, cache gap(work) 4 | TTFT seconds: queue 68%, own_cost_est 7%, cache_gap_s 19%, interleave 6%
-   their queue time was spent behind: head:>=64k 49%, head:8k-64k 19%, followup:<8k 12%, followup:8k-64k 10%, head:<8k 7%, followup:>=64k 4%
--- overall_intra: 21 over | primary cause queue(arrangement) 14, own work(cost) 4, cache gap(work) 3 | TTFT seconds: queue 68%, own_cost_est 19%, cache_gap_s 7%, interleave 6%
-   their queue time was spent behind: head:>=64k 55%, head:8k-64k 21%, followup:<8k 11%, followup:8k-64k 7%, head:<8k 4%, followup:>=64k 2%
--- turn_start: 0 over
--- chain_start: 23 over | primary cause queue(arrangement) 22, own work(cost) 1 | TTFT seconds: queue 80%, own_cost_est 16%, cache_gap_s 0%, interleave 4%
-   their queue time was spent behind: head:>=64k 67%, head:8k-64k 22%, followup:8k-64k 5%, followup:<8k 3%, head:<8k 3%
--- TPOT>0.10: 203 | share of their decode window with some other prefill active: p50 99% | that prefill belonged to: head:>=64k 66%, head:8k-64k 17%, followup:8k-64k 7%, followup:<8k 6%, head:<8k 3%, followup:>=64k 2%
--- top blockers by TTFT-over queue time caused:
-      83.5s  head:>=64k       uncached  252115 prefill 22.2s  master:canon:QSdTYVbowNG_k_R8lOG7T:llm:1
-      61.3s  head:>=64k       uncached  195041 prefill 16.7s  master:canon:Gk3UkHQ6BpqSW7SdqZD7i:llm:1
-      56.5s  head:>=64k       uncached   85341 prefill 7.1s  -subagent-decc99ccea990cea699d5b97:llm:1
-      55.4s  head:>=64k       uncached   81974 prefill 6.9s  master:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5
-      50.7s  head:>=64k       uncached  256733 prefill 24.1s  ster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159
--- top blockers by TPOT-over decode time caused:
-     300.0s  head:>=64k       uncached  211336 prefill 19.6s  master:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1
-     245.8s  head:>=64k       uncached  256733 prefill 24.1s  ster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159
-     214.7s  head:>=64k       uncached  169326 prefill 14.7s  master:canon:qciFldST32QKFYjmIIyWU:llm:1
-     201.4s  head:>=64k       uncached  144191 prefill 12.7s  master:canon:7R_gC0sdkKuFwausVMIg2:llm:1
-     198.4s  head:>=64k       uncached  194725 prefill 16.7s  master:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1
+DIAGNOSTIC_ONLY schema=2 n=722 cohort=verified; not a runner/SLO verdict
+Measured phases and overlapping request windows; no causal labels or GPU busy-time claims.
+Cost SCENARIO: {"assumed_chunk": 16384, "fixed_s": 0.11, "page_size": 64, "per_token_us": 65}
+Model above measured exec window: 123/722; signed residual retained.
+LCP coverage: 411/411 followups; missing is unknown.
+Server minus client clock offset: 0.0; None disables decode overlap.
+-- fast_intra: 13 threshold overs; queue>half TTFT: 9
+   measured queue=66.512, exec_window=31.921 request-s
+   queue window overlap coverage: 98.3%
+   within that overlap, equal-share candidate kinds: cohort_head:>=64k 49%, cohort_head:8k-64k 18%, followup:<8k 12%, followup:8k-64k 10%, cohort_head:<8k 7%, followup:>=64k 4%
+-- overall_intra: 21 threshold overs; queue>half TTFT: 13
+   measured queue=148.883, exec_window=69.126 request-s
+   queue window overlap coverage: 98.3%
+   within that overlap, equal-share candidate kinds: cohort_head:>=64k 55%, cohort_head:8k-64k 21%, followup:<8k 10%, followup:8k-64k 7%, cohort_head:<8k 4%, followup:>=64k 2%
+-- turn_start: 0 threshold overs; queue>half TTFT: 0
+-- chain_start: 23 threshold overs; queue>half TTFT: 22
+   measured queue=847.250, exec_window=210.966 request-s
+   queue window overlap coverage: 99.0%
+   within that overlap, equal-share candidate kinds: cohort_head:>=64k 67%, cohort_head:8k-64k 22%, followup:8k-64k 5%, followup:<8k 3%, cohort_head:<8k 3%
+-- TPOT>0.10: 203; decode WINDOW overlap median: 98.9%
+   within that overlap, equal-share candidate kinds: cohort_head:>=64k 66%, cohort_head:8k-64k 17%, followup:8k-64k 7%, followup:<8k 6%, cohort_head:<8k 3%, followup:>=64k 2%
+-- ttft overlapping candidates (request-seconds summed across affected requests, not GPU seconds):
+   83.492 request-s; window=22.214s cohort_head:>=64k scimaster:canon:QSdTYVbowNG_k_R8lOG7T:llm:1
+   61.291 request-s; window=16.702s cohort_head:>=64k scimaster:canon:Gk3UkHQ6BpqSW7SdqZD7i:llm:1
+   56.506 request-s; window=7.063s cohort_head:>=64k biomaster:canon:member-v5-subagent-decc99ccea990cea699d5b97:llm:1
+   55.384 request-s; window=6.923s cohort_head:>=64k biomaster:canon:Gw0qXGCFJ38P_kQn8DIVL:llm:5
+   50.666 request-s; window=24.092s cohort_head:>=64k biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159
+-- tpot overlapping candidates (request-seconds summed across affected requests, not GPU seconds):
+   300.031 request-s; window=19.609s cohort_head:>=64k biomaster:canon:Vz2aFtqN3ZMcqqbBDw5Cv:llm:1
+   245.763 request-s; window=24.092s cohort_head:>=64k biomaster:canon:ZDcIqU6ny8jlzekdDzqQF:llm:159
+   214.725 request-s; window=14.676s cohort_head:>=64k scimaster:canon:qciFldST32QKFYjmIIyWU:llm:1
+   201.399 request-s; window=12.663s cohort_head:>=64k scimaster:canon:7R_gC0sdkKuFwausVMIg2:llm:1
+   198.370 request-s; window=16.688s cohort_head:>=64k scimaster:canon:nXmax-V7YbrxPVrgHJcFZ:llm:1

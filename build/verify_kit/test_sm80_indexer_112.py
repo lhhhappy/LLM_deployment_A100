@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """T43 A100 comparison against UNMODIFIED patch 110; JSONL receipts, no model/service.
 
-Copy this file + scripts/kernels/sm80_indexer_112.py + build/p110/sm80_deep_gemm.py
+Copy this file + tests/gpu/kernels/sm80_indexer_112.py + build/p110/sm80_deep_gemm.py
 into one private GPU directory. --mode smoke|numeric|bench|graph|all.
 Synthetic activations with model shapes, never claimed as model accuracy or SLO.
 """
@@ -30,7 +30,7 @@ def module(name, path):
 HERE = Path(__file__).resolve().parent
 # In the repo use the canonical sources; on GPU use colocated copies.
 SRC = HERE / 'kernels/sm80_indexer_112.py'
-REF = HERE.parent / 'build/p110/sm80_deep_gemm.py'
+REF = HERE.parents[1] / 'build/p110/sm80_deep_gemm.py'
 if not SRC.exists():
     SRC, REF = HERE / 'sm80_indexer_112.py', HERE / 'sm80_deep_gemm.py'
 new = module('kernels112', SRC)

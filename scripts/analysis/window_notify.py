@@ -37,6 +37,22 @@ def source_sample(state, data, error, now):
             dict(alerts=['notification bridge cannot read GPU watcher']))
 
 
+def watcher_sample(state, sample, now):
+    """Report a persistent watcher read failure once, without hiding engine alerts."""
+    if sample is None:
+        return None
+    watcher, health = sample
+    if (watcher.get('health') != 'retrying' or health.get('alerts')
+            or watcher.get('job_state') in TERMINAL):
+        state.pop('watcher_retry_since', None)
+        return sample
+    since = state.setdefault('watcher_retry_since', now)
+    if now - since < 300:
+        return None
+    # Normalize changing transport exceptions so one outage has one event key.
+    return (dict(watcher, error='watcher cannot read Pod for over 5 minutes'), health)
+
+
 def message(job, key, state, health, now):
     view, _ = compact_status(state, health, now)
     brief = state.get('analysis_brief') or state.get('last_report', '暂无诊断快照')
@@ -44,7 +60,7 @@ def message(job, key, state, health, now):
     instruction = ('自动分析已完成：直接向用户简短报告结果，无需重复手动取数或运行分析。'
                    '仅有异常或新问题才深入取证；不因窗口FAIL停任务。') if state.get('analysis_brief') else (
                    '先读缓存摘要，按需取证；不因局部FAIL自动停任务。')
-    return (f'[N30 watcher event {key[:12]}] {job}: '
+    return (f'[replay watcher event {key[:12]}] {job}: '
             f"状态={view['job_state']} 阶段={view['phase']} 监控={view['monitor']} 完成={view['completed']}; "
             f'{brief}; alerts={alerts}; error={view["error"]}; analysis_error={view["analysis_error"]}. '
             f'证据：{state.get("analysis_path", "window/")}。{instruction}')[:1600]
@@ -107,6 +123,7 @@ def main():
                 sample = source_sample(state, data, None, time.time())
             except Exception as exc:
                 sample = source_sample(state, None, exc, time.time())
+            sample = watcher_sample(state, sample, time.time())
             if sample is not None:
                 s, h = sample
                 key = event_key(s, h, time.time())

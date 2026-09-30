@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Send a short peer message to a registered, live local agent terminal.
+"""Send a short peer message to a registered, live local agent.
 
 Runtime registration lives in ignored build/scratch/coordination/sessions.json.
-Uses the installed Orca relay protocol; credentials stay local and are never printed.
+Terminal agents use Orca relay; Codex app-server sessions use their Unix control
+socket and turn/steer (active) or turn/start (idle). Credentials stay local.
 Does not resume/fork sessions, interrupt work, or modify conversation logs.
 After delivery, the recipient must acknowledge in its report: terminal submission
 alone is not a receipt. Re-register after restarting a terminal or relay.
@@ -92,6 +93,23 @@ def main():
     live = proc(target['pid'])
     if live['start'] != target['start'] or live['comm'] != target['comm']:
         raise ValueError('target agent registration is stale; no input sent')
+    message = f'[Peer message from {args.from_agent}; user-authorized coordination] {text}'
+    transport = target.get('transport', 'terminal')
+    if transport == 'codex-app-server':
+        from agent_codex_client import CodexClient
+        client = CodexClient(target['socket'], target['pid'])
+        try:
+            if args.check:
+                client.thread(target['session'])
+                print(f'VALID destination={args.to} session={target["session"]} transport={transport}')
+                return
+            turn_id = client.deliver(target['session'], message)
+            print(f'SUBMITTED destination={args.to} session={target["session"]} turn={turn_id}; awaiting report acknowledgment')
+        finally:
+            client.close()
+        return
+    if transport != 'terminal':
+        raise ValueError(f'unsupported agent transport: {transport}')
     relay = Relay(reg['relay'])
     try:
         terminals = relay.request(1, 'pty.listProcesses', {})
@@ -110,7 +128,6 @@ def main():
         if args.check:
             print(f'VALID destination={args.to} session={target["session"]}')
             return
-        message = f'[Peer message from {args.from_agent}; user-authorized coordination] {text}'
         relay.send({'jsonrpc': '2.0', 'method': 'pty.data',
                     'params': {'id': terminal, 'data': '\x1b[200~' + message + '\x1b[201~'}})
         time.sleep(0.3)

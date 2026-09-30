@@ -9,6 +9,8 @@ cd "$(dirname "$0")/.."
 ARM="${1:?usage: submit_official.sh A|B [existing_attempt_id]}"
 ID="${2:-}"
 CH=llm-challenge-arena-v1
+SUBMIT_MODEL="${PLAYGROUND_MODEL:-gpt-6}"
+SUBMIT_HARNESS="${PLAYGROUND_HARNESS:-codex}"
 DAY="${DAY:-0922}"
 OUT="build/submit_${DAY}_${ARM}"
 ZIP="build/submit_${DAY}_${ARM}.zip"
@@ -26,7 +28,7 @@ TRACE_JSON=$(python3 -c 'import json,sys;print(json.dumps([json.loads(l) for l i
 if [ -z "$ID" ]; then
 RESP=$(curl -sS -X POST "https://play.bohrium.com/api/challenges/$CH/attempts" \
   -H "Authorization: Bearer $PLAYGROUND_TOKEN" \
-  -F "method=Playground CLI submission" -F "model=claude-opus-5" -F "harness=claude-code" \
+  -F "method=Playground CLI submission" -F "model=$SUBMIT_MODEL" -F "harness=$SUBMIT_HARNESS" \
   -F "type=agent" -F "status=submitted" -F "detail=official ${ARM} $(date -u +%F)" \
   -F "manifest_json=<$MANIFEST/arm_manifest.json" \
   --form-string "trace=$TRACE_JSON" -F "author_name=Playground CLI")

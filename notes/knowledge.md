@@ -41,7 +41,6 @@
 ## 数据集 v5：s1-dev-longchain-v5（2026-09-27，fable；只改输出预算）
 
 - 父集 v4。唯一变化：合成请求（4879 条中 4835 条改动）的输出预算 `max_output_i` 按公开 722 条真实输出的分布（取 1.6 次幂加重尾巴）重新抽样，再按链缩放使每条链的合成输出总量与 v4 相同（= 来源整链总量减原始请求），单条上限 16384（1200 s 请求超时下 60 ms/token 仍能算完），最小 2，整数和精确保持；原始 722 条不动，正文、cohort、链元数据不动。工具 `scripts/longchain/rebudget.py`（seed 20270101）。
-- v4 预算 P95 2,270；v5 全集 P50/P95/P99/max = 254/3,186/9,690/16,384，均值 734 不变。
 - 文件：requests.jsonl（sha256 22917b5926f85a1c8ee38899be836c39579d50b090c87507ef77b5256e022855）；chains/cohort/provenance 与 v4 相同（cohort_sha256 ff1dccae1087a798，内部 set 标签仍为 s1-dev-longchain-v4，bodies 复用 v4 的文件，pod 上以符号链接指向 v4 的 bodies）。位置：本容器 `cache/s1-dev-longchain-v5/`（元数据）、GPU 机 `/sjtu/linhang/arena/repo/cache/s1-dev-longchain-v5/`、pod `/tmp/ax/data/s1-dev-longchain-v5/`。
 
 ## 数据集 v5g：s1-dev-longchain-v5g（2026-09-27，fable）

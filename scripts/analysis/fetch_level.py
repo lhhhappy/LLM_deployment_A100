@@ -21,6 +21,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 
 REPO = Path(__file__).resolve().parents[2]
 CHUNK = 120000
@@ -88,9 +89,14 @@ def destination(run, n, evidence):
 
 def remote(code, *args):
     command = shlex.join(["python3", "-c", code, *map(str, args)])
-    gpu_command = "cd /sjtu/linhang/arena/repo && " + shlex.join(["scripts/pod/pexec_codex", command])
-    result = subprocess.run([str(REPO / "scripts/gssh"), gpu_command], cwd=REPO,
-                            env={**os.environ, "GSSH_TIMEOUT": "600"},
+    if os.environ.get("FETCH_TRANSPORT") == "local":
+        argv = [str(REPO / "scripts/pod/pexec_codex"), command]
+        env = {**os.environ, "PEXEC_TRANSPORT": "local", "PEXEC_TIMEOUT": "180"}
+    else:
+        gpu_command = "cd /sjtu/linhang/arena/repo && " + shlex.join(["scripts/pod/pexec_codex", command])
+        argv = [str(REPO / "scripts/gssh"), gpu_command]
+        env = {**os.environ, "GSSH_TIMEOUT": "600"}
+    result = subprocess.run(argv, cwd=REPO, env=env,
                             stdout=subprocess.PIPE, text=True, check=True)
     return result.stdout
 
@@ -111,10 +117,17 @@ def download(run, n, target):
     digest = hashlib.sha256()
     with target.open("wb") as out:
         for offset in range(0, size, CHUNK):
-            payload = marked(remote(READ_CODE, archive, offset, CHUNK), "FETCH_DATA ")
-            data = base64.b64decode(payload, validate=True)
-            if len(data) != min(CHUNK, size - offset):
-                raise ValueError("truncated archive chunk")
+            for attempt in range(5):
+                try:
+                    payload = marked(remote(READ_CODE, archive, offset, CHUNK), "FETCH_DATA ")
+                    data = base64.b64decode(payload, validate=True)
+                    if len(data) != min(CHUNK, size - offset):
+                        raise ValueError("truncated archive chunk")
+                    break
+                except subprocess.CalledProcessError:
+                    if attempt == 4:
+                        raise
+                    time.sleep(2)
             digest.update(data)
             out.write(data)
     if target.stat().st_size != size or digest.hexdigest() != sha:

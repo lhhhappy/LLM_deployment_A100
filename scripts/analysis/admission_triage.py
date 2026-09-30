@@ -124,6 +124,15 @@ def classify(raw_rows, events, selected_ids=None):
                     row['decisions'].get(k, 0) < v for k, v in previous['decisions'].items()
                 ):
                     raise ValueError(f'{rid}: timestamps/cumulative counters moved backwards')
+                before, after = previous.get('decision_intervals'), row.get('decision_intervals')
+                if before is not None and after is not None and (
+                    after['count'] < before['count'] or any(
+                        after[field].get(k, 0.0) + 1e-6 < v
+                        for field in ('seconds_by_reason', 'seconds_by_batch')
+                        for k, v in before[field].items()
+                    )
+                ):
+                    raise ValueError(f'{rid}: cumulative decision intervals moved backwards')
             if rid in admitted:
                 raise ValueError(f'{rid}: duplicate/post-admission record in first episode')
             if kind == 'admit':
@@ -155,6 +164,7 @@ def classify(raw_rows, events, selected_ids=None):
             'post_admission_s': r['t_first_token_s'] - r['t_exec_start_s'],
             'diagnostic_scope': scope,
             'observed_groups': observed, 'decision_counts': counts, 'first_reason_examples': examples,
+            'decision_intervals': observation.get('decision_intervals') if observation else None,
             'no_token_scan_stop_example': scan_context,
             'skipped_request_feasibility': 'unknown',
             'later_arrivals_admitted_first': order[rid]['count'],
@@ -180,6 +190,7 @@ def classify(raw_rows, events, selected_ids=None):
             'admission observed does not guarantee diagnostics covered the full wait',
             'unknown/unobserved does not mean absence; snapshots and byte-limited streams are partial',
             'only matching first queue episodes are joined; warmup/retractions/unscoped legacy records excluded',
+            'decision intervals partition observed wall time by the preceding decision, not persistent blockers or GPU service',
         ],
     }
 

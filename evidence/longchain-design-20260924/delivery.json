@@ -23,5 +23,6 @@
   "closed_loop_residency_simulated": false,
   "note": "Manifest records immutable build status; this receipt records subsequent CPU acceptance. Not an official-distribution or SLO claim.",
   "current_path": "data/s1-dev-longchain",
-  "acceptance_sha256": "4430017f550ac619e5c2e6457803587f7044b3e53c356812ffe829e535f080ad"
+  "acceptance_sha256": "4430017f550ac619e5c2e6457803587f7044b3e53c356812ffe829e535f080ad",
+  "acceptance_path": "evidence/longchain-design-20260924/full-acceptance/acceptance.json"
 }

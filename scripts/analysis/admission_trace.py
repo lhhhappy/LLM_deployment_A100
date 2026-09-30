@@ -15,7 +15,7 @@ from pathlib import Path
 MARKER = "[ax-admission] "
 
 
-def validate(row):
+def validate(row, schema=1):
     if not isinstance(row.get("rid"), str) or not row["rid"]:
         raise ValueError("admission row lacks rid")
     counts = row.get("decisions")
@@ -45,6 +45,43 @@ def validate(row):
                     raise ValueError("invalid head_added")
             else:
                 raise ValueError(f"unknown example field: {key}")
+    intervals = row.get("decision_intervals")
+    if schema >= 3 and intervals is None:
+        raise ValueError("schema 3 lacks decision intervals")
+    if intervals is not None:
+        validate_intervals(intervals, age, counts)
+
+
+def validate_intervals(intervals, observed, decisions):
+    if not isinstance(intervals, dict):
+        raise ValueError("invalid decision intervals")
+    count = intervals.get("count")
+    if type(count) is not int or count < 0:
+        raise ValueError("invalid interval count")
+    totals = []
+    for name in ("seconds_by_reason", "seconds_by_batch"):
+        values = intervals.get(name)
+        if not isinstance(values, dict) or any(
+            not isinstance(k, str) or not k or type(v) not in (int, float)
+            or not math.isfinite(v) or v < 0 for k, v in values.items()
+        ):
+            raise ValueError(f"invalid {name}")
+        if name == "seconds_by_reason" and any(
+            k != "unobserved_path" and not decisions.get(k) for k in values
+        ):
+            raise ValueError("interval reason has no observed decision")
+        if name == "seconds_by_batch" and set(values) - {"prefill", "decode", "idle"}:
+            raise ValueError("unknown interval batch kind")
+        totals.append(sum(values.values()))
+    uncovered = intervals.get("uncovered_s")
+    if type(uncovered) not in (int, float) or not math.isfinite(uncovered) or uncovered < 0:
+        raise ValueError("invalid uncovered interval")
+    if not math.isclose(totals[0], totals[1], abs_tol=1e-6, rel_tol=1e-9):
+        raise ValueError("reason/batch wall totals differ")
+    if not math.isclose(totals[0] + uncovered, observed, abs_tol=1e-6, rel_tol=1e-9):
+        raise ValueError("intervals do not account for observed wait")
+    if count == 0 and any(totals):
+        raise ValueError("nonzero wall time without intervals")
 
 
 def iter_events(lines, max_bytes=16 * 1024 * 1024):
@@ -62,18 +99,18 @@ def iter_events(lines, max_bytes=16 * 1024 * 1024):
             raise ValueError("diagnostic input exceeds byte budget; select one run")
         try:
             obj = json.loads(line.split(MARKER, 1)[1])
-            if not isinstance(obj, dict) or obj.get("schema", 1) not in (1, 2):
+            if not isinstance(obj, dict) or obj.get("schema", 1) not in (1, 2, 3):
                 raise ValueError("unsupported admission schema")
             event = obj.get("event")
             if event == "admit":
-                validate(obj)
+                validate(obj, obj.get("schema", 1))
             elif event == "waiting":
                 sample = obj["sample"]
                 if not isinstance(sample, list) or type(obj.get("queue_size")) is not int or obj["queue_size"] < len(sample):
                     raise ValueError("invalid waiting queue size")
                 seen = set()
                 for row in sample:
-                    validate(row)
+                    validate(row, obj.get("schema", 1))
                     if row["rid"] in seen:
                         raise ValueError("duplicate rid in waiting snapshot")
                     seen.add(row["rid"])
@@ -88,6 +125,7 @@ def analyze(lines, raw_rows=()):
     admitted, pending = {}, {}
     snapshots = admits = 0
     budget_exhausted = False
+    latest_waiting = None
     for obj in iter_events(lines):
         if obj["event"] == "budget_exhausted":
             budget_exhausted = True
@@ -96,6 +134,18 @@ def analyze(lines, raw_rows=()):
             pending.pop(obj["rid"], None)
             admits += 1
         else:
+            latest_waiting = {
+                "observed_at_s": obj.get("observed_at_s"),
+                "queue_size": obj["queue_size"],
+                "sampled_requests": len(obj["sample"]),
+                "unsampled_requests": obj["queue_size"] - len(obj["sample"]),
+                "sample": obj["sample"],
+                "scope": "waiting queue at snapshot only; excludes active partial and requests before scheduler receipt",
+            }
+            # A complete queue snapshot supersedes stale pending identities.
+            # Truncated snapshots cannot establish that omitted RIDs departed.
+            if obj["queue_size"] == len(obj["sample"]):
+                pending.clear()
             for row in obj["sample"]:
                 pending[row["rid"]] = row
             snapshots += 1
@@ -123,12 +173,14 @@ def analyze(lines, raw_rows=()):
             "admitted_decisions": dict(counts) if episodes else None,
             "last_pending_decisions": pending_row["decisions"] if pending_row else None,
             "last_pending_observed_wait_s": pending_row["observed_wait_s"] if pending_row else None,
+            "last_pending_decision_intervals": pending_row.get("decision_intervals") if pending_row else None,
             "ttft_s": rr.get("ttft_s"), "phase": rr.get("phase"),
         })
     return {
         "admission_events": admits, "waiting_snapshots": snapshots,
         "budget_exhausted": budget_exhausted,
         "admitted_decision_counts": dict(aggregate), "rows": rows,
+        "latest_waiting_snapshot": latest_waiting,
         "limitations": [
             "decision counts are not time shares or a counterfactual latency saving",
             "waiting samples are bounded cumulative observations, not a full queue history",
@@ -136,6 +188,8 @@ def analyze(lines, raw_rows=()):
             "cache fields reflect the most recent match, not necessarily arrival residency",
             "generic/unscanned reasons do not prove resource infeasibility for each request",
             "this summary joins rid only; use admission_triage.py for first-admission time/episode filtering",
+            "decision intervals are subsequent scheduler wall time, not sustained blocking causes or GPU service",
+            "latest queue snapshot is not an all-arrived, not-yet-first-token service census",
         ],
     }
 

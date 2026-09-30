@@ -7,9 +7,10 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 PKG = sys.argv[1]
-REPO = "/workspace/Agentic_science_challenge"
+REPO = str(Path(__file__).resolve().parents[4])
 
 
 def src_part(n):
