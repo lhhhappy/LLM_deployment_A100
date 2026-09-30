@@ -23,6 +23,14 @@ class MetadataGlueGraph:
         self.disabled = False
         self._states: Dict[Any, dict] = {}
         self._capture_stream = None
+        # Separate qualification commit only; installs in each TP worker.
+        import os
+
+        diagnostic_dir = os.environ.get("SGLANG_AX_METADATA_GLUE_DIAGNOSTIC_DIR")
+        if diagnostic_dir:
+            from sglang.srt.model_executor.runner.diagnose_checkpoint_glue import install
+
+            install(diagnostic_dir)
 
     def reset(self):
         """Runner recapture invalidates all captured metadata addresses."""
