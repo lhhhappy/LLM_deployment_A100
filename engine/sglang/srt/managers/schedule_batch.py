@@ -2006,7 +2006,7 @@ def mamba_lazy_spec_in_window(
 
 
 def set_mamba_track_indices_from_reqs(
-    batch, track_positions: Optional[List[int]] = None, *, store_buffer_indices: bool = True
+    batch, track_positions: Optional[List[int]] = None
 ):
     """Build mamba_track_indices from req objects (authoritative source).
 
@@ -2029,8 +2029,7 @@ def set_mamba_track_indices_from_reqs(
             )
             for req in batch.reqs
         ]
-    if store_buffer_indices:
-        batch.mamba_track_buffer_indices = list(track_positions)
+    batch.mamba_track_buffer_indices = list(track_positions)
     idx = (
         torch.tensor(
             track_positions,
@@ -2045,17 +2044,16 @@ def set_mamba_track_indices_from_reqs(
     )
 
 
-def _mamba_prefill_track_gpu_positions(batch, req_pool_indices) -> Optional[List[int]]:
-    """Snapshot positions before the per-request helper swaps them.
+def _mamba_prefill_track_gpu_slots(
+    batch, req_pool_indices
+) -> Optional[List[torch.Tensor]]:
+    """Freeze the native per-request slot selection before the helper swaps it.
 
-    Only the static pool's ordinary prefill contract is enabled. alloc_for_extend
-    has already allocated every request and populated the authoritative mapping;
-    donation/set_mamba_ping_pong_slot refresh that same mapping. Its gather is
-    stream ordered and produces a batch-owned tensor, not a live mapping view.
+    Each scalar is a device view of the exact buffer and position the original
+    helper would read. The caller stacks these into a batch-owned vector before
+    subsequent slot changes. No mapping gather or position upload is needed.
     """
-    # The fixed gather/upload preparation cost does not amortize on small
-    # prefills. Keep them on the original path (one threshold, no batch table).
-    if not envs.SGLANG_AX_MAMBA_PREFILL_TRACK_GPU.get() or len(batch.reqs) < 8:
+    if not envs.SGLANG_AX_MAMBA_PREFILL_TRACK_GPU.get():
         return None
     pool = batch.req_to_token_pool
     if (
@@ -2064,39 +2062,33 @@ def _mamba_prefill_track_gpu_positions(batch, req_pool_indices) -> Optional[List
         or mamba_extra_buffer_lazy_enabled()
         or not batch.spec_algorithm.is_none()
         or not batch.forward_mode.is_extend()
+        or get_parallel().pp_size != 1
         or get_schedule().enable_mixed_chunk
         or getattr(batch.tree_cache, "ax_kda_dual_snapshot", False)
         or batch.ax_kda_dual_snapshot_batch
         or not batch.reqs
-    ):
-        return None
-    mapping = getattr(pool, "req_index_to_mamba_ping_pong_track_buffer_mapping", None)
-    if (
-        not isinstance(mapping, torch.Tensor)
-        or mapping.device.type != "cuda"
-        or mapping.dtype != torch.int64
-        or mapping.ndim != 2
         or not isinstance(req_pool_indices, torch.Tensor)
-        or req_pool_indices.device != mapping.device
+        or req_pool_indices.device.type != "cuda"
         or req_pool_indices.dtype != torch.int64
         or tuple(req_pool_indices.shape) != (len(batch.reqs),)
+        or torch.cuda.is_current_stream_capturing()
     ):
         return None
-    positions = []
+    slots = []
     for req in batch.reqs:
         buf = req.kv.mamba_ping_pong_track_buffer
         pos = req.kv.mamba_next_track_idx
         if (
             not isinstance(buf, torch.Tensor)
-            or buf.device != mapping.device
-            or buf.dtype != mapping.dtype
-            or tuple(buf.shape) != (mapping.shape[1],)
+            or buf.device != req_pool_indices.device
+            or buf.dtype != torch.int64
+            or tuple(buf.shape) != (pool.mamba_ping_pong_track_buffer_size,)
             or type(pos) is not int
-            or not 0 <= pos < mapping.shape[1]
+            or not 0 <= pos < pool.mamba_ping_pong_track_buffer_size
         ):
             return None
-        positions.append(pos)
-    return positions
+        slots.append(buf.select(0, pos))
+    return slots
 
 
 def release_req(
@@ -2640,7 +2632,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 self, mamba_checkpoint_grid(self.tree_cache.page_size)
             )
 
-        mamba_track_positions_gpu = _mamba_prefill_track_gpu_positions(
+        mamba_track_slots_gpu = _mamba_prefill_track_gpu_slots(
             self, req_pool_indices_tensor
         )
 
@@ -2708,7 +2700,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
 
             if mamba_extra_buffer_enabled():
                 track_entry = self._mamba_radix_cache_v2_req_prepare_for_extend(
-                    req, read_track_index=mamba_track_positions_gpu is None
+                    req, read_track_index=mamba_track_slots_gpu is None
                 )
                 mamba_track_mask_cpu.append(track_entry.track_mask)
                 mamba_track_indices_cpu.append(track_entry.track_index)
@@ -2814,7 +2806,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         self.extend_input_logprob_token_ids = extend_input_logprob_token_ids
 
         if mamba_extra_buffer_enabled():
-            if mamba_track_positions_gpu is None:
+            if mamba_track_slots_gpu is None:
                 self.mamba_track_indices = torch.tensor(
                     mamba_track_indices_cpu,
                     dtype=torch.int64,
@@ -2823,10 +2815,8 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
             else:
                 # Do not publish decode-only logical-position metadata during
                 # prefill. Only the device slot-ID tensor changes its source.
-                set_mamba_track_indices_from_reqs(
-                    self, mamba_track_positions_gpu, store_buffer_indices=False
-                )
-            if mamba_track_positions_gpu is None:
+                self.mamba_track_indices = torch.stack(mamba_track_slots_gpu)
+            if mamba_track_slots_gpu is None:
                 self.mamba_track_mask = torch.tensor(
                     mamba_track_mask_cpu,
                     dtype=torch.bool,
@@ -2840,7 +2830,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 self.ax_mamba_prefill_track_staging = None
             else:
                 # Pageable uploads would synchronize behind the previous forward
-                # and undo the device-only slot gather. Fresh sources per batch;
+                # and undo the device-only preparation. Fresh sources per batch;
                 # retain them in the overlap snapshot and let the pinned allocator
                 # event-fence storage reuse after these asynchronous copies.
                 mask_staging = torch.tensor(
