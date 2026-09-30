@@ -516,6 +516,7 @@ def fused_recurrent_kda_packed_decode(
     ssm_state_indices: torch.Tensor,
     use_qk_l2norm_in_kernel: bool = False,
     lower_bound: Optional[float] = None,
+    use_cuda_kernel: bool = True,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """KDA T=1 decode fast path. Mirrors ``fused_recurrent_gated_delta_rule_packed_decode``
     but the gate ``g`` is a per-K vector instead of a scalar.
@@ -524,7 +525,7 @@ def fused_recurrent_kda_packed_decode(
         mixed_qkv: ``[B, 2*H*K + HV*V]`` packed projection output after conv1d.
             Requires ``num_q_heads == num_k_heads == H`` and ``head_q_dim == head_k_dim == K``.
         a: ``[B, HV*K]`` per-K gate input (typically reshaped from ``[B, HV, K]``).
-        b: ``[B, HV]`` beta input (post-sigmoid scalar per head).
+        b: ``[B, HV]`` raw beta projection (sigmoid is applied in the kernel).
         A_log: ``[HV]`` log-space decay parameter.
         dt_bias: ``[HV*K]`` per-K time-step bias.
         scale: attention scale factor (typically ``head_k_dim ** -0.5``).
@@ -627,7 +628,7 @@ def fused_recurrent_kda_packed_decode(
     # part (~9.6 TB/s) where this triton kernel tops out at ~5 TB/s holding a
     # [BV, K] register tile per warp. ULP-level output differences only
     # (reduction order); small batches keep triton (launch-bound anyway).
-    if use_qk_l2norm_in_kernel:
+    if use_qk_l2norm_in_kernel and use_cuda_kernel:
         from sglang.kernels.ops.attention import kda_packed_decode as kda_decode_cuda
 
         if kda_decode_cuda.covered(

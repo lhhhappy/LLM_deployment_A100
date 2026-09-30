@@ -1,4 +1,5 @@
 import importlib.util
+import math
 from typing import Optional, Tuple, Union
 
 import torch
@@ -47,6 +48,69 @@ from sglang.srt.runtime_context import (
 _AX_KDA_PREFILL_CPU_LENGTH = get_bool_env_var(
     "SGLANG_AX_KDA_PREFILL_CPU_LENGTH", "false"
 )
+
+_AX_SM80_KDA_PACKED_DECODE = get_bool_env_var(
+    "SGLANG_AX_SM80_KDA_PACKED_DECODE", "false"
+)
+
+
+def _ax_kda_packed_token_rows(tensor, batch, width):
+    # GLM beta is a split view of a wider projection; row pitch can be gapped.
+    return tensor.ndim >= 2 and tensor.stride(-1) == 1 and tensor.shape in (
+        (batch, width), (1, batch, width), (batch, 1, width)
+    )
+
+
+def _ax_kda_safe_packed_decode_covered(layer, qkv, a, b, states, indices):
+    """Metadata-only check: never synchronize or copy a state-pool view."""
+    lower_bound = getattr(layer, "lower_bound", None)
+    if (
+        type(lower_bound) not in (float, int)
+        or not math.isfinite(lower_bound)
+        or lower_bound >= 0
+        or qkv.ndim != 2
+        or states.ndim != 4
+        or indices.ndim != 1
+    ):
+        return False
+    batch = qkv.shape[0]
+    hv, v, k = states.shape[-3:]
+    if v != 128 or k != 128:
+        return False
+    hq = layer.q_dim // k
+    return (
+        batch >= 1
+        and layer.head_q_dim == layer.head_k_dim == k
+        and layer.head_v_dim == v
+        and layer.q_dim == layer.k_dim == hq * k
+        and hq > 0
+        and hv % hq == 0
+        and layer.num_v_heads == hv
+        and layer.v_dim == hv * v
+        and qkv.shape == (batch, 2 * hq * k + hv * v)
+        and _ax_kda_packed_token_rows(a, batch, hv * k)
+        and _ax_kda_packed_token_rows(b, batch, hv)
+        and indices.shape == (batch,)
+        and layer.A_log.numel() == hv
+        and layer.dt_bias.numel() == hv * k
+        and all(t.dtype == torch.bfloat16 for t in (qkv, a, b))
+        and all(
+            t.dtype == torch.float32
+            for t in (states, layer.A_log, layer.dt_bias)
+        )
+        and indices.dtype == torch.int32
+        and qkv.is_cuda
+        and all(
+            t.device == qkv.device
+            for t in (a, b, states, indices, layer.A_log, layer.dt_bias)
+        )
+        and all(
+            t.is_contiguous()
+            for t in (qkv, indices, layer.A_log, layer.dt_bias)
+        )
+        and states.stride()[-3:] == (v * k, k, 1)
+        and states.stride(0) >= hv * v * k
+    )
 
 
 def _ax_kda_cpu_logical_tokens(forward_batch, query_start_loc, *, attn_cp_size=1):
@@ -471,6 +535,20 @@ class KDAAttnBackend(MambaAttnBackendBase):
         self.kernel_dispatcher = KDAKernelDispatcher(
             decode_backend, prefill_backend, verify_backend
         )
+        pool = self.req_to_token_pool.mamba_pool
+        self._ax_safe_packed_decode = (
+            _AX_SM80_KDA_PACKED_DECODE
+            and self.kernel_dispatcher.decode_kernel
+            is self.kernel_dispatcher.triton_kernel
+            and is_cuda()
+            and torch.cuda.get_device_capability(model_runner.device) == (8, 0)
+            and not get_spec().speculative_algorithm
+            and not pool.enable_linear_replayssm
+            and not pool.enable_linear_replayssm_spec
+        )
+        self._ax_safe_packed_notice = self._ax_safe_packed_decode
+        if self._ax_safe_packed_decode:
+            rank0_log("[ax] KDA safe-gate packed decode armed: sm80 bf16 Triton D=128")
         # Warm only the selected prefill implementation, before graph capture.
         # The same Triton object can also be an unused fallback for other backends.
         if self.kernel_dispatcher.extend_kernel is self.kernel_dispatcher.triton_kernel:
@@ -718,8 +796,29 @@ class KDAAttnBackend(MambaAttnBackendBase):
         # The packed kernel assumes one token per request.
         if (
             self.kernel_dispatcher.supports_packed_decode
-            and getattr(layer, "lower_bound", None) is None
+            and (
+                getattr(layer, "lower_bound", None) is None
+                or (
+                    self._ax_safe_packed_decode
+                    and all(
+                        t is None
+                        for t in (
+                            replayssm_d, replayssm_k, replayssm_g,
+                            replayssm_write_pos, replayssm_force_flush,
+                        )
+                    )
+                    and _ax_kda_safe_packed_decode_covered(
+                        layer, qkv, a, b, ssm_states, cache_indices
+                    )
+                )
+            )
         ):
+            if layer.lower_bound is not None and self._ax_safe_packed_notice:
+                rank0_log(
+                    "[ax] KDA safe-gate packed decode engaged: "
+                    f"B={qkv.shape[0]} H={layer.num_v_heads} D={layer.head_k_dim}"
+                )
+                self._ax_safe_packed_notice = False
             assert qkv.shape[0] == cache_indices.shape[0], (
                 "KDA packed decode requires one token per sequence (T=1): "
                 f"got {qkv.shape[0]} tokens for {cache_indices.shape[0]} requests."
@@ -741,6 +840,9 @@ class KDAAttnBackend(MambaAttnBackendBase):
                 replayssm_g=replayssm_g,
                 replayssm_write_pos=replayssm_write_pos,
                 replayssm_force_flush=replayssm_force_flush,
+                # Use scalar-load Triton for the optional A100 safe-gate route.
+                # Preserve CUDA dispatch for the existing no-safe-gate route.
+                use_cuda_kernel=layer.lower_bound is None,
             )
             self._track_mamba_state_decode(
                 forward_batch, conv_states, ssm_states, cache_indices, layer.layer_id

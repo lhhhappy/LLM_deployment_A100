@@ -156,6 +156,7 @@ class TritonKDAKernel(LinearAttnKernelBase):
             ssm_state_indices=cache_indices,
             use_qk_l2norm_in_kernel=True,
             lower_bound=lower_bound,
+            use_cuda_kernel=kwargs.get("use_cuda_kernel", True),
         )
         # [B, 1, HV, V] -> [1, B, HV, V] view to match existing decode layout.
         return out.transpose(0, 1)
