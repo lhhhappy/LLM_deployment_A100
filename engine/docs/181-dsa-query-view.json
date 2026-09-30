@@ -1,0 +1,31 @@
+{
+  "mechanism": 181,
+  "enable": "SGLANG_AX_DSA_QUERY_VIEW=1",
+  "default": "off",
+  "change": "Reuse the existing complete contiguous CUDA BF16 query view in TileLang decode instead of concatenating it again when there is no separate RoPE tail. Q is read-only and arithmetic is unchanged.",
+  "gate": "CUDA, not HIP, existing complete contiguous BF16 q_all, 16-byte-aligned data pointer, BF16 KV, query last dimension equals value head dimension, all-phase sparse Triton disabled. Unsupported inputs retain the original concatenation.",
+  "lifetime": "The query view retains its source storage. Producers and read-only consumers use the existing stream ordering; captured graph input storage and addresses follow the existing static graph contract.",
+  "source_sha256": "5b28e712a31c7aa9639f0bd71be4fee0752905dd71f78ca01f9b55536c8e17b7",
+  "qualification": "Actual TileLang attention method and production guard extracted via AST; output and LSE bitwise equal for B1/24/32/48, arbitrary physical pages, mixed lengths and invalid slots, graph input mutation and shrink/grow, aligned offset and unaligned fallback. No complete model or TP8 evidence yet.",
+  "full_graph_single_replay_median_us": {
+    "B1": [
+      131.616,
+      127.936
+    ],
+    "B24": [
+      146.608,
+      145.344
+    ],
+    "B32": [
+      149.792,
+      147.936
+    ],
+    "B48": [
+      152.72,
+      149.632
+    ]
+  },
+  "limitations": "Single A100, synthetic tensors. No measured model TPOT/chain or retained graph memory benefit. Prefill is unchanged.",
+  "evidence": "evidence/execution-0930/dsa-query-view/receipt.json",
+  "pending": "TP8 real-model smoke, path hit verification, and paired chain/TPOT service comparison"
+}
