@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Callable, List, NamedTuple, Optional
 
 import torch
 
+from sglang.srt.environ import envs
 from sglang.srt.mem_cache.hicache_storage import (
     STORAGE_BATCH_SIZE,
     HiCacheStorageConfig,
@@ -125,6 +126,8 @@ class CacheOperation:
     @staticmethod
     def _merge_pool_transfers(
         ops: List[CacheOperation],
+        merged_host_indices=None,
+        merged_device_indices=None,
     ) -> Optional[List[PoolTransfer]]:
         grouped: dict[tuple[PoolName, Optional[PoolName]], List[PoolTransfer]] = {}
         for op in ops:
@@ -135,15 +138,28 @@ class CacheOperation:
         if not grouped:
             return None
 
-        def cat_or_none(tensors):
+        reuse_alias = envs.SGLANG_AX_HICACHE_INDEX_ALIAS.get()
+
+        def cat_or_none(tensors, attribute, merged):
             parts = [tensor for tensor in tensors if tensor is not None]
+            if (
+                reuse_alias
+                and merged is not None
+                and len(parts) == len(ops)
+                and all(part is getattr(op, attribute) for part, op in zip(parts, ops))
+            ):
+                return merged
             return torch.cat(parts) if parts else None
 
         return [
             PoolTransfer(
                 name=transfers[0].name,
-                host_indices=cat_or_none(t.host_indices for t in transfers),
-                device_indices=cat_or_none(t.device_indices for t in transfers),
+                host_indices=cat_or_none(
+                    (t.host_indices for t in transfers), "host_indices", merged_host_indices
+                ),
+                device_indices=cat_or_none(
+                    (t.device_indices for t in transfers), "device_indices", merged_device_indices
+                ),
                 keys=[key for t in transfers if t.keys for key in t.keys] or None,
                 hit_policy=transfers[0].hit_policy,
                 indices_from_pool=transfers[0].indices_from_pool,
@@ -167,7 +183,9 @@ class CacheOperation:
             device_indices,
             -1,
             priority,
-            pool_transfers=CacheOperation._merge_pool_transfers(ops),
+            pool_transfers=CacheOperation._merge_pool_transfers(
+                ops, host_indices, device_indices
+            ),
         )
         merged_op.node_ids = node_ids
         return merged_op
