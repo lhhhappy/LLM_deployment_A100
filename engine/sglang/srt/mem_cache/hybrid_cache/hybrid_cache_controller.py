@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 import torch
 
+from sglang.srt.environ import envs
 from sglang.srt.managers.cache_controller import (
     CacheOperation,
 )
@@ -610,13 +611,23 @@ class HybridCacheController(BaseHiCacheController):
         host_indices, device_indices = self.move_indices(
             operation.host_indices, operation.device_indices
         )
+        reuse_alias = (
+            self.io_backend == "kernel" and envs.SGLANG_AX_HICACHE_INDEX_ALIAS.get()
+        )
         resolved_pool_transfers = None
         if operation.pool_transfers:
             resolved_pool_transfers = []
             for transfer in operation.pool_transfers:
-                transfer_host_indices, transfer_device_indices = self.move_indices(
-                    transfer.host_indices, transfer.device_indices
-                )
+                if (
+                    reuse_alias
+                    and transfer.host_indices is operation.host_indices
+                    and transfer.device_indices is operation.device_indices
+                ):
+                    transfer_host_indices, transfer_device_indices = host_indices, device_indices
+                else:
+                    transfer_host_indices, transfer_device_indices = self.move_indices(
+                        transfer.host_indices, transfer.device_indices
+                    )
                 # Keep the original PoolTransfer unchanged because tree-owned
                 # transfers may still reference radix-tree host state. The
                 # controller only needs a normalized execution-time copy.

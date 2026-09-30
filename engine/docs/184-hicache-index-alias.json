@@ -1,0 +1,17 @@
+{
+  "mechanism": 184,
+  "enable": "SGLANG_AX_HICACHE_INDEX_ALIAS=1",
+  "default": "off",
+  "change": "Normalize a shared host/device index pair once for ordinary kernel transfers. Preserve identity after merging only if every member field is the corresponding operation field in the original order.",
+  "guard": "Normalization reuses only complete Tensor identity pairs on the kernel I/O backend. Equal-valued distinct tensors, subsets, missing or reordered members retain independent normalization and concatenation. Original PoolTransfer objects remain unchanged.",
+  "ownership": "Per-operation references only; no persistent cache or staging buffer. Original L2 start/fence/readiness/finish events and record_stream handling remain unchanged; shared indices are read-only.",
+  "measured": "Single A100 run, 80 interleaved pairs per size: normalization saved8-45us; complete synthetic pinned-host11KV+3indexer transfer saved7-45us. Outputs, descriptors and16-generation two-stream early-release pressure matched.",
+  "source_sha256": {
+    "engine/sglang/srt/managers/cache_controller.py": "8fee3be45454a4fa453b20c3d80e9ee835356c3c16b488b8ac893e42d606c157",
+    "engine/sglang/srt/mem_cache/hybrid_cache/hybrid_cache_controller.py": "0d7e870cd6d8b7a5b780297c4925865bb7daced33579c708527f5857bc15c19a"
+  },
+  "qualification_scope": "Exact AST merge/normalization plus actual pinned-host row copy and L2 stream lifecycle, synthetic pools. No TP8/model, production page-index/JIT layout, or measured service gain.",
+  "evidence": "evidence/execution-0930/cache-index-alias/184-summary.json",
+  "review": "Root independently checked pure kernel move_indices source, same-order merge identity condition, unchanged descriptors and stream lifetime; exact candidate source hashes match qualification.",
+  "pending": "Bounded real-model Pod experiment and paired chain/TPOT; keep default off."
+}
