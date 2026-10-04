@@ -1,0 +1,44 @@
+{
+  "purpose": "Local diagnostic workload used in the September 30 exploration; not the hidden official set",
+  "source": {
+    "root": "s1-dev/data/dev-combined-v1",
+    "harness": "s1-dev/harness",
+    "tokenizer": "s1-dev/glm_tok",
+    "read_corpus": "build/base_exact",
+    "assets_in_git": false
+  },
+  "build_v4": {
+    "chains": 311,
+    "seed": 20260924,
+    "max_context_tokens": 524288,
+    "rewrite_topup": true
+  },
+  "rebudget_v5": {
+    "gamma": 1.6,
+    "cap": 16384,
+    "seed": 20270101
+  },
+  "gap_proposal": {
+    "ttft_s": 1.5,
+    "tpot_s": 0.03,
+    "gap_cap_s": 310.0,
+    "chain_cap_s": 3600.0,
+    "allow_scale_down": false,
+    "redistribute": false
+  },
+  "tail_selection": {
+    "rule": "synthetic non-head, old gap > v5 non-head P90, proposal > max(old gap, 60s), proposal <= 310s",
+    "ordinary_p50_p90": "preserved"
+  },
+  "cohort_rotation": {
+    "offset": 150,
+    "rule": "chains[150:] + chains[:150]",
+    "observed_cohort_sha256": "b78593bdea138f58"
+  },
+  "validation": {
+    "expected_chains": 311,
+    "expected_requests": 5601,
+    "body_render_and_harness_check": "required before claiming a fully validated regenerated dataset",
+    "official_score_equivalence": false
+  }
+}

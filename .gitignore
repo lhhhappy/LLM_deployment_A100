@@ -21,6 +21,9 @@ credentials*
 data/longchain-*/
 data/s1-dev-longchain/
 data/s1-dev-longchain-lite/
+# Workload inputs and generated datasets stay local; publish code and recipes.
+data/*
+!data/README.md
 build/engine/
 .codegraph/
 

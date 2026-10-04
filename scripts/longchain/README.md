@@ -1,19 +1,19 @@
 # 长程测试集工具
 
-当前成品：[`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，311链、5601请求；已完成全量CPU验收。交付与分布见[`data/README.md`](../../data/README.md)。本目录集中维护生成、校验、回放入口与Phoenix观测，不在`scripts/analysis/`保留旧副本。
+最新探索负载是 `s1-dev-longchain-v5g-tail-rot150`。本目录把生成、元数据派生、校验与回放方法放进 Git；原始输入和生成产物留在本地。先读 [09-30 可执行配方](recipes/README.md) 和 [参数 JSON](recipes/0930.json)，基础生成设计见 [longchain.md](longchain.md)。
 
-64链快速试跑集已生成：`data/s1-dev-longchain-lite`，1123请求，按用户要求未跑自检。原runner只换root/set/cohort，具体参数见[`data/README.md`](../../data/README.md)。复现命令：`python3 -B scripts/longchain/longchain_subset.py`。
+v2 完整集和 lite 是早期诊断负载，历史结论保留在 Git 与实验记录；不把它们当作当前 N42 探索使用的数据。数据边界见 [data/README.md](../../data/README.md)。
 
-## 直接回放当前成品
+## 回放已验收的本地成品
 
 在仓库根目录运行，换成实际引擎根地址和本次N；每次使用全新的输出目录。下面N=14只是命令示例，不是CPU推断出的推荐通过档。
 
 ```bash
 uv run --with-requirements scripts/longchain/requirements-longchain.txt \
   python -B scripts/longchain/longchain_replay.py \
-  --root data/s1-dev-longchain \
+  --root cache/s1-dev-longchain-v5g-tail-rot150 \
   --base-url http://ENGINE_HOST:8000 \
-  --n 14 --out runs/longchain-n14-01
+  --n 14 --out build/scratch/longchain-n14-01
 ```
 
 鉴权服务追加`--api-key`；引擎地址带`/v1`会由原runner剥离。该入口先离线验收，再调用原checked runner：preflight → warmup → 真正flush KV → 完整回放 → 原评分和题面补充门。它不启动或修改引擎。API key不写日志。复用同一引擎JIT预热时可加`--skip-warmup`，每档flush仍执行。
@@ -21,18 +21,21 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt \
 只替换负载时，现有队列/原runner使用这三个参数即可，发压和评分算法不变：
 
 ```text
---root data/s1-dev-longchain
---set s1-dev-longchain
---cohort data/s1-dev-longchain/cohort.json
+--root cache/s1-dev-longchain-v5g-tail-rot150
+--set s1-dev-longchain-v5g-tail-rot150
+--cohort cache/s1-dev-longchain-v5g-tail-rot150/cohort.json
 ```
 
-评分必须指向`data/s1-dev-longchain/requests.jsonl`；使用新的运行目录避免原harness复用别的数据的body cache。不要加`--max-chains`、`--no-gap`或`--include-all`后把结果当同一份负载。
+评分必须指向本次数据集的 `requests.jsonl`；使用新的运行目录避免原harness复用别的数据的body cache。不要加`--max-chains`、`--no-gap`或`--include-all`后把结果当同一份负载。
 
 ## 文件职责
 
 | 文件 | 用途 |
 |---|---|
 | `longchain.py` / `longchain_events.py` | 源素材、冻结事件计划与不可变历史编译 |
+| `rebudget.py` / `regap.py` | 派生输出预算和等待提案，复用正文，写新目录 |
+| `longchain_metadata.py` / `repair_metadata.py` | 核对字段、输入身份、覆盖与来源，发布不可变派生集 |
+| `finalize_v5g.py` / `rotate_cohort.py` | 选择等待长尾，再重排同一组完整链 |
 | `longchain_subset.py` | 从成品按链长、pack分层抽取64条完整链；正文和等待不变，不运行自检 |
 | `longchain_check.py` | 独立正文、工具组、token/LCP、预算和来源验收 |
 | `longchain_replay.py` | 离线防护后调用原runner与评分，不是另一套回放算法 |

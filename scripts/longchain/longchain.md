@@ -1,5 +1,7 @@
 # 长程 s1-dev：生成设计与验收契约
 
+本页说明 v3/v4 基础生成的机制与扩展契约。最新探索数据的完整派生链路、参数与校验入口统一见 [09-30 配方](recipes/README.md)；生产输入与产物不随 Git 发布。早期 v2 / lite 的现行状态从这里退出，历史证据按当时版本阅读。
+
 2026-09-26 起为 v3（`source-event-longchain-v3`）。当前实现为 `longchain.py` + `longchain_events.py`：先冻结事件计划，再编译不可变历史快照；复用原 Renderer、数据布局和回放程序。正文以 s1-dev 为素材；每一步的负载（新增 token、等待、输出）照搬主办方同类公开请求，每条链对齐主办方冻结的三个总数（见下节）。不再读取 Phoenix。独立性指每条接收链的历史和依赖自足，不强制隔离 KV，也不要求每个文本片段唯一。
 
 ## v3：按主办方 token 结构对齐（2026-09-26）
@@ -15,7 +17,7 @@
 - **长度补足**：借来的工具块短于目标时，加一个并行 Read 调用，结果文本先取公开工具结果中的长文本，再取冻结源码树 `build/base_exact`（`--read-corpus`）的文本文件，按固定顺序往下读、不回头重复；清单记录语料哈希与读取位置，只有 token 数有意义。
 - **已知偏差**：公开请求集中在链的前几步，模板带有"开头"特征；主办方少数链有压缩式改写（下一条 prompt 变短），v3 只在上下文超限时缩短上下文；5 份公开正文的会话没有可用的 Read 定义，这些链的新增与改写会偏少；新增总量可能偏少（见上）。偏差按链写入 `manifest.json` 的 `chain_summaries`（`synthesized_*` 对 `target_*`，目标为源链总数减公开部分），用 `workload_compare.py` 汇总。
 
-v2 成品为 [`data/s1-dev-longchain/`](../../data/s1-dev-longchain/)，v3 通过验收后放在 `data/s1-dev-longchain-v3/`；规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/` 下的新目录，通过验收才成为成品。全量生成需数 GB 内存，在 GPU 开发机 `/sjtu/linhang/arena/runs/` 下运行，产物再经 `scripts/pod/ppush` 进 Pod。
+v2 成品为 `data/s1-dev-longchain/`（本地归档：`../../data/s1-dev-longchain/`），v3 通过验收后放在 `data/s1-dev-longchain-v3/`；规模与验收进度见 [`data/README.md`](../../data/README.md)。生成中间件只写 `cache/` 下的新目录，通过验收才成为成品。全量生成需数 GB 内存，在 GPU 开发机 `/sjtu/linhang/arena/runs/` 下运行，产物再经 `scripts/pod/ppush` 进 Pod。
 
 三路审查已修复重建摘要被下一步删除、素材不足绕过压力重建、丢弃试选污染使用计数，以及重建收据和工具边界漏检。极短中间历史的摘要可能比原文更长，生成器会收紧同一次重建的尾部/摘录并重新真实渲染，仍不缩短则拒绝生成；调整写入来源账本。
 
@@ -44,7 +46,7 @@ uv run --with-requirements scripts/longchain/requirements-longchain.txt python -
 
 构造可用原harness回放的长程合成开发集，检查部署在持续增长、等待、重建和混合竞争下的表现。原开发集继续独立承担A/B和回归；新集不能预测正式N@SLO。
 
-**按task.md原理核对的结论**：跨session借query/片段并离线冻结，与该harness的固定轨迹回放方式兼容。[task.md](../../llm-challenge-arena-v1/task.md)第167–222行规定完整渲染prompt与逐请求`max_new_tokens + ignore_eos`，压测评分不读输出正文；第488行明确工具结果来自冻结记录、不执行工具。[s1_loadgen.py](../../s1-dev/harness/s1_loadgen.py)的`drive`逐次读取冻结prompt，没有把本次回答反馈到下一prompt。因此无需恢复A原故事或执行其真实工具，也无需对合成对话做逐题正确性打分。此结论只涉及自建诊断负载；官方能力评测仍独立保留。
+**按task.md原理核对的结论**：跨session借query/片段并离线冻结，与该harness的固定轨迹回放方式兼容。[task.md](../../llm-challenge-arena-v1/task.md)第167–222行规定完整渲染prompt与逐请求`max_new_tokens + ignore_eos`，压测评分不读输出正文；第488行明确工具结果来自冻结记录、不执行工具。s1_loadgen.py（本地归档：`../../s1-dev/harness/s1_loadgen.py`）的`drive`逐次读取冻结prompt，没有把本次回答反馈到下一prompt。因此无需恢复A原故事或执行其真实工具，也无需对合成对话做逐题正确性打分。此结论只涉及自建诊断负载；官方能力评测仍独立保留。
 
 用户要求review聚焦**负载真实性**：实际token长度/增量/输出预算、事件与间隔、历史稳定/重建、共享前缀、链长与竞争结构。只因话题跳转或措辞不精致不应阻断生成；格式损坏、未闭合工具引用或大段克隆导致的负载畸变才须修复。不能进一步推成“任意正文同分”：tokenization、MTP接受率、MoE路由和实际闭环交错仍可能受内容影响。冻结同一成品做A/B，并报告这些实测差异；不追求完整故事复原。
 
@@ -185,7 +187,7 @@ N是逻辑槽数；等待占槽，但该链此时没有在飞模型请求。其�
 
 方案review不是向用户再索取批准的关口；在既有授权下推进。发现不一致就修复并记录，不能用review作为一直不生成数据的理由。
 
-证据入口：[四类请求与来源审查](../../notes/codex-四类请求与造数建议.md)、[旧候选冻结](../../evidence/longchain-audit/frozen-candidate/README.md)。
+证据入口：[四类请求与来源审查](../../notes/codex-四类请求与造数建议.md)、旧候选冻结（本地归档：`../../evidence/longchain-audit/frozen-candidate/README.md`）。
 
 ## 当前完整集的代表性边界
 
