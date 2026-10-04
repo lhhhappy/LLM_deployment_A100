@@ -1,0 +1,155 @@
+{
+  "metadata": {
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "numerical_tolerances": {
+      "output_max_abs": 0.01,
+      "state_max_abs": 0.002,
+      "state_relative_rms": 0.002
+    },
+    "note": "synthetic correctness, not model accuracy; timing includes full Python dispatch/allocation, graph amortizes 10 decode steps per replay"
+  },
+  "records": [
+    {
+      "type": "numerical_graph",
+      "batch": 4,
+      "steps": 256,
+      "pitch": true,
+      "changing_live_indices": true,
+      "max_errors": {
+        "triton_output": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0,
+          "max_bf16_ulp": 0,
+          "fraction_different": 0.0,
+          "fraction_gt1ulp": 0.0
+        },
+        "triton_state": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0
+        },
+        "cuda_output": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0,
+          "max_bf16_ulp": 0,
+          "fraction_different": 0.0,
+          "fraction_gt1ulp": 0.0
+        },
+        "cuda_state": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0
+        }
+      }
+    },
+    {
+      "type": "numerical_graph",
+      "batch": 8,
+      "steps": 256,
+      "pitch": true,
+      "changing_live_indices": true,
+      "max_errors": {
+        "triton_output": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0,
+          "max_bf16_ulp": 0,
+          "fraction_different": 0.0,
+          "fraction_gt1ulp": 0.0
+        },
+        "triton_state": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0
+        },
+        "cuda_output": {
+          "max_abs": 1.9073486328125e-06,
+          "rms": 2.4333495218797907e-08,
+          "relative_rms": 4.724771435073426e-06,
+          "max_bf16_ulp": 1,
+          "fraction_different": 0.00032552084303461015,
+          "fraction_gt1ulp": 0.0
+        },
+        "cuda_state": {
+          "max_abs": 1.7881393432617188e-07,
+          "rms": 3.0088820324181142e-09,
+          "relative_rms": 1.2832780249318908e-08
+        }
+      }
+    },
+    {
+      "type": "numerical_graph",
+      "batch": 32,
+      "steps": 256,
+      "pitch": true,
+      "changing_live_indices": true,
+      "max_errors": {
+        "triton_output": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0,
+          "max_bf16_ulp": 0,
+          "fraction_different": 0.0,
+          "fraction_gt1ulp": 0.0
+        },
+        "triton_state": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0
+        },
+        "cuda_output": {
+          "max_abs": 0.0001220703125,
+          "rms": 7.629394644936838e-07,
+          "relative_rms": 0.00017320090516225825,
+          "max_bf16_ulp": 12,
+          "fraction_different": 0.00023437499476131052,
+          "fraction_gt1ulp": 3.9062499126885086e-05
+        },
+        "cuda_state": {
+          "max_abs": 1.7881393432617188e-07,
+          "rms": 3.1335387618014465e-09,
+          "relative_rms": 1.7037351205847894e-08
+        }
+      }
+    },
+    {
+      "type": "numerical_graph",
+      "batch": 48,
+      "steps": 256,
+      "pitch": true,
+      "changing_live_indices": true,
+      "max_errors": {
+        "triton_output": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0,
+          "max_bf16_ulp": 0,
+          "fraction_different": 0.0,
+          "fraction_gt1ulp": 0.0
+        },
+        "triton_state": {
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "relative_rms": 0.0
+        },
+        "cuda_output": {
+          "max_abs": 0.0001220703125,
+          "rms": 6.188255952110921e-07,
+          "relative_rms": 0.00014657078131905397,
+          "max_bf16_ulp": 10,
+          "fraction_different": 0.00017989308980759233,
+          "fraction_gt1ulp": 2.5699013349367306e-05
+        },
+        "cuda_state": {
+          "max_abs": 1.7881393432617188e-07,
+          "rms": 3.3026736900865217e-09,
+          "relative_rms": 1.924277772978101e-08
+        }
+      }
+    }
+  ]
+}

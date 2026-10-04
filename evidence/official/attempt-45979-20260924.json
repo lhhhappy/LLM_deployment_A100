@@ -1,0 +1,38 @@
+{
+  "id": 45979,
+  "execStatus": "completed",
+  "outcome": "partial",
+  "scorecard_keys": [
+    "harbor_replay_executed",
+    "harbor_reward",
+    "harbor_score",
+    "scorewheel_datasets",
+    "scorewheel_engine",
+    "scorewheel_eval_id",
+    "scorewheel_gate_passed",
+    "scorewheel_raw_result",
+    "scorewheel_stress",
+    "trace_score"
+  ],
+  "stress": {
+    "chain_start_p95": 30.234253644943237,
+    "evaluation_status": "PASS",
+    "fast_intra_p95": 1.5190842151641846,
+    "n": 14,
+    "n_at_slo": 14,
+    "overall_intra_p95": 3.8729450702667236,
+    "passed": true,
+    "reason": null,
+    "slo_attainment": 0.9541387024608501,
+    "tpm_all": 1757558.4166666667,
+    "tpm_decode": 20546.916666666668,
+    "tpot_mean": 0.017435166367994834,
+    "tpot_p95": 0.03638074694227087,
+    "turn_start_p95": 6.393102169036865
+  },
+  "datasets": {
+    "aime26": 0.9772727272727273,
+    "gpqa-diamond": 0.9807692307692307
+  },
+  "gate_passed": true
+}

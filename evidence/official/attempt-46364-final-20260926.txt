@@ -1,0 +1,4 @@
+attempt 46364 created 2026-09-25T15:18:39+00:00 exec=completed outcome=partial score=98.7179
+  capability gate=True aime26=1 gpqa=0.9743589743589743
+  stress n_at_slo=22 tpot_mean=0.0226 tpot_p95=0.0438 fast=1.86 overall=3.15 turn=10.66 chain=41.97 slo_att=0.958 tpm_all=1729474
+  scoringDetails: {"gradable": true, "harbor_reward": 0.98717949, "playground_score": 98.717949, "source": "harbor_worker", "summary": "Received and graded in full. Strong submission.", "total_score": 98.717949, "trace_factor": 1}

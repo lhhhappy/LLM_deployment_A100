@@ -1,0 +1,131 @@
+{
+  "basis": "Developer receipts and independent reviews; closed Pod diagnostics; profile03 all8 SHA verified. No new formal submission.",
+  "directions": [
+    {
+      "name": "MoE decode W2",
+      "status": "COMBINATION_QUEUED_N42_N46",
+      "commit": "6b629210",
+      "observed_scope": "synthetic real-geometry full MoE graph ~4-4.5% faster",
+      "evidence": "moe/full-candidates.json"
+    },
+    {
+      "name": "DSA decode page reuse",
+      "status": "COMBINATION_QUEUED_N42_N46",
+      "commit": "400adf7d",
+      "observed_scope": "native paged selection stage savings; exact logits on qualification cases; unchanged selector has cutoff-tie nondeterminism",
+      "evidence": "dsa/final-wrapper-results.json"
+    },
+    {
+      "name": "KDA packed safe decode",
+      "status": "DEVELOPER_TESTED_DEFERRED",
+      "commit": "d18933a9",
+      "reason": "bitwise recurrence tests passed; B32/B36 local cost slightly worse; standalone Pod arm cancelled"
+    },
+    {
+      "name": "CUDA graph extra buckets",
+      "status": "POD_DRAINED_EXCLUDED_FROM_COMBINATION",
+      "chain_pair_a1": {
+        "repaired": 3,
+        "new_bad": 7
+      },
+      "chain_pair_a2": {
+        "repaired": 3,
+        "new_bad": 5
+      },
+      "evidence": [
+        "graph-vs-a1/paired.json",
+        "graph-vs-a2/paired.json"
+      ],
+      "scope": "one-hour diagnostic, not full cohort PASS"
+    },
+    {
+      "name": "mHC small-batch post/pre",
+      "status": "DEVELOPER_TESTED_REJECTED_HELPER",
+      "graph_m32_us": [
+        22.872,
+        34.14
+      ],
+      "reason": "graph helper slower; separate native finalizer gives only small local savings and not production-integrated"
+    },
+    {
+      "name": "Decode metadata glue",
+      "status": "TP8_QUALIFICATION_INVALID_OFF",
+      "batch32_complete_boundary_us": [
+        708.8715210556984,
+        158.40109437704086
+      ],
+      "scope": "actual methods plus synthetic static pools; excludes model/TP8/checkpoints/SLO",
+      "evidence": "metadata-glue-review/tp8-04m-findings.json",
+      "commit": "f3a99079",
+      "qualification_commit": "eb1e7caf",
+      "reason": "Cross-wave output mismatch with baseline within-wave nondeterminism; cause unresolved. Do not enable."
+    },
+    {
+      "name": "Short prefill CUDA graph",
+      "status": "NOT_QUALIFIED_ON_CURRENT_TP8_STACK",
+      "reason": "historical170 correctness/scatter/state issues require model-level validation; decode metadata glue does not establish prefill graph compatibility"
+    },
+    {
+      "name": "Deadline measured-cost calibration",
+      "status": "READ_ONLY_REVIEW_COMPLETE_NO_CHANGE",
+      "constraint": "do not blindly retune68us or treat queue latency as execution cost",
+      "evidence": "deadline/cost-review-400adf7d.json"
+    },
+    {
+      "name": "KV/KDA checkpoint retention",
+      "status": "READ_ONLY_REVIEW_COMPLETE_CAUSE_UNRESOLVED",
+      "constraint": "quantify real state-miss recomputation before implementing retention changes",
+      "evidence": "cache-review/receipt.json"
+    },
+    {
+      "name": "KDA shared prefix-state mask",
+      "status": "COMMITTED_DEFAULT_OFF_DEVELOPER_BOUNDARY_PASSED",
+      "commit": "8f19417f",
+      "saved_mask_boundary_us": "257-260",
+      "scope": "34 real convolutions but scan stub; no TP8/model gain",
+      "evidence": "kda-shared-prefix/receipt.json"
+    },
+    {
+      "name": "GPU-only prefill track indices with pinned uploads",
+      "status": "COMMITTED_DEFAULT_OFF_BATCH8_GUARD",
+      "scope": "Final eligible B8/12/32 full-prepare improved; B1/B2 preserve baseline. Current synthetic boundary scope; TP8 pending.",
+      "constraint": "Do not enable globally; current N46 first250 prefill batches238 have B1",
+      "evidence": "tokenspeed-host-review/179-final-summary.json",
+      "commit": "86b82497"
+    },
+    {
+      "name": "DSA aligned query view",
+      "status": "COMMITTED_DEFAULT_OFF_DEVELOPER_AND_INDEPENDENT_REVIEW_PASSED",
+      "commit": "7f87346f",
+      "evidence": "dsa-query-view/receipt.json",
+      "scope": "Complete primitive/preparation boundary; TP8 service gain pending"
+    },
+    {
+      "name": "Mamba allocation GPU index upload",
+      "status": "COMMITTED_DEFAULT_OFF_DEVELOPER_AND_INDEPENDENT_REVIEW_PASSED",
+      "commit": "ce395da5",
+      "evidence": "tokenspeed-host-review/182-final-summary.json",
+      "scope": "Complete primitive/preparation boundary; TP8 service gain pending"
+    },
+    {
+      "name": "Direct per-Req track scalar stacking",
+      "status": "DEVELOPER_REJECTED_B32_REGRESSION",
+      "mechanism": 183,
+      "evidence": "tokenspeed-host-review/183-rejection-summary.json"
+    },
+    {
+      "name": "HiCache tensor-identity index reuse",
+      "status": "COMMITTED_DEFAULT_OFF_DEVELOPER_AND_INDEPENDENT_REVIEW_PASSED",
+      "commit": "ca5d646c",
+      "evidence": "cache-index-alias/184-summary.json",
+      "scope": "Exact merge/normalize AST and synthetic full transfer; TP8 service qualification pending"
+    },
+    {
+      "name": "DSA H8 dead output staging removal",
+      "status": "DEVELOPER_PROBE_NOT_ADOPTED",
+      "mechanism": 185,
+      "evidence": "dsa-h8-no-stage/185-probe-summary.json",
+      "reason": "Graph and large shapes improved, but B24/B48 eager complete boundary has residual regression; not included in Pod combination"
+    }
+  ]
+}

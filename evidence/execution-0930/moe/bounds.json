@@ -1,0 +1,2705 @@
+{
+  "metadata": {
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "torch": "2.13.0+cu130",
+    "geometry": {
+      "hidden": 4096,
+      "per_rank_intermediate": 256,
+      "routed_experts": 288,
+      "fused_shared": 1,
+      "topk": 9,
+      "clamp": 10,
+      "routed_scaling": 2.5
+    },
+    "source": "bf6b66fa clean exported engine; 117 real FusedMoE, synthetic quantized checkpoint",
+    "configs": {
+      "compute_config": {
+        "use_f16_accum": false,
+        "gemm_type": "indexed"
+      },
+      "w13_tuning_config": [
+        [
+          0,
+          1,
+          {
+            "block_shape": [
+              16,
+              64,
+              256
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 36,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          1,
+          2,
+          {
+            "block_shape": [
+              16,
+              64,
+              256
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 72,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          2,
+          8,
+          {
+            "block_shape": [
+              16,
+              64,
+              256
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          8,
+          16,
+          {
+            "block_shape": [
+              16,
+              128,
+              128
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          16,
+          64,
+          {
+            "block_shape": [
+              16,
+              256,
+              64
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          64,
+          4160,
+          {
+            "block_shape": [
+              16,
+              256,
+              128
+            ],
+            "warp_shape": [
+              16,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          4160,
+          8320,
+          {
+            "block_shape": [
+              32,
+              256,
+              64
+            ],
+            "warp_shape": [
+              16,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          8320,
+          12480,
+          {
+            "block_shape": [
+              48,
+              256,
+              128
+            ],
+            "warp_shape": [
+              48,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 3,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          12480,
+          16896,
+          {
+            "block_shape": [
+              64,
+              256,
+              64
+            ],
+            "warp_shape": [
+              32,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          16896,
+          25216,
+          {
+            "block_shape": [
+              96,
+              256,
+              64
+            ],
+            "warp_shape": [
+              48,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          25216,
+          33536,
+          {
+            "block_shape": [
+              128,
+              256,
+              64
+            ],
+            "warp_shape": [
+              64,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          33536,
+          50176,
+          {
+            "block_shape": [
+              64,
+              256,
+              64
+            ],
+            "warp_shape": [
+              32,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          50176,
+          1073741824,
+          {
+            "block_shape": [
+              128,
+              256,
+              64
+            ],
+            "warp_shape": [
+              64,
+              64,
+              64
+            ],
+            "use_stream_k": true,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ]
+      ],
+      "w2_tuning_config": [
+        [
+          0,
+          1,
+          {
+            "block_shape": [
+              16,
+              64,
+              256
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 22,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          1,
+          2,
+          {
+            "block_shape": [
+              16,
+              128,
+              128
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 43,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          2,
+          4,
+          {
+            "block_shape": [
+              16,
+              256,
+              64
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 86,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          4,
+          64,
+          {
+            "block_shape": [
+              16,
+              256,
+              64
+            ],
+            "warp_shape": [
+              16,
+              64,
+              32
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          64,
+          4160,
+          {
+            "block_shape": [
+              16,
+              256,
+              128
+            ],
+            "warp_shape": [
+              16,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          4160,
+          8320,
+          {
+            "block_shape": [
+              32,
+              256,
+              64
+            ],
+            "warp_shape": [
+              16,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          8320,
+          12480,
+          {
+            "block_shape": [
+              48,
+              256,
+              128
+            ],
+            "warp_shape": [
+              48,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 3,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          12480,
+          16896,
+          {
+            "block_shape": [
+              64,
+              256,
+              64
+            ],
+            "warp_shape": [
+              32,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          16896,
+          25216,
+          {
+            "block_shape": [
+              96,
+              256,
+              64
+            ],
+            "warp_shape": [
+              48,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          25216,
+          33536,
+          {
+            "block_shape": [
+              128,
+              256,
+              64
+            ],
+            "warp_shape": [
+              64,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          33536,
+          50176,
+          {
+            "block_shape": [
+              64,
+              256,
+              64
+            ],
+            "warp_shape": [
+              32,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 5,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ],
+        [
+          50176,
+          1073741824,
+          {
+            "block_shape": [
+              128,
+              256,
+              64
+            ],
+            "warp_shape": [
+              64,
+              64,
+              64
+            ],
+            "use_stream_k": false,
+            "use_f16_accum": false,
+            "num_sms": 108,
+            "num_stages": 4,
+            "num_ctas_per_sm": 1,
+            "num_write_splits": 1
+          }
+        ]
+      ],
+      "compute_config_str": "{\"use_f16_accum\": false, \"gemm_type\": \"indexed\"}",
+      "w13_tuning_config_str": "[[0, 1, {\"block_shape\": [16, 64, 256], \"warp_shape\": [16, 64, 32], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 36, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [1, 2, {\"block_shape\": [16, 64, 256], \"warp_shape\": [16, 64, 32], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 72, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [2, 8, {\"block_shape\": [16, 64, 256], \"warp_shape\": [16, 64, 32], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [8, 16, {\"block_shape\": [16, 128, 128], \"warp_shape\": [16, 64, 32], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [16, 64, {\"block_shape\": [16, 256, 64], \"warp_shape\": [16, 64, 32], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [64, 4160, {\"block_shape\": [16, 256, 128], \"warp_shape\": [16, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [4160, 8320, {\"block_shape\": [32, 256, 64], \"warp_shape\": [16, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [8320, 12480, {\"block_shape\": [48, 256, 128], \"warp_shape\": [48, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 3, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [12480, 16896, {\"block_shape\": [64, 256, 64], \"warp_shape\": [32, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [16896, 25216, {\"block_shape\": [96, 256, 64], \"warp_shape\": [48, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [25216, 33536, {\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [33536, 50176, {\"block_shape\": [64, 256, 64], \"warp_shape\": [32, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [50176, 1073741824, {\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": true, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}]]",
+      "w2_tuning_config_str": "[[0, 1, {\"block_shape\": [16, 64, 256], \"warp_shape\": [16, 64, 32], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 22, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [1, 2, {\"block_shape\": [16, 128, 128], \"warp_shape\": [16, 64, 32], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 43, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [2, 4, {\"block_shape\": [16, 256, 64], \"warp_shape\": [16, 64, 32], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 86, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [4, 64, {\"block_shape\": [16, 256, 64], \"warp_shape\": [16, 64, 32], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [64, 4160, {\"block_shape\": [16, 256, 128], \"warp_shape\": [16, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [4160, 8320, {\"block_shape\": [32, 256, 64], \"warp_shape\": [16, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [8320, 12480, {\"block_shape\": [48, 256, 128], \"warp_shape\": [48, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 3, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [12480, 16896, {\"block_shape\": [64, 256, 64], \"warp_shape\": [32, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [16896, 25216, {\"block_shape\": [96, 256, 64], \"warp_shape\": [48, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [25216, 33536, {\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [33536, 50176, {\"block_shape\": [64, 256, 64], \"warp_shape\": [32, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 5, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}], [50176, 1073741824, {\"block_shape\": [128, 256, 64], \"warp_shape\": [64, 64, 64], \"use_stream_k\": false, \"use_f16_accum\": false, \"num_sms\": 108, \"num_stages\": 4, \"num_ctas_per_sm\": 1, \"num_write_splits\": 1}]]"
+    }
+  },
+  "records": [
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007774881552904844,
+      "median_us": 64.35328006744385,
+      "samples_us": [
+        64.3116807937622,
+        64.41088199615479,
+        64.33023929595947,
+        64.35200214385986,
+        64.36992168426514,
+        64.29056167602539,
+        64.34624195098877,
+        64.38591957092285,
+        64.35455799102783,
+        64.4646406173706,
+        64.34239864349365,
+        64.35776233673096
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007769403979182243,
+      "median_us": 63.86879920959473,
+      "samples_us": [
+        63.98911952972412,
+        64.02944087982178,
+        63.826560974121094,
+        63.89376163482666,
+        63.86303901672363,
+        63.814401626586914,
+        63.87135982513428,
+        63.76448154449463,
+        63.866238594055176,
+        63.89823913574219,
+        63.81375789642334,
+        63.893117904663086
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007512663956731558,
+      "median_us": 53.6521577835083,
+      "samples_us": [
+        63.445119857788086,
+        63.676161766052246,
+        63.622398376464844,
+        63.788161277770996,
+        63.69408130645752,
+        55.077757835388184,
+        52.17599868774414,
+        52.22655773162842,
+        52.186241149902344,
+        52.21183776855469,
+        52.22271919250488,
+        52.21951961517334
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007512663956731558,
+      "median_us": 57.15583801269531,
+      "samples_us": [
+        62.96703815460205,
+        62.855682373046875,
+        62.90112018585205,
+        62.846717834472656,
+        62.972798347473145,
+        62.8115177154541,
+        51.447038650512695,
+        51.429758071899414,
+        51.46304130554199,
+        51.395201683044434,
+        51.50015830993652,
+        51.44063949584961
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.012497719377279282,
+      "median_us": 52.27008104324341,
+      "samples_us": [
+        52.354559898376465,
+        52.369279861450195,
+        52.357120513916016,
+        52.31423854827881,
+        52.271361351013184,
+        52.26880073547363,
+        52.238078117370605,
+        52.22015857696533,
+        52.227840423583984,
+        52.21248149871826,
+        52.383360862731934,
+        52.23423957824707
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 1,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.012463781051337719,
+      "median_us": 54.23840045928955,
+      "samples_us": [
+        54.25343990325928,
+        54.29759979248047,
+        54.3833589553833,
+        54.24511909484863,
+        54.181761741638184,
+        54.23168182373047,
+        54.1977596282959,
+        54.09791946411133,
+        54.22463893890381,
+        54.14400100708008,
+        54.289917945861816,
+        54.26112174987793
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          128,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 31,
+      "reference_relative_l2": 0.006696649361401796,
+      "median_us": 103.056321144104,
+      "samples_us": [
+        102.95616149902344,
+        102.88127899169922,
+        103.0361557006836,
+        103.10400009155273,
+        102.77055740356445,
+        103.03999900817871,
+        102.96768188476562,
+        103.1283187866211,
+        103.21536064147949,
+        103.22303771972656,
+        103.21855545043945,
+        103.0726432800293
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 31,
+      "reference_relative_l2": 0.006696649361401796,
+      "median_us": 103.32640171051025,
+      "samples_us": [
+        103.03744316101074,
+        103.46559524536133,
+        103.08352470397949,
+        103.29855918884277,
+        103.31904411315918,
+        103.55775833129883,
+        103.34848403930664,
+        103.2147216796875,
+        103.23712348937988,
+        103.33375930786133,
+        103.65823745727539,
+        103.35871696472168
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.0066782524809241295,
+      "median_us": 61.163201332092285,
+      "samples_us": [
+        61.147518157958984,
+        60.97087860107422,
+        61.34399890899658,
+        61.14816188812256,
+        61.1411190032959,
+        61.14175796508789,
+        61.24864101409912,
+        61.24288082122803,
+        61.32160186767578,
+        61.13215923309326,
+        61.17824077606201,
+        61.198081970214844
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.006716348696500063,
+      "median_us": 61.06752157211304,
+      "samples_us": [
+        61.351680755615234,
+        61.079039573669434,
+        61.14431858062744,
+        61.06048107147217,
+        60.785279273986816,
+        61.03936195373535,
+        60.84224224090576,
+        61.17311954498291,
+        61.011199951171875,
+        61.079678535461426,
+        60.92927932739258,
+        61.074562072753906
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 18,
+      "reference_relative_l2": 0.015704970806837082,
+      "median_us": 77.86144018173218,
+      "samples_us": [
+        78.00896167755127,
+        77.76512145996094,
+        77.62303829193115,
+        78.03520202636719,
+        77.74911880493164,
+        77.9423999786377,
+        77.76832103729248,
+        78.06591987609863,
+        77.85151958465576,
+        77.8713607788086,
+        77.70048141479492,
+        77.92064189910889
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 4,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 18,
+      "reference_relative_l2": 0.01618869975209236,
+      "median_us": 78.8156795501709,
+      "samples_us": [
+        78.75455856323242,
+        78.91583919525146,
+        78.90431880950928,
+        78.70528221130371,
+        78.98367881774902,
+        78.79231929779053,
+        78.67519855499268,
+        78.6681604385376,
+        78.83903980255127,
+        78.76863956451416,
+        78.9024019241333,
+        78.85119915008545
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          32
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 5,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 55,
+      "reference_relative_l2": 0.006370272487401962,
+      "median_us": 153.3475160598755,
+      "samples_us": [
+        153.3414363861084,
+        153.23712348937988,
+        153.439359664917,
+        153.57439994812012,
+        153.2364845275879,
+        153.39008331298828,
+        152.9964828491211,
+        153.32863807678223,
+        153.5871982574463,
+        153.6012840270996,
+        153.35359573364258,
+        152.6598358154297
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 55,
+      "reference_relative_l2": 0.006370169576257467,
+      "median_us": 145.77343940734863,
+      "samples_us": [
+        145.89183807373047,
+        146.08511924743652,
+        145.79903602600098,
+        145.665922164917,
+        145.91168403625488,
+        145.4963207244873,
+        145.7164764404297,
+        145.7478427886963,
+        145.8515167236328,
+        145.4694366455078,
+        146.11007690429688,
+        145.14880180358887
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007088522892445326,
+      "median_us": 64.05632019042969,
+      "samples_us": [
+        64.46656227111816,
+        64.15679931640625,
+        64.25471782684326,
+        63.766398429870605,
+        63.941121101379395,
+        64.04543876647949,
+        64.06720161437988,
+        63.97952079772949,
+        64.21311855316162,
+        63.928961753845215,
+        64.02495861053467,
+        64.0992021560669
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.0071145836263895035,
+      "median_us": 61.59008026123047,
+      "samples_us": [
+        61.77408218383789,
+        61.599998474121094,
+        61.62559986114502,
+        61.507840156555176,
+        61.607041358947754,
+        61.66656017303467,
+        61.580162048339844,
+        61.46048069000244,
+        61.391358375549316,
+        61.478400230407715,
+        61.47136211395264,
+        61.626877784729004
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.013853630982339382,
+      "median_us": 90.39135932922363,
+      "samples_us": [
+        90.27775764465332,
+        90.40255546569824,
+        90.47871589660645,
+        90.33663749694824,
+        90.38016319274902,
+        90.37568092346191,
+        90.43456077575684,
+        90.55680274963379,
+        90.1420783996582,
+        90.71807861328125,
+        90.18431663513184,
+        90.73920249938965
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 8,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.01385347731411457,
+      "median_us": 85.52832126617432,
+      "samples_us": [
+        85.47455787658691,
+        85.20256042480469,
+        85.46048164367676,
+        85.65759658813477,
+        85.56032180786133,
+        85.60256004333496,
+        85.52448272705078,
+        85.50784111022949,
+        85.53215980529785,
+        85.7811164855957,
+        85.4099178314209,
+        85.78944206237793
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 80,
+      "reference_relative_l2": 0.006181906908750534,
+      "median_us": 200.11679649353027,
+      "samples_us": [
+        200.2195167541504,
+        200.63871383666992,
+        200.34944534301758,
+        199.81695175170898,
+        200.14015197753906,
+        200.09344100952148,
+        200.01792907714844,
+        200.29247283935547,
+        199.94367599487305,
+        199.86175537109375,
+        199.89055633544922,
+        200.2579116821289
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 80,
+      "reference_relative_l2": 0.006182067561894655,
+      "median_us": 191.90495491027832,
+      "samples_us": [
+        191.8489646911621,
+        191.97248458862305,
+        191.4463996887207,
+        191.90847396850586,
+        191.92703247070312,
+        191.4771270751953,
+        191.90143585205078,
+        191.8067169189453,
+        192.3244857788086,
+        191.94623947143555,
+        192.38719940185547,
+        191.4041519165039
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.006970196962356567,
+      "median_us": 65.72064161300659,
+      "samples_us": [
+        65.84896087646484,
+        65.7804822921753,
+        65.90271949768066,
+        65.81632137298584,
+        65.68575859069824,
+        65.67935943603516,
+        65.74079990386963,
+        65.7254409790039,
+        65.55583953857422,
+        65.54431915283203,
+        65.52063941955566,
+        65.71584224700928
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.0067970165982842445,
+      "median_us": 63.17312002182007,
+      "samples_us": [
+        63.34144115447998,
+        63.009281158447266,
+        63.267202377319336,
+        63.05408000946045,
+        63.09120178222656,
+        63.315839767456055,
+        63.17567825317383,
+        63.335041999816895,
+        63.17056179046631,
+        62.98816204071045,
+        63.18079948425293,
+        63.15072059631348
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.013745874166488647,
+      "median_us": 91.71264171600342,
+      "samples_us": [
+        91.70944213867188,
+        91.57695770263672,
+        91.47583961486816,
+        91.85791969299316,
+        91.46304130554199,
+        91.83039665222168,
+        91.71584129333496,
+        91.49824142456055,
+        91.97183609008789,
+        91.68576240539551,
+        91.76447868347168,
+        92.07167625427246
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 12,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.01374562457203865,
+      "median_us": 86.66816234588623,
+      "samples_us": [
+        86.6592025756836,
+        86.61503791809082,
+        86.54144287109375,
+        86.91967964172363,
+        86.64896011352539,
+        86.56831741333008,
+        86.77056312561035,
+        86.5766429901123,
+        86.67712211608887,
+        86.91328048706055,
+        86.85888290405273,
+        86.83199882507324
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 106,
+      "reference_relative_l2": 0.0057881553657352924,
+      "median_us": 247.9097557067871,
+      "samples_us": [
+        247.70368576049805,
+        248.41856002807617,
+        247.49439239501953,
+        247.9360008239746,
+        248.3353614807129,
+        247.6723289489746,
+        248.33984375,
+        248.73855590820312,
+        247.81055450439453,
+        247.8835105895996,
+        247.87904739379883,
+        248.16064834594727
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 106,
+      "reference_relative_l2": 0.0057881856337189674,
+      "median_us": 238.156156539917,
+      "samples_us": [
+        238.87615203857422,
+        237.9654312133789,
+        237.891845703125,
+        237.81696319580078,
+        238.62592697143555,
+        238.01279067993164,
+        239.02847290039062,
+        238.53439331054688,
+        237.9430389404297,
+        237.82527923583984,
+        238.3238410949707,
+        238.29952239990234
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.007020583841949701,
+      "median_us": 66.76928043365479,
+      "samples_us": [
+        67.0252799987793,
+        66.78336143493652,
+        66.90624237060547,
+        66.74560070037842,
+        66.7142391204834,
+        66.74431800842285,
+        66.84864044189453,
+        66.72575950622559,
+        66.6707181930542,
+        67.06943988800049,
+        66.75519943237305,
+        67.05471992492676
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.006969876121729612,
+      "median_us": 64.80000019073486,
+      "samples_us": [
+        64.95232105255127,
+        64.6937608718872,
+        64.77888107299805,
+        64.75327968597412,
+        65.07775783538818,
+        64.88895893096924,
+        64.94656085968018,
+        64.69183921813965,
+        64.8518419265747,
+        64.75327968597412,
+        64.82111930847168,
+        64.65216159820557
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.01347076240926981,
+      "median_us": 92.54208087921143,
+      "samples_us": [
+        92.52799987792969,
+        92.49024391174316,
+        92.75967597961426,
+        92.74239540100098,
+        92.55616188049316,
+        92.67328262329102,
+        93.01759719848633,
+        92.7302360534668,
+        92.2867202758789,
+        92.27071762084961,
+        92.48767852783203,
+        92.43840217590332
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 16,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 23,
+      "reference_relative_l2": 0.013470734469592571,
+      "median_us": 87.57920265197754,
+      "samples_us": [
+        87.4227237701416,
+        87.72480010986328,
+        87.51232147216797,
+        87.7337646484375,
+        87.64608383178711,
+        87.50783920288086,
+        87.36448287963867,
+        87.41056442260742,
+        87.43871688842773,
+        87.67359733581543,
+        87.72095680236816,
+        87.64991760253906
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "normal",
+      "candidate": "native",
+      "unique_routed_experts": 227,
+      "reference_relative_l2": 0.006311022210866213,
+      "median_us": 494.7990417480469,
+      "samples_us": [
+        494.62398529052734,
+        494.4966506958008,
+        495.87841033935547,
+        495.9596633911133,
+        495.2735900878906,
+        494.8128128051758,
+        495.3318405151367,
+        494.55169677734375,
+        495.63201904296875,
+        494.6246337890625,
+        494.53121185302734,
+        494.78527069091797
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "normal",
+      "candidate": "down64",
+      "unique_routed_experts": 227,
+      "reference_relative_l2": 0.006312239915132523,
+      "median_us": 475.2892875671387,
+      "samples_us": [
+        476.1836624145508,
+        474.30145263671875,
+        474.9599838256836,
+        474.61055755615234,
+        475.64544677734375,
+        475.07713317871094,
+        475.401611328125,
+        475.3241729736328,
+        475.15838623046875,
+        475.90911865234375,
+        476.16382598876953,
+        475.25440216064453
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "skew",
+      "candidate": "native",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.0063299257308244705,
+      "median_us": 100.02943992614746,
+      "samples_us": [
+        100.11455535888672,
+        100.18752098083496,
+        100.01855850219727,
+        100.00063896179199,
+        99.98335838317871,
+        100.15487670898438,
+        100.04032135009766,
+        100.26495933532715,
+        100.2400016784668,
+        99.92256164550781,
+        99.93791580200195,
+        99.89312171936035
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "skew",
+      "candidate": "down64",
+      "unique_routed_experts": 8,
+      "reference_relative_l2": 0.006330661475658417,
+      "median_us": 89.0060806274414,
+      "samples_us": [
+        89.17056083679199,
+        89.06944274902344,
+        89.02463912963867,
+        88.9254379272461,
+        89.01439666748047,
+        88.99776458740234,
+        88.98431777954102,
+        89.04447555541992,
+        88.98112297058105,
+        89.08608436584473,
+        88.87680053710938,
+        88.94911766052246
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "clamp",
+      "candidate": "native",
+      "unique_routed_experts": 27,
+      "reference_relative_l2": 0.012637987732887268,
+      "median_us": 117.3689603805542,
+      "samples_us": [
+        117.36255645751953,
+        117.51744270324707,
+        117.29215621948242,
+        117.42527961730957,
+        117.43167877197266,
+        117.37088203430176,
+        117.39199638366699,
+        117.36639976501465,
+        117.40544319152832,
+        117.28063583374023,
+        117.36703872680664,
+        117.20831871032715
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      }
+    },
+    {
+      "type": "full_candidate",
+      "batch": 64,
+      "distribution": "clamp",
+      "candidate": "down64",
+      "unique_routed_experts": 27,
+      "reference_relative_l2": 0.012637992389500141,
+      "median_us": 104.26208019256592,
+      "samples_us": [
+        104.36927795410156,
+        104.37055587768555,
+        104.14015769958496,
+        104.27712440490723,
+        104.1926383972168,
+        104.34176445007324,
+        104.22911643981934,
+        104.24703598022461,
+        104.43136215209961,
+        104.06784057617188,
+        104.16192054748535,
+        104.47808265686035
+      ],
+      "up_config": {
+        "block_shape": [
+          16,
+          256,
+          128
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": true,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 1,
+        "num_write_splits": 1
+      },
+      "down_config": {
+        "block_shape": [
+          16,
+          256,
+          64
+        ],
+        "warp_shape": [
+          16,
+          64,
+          64
+        ],
+        "use_stream_k": false,
+        "use_f16_accum": false,
+        "num_sms": 108,
+        "num_stages": 4,
+        "num_ctas_per_sm": 2,
+        "num_write_splits": 1
+      }
+    }
+  ]
+}

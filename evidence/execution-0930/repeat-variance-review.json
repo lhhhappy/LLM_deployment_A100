@@ -1,0 +1,2501 @@
+{
+  "schema": 1,
+  "scope": "Independent CPU-only reanalysis of archived fixed-duration drained diagnostics; no production/harness/queue mutation or service rerun. Raw request counts and timestamps are measured, causal attributions explicitly limited.",
+  "current_user_rule": "Latest question.md prefers same-condition relative behavior; do not veto solely on local absolute gate failure or one newbad. Correctness/census and chain costs remain explicit.",
+  "quantile": "sorted[min(n-1,floor(.95*n))], original harness convention",
+  "sources": {
+    "a1": {
+      "path": "evidence/chain-night-0929/verdicts/a1-baseline/raw_s1-dev-longchain-v5g-tail-rot150_N42_1790702333.jsonl",
+      "sha256": "798c5f17789e7b39b64371791ea0868883bfdc8068b1a091989486bfbff68255"
+    },
+    "a2": {
+      "path": "evidence/chain-night-0929/verdicts/a2-baseline-repeat/raw_s1-dev-longchain-v5g-tail-rot150_N42_1790719811.jsonl",
+      "sha256": "fa0173b362915fe1aca62d482a57559d25b2bf700ce611cdda2a2a360a32c485"
+    },
+    "05": {
+      "path": "evidence/execution-0930/pod/moe-dsa-n42/raw_s1-dev-longchain-v5g-tail-rot150_N42_1790736693.jsonl",
+      "sha256": "ddc9add201a049119be23cbaac15c30e51c5ba925f90bfc7de6bd07333a89fd3"
+    },
+    "06": {
+      "path": "evidence/execution-0930/pod/moe-dsa-n46/raw_s1-dev-longchain-v5g-tail-rot150_N46_1790740838.jsonl",
+      "sha256": "7ed2bbb3e8981ac7ab4bac5729ef46de9f536c4c435f6e2de8588253b94336d3"
+    },
+    "07": {
+      "path": "evidence/execution-0930/pod/smallfix-n42/raw_s1-dev-longchain-v5g-tail-rot150_N42_1790745153.jsonl",
+      "sha256": "24c7362dfa2e2703b6e094d741f60c8ff6b0da9b1edd6ac14c5fa5c022aecde1"
+    }
+  },
+  "census": {
+    "a1": {
+      "raw_rows": 3133,
+      "unique_ids": 3133,
+      "errors": 0,
+      "tpot_s": {
+        "n": 3133,
+        "mean": 0.06151350116356274,
+        "median": 0.0473205432024869,
+        "p05": 0.033890470732436624,
+        "p95": 0.10360179663858497,
+        "min": 0.015729237959876845,
+        "max": 3.3478624391303
+      },
+      "chain_ttft_s": {
+        "n": 368,
+        "mean": 5.862157407014267,
+        "median": 1.1205763816833496,
+        "p05": 0.2711355686187744,
+        "p95": 23.62871265411377,
+        "min": 0.2288215160369873,
+        "max": 104.58134388923645
+      },
+      "chain_over_30": 14
+    },
+    "a2": {
+      "raw_rows": 3132,
+      "unique_ids": 3132,
+      "errors": 0,
+      "tpot_s": {
+        "n": 3132,
+        "mean": 0.06202849516128827,
+        "median": 0.047455515520724065,
+        "p05": 0.03403584255526463,
+        "p95": 0.10564580271020532,
+        "min": 0.0016243940529723961,
+        "max": 3.363091181564544
+      },
+      "chain_ttft_s": {
+        "n": 367,
+        "mean": 6.516137327095469,
+        "median": 1.1692583560943604,
+        "p05": 0.268507719039917,
+        "p95": 28.942787408828735,
+        "min": 0.23562097549438477,
+        "max": 140.21734619140625
+      },
+      "chain_over_30": 17
+    },
+    "05": {
+      "raw_rows": 3257,
+      "unique_ids": 3257,
+      "errors": 0,
+      "tpot_s": {
+        "n": 3257,
+        "mean": 0.059803884566743425,
+        "median": 0.04543286605079887,
+        "p05": 0.03140727343270555,
+        "p95": 0.10328896383383215,
+        "min": 0.008242889773100615,
+        "max": 3.3504374967555384
+      },
+      "chain_ttft_s": {
+        "n": 374,
+        "mean": 6.040285907327172,
+        "median": 1.0552968978881836,
+        "p05": 0.26023125648498535,
+        "p95": 26.44951367378235,
+        "min": 0.22191691398620605,
+        "max": 148.434876203537
+      },
+      "chain_over_30": 15
+    },
+    "06": {
+      "raw_rows": 3328,
+      "unique_ids": 3328,
+      "errors": 0,
+      "tpot_s": {
+        "n": 3328,
+        "mean": 0.06266564721723843,
+        "median": 0.04763081588443806,
+        "p05": 0.032365973559873445,
+        "p95": 0.11127782521512487,
+        "min": 0.0023506684228777885,
+        "max": 3.4673810868657062
+      },
+      "chain_ttft_s": {
+        "n": 379,
+        "mean": 7.2176958816347145,
+        "median": 1.5568640232086182,
+        "p05": 0.28801822662353516,
+        "p95": 37.52005052566528,
+        "min": 0.22942233085632324,
+        "max": 135.8727412223816
+      },
+      "chain_over_30": 24
+    },
+    "07": {
+      "raw_rows": 3268,
+      "unique_ids": 3268,
+      "errors": 0,
+      "tpot_s": {
+        "n": 3268,
+        "mean": 0.059883158647107686,
+        "median": 0.04543771610961485,
+        "p05": 0.03128843177627358,
+        "p95": 0.1036559675648144,
+        "min": 0.0017019848649700482,
+        "max": 3.321024701564706
+      },
+      "chain_ttft_s": {
+        "n": 373,
+        "mean": 5.482344548120575,
+        "median": 1.0719785690307617,
+        "p05": 0.2623481750488281,
+        "p95": 25.133604526519775,
+        "min": 0.22495794296264648,
+        "max": 93.77013087272644
+      },
+      "chain_over_30": 13
+    }
+  },
+  "config_identity": {
+    "A1_A2_image_command_env_model_exact_equal": true,
+    "warmup_plan_sha256": "b51d05ebeeca936189e2fe8ea3c1c38e49680a77aeea155e19baf16a7a5563ac",
+    "same_16_request_warmup": true,
+    "warmup_elapsed_s": [
+      80.77150082588196,
+      79.89247107505798
+    ],
+    "flush_success_both": true,
+    "note": "A1 and A2 are nonadjacent arms separated by three other arms; equal config is not equal wall-clock arrival or cache history. Raw namespaces differ as required after true flush."
+  },
+  "a1_a2_pair": {
+    "common": 3108,
+    "A1_only": [
+      "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:2",
+      "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:3",
+      "biomaster:canon:Lwu_zY1WufTe5ezfpl-__:llm:1",
+      "biomaster:canon:Lwu_zY1WufTe5ezfpl-__:llm:2",
+      "biomaster:canon:lc_20260924_004:llm:0013",
+      "biomaster:canon:lc_20260924_004:llm:0014",
+      "biomaster:canon:lc_20260924_086:llm:0003",
+      "biomaster:canon:lc_20260924_088:llm:0006",
+      "biomaster:canon:lc_20260924_088:llm:0007",
+      "biomaster:canon:lc_20260924_088:llm:0008",
+      "biomaster:canon:lc_20260924_088:llm:0009",
+      "biomaster:canon:lc_20260924_088:llm:0010",
+      "biomaster:canon:lc_20260924_088:llm:0011",
+      "biomaster:canon:lc_20260924_088:llm:0012",
+      "biomaster:canon:lc_20260924_088:llm:0013",
+      "biomaster:canon:lc_20260924_101:llm:0028",
+      "biomaster:canon:lc_20260924_101:llm:0029",
+      "biomaster:canon:lc_20260924_101:llm:0030",
+      "biomaster:canon:lc_20260924_101:llm:0031",
+      "biomaster:canon:lc_20260924_110:llm:0008",
+      "biomaster:canon:lc_20260924_110:llm:0009",
+      "biomaster:canon:lc_20260924_129:llm:0003",
+      "biomaster:canon:lc_20260924_214:llm:0007",
+      "biomaster:canon:pZq0stRha3AySPYQTTkIL:llm:0",
+      "scimaster:canon:lc_20260924_271:llm:0032"
+    ],
+    "A2_only": [
+      "biomaster:canon:lc_20260924_027:llm:0006",
+      "biomaster:canon:lc_20260924_027:llm:0007",
+      "biomaster:canon:lc_20260924_042:llm:0043",
+      "biomaster:canon:lc_20260924_044:llm:0051",
+      "biomaster:canon:lc_20260924_048:llm:0012",
+      "biomaster:canon:lc_20260924_059:llm:0010",
+      "biomaster:canon:lc_20260924_059:llm:0011",
+      "biomaster:canon:lc_20260924_059:llm:0012",
+      "biomaster:canon:lc_20260924_059:llm:0013",
+      "biomaster:canon:lc_20260924_059:llm:0014",
+      "biomaster:canon:lc_20260924_059:llm:0015",
+      "biomaster:canon:lc_20260924_059:llm:0016",
+      "biomaster:canon:lc_20260924_059:llm:0017",
+      "biomaster:canon:lc_20260924_071:llm:0025",
+      "biomaster:canon:lc_20260924_124:llm:0016",
+      "biomaster:canon:lc_20260924_127:llm:0010",
+      "biomaster:canon:lc_20260924_136:llm:0009",
+      "biomaster:canon:lc_20260924_136:llm:0010",
+      "biomaster:canon:lc_20260924_203:llm:0044",
+      "biomaster:canon:lc_20260924_203:llm:0045",
+      "scimaster:canon:lc_20260924_248:llm:0006",
+      "scimaster:canon:lc_20260924_272:llm:0007",
+      "scimaster:canon:lc_20260924_307:llm:0075",
+      "scimaster:canon:lc_20260924_307:llm:0076"
+    ],
+    "delta_A2_minus_A1": {
+      "tpot_s": {
+        "n": 3108,
+        "mean": 0.0004832840335138398,
+        "median": 4.3433373772064354e-05,
+        "p05": -0.030029533455769225,
+        "p95": 0.03007215111968088,
+        "min": -0.3371780657034833,
+        "max": 0.47924685617908835
+      },
+      "ttft_s": {
+        "n": 3108,
+        "mean": -0.19927497313596415,
+        "median": -0.0012983083724975586,
+        "p05": -5.763402462005615,
+        "p95": 4.757829427719116,
+        "min": -128.28251814842224,
+        "max": 210.66615962982178
+      },
+      "ttft_client_s": {
+        "n": 3108,
+        "mean": -0.19835388967965129,
+        "median": -0.004113086964935064,
+        "p05": -5.817907688207924,
+        "p95": 4.742892880924046,
+        "min": -128.28198476042598,
+        "max": 210.65663475822657
+      },
+      "queue_time_s": {
+        "n": 3108,
+        "mean": -0.1937627684962642,
+        "median": 7.069110870361328e-05,
+        "p05": -5.657141923904419,
+        "p95": 4.603103876113892,
+        "min": -128.42772245407104,
+        "max": 212.44412803649902
+      },
+      "wall_s": {
+        "n": 3108,
+        "mean": 0.041772250426475296,
+        "median": -0.004864931106567383,
+        "p05": -11.179823160171509,
+        "p95": 11.593672275543213,
+        "min": -128.43516516685486,
+        "max": 212.56066155433655
+      },
+      "cached_tokens": {
+        "n": 3108,
+        "mean": -60.95238095238095,
+        "median": 0.0,
+        "p05": 0,
+        "p95": 0,
+        "min": -212224,
+        "max": 132352
+      }
+    },
+    "output_count_changed": 0,
+    "prompt_tokens_changed": 0,
+    "cached_tokens_changed": 236,
+    "output_content_scope": "Raw archive records output counts only, not generated output_ids/text; equal counts does not prove equal generated content."
+  },
+  "timestamp_decomposition": {
+    "relative_dispatch_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 1752.1220044079435,
+        "median": 1747.9104450941086,
+        "p05": 192.73031497001648,
+        "p95": 3386.1921966075897,
+        "min": 0.0,
+        "max": 3599.1860299110413
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 1755.1602266252119,
+        "median": 1758.0718019008636,
+        "p05": 191.70040440559387,
+        "p95": 3378.474470615387,
+        "min": 0.0,
+        "max": 3592.992202758789
+      },
+      "delta": {
+        "n": 3108,
+        "mean": 3.0382222172683115,
+        "median": 1.7965275049209595,
+        "p05": -29.705108165740967,
+        "p95": 38.308176040649414,
+        "min": -173.5644941329956,
+        "max": 151.5828492641449
+      }
+    },
+    "client_to_api_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 0.020117660133381454,
+        "median": 0.00324404239654541,
+        "p05": 0.0015895366668701172,
+        "p95": 0.09212756156921387,
+        "min": 0.0010502338409423828,
+        "max": 1.0377893447875977
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 0.01892173972982851,
+        "median": 0.0032652616500854492,
+        "p05": 0.0015914440155029297,
+        "p95": 0.09602713584899902,
+        "min": 0.0010542869567871094,
+        "max": 0.809502363204956
+      },
+      "delta": {
+        "n": 3108,
+        "mean": -0.0011959204035529452,
+        "median": 1.919269561767578e-05,
+        "p05": -0.07509231567382812,
+        "p95": 0.06964325904846191,
+        "min": -0.4311540126800537,
+        "max": 0.395845890045166
+      }
+    },
+    "api_recv_to_dispatch_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 0.12002823128816857,
+        "median": 0.1009054183959961,
+        "p05": 0.038761138916015625,
+        "p95": 0.2686614990234375,
+        "min": 0.017818927764892578,
+        "max": 0.6064786911010742
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 0.12022329918666236,
+        "median": 0.10175561904907227,
+        "p05": 0.03804445266723633,
+        "p95": 0.26061320304870605,
+        "min": 0.01763439178466797,
+        "max": 0.6213681697845459
+      },
+      "delta": {
+        "n": 3108,
+        "mean": 0.00019506789849378273,
+        "median": 0.00010776519775390625,
+        "p05": -0.017671823501586914,
+        "p95": 0.015738964080810547,
+        "min": -0.28566956520080566,
+        "max": 0.37222838401794434
+      }
+    },
+    "api_dispatch_to_forward_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 2.322497663887618,
+        "median": 0.16300976276397705,
+        "p05": 0.011209964752197266,
+        "p95": 9.510827541351318,
+        "min": 0.0037603378295898438,
+        "max": 129.54481983184814
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 2.1242568631736773,
+        "median": 0.15143144130706787,
+        "p05": 0.010684013366699219,
+        "p95": 7.974441289901733,
+        "min": 0.004014730453491211,
+        "max": 212.51129341125488
+      },
+      "delta": {
+        "n": 3108,
+        "mean": -0.19824080071394048,
+        "median": -0.00028002262115478516,
+        "p05": -5.678218126296997,
+        "p95": 4.715967893600464,
+        "min": -128.4443302154541,
+        "max": 212.48626351356506
+      }
+    },
+    "forward_to_server_first_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 0.6240840914780262,
+        "median": 0.3923156261444092,
+        "p05": 0.1773223876953125,
+        "p95": 1.9259450435638428,
+        "min": 0.16351628303527832,
+        "max": 24.896251678466797
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 0.6228548511575087,
+        "median": 0.39134955406188965,
+        "p05": 0.17690086364746094,
+        "p95": 1.9430744647979736,
+        "min": 0.16142940521240234,
+        "max": 19.59842801094055
+      },
+      "delta": {
+        "n": 3108,
+        "mean": -0.001229240320517443,
+        "median": -1.621246337890625e-05,
+        "p05": -0.26061010360717773,
+        "p95": 0.25315308570861816,
+        "min": -11.577444314956665,
+        "max": 19.343985080718994
+      }
+    },
+    "server_first_to_client_first_s": {
+      "A1": {
+        "n": 3108,
+        "mean": 0.020200609470426345,
+        "median": 0.0030666589736938477,
+        "p05": 0.0008642673492431641,
+        "p95": 0.12174320220947266,
+        "min": -0.011837005615234375,
+        "max": 0.5575988292694092
+      },
+      "A2": {
+        "n": 3108,
+        "mean": 0.02231761126598029,
+        "median": 0.003088831901550293,
+        "p05": 0.0007195472717285156,
+        "p95": 0.1403963565826416,
+        "min": -0.0071904659271240234,
+        "max": 0.5714669227600098
+      },
+      "delta": {
+        "n": 3108,
+        "mean": 0.0021170017955539464,
+        "median": 2.1219253540039062e-05,
+        "p05": -0.09254312515258789,
+        "p95": 0.11193680763244629,
+        "min": -0.5479307174682617,
+        "max": 0.5684854984283447
+      }
+    }
+  },
+  "timestamp_decomposition_note": "API dispatch\u2192forward is a scheduler/admission waiting proxy, not measured kernel time. req_time_stats.py:759 freezes forward_entry on the first selected batch (not later chunk continuation); forward\u2192first therefore includes all chunk prefill, prep, launch and intervening scheduling until first token and cannot be called pure GPU latency. Cross client/server components assume a shared clock; observed small negative first-delivery offsets show calibration is imperfect. No clock drift measurement is archived.",
+  "closed_loop_gap": {
+    "per_arm": {
+      "a1": {
+        "dispatch_minus_previous_finish_minus_frozen_gap_s": {
+          "n": 2863,
+          "mean": 0.009033205549990935,
+          "median": 0.006415893554687635,
+          "p05": 0.0028008728027344443,
+          "p95": 0.025350082397460838,
+          "min": 0.001719854354858441,
+          "max": 0.29306329154968225
+        },
+        "edge_count": 2863
+      },
+      "a2": {
+        "dispatch_minus_previous_finish_minus_frozen_gap_s": {
+          "n": 2864,
+          "mean": 0.008965747979100198,
+          "median": 0.006681111335754386,
+          "p05": 0.0029445075988769887,
+          "p95": 0.024945966720581025,
+          "min": 0.001810930252075238,
+          "max": 0.07448910331726077
+        },
+        "edge_count": 2864
+      }
+    },
+    "paired_delta_dispatch_minus_delta_prev_finish_s": {
+      "n": 2840,
+      "mean": -7.184659931021677e-05,
+      "median": 0.0001894235610961914,
+      "p05": -0.0015702247619628906,
+      "p95": 0.0021140575408935547,
+      "min": -0.2899014949798584,
+      "max": 0.03303837776184082
+    },
+    "proof": "Original drive waits frozen gap AFTER previous response completes and renders next prompt, then dispatches. N worker slots dequeue the next chain only after prior chain drive ends. Thus same workload hashes do not fix arrivals: service stalls directly shift later requests, which change competing requests/cache reuse and admit-before-cutoff set. This mechanism is proved by source and residual timestamps; seed of initial tiny service differences remains unidentified.",
+    "source_lines": [
+      "s1-dev/harness/s1_loadgen.py:337",
+      "s1-dev/harness/s1_loadgen.py:361",
+      "s1-dev/harness/s1_loadgen.py:589",
+      "scripts/pod/verify/timed_loadgen.py:71"
+    ]
+  },
+  "tpot_delta_concentration": {
+    "net_sum_s_per_token": 1.5020467761610137,
+    "positive_sum": 21.99864150941306,
+    "negative_sum": -20.496594733251975,
+    "positive_count": 1570,
+    "negative_count": 1538,
+    "top_positive_contribution_to_paired_mean_ms": {
+      "1": 0.15419783017345184,
+      "5": 0.5561888408221239,
+      "10": 0.9100148169642073,
+      "50": 2.3475496274081933,
+      "100": 3.2131817925852912
+    },
+    "mean_delta_ms_after_omitting_k_largest_absolute_deltas_DIAGNOSTIC_ONLY": {
+      "5": 0.33043712039550704,
+      "10": 0.22863403808947205,
+      "50": -0.14701515054340025,
+      "100": -0.08571557115906792
+    },
+    "top_positive": [
+      {
+        "delta_s_per_token": 0.47924685617908835,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_008:llm:0004",
+          "phase": "intra",
+          "idx": 4,
+          "arrival_after_s": 1772.0749804973602,
+          "ttft_s": 0.6545369625091553,
+          "client_ttft_s": 0.7006939817219973,
+          "queue_time_s": 0.04270029067993164,
+          "api_to_forward_s": 0.16430377960205078,
+          "forward_to_first_s": 0.4086484909057617,
+          "prompt_tokens": 39624,
+          "cached_tokens": 38912,
+          "expected_uncached": 639,
+          "output_tokens": 23,
+          "tpot_s": 0.042179901830174706,
+          "postfirst_client_span_s": 0.9279578402638435
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_008:llm:0004",
+          "phase": "intra",
+          "idx": 4,
+          "arrival_after_s": 1745.6696984767914,
+          "ttft_s": 1.3221006393432617,
+          "client_ttft_s": 1.3266561850905418,
+          "queue_time_s": 0.4699110984802246,
+          "api_to_forward_s": 0.8790774345397949,
+          "forward_to_first_s": 0.35953474044799805,
+          "prompt_tokens": 39624,
+          "cached_tokens": 38912,
+          "expected_uncached": 639,
+          "output_tokens": 23,
+          "tpot_s": 0.5214267580092631,
+          "postfirst_client_span_s": 11.471388676203787
+        }
+      },
+      {
+        "delta_s_per_token": 0.3351918913290969,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_276:llm:0007",
+          "phase": "intra",
+          "idx": 7,
+          "arrival_after_s": 2354.120485305786,
+          "ttft_s": 0.6219582557678223,
+          "client_ttft_s": 0.6293262410908937,
+          "queue_time_s": 0.009767532348632812,
+          "api_to_forward_s": 0.040583133697509766,
+          "forward_to_first_s": 0.4139213562011719,
+          "prompt_tokens": 91442,
+          "cached_tokens": 90624,
+          "expected_uncached": 624,
+          "output_tokens": 15,
+          "tpot_s": 0.06970042309590749,
+          "postfirst_client_span_s": 0.9758059233427048
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_276:llm:0007",
+          "phase": "intra",
+          "idx": 7,
+          "arrival_after_s": 2378.703045129776,
+          "ttft_s": 0.41629886627197266,
+          "client_ttft_s": 0.42199020739644766,
+          "queue_time_s": 0.029540061950683594,
+          "api_to_forward_s": 0.05847501754760742,
+          "forward_to_first_s": 0.1831357479095459,
+          "prompt_tokens": 91442,
+          "cached_tokens": 90624,
+          "expected_uncached": 624,
+          "output_tokens": 15,
+          "tpot_s": 0.4048923144250044,
+          "postfirst_client_span_s": 5.668492401950061
+        }
+      },
+      {
+        "delta_s_per_token": 0.3118936646729708,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_302:llm:0009",
+          "phase": "intra",
+          "idx": 9,
+          "arrival_after_s": 1586.4739022254944,
+          "ttft_s": 0.5133907794952393,
+          "client_ttft_s": 0.540907091461122,
+          "queue_time_s": 0.003310680389404297,
+          "api_to_forward_s": 0.02093958854675293,
+          "forward_to_first_s": 0.44437527656555176,
+          "prompt_tokens": 25114,
+          "cached_tokens": 22016,
+          "expected_uncached": 3071,
+          "output_tokens": 26,
+          "tpot_s": 0.03075295392423868,
+          "postfirst_client_span_s": 0.768823848105967
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_302:llm:0009",
+          "phase": "intra",
+          "idx": 9,
+          "arrival_after_s": 1576.549706697464,
+          "ttft_s": 0.9856781959533691,
+          "client_ttft_s": 0.9902452556416392,
+          "queue_time_s": 0.4762248992919922,
+          "api_to_forward_s": 0.6896123886108398,
+          "forward_to_first_s": 0.2455124855041504,
+          "prompt_tokens": 25114,
+          "cached_tokens": 22016,
+          "expected_uncached": 3071,
+          "output_tokens": 26,
+          "tpot_s": 0.34264661859720946,
+          "postfirst_client_span_s": 8.566165464930236
+        }
+      },
+      {
+        "delta_s_per_token": 0.3054524897489437,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_088:llm:0005",
+          "phase": "intra",
+          "idx": 5,
+          "arrival_after_s": 3395.1350679397583,
+          "ttft_s": 18.685832023620605,
+          "client_ttft_s": 18.690105349756777,
+          "queue_time_s": 18.229097366333008,
+          "api_to_forward_s": 18.257688760757446,
+          "forward_to_first_s": 0.38320374488830566,
+          "prompt_tokens": 22245,
+          "cached_tokens": 20480,
+          "expected_uncached": 1700,
+          "output_tokens": 44,
+          "tpot_s": 0.03198988607889691,
+          "postfirst_client_span_s": 1.3755651013925672
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_088:llm:0005",
+          "phase": "intra",
+          "idx": 5,
+          "arrival_after_s": 3411.8662753105164,
+          "ttft_s": 200.4044589996338,
+          "client_ttft_s": 200.40836788155138,
+          "queue_time_s": 200.0200071334839,
+          "api_to_forward_s": 200.17605471611023,
+          "forward_to_first_s": 0.18326783180236816,
+          "prompt_tokens": 22245,
+          "cached_tokens": 20480,
+          "expected_uncached": 1700,
+          "output_tokens": 44,
+          "tpot_s": 0.3374423758278406,
+          "postfirst_client_span_s": 14.510022160597146
+        }
+      },
+      {
+        "delta_s_per_token": 0.29685001534506167,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_097:llm:0012",
+          "phase": "intra",
+          "idx": 12,
+          "arrival_after_s": 533.4499423503876,
+          "ttft_s": 0.6357595920562744,
+          "client_ttft_s": 0.6411711117252707,
+          "queue_time_s": 0.03197431564331055,
+          "api_to_forward_s": 0.29428958892822266,
+          "forward_to_first_s": 0.1813490390777588,
+          "prompt_tokens": 93488,
+          "cached_tokens": 93184,
+          "expected_uncached": 198,
+          "output_tokens": 30,
+          "tpot_s": 0.08176151858963843,
+          "postfirst_client_span_s": 2.3710840390995145
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_097:llm:0012",
+          "phase": "intra",
+          "idx": 12,
+          "arrival_after_s": 528.9729533195496,
+          "ttft_s": 0.9410734176635742,
+          "client_ttft_s": 0.9491044022142887,
+          "queue_time_s": 0.45880794525146484,
+          "api_to_forward_s": 0.5883235931396484,
+          "forward_to_first_s": 0.18347907066345215,
+          "prompt_tokens": 93488,
+          "cached_tokens": 93184,
+          "expected_uncached": 198,
+          "output_tokens": 30,
+          "tpot_s": 0.3786115339347001,
+          "postfirst_client_span_s": 10.979734484106302
+        }
+      },
+      {
+        "delta_s_per_token": 0.2575539300178594,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_236:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 1702.0388627052307,
+          "ttft_s": 0.4618489742279053,
+          "client_ttft_s": 0.46625088155269623,
+          "queue_time_s": 0.003765106201171875,
+          "api_to_forward_s": 0.008337020874023438,
+          "forward_to_first_s": 0.4161949157714844,
+          "prompt_tokens": 17610,
+          "cached_tokens": 15104,
+          "expected_uncached": 575,
+          "output_tokens": 48,
+          "tpot_s": 0.03702750122372774,
+          "postfirst_client_span_s": 1.740292557515204
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_236:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 1708.9435846805573,
+          "ttft_s": 1.0380065441131592,
+          "client_ttft_s": 1.07255988009274,
+          "queue_time_s": 0.03942608833312988,
+          "api_to_forward_s": 0.40042614936828613,
+          "forward_to_first_s": 0.6043591499328613,
+          "prompt_tokens": 17610,
+          "cached_tokens": 15104,
+          "expected_uncached": 575,
+          "output_tokens": 48,
+          "tpot_s": 0.29458143124158714,
+          "postfirst_client_span_s": 13.845327268354596
+        }
+      },
+      {
+        "delta_s_per_token": 0.2373048736928747,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_093:llm:0017",
+          "phase": "intra",
+          "idx": 17,
+          "arrival_after_s": 1810.882438659668,
+          "ttft_s": 0.99759840965271,
+          "client_ttft_s": 1.002869477495551,
+          "queue_time_s": 0.3273766040802002,
+          "api_to_forward_s": 0.5106844902038574,
+          "forward_to_first_s": 0.40819692611694336,
+          "prompt_tokens": 37197,
+          "cached_tokens": 36608,
+          "expected_uncached": 483,
+          "output_tokens": 27,
+          "tpot_s": 0.034314379131851286,
+          "postfirst_client_span_s": 0.8921738574281335
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_093:llm:0017",
+          "phase": "intra",
+          "idx": 17,
+          "arrival_after_s": 1812.3759181499481,
+          "ttft_s": 0.6321303844451904,
+          "client_ttft_s": 0.6750280223786831,
+          "queue_time_s": 0.04205632209777832,
+          "api_to_forward_s": 0.16009235382080078,
+          "forward_to_first_s": 0.39907002449035645,
+          "prompt_tokens": 37197,
+          "cached_tokens": 36608,
+          "expected_uncached": 483,
+          "output_tokens": 27,
+          "tpot_s": 0.271619252824726,
+          "postfirst_client_span_s": 7.0621005734428755
+        }
+      },
+      {
+        "delta_s_per_token": 0.2102757940959671,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_115:llm:0023",
+          "phase": "intra",
+          "idx": 23,
+          "arrival_after_s": 966.8572642803192,
+          "ttft_s": 1.2966840267181396,
+          "client_ttft_s": 1.3018675846979022,
+          "queue_time_s": 0.9948995113372803,
+          "api_to_forward_s": 1.0020906925201416,
+          "forward_to_first_s": 0.18272113800048828,
+          "prompt_tokens": 57505,
+          "cached_tokens": 56832,
+          "expected_uncached": 485,
+          "output_tokens": 24,
+          "tpot_s": 0.030800212377115437,
+          "postfirst_client_span_s": 0.708404884673655
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_115:llm:0023",
+          "phase": "intra",
+          "idx": 23,
+          "arrival_after_s": 996.4314160346985,
+          "ttft_s": 1.1057929992675781,
+          "client_ttft_s": 1.1109149567782879,
+          "queue_time_s": 0.4723389148712158,
+          "api_to_forward_s": 0.8110105991363525,
+          "forward_to_first_s": 0.18376660346984863,
+          "prompt_tokens": 57505,
+          "cached_tokens": 56832,
+          "expected_uncached": 485,
+          "output_tokens": 24,
+          "tpot_s": 0.24107600647308255,
+          "postfirst_client_span_s": 5.544748148880899
+        }
+      },
+      {
+        "delta_s_per_token": 0.19887962564826014,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0041",
+          "phase": "intra",
+          "idx": 41,
+          "arrival_after_s": 2632.974292755127,
+          "ttft_s": 0.6224727630615234,
+          "client_ttft_s": 0.6280779168009758,
+          "queue_time_s": 0.004569292068481445,
+          "api_to_forward_s": 0.03704714775085449,
+          "forward_to_first_s": 0.4778599739074707,
+          "prompt_tokens": 60537,
+          "cached_tokens": 52224,
+          "expected_uncached": 5561,
+          "output_tokens": 23,
+          "tpot_s": 0.07006396996704015,
+          "postfirst_client_span_s": 1.5414073392748833
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_307:llm:0041",
+          "phase": "intra",
+          "idx": 41,
+          "arrival_after_s": 2630.3945491313934,
+          "ttft_s": 1.360459804534912,
+          "client_ttft_s": 1.4095104448497295,
+          "queue_time_s": 0.45580291748046875,
+          "api_to_forward_s": 0.7732388973236084,
+          "forward_to_first_s": 0.47572827339172363,
+          "prompt_tokens": 60537,
+          "cached_tokens": 52224,
+          "expected_uncached": 5561,
+          "output_tokens": 23,
+          "tpot_s": 0.2689435956153003,
+          "postfirst_client_span_s": 5.916759103536607
+        }
+      },
+      {
+        "delta_s_per_token": 0.19567691039463336,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_294:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 566.3436210155487,
+          "ttft_s": 6.882517099380493,
+          "client_ttft_s": 6.930989150889218,
+          "queue_time_s": 6.26408576965332,
+          "api_to_forward_s": 6.286815404891968,
+          "forward_to_first_s": 0.21030235290527344,
+          "prompt_tokens": 180263,
+          "cached_tokens": 179712,
+          "expected_uncached": 487,
+          "output_tokens": 45,
+          "tpot_s": 0.04474514801139859,
+          "postfirst_client_span_s": 1.9687865125015378
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_294:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 585.8809254169464,
+          "ttft_s": 1.1292667388916016,
+          "client_ttft_s": 1.1899371705949306,
+          "queue_time_s": 0.04729914665222168,
+          "api_to_forward_s": 0.3740229606628418,
+          "forward_to_first_s": 0.21517014503479004,
+          "prompt_tokens": 180263,
+          "cached_tokens": 179712,
+          "expected_uncached": 487,
+          "output_tokens": 45,
+          "tpot_s": 0.24042205840603195,
+          "postfirst_client_span_s": 10.578570569865406
+        }
+      }
+    ],
+    "top_negative": [
+      {
+        "delta_s_per_token": -0.3371780657034833,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_201:llm:0012",
+          "phase": "intra",
+          "idx": 12,
+          "arrival_after_s": 2695.099002122879,
+          "ttft_s": 1.787017583847046,
+          "client_ttft_s": 1.792970223352313,
+          "queue_time_s": 0.8305752277374268,
+          "api_to_forward_s": 0.9585151672363281,
+          "forward_to_first_s": 0.7093043327331543,
+          "prompt_tokens": 64729,
+          "cached_tokens": 51712,
+          "expected_uncached": 12762,
+          "output_tokens": 33,
+          "tpot_s": 0.3804329615086317,
+          "postfirst_client_span_s": 12.173854768276215
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_201:llm:0012",
+          "phase": "intra",
+          "idx": 12,
+          "arrival_after_s": 2711.642210006714,
+          "ttft_s": 1.936166763305664,
+          "client_ttft_s": 2.0183163229376078,
+          "queue_time_s": 0.8748104572296143,
+          "api_to_forward_s": 0.8972101211547852,
+          "forward_to_first_s": 0.9170467853546143,
+          "prompt_tokens": 64729,
+          "cached_tokens": 51712,
+          "expected_uncached": 12762,
+          "output_tokens": 33,
+          "tpot_s": 0.04325489580514841,
+          "postfirst_client_span_s": 1.384156665764749
+        }
+      },
+      {
+        "delta_s_per_token": -0.3124539549039169,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_044:llm:0046",
+          "phase": "intra",
+          "idx": 46,
+          "arrival_after_s": 3339.484323978424,
+          "ttft_s": 1.5272321701049805,
+          "client_ttft_s": 1.6268270164728165,
+          "queue_time_s": 1.1587457656860352,
+          "api_to_forward_s": 1.1766738891601562,
+          "forward_to_first_s": 0.17625832557678223,
+          "prompt_tokens": 96710,
+          "cached_tokens": 96256,
+          "expected_uncached": 329,
+          "output_tokens": 23,
+          "tpot_s": 0.3506704107011584,
+          "postfirst_client_span_s": 7.714749035425485
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_044:llm:0046",
+          "phase": "intra",
+          "idx": 46,
+          "arrival_after_s": 3297.8571269512177,
+          "ttft_s": 5.558294057846069,
+          "client_ttft_s": 5.589250508695841,
+          "queue_time_s": 4.983437538146973,
+          "api_to_forward_s": 5.165276765823364,
+          "forward_to_first_s": 0.1808311939239502,
+          "prompt_tokens": 96710,
+          "cached_tokens": 96256,
+          "expected_uncached": 329,
+          "output_tokens": 23,
+          "tpot_s": 0.03821645579724149,
+          "postfirst_client_span_s": 0.8407620275393128
+        }
+      },
+      {
+        "delta_s_per_token": -0.296358936233446,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_093:llm:0033",
+          "phase": "intra",
+          "idx": 33,
+          "arrival_after_s": 2258.785844564438,
+          "ttft_s": 0.9494211673736572,
+          "client_ttft_s": 0.9547529872506857,
+          "queue_time_s": 0.46127963066101074,
+          "api_to_forward_s": 0.6826229095458984,
+          "forward_to_first_s": 0.18267416954040527,
+          "prompt_tokens": 40872,
+          "cached_tokens": 39424,
+          "expected_uncached": 1226,
+          "output_tokens": 13,
+          "tpot_s": 0.35871982434764504,
+          "postfirst_client_span_s": 4.3046378921717405
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_093:llm:0033",
+          "phase": "intra",
+          "idx": 33,
+          "arrival_after_s": 2257.1964740753174,
+          "ttft_s": 3.309931993484497,
+          "client_ttft_s": 3.3154729986563325,
+          "queue_time_s": 2.7847652435302734,
+          "api_to_forward_s": 3.0061142444610596,
+          "forward_to_first_s": 0.2272968292236328,
+          "prompt_tokens": 40872,
+          "cached_tokens": 39424,
+          "expected_uncached": 1226,
+          "output_tokens": 13,
+          "tpot_s": 0.06236088811419904,
+          "postfirst_client_span_s": 0.7483306573703885
+        }
+      },
+      {
+        "delta_s_per_token": -0.24645936429234488,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_239:llm:0035",
+          "phase": "intra",
+          "idx": 35,
+          "arrival_after_s": 1705.612226486206,
+          "ttft_s": 0.5095055103302002,
+          "client_ttft_s": 0.5432011084631085,
+          "queue_time_s": 0.038584232330322266,
+          "api_to_forward_s": 0.16486716270446777,
+          "forward_to_first_s": 0.2568697929382324,
+          "prompt_tokens": 44126,
+          "cached_tokens": 41216,
+          "expected_uncached": 2850,
+          "output_tokens": 15,
+          "tpot_s": 0.28082897713673965,
+          "postfirst_client_span_s": 3.9316056799143553
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_239:llm:0035",
+          "phase": "intra",
+          "idx": 35,
+          "arrival_after_s": 1703.3081357479095,
+          "ttft_s": 0.5578515529632568,
+          "client_ttft_s": 0.5683540711179376,
+          "queue_time_s": 0.004164695739746094,
+          "api_to_forward_s": 0.039177894592285156,
+          "forward_to_first_s": 0.43697690963745117,
+          "prompt_tokens": 44126,
+          "cached_tokens": 41216,
+          "expected_uncached": 2850,
+          "output_tokens": 15,
+          "tpot_s": 0.034369612844394784,
+          "postfirst_client_span_s": 0.481174579821527
+        }
+      },
+      {
+        "delta_s_per_token": -0.24635747518729081,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_203:llm:0035",
+          "phase": "intra",
+          "idx": 35,
+          "arrival_after_s": 2695.314090490341,
+          "ttft_s": 0.8270306587219238,
+          "client_ttft_s": 0.8338055768981576,
+          "queue_time_s": 0.033777475357055664,
+          "api_to_forward_s": 0.3847806453704834,
+          "forward_to_first_s": 0.32821059226989746,
+          "prompt_tokens": 59615,
+          "cached_tokens": 54784,
+          "expected_uncached": 4592,
+          "output_tokens": 56,
+          "tpot_s": 0.28063747046346016,
+          "postfirst_client_span_s": 15.43506087549031
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_203:llm:0035",
+          "phase": "intra",
+          "idx": 35,
+          "arrival_after_s": 2720.545463323593,
+          "ttft_s": 0.6512439250946045,
+          "client_ttft_s": 0.6583737963810563,
+          "queue_time_s": 0.005156517028808594,
+          "api_to_forward_s": 0.012251615524291992,
+          "forward_to_first_s": 0.5255265235900879,
+          "prompt_tokens": 59615,
+          "cached_tokens": 54784,
+          "expected_uncached": 4592,
+          "output_tokens": 56,
+          "tpot_s": 0.034279995276169345,
+          "postfirst_client_span_s": 1.8853997401893139
+        }
+      },
+      {
+        "delta_s_per_token": -0.2367078776128198,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_106:llm:0015",
+          "phase": "intra",
+          "idx": 15,
+          "arrival_after_s": 3467.1416964530945,
+          "ttft_s": 1.6844360828399658,
+          "client_ttft_s": 1.6897684633731842,
+          "queue_time_s": 1.3689942359924316,
+          "api_to_forward_s": 1.372377634048462,
+          "forward_to_first_s": 0.21996569633483887,
+          "prompt_tokens": 48139,
+          "cached_tokens": 45312,
+          "expected_uncached": 2668,
+          "output_tokens": 20,
+          "tpot_s": 0.2676378533636269,
+          "postfirst_client_span_s": 5.085119213908911
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_106:llm:0015",
+          "phase": "intra",
+          "idx": 15,
+          "arrival_after_s": 3448.6486978530884,
+          "ttft_s": 1.2905497550964355,
+          "client_ttft_s": 1.2964856997132301,
+          "queue_time_s": 0.572129487991333,
+          "api_to_forward_s": 0.5766992568969727,
+          "forward_to_first_s": 0.6246044635772705,
+          "prompt_tokens": 48139,
+          "cached_tokens": 45312,
+          "expected_uncached": 2668,
+          "output_tokens": 20,
+          "tpot_s": 0.030929975750807085,
+          "postfirst_client_span_s": 0.5876695392653346
+        }
+      },
+      {
+        "delta_s_per_token": -0.2336666855844669,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_224:llm:0068",
+          "phase": "intra",
+          "idx": 68,
+          "arrival_after_s": 2518.6203515529633,
+          "ttft_s": 3.0280025005340576,
+          "client_ttft_s": 3.087359764613211,
+          "queue_time_s": 1.8356027603149414,
+          "api_to_forward_s": 2.058431386947632,
+          "forward_to_first_s": 0.6430935859680176,
+          "prompt_tokens": 202298,
+          "cached_tokens": 201728,
+          "expected_uncached": 420,
+          "output_tokens": 17,
+          "tpot_s": 0.2735439919051714,
+          "postfirst_client_span_s": 4.376703870482743
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_224:llm:0068",
+          "phase": "intra",
+          "idx": 68,
+          "arrival_after_s": 2550.2185201644897,
+          "ttft_s": 0.5365688800811768,
+          "client_ttft_s": 0.5508791692554951,
+          "queue_time_s": 0.010426044464111328,
+          "api_to_forward_s": 0.029431819915771484,
+          "forward_to_first_s": 0.17083311080932617,
+          "prompt_tokens": 202298,
+          "cached_tokens": 201728,
+          "expected_uncached": 420,
+          "output_tokens": 17,
+          "tpot_s": 0.03987730632070452,
+          "postfirst_client_span_s": 0.6380369011312723
+        }
+      },
+      {
+        "delta_s_per_token": -0.23010429981737757,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_006:llm:0014",
+          "phase": "intra",
+          "idx": 14,
+          "arrival_after_s": 1706.494886636734,
+          "ttft_s": 0.7292213439941406,
+          "client_ttft_s": 0.7309633567929268,
+          "queue_time_s": 0.03558659553527832,
+          "api_to_forward_s": 0.45009422302246094,
+          "forward_to_first_s": 0.18125605583190918,
+          "prompt_tokens": 49105,
+          "cached_tokens": 48896,
+          "expected_uncached": 67,
+          "output_tokens": 53,
+          "tpot_s": 0.27925794704172474,
+          "postfirst_client_span_s": 14.521413246169686
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_006:llm:0014",
+          "phase": "intra",
+          "idx": 14,
+          "arrival_after_s": 1692.96093916893,
+          "ttft_s": 0.5027663707733154,
+          "client_ttft_s": 0.5055973548442125,
+          "queue_time_s": 0.04327273368835449,
+          "api_to_forward_s": 0.14569497108459473,
+          "forward_to_first_s": 0.21433401107788086,
+          "prompt_tokens": 49105,
+          "cached_tokens": 48896,
+          "expected_uncached": 67,
+          "output_tokens": 53,
+          "tpot_s": 0.04915364722434718,
+          "postfirst_client_span_s": 2.5559896556660533
+        }
+      },
+      {
+        "delta_s_per_token": -0.17828620897295575,
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_078:llm:0018",
+          "phase": "intra",
+          "idx": 18,
+          "arrival_after_s": 2698.7894015312195,
+          "ttft_s": 0.35758376121520996,
+          "client_ttft_s": 0.3623865144327283,
+          "queue_time_s": 0.03448295593261719,
+          "api_to_forward_s": 0.08678865432739258,
+          "forward_to_first_s": 0.18524456024169922,
+          "prompt_tokens": 47280,
+          "cached_tokens": 46080,
+          "expected_uncached": 1027,
+          "output_tokens": 61,
+          "tpot_s": 0.2157116016217818,
+          "postfirst_client_span_s": 12.942696097306907
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_078:llm:0018",
+          "phase": "intra",
+          "idx": 18,
+          "arrival_after_s": 2727.4258377552032,
+          "ttft_s": 0.8492522239685059,
+          "client_ttft_s": 1.0024235974997282,
+          "queue_time_s": 0.28673577308654785,
+          "api_to_forward_s": 0.5669424533843994,
+          "forward_to_first_s": 0.1852884292602539,
+          "prompt_tokens": 47280,
+          "cached_tokens": 46080,
+          "expected_uncached": 1027,
+          "output_tokens": 61,
+          "tpot_s": 0.03742539264882604,
+          "postfirst_client_span_s": 2.2455235589295626
+        }
+      },
+      {
+        "delta_s_per_token": -0.14994788092785868,
+        "a1": {
+          "req_id": "scimaster:canon:lc_20260924_267:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 2434.9329204559326,
+          "ttft_s": 0.5466597080230713,
+          "client_ttft_s": 0.5934407832100987,
+          "queue_time_s": 0.047919273376464844,
+          "api_to_forward_s": 0.14393949508666992,
+          "forward_to_first_s": 0.18943238258361816,
+          "prompt_tokens": 130050,
+          "cached_tokens": 129024,
+          "expected_uncached": 853,
+          "output_tokens": 30,
+          "tpot_s": 0.18088653307921929,
+          "postfirst_client_span_s": 5.245709459297359
+        },
+        "a2": {
+          "req_id": "scimaster:canon:lc_20260924_267:llm:0003",
+          "phase": "intra",
+          "idx": 3,
+          "arrival_after_s": 2435.1210930347443,
+          "ttft_s": 0.46693897247314453,
+          "client_ttft_s": 0.47339448519051075,
+          "queue_time_s": 0.030912399291992188,
+          "api_to_forward_s": 0.07698917388916016,
+          "forward_to_first_s": 0.18309402465820312,
+          "prompt_tokens": 130050,
+          "cached_tokens": 129024,
+          "expected_uncached": 853,
+          "output_tokens": 30,
+          "tpot_s": 0.030938652151360595,
+          "postfirst_client_span_s": 0.8972209123894572
+        }
+      }
+    ],
+    "top10_positive_equal_cache_count": 10
+  },
+  "period_comparison": {
+    "0-120s_both": {
+      "n": 65,
+      "A1_tpot": {
+        "n": 65,
+        "mean": 0.46766673311425616,
+        "median": 0.3049195064518314,
+        "p05": 0.08398806735760231,
+        "p95": 1.7267152822734613,
+        "min": 0.05705393382381445,
+        "max": 3.3478624391303
+      },
+      "A2_tpot": {
+        "n": 65,
+        "mean": 0.4680069156254571,
+        "median": 0.3046065760059999,
+        "p05": 0.08271321974889896,
+        "p95": 1.7263873845760553,
+        "min": 0.05505543188930422,
+        "max": 3.363091181564544
+      },
+      "delta": {
+        "n": 65,
+        "mean": 0.0003401825112009458,
+        "median": -0.00019758870704705833,
+        "p05": -0.004487225377376669,
+        "p95": 0.005078183234931699,
+        "min": -0.007491705587340469,
+        "max": 0.02800715300559886
+      }
+    },
+    "120-600s_both": {
+      "n": 460,
+      "A1_tpot": {
+        "n": 460,
+        "mean": 0.060513819650839136,
+        "median": 0.05479292180049621,
+        "p05": 0.03541794536716264,
+        "p95": 0.1101795949899916,
+        "min": 0.021160533618448035,
+        "max": 0.3206759522713366
+      },
+      "A2_tpot": {
+        "n": 460,
+        "mean": 0.06312525312633252,
+        "median": 0.05615969204480432,
+        "p05": 0.034566335319338934,
+        "p95": 0.12552531564230085,
+        "min": 0.028100490749168854,
+        "max": 0.3786115339347001
+      },
+      "delta": {
+        "n": 460,
+        "mean": 0.00261143347549339,
+        "median": -2.5534824005316037e-05,
+        "p05": -0.026773347069198886,
+        "p95": 0.0443613190951129,
+        "min": -0.14352667420092274,
+        "max": 0.29685001534506167
+      }
+    },
+    "600-1800s_both": {
+      "n": 1058,
+      "A1_tpot": {
+        "n": 1058,
+        "mean": 0.05291287035587422,
+        "median": 0.04709294511769442,
+        "p05": 0.03402349264056326,
+        "p95": 0.08933243611877564,
+        "min": 0.02901861909776926,
+        "max": 0.44077555563611287
+      },
+      "A2_tpot": {
+        "n": 1058,
+        "mean": 0.05382854491120242,
+        "median": 0.04750576849110148,
+        "p05": 0.034111553944447745,
+        "p95": 0.08900302604236586,
+        "min": 0.0016243940529723961,
+        "max": 0.5214267580092631
+      },
+      "delta": {
+        "n": 1058,
+        "mean": 0.0009156745553281963,
+        "median": 0.0001801868737409569,
+        "p05": -0.03040175656982077,
+        "p95": 0.03214793684689895,
+        "min": -0.24645936429234488,
+        "max": 0.47924685617908835
+      }
+    },
+    "1800-3600s_both": {
+      "n": 1506,
+      "A1_tpot": {
+        "n": 1506,
+        "mean": 0.05063054389779107,
+        "median": 0.045867469373963674,
+        "p05": 0.03350179388701004,
+        "p95": 0.08061299057712096,
+        "min": 0.015729237959876845,
+        "max": 0.3804329615086317
+      },
+      "A2_tpot": {
+        "n": 1506,
+        "mean": 0.05012824080408698,
+        "median": 0.0450660893613703,
+        "p05": 0.03380604355328983,
+        "p95": 0.07861038045957684,
+        "min": 0.011411411377290884,
+        "max": 0.4048923144250044
+      },
+      "delta": {
+        "n": 1506,
+        "mean": -0.0005023030937040897,
+        "median": 0.00012507065020288255,
+        "p05": -0.03062480147927999,
+        "p95": 0.029397422951952565,
+        "min": -0.3371780657034833,
+        "max": 0.3351918913290969
+      }
+    }
+  },
+  "opening": {
+    "a1": {
+      "n": 65,
+      "sum_tpot_contribution_to_whole_mean_ms": 9.702629317723158,
+      "top5_contribution_to_whole_mean_ms": 3.5901782279311574,
+      "top5": [
+        {
+          "req_id": "scimaster:canon:zlBy3aBiTqMNBYqPsCGRf:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.003926992416381836,
+          "ttft_s": 2.4108192920684814,
+          "client_ttft_s": 3.227661552838981,
+          "queue_time_s": 0.764561653137207,
+          "api_to_forward_s": 1.2287931442260742,
+          "forward_to_first_s": 1.1557457447052002,
+          "prompt_tokens": 14044,
+          "cached_tokens": 0,
+          "expected_uncached": 14044,
+          "output_tokens": 29,
+          "tpot_s": 3.3478624391303,
+          "postfirst_client_span_s": 93.7401482956484
+        },
+        {
+          "req_id": "scimaster:canon:rz5iTPs02_Up8QlQwD-3I:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.03080129623413086,
+          "ttft_s": 6.727083206176758,
+          "client_ttft_s": 7.297056614421308,
+          "queue_time_s": 5.37751317024231,
+          "api_to_forward_s": 5.537508487701416,
+          "forward_to_first_s": 1.161426067352295,
+          "prompt_tokens": 14293,
+          "cached_tokens": 512,
+          "expected_uncached": 14293,
+          "output_tokens": 35,
+          "tpot_s": 2.642751883770175,
+          "postfirst_client_span_s": 89.85356404818594
+        },
+        {
+          "req_id": "biomaster:canon:PwNBTuO_uXv_YBEeSwric:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0,
+          "ttft_s": 1.7576303482055664,
+          "client_ttft_s": 2.1452638497576118,
+          "queue_time_s": 0.002461671829223633,
+          "api_to_forward_s": 0.0037603378295898438,
+          "forward_to_first_s": 1.7050673961639404,
+          "prompt_tokens": 18658,
+          "cached_tokens": 0,
+          "expected_uncached": 18658,
+          "output_tokens": 46,
+          "tpot_s": 2.12382195825792,
+          "postfirst_client_span_s": 95.57198812160641
+        },
+        {
+          "req_id": "biomaster:canon:B2LeYpwICaaES203Rc73M:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.03446531295776367,
+          "ttft_s": 5.920215368270874,
+          "client_ttft_s": 6.598108399659395,
+          "queue_time_s": 3.5679845809936523,
+          "api_to_forward_s": 3.5834295749664307,
+          "forward_to_first_s": 2.273505687713623,
+          "prompt_tokens": 34152,
+          "cached_tokens": 1024,
+          "expected_uncached": 34152,
+          "output_tokens": 54,
+          "tpot_s": 1.7267152822734613,
+          "postfirst_client_span_s": 91.51590996049345
+        },
+        {
+          "req_id": "biomaster:canon:FWn2Kweqx4Q0VpssNR5W4:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.006872415542602539,
+          "ttft_s": 1.6033082008361816,
+          "client_ttft_s": 2.139549565501511,
+          "queue_time_s": 0.5899922847747803,
+          "api_to_forward_s": 0.943824052810669,
+          "forward_to_first_s": 0.6215956211090088,
+          "prompt_tokens": 18658,
+          "cached_tokens": 18176,
+          "expected_uncached": 18658,
+          "output_tokens": 71,
+          "tpot_s": 1.4068768246764582,
+          "postfirst_client_span_s": 98.48137772735208
+        }
+      ]
+    },
+    "a2": {
+      "n": 65,
+      "sum_tpot_contribution_to_whole_mean_ms": 9.712787201677745,
+      "top5_contribution_to_whole_mean_ms": 3.59200148481909,
+      "top5": [
+        {
+          "req_id": "scimaster:canon:zlBy3aBiTqMNBYqPsCGRf:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0,
+          "ttft_s": 2.4093570709228516,
+          "client_ttft_s": 2.7685217997059226,
+          "queue_time_s": 0.7736074924468994,
+          "api_to_forward_s": 1.2252190113067627,
+          "forward_to_first_s": 1.1572895050048828,
+          "prompt_tokens": 14044,
+          "cached_tokens": 0,
+          "expected_uncached": 14044,
+          "output_tokens": 29,
+          "tpot_s": 3.363091181564544,
+          "postfirst_client_span_s": 94.16655308380723
+        },
+        {
+          "req_id": "scimaster:canon:rz5iTPs02_Up8QlQwD-3I:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.030077695846557617,
+          "ttft_s": 6.644347429275513,
+          "client_ttft_s": 7.282936812378466,
+          "queue_time_s": 5.390761375427246,
+          "api_to_forward_s": 5.459138631820679,
+          "forward_to_first_s": 1.1614961624145508,
+          "prompt_tokens": 14293,
+          "cached_tokens": 512,
+          "expected_uncached": 14293,
+          "output_tokens": 35,
+          "tpot_s": 2.6421688968480073,
+          "postfirst_client_span_s": 89.83374249283224
+        },
+        {
+          "req_id": "biomaster:canon:PwNBTuO_uXv_YBEeSwric:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0035598278045654297,
+          "ttft_s": 1.7398149967193604,
+          "client_ttft_s": 2.4462428418919444,
+          "queue_time_s": 0.0026912689208984375,
+          "api_to_forward_s": 0.004029273986816406,
+          "forward_to_first_s": 1.6891374588012695,
+          "prompt_tokens": 18658,
+          "cached_tokens": 0,
+          "expected_uncached": 18658,
+          "output_tokens": 46,
+          "tpot_s": 2.1163302526705796,
+          "postfirst_client_span_s": 95.23486137017608
+        },
+        {
+          "req_id": "biomaster:canon:B2LeYpwICaaES203Rc73M:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0336918830871582,
+          "ttft_s": 6.094017505645752,
+          "client_ttft_s": 6.5849787993356586,
+          "queue_time_s": 3.5779922008514404,
+          "api_to_forward_s": 3.756378650665283,
+          "forward_to_first_s": 2.2776565551757812,
+          "prompt_tokens": 34152,
+          "cached_tokens": 1024,
+          "expected_uncached": 34152,
+          "output_tokens": 54,
+          "tpot_s": 1.7263873845760553,
+          "postfirst_client_span_s": 91.49853138253093
+        },
+        {
+          "req_id": "biomaster:canon:FWn2Kweqx4Q0VpssNR5W4:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.00847625732421875,
+          "ttft_s": 1.6946721076965332,
+          "client_ttft_s": 2.4414623053744435,
+          "queue_time_s": 0.5968358516693115,
+          "api_to_forward_s": 1.0164384841918945,
+          "forward_to_first_s": 0.6463701725006104,
+          "prompt_tokens": 18658,
+          "cached_tokens": 18176,
+          "expected_uncached": 18658,
+          "output_tokens": 71,
+          "tpot_s": 1.4021709347942046,
+          "postfirst_client_span_s": 98.15196543559432
+        }
+      ]
+    },
+    "05": {
+      "n": 67,
+      "sum_tpot_contribution_to_whole_mean_ms": 9.370159575586904,
+      "top5_contribution_to_whole_mean_ms": 3.450598327504116,
+      "top5": [
+        {
+          "req_id": "scimaster:canon:zlBy3aBiTqMNBYqPsCGRf:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.002644062042236328,
+          "ttft_s": 2.360813856124878,
+          "client_ttft_s": 3.066746479831636,
+          "queue_time_s": 0.7638213634490967,
+          "api_to_forward_s": 1.1790666580200195,
+          "forward_to_first_s": 1.1575586795806885,
+          "prompt_tokens": 14044,
+          "cached_tokens": 0,
+          "expected_uncached": 14044,
+          "output_tokens": 29,
+          "tpot_s": 3.3504374967555384,
+          "postfirst_client_span_s": 93.81224990915507
+        },
+        {
+          "req_id": "scimaster:canon:rz5iTPs02_Up8QlQwD-3I:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0267946720123291,
+          "ttft_s": 6.73399806022644,
+          "client_ttft_s": 7.301489838398993,
+          "queue_time_s": 5.372450351715088,
+          "api_to_forward_s": 5.547732353210449,
+          "forward_to_first_s": 1.162914752960205,
+          "prompt_tokens": 14293,
+          "cached_tokens": 512,
+          "expected_uncached": 14293,
+          "output_tokens": 35,
+          "tpot_s": 2.6391120959237657,
+          "postfirst_client_span_s": 89.72981126140803
+        },
+        {
+          "req_id": "biomaster:canon:PwNBTuO_uXv_YBEeSwric:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0,
+          "ttft_s": 1.742034673690796,
+          "client_ttft_s": 2.1057136924937367,
+          "queue_time_s": 0.0024480819702148438,
+          "api_to_forward_s": 0.004058837890625,
+          "forward_to_first_s": 1.6708178520202637,
+          "prompt_tokens": 18658,
+          "cached_tokens": 0,
+          "expected_uncached": 18658,
+          "output_tokens": 46,
+          "tpot_s": 2.121266648111244,
+          "postfirst_client_span_s": 95.45699916500598
+        },
+        {
+          "req_id": "biomaster:canon:B2LeYpwICaaES203Rc73M:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.029899120330810547,
+          "ttft_s": 5.9268152713775635,
+          "client_ttft_s": 6.60412975307554,
+          "queue_time_s": 3.565563440322876,
+          "api_to_forward_s": 3.5947444438934326,
+          "forward_to_first_s": 2.271739959716797,
+          "prompt_tokens": 34152,
+          "cached_tokens": 1024,
+          "expected_uncached": 34152,
+          "output_tokens": 54,
+          "tpot_s": 1.7234028268535182,
+          "postfirst_client_span_s": 91.34034982323647
+        },
+        {
+          "req_id": "biomaster:canon:FWn2Kweqx4Q0VpssNR5W4:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0014796257019042969,
+          "ttft_s": 1.4774503707885742,
+          "client_ttft_s": 2.1043468043208122,
+          "queue_time_s": 0.5929121971130371,
+          "api_to_forward_s": 0.8230652809143066,
+          "forward_to_first_s": 0.6192991733551025,
+          "prompt_tokens": 18658,
+          "cached_tokens": 18176,
+          "expected_uncached": 18658,
+          "output_tokens": 71,
+          "tpot_s": 1.404379685036838,
+          "postfirst_client_span_s": 98.30657795257866
+        }
+      ]
+    },
+    "06": {
+      "n": 62,
+      "sum_tpot_contribution_to_whole_mean_ms": 9.96161856766623,
+      "top5_contribution_to_whole_mean_ms": 3.492566698327768,
+      "top5": [
+        {
+          "req_id": "scimaster:canon:zlBy3aBiTqMNBYqPsCGRf:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0,
+          "ttft_s": 1.1457905769348145,
+          "client_ttft_s": 1.936137480661273,
+          "queue_time_s": 0.0028488636016845703,
+          "api_to_forward_s": 0.004323720932006836,
+          "forward_to_first_s": 1.106574535369873,
+          "prompt_tokens": 14044,
+          "cached_tokens": 0,
+          "expected_uncached": 14044,
+          "output_tokens": 29,
+          "tpot_s": 3.4673810868657062,
+          "postfirst_client_span_s": 97.08667043223977
+        },
+        {
+          "req_id": "scimaster:canon:rz5iTPs02_Up8QlQwD-3I:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.03192138671875,
+          "ttft_s": 6.676167011260986,
+          "client_ttft_s": 7.574038161896169,
+          "queue_time_s": 5.4324212074279785,
+          "api_to_forward_s": 5.4917919635772705,
+          "forward_to_first_s": 1.1589155197143555,
+          "prompt_tokens": 14293,
+          "cached_tokens": 3840,
+          "expected_uncached": 14293,
+          "output_tokens": 35,
+          "tpot_s": 2.694430240621681,
+          "postfirst_client_span_s": 91.61062818113714
+        },
+        {
+          "req_id": "biomaster:canon:PwNBTuO_uXv_YBEeSwric:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.005380868911743164,
+          "ttft_s": 4.120503187179565,
+          "client_ttft_s": 4.470529750920832,
+          "queue_time_s": 1.9351212978363037,
+          "api_to_forward_s": 2.2373011112213135,
+          "forward_to_first_s": 1.838411569595337,
+          "prompt_tokens": 18658,
+          "cached_tokens": 0,
+          "expected_uncached": 18658,
+          "output_tokens": 46,
+          "tpot_s": 2.113240130866567,
+          "postfirst_client_span_s": 95.09580588899553
+        },
+        {
+          "req_id": "scimaster:canon:r7PTZDEtzxTq5Idb6Bhl8:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.058957815170288086,
+          "ttft_s": 1.8256819248199463,
+          "client_ttft_s": 2.691498750820756,
+          "queue_time_s": 0.3959648609161377,
+          "api_to_forward_s": 0.6039817333221436,
+          "forward_to_first_s": 1.1965887546539307,
+          "prompt_tokens": 14341,
+          "cached_tokens": 0,
+          "expected_uncached": 14341,
+          "output_tokens": 58,
+          "tpot_s": 1.7126019121915625,
+          "postfirst_client_span_s": 97.61830899491906
+        },
+        {
+          "req_id": "biomaster:canon:B2LeYpwICaaES203Rc73M:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.03601670265197754,
+          "ttft_s": 12.128600358963013,
+          "client_ttft_s": 13.105668821372092,
+          "queue_time_s": 11.160618543624878,
+          "api_to_forward_s": 11.283350944519043,
+          "forward_to_first_s": 0.7713820934295654,
+          "prompt_tokens": 34152,
+          "cached_tokens": 33536,
+          "expected_uncached": 34152,
+          "output_tokens": 54,
+          "tpot_s": 1.6356086014892977,
+          "postfirst_client_span_s": 86.68725587893277
+        }
+      ]
+    },
+    "07": {
+      "n": 67,
+      "sum_tpot_contribution_to_whole_mean_ms": 9.295987716753112,
+      "top5_contribution_to_whole_mean_ms": 3.4036532628162077,
+      "top5": [
+        {
+          "req_id": "scimaster:canon:zlBy3aBiTqMNBYqPsCGRf:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.008287906646728516,
+          "ttft_s": 2.9630401134490967,
+          "client_ttft_s": 3.8510824013501406,
+          "queue_time_s": 1.671273946762085,
+          "api_to_forward_s": 1.790830373764038,
+          "forward_to_first_s": 1.1491129398345947,
+          "prompt_tokens": 14044,
+          "cached_tokens": 0,
+          "expected_uncached": 14044,
+          "output_tokens": 29,
+          "tpot_s": 3.321024701564706,
+          "postfirst_client_span_s": 92.98869164381176
+        },
+        {
+          "req_id": "scimaster:canon:rz5iTPs02_Up8QlQwD-3I:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.032318115234375,
+          "ttft_s": 7.061672210693359,
+          "client_ttft_s": 7.634803870692849,
+          "queue_time_s": 5.505773305892944,
+          "api_to_forward_s": 5.887507438659668,
+          "forward_to_first_s": 1.1480293273925781,
+          "prompt_tokens": 14293,
+          "cached_tokens": 512,
+          "expected_uncached": 14293,
+          "output_tokens": 35,
+          "tpot_s": 2.628607814337182,
+          "postfirst_client_span_s": 89.37266568746418
+        },
+        {
+          "req_id": "biomaster:canon:PwNBTuO_uXv_YBEeSwric:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0,
+          "ttft_s": 5.334602117538452,
+          "client_ttft_s": 6.009701547212899,
+          "queue_time_s": 3.3240673542022705,
+          "api_to_forward_s": 3.732098340988159,
+          "forward_to_first_s": 1.5643484592437744,
+          "prompt_tokens": 18658,
+          "cached_tokens": 512,
+          "expected_uncached": 18658,
+          "output_tokens": 46,
+          "tpot_s": 2.034006504652401,
+          "postfirst_client_span_s": 91.53029270935804
+        },
+        {
+          "req_id": "biomaster:canon:B2LeYpwICaaES203Rc73M:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.03691220283508301,
+          "ttft_s": 2.02057147026062,
+          "client_ttft_s": 2.9769147085025907,
+          "queue_time_s": 0.8460886478424072,
+          "api_to_forward_s": 1.1636931896209717,
+          "forward_to_first_s": 0.7929177284240723,
+          "prompt_tokens": 34152,
+          "cached_tokens": 32768,
+          "expected_uncached": 34152,
+          "output_tokens": 54,
+          "tpot_s": 1.7913016981779124,
+          "postfirst_client_span_s": 94.93899000342935
+        },
+        {
+          "req_id": "biomaster:canon:FWn2Kweqx4Q0VpssNR5W4:llm:0",
+          "phase": "session_start",
+          "idx": 0,
+          "arrival_after_s": 0.0071070194244384766,
+          "ttft_s": 5.061469316482544,
+          "client_ttft_s": 6.006508926860988,
+          "queue_time_s": 4.318103075027466,
+          "api_to_forward_s": 4.460946559906006,
+          "forward_to_first_s": 0.5661540031433105,
+          "prompt_tokens": 18658,
+          "cached_tokens": 18176,
+          "expected_uncached": 18658,
+          "output_tokens": 71,
+          "tpot_s": 1.348198144151164,
+          "postfirst_client_span_s": 94.37387009058148
+        }
+      ]
+    }
+  },
+  "chain_self_repeat": {
+    "common": 366,
+    "A1": {
+      "n": 366,
+      "mean": 5.885612483233051,
+      "p50": 1.1257269382476807,
+      "p95": 23.62871265411377
+    },
+    "A2": {
+      "n": 366,
+      "mean": 6.499458989810423,
+      "p50": 1.1692583560943604,
+      "p95": 28.942787408828735
+    },
+    "repaired": [
+      {
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_004:llm:0009",
+          "phase": "context_reset",
+          "idx": 9,
+          "arrival_after_s": 2790.089459180832,
+          "ttft_s": 40.34896731376648,
+          "client_ttft_s": 40.36230637319386,
+          "queue_time_s": 39.32579183578491,
+          "api_to_forward_s": 39.47639083862305,
+          "forward_to_first_s": 0.49008870124816895,
+          "prompt_tokens": 234755,
+          "cached_tokens": 233216,
+          "expected_uncached": 1456,
+          "output_tokens": 1657,
+          "tpot_s": 0.04579331701540429,
+          "postfirst_client_span_s": 75.8337329775095
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_004:llm:0009",
+          "phase": "context_reset",
+          "idx": 9,
+          "arrival_after_s": 2939.675179719925,
+          "ttft_s": 13.910089492797852,
+          "client_ttft_s": 13.943062703125179,
+          "queue_time_s": 13.012227535247803,
+          "api_to_forward_s": 13.022641658782959,
+          "forward_to_first_s": 0.4967668056488037,
+          "prompt_tokens": 234755,
+          "cached_tokens": 233216,
+          "expected_uncached": 1456,
+          "output_tokens": 1657,
+          "tpot_s": 0.042600804375223636,
+          "postfirst_client_span_s": 70.54693204537034
+        }
+      },
+      {
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_211:llm:0008",
+          "phase": "context_reset",
+          "idx": 8,
+          "arrival_after_s": 2842.6054599285126,
+          "ttft_s": 56.341249227523804,
+          "client_ttft_s": 56.346990102902055,
+          "queue_time_s": 55.87926459312439,
+          "api_to_forward_s": 56.03295683860779,
+          "forward_to_first_s": 0.17844271659851074,
+          "prompt_tokens": 69053,
+          "cached_tokens": 67584,
+          "expected_uncached": 1298,
+          "output_tokens": 3487,
+          "tpot_s": 0.046009042069189814,
+          "postfirst_client_span_s": 160.38752065319568
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_211:llm:0008",
+          "phase": "context_reset",
+          "idx": 8,
+          "arrival_after_s": 2860.7064151763916,
+          "ttft_s": 1.747974157333374,
+          "client_ttft_s": 1.754388083703816,
+          "queue_time_s": 1.414534568786621,
+          "api_to_forward_s": 1.4286487102508545,
+          "forward_to_first_s": 0.17985892295837402,
+          "prompt_tokens": 69053,
+          "cached_tokens": 67584,
+          "expected_uncached": 1298,
+          "output_tokens": 3487,
+          "tpot_s": 0.047043657338014806,
+          "postfirst_client_span_s": 163.99418948031962
+        }
+      }
+    ],
+    "newbad": [
+      {
+        "a1": {
+          "req_id": "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:1",
+          "phase": "context_reset",
+          "idx": 0,
+          "arrival_after_s": 3439.4125781059265,
+          "ttft_s": 3.689601421356201,
+          "client_ttft_s": 3.7004931550472975,
+          "queue_time_s": 0.9175498485565186,
+          "api_to_forward_s": 1.1035892963409424,
+          "forward_to_first_s": 2.475635051727295,
+          "prompt_tokens": 60848,
+          "cached_tokens": 18176,
+          "expected_uncached": 2190,
+          "output_tokens": 170,
+          "tpot_s": 0.044644730110492935,
+          "postfirst_client_span_s": 7.544959388673306
+        },
+        "a2": {
+          "req_id": "biomaster:canon:64JxJ2SsaBv32vna0Eq9U:llm:1",
+          "phase": "context_reset",
+          "idx": 0,
+          "arrival_after_s": 3486.359143972397,
+          "ttft_s": 140.21734619140625,
+          "client_ttft_s": 140.22867108136415,
+          "queue_time_s": 137.61233067512512,
+          "api_to_forward_s": 137.63886737823486,
+          "forward_to_first_s": 2.4719343185424805,
+          "prompt_tokens": 60848,
+          "cached_tokens": 18176,
+          "expected_uncached": 2190,
+          "output_tokens": 170,
+          "tpot_s": 0.02453321672028162,
+          "postfirst_client_span_s": 4.146113625727594
+        }
+      },
+      {
+        "a1": {
+          "req_id": "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:101",
+          "phase": "intra",
+          "idx": 0,
+          "arrival_after_s": 795.8891253471375,
+          "ttft_s": 4.486829042434692,
+          "client_ttft_s": 4.551346625201404,
+          "queue_time_s": 3.385932683944702,
+          "api_to_forward_s": 3.572596549987793,
+          "forward_to_first_s": 0.6665337085723877,
+          "prompt_tokens": 141393,
+          "cached_tokens": 130304,
+          "expected_uncached": 141393,
+          "output_tokens": 126,
+          "tpot_s": 0.0417827168405056,
+          "postfirst_client_span_s": 5.2228396050632
+        },
+        "a2": {
+          "req_id": "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:101",
+          "phase": "intra",
+          "idx": 0,
+          "arrival_after_s": 800.033323764801,
+          "ttft_s": 97.46545028686523,
+          "client_ttft_s": 97.4725835248828,
+          "queue_time_s": 96.25185179710388,
+          "api_to_forward_s": 96.27596521377563,
+          "forward_to_first_s": 0.9300365447998047,
+          "prompt_tokens": 141393,
+          "cached_tokens": 134656,
+          "expected_uncached": 141393,
+          "output_tokens": 126,
+          "tpot_s": 0.04236936210840941,
+          "postfirst_client_span_s": 5.296170263551176
+        }
+      },
+      {
+        "a1": {
+          "req_id": "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:149",
+          "phase": "intra",
+          "idx": 0,
+          "arrival_after_s": 840.479574918747,
+          "ttft_s": 1.350369930267334,
+          "client_ttft_s": 1.35874611325562,
+          "queue_time_s": 0.7253313064575195,
+          "api_to_forward_s": 0.7335610389709473,
+          "forward_to_first_s": 0.23311734199523926,
+          "prompt_tokens": 230769,
+          "cached_tokens": 228864,
+          "expected_uncached": 230769,
+          "output_tokens": 157,
+          "tpot_s": 0.04068040349281942,
+          "postfirst_client_span_s": 6.34614294487983
+        },
+        "a2": {
+          "req_id": "biomaster:canon:e6ptEux9ZyIxwnEA6nYuo:llm:149",
+          "phase": "intra",
+          "idx": 0,
+          "arrival_after_s": 854.9625382423401,
+          "ttft_s": 43.14286923408508,
+          "client_ttft_s": 43.152326800860465,
+          "queue_time_s": 41.18034744262695,
+          "api_to_forward_s": 41.2036566734314,
+          "forward_to_first_s": 1.5399014949798584,
+          "prompt_tokens": 230769,
+          "cached_tokens": 216576,
+          "expected_uncached": 230769,
+          "output_tokens": 157,
+          "tpot_s": 0.03703288208000744,
+          "postfirst_client_span_s": 5.777129604481161
+        }
+      },
+      {
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_039:llm:0005",
+          "phase": "context_reset",
+          "idx": 5,
+          "arrival_after_s": 643.2396514415741,
+          "ttft_s": 0.29187941551208496,
+          "client_ttft_s": 0.5994503777474165,
+          "queue_time_s": 0.003682851791381836,
+          "api_to_forward_s": 0.013176441192626953,
+          "forward_to_first_s": 0.185560941696167,
+          "prompt_tokens": 41114,
+          "cached_tokens": 39168,
+          "expected_uncached": 1597,
+          "output_tokens": 2045,
+          "tpot_s": 0.053526287100144794,
+          "postfirst_client_span_s": 109.40773083269596
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_039:llm:0005",
+          "phase": "context_reset",
+          "idx": 5,
+          "arrival_after_s": 652.0997688770294,
+          "ttft_s": 31.857292890548706,
+          "client_ttft_s": 31.862804130651057,
+          "queue_time_s": 30.766510725021362,
+          "api_to_forward_s": 30.79528021812439,
+          "forward_to_first_s": 0.9806394577026367,
+          "prompt_tokens": 41114,
+          "cached_tokens": 39424,
+          "expected_uncached": 1597,
+          "output_tokens": 2045,
+          "tpot_s": 0.05072857741833302,
+          "postfirst_client_span_s": 103.68921224307269
+        }
+      },
+      {
+        "a1": {
+          "req_id": "biomaster:canon:lc_20260924_083:llm:0008",
+          "phase": "context_reset",
+          "idx": 8,
+          "arrival_after_s": 830.554182767868,
+          "ttft_s": 6.686737298965454,
+          "client_ttft_s": 6.750650832429528,
+          "queue_time_s": 5.993936061859131,
+          "api_to_forward_s": 6.020087003707886,
+          "forward_to_first_s": 0.3967132568359375,
+          "prompt_tokens": 152185,
+          "cached_tokens": 150272,
+          "expected_uncached": 1850,
+          "output_tokens": 120,
+          "tpot_s": 0.04329904027971901,
+          "postfirst_client_span_s": 5.152585793286562
+        },
+        "a2": {
+          "req_id": "biomaster:canon:lc_20260924_083:llm:0008",
+          "phase": "context_reset",
+          "idx": 8,
+          "arrival_after_s": 824.6519179344177,
+          "ttft_s": 38.20993399620056,
+          "client_ttft_s": 38.219269985333085,
+          "queue_time_s": 37.49464511871338,
+          "api_to_forward_s": 37.52170944213867,
+          "forward_to_first_s": 0.4144585132598877,
+          "prompt_tokens": 152185,
+          "cached_tokens": 150272,
+          "expected_uncached": 1850,
+          "output_tokens": 120,
+          "tpot_s": 0.040717156995244384,
+          "postfirst_client_span_s": 4.845341682434082
+        }
+      }
+    ],
+    "strata": [
+      {
+        "period": "opening_both",
+        "edge_type": "append-only",
+        "phase": "context_reset",
+        "n": 10,
+        "transitions": {
+          "good_both": 8,
+          "bad_both": 2
+        }
+      },
+      {
+        "period": "opening_both",
+        "edge_type": "append-only",
+        "phase": "intra",
+        "n": 7,
+        "transitions": {
+          "good_both": 5,
+          "bad_both": 2
+        }
+      },
+      {
+        "period": "opening_both",
+        "edge_type": "chain-head",
+        "phase": "session_start",
+        "n": 34,
+        "transitions": {
+          "good_both": 34
+        }
+      },
+      {
+        "period": "opening_both",
+        "edge_type": "compact-rebuild",
+        "phase": "intra",
+        "n": 1,
+        "transitions": {
+          "good_both": 1
+        }
+      },
+      {
+        "period": "opening_both",
+        "edge_type": "system-tools-changed",
+        "phase": "intra",
+        "n": 18,
+        "transitions": {
+          "bad_both": 7,
+          "good_both": 11
+        }
+      },
+      {
+        "period": "opening_both",
+        "edge_type": "system-tools-changed",
+        "phase": "turn_start",
+        "n": 20,
+        "transitions": {
+          "good_both": 20
+        }
+      },
+      {
+        "period": "opening_boundary_mixed",
+        "edge_type": "system-tools-changed",
+        "phase": "turn_start",
+        "n": 1,
+        "transitions": {
+          "good_both": 1
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "append-only",
+        "phase": "context_reset",
+        "n": 103,
+        "transitions": {
+          "good_both": 98,
+          "new_bad": 3,
+          "repaired": 2
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "append-only",
+        "phase": "intra",
+        "n": 18,
+        "transitions": {
+          "good_both": 18
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "chain-head",
+        "phase": "session_start",
+        "n": 58,
+        "transitions": {
+          "good_both": 58
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "compact-rebuild",
+        "phase": "intra",
+        "n": 5,
+        "transitions": {
+          "good_both": 5
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "system-tools-changed",
+        "phase": "intra",
+        "n": 50,
+        "transitions": {
+          "good_both": 47,
+          "new_bad": 2,
+          "bad_both": 1
+        }
+      },
+      {
+        "period": "steady_both",
+        "edge_type": "system-tools-changed",
+        "phase": "turn_start",
+        "n": 41,
+        "transitions": {
+          "good_both": 41
+        }
+      }
+    ],
+    "newbad_admission_component": "All5 steady newbad TTFTs are dominated by API\u2192first selected batch waits: A1\u2192A2 waits1.104\u2192137.639s;3.573\u219296.276s;.734\u219241.204s;.013\u219230.795s;6.020\u219237.522s. Two have exactly equal cache counts and the remaining three change cache counts; exact KDA/host effects not identifiable. Total TTFT and per-request details retained above."
+  },
+  "07_independent_pairs": {
+    "a1": {
+      "common_recomputed": 3133,
+      "baseline_only": 0,
+      "candidate_only": 135,
+      "equal_output_counts": true,
+      "chain_n": 368,
+      "repaired_recomputed": 2,
+      "newbad_recomputed": 1,
+      "tpot_base_s": {
+        "n": 3133,
+        "mean": 0.06151350116356274,
+        "median": 0.0473205432024869,
+        "p05": 0.033890470732436624,
+        "p95": 0.10360179663858497,
+        "min": 0.015729237959876845,
+        "max": 3.3478624391303
+      },
+      "tpot_07_s": {
+        "n": 3133,
+        "mean": 0.06033513229888729,
+        "median": 0.04537995512952946,
+        "p05": 0.0314241969177923,
+        "p95": 0.10620121620967984,
+        "min": 0.0017019848649700482,
+        "max": 3.321024701564706
+      },
+      "matches_root_pair_common": true,
+      "root_repaired": 2,
+      "root_newbad": 1
+    },
+    "a2": {
+      "common_recomputed": 3132,
+      "baseline_only": 0,
+      "candidate_only": 136,
+      "equal_output_counts": true,
+      "chain_n": 367,
+      "repaired_recomputed": 4,
+      "newbad_recomputed": 0,
+      "tpot_base_s": {
+        "n": 3132,
+        "mean": 0.06202849516128827,
+        "median": 0.047455515520724065,
+        "p05": 0.03403584255526463,
+        "p95": 0.10564580271020532,
+        "min": 0.0016243940529723961,
+        "max": 3.363091181564544
+      },
+      "tpot_07_s": {
+        "n": 3132,
+        "mean": 0.060314151746041864,
+        "median": 0.045330909209074705,
+        "p05": 0.031404028385423305,
+        "p95": 0.10620121620967984,
+        "min": 0.0017019848649700482,
+        "max": 3.321024701564706
+      },
+      "matches_root_pair_common": true,
+      "root_repaired": 4,
+      "root_newbad": 0
+    },
+    "moe-dsa": {
+      "common_recomputed": 3241,
+      "baseline_only": 16,
+      "candidate_only": 27,
+      "equal_output_counts": true,
+      "chain_n": 373,
+      "repaired_recomputed": 2,
+      "newbad_recomputed": 0,
+      "tpot_base_s": {
+        "n": 3241,
+        "mean": 0.05990698077633999,
+        "median": 0.04546795101688787,
+        "p05": 0.03146421378371359,
+        "p95": 0.10328896383383215,
+        "min": 0.008242889773100615,
+        "max": 3.3504374967555384
+      },
+      "tpot_07_s": {
+        "n": 3241,
+        "mean": 0.059939999230976496,
+        "median": 0.04540337738875724,
+        "p05": 0.03129146522227323,
+        "p95": 0.10419323806577235,
+        "min": 0.0017019848649700482,
+        "max": 3.321024701564706
+      },
+      "matches_root_pair_common": true,
+      "root_repaired": 2,
+      "root_newbad": 0
+    }
+  },
+  "observable_engineering_findings": [
+    {
+      "finding": "Opening post-first-token starvation is real and disproportionately harms unweighted mean TPOT for short outputs. First-five short requests have >tens-of-seconds postfirst spans across repeats; inspect opening table.",
+      "contract": "Client TPOT includes stalls and token transport after first event; it is not a decoder-only kernel cost.",
+      "candidate": "125 relief0 overrides normal2 and min risk1 to zero decode deferrals, allowing consecutive admitted prefill batches. relief1 supplies a decode opportunity after each extend; an opportunity is not a guaranteed productive decode. This is an authorized parameter test proposal, not measured causality/benefit.",
+      "source": "scheduler.py:1969-1995; ax_deadline.py:344-377",
+      "limits": "No same-run batch chronology/relief state log in local archive yet; cannot label all opening stalls as confirmed relief-caused."
+    },
+    {
+      "finding": "125 is history-dependent: rate EWMA charges intervals between prefills including decode and retains its rate across true flush; slow RID count is cumulative and latches at80 with gate.10 until flush. Small arrival changes can change relief switching time and cumulative slow count.",
+      "candidate": "Observe rate/backlog/slow/relieved/effective interval at each state transition. Do not change reset policy without qualification; retained warmup rate is intentional source contract.",
+      "source": "ax_deadline.py:329-377; scheduler.py:1665-1684,1969-1995",
+      "limits": "Actual A1/A2 trip/on/off transitions not observed; same rep16 warmup and successful flush rule out simply carrying raw cache content."
+    },
+    {
+      "finding": "236 same IDs show different cached token counts, including large changes; server does genuinely compute different amounts of effective prefix work, despite same expected workload.",
+      "candidate": "Correlate cache prefix length, KDA checkpoint availability/host load and eviction reasons with admission batches, instead of optimizing only already-cached pure-decode kernels.",
+      "limits": "cached_tokens does not distinguish KV hit from KDA checkpoint hit or host cache; cannot prove KDA miss/eviction or memory pressure from this field alone."
+    }
+  ],
+  "missing_observations": [
+    "No archived A1/A2/05/06/07 complete server batch log located under their result directories.",
+    "No per-request per-token server/client timestamps after first event, server last-token timestamp or transport flush timing; cannot separate postfirst compute starvation from buffering.",
+    "No same-run GPU clocks/utilization/power/thermal samples, CPU steal/load/context switches, process restart/JIT compilation timeline; uniform hardware drift is not proved or fully excluded.",
+    "No batch cardinalities/actual uncached token totals/full prefill step wall+GPU timing/relief transitions/running and waiting queue depth trace. Raw admission proxy is not exact scheduler waiting_queue depth.",
+    "No KDA checkpoint hit/miss/host load/eviction reasons or KV+Mamba free slots over time; memory-pressure hypothesis lacks measurements.",
+    "Archived fetch receipt has archive SHA, raw independently SHAed; dispatch ledger file not local, so reported dispatch census matches timed_window receipt but its ledger hash cannot be independently recomputed."
+  ],
+  "minimum_once_instrument_proposal": {
+    "scope": "One bounded diagnostic stream on an already authorized run, no changes to harness, scoring, input order, gaps, outputs or scheduler decisions; no extra service evaluation requested.",
+    "server": "Use rank0 bounded record per batch: monotonic batch seq/start/end host timestamps, mode, real batch size/new/continued uncached tokens, productive decode count, waiting/running count, cold backlog, rate, slow/seen/tripped/relieved/effective interval, KV/Mamba free slots. Preserve existing ax-125 transitions. Add hashed RID\u2192first-token/decode-batch and cache prefix/KDA checkpoint/hostload reason on misses; sample ring buffer dump on long postfirst stall. Do not synchronize CUDA per step; optional bounded events with later query only if separately approved.",
+    "transport": "Record first and last generated token server monotonic timestamps in diagnostic log, not scored metadata; expose SSE enqueue/send timing only for stalled RID sample. Client raw already gives first/finish and needs no harness change.",
+    "system": "Read-only low-rate1Hz GPU clock/power/temp/utilization and CPU load/steal/RSS/JIT log with shared timestamps; bounded archive budget.",
+    "why": "A single chronology joins arrival\u2192admit\u2192prefill/decode\u2192SSE and identifies lost decode opportunities, checkpoint recomputation, or true system slowdown, rather than inferring them from TPOT alone."
+  },
+  "conclusion": {
+    "proved": "Closed-loop completion-driven arrivals and different cache work amplify tiny timing/order differences into distinct service histories. TTFT variability is predominantly admission/scheduling time and chain threshold changes occur in steady phase, not a repeat-wide execution slowdown. TPOT paired median shift is tiny while broad bidirectional tails cancel; do not summarize as generic random noise.",
+    "unproved": "Root cause of initial perturbation, exact share attributable to relief/prefill starvation vs cache/KDA vs hardware/transport cannot be assigned from current raw endpoints alone.",
+    "07": "Relative baseline mean/chain improvement independently confirmed, but added five fixes vs05 have +.033ms matched mean and cannot be claimed a clear further TPOT gain; equal output counts only. P95 and single newbad vsA1 remain costs under latest user rule.",
+    "protection": "Protect true N42 admission/census/output contracts and chain cost; do not seek ranked TPM by forcing more prefills that starve already-decoding short outputs. A1/A2 repeat scale .483ms is much smaller than5.914ms formal gap but cannot be used as formal significance interval."
+  },
+  "cache_conditional": {
+    "cache_equal": {
+      "n": 2872,
+      "ttft_delta_s": {
+        "n": 2872,
+        "mean": -0.27613917707068675,
+        "median": -0.0013371706008911133,
+        "p95": 4.379950523376465,
+        "min": -128.28251814842224,
+        "max": 210.66615962982178
+      },
+      "tpot_delta_s": {
+        "n": 2872,
+        "mean": 0.0006552796075892011,
+        "median": 3.727979911489869e-05,
+        "p95": 0.03174946428710268,
+        "min": -0.3371780657034833,
+        "max": 0.47924685617908835
+      },
+      "forward_to_first_delta_s": {
+        "n": 2872,
+        "mean": -0.006638503340293438,
+        "median": -8.940696716308594e-06,
+        "p95": 0.21924066543579102,
+        "min": -10.084839105606079,
+        "max": 6.090094089508057
+      }
+    },
+    "cache_changed": {
+      "n": 236,
+      "ttft_delta_s": {
+        "n": 236,
+        "mean": 0.7361233052560838,
+        "median": 0.0032775402069091797,
+        "p95": 15.236642122268677,
+        "min": -102.58976459503174,
+        "max": 138.4806501865387
+      },
+      "tpot_delta_s": {
+        "n": 236,
+        "mean": -0.0016098146476066593,
+        "median": 7.328001230789277e-05,
+        "p95": 0.024966751662022356,
+        "min": -0.11802400961252195,
+        "max": 0.07472446599288039
+      },
+      "forward_to_first_delta_s": {
+        "n": 236,
+        "mean": 0.0645987401574345,
+        "median": -0.00011587142944335938,
+        "p95": 0.5601074695587158,
+        "min": -11.577444314956665,
+        "max": 19.343985080718994
+      }
+    }
+  },
+  "queue_depth_proxy": {
+    "a1": {
+      "client_outstanding_at_dispatch": {
+        "n": 3133,
+        "mean": 32.387488030641556,
+        "median": 33,
+        "p95": 38,
+        "min": 1,
+        "max": 42
+      },
+      "api_admitted_not_yet_first_selected_batch_at_dispatch": {
+        "n": 3133,
+        "mean": 1.5837855090967123,
+        "median": 0,
+        "p95": 7,
+        "min": 0,
+        "max": 32
+      }
+    },
+    "a2": {
+      "client_outstanding_at_dispatch": {
+        "n": 3132,
+        "mean": 32.29948914431673,
+        "median": 33.0,
+        "p95": 38,
+        "min": 1,
+        "max": 42
+      },
+      "api_admitted_not_yet_first_selected_batch_at_dispatch": {
+        "n": 3132,
+        "mean": 1.4303959131545338,
+        "median": 0.0,
+        "p95": 7,
+        "min": 0,
+        "max": 32
+      }
+    },
+    "limits": "Timestamp-derived request interval counts do not expose actual scheduler queue or batch ownership, hostcache waiting, pending continuation, or async runner depth. They should not be called waiting_queue length."
+  },
+  "initial_42": {
+    "same_set": true,
+    "n_common": 42,
+    "ttft_delta_s": {
+      "n": 42,
+      "mean": 0.10185134978521437,
+      "median": 0.12802064418792725,
+      "p95": 0.22904610633850098,
+      "min": -0.10408639907836914,
+      "max": 0.3028831481933594
+    },
+    "tpot_delta_s": {
+      "n": 42,
+      "mean": 0.00040525940024716884,
+      "median": -0.00018522915288776698,
+      "p95": 0.002230831477791073,
+      "min": -0.007491705587340469,
+      "max": 0.02800715300559886
+    },
+    "wall_delta_s": {
+      "n": 42,
+      "mean": 0.04183637528192429,
+      "median": -0.055480360984802246,
+      "p95": 0.39966630935668945,
+      "min": -1.0492291450500488,
+      "max": 6.8175623416900635
+    }
+  }
+}

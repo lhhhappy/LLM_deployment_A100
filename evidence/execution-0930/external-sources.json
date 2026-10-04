@@ -1,0 +1,14 @@
+{
+  "tokenspeed": {
+    "path": "build/external-review-0930/tokenspeed",
+    "commit": "e565a05bc792f2d1dd6a1e9d584ee092af76acc6"
+  },
+  "flashinfer": {
+    "path": "build/external-review-0930/flashinfer",
+    "commit": "d38e47835b5facbdce667a14e2dbe181503f86a5"
+  },
+  "flashmla-ampere": {
+    "path": "build/external-review-0930/flashmla-ampere",
+    "commit": "0d9ff279bfbc91104efd4c567d62f798144de47b"
+  }
+}

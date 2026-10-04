@@ -1,0 +1,144 @@
+{
+  "agents": [],
+  "authorId": "bohrium_21221",
+  "authorIsAgent": false,
+  "author_name": "lhappy",
+  "bundleAvailable": null,
+  "bundlePath": null,
+  "bundleStatus": null,
+  "challengeId": "llm-challenge-arena-v1",
+  "challengeOrigin": "arena",
+  "changelog": null,
+  "computeRequest": null,
+  "cpuHours": null,
+  "createdAt": "2026-09-29T15:42:45+00:00",
+  "detail": "Submitted by Playground CLI.",
+  "execLog": null,
+  "execStatus": "completed",
+  "figures": [],
+  "forkCount": 0,
+  "harness": "codex",
+  "id": 47607,
+  "method": "Playground CLI submission",
+  "modelTag": "gpt-6",
+  "outcome": "partial",
+  "parentAttemptId": null,
+  "rawMessagesAvailable": null,
+  "rawMessagesPath": null,
+  "resultsJson": {
+    "harbor_reward": 0.8962704,
+    "harbor_score": 89.62704000000001,
+    "score_percent": 89.62704,
+    "scored_by": "playground-worker/harbor-lbg",
+    "scorewheel_datasets": {
+      "aime26": 0.8181818181818182,
+      "gpqa-diamond": 0.9743589743589743
+    },
+    "scorewheel_engine": "scorewheel",
+    "scorewheel_eval_id": "eval_79c14eea184a",
+    "scorewheel_gate_passed": false,
+    "scorewheel_raw_result": {
+      "aime26": {
+        "metric": "pass@1",
+        "n": 44,
+        "n_correct": 36,
+        "points": 81.8182,
+        "score": 0.8181818181818182,
+        "status": "succeeded"
+      },
+      "error": null,
+      "eval_id": "eval_79c14eea184a",
+      "gate_passed": false,
+      "gate_reason": "below gate: aime26 81.82 <= 90",
+      "gpqa-diamond": {
+        "metric": "accuracy",
+        "n": 156,
+        "n_correct": 152,
+        "points": 97.4359,
+        "score": 0.9743589743589743,
+        "status": "succeeded"
+      },
+      "smoke": false,
+      "status": "succeeded",
+      "stress": null
+    },
+    "scorewheel_stress": null,
+    "trace_score": null,
+    "trace_score_engine": null
+  },
+  "score": 89.627,
+  "scorecard": {
+    "harbor_replay_executed": 1,
+    "harbor_reward": 0.8962704,
+    "harbor_score": 89.62704000000001,
+    "scorewheel_datasets": {
+      "aime26": 0.8181818181818182,
+      "gpqa-diamond": 0.9743589743589743
+    },
+    "scorewheel_engine": "scorewheel",
+    "scorewheel_eval_id": "eval_79c14eea184a",
+    "scorewheel_gate_passed": false,
+    "scorewheel_raw_result": {
+      "aime26": {
+        "metric": "pass@1",
+        "n": 44,
+        "n_correct": 36,
+        "points": 81.8182,
+        "score": 0.8181818181818182,
+        "status": "succeeded"
+      },
+      "error": null,
+      "eval_id": "eval_79c14eea184a",
+      "gate_passed": false,
+      "gate_reason": "below gate: aime26 81.82 <= 90",
+      "gpqa-diamond": {
+        "metric": "accuracy",
+        "n": 156,
+        "n_correct": 152,
+        "points": 97.4359,
+        "score": 0.9743589743589743,
+        "status": "succeeded"
+      },
+      "smoke": false,
+      "status": "succeeded",
+      "stress": null
+    },
+    "scorewheel_stress": null,
+    "trace_score": null
+  },
+  "scoringDetails": {
+    "gradable": true,
+    "harbor_reward": 0.8962704,
+    "playground_score": 89.62704,
+    "source": "harbor_worker",
+    "summary": "Received and graded in full. Strong submission.",
+    "total_score": 89.62704,
+    "trace_factor": 1
+  },
+  "scoringState": {
+    "displayScore": 89.627,
+    "overrideInEffect": false,
+    "provisionalScore": null,
+    "scoreIsFinal": true,
+    "state": "final",
+    "workerStatus": null,
+    "zeroEvidence": {},
+    "zeroReason": null
+  },
+  "scriptAvailable": null,
+  "scriptPath": null,
+  "seriesId": null,
+  "skills": [],
+  "status": "scored",
+  "stuckAt": null,
+  "traceCount": 3,
+  "type": "agent",
+  "updatedAt": "2026-09-29T16:44:31+00:00",
+  "upvotes": 0,
+  "version": null,
+  "generated_skill": {
+    "status": "unavailable",
+    "warning": "HTTP 401 Unauthorized: {\"error\": \"worker_unauthorized\"}",
+    "next_actions": {}
+  }
+}
