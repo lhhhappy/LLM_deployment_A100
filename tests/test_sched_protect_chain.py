@@ -709,8 +709,14 @@ class HiCacheTierTests(unittest.TestCase):
         dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_AX_DSA_SPARSE_TRITON_PREFILL': False, '_ax118_engaged': False}
         compile_nodes(TREE_180 / 'srt/layers/attention/dsa_backend.py', {'ax118_state'}, dsa_ns)
         dsa.ax118_state = dsa_ns['ax118_state']
+        local_extend = ModuleType('sglang.srt.layers.dcp.local_extend')
+        local_ns = {}
+        compile_nodes(TREE_180 / 'srt/layers/dcp/local_extend.py',
+                      {'local_extend_mechanism_tokens'}, local_ns)
+        local_extend.local_extend_mechanism_tokens = local_ns['local_extend_mechanism_tokens']
         mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy,
-                                        'sglang.srt.layers.attention.dsa_backend': dsa})
+                                        'sglang.srt.layers.attention.dsa_backend': dsa,
+                                        'sglang.srt.layers.dcp.local_extend': local_extend})
         mods.start()
         self.addCleanup(mods.stop)
         # The base resolves --speculative-algorithm NEXTN to EAGLE before the scheduler starts (061r log).
@@ -727,7 +733,11 @@ class HiCacheTierTests(unittest.TestCase):
                                 '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
                                 '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
                                 '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset', '128=off:SGLANG_AX_DEADLINE_FAMILY_unset',
-                                '140=off', '180=off:no_hierarchical_cache'])
+                                '128p=off:SGLANG_AX_PREFIX_PRODUCER_unset',
+                                '131=off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset', '131_sync=off', '131_chunk=off',
+                                '132=off:SGLANG_AX_DEADLINE_CHAIN_FIRST_unset',
+                                '140=off', '180=off:no_hierarchical_cache',
+                                'dcp_local=off', 'dcp_local_max=0', 'dcp_local_large=0'])
         s.enable_hierarchical_cache = True
         dsa_ns['_AX_DSA_SPARSE_TRITON'] = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
