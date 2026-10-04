@@ -1,0 +1,15 @@
+{
+  "status": "BUILT_NOT_SUBMITTED",
+  "engine_commit": "ca5d646c252688177480c7e67cec0a901e4b7069",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0930a",
+  "image_id": 168511,
+  "dockerfile_sha256": "c82017e2c9133d4979726ae07d16218b321c686be0748f8eb4cb9bf6f84cc984",
+  "source_base": "bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2",
+  "source_verified_by": "scripts/build_image.sh tree equality and exact embedded diff",
+  "variants": [
+    "TPOT",
+    "CAP",
+    "BASE"
+  ],
+  "formal_attempts_created": 0
+}

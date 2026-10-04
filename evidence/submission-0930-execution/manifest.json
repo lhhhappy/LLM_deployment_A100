@@ -1,0 +1,29 @@
+{
+  "release": "official-47798-n42",
+  "verified_utc": "2026-10-04T02:36:03.528860+00:00",
+  "engine_commit": "ca5d646c252688177480c7e67cec0a901e4b7069",
+  "engine_tree": "c00a0cc4bca19797289da029bf7ded06dc78489e",
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0930a",
+  "primary_attempt": 47798,
+  "alternative_attempt": 47800,
+  "artifacts": {
+    "evidence/official/attempt-47798-final-20261003.json": "e07301530d6e763874bbf2d59baecf4765e5982662740b368a7698f7c08d66d7",
+    "evidence/official/attempt-47800-final-20261003.json": "04d5b24c8ab0d461c6c5e68c8e3b719d1682595b078399eecbef0bfbf8aa4947",
+    "evidence/submission-0930-execution/CAP/arm_manifest.json": "da93bd4ed673b4a801d9f38fdbb20321d5dc96162b8e3dd193205b9aed4adbdf",
+    "evidence/submission-0930-execution/CAP/bundle-audit.json": "3a14c443d32ddd403aa3de4a73f9f0d25ed93d1f61d9f1708fb8ad192d43e260",
+    "evidence/submission-0930-execution/CAP/dry-run.json": "bbd74cf3822d06092638f0ea74fe29b058871264057fac5e80f059073b52dc8f",
+    "evidence/submission-0930-execution/CAP/submission.zip": "c5d27665b6b829c27926386851c8f05f0f67ff4c4b0f5c34bd3302b96f3e8da2",
+    "evidence/submission-0930-execution/CAP/upload-receipt.json": "20563874d036a339a67306bbfc9c7be2c215831286e9bd33632f2bec401b73bd",
+    "evidence/submission-0930-execution/Dockerfile": "c82017e2c9133d4979726ae07d16218b321c686be0748f8eb4cb9bf6f84cc984",
+    "evidence/submission-0930-execution/TPOT/arm_manifest.json": "2f5b554c72e6d3aeec0487d1fb4ba72087cd19c27be0e092234c43064b2ab30b",
+    "evidence/submission-0930-execution/TPOT/bundle-audit.json": "2dcc9c8b465ba3342125e8c54bdf6c366e555e1438b665b3975fe40e551f829a",
+    "evidence/submission-0930-execution/TPOT/dry-run.json": "577890fb26836f5b74404a585ff9642b2daf83d383e1a6e2caaf20848444b738",
+    "evidence/submission-0930-execution/TPOT/submission.zip": "0d0930d413a77789617e6d81f288e2ef52e6636fb922b04e459d5d083c7932c1",
+    "evidence/submission-0930-execution/TPOT/upload-receipt.json": "a132d8b5971dd8a89bc5e4a9b338bdb8610b5573cc4559d702b31fe82b380d88",
+    "evidence/submission-0930-execution/decision.json": "171ecff998310e2f6674b1123892afff9ad782c3f84869d2907be8b92a32322e",
+    "evidence/submission-0930-execution/image-build.json": "a15689df96a51ea4e4bd720b6c1959d11a76dd257ceea1a7ced9ff0ad0cac8da",
+    "evidence/submission-0930-execution/preparation.json": "c3763c57af11f2942bae5cde2cdad41c7009e1f493ccd10253d58f82e47f9ba1",
+    "submission/official-0930-CAP.json": "83511c9af5c0a61151de097728cf14b783627c08eb92327327d30fbbf9c25110",
+    "submission/official-0930-TPOT.json": "8f68575bad3ec7c032fd148005855d5a099af55d5c1f0dc82e2cdd051190c6b2"
+  }
+}

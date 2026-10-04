@@ -1,0 +1,32 @@
+{
+  "status": "DRY_RUN_ONLY",
+  "zip_sha256": "0d0930d413a77789617e6d81f288e2ef52e6636fb922b04e459d5d083c7932c1",
+  "files": [
+    "Dockerfile",
+    "README.md",
+    "arm_manifest.json",
+    "characterization.json",
+    "execution/results/submission.json",
+    "execution/run.log",
+    "logs/run.log",
+    "native_trace/stub-trace.jsonl",
+    "outputs/submission.json",
+    "raw_messages.jsonl",
+    "requirements.txt",
+    "results/submission.json",
+    "src/reproduce.py",
+    "submission.json",
+    "traces/raw_messages.jsonl",
+    "traces/trace.jsonl"
+  ],
+  "engine_submission_copies": [
+    "execution/results/submission.json",
+    "outputs/submission.json",
+    "results/submission.json"
+  ],
+  "all_engine_submission_copies_match_frozen": true,
+  "top_level_submission_json": "CLI scaffold metadata; separate from engine payload",
+  "extra_output_files": [],
+  "image": "registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0930a",
+  "formal_attempts_created": 0
+}

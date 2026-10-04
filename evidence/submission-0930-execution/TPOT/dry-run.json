@@ -1,0 +1,91 @@
+{
+  "status": "dry_run",
+  "bundle": "/workspace/Agentic_science_challenge/build/submit_0930_TPOT.zip",
+  "bundle_sha256": "0d0930d413a77789617e6d81f288e2ef52e6636fb922b04e459d5d083c7932c1",
+  "manifest": {
+    "arm_version": "1.1",
+    "paper": {
+      "title": "llm-challenge-arena-v1",
+      "url": ""
+    },
+    "entrypoint": "src/reproduce.py",
+    "environment": {
+      "dependencies": "requirements.txt"
+    },
+    "execution": {
+      "ran_at": "2026-09-30T08:43:40Z",
+      "wall_time_s": 1,
+      "log_path": "execution/run.log",
+      "artifacts": [
+        {
+          "id": "artifact-1",
+          "path": "execution/results/submission.json",
+          "kind": "output",
+          "type": "file",
+          "format": "json"
+        }
+      ]
+    },
+    "expected_outputs": [
+      {
+        "name": "submission.json",
+        "path": "outputs/submission.json",
+        "type": "text",
+        "comparison_method": "harbor_checker",
+        "produced_by": [
+          "artifact-1"
+        ]
+      }
+    ],
+    "characterization": "characterization.json",
+    "trace": "traces/trace.jsonl",
+    "raw_messages": "raw_messages.jsonl",
+    "provenance": {
+      "created_by": "@paper2arm/playground-cli",
+      "created_at": "2026-09-30T08:43:40Z",
+      "challenge_id": "llm-challenge-arena-v1",
+      "task_id": "llm-challenge-arena-v1",
+      "run_id": "local-20260930t084340z-a03f9b37",
+      "model": "unknown",
+      "harness": "harbor-lbg",
+      "declared_model": "",
+      "declared_harness": "",
+      "detected_model": "",
+      "detected_harness": "",
+      "model_source": "fallback",
+      "harness_source": "fallback"
+    }
+  },
+  "trace_steps": [
+    {
+      "step_type": "observation",
+      "type": "observation",
+      "step_id": "observation_0_d57c4ec2",
+      "step_order": 1,
+      "title": "stub",
+      "body": "",
+      "timestamp": "2026-09-30T08:43:40Z",
+      "cost_usd": 0
+    },
+    {
+      "step_type": "observation",
+      "type": "observation",
+      "step_id": "observation_1_3fb36032",
+      "step_order": 2,
+      "title": "user",
+      "body": "{\"content\":[{\"type\":\"text\",\"text\":\"placeholder\"}]}",
+      "timestamp": "2026-09-30T08:43:40Z",
+      "cost_usd": 0
+    },
+    {
+      "step_type": "thought",
+      "type": "thought",
+      "step_id": "thought_2_2a1c59b2",
+      "step_order": 3,
+      "title": "assistant",
+      "body": "{\"content\":[{\"type\":\"text\",\"text\":\"placeholder\"}]}",
+      "timestamp": "2026-09-30T08:43:40Z",
+      "cost_usd": 0
+    }
+  ]
+}
