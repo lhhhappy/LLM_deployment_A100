@@ -6,13 +6,13 @@
 
 ## 目标与工作循环
 
-目标以 [task.md](llm-challenge-arena-v1/task.md) 的正式排名为准：先比 `n_at_slo`（越大越好），再比 `tpot_mean`（越小越好）；TPM 只回报、不排名。最终评测回放 341 条会话链、5150 个请求，整轮约 8–10 小时。正式 A（attempt 45979，N14，保留 MTP）是部署基线。
+目标以 [task.md](llm-challenge-arena-v1/task.md) 的正式排名为准：先比 `n_at_slo`（越大越好），再比 `tpot_mean`（越小越好）；TPM 只回报、不排名。最终评测回放 341 条会话链、5150 个请求，整轮约 8–10 小时。当前发布基线为 09-30 CAP（attempt 47798，正式 N42），源码 `ca5d646c`、配置 `submission/official-0930-CAP.json`；身份与最终成绩以 [提交记录](notes/submissions.md) 为准。正式 A（45979，N14）保留为历史校准基线。
 
 每轮按同一个循环：理解明确的问题 → 在基线上实现最小修复并补必要观测 → 代码审查与按需验证 → 8 卡实验 → 用原 harness 与完整数据判分 → 看原始记录找原因 → 改进 → 记录。按正常工程开发选择验证方式，不强制先做 CPU/开发机探针或新增回归测试；Pod空闲且实验已授权时可直接实机验证。开发完成可请其他参与者review代码、查问题。开发探针按覆盖目标短测，确认错误留证后立即结束自己的测试，不必等70分钟；完整成绩仍要求全量闭合。多变量组合只评价组合本身。开发集是链前缀抽样，只用于比较我们自己的配置；与正式的差异用校准运行（正式 A/B 原样复现）来量。
 
 ## 判定优先级：chain 第一（用户多次强调，2026-09-26 / 09-28）
 
-- 用户要求任何实验、任何候选**先看 chain**。09-28 官方 47043 已到 N30：chain p95 25.608 s、fast 3.445 s、TPOT p95 59.582 ms；旧的“只有 chain 紧、fast 有 1.5–3 倍余量”已失效，且平台不返回更高失败档的门，不能断言只败在 chain（[复核](notes/reports/0928-official-local-synthesis.md)）。仍按同一准则比较：同一批请求 ID 上的 chain 超标条数，分开场与稳态、按链首类型（session_start / 切段 intra / turn_start / reset）列出修好与新坏。
+- 用户要求任何实验、任何候选**先看 chain**。最新正式结果见 [提交记录](notes/submissions.md)。历史 09-28 官方 47043 到 N30：chain p95 25.608 s、fast 3.445 s、TPOT p95 59.582 ms；旧的“只有 chain 紧、fast 有 1.5–3 倍余量”已失效，且平台不返回更高失败档的门，不能断言只败在 chain（[复核](notes/reports/0928-official-local-synthesis.md)）。仍按同一准则比较：同一批请求 ID 上的 chain 超标条数，分开场与稳态、按链首类型（session_start / 切段 intra / turn_start / reset）列出修好与新坏。
 - **chain 变差的改动一律否决**，不管它把 fast、overall、TPOT 均值改善了多少；fast / overall 只作为代价记录，不作为采用理由。TPOT 只盯 `tpot_p95 ≤ 0.10` 这道无余量的硬门（本地 p95 约为均值 1.75 倍，均值上限约 0.055）。
 - 汇报和看板的第一句写 chain 的结果；"fast 大幅回落"这类话只能放在代价里。上传候选的取舍同样只按 chain 与硬门。
 

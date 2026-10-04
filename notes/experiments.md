@@ -2,25 +2,41 @@
 
 只记能指导下一轮的实验：相对基线的变化、完整数据判定、结论和原始证据。**开发集的通过档位不是正式 N@SLO 预测**。一条档位记录须保留完整 cohort、raw、run/report 和服务日志；`LEVEL` 为 `INVALID` 时不得当成绩比较。历史细节在 git 与 `evidence/`，不重复长篇过程日志。
 
+## 09-30 执行组合与最后两包
+
+最新服务组合在 chain 上的同 ID 对照支持保留 07 底座：对两次旧基线 A1/A2 分别修 2 / 新 1、修 4 / 新 0；对 05 修 2 / 新 0。但最后 TPOT 臂 09 对 07 的 373 个共同 chain 请求修 2 / 新 5，p95 25.134→28.554 秒。该臂确有 chain 代价，不应只汇报 TPOT 改善。最终选择与正式成绩分别见 [原始决策](../evidence/submission-0930-execution/decision.json) 和 [提交记录](submissions.md)。
+
+| 运行 / 问题 | 条件与主要观察 | 结论与边界 |
+| --- | --- | --- |
+| 05→07：执行小修是否兑现 | N42，均为 3600 秒派发后排空；共同 3241 个 ID 的 TPOT mean 59.907→59.940 ms，chain 修 2 / 新 0 | 五项小修未建立额外 TPOT 均值收益；组合底座仍有 chain 保护证据 |
+| 07→09：积压 decode interval 0→1 | 同 N42 / 1h；共同 3259 个 ID 的 mean 59.942→57.151 ms、p95 104.193→99.485 ms；chain 修 2 / 新 5 | 改善主要集中开场短输出的首字后等待；全窗口 fast 245/2486 超 3 秒，仍不满足本地统计门。不是完整 cohort PASS |
+| 06→10：常态冷块 16k→12k | N46，10 只派发 2700 秒、06 为 3600 秒；共同 2541 ID 的 mean 67.767→67.006 ms，chain 修 5 / 新 4、p95 38.042→39.055 秒 | 时长和覆盖不同，只作描述比较；10 的 TPOT p95 114.926 ms，不能写成 N46 本地通过或容量提升已证明 |
+
+数据身份为 `s1-dev-longchain-v5g-tail-rot150`，完整成员和等待规则冻结、`cohort_sha256=b78593bdea138f58`；每次 raw 的 SHA256、派发范围、元数据和输出计数一致性在 [独立最终复核](../evidence/execution-0930/final-results-review.json) 中。raw 没有输出正文或 token IDs，这些收据不能证明语义输出一致；也不能把闭环同 ID 结果解释为单一因果效应。
+
+[独立代码与证据审查](../evidence/execution-0930/astra-final4h-review.md) 说明路由、异步生命周期、首字后等待和当时的建议；[重复波动复核](../evidence/execution-0930/repeat-variance-review.json) 说明相同配置也会改变派发、缓存与坏例身份。算子/开发机结果和反例见 [执行工程研究](../research/codex/R34_execution_engineering_0930.md)。原始运行正文与完整日志依项目归档约定保存在外部，公开 Git 保留代码、聚合收据和可核查的来源哈希。
+
+用户最终选择 10（CAP）与 09（TPOT）探索正式结果，接受当时未闭合的能力与容量风险；两份共享 `ca5d646c` 与 `lh-img:0930a`，仅常态 cold cap 和 backlog interval 不同。上传成功后原任务按用户要求关闭，没有再入队“12k + relief1”的追加运行。初始 queued 回执保留时间语境，最新最终回报只维护在提交记录。
+
 ## 证据索引与归档约定
 
 这里是运行证据的唯一目录索引；实时状态仍以[队列](queue.md)为准。`DRAINED` 表示指定派发窗口的请求已排空，只能作同数据、同 ID 的机制对照；完整档是否有效以原 harness 和完整性收据为准。新运行在队列登记编号与脚本，结束后在此补状态、配置差异、数据哈希、原始证据和结论。原始 raw、服务日志、派发/flush 收据与判分不可因清理文档而删除；Pod 副本须在开发机归档并核 SHA256 后才能清理。
 
 | 运行 | 状态与比较问题 | 证据入口 |
 | --- | --- | --- |
-| 094 公开 dev 原样开场 | 派发并排空 722/722；原 harness 四类 TTFT 均 FAIL，chain p95 69.69 秒；附加窗口 verdict 因 cohort 文件缺失为 INVALID，不能替代原 harness | [任务目录](../evidence/L094-dev_opening_release0_n22/) |
-| 096 K9+117 校准 | 启动阶段按用户要求停止，未形成比较结果 | [任务目录](../evidence/L096-calib_k9v2_117_n22/) |
-| 097 v3 初次部署 | 缺失数据检查脚本而落回默认数据；发现后停止，整次作废。098–102 尚未启动即撤队 | [任务目录](../evidence/L097-v3_open_base_n26/) |
-| 103 v3/N26 底座 | 开场 600 秒、排空；后续对照基线 | [分析索引](../evidence/L103-v3_open_base_n26/opening/analysis.json) |
-| 104 124 | 对 103 同 ID 443 条：chain 超时 19→17，fast 56→26、overall 40→21、turn 1→1；排空 | [分析索引](../evidence/L104-v3_open_124_n26/opening/analysis.json) |
-| 105 124+125 | 对 104 同 ID：chain 超时 17→13；排空 | [分析索引](../evidence/L105-v3_open_124_125_n26/opening/analysis.json) |
-| 106 124+冷块 8192 | 对 104 同 ID：chain 超时 17→15；排空 | [分析索引](../evidence/L106-v3_open_124_cap8192_n26/opening/analysis.json) |
-| 107 124+117 | 启动机制校验失败，未测量；脚本已修正，见 110 | [任务目录](../evidence/L107-v3_open_124_117_n26/) |
-| 108 全集 N26 | 用户要求中途停止，不能判分 | [任务目录](../evidence/L108-v3_46364_n26_full/) |
-| 109 124+激进 125 | 对 105 同 ID 440 条：chain 超时 13→9（修 4、新 0），turn 2→3，TPOT 均值 55.45→61.84 ms；排空 453/453、错误 0 | [分析索引](../evidence/L109-v3_open_124_125x_n26/opening/analysis.json) |
-| 110 124+117 重跑 | Pod done；已取回 500 条唯一 raw、错误 0。对 104 同 ID 452 条：chain 超时 17→18（修 1、新 2），fast 26→33、overall 21→31、turn 1→0；TPOT 均值 50.63→45.56 ms，>0.10 秒 23→4。短测只作机制诊断，不判完整 N26；定时排空收据与本地归档仍待闭合 | [原始 raw](../evidence/L110-v3_open_124_117_n26/N26/raw_s1-dev-longchain-v3_N26_1790410811.jsonl)、[传输 SHA256](../evidence/L110-v3_open_124_117_n26/N26/fetch_status.json) |
+| 094 公开 dev 原样开场 | 派发并排空 722/722；原 harness 四类 TTFT 均 FAIL，chain p95 69.69 秒；附加窗口 verdict 因 cohort 文件缺失为 INVALID，不能替代原 harness | 任务目录（本地归档：`../evidence/L094-dev_opening_release0_n22/`） |
+| 096 K9+117 校准 | 启动阶段按用户要求停止，未形成比较结果 | 任务目录（本地归档：`../evidence/L096-calib_k9v2_117_n22/`） |
+| 097 v3 初次部署 | 缺失数据检查脚本而落回默认数据；发现后停止，整次作废。098–102 尚未启动即撤队 | 任务目录（本地归档：`../evidence/L097-v3_open_base_n26/`） |
+| 103 v3/N26 底座 | 开场 600 秒、排空；后续对照基线 | 分析索引（本地归档：`../evidence/L103-v3_open_base_n26/opening/analysis.json`） |
+| 104 124 | 对 103 同 ID 443 条：chain 超时 19→17，fast 56→26、overall 40→21、turn 1→1；排空 | 分析索引（本地归档：`../evidence/L104-v3_open_124_n26/opening/analysis.json`） |
+| 105 124+125 | 对 104 同 ID：chain 超时 17→13；排空 | 分析索引（本地归档：`../evidence/L105-v3_open_124_125_n26/opening/analysis.json`） |
+| 106 124+冷块 8192 | 对 104 同 ID：chain 超时 17→15；排空 | 分析索引（本地归档：`../evidence/L106-v3_open_124_cap8192_n26/opening/analysis.json`） |
+| 107 124+117 | 启动机制校验失败，未测量；脚本已修正，见 110 | 任务目录（本地归档：`../evidence/L107-v3_open_124_117_n26/`） |
+| 108 全集 N26 | 用户要求中途停止，不能判分 | 任务目录（本地归档：`../evidence/L108-v3_46364_n26_full/`） |
+| 109 124+激进 125 | 对 105 同 ID 440 条：chain 超时 13→9（修 4、新 0），turn 2→3，TPOT 均值 55.45→61.84 ms；排空 453/453、错误 0 | 分析索引（本地归档：`../evidence/L109-v3_open_124_125x_n26/opening/analysis.json`） |
+| 110 124+117 重跑 | Pod done；已取回 500 条唯一 raw、错误 0。对 104 同 ID 452 条：chain 超时 17→18（修 1、新 2），fast 26→33、overall 21→31、turn 1→0；TPOT 均值 50.63→45.56 ms，>0.10 秒 23→4。短测只作机制诊断，不判完整 N26；定时排空收据与本地归档仍待闭合 | 原始 raw（本地归档：`../evidence/L110-v3_open_124_117_n26/N26/raw_s1-dev-longchain-v3_N26_1790410811.jsonl`）、传输 SHA256（本地归档：`../evidence/L110-v3_open_124_117_n26/N26/fetch_status.json`） |
 
-上述链接指向索引文件或任务目录，完整 raw 位于各运行的 `window/raw.jsonl`，服务日志和校验收据在同一证据目录。历史编号无需重排；失效、取消的编号要保留原因，避免误用其结果。
+可访问的链接指向仓库索引或任务目录；标为“本地归档”的路径需要原项目归档，不随 Git 克隆提供。完整 raw 位于各运行的 `window/raw.jsonl`，服务日志和校验收据在同一证据目录。历史编号无需重排；失效、取消的编号要保留原因，避免误用其结果。
 
 ## 当前开发集对照
 
@@ -60,7 +76,7 @@
 
 118对chain与turn有小幅正收益，fast多3条坏例；117在同一3389个ID上对turn、fast、overall和TPOT更好，chain比118多1条超时。两者均只在各自的081基线上单独开启，不能把收益相加或据此断言叠加效果。093实际未命中量比081少132,608 token（0.9%）；这是运行结果，不等于kernel节省的工作。60分钟诊断窗口已排空但不是5601条全量N30，也不能预测正式N26的失败门。
 
-[排空收据与原harness诊断](../evidence/L093-cap6144_118_n30_60m/window/snapshot.json)、[同ID逐请求对照](../evidence/L093-cap6144_118_n30_60m/window/analysis/20260926T050632Z-280971f1/analysis.json)、[时间窗](../evidence/L093-cap6144_118_n30_60m/window/window_gates.txt)。
+排空收据与原harness诊断（本地归档：`../evidence/L093-cap6144_118_n30_60m/window/snapshot.json`）、同ID逐请求对照（本地归档：`../evidence/L093-cap6144_118_n30_60m/window/analysis/20260926T050632Z-280971f1/analysis.json`）、时间窗（本地归档：`../evidence/L093-cap6144_118_n30_60m/window/window_gates.txt`）。
 
 ### 089：K9/N22 完整校准，负载未对齐正式（2026-09-26，Codex）
 
@@ -74,7 +90,7 @@
 | chain p95 | 23.23s，超时16/允许24 | 41.97s |
 | TPOT均值 / p95 | 28.77 / 73.38ms | 22.61 / 43.79ms |
 
-正式数据不公开四桶超时计数，因此表中只比较两边都有的p95。K9把本地紧门推向fast/overall，却低估正式chain/turn尾部；请求数和总token相近不足以作为校准。后续需校对链首与turn的新增工作分布、缓存历史和链中小请求比例，再用新数据比较机制。监控通知的旧消息发送失败曾令自动采样停在408条；改用独立通知进程后，采样补齐并与原harness全量判分一致。[完整判分](../evidence/L089-calib_k9v2_cap6144_n22/window/snapshot.json)、[窗口统计](../evidence/L089-calib_k9v2_cap6144_n22/window/window_gates.json)。
+正式数据不公开四桶超时计数，因此表中只比较两边都有的p95。K9把本地紧门推向fast/overall，却低估正式chain/turn尾部；请求数和总token相近不足以作为校准。后续需校对链首与turn的新增工作分布、缓存历史和链中小请求比例，再用新数据比较机制。监控通知的旧消息发送失败曾令自动采样停在408条；改用独立通知进程后，采样补齐并与原harness全量判分一致。完整判分（本地归档：`../evidence/L089-calib_k9v2_cap6144_n22/window/snapshot.json`）、窗口统计（本地归档：`../evidence/L089-calib_k9v2_cap6144_n22/window/window_gates.json`）。
 
 ### 088：K9/N22 首次校准未进入测量（2026-09-26，Codex）
 
@@ -82,7 +98,7 @@
 
 ### 086：117 Humming，N34 派发窗口主动中止（2026-09-26，Codex）
 
-相对082只开启117；用户改为优先校准本地与正式负载后，按单job停机流程在完成1038条时结束，未完成60分钟窗口或全量。共同已完成1038条相对082：fast超时251→222、overall195→175、turn5→5、chain31→27；TPOT均值42.31→38.39ms、p95 98.13→84.37ms，请求错误0。这些是开放窗口证据，**不能判N34通过或失败**。窗口另有未完成请求，不能由已完成请求推断完整负载尾部。[同ID窗口分析](../evidence/L086-cap6144_117_n34_60m/window/analysis/20260926T013108Z-6b69e3e0/analysis.json)。
+相对082只开启117；用户改为优先校准本地与正式负载后，按单job停机流程在完成1038条时结束，未完成60分钟窗口或全量。共同已完成1038条相对082：fast超时251→222、overall195→175、turn5→5、chain31→27；TPOT均值42.31→38.39ms、p95 98.13→84.37ms，请求错误0。这些是开放窗口证据，**不能判N34通过或失败**。窗口另有未完成请求，不能由已完成请求推断完整负载尾部。同ID窗口分析（本地归档：`../evidence/L086-cap6144_117_n34_60m/window/analysis/20260926T013108Z-6b69e3e0/analysis.json`）。
 
 ### 084：117 Humming FP8 MoE，N30 派发 60 分钟（2026-09-25，Codex）
 
@@ -90,7 +106,7 @@
 
 117在真实TP8混合负载中减少了整体等待与解码耗时，是目前执行层最有希望的候选；chain净改善仅1条，尚不能证明N34晋档。此项是60分钟短窗，不能判完整N30或正式成绩。086的N34筛选按用户要求主动中止，部分结果见本页；先用089校准本地负载与正式N22的差异。
 
-[同ID对照](../evidence/L084-cap6144_117_n30_60m/window/analysis/20260925T233432Z-52cc39de/analysis.json)、[60分钟完成量与raw SHA](../evidence/L084-cap6144_117_n30_60m/window/completion_60m_comparison.json)、[短窗统计](../evidence/L084-cap6144_117_n30_60m/window/window_gates.json)、[机制说明](../research/codex/R32_117_humming_effect.md)。
+同ID对照（本地归档：`../evidence/L084-cap6144_117_n30_60m/window/analysis/20260925T233432Z-52cc39de/analysis.json`）、60分钟完成量与raw SHA（本地归档：`../evidence/L084-cap6144_117_n30_60m/window/completion_60m_comparison.json`）、短窗统计（本地归档：`../evidence/L084-cap6144_117_n30_60m/window/window_gates.json`）、[机制说明](../research/codex/R32_117_humming_effect.md)。
 
 ### 083：127 深分叉检查点，N30 派发 60 分钟（2026-09-25，Codex）
 
@@ -98,7 +114,7 @@
 
 缓存机制有真实效果，但远小于原先从静态分叉点估计的 9% 整场潜力，且这次快请求等待变差；127 暂不晋级为 N34 主方案，也不据此否定后续链轮次的检查点价值。082 的新证据指向 N34 设备 KV 驻留与 host 恢复层级迁移，详见 [R31](../research/codex/R31_n34_waiting_bottleneck.md)。117 的后续执行层结果见本页 084。
 
-[同 ID 对照](../evidence/L083-cap6144_127_n30_60m/window/analysis/20260925T222438Z-31ee0954/analysis.json)、[原窗口统计](../evidence/L083-cap6144_127_n30_60m/window/window_gates.txt)、[完整短窗 raw](../evidence/L083-cap6144_127_n30_60m/window/raw.jsonl)。
+同 ID 对照（本地归档：`../evidence/L083-cap6144_127_n30_60m/window/analysis/20260925T222438Z-31ee0954/analysis.json`）、原窗口统计（本地归档：`../evidence/L083-cap6144_127_n30_60m/window/window_gates.txt`）、完整短窗 raw（本地归档：`../evidence/L083-cap6144_127_n30_60m/window/raw.jsonl`）。
 
 ### 085：attn-TP输入scatter，N30派发60分钟（2026-09-25，Codex）
 
@@ -115,7 +131,7 @@
 
 scatter在这一窗口略减chain超时并改善TPOT，却新增19条fast坏例、5条overall坏例；不是无代价的整档提速。较前2287条开放窗口，fast代价在后半段继续扩大。离线B峰值约1459k tokens、排空残差−128；混合时段decode墙钟占比估计57.9%（覆盖3454秒），不是GPU实测。样本量、能力冒烟和输出合同足以支持继续研究，不足以证明正式能力与完整N30门；重算差异亦不能直接归因为scatter改变缓存机制，需结合到达与排队账分析。087计划在117基础上检验只对大块scatter是否消除fast代价，但该假设尚未由085的分桶证实；任务尚未启动，按校准优先级暂缓。
 
-[同ID最终对照](../evidence/L085-cap6144_scatter_n30_60m/window/analysis/20260925T211458Z-97aba312/analysis.json)、[排空诊断](../evidence/L085-cap6144_scatter_n30_60m/opening/analysis.json)、[派发收据](../evidence/L085-cap6144_scatter_n30_60m/opening/source/timed_window.json)、[最终raw快照](../evidence/L085-cap6144_scatter_n30_60m/window/raw.jsonl)。Pod原run的`job.log`显示能力12/12；归档服务日志含TP0–TP7生效行及排空后SIGTERM（剩余请求0）。
+同ID最终对照（本地归档：`../evidence/L085-cap6144_scatter_n30_60m/window/analysis/20260925T211458Z-97aba312/analysis.json`）、排空诊断（本地归档：`../evidence/L085-cap6144_scatter_n30_60m/opening/analysis.json`）、派发收据（本地归档：`../evidence/L085-cap6144_scatter_n30_60m/opening/source/timed_window.json`）、最终raw快照（本地归档：`../evidence/L085-cap6144_scatter_n30_60m/window/raw.jsonl`）。Pod原run的`job.log`显示能力12/12；归档服务日志含TP0–TP7生效行及排空后SIGTERM（剩余请求0）。
 
 ### 082：cold6144，全量长链N34（2026-09-25，Codex）
 
@@ -131,7 +147,7 @@ scatter在这一窗口略减chain超时并改善TPOT，却新增19条fast坏例�
 
 fast超时比081多317条，overall多216条，chain多16条；运行中共同5200条快照已显示相同方向。082完整raw里超时请求的首入批前等待中位数：fast约6.0秒、overall约8.6秒、chain约65.1秒；入批至首token分别约0.6/0.7/5.0秒。完整同ID 5601条中，实际未命中工作较081多161,024 tokens（约0.8%），不足以单独解释大幅TTFT退化；这仍不是逐批因果分解。TPOT超0.10秒47/5601，集中在开场时段；不能把其均值变化当稳定噪声外收益或损失。N34已不是081所示的“仅chain差一门”形态，需要同时看排队、fast余量和prefill产能。
 
-[完整本地判分](../evidence/L082-cap6144_full_n34/N34/level_verdict.json)、[原harness统计](../evidence/L082-cap6144_full_n34/N34/score_formal.json)、[坏例表](../evidence/L082-cap6144_full_n34/N34/badcases.csv)、[传输收据](../evidence/L082-cap6144_full_n34/N34/fetch_status.json)。完整raw、run与服务日志已取回，本地复算与Pod判分一致。
+完整本地判分（本地归档：`../evidence/L082-cap6144_full_n34/N34/level_verdict.json`）、原harness统计（本地归档：`../evidence/L082-cap6144_full_n34/N34/score_formal.json`）、坏例表（本地归档：`../evidence/L082-cap6144_full_n34/N34/badcases.csv`）、传输收据（本地归档：`../evidence/L082-cap6144_full_n34/N34/fetch_status.json`）。完整raw、run与服务日志已取回，本地复算与Pod判分一致。
 
 ### 081q：126按需留位，N26开场（2026-09-25，Codex）
 
@@ -139,7 +155,7 @@ fast超时比081多317条，overall多216条，chain多16条；运行中共同52
 
 全窗TPOT均值/p95/最大45.89/107.54/125.39ms，超过0.10秒37/381（9.71%）。离线B峰值约1296.7k tokens、排空残差0；混合时段decode墙钟占比估计39.9%（覆盖561秒，非GPU实测）。本次留位保住了078失去的fast/overall请求，且共同ID的chain收益未退；TPOT超线条数略增。短测仅诊断，不能据此判完整N26或保证N30收益。日志中的Traceback发生在排空后的SIGTERM，退出时剩余请求0，未影响已完成请求。
 
-[自动分析](../evidence/L081q-opening_126_demand6144_n26/opening/analysis.json)、[对074](../evidence/L081q-opening_126_demand6144_n26/opening/comparison.json)、[对078](../evidence/L081q-opening_126_demand6144_n26/opening/comparisons/078-opening_q1b_cold6144_n26/comparison.json)、[排空收据](../evidence/L081q-opening_126_demand6144_n26/opening/source/timed_verdict.json)。
+自动分析（本地归档：`../evidence/L081q-opening_126_demand6144_n26/opening/analysis.json`）、对074（本地归档：`../evidence/L081q-opening_126_demand6144_n26/opening/comparison.json`）、对078（本地归档：`../evidence/L081q-opening_126_demand6144_n26/opening/comparisons/078-opening_q1b_cold6144_n26/comparison.json`）、排空收据（本地归档：`../evidence/L081q-opening_126_demand6144_n26/opening/source/timed_verdict.json`）。
 
 ### 081p：TP8冷prefill 8k/16k块的执行时间账（2026-09-25，Codex）
 
@@ -147,7 +163,7 @@ fast超时比081多317条，overall多216条，chain多16条；运行中共同52
 
 rank0的8k/16k EXTEND kernel时长分类约为MoE 33/33%、通信12/11%、dense GEMM 10/9%、KDA 9/9%、mHC/norm 12/11%、未归类26/26%；这不是关键路径占比。未归类含约0.72秒的泛名`main_kernel`，不能据分类中的DSA实名0%断言注意力免费。可辨认的Marlin MoE总时长两档均约1.17秒，NCCL all-reduce约0.40秒。16k的nvidia-smi采样峰值较各自预热后基线多约1818MiB/卡，8k仅4MiB；rank0绝对峰值78416MiB对76538MiB。单样本只支持优先追每token算子成本与未归类kernel，尚不支持把16k加入服务配置。
 
-[8k账本](../evidence/L081p-tp8_prefill_profile_8k_16k/tp8_8k/ledger-rank0-rank1.json)、[16k账本](../evidence/L081p-tp8_prefill_profile_8k_16k/tp8_16k/ledger-rank0-rank1.json)、[六文件SHA清单](../evidence/L081p-tp8_prefill_profile_8k_16k/transfer-manifest.json)。完整trace保留在GPU开发机归档与Pod原run。
+8k账本（本地归档：`../evidence/L081p-tp8_prefill_profile_8k_16k/tp8_8k/ledger-rank0-rank1.json`）、16k账本（本地归档：`../evidence/L081p-tp8_prefill_profile_8k_16k/tp8_16k/ledger-rank0-rank1.json`）、六文件SHA清单（本地归档：`../evidence/L081p-tp8_prefill_profile_8k_16k/transfer-manifest.json`）。完整trace保留在GPU开发机归档与Pod原run。
 
 ### 081：cold6144，全量长链N30（2026-09-25，Codex）
 
@@ -163,7 +179,7 @@ rank0的8k/16k EXTEND kernel时长分类约为MoE 33/33%、通信12/11%、dense 
 
 chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与窗口后段的同ID结果一致。chain p95数值略高于30秒，但题面统计余量允许29条超时，实测23条，因此本地整档通过。**turn p95虽然略降，同159个请求的超15秒坏例却是修复4条、新增4条；20条TTFT增加超过3秒。**正式46251→46364的turn p95同时从6.58升至10.66秒（+62%），本地汇总p95不能代表正式尾部。单配置各一次，不能把小幅TPOT变化当成稳定提速；6144仍消耗部分fast余量。[turn逐请求审计](../research/codex/R33_turn_start_regression.md)。
 
-[完整判分与本地复核](../evidence/L081-cap6144_full_n30/N30/level_verdict.json)；[传输收据](../evidence/L081-cap6144_full_n30/N30/fetch_status.json)记录1,604,070字节归档的SHA256 `bba6cd9f5e4537938ef9ed2eb4a77ae99f538c22a845dd2d96a92adfbd90285b`。完整raw、run、服务日志取回后，本地原harness加题面余量复算与Pod判分一致。
+完整判分与本地复核（本地归档：`../evidence/L081-cap6144_full_n30/N30/level_verdict.json`）；传输收据（本地归档：`../evidence/L081-cap6144_full_n30/N30/fetch_status.json`）记录1,604,070字节归档的SHA256 `bba6cd9f5e4537938ef9ed2eb4a77ae99f538c22a845dd2d96a92adfbd90285b`。完整raw、run、服务日志取回后，本地原harness加题面余量复算与Pod判分一致。
 
 ### 079：123 aging300 + cold6144，N26开场（2026-09-25，Codex）
 
@@ -171,13 +187,13 @@ chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与�
 
 全窗TPOT均值/p95/max45.67/108.91/132.67ms，超线35/375（9.33%）；离线B峰值1297.9k、终点残差0。decode墙钟估计36.9%（覆盖559秒，非GPU实测）。相对076改善chain，但fast/overall和TPOT代价明显；组合未保留单独排序时的短请求表现。079与078的直接比较等统一共同ID表，不能拿不同配对集合相减。仅开场诊断，不判完整档。
 
-[对074](../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/comparison.json)、[对076](../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/comparisons/076-opening_q2_srpt300_n26/comparison.json)、[自动分析](../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/analysis.json)。完整分析及raw已自动同步本地、21文件SHA验证。14:55:18服务告警来自排空后的正常换引擎，见[核查](../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/shutdown-alert-review.json)。
+对074（本地归档：`../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/comparison.json`）、对076（本地归档：`../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/comparisons/076-opening_q2_srpt300_n26/comparison.json`）、自动分析（本地归档：`../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/analysis.json`）。完整分析及raw已自动同步本地、21文件SHA验证。14:55:18服务告警来自排空后的正常换引擎，见核查（本地归档：`../evidence/L079-opening_q2_srpt300_cold6144_n26/opening/shutdown-alert-review.json`）。
 
 ### 078：cold6144，N26开场（2026-09-25，Codex）
 
 对074仅COLD_CAP 4096→6144，仍759a6eb/123off/interval2。600秒派发后排空382条、零错误；首分钟chain14/27、整窗16/68超30s。对074共同371条：fast23→32、overall30→33、turn0→0、chain21→16（修复5/新增0），TPOT>0.10为1→33。
 
-全窗TPOT均值/p95/max45.07/107.54/124.20ms，超线33/382（8.64%）；离线B峰值1299.1k、终点残差0；decode墙钟估计38.7%（覆盖556秒，非GPU实测）。有链首收益，也消耗fast/TPOT余量；只作开场诊断。18个完整分析与raw文件已同步本地并核SHA。[对074](../evidence/L078-opening_q1b_cold6144_n26/opening/comparison.json)、[分析](../evidence/L078-opening_q1b_cold6144_n26/opening/analysis.json)。
+全窗TPOT均值/p95/max45.07/107.54/124.20ms，超线33/382（8.64%）；离线B峰值1299.1k、终点残差0；decode墙钟估计38.7%（覆盖556秒，非GPU实测）。有链首收益，也消耗fast/TPOT余量；只作开场诊断。18个完整分析与raw文件已同步本地并核SHA。对074（本地归档：`../evidence/L078-opening_q1b_cold6144_n26/opening/comparison.json`）、分析（本地归档：`../evidence/L078-opening_q1b_cold6144_n26/opening/analysis.json`）。
 
 ### 077：prefill-decode-interval 2→1，N26开场（2026-09-25，Codex）
 
@@ -185,7 +201,7 @@ chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与�
 
 全窗TPOT均值/p95/max为52.38/146.14/170.94ms，超0.10为61/353（17.28%）；离线B峰值1304.6k、终点残差0。decode墙钟占比估计36.0%（覆盖548秒），不是GPU实测。chain净少3条但TPOT代价较大，本轮不将interval1叠进079；不把短窗判成完整档。排空后正常换引擎产生SystemExit0/CancelledError，退出剩余请求0。
 
-[自动对照](../evidence/L077-opening_q3_interval1_n26/opening/comparison.json)、[分析](../evidence/L077-opening_q3_interval1_n26/opening/analysis.json)、[告警复核](../evidence/L077-opening_q3_interval1_n26/opening/shutdown-alert-review.json)。
+自动对照（本地归档：`../evidence/L077-opening_q3_interval1_n26/opening/comparison.json`）、分析（本地归档：`../evidence/L077-opening_q3_interval1_n26/opening/analysis.json`）、告警复核（本地归档：`../evidence/L077-opening_q3_interval1_n26/opening/shutdown-alert-review.json`）。
 
 ### 076：123 aging300，N26开场（2026-09-25，Codex）
 
@@ -193,7 +209,7 @@ chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与�
 
 全窗TPOT均值/p95/max43.69/87.76/104.07ms，超0.10为2/374（0.53%）；离线B峰值1284.7k、终点残差0。decode墙钟占比估计38.4%（覆盖570秒），不是GPU实测。短测中排序的整体取舍优于8192冷块或interval1；chain收益仍小，不能据此承诺正式更高N。未隔离测量广播本身的墙钟开销。14:02:48告警已确认为排空后正常换引擎，退出剩余请求0。
 
-[自动对照](../evidence/L076-opening_q2_srpt300_n26/opening/comparison.json)、[分析](../evidence/L076-opening_q2_srpt300_n26/opening/analysis.json)、[告警复核](../evidence/L076-opening_q2_srpt300_n26/opening/shutdown-alert-review.json)。
+自动对照（本地归档：`../evidence/L076-opening_q2_srpt300_n26/opening/comparison.json`）、分析（本地归档：`../evidence/L076-opening_q2_srpt300_n26/opening/analysis.json`）、告警复核（本地归档：`../evidence/L076-opening_q2_srpt300_n26/opening/shutdown-alert-review.json`）。
 
 ### 075：冷块上限4096→8192，N26开场（2026-09-25，Codex）
 
@@ -201,7 +217,7 @@ chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与�
 
 离线B峰值约1301k、终点残差0；decode墙钟估计38.2%（覆盖540秒），非GPU实测。结果支持更大冷块能改善一些chain，但明显挤压其他请求，不能直接作为整体晋级配置；不把短测判成完整N26失败，也不废弃机制。076单测排序、077单测interval1继续。13:45:38告警发生在排空后的正常引擎更换路径，SystemExit0/CancelledError，退出时剩余请求0。
 
-[自动对照](../evidence/L075-opening_q1_cold8192_n26/opening/comparison.json)、[分析](../evidence/L075-opening_q1_cold8192_n26/opening/analysis.json)、[告警复核](../evidence/L075-opening_q1_cold8192_n26/opening/shutdown-alert-review.json)。
+自动对照（本地归档：`../evidence/L075-opening_q1_cold8192_n26/opening/comparison.json`）、分析（本地归档：`../evidence/L075-opening_q1_cold8192_n26/opening/analysis.json`）、告警复核（本地归档：`../evidence/L075-opening_q1_cold8192_n26/opening/shutdown-alert-review.json`）。
 
 ### 073/074：0925a原引擎配置，N22/N26开场10分钟诊断（2026-09-25，Codex）
 
@@ -222,7 +238,7 @@ chain超时比069少8条，fast多20条；完整共同5601条的四桶计数与�
 
 decode占时来自同轮纯decode窗口及069同引擎拟合的估计，含CPU开销，不是GPU忙时实测。无decoder的连续prefill参考只有N22的7段/2.55秒、N26的3段/1.07秒，约10.19k/9.82k token/s，样本不足以判断稳定孤立产能。后段KV日志最高已接近/达到1.00，不能把“开场不缺显存”推广到全部10分钟。
 
-自动证据：[N22](../evidence/L073-official_0925a_opening_n22/opening/analysis.json)、[N26](../evidence/L074-official_0925a_opening_n26/opening/analysis.json)、[同ID比较](../evidence/L074-official_0925a_opening_n26/opening/comparison.json)。raw、派发ledger及计分收据在GPU同run的window/opening和Pod原run；本地已取回自动分析及来源文件并核验SHA。两档结束；用户随后批准075–077独立探针。13:37更新：原opening_report的p95插值改为原harness floor(q*n)，与074 timed_score逐项一致。B曲线是实际到达账减页对齐batch工作、加末页padding修正；残差保留，不能当精确GPU待算量或清空时刻。
+自动证据：N22（本地归档：`../evidence/L073-official_0925a_opening_n22/opening/analysis.json`）、N26（本地归档：`../evidence/L074-official_0925a_opening_n26/opening/analysis.json`）、同ID比较（本地归档：`../evidence/L074-official_0925a_opening_n26/opening/comparison.json`）。raw、派发ledger及计分收据在GPU同run的window/opening和Pod原run；本地已取回自动分析及来源文件并核验SHA。两档结束；用户随后批准075–077独立探针。13:37更新：原opening_report的p95插值改为原harness floor(q*n)，与074 timed_score逐项一致。B曲线是实际到达账减页对齐batch工作、加末页padding修正；残差保留，不能当精确GPU待算量或清空时刻。
 
 ### 069：host容量32→64GB/rank，全量长链N30（2026-09-24，Codex，独立复核通过）
 
@@ -257,7 +273,7 @@ CPU真实调度器47项通过（当前759的HiCache/122，历史机制基准保�
 
 取证误漏`--data-root`曾用旧dev集产生INVALID（extra4879）；保留原报错，正确冻结集重新判分，原raw/run未改。
 后续显式使用`fetch_level.sh <run> 30 --data-root data/s1-dev-longchain`。
-证据：[最终审计](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/final-audit.json)、[完整判分](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/level_verdict.json)、[5601条对照](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.csv)、[摘要](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.txt)、[311条坏例](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/ttft-cases.csv)、[独立复核](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/independent-review.json)。
+证据：[最终审计](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/final-audit.json)、[完整判分](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/level_verdict.json)、5601条对照（本地归档：`../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.csv`）、[摘要](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/compare_vs_068.txt)、311条坏例（本地归档：`../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/ttft-cases.csv`）、[独立复核](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/N30/independent-review.json)。
 
 ### 068：关闭122，全量长链N30（2026-09-24，Codex，独立复核通过）
 
@@ -292,7 +308,7 @@ lc139:0002两轮cached=0，TTFT288.65→265.63秒；前驱结束到执行326.57�
 KV/indexer与KDA host份额一起增加，8卡总预算256→512GB，GPU池预算不变；CPU源码尺寸函数与cgroup余量筛查通过。
 实际容量、启动、短预热与flush必须再次核对；容量无收益再补定向保存/淘汰/恢复trace。独立参与者复核全量原始数据后支持此设计，无阻断问题。
 
-证据：[完整判定](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/level_verdict.json)、[5601条对照](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.csv)、[对照摘要](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.txt)、[589条坏例](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/ttft-cases.csv)、[哈希](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/case-list-manifest.json)、[指标口径](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/cache-runtime-summary.json)、[069预算筛查](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)。
+证据：完整判定（本地归档：`../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/level_verdict.json`）、5601条对照（本地归档：`../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.csv`）、[对照摘要](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/compare_vs_067.txt)、589条坏例（本地归档：`../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/ttft-cases.csv`）、[哈希](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/case-list-manifest.json)、[指标口径](../evidence/L068-official_b_pace_off_full_n30_shortwarm/N30/cache-runtime-summary.json)、[069预算筛查](../evidence/L069-official_b_pace_off_host64_full_n30_shortwarm/budget-probe.json)。
 
 ### 067：组合全量长链N30（2026-09-24，Codex）
 
@@ -315,7 +331,7 @@ TPOT均值.033498秒/token。原固定稳态窗[10,70)分钟2585条，有效：�
 坏例recv→exec中位依次约5.4/8.0/21.1/63.4秒；该间隔不能直接归因调度。8条慢fast已验证prompt LCP大于cached，尚不能证明有效混合状态曾存在或被淘汰。
 下一项068只切122 off；比较整个节奏/块预算机制，不预设净收益，不同时改成本模型或180。
 
-[完整判定与收据](../evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json)、[唯一坏例CSV](../evidence/L067-official_b_full_n30_shortwarm/N30/ttft-cases.csv)、[数据与raw哈希](../evidence/L067-official_b_full_n30_shortwarm/N30/case-list-manifest.json)、[过程与归因边界](reports/sglang-shortwarm-mainline-0924.md)。
+完整判定与收据（本地归档：`../evidence/L067-official_b_full_n30_shortwarm/N30/level_verdict.json`）、唯一坏例CSV（本地归档：`../evidence/L067-official_b_full_n30_shortwarm/N30/ttft-cases.csv`）、数据与raw哈希（本地归档：`../evidence/L067-official_b_full_n30_shortwarm/N30/case-list-manifest.json`）、[过程与归因边界](reports/sglang-shortwarm-mainline-0924.md)。
 
 | 实验 | 只改什么 / 环境 | 完整档结果 | 结论与证据 |
 |---|---|---|---|
@@ -328,20 +344,20 @@ TPOT均值.033498秒/token。原固定稳态窗[10,70)分钟2585条，有效：�
 
 ### 09-24 00:40–00:47 UTC：Codex只读复核补充
 
-037b–042这批队列已结束，037c/d均未通过N22，没有自动进入N26。下列完整档均有722条、0请求错误，并用原harness与题面规则CPU重算；041没有完整档。各门明细、配置类型和源码限制见 [codex-分析](codex-分析-2026-09-24.md)，[复算JSON](../evidence/queue-review-20260924/rescored_levels.json)。
+037b–042这批队列已结束，037c/d均未通过N22，没有自动进入N26。下列完整档均有722条、0请求错误，并用原harness与题面规则CPU重算；041没有完整档。各门明细、配置类型和源码限制见 [codex-分析](codex-分析-2026-09-24.md)，复算JSON（本地归档：`../evidence/queue-review-20260924/rescored_levels.json`）。
 
 | 实验 | 相对基线只改什么 / 环境 | 完整档结果 | 结论与证据 |
 |---|---|---|---|
 | 037b N22 | S1+固定16轮decode，对照036 | TPOT mean/p95 .0562/.0695，0超标；overall29/27、turn5/3、chain78/22失败 | 固定间隔仍过度挤压prefill；[L037b](../evidence/L037b/) |
 | 037c N22 | S1+122，target=.17 | TPOT .0783/.1424，187超标；chain33/22，整档FAIL | 相对固定16轮减轻TTFT回退，但未同时守住chain与TPOT；公式按固定成本估计，不是实测反馈；[L037c](../evidence/L037c/) |
 | 037d N22 | 037c+123，aging=2000 | TPOT .0810/.1466，203超标；chain23/22（CP；Wald允许23），TPOT使整档在各方法下仍FAIL | chain超标33→23，小于64k未命中的超标chain21→8；仍不能抢占当前partial，长请求可等到110秒；[L037d](../evidence/L037d/) |
-| 038 N22 | S1关闭140 | TPOT .0979/.2586，202超标；四TTFT过，整档FAIL | 同链LCP对齐缺口1,304,448，大于两次S1的863,936–916,480；关闭无改善证据，先保留140；[L038](../evidence/L038/) |
-| 039 N22 | 038+MTP及配套graph/backend/槽位配置 | TPOT .0772/.2039，186超标；overall29/27、chain30/22，整档FAIL | 组合改善decode但新增TTFT失败；KV965,504，不能单独归因MTP；[L039](../evidence/L039/) |
-| 040 N22 | S1状态槽200→400 | TPOT .0861/.2265，182超标；四TTFT过，整档FAIL | 同链对齐缺口450,496，约减半；全prefill只少5%–6%，KV容量少22%；p95相对042仅改善.0058，需复验；[L040](../evidence/L040/) |
-| 041 | S1+DCP8 | 冒烟阶段引擎异常，未进入完整N22 | `dcp/comm.py:293`目标[33,1,512]、输入[40,1,512]；疑似TP8/scatter补齐契约不一致，未修复，不能评价性能；[服务日志](../evidence/queue-review-20260924/041-server-tail.log) |
+| 038 N22 | S1关闭140 | TPOT .0979/.2586，202超标；四TTFT过，整档FAIL | 同链LCP对齐缺口1,304,448，大于两次S1的863,936–916,480；关闭无改善证据，先保留140；L038（本地归档：`../evidence/L038/`） |
+| 039 N22 | 038+MTP及配套graph/backend/槽位配置 | TPOT .0772/.2039，186超标；overall29/27、chain30/22，整档FAIL | 组合改善decode但新增TTFT失败；KV965,504，不能单独归因MTP；L039（本地归档：`../evidence/L039/`） |
+| 040 N22 | S1状态槽200→400 | TPOT .0861/.2265，182超标；四TTFT过，整档FAIL | 同链对齐缺口450,496，约减半；全prefill只少5%–6%，KV容量少22%；p95相对042仅改善.0058，需复验；L040（本地归档：`../evidence/L040/`） |
+| 041 | S1+DCP8 | 冒烟阶段引擎异常，未进入完整N22 | `dcp/comm.py:293`目标[33,1,512]、输入[40,1,512]；疑似TP8/scatter补齐契约不一致，未修复，不能评价性能；服务日志（本地归档：`../evidence/queue-review-20260924/041-server-tail.log`） |
 | 042 N22 | S1原样重复036 | TPOT .0915/.2323，175超标；fast15/23、overall18/27、turn0/3、chain17/22；仅TPOT失败 | 同配置fast7→15、p95 .2532→.2323；一次重跑证明有波动，尚非稳定噪声估计；[L042](../evidence/L042/) |
 
-真实同链LCP复核使用T56既有渲染结果，并核对同一req_id、前驱与prompt长度；只代表本轮前驱prompt的缺口，不是全部缓存潜力或已证明可恢复的时间。[缓存账本](../evidence/queue-review-20260924/cache_lcp_comparison.json)。旧为当时交接快照，最新结论以本表与codex分析为准。
+真实同链LCP复核使用T56既有渲染结果，并核对同一req_id、前驱与prompt长度；只代表本轮前驱prompt的缺口，不是全部缓存潜力或已证明可恢复的时间。缓存账本（本地归档：`../evidence/queue-review-20260924/cache_lcp_comparison.json`）。旧为当时交接快照，最新结论以本表与codex分析为准。
 
 ## 正式A/B原样校准：044r/045r（2026-09-24，Claude）
 
@@ -357,7 +373,7 @@ TPOT均值.033498秒/token。原固定稳态窗[10,70)分钟2585条，有效：�
 ## Codex CPU复核：阻塞窗口脚本（2026-09-24）
 
 - 原 `blocking.py` 把执行窗口与模型成本残差标成因果拆分，并用 `min()` 隐藏估计越界；已改为实测阶段、候选窗口重合、成本情景三类数据，schema=2。
-- 8个CPU回归用例通过；042/037d各722条完整raw重算，超标条数不变。生成窗口重合中位数86.9%/98.9%；成本估计越界218/123条，直接保留而非截断。[042](../evidence/L042/blocking.json)、[037d](../evidence/L037d/blocking.json)。
+- 8个CPU回归用例通过；042/037d各722条完整raw重算，超标条数不变。生成窗口重合中位数86.9%/98.9%；成本估计越界218/123条，直接保留而非截断。042（本地归档：`../evidence/L042/blocking.json`）、037d（本地归档：`../evidence/L037d/blocking.json`）。
 - 新增真实cohort/时间/token/LCP校验、显式时钟偏移、逐请求候选ID与request-seconds；没有新增GPU实验或正式提交。[完整说明](codex-分析-阻塞归因与执行路线.md)。
 
 ## 过去尝试留下的教训
@@ -373,13 +389,13 @@ TPOT均值.033498秒/token。原固定稳态窗[10,70)分钟2585条，有效：�
 
 - 问题：分析器是否正确计算一次CUDA graph forward？既有TP1 trace中只有一个decode，旧`prof_ledger.py`却报44步、平均0.6ms、outside=-2.9%。原因是把不同stream的同一External id重复计数。
 - 改进：按逻辑forward合并标记；拒绝无法按时间归因的跨forward重叠和多GPU混合trace。mHC名称优先于泛GEMM；不按TileLang框架名猜DSA，空档不直接归因CPU。
-- 验证：4个CPU用例通过，4份已有trace均还原为1个extend+1个decode；示例decode14.7ms、outside1.1%。[修前/修后及回归](../evidence/cost-audit-20260924/)。没有运行GPU实验、修改pod或提交。
+- 验证：4个CPU用例通过，4份已有trace均还原为1个extend+1个decode；示例decode14.7ms、outside1.1%。修前/修后及回归（本地归档：`../evidence/cost-audit-20260924/`）。没有运行GPU实验、修改pod或提交。
 - 同轮只读查回正式A=N14、B=N10及能力通过事实。下一步先补同配置同档校准，正式A保留MTP作部署基线；不再要求无MTP S1的dev N22全过后才能研究正式候选。开发集11门照实报告。[分析§10–12](codex-分析-2026-09-24.md#11-昨天正式ab带来的优先级修正)
 
 ## Codex CPU复核：评测工具与旧结论更新（2026-09-24）
 
 - 修复清缓存失败仍测量、多档取证混文件、吞 runner/verdict 退出码及引擎复用缺日志；原 runner/harness 只读，CP 主评分不改，替代区间只输出敏感性。13个CPU回归用例通过，本地脚本语法检查通过。
-- 035–042共10个完整档逐项比较修改前后主评分报告，全部一致，仍均FAIL；037d只有chain对区间方法敏感，TPOT仍FAIL。此次回归只验证分数不变，不伪造旧归档缺失的run_dev.log。[评分回归](../evidence/eval-tools-audit-20260924/score-regression.json)
+- 035–042共10个完整档逐项比较修改前后主评分报告，全部一致，仍均FAIL；037d只有chain对区间方法敏感，TPOT仍FAIL。此次回归只验证分数不变，不伪造旧归档缺失的run_dev.log。评分回归（本地归档：`../evidence/eval-tools-audit-20260924/score-regression.json`）
 - Fable评估中的冻结缓存归因、TPM推产能、驻留覆盖及正式门难度等旧判断已直接更正文；旧044/045同配置校准作废，使用044r/045r的完整重跑。没有同步pod、入队、打镜像或提交。[审计修复](fable-审计-2026-09-24.md)、[评估正文](fable-评估-2026-09-24.md)
 
 ## 047：正式A原样 dev N22（2026-09-24，Codex）

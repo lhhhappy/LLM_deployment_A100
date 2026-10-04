@@ -12,7 +12,7 @@ chain”当作结论：同样的省时落在不同请求和不同等待位置，
 本轮用现行 `scripts/pod/verify/prof_ledger.py` 在 Pod CPU 上重算两份 rank0 原 trace：单请求目标模型
 完整 8k 块 591.9 ms（5 块），负载下 584.1 ms（28 块）；草稿独立列为 27.1 / 25.1 ms。负载窗口
 98.7% 在 extend、decode 为 0%，开场几乎没有 decode 时间可再交换。原先目标/草稿混合的均值不能使用。
-[重算账本](../../evidence/prefill-sm80-0927/profile-ledger.json) 保留各形状的 span、busy 与计数。
+重算账本（本地归档：`../../evidence/prefill-sm80-0927/profile-ledger.json`） 保留各形状的 span、busy 与计数。
 其粗粒度 kernel 分类会漏掉匿名 DSA/Humming 核，不能把 `other` 或 `kda` 百分比直接当作真实算子归因。
 Fable 人工映射的目标块摘要仍是：DSA `main_kernel` 21.7%、mHC 三核约 13.9%、all-reduce 11.7%；
 本轮独立重算确认的是完整块时间与执行阶段，未将上述人工分类冒充本脚本输出。
@@ -22,7 +22,7 @@ Fable 人工映射的目标块摘要仍是：DSA `main_kernel` 21.7%、mHC 三�
 4.303→4.100 ms；256k 改 GROUP=64 的一组为 4.073 ms。这只是单卡合成算子、同进程交替计时，尚不是
 真实模型或服务收益。128k 即使按目标 11 层相加也只约 1 ms，因此本轮不为这点收益增加生产旋钮。
 原 JSONL 留在开发机 `/sjtu/linhang/arena/codex/prefill-sm80-0927/results/tune-1024-{32768,65536}-causal.jsonl`；
-可复现工具为 [indexer probe](../../scripts/analysis/bench_prefill_indexer.py)。
+可复现工具为 indexer probe（本地归档：`../../scripts/analysis/bench_prefill_indexer.py`）。
 
 **历史可核实的候选证据：** [118 原始 bench](../../evidence/dsa118/bench.jsonl) 的单卡 H8、D512、8192 query rows：
 49k 上下文 10.587→6.585 ms，首个 8k 块 9.943→5.145 ms。测量是 CUDA graph 内随机页/索引的算子计时，
@@ -108,8 +108,8 @@ Triton 3.7.1、TileLang 0.1.12，候选执行代码为 `3caadef4`。没有停止
 8k 行时 ON 的临时峰值增量为 64 MiB（输出），OFF 通常为 130.25 MiB（16384 上下文一组为 131.00 MiB）；
 16k 行为 128 对 260.5 MiB。未新增持久张量。成本矩阵预热单个 width 加载 9 个核，此后额外加载 0。
 部分 eager 样本有 host/launch 长尾，全部保留；表中位数不能充当服务尾延迟。更长上下文时节省变小，也不能
-用 49k 的加速比代表 262k。完整日志为 [GPU suite](../../evidence/prefill-sm80-0927/118-prefill-tests.log) 与
-[成本矩阵](../../evidence/prefill-sm80-0927/118-prefill-cost.jsonl)。
+用 49k 的加速比代表 262k。完整日志为 GPU suite（本地归档：`../../evidence/prefill-sm80-0927/118-prefill-tests.log`） 与
+成本矩阵（本地归档：`../../evidence/prefill-sm80-0927/118-prefill-cost.jsonl`）。
 
 复现（候选源码已上传到独立目录）：
 
@@ -136,12 +136,12 @@ forward，不把 draft 平均进去。再用同数据、同派发窗口的开场
 不能把历史 118 的 decode 加速写成这个 prefill-only 开关的收益。
 
 负载验证还须区分源会话起点与回放链首；用户新提供的是源业务历史缓存统计，不是正式运行缓存。
-参见 [链首来源核实](chain-origin-audit-0927.md)。本候选按执行阶段生效，稳态普通 prefill 同样覆盖，
+参见 链首来源核实（本地归档：`chain-origin-audit-0927.md`）。本候选按执行阶段生效，稳态普通 prefill 同样覆盖，
 不依赖开场计时、固定请求 ID 或源会话标签。
 
 ## mHC post 探索：本轮不推进生产改动
 
-在 GPU1 用 [独立算子探针](../../scripts/analysis/bench_mhc_post.py) 对现行 TileLang post 做了直接 Triton
+在 GPU1 用 独立算子探针（本地归档：`../../scripts/analysis/bench_mhc_post.py`） 对现行 TileLang post 做了直接 Triton
 读写原型。它没有接入引擎，不改变运行开关。简单逐项 FMA 与原核有少量末位差异；把首个乘加改为
 `fma(post, x, mix0 * residual0)` 再依次加入其余 residual，在本次 8192/128 行、H4096 的全输出比较中
 逐位相等，且 64 个参考行满足独立 float64 误差界限。这个局部结果不代表所有输入逐位等价。
@@ -149,8 +149,8 @@ forward，不把 draft 平均进去。再用同数据、同派发窗口的开场
 关键负结果：8k 行 TileLang 为 0.3648 ms，最好的两个直接读写原型为 0.3656 / 0.3660 ms，没有大块收益。
 128 行有较短计时，但 eager 波动显著，不能拿来声称目标大块提速。因此本轮不增加 mHC 生产旋钮；
 后续应关注 post/pre 融合减少中间张量搬运，而不是仅重写同一 post 的存取。原始两次测量：
-[初始表达式](../../evidence/prefill-sm80-0927/mhc-post-probe.jsonl)、
-[调整乘加顺序](../../evidence/prefill-sm80-0927/mhc-post-fma2-probe.jsonl)。
+初始表达式（本地归档：`../../evidence/prefill-sm80-0927/mhc-post-probe.jsonl`）、
+调整乘加顺序（本地归档：`../../evidence/prefill-sm80-0927/mhc-post-fma2-probe.jsonl`）。
 
 119 的大块 scatter 候选已经存在，应先区分其收益与新增 kernel 的收益；不重复开发已有机制，
 不把孤立算子百分比直接相加。当前最直接可交 TP8 的仍是 118 prefill 入口。

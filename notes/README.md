@@ -2,6 +2,8 @@
 
 本目录记录项目决策、结果和可复用分析。写新内容前先判断它属于哪一种信息；每类信息只在一个现行文件维护，其他文档用链接引用。赛题规则以 [`task.md`](../llm-challenge-arena-v1/task.md) 为准，项目边界以仓库根目录 [`AGENTS.md`](../AGENTS.md) 为准。
 
+首次阅读项目可先看 [探索历程与逐提交索引](read-history.md)、[最新源码地图](architecture.md) 和 [复现说明](reproduce.md)。正式结果统一在 [submissions.md](submissions.md)，造数据的方法统一在 [生成配方](../scripts/longchain/recipes/README.md)。
+
 ## 信息放置
 
 | 内容 | 唯一现行位置 | 维护规则 |
@@ -11,11 +13,11 @@
 | 完整运行结果、有效性、对照和结论 | [`experiments.md`](experiments.md) | 每项结果有唯一编号、基线/改动、数据完整性与判定、关键指标、边界、证据链接。包括 INVALID 和中断结果，但明确标注不可作成绩。 |
 | 本地评测口径与判定流程 | [`evaluation.md`](evaluation.md) | 只维护合同，不在其他文档另造评分口径。 |
 | 正式提交、平台终态和正式分数 | [`submissions.md`](submissions.md) | 实验记录引用此处，不另抄正式成绩表。 |
-| 当前阶段的研究假设、实验顺序、决策门 | [`program-n30-v3.md`](program-n30-v3.md) | 只维护当前计划。阶段结束时压缩成结论或归档独立分析，避免计划变成运行流水账。 |
+| v3/N30 历史阶段的研究假设与推理账本 | [`program-n30-v3.md`](program-n30-v3.md) | 历史阶段按日期阅读；后续派发以 queue 为准，最新发布从 submissions 进入。 |
 | 合作接口、责任和协作流程 | [`collaboration.md`](collaboration.md) | 不记录会话实时状态；按文件中指向的动态登记处查找。 |
 | 一项审查、事故复盘、坏例归因或专题分析 | [`reports/`](reports/) | 每文聚焦一个问题并保留推理与原始证据链接；完成后把可复用结论提升到 knowledge、experiments、research 或正式计划，报告本身保留审计轨迹。 |
 | 跨会话交接 | [`handoffs/`](handoffs/) | 只写接手所需背景、边界、入口和未完成事项；动态状态指向 queue/knowledge，不复制它们。任务结束后标明已结束或删除纯导航副本。 |
-| 个人工作流水 | [`iterations/`](iterations/) | 按日期记行动与短期状态；不得作为当前事实或实验记录的替代。结束后将可复用结论迁入其唯一归处，再压缩流水。 |
+| 个人工作流水 | 迭代记录（Git 历史） | 按日期记行动与短期状态；不得作为当前事实或实验记录的替代。结束后将可复用结论迁入其唯一归处，再压缩流水。 |
 | 历史专题草稿、来源核查或一次性建议 | 根目录下有明确主题的文档 | 保留有独立数据、推理或可复用约束的内容；纯目录、过时状态页与其他文档重复的导航应并入现行入口后删除。 |
 
 若一段文字同时像计划和结果，拆开：计划放阶段计划，执行状态放队列，闭合结果放实验记录，能跨轮复用的事实再提炼到知识库。原始 raw、日志、评分收据和逐请求数据留在 `evidence/`，笔记只写解释和链接。
@@ -40,6 +42,6 @@
 ## 从这里进入
 
 - 先看 [queue.md](queue.md)、[knowledge.md](knowledge.md)、[experiments.md](experiments.md) 获取当前运行、事实和结果。
-- 当前方案看 [program-n30-v3.md](program-n30-v3.md)；评分方式看 [evaluation.md](evaluation.md)。
+- 历史阶段方案看 [program-n30-v3.md](program-n30-v3.md)；评分方式看 [evaluation.md](evaluation.md)。
 - 特定事故、代码/数据审查和坏例分析在 [`reports/`](reports/)；引擎交接在 [`handoffs/`](handoffs/)；长链材料与源码设计的现行说明分别看 [`scripts/longchain/longchain.md`](../scripts/longchain/longchain.md) 和 [`data/README.md`](../data/README.md)。
 - 源码性能研究统一从 [`research/README.md`](../research/README.md) 进入；不要把研究笔记另复制一份到此目录。

@@ -1,5 +1,7 @@
 # 正式提交 47266：0928c KDA 全候选
 
+> 以下保留 09-28 上传时的记录；其中 queued 是当时状态。47266 后来已完成并通过 N42，最终回报和最新 09-30 提交见 [正式提交记录](../../notes/submissions.md)。
+
 2026-09-28 15:09 UTC，Codex 按用户明确授权完成提交。平台返回 attempt **47266**、worker job **25359**；初次独立查询状态为 **queued**，能力与压测成绩尚未返回。提交成功不等于评测通过。
 
 提交物为镜像 `registry.dp.tech/dptech/dp/native/prod-4727808/21221/lh-img:0928c`，引擎 `bf6b66faf3ffbe10e593e858d3bbedd1c48cefb2`，即已验证的钉池 400 + 118 + attention-TP 输入分片 + MoE 调参 + KDA prefill。未加入后续被否决的 133 调参。

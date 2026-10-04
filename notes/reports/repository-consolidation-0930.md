@@ -2,7 +2,7 @@
 
 项目根目录为 `/workspace/Agentic_science_challenge/LLM_deployment_A100/`。代码、`.git`、`scripts/`、`build/`、`evidence/`、数据和缓存全部位于项目内。父目录只保留系列入口与项目子目录，其他比赛使用各自的子目录。
 
-私有仓库：[lhhhappy/LLM_deployment_A100](https://github.com/lhhhappy/LLM_deployment_A100)。69 个分支、22 个标签已推送并逐项核验对象 ID，其中包括 18 个 `archive/wip-20260930/*` 工作区快照。归档快照保留清理前的未提交修改；原分支不合并这些修改。所有清理前 checkout 的 HEAD 都仍能由已推送的分支或标签到达。
+仓库：[lhhhappy/LLM_deployment_A100](https://github.com/lhhhappy/LLM_deployment_A100)。69 个分支、22 个标签已推送并逐项核验对象 ID，其中包括 18 个 `archive/wip-20260930/*` 工作区快照。归档快照保留清理前的未提交修改；原分支不合并这些修改。所有清理前 checkout 的 HEAD 都仍能由已推送的分支或标签到达。
 
 47 个关联 worktree 中已移除 46 个，本地保留主仓库和 `build/worktrees/final-execution-0930/`。最终候选仍为 `codex/final-execution-0930` / `ca5d646c252688177480c7e67cec0a901e4b7069`，工作区干净。两份正式 CAP / TPOT 提交 ZIP 的 SHA256 保持不变。
 

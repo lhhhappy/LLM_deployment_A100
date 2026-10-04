@@ -6,7 +6,7 @@
 结论：现有 v4/v5 可以复用正文、增量修订元数据。已经修复两个脚本的输入覆盖和发布契约问题，
 完成 v5 对照、旧 v5g 压力参照、v5g-tail 主候选，已在 GPU 开发机及 Pod 上复用正文部署。真实等待只有汇总统计，不能恢复每个请求的间隔或位置；
 补算工作量的偏差也不能通过改 `uncached_expected` 标签修好。
-Fable 已独立复核接受三套发布及 tail 规则，后续同数据对照由他编排；当前状态只看共享[实验队列](/workspace/Agentic_science_challenge/notes/queue.md)。
+Fable 已独立复核接受三套发布及 tail 规则，后续同数据对照由他编排；当前状态只看共享[实验队列](../queue.md)。
 
 ## 1. 审查覆盖与调用图
 
@@ -152,5 +152,5 @@ gap 定位与边界、cohort 漏项/链内改序、真实 checker 对衍生数�
 [部署与源统计收据目录](../../evidence/longchain-incremental-repair-0927/)。
 
 本地与正式 chain 的 36 组记录重算另见
-[chain 再分析](/workspace/Agentic_science_challenge/build/worktrees/prefill-sm80-0927/notes/reports/chain-local-official-reaudit-0927.md)。
+chain 再分析（本地归档：`chain-local-official-reaudit-0927.md`）。
 本轮没有新的 GPU 性能结果，不据此宣称 chain p95 或 N@SLO 已改善。

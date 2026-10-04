@@ -1,13 +1,37 @@
-# GLM-5.3-Flash 推理服务赛：仓库入口
+# GLM-5.3-Flash on 8×A100：正式 N=42 与探索记录
 
-本仓库在 8×A100 上开发推理服务。**赛规以 [task.md](llm-challenge-arena-v1/task.md) 为准**；本地开发集只用于比较我们自己的配置，不能直接换算正式 N@SLO。协作与代码边界见 [AGENTS.md](AGENTS.md)。
+本仓库记录固定模型、固定 8×A100 条件下的推理服务优化：接口适配、缓存与调度、A100 算子实现，以及有效和失败的实验。排名先比较 N@SLO，再比较 TPOT 均值；规则见 [task.md](llm-challenge-arena-v1/task.md)。
+
+**最新有效正式提交是 2026-09-30 的 CAP / attempt 47798。** 引擎为 `ca5d646c`，镜像为 `lh-img:0930a`；默认分支中的 `engine/sglang/` 与该提交逐文件一致。完整成绩与同日另一方案的结果只维护在 [正式提交记录](notes/submissions.md)。
+
+## 第一次访问，从这里开始
+
+| 想了解什么 | 阅读入口 |
+| --- | --- |
+| 最新交了什么、正式结果如何 | [提交记录](notes/submissions.md)、[冻结配置](submission/official-0930-CAP.json)、[原始包与回执](evidence/submission-0930-execution/README.md) |
+| 怎样一步一步理解每个 commit | [探索历程与 65 个引擎提交的阅读索引](notes/read-history.md) |
+| 请求怎样经过调度、缓存和模型 | [最新源码地图](notes/architecture.md) |
+| 怎样克隆、核验、启动和比较 | [复现说明](notes/reproduce.md) |
+| 本地诊断数据怎样生成、怎样校验 | [生成配方](scripts/longchain/recipes/README.md)、[参数 JSON](scripts/longchain/recipes/0930.json)；数据本体留在本地 |
+| 某条路线为什么采用或放弃 | [实验记录](notes/experiments.md)、[研究索引](research/README.md) |
+
+无需 GPU 的第一步：
+
+```bash
+git clone https://github.com/lhhhappy/LLM_deployment_A100.git
+cd LLM_deployment_A100
+python3 scripts/verify_release.py
+git show ca5d646c -- engine/sglang engine/docs
+```
+
+核验脚本检查正式源码树、归档哈希、ZIP 内配置和官方终态。真实服务需使用记录中的 A100 镜像与模型挂载，见复现说明。本地短测用于机制比较，正式分数来自平台回报。
 
 ## 从哪里看
 
 | 需要知道什么 | 唯一现行入口 |
 | --- | --- |
 | Pod 正在跑什么、接下来排什么 | [实验队列](notes/queue.md)；实时状态用 `scripts/pod/pread status` |
-| 当前阶段为什么这样设计 | [v3/N30 阶段计划](notes/program-n30-v3.md) |
+| 历史 v3/N30 阶段为什么这样设计 | [阶段计划与推理账本](notes/program-n30-v3.md) |
 | 已核实的事实与撤回的解释 | [知识库](notes/knowledge.md) |
 | 本地运行怎样判有效、怎样比较 | [评估合同](notes/evaluation.md) |
 | 历次结果和原始证据 | [实验记录](notes/experiments.md) |
