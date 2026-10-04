@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Derive a gap-realistic variant of a frozen long-chain set: same chains, same prompts, same output budgets and
-replay order; only the imputed replay gaps are rescaled per chain so that each chain's wall time matches the
-organizer's real chain duration (chains.jsonl: last_end_offset_ms - first_dispatch_offset_ms).
+"""Derive a duration-based gap sensitivity variant: same chains, prompts, output budgets and
+replay order; imputed replay gaps are rescaled using an estimated service cost and source chain duration
+(chains.jsonl: last_end_offset_ms - first_dispatch_offset_ms). This does not reconstruct observed request gaps.
 
-Why: v3 copied per-request gaps from the public prefix rows (median 2.6 s), but the organizer's full chains last
-much longer (mean 2232 s vs v3's about 626 s of gaps plus estimated service), so locally far more sessions are
-awake at once than online and the KV pool fills at N30 (notes/reports/109-chain-turn-rootcause-0926.md §4,
-notes/fable-策略-2026-09-26.md). Gaps the organizer published (gap_imputed false) are kept byte for byte.
+Why: the public-prefix gap pool omits the full source history's long tail. A per-chain stretch is useful as a
+sensitivity experiment, but also shifts the median and cannot recover event placement or tool/think decomposition.
+Its effects on instantaneous activity and cache reuse must be measured. Non-imputed public gaps are kept unchanged.
 
 Rule per chain (all quantities in seconds):
   target = clamp(real_duration - sum(ttft_s + max_output_i * tpot_s), 0, chain_cap)   # harness caps a chain at 3600
@@ -18,8 +17,8 @@ Chains without an organizer duration, with a single request, or with no imputed 
 
 Usage: regap.py --src cache/s1-dev-longchain-v3 --organizer s1-dev/data/dev-combined-v1/chains.jsonl
                --out cache/s1-dev-longchain-v3g --set s1-dev-longchain-v3g [--ttft-s 1.5 --tpot-s 0.03]
-Writes requests.jsonl, chains.jsonl (copied), cohort.json (set renamed, cohort_sha256 recomputed by the checker's
-rule), manifest.json (parent hashes, rule, statistics). Bodies are not copied: point bodies/ at the parent's.
+Writes a fresh derivative with updated request provenance and a complete manifest. Body shards are linked to
+the parent, not copied. --metadata-only permits missing source assets but marks the result incomplete.
 """
 import argparse
 import hashlib
@@ -27,6 +26,10 @@ import json
 import statistics
 from collections import defaultdict
 from pathlib import Path
+if __package__:
+    from .longchain_metadata import checked_output, publish
+else:
+    from longchain_metadata import checked_output, publish
 
 
 def sha(path):
@@ -35,7 +38,7 @@ def sha(path):
 
 def q(v, p):
     s = sorted(v)
-    return s[min(len(s) - 1, int(p * len(s)))] if s else float('nan')
+    return s[min(len(s) - 1, int(p * len(s)))] if s else None
 
 
 def main():
@@ -50,9 +53,9 @@ def main():
     ap.add_argument('--chain-cap-s', type=float, default=3600.0)
     ap.add_argument('--allow-scale-down', action='store_true')
     ap.add_argument('--redistribute', action='store_true', help='spread the time cut by gap_cap over the other imputed gaps (not the organizer rule)')
+    ap.add_argument('--metadata-only', action='store_true', help='allow missing parent assets; output remains explicitly incomplete')
     a = ap.parse_args()
-    src, out = Path(a.src), Path(a.out)
-    out.mkdir(parents=True, exist_ok=True)
+    src, out = checked_output(a.src, a.out)
     rows = [json.loads(l) for l in open(src / 'requests.jsonl')]
     by_id = {f"{r['pack']}:{r['view']}:{r['logical_call_id']}": r for r in rows}
     cohort = json.loads((src / 'cohort.json').read_text())
@@ -112,15 +115,8 @@ def main():
         stats['changed'] += 1
         stats['factors'].append(f)
         stats['after'].append(valid_sum + sum(new.values()))
-    with open(out / 'requests.jsonl', 'w') as fh:
-        for r in rows:
-            fh.write(json.dumps(r, ensure_ascii=False) + '\n')
-    (out / 'chains.jsonl').write_bytes((src / 'chains.jsonl').read_bytes())
-    cohort['set'] = a.set
-    cohort['cohort_sha256'] = hashlib.sha256(json.dumps(cohort['chains'], ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:16]
-    (out / 'cohort.json').write_text(json.dumps(cohort, ensure_ascii=False, indent=1) + '\n')
     summary = dict(
-        generator='regap-v1', set=a.set, parent_set=cohort.get('parent_set') or json.loads((src / 'cohort.json').read_text())['set'],
+        kind='duration-based-gap-sensitivity', set=a.set, parent_set=cohort['set'],
         parent_requests_sha256=sha(src / 'requests.jsonl'), parent_cohort_sha256=json.loads((src / 'cohort.json').read_text())['cohort_sha256'],
         organizer_chains_sha256=sha(a.organizer),
         rule=dict(ttft_s=a.ttft_s, tpot_s=a.tpot_s, gap_cap_s=a.gap_cap_s, chain_cap_s=a.chain_cap_s, allow_scale_down=a.allow_scale_down,
@@ -129,13 +125,17 @@ def main():
                                                                           no_imputed=stats['no_imputed'], would_scale_down=stats['scaled_down_skipped']),
         chains_over_harness_cap=stats['capped_chain'], gaps_capped=stats['capped_gaps'],
         factor=dict(median=q(stats['factors'], .5), p90=q(stats['factors'], .9), max=max(stats['factors']) if stats['factors'] else None),
-        chain_gap_seconds=dict(before_mean=statistics.mean(stats['before']), after_mean=statistics.mean(stats['after']),
-                               organizer_duration_mean=statistics.mean(stats['real_durations'])),
-        requests_sha256=sha(out / 'requests.jsonl'), cohort_sha256=cohort['cohort_sha256'],
+        chain_gap_seconds=dict(before_mean=statistics.mean(stats['before']) if stats['before'] else None,
+                               after_mean=statistics.mean(stats['after']) if stats['after'] else None,
+                               organizer_duration_mean=statistics.mean(stats['real_durations']) if stats['real_durations'] else None),
+        cohort_sha256=cohort['cohort_sha256'],
     )
     gaps_after = [(r.get('replay_gap_ms') or 0) / 1000.0 for r in rows if r.get('replay_gap_ms')]
-    summary['per_request_gap_s'] = dict(median=q(gaps_after, .5), mean=statistics.mean(gaps_after), p90=q(gaps_after, .9), max=max(gaps_after))
-    (out / 'manifest.json').write_text(json.dumps(summary, ensure_ascii=False, indent=1) + '\n')
+    summary['per_request_gap_s'] = dict(median=q(gaps_after, .5), mean=statistics.mean(gaps_after) if gaps_after else None,
+                                       p90=q(gaps_after, .9), max=max(gaps_after) if gaps_after else None)
+    manifest = publish(src, out, rows, name=a.set, operation=summary, metadata_only=a.metadata_only)
+    summary['status'] = manifest['status']
+    summary['requests_sha256'] = manifest['artifacts']['requests.jsonl']
     print(json.dumps(summary, ensure_ascii=False, indent=1))
 
 

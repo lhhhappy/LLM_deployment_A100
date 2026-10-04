@@ -1,0 +1,391 @@
+{
+  "structure": {
+    "status": "STRUCTURAL_OK",
+    "complete_pass": false,
+    "errors": [],
+    "warnings": [
+      "full Renderer/tokenizer validation unavailable; structural checks only, not a complete PASS"
+    ],
+    "counts": {
+      "canon_request_ids": 5601,
+      "serving_request_ids": 5601,
+      "expected_ids": 5601,
+      "body_ids": 5601,
+      "matched_bodies": 5601,
+      "chains": 311,
+      "source_chain_length_mismatches": 0,
+      "rendered_prompts": 0,
+      "synthetic_tool_blocks_implicit_ids": 0
+    },
+    "manifest_checks": {
+      "source_aggregate": {
+        "chains": 311,
+        "requests": 5601,
+        "mean_length": 18.009646302250804,
+        "mean_prompt": 86602.19175147296,
+        "mean_output": 732.8953758257454,
+        "family_pair_probability": 0.01742557825951665,
+        "family_count": 156
+      },
+      "source_output_aggregate_conflict_chains": 3,
+      "visible_start_after_source_start_chains": 53,
+      "manifest_chain_summaries": 311,
+      "source_prompt_sum": 485058876,
+      "generated_prompt_sum": 474896606,
+      "source_output_sum": 4104947,
+      "generated_output_sum": 4108438,
+      "source_prompt_mean_per_chain": 1559674.84244373,
+      "generated_prompt_mean_per_chain": 1526998.733118971,
+      "source_output_mean_per_chain": 13199.18649517685,
+      "generated_output_mean_per_chain": 13210.4115755627,
+      "source_vs_generated_phase_counts": [
+        {
+          "phase": "context_reset",
+          "source_target_requests": 141,
+          "generated_actual_requests": 141,
+          "delta_requests": 0
+        },
+        {
+          "phase": "intra",
+          "source_target_requests": 5125,
+          "generated_actual_requests": 5125,
+          "delta_requests": 0
+        },
+        {
+          "phase": "session_start",
+          "source_target_requests": 104,
+          "generated_actual_requests": 104,
+          "delta_requests": 0
+        },
+        {
+          "phase": "turn_start",
+          "source_target_requests": 231,
+          "generated_actual_requests": 231,
+          "delta_requests": 0
+        }
+      ]
+    },
+    "artifact_checks": {
+      "listed": 7,
+      "verified": 7,
+      "missing_entries": [],
+      "mismatches": []
+    },
+    "source_hash_checks": {
+      "adapted_original_rows": 0,
+      "verified_against_parent_provenance": 0,
+      "skipped_reason": null
+    },
+    "full_report": {
+      "path": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/validation/v5g-tail-structure.json",
+      "bytes": 3601430,
+      "sha256": "da42e4a8d6910ad0d0639e95c284738beafd863388d33b7a0dfd8871cffadde5"
+    }
+  },
+  "publication": {
+    "v5": {
+      "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5-review-0927",
+      "set": "s1-dev-longchain-v5-review-0927",
+      "rows": 5601,
+      "chains": 311,
+      "status": "BUILT_UNVALIDATED",
+      "request_values_equal_to_existing": true,
+      "request_values_equal_to_plan": true,
+      "changes_from_v4": {
+        "max_output_i": 4835
+      },
+      "tail_rule": null,
+      "requests_sha256": "9826b9441eb11cf2294249f4ca1fc6b2bc0d977539097b4372506c9d5bd5f1bd",
+      "cohort_sha256": "ff1dccae1087a798",
+      "gap_seconds": {
+        "count": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 22.11,
+        "p99": 33.21,
+        "mean": 5.647388468809074,
+        "over60": 18,
+        "total": 29874.685
+      },
+      "body_refs": {
+        "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+      }
+    },
+    "v5g": {
+      "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-review-0927",
+      "set": "s1-dev-longchain-v5g-review-0927",
+      "rows": 5601,
+      "chains": 311,
+      "status": "BUILT_UNVALIDATED",
+      "request_values_equal_to_existing": true,
+      "request_values_equal_to_plan": true,
+      "changes_from_v4": {
+        "max_output_i": 4835,
+        "replay_gap_ms": 3806,
+        "gap_regap_factor": 3806
+      },
+      "tail_rule": null,
+      "requests_sha256": "97a81094142bcd25dead7681d44dc508b85870cd5d8c1eb4a1f9e72277276f6c",
+      "cohort_sha256": "ff1dccae1087a798",
+      "gap_seconds": {
+        "count": 5290,
+        "p50": 7.319,
+        "p90": 50.904,
+        "p95": 99.846,
+        "p99": 310.0,
+        "mean": 23.115084688090736,
+        "over60": 440,
+        "total": 122278.798
+      },
+      "body_refs": {
+        "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+      }
+    },
+    "v5g-tail": {
+      "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927",
+      "set": "s1-dev-longchain-v5g-tail-review-0927",
+      "rows": 5601,
+      "chains": 311,
+      "status": "BUILT_UNVALIDATED",
+      "request_values_equal_to_existing": false,
+      "request_values_equal_to_plan": true,
+      "changes_from_v4": {
+        "max_output_i": 4835,
+        "replay_gap_ms": 239,
+        "gap_regap_factor": 239
+      },
+      "tail_rule": {
+        "kind": "tail-only-gap-sensitivity",
+        "threshold_ms": 12551,
+        "changed_requests": 239,
+        "rule": "synthetic non-head; old gap > v5 P90; duration proposal > max(old gap,60s); keep all other gaps",
+        "limitation": "event placement remains synthetic; no claim of recovered source timing"
+      },
+      "requests_sha256": "6170fd8204db4de8be4f99861d8cfa20ba36eab8b3317b8a3cd1343c5aef8ebb",
+      "cohort_sha256": "ff1dccae1087a798",
+      "gap_seconds": {
+        "count": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 33.21,
+        "p99": 245.467,
+        "mean": 11.239144990548203,
+        "over60": 250,
+        "total": 59455.077
+      },
+      "body_refs": {
+        "bodies/s1-dev-longchain-v4.jsonl.gz": "db1b618d4f647824df9608aa07c61eae0d3600a551aa092ba70f8258d18feb1a"
+      }
+    }
+  },
+  "effective_gap": {
+    "scope": "Original harness effective waiting only; no restored-source or performance claim",
+    "harness_path": "/dev/shm/arena-runtime/ax/s1/s1-dev/harness/s1_loadgen.py",
+    "harness_sha256": "440fd2589b00a3b891d5c9d1183c96e5dd4a264ffbc7a879d9f3cf1ebc86793f",
+    "datasets": {
+      "s1-dev-longchain-v5-review-0927": {
+        "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5-review-0927",
+        "requests_sha256": "9826b9441eb11cf2294249f4ca1fc6b2bc0d977539097b4372506c9d5bd5f1bd",
+        "cohort_id": "ff1dccae1087a798",
+        "harness_stats": {
+          "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+          "rounding": "last-nonzero-remainder",
+          "chain_gap_cap_ms": 3600000,
+          "n_chains": 311,
+          "n_chains_compressed": 0,
+          "n_requests_in_compressed_chains": 0,
+          "original_gap_sum_ms": 30442602,
+          "effective_gap_sum_ms": 30442602,
+          "affected_chains": [],
+          "affected_chains_truncated": 0
+        },
+        "original_nonheads": {
+          "count": 5290,
+          "sum_ms": 29874685,
+          "mean_ms": 5647.388468809074,
+          "p50_ms": 2653,
+          "p90_ms": 12551,
+          "p95_ms": 22110,
+          "p99_ms": 33210,
+          "max_ms": 300782,
+          "over60s": 18,
+          "over300s": 11
+        },
+        "effective_nonheads": {
+          "count": 5290,
+          "sum_ms": 29874685,
+          "mean_ms": 5647.388468809074,
+          "p50_ms": 2653,
+          "p90_ms": 12551,
+          "p95_ms": 22110,
+          "p99_ms": 33210,
+          "max_ms": 300782,
+          "over60s": 18,
+          "over300s": 11
+        },
+        "original_heads": {
+          "count": 311,
+          "sum_ms": 567917,
+          "mean_ms": 1826.0996784565916,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        },
+        "effective_heads": {
+          "count": 311,
+          "sum_ms": 567917,
+          "mean_ms": 1826.0996784565916,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        }
+      },
+      "s1-dev-longchain-v5g-review-0927": {
+        "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-review-0927",
+        "requests_sha256": "97a81094142bcd25dead7681d44dc508b85870cd5d8c1eb4a1f9e72277276f6c",
+        "cohort_id": "ff1dccae1087a798",
+        "harness_stats": {
+          "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+          "rounding": "last-nonzero-remainder",
+          "chain_gap_cap_ms": 3600000,
+          "n_chains": 311,
+          "n_chains_compressed": 1,
+          "n_requests_in_compressed_chains": 235,
+          "original_gap_sum_ms": 122846715,
+          "effective_gap_sum_ms": 122843341,
+          "affected_chains": [
+            {
+              "chain_id": "biomaster:canon:ZOKo30rK3jUVi577Z0ein:1",
+              "original_ms": 3603374,
+              "effective_ms": 3600000,
+              "alpha": 0.999064,
+              "n_requests": 235
+            }
+          ],
+          "affected_chains_truncated": 0
+        },
+        "original_nonheads": {
+          "count": 5290,
+          "sum_ms": 122278798,
+          "mean_ms": 23115.084688090737,
+          "p50_ms": 7319,
+          "p90_ms": 50904,
+          "p95_ms": 99846,
+          "p99_ms": 310000,
+          "max_ms": 310000,
+          "over60s": 440,
+          "over300s": 65
+        },
+        "effective_nonheads": {
+          "count": 5290,
+          "sum_ms": 122275427,
+          "mean_ms": 23114.447448015122,
+          "p50_ms": 7319,
+          "p90_ms": 50904,
+          "p95_ms": 99846,
+          "p99_ms": 310000,
+          "max_ms": 310000,
+          "over60s": 440,
+          "over300s": 65
+        },
+        "original_heads": {
+          "count": 311,
+          "sum_ms": 567917,
+          "mean_ms": 1826.0996784565916,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        },
+        "effective_heads": {
+          "count": 311,
+          "sum_ms": 567914,
+          "mean_ms": 1826.0900321543409,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        }
+      },
+      "s1-dev-longchain-v5g-tail-review-0927": {
+        "root": "/dev/shm/arena-runtime/ax/codex/longchain-repair-0927/data/s1-dev-longchain-v5g-tail-review-0927",
+        "requests_sha256": "6170fd8204db4de8be4f99861d8cfa20ba36eab8b3317b8a3cd1343c5aef8ebb",
+        "cohort_id": "ff1dccae1087a798",
+        "harness_stats": {
+          "pacing_rule": "S=Σreplay_gap; α=min(1, cap/S); eff_i=round(orig_i×α)",
+          "rounding": "last-nonzero-remainder",
+          "chain_gap_cap_ms": 3600000,
+          "n_chains": 311,
+          "n_chains_compressed": 0,
+          "n_requests_in_compressed_chains": 0,
+          "original_gap_sum_ms": 60022994,
+          "effective_gap_sum_ms": 60022994,
+          "affected_chains": [],
+          "affected_chains_truncated": 0
+        },
+        "original_nonheads": {
+          "count": 5290,
+          "sum_ms": 59455077,
+          "mean_ms": 11239.144990548204,
+          "p50_ms": 2653,
+          "p90_ms": 12551,
+          "p95_ms": 33210,
+          "p99_ms": 245467,
+          "max_ms": 310000,
+          "over60s": 250,
+          "over300s": 39
+        },
+        "effective_nonheads": {
+          "count": 5290,
+          "sum_ms": 59455077,
+          "mean_ms": 11239.144990548204,
+          "p50_ms": 2653,
+          "p90_ms": 12551,
+          "p95_ms": 33210,
+          "p99_ms": 245467,
+          "max_ms": 310000,
+          "over60s": 250,
+          "over300s": 39
+        },
+        "original_heads": {
+          "count": 311,
+          "sum_ms": 567917,
+          "mean_ms": 1826.0996784565916,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        },
+        "effective_heads": {
+          "count": 311,
+          "sum_ms": 567917,
+          "mean_ms": 1826.0996784565916,
+          "p50_ms": 750,
+          "p90_ms": 2840,
+          "p95_ms": 5448,
+          "p99_ms": 32754,
+          "max_ms": 62202,
+          "over60s": 1,
+          "over300s": 0
+        }
+      }
+    }
+  }
+}

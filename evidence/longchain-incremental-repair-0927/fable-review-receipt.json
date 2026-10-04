@@ -1,0 +1,330 @@
+{
+  "source": "/dev/shm/arena-runtime/ax/codex/review-0927/review.json",
+  "bytes": 6440,
+  "sha256": "b95250d61395954a18aa7e32160071b53fa027f98884a7fce60487ac6ff90142",
+  "review": {
+    "rows": {
+      "v4": 5601,
+      "v5": 5601,
+      "v5g": 5601,
+      "rv5": 5601,
+      "rv5g": 5601,
+      "rtail": 5601
+    },
+    "id_order_equal_v4": {
+      "v4": true,
+      "v5": true,
+      "v5g": true,
+      "rv5": true,
+      "rv5g": true,
+      "rtail": true
+    },
+    "diff": {
+      "rv5-v5": {},
+      "rv5g-v5g": {},
+      "rv5-v4": {
+        "max_output_i": 4835
+      },
+      "rv5g-rv5": {
+        "replay_gap_ms": 3806,
+        "gap_regap_factor": 3806
+      },
+      "rtail-rv5": {
+        "replay_gap_ms": 239,
+        "gap_regap_factor": 239
+      },
+      "rtail-rv5g": {
+        "replay_gap_ms": 3567,
+        "gap_regap_factor": 3567
+      }
+    },
+    "cohort_chains_equal_v4": {
+      "v4": true,
+      "v5": true,
+      "v5g": true,
+      "rv5": true,
+      "rv5g": true,
+      "rtail": true
+    },
+    "cohort_sha": {
+      "v4": "ff1dccae1087a798",
+      "v5": "ff1dccae1087a798",
+      "v5g": "ff1dccae1087a798",
+      "rv5": "ff1dccae1087a798",
+      "rv5g": "ff1dccae1087a798",
+      "rtail": "ff1dccae1087a798"
+    },
+    "heads": 311,
+    "head_format_matches_rows": true,
+    "tail_rule": {
+      "threshold_ms": 12551,
+      "changed": 239,
+      "predicate_rows": 239,
+      "changed_equals_predicate": true,
+      "values_from_v5g_and_bounds_ok": true,
+      "changed_context_resets": 0,
+      "changed_chain_index0": 128,
+      "changed_phase": {
+        "intra": 237,
+        "context_reset": 2
+      },
+      "changed_chains": 70,
+      "old_ms_min_max": [
+        12854,
+        300782
+      ],
+      "new_ms_min_max": [
+        60070,
+        310000
+      ]
+    },
+    "gap_stats": {
+      "rv5": {
+        "n": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 22.11,
+        "p99": 33.21,
+        "mean": 5.647,
+        "over60": 18,
+        "over300": 11,
+        "total": 29874.685
+      },
+      "rv5g": {
+        "n": 5290,
+        "p50": 7.319,
+        "p90": 50.904,
+        "p95": 99.846,
+        "p99": 310.0,
+        "mean": 23.115,
+        "over60": 440,
+        "over300": 65,
+        "total": 122278.798
+      },
+      "rtail": {
+        "n": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 33.21,
+        "p99": 245.467,
+        "mean": 11.239,
+        "over60": 250,
+        "over300": 39,
+        "total": 59455.077
+      }
+    },
+    "effective_gaps_cap3600": {
+      "rv5": {
+        "n": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 22.11,
+        "p99": 33.21,
+        "over60": 18,
+        "total": 29874.7,
+        "chains_compressed": 0,
+        "reqs_in_compressed": 0,
+        "orig_sum_s": 30442,
+        "eff_sum_s": 30442,
+        "top": []
+      },
+      "rv5g": {
+        "n": 5290,
+        "p50": 7.319,
+        "p90": 50.904,
+        "p95": 99.846,
+        "p99": 310.0,
+        "over60": 440,
+        "total": 122275.4,
+        "chains_compressed": 1,
+        "reqs_in_compressed": 235,
+        "orig_sum_s": 122846,
+        "eff_sum_s": 122843,
+        "top": [
+          [
+            "biomaster:canon:ZOKo30rK3jUVi577Z0ein:1",
+            3603,
+            235
+          ]
+        ]
+      },
+      "rtail": {
+        "n": 5290,
+        "p50": 2.653,
+        "p90": 12.551,
+        "p95": 33.21,
+        "p99": 245.467,
+        "over60": 250,
+        "total": 59455.1,
+        "chains_compressed": 0,
+        "reqs_in_compressed": 0,
+        "orig_sum_s": 60022,
+        "eff_sum_s": 60022,
+        "top": []
+      }
+    },
+    "head_gaps": {
+      "nonzero": 207,
+      "max": 62.202,
+      "sum": 567.9
+    },
+    "manifests": {
+      "rv5": {
+        "set": "s1-dev-longchain-v5-review-0927",
+        "status": "BUILT_UNVALIDATED",
+        "max_context_tokens": 524288,
+        "n_artifacts": 7,
+        "artifact_sha_ok": true,
+        "bad": [],
+        "missing": [],
+        "bodies_link": "/dev/shm/arena-runtime/ax/data/s1-dev-longchain-v4/bodies/s1-dev-longchain-v4.jsonl.gz",
+        "prov_lines": 5601,
+        "manifest_keys": [
+          "actual_output_sum",
+          "actual_prompt_sum",
+          "artifacts",
+          "assumptions",
+          "chain_summaries",
+          "donor_usage",
+          "donors",
+          "formal_score",
+          "generator",
+          "implementation",
+          "implementation_event_compiler_sha256",
+          "load_templates",
+          "max_context_tokens",
+          "metadata_patches",
+          "missing_artifacts",
+          "n_chains",
+          "n_requests",
+          "original_requests",
+          "quality_status",
+          "read_corpus",
+          "read_corpus_position",
+          "rejected_transitions",
+          "seed",
+          "selected_chain_ids",
+          "selected_source_aggregate",
+          "set",
+          "source_aggregate",
+          "source_files",
+          "source_root",
+          "status",
+          "synthesized_new_tokens",
+          "synthesized_rewrites",
+          "target_new_tokens",
+          "target_rewrites",
+          "tokenizer"
+        ]
+      },
+      "rv5g": {
+        "set": "s1-dev-longchain-v5g-review-0927",
+        "status": "BUILT_UNVALIDATED",
+        "max_context_tokens": 524288,
+        "n_artifacts": 7,
+        "artifact_sha_ok": true,
+        "bad": [],
+        "missing": [],
+        "bodies_link": "/dev/shm/arena-runtime/ax/data/s1-dev-longchain-v4/bodies/s1-dev-longchain-v4.jsonl.gz",
+        "prov_lines": 5601,
+        "manifest_keys": [
+          "actual_output_sum",
+          "actual_prompt_sum",
+          "artifacts",
+          "assumptions",
+          "chain_summaries",
+          "donor_usage",
+          "donors",
+          "formal_score",
+          "generator",
+          "implementation",
+          "implementation_event_compiler_sha256",
+          "load_templates",
+          "max_context_tokens",
+          "metadata_patches",
+          "missing_artifacts",
+          "n_chains",
+          "n_requests",
+          "original_requests",
+          "quality_status",
+          "read_corpus",
+          "read_corpus_position",
+          "rejected_transitions",
+          "seed",
+          "selected_chain_ids",
+          "selected_source_aggregate",
+          "set",
+          "source_aggregate",
+          "source_files",
+          "source_root",
+          "status",
+          "synthesized_new_tokens",
+          "synthesized_rewrites",
+          "target_new_tokens",
+          "target_rewrites",
+          "tokenizer"
+        ]
+      },
+      "rtail": {
+        "set": "s1-dev-longchain-v5g-tail-review-0927",
+        "status": "BUILT_UNVALIDATED",
+        "max_context_tokens": 524288,
+        "n_artifacts": 7,
+        "artifact_sha_ok": true,
+        "bad": [],
+        "missing": [],
+        "bodies_link": "/dev/shm/arena-runtime/ax/data/s1-dev-longchain-v4/bodies/s1-dev-longchain-v4.jsonl.gz",
+        "prov_lines": 5601,
+        "manifest_keys": [
+          "actual_output_sum",
+          "actual_prompt_sum",
+          "artifacts",
+          "assumptions",
+          "chain_summaries",
+          "donor_usage",
+          "donors",
+          "formal_score",
+          "generator",
+          "implementation",
+          "implementation_event_compiler_sha256",
+          "load_templates",
+          "max_context_tokens",
+          "metadata_patches",
+          "missing_artifacts",
+          "n_chains",
+          "n_requests",
+          "original_requests",
+          "quality_status",
+          "read_corpus",
+          "read_corpus_position",
+          "rejected_transitions",
+          "seed",
+          "selected_chain_ids",
+          "selected_source_aggregate",
+          "set",
+          "source_aggregate",
+          "source_files",
+          "source_root",
+          "status",
+          "synthesized_new_tokens",
+          "synthesized_rewrites",
+          "target_new_tokens",
+          "target_rewrites",
+          "tokenizer"
+        ]
+      }
+    },
+    "bodies": {
+      "shard_ids": 5601,
+      "example_body_ref": "bodies/s1-dev-longchain-v4.jsonl.gz",
+      "rows_with_body": 5601,
+      "missing_bodies": 0
+    }
+  },
+  "reader_notes": {
+    "changed_context_resets": "The original review field counts non-null context_reset_event_id, not phase. changed_phase.context_reset is 2.",
+    "changed_chain_index0": "chain_index is a source session segment index, not within-chain request position. 128 refers to requests belonging to source segment 0; changed cohort heads is 0 by the independently verified rule.",
+    "original_review_preserved": true,
+    "review_conclusion": "Accepted by Fable as a metadata-only sensitivity arm, not a reconstruction of formal workload or a full token rerender VALID."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "source": "user-requeried business history; no source export retained; not independently queried in this run",
+  "definition": "next.started_at - previous.ended_at; raw; no tool/think decomposition or cap",
+  "chains": 311,
+  "requests": 5601,
+  "valid_nonhead_gaps": 5290,
+  "head_gaps": null,
+  "seconds": {
+    "mean": 78.668,
+    "p50": 2.396,
+    "p90": 21.528,
+    "p95": 91.668,
+    "p99": 551.314,
+    "max_hours_approx": 26.06
+  },
+  "counts_over_seconds": {
+    "60": 340,
+    "300": 148,
+    "3600": 10
+  },
+  "negative_or_zero": 0,
+  "policy": "sensitivity constraints, not per-request reconstruction or post-harness percentile targets"
+}
