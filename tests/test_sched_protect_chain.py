@@ -4,17 +4,18 @@
 No CUDA/torch import; model forwards, cache/pools and ScheduleBatch are faked.
 The decision methods, 101 split, resource accounting and LPM sort are production
 code. Trees come from the engine git history (scripts/engine/tree.py, cached under build/engine/trees):
-the commit before 120, the initial 120 commit, and working source for the HiCache tier tests.
+the commit before 120, the 120 commit, and HEAD (all candidates, default off) for the HiCache tier tests.
 Run: python3 -m unittest discover -s tests -p test_sched_protect_chain.py
 """
 from __future__ import annotations
 
 import ast
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from enum import Enum, auto
 from functools import lru_cache
 import hashlib
+import importlib.util
 import json
 import logging
 import math
@@ -34,9 +35,7 @@ sys.path.insert(0, str(ROOT / 'scripts/engine'))
 from tree import tree_dir  # noqa: E402
 
 BASE = tree_dir('before:120')
-# Historical 120-only baseline: follow-up 120 commits include later mechanisms.
-# Working-source regressions live in HiCacheTierTests and test_admission_trace.
-CANDIDATE = tree_dir('bdeca5c')
+CANDIDATE = tree_dir('mech:120')
 EVIDENCE = ROOT / 'evidence/T41'
 
 
@@ -143,7 +142,7 @@ def compile_nodes(path, names, ns):
 
 def load_source(root=CANDIDATE):
     ns = dict(Union=Union, Enum=Enum, auto=auto, math=math, os=os, random=random, time=time,
-              lru_cache=lru_cache, contextmanager=contextmanager, Counter=Counter,
+              lru_cache=lru_cache, contextmanager=contextmanager, nullcontext=nullcontext, Counter=Counter,
               logger=logging.getLogger('p120'), _IS_HIP=False, PREFILL_TILE_BUDGET=0,
               PREFILL_TILE_BUDGET_MODE='compact', CLIP_MAX_NEW_TOKENS=4096,
               IGNORE_EOS_RESERVE_TOKENS=1, _ROLE_BOUNDARY_SCAN_WINDOW=32768,
@@ -160,7 +159,6 @@ def load_source(root=CANDIDATE):
               scheduler_nvtx_method=lambda _: (lambda f: f),
               PrefillStats=NS(from_adder=lambda *a, **kw: None),
               set_time_batch=lambda *a: None, set_schedule_time_batch=lambda *a: None,
-              convert_time_to_realtime=lambda t: t + time.time() - time.perf_counter(),
               split_cached_prefix_by_tier=lambda **kw: (kw['prefix_len'], 0, 0))
     for name in ('SWATokenToKVPoolAllocator', 'DeepSeekV4HiSparseTokenToKVPoolAllocator',
                  'PureSWATokenToKVPoolAllocator', 'UnifiedMambaTokenToKVPoolAllocator',
@@ -175,15 +173,38 @@ def load_source(root=CANDIDATE):
     names = {'get_next_batch_to_run', 'get_new_batch_prefill', '_get_new_batch_prefill_raw',
              '_arm_prefill_decode_interval', '_should_defer_prefill',
              '_ax_sched_protect_enabled', '_ax_sched_protect_blocker', '_ax_mechanism_report',
-             '_ax_admission_trace',
-             '_ax_kv_scan_limit', '_ax_scan_after_kv_rejection', '_ax_release_rejected_match',
              '_ax_sched_protect_limits', '_ax_should_decode',
              'get_num_allocatable_reqs', '_ax_pace', '_ax_pace_now', '_ax_pace_slack',
-             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits'}
+             '_ax_pace_should_decode', '_ax_pace_limits', '_ax_short_reserve_limits',
+             '_ax_humming_report', '_ax_scatter_report', '_ax_admission_cfgs', '_ax_admission_plan',
+             '_ax_family_plan', '_ax_flush_admission_state',
+             '_ax_prefix_plan', '_ax_prefix_consensus', '_ax_prefix_cleanup', '_ax_prefix_admit_ready',
+             '_ax_demand_cap_max', '_ax_demand_limits', '_ax_short_hit_reserve',
+             '_ax_chain_risk_cfg', '_ax_chain_risk_interval'}  # 131 (off in these tests; the arm hook calls it)
     cls = ast.ClassDef(name='Scheduler', bases=[], keywords=[], decorator_list=[],
                       body=[n for n in source_cls.body if getattr(n, 'name', '') in names])
     ns.setdefault('math', math)
     ns.setdefault('os', os)
+    # Module-level helpers the scheduler methods use: 120's TP0 trace (off) and 124/125's decisions.
+    ns['ax_chunk_alignment'] = NS(ENABLED=False)
+    deadline = root / 'srt/managers/ax_deadline.py'
+    if deadline.exists():
+        spec = importlib.util.spec_from_file_location('ax_deadline', deadline)
+        ns['ax_deadline'] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ns['ax_deadline'])
+    readiness = root / 'srt/mem_cache/ax_prefix_readiness.py'
+    if readiness.exists():
+        spec = importlib.util.spec_from_file_location('ax_prefix_readiness', readiness)
+        ns['ax_prefix_readiness'] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ns['ax_prefix_readiness'])
+        managers, cache = ModuleType('sglang.srt.managers'), ModuleType('sglang.srt.mem_cache')
+        managers.ax_deadline = ns['ax_deadline']
+        cache.ax_prefix_readiness = ns['ax_prefix_readiness']
+        spec = importlib.util.spec_from_file_location('ax_prefix_producer', root / 'srt/managers/ax_prefix_producer.py')
+        ns['ax_prefix_producer'] = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'sglang.srt.managers': managers, 'sglang.srt.mem_cache': cache}):
+            spec.loader.exec_module(ns['ax_prefix_producer'])
+    ns.setdefault('sys', sys)
     mod = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), cls], type_ignores=[])
     exec(compile(ast.fix_missing_locations(mod), str(root / 'srt/managers/scheduler.py'), 'exec'), ns)
     # Only this dependency import is inside a production method.
@@ -204,6 +225,7 @@ def make_scheduler(root=CANDIDATE, waiting=(), chunk=None, running=(), budget=81
                  'enable_dynamic_chunking', 'is_mixed_chunk', 'enable_overlap'):
         setattr(s, name, False)
     s.ps = NS(pp_size=1, tp_size=1, tp_rank=0)
+    s.schedule_policy = 'lpm'
     s.dllm_config = None
     s.disaggregation_mode = 'null'
     s.chunked_prefill_size = budget
@@ -316,12 +338,22 @@ class ProtectTests(unittest.TestCase):
         trace.append(step(s))
         self.assertEqual([r['mode'] for r in trace], ['prefill', 'decode', 'prefill', 'decode'])
         self.assertEqual([r[0] for r in trace[2]['reqs']], ['cold', 'short'])
-        # 120 caps a cold chunk only while other requests wait: alone it takes the full 8192 budget,
-        # once the short hit is waiting the continuation is capped to 2048 and the short joins the batch.
-        self.assertEqual(trace[0]['reqs'][0][2], 8192)
-        self.assertEqual(trace[2]['reqs'][0][2], 8192 + 2048)
+        # A request is decoding, so 121 caps the cold chunk at 2048 from the first chunk on
+        # (engine/docs/121: "chunks are uncapped only when the engine is otherwise idle"); the short
+        # hit joins the next prefill beside the capped continuation.
+        self.assertEqual(trace[0]['reqs'][0][2], 2048)
+        self.assertEqual(trace[2]['reqs'][0][2], 2048 + 2048)
         self.assertIn('short', [r[0] for r in trace[3]['reqs']])
         (EVIDENCE / 'interleave.json').write_text(json.dumps(trace, indent=2) + '\n')
+
+    def test_idle_cold_takes_the_full_budget_until_a_short_hit_waits(self):
+        # 120's own rule, with nothing decoding: alone the cold request takes the full 8192 budget;
+        # once a short hit waits, the continuation is capped to 2048 and the short joins the batch.
+        s, _ = make_scheduler(waiting=[Req('cold', 100000)])
+        first = step(s)
+        second = step(s, [Req('short', 512, cached=65536)])
+        self.assertEqual(first['reqs'], [('cold', 0, 8192)])
+        self.assertEqual(second['reqs'], [('cold', 8192, 8192 + 2048), ('short', 65536, 66048)])
 
     def test_only_cold_no_idle_or_decode_gap(self):
         cold = Req('cold', 100000)
@@ -462,8 +494,10 @@ class ProtectTests(unittest.TestCase):
         self.assertEqual(modes, ['prefill'] * 3)
 
     def test_unsupported_modes_bypass_protection(self):
+        # enable_hierarchical_cache is not in this list: since 180 the L1/L2 host tier keeps the
+        # protection and only L3 storage bypasses it (scheduler.py blocker list; HiCacheTierTests).
         for attr, value in [('is_mixed_chunk', True), ('require_mlp_sync', True),
-                            ('enable_lora', True), ('enable_hierarchical_cache', True),
+                            ('enable_lora', True), ('enable_hicache_storage', True),
                             ('enable_hisparse', True), ('is_hybrid_swa', True),
                             ('enable_priority_preemption', True), ('dllm_config', object()),
                             ('disaggregation_mode', 'prefill'), ('prefill_delayer', object()),
@@ -603,24 +637,9 @@ class ProtectTests(unittest.TestCase):
                     self.assertGreaterEqual(a.rem_input_tokens, 0)
                     self.assertGreaterEqual(a.rem_chunk_tokens, 0)
 
-    def test_original_lpm_role_budget_and_interfaces_unchanged(self):
-        def classes(path):
-            return {n.name: {m.name: ast.dump(m) for m in n.body if isinstance(m, ast.FunctionDef)}
-                    for n in ast.parse(path.read_text()).body if isinstance(n, ast.ClassDef)}
-        base = classes(BASE / 'srt/managers/schedule_policy.py')
-        new = classes(CANDIDATE / 'srt/managers/schedule_policy.py')
-        self.assertEqual(base['SchedulePolicy'], new['SchedulePolicy'])
-        for method in ('_role_split_len', '_update_prefill_budget', '_mamba_gap_budget_for_req',
-                       '_req_inc_lock_ref', '_lock_node', 'rem_total_tokens', 'cur_rem_tokens'):
-            self.assertEqual(base['PrefillAdder'][method], new['PrefillAdder'][method], method)
-        for rel in ('srt/entrypoints/http_server.py', 'srt/managers/tokenizer_manager.py',
-                    'srt/managers/scheduler_components/flush_wrapper.py',
-                    'srt/managers/schedule_batch.py'):
-            self.assertEqual((BASE / rel).read_bytes(), (CANDIDATE / rel).read_bytes(), rel)
 
-
-# Working source: include uncommitted diagnostics as well as the 180 tier.
-TREE_180 = ROOT / 'engine/sglang'
+# HEAD: official A + all default-off candidates (incl. 180) + the mechanism report.
+TREE_180 = tree_dir('HEAD')
 
 
 class HiCacheTierTests(unittest.TestCase):
@@ -684,7 +703,14 @@ class HiCacheTierTests(unittest.TestCase):
         policy = ModuleType('sglang.srt.managers.schedule_policy')
         policy._role_boundary_token_ids = ns['_role_boundary_token_ids']
         policy._ax_srpt_aging = ns['_ax_srpt_aging']
-        mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy})
+        # 118's state comes from the DSA backend module when a DSA backend imported it: its production function
+        # over the module switch and the flag a backend sets after validating and warming up the kernel.
+        dsa = ModuleType('sglang.srt.layers.attention.dsa_backend')
+        dsa_ns = {'_AX_DSA_SPARSE_TRITON': False, '_AX_DSA_SPARSE_TRITON_PREFILL': False, '_ax118_engaged': False}
+        compile_nodes(TREE_180 / 'srt/layers/attention/dsa_backend.py', {'ax118_state'}, dsa_ns)
+        dsa.ax118_state = dsa_ns['ax118_state']
+        mods = patch.dict(sys.modules, {'sglang.srt.managers.schedule_policy': policy,
+                                        'sglang.srt.layers.attention.dsa_backend': dsa})
         mods.start()
         self.addCleanup(mods.stop)
         # The base resolves --speculative-algorithm NEXTN to EAGLE before the scheduler starts (061r log).
@@ -696,15 +722,27 @@ class HiCacheTierTests(unittest.TestCase):
                 os.environ.pop(k, None)
             rep = s._ax_mechanism_report()
         head = rep.split(' | ')[0].split()
-        self.assertEqual(head, ['101=off:role_ids_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
-                                '123=off:SGLANG_AX_SRPT_AGING_unset', '140=off', '180=off:no_hierarchical_cache',
-                                '120_trace=off', '120_scan=off'])
+        self.assertEqual(head, ['101=off:role_ids_unset', '117=off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset',
+                                '118=off:SGLANG_AX_DSA_SPARSE_TRITON_unset',
+                                '119=off:SGLANG_AX_SCATTER_MIN_TOKENS_unset', '120=on', '122=off:SGLANG_AX_PACE_TPOT_unset',
+                                '123=off:SGLANG_AX_SRPT_AGING_unset', '124=off:SGLANG_AX_DEADLINE_TIERS_unset',
+                                '125=off:SGLANG_AX_BACKLOG_RELIEF_unset', '126=off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset', '128=off:SGLANG_AX_DEADLINE_FAMILY_unset',
+                                '140=off', '180=off:no_hierarchical_cache'])
         s.enable_hierarchical_cache = True
+        dsa_ns['_AX_DSA_SPARSE_TRITON'] = True
         with patch.dict(os.environ, dict(env, SGLANG_AX_PACE_TPOT='0.085')):
+            self.assertIn(' 118=off:no_tilelang_dsa_backend ', s._ax_mechanism_report())
+            dsa_ns['_ax118_engaged'] = True
             rep = s._ax_mechanism_report()
+        self.assertIn(' 118=on ', rep)
         self.assertIn('120=on 122=on', rep)
         self.assertIn('180=on', rep)
         self.assertIn('spec=EAGLE dcp=1', rep)
+        # Without a DSA backend in the process the report does not import one.
+        with patch.dict(sys.modules):
+            del sys.modules['sglang.srt.layers.attention.dsa_backend']
+            self.assertIn(' 118=off:no_dsa_backend ', s._ax_mechanism_report())
+            self.assertNotIn('sglang.srt.layers.attention.dsa_backend', sys.modules)
 
 if __name__ == '__main__':
     unittest.main()

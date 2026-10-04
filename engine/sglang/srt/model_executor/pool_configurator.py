@@ -256,11 +256,11 @@ class DefaultPoolConfigurator(MemoryPoolConfigurator):
                     target_kv_num_layers = get_glm_dsa_layer_split_effective_num_layers(
                         kvc, num_layers
                     )
-                    # Draft pools are DCP-replicated, not sharded: budget all copies.
+                    # [ax] 115: DSA draft latent is owner-striped like target;
+                    # its indexer remains replicated over virtual locations.
                     dcp_size = kvc.ps.attn_dcp_size
-                    draft_kv_size = (
-                        int(target_kv_size * draft_num_layers / target_kv_num_layers)
-                        * dcp_size
+                    draft_kv_size = int(
+                        target_kv_size * draft_num_layers / target_kv_num_layers
                     )
                     draft_indexer_size = (
                         self._compute_dsa_indexer_cell_size(
@@ -457,8 +457,10 @@ class DefaultPoolConfigurator(MemoryPoolConfigurator):
                 kvc, _get_dsa_cache_layer_ids(kvc, num_layers)
             )
 
-        if not allocate_all_layers and not kvc.is_draft_worker:
-            # [ax] 116: target indexer K is replicated over the DCP virtual loc space (W x rows).
+        if not allocate_all_layers:
+            # [ax] 115: target and DSA draft indexers both span virtual locs.
+            # allocate_all_layers is the unscaled draft term above, whose
+            # caller applies dcp_size exactly once.
             indexer_ratio *= kvc.ps.attn_dcp_size
         return int(
             indexer_size_per_token * num_indexer_layers * element_size * indexer_ratio

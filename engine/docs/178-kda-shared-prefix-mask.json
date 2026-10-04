@@ -1,0 +1,20 @@
+{
+  "mechanism": 178,
+  "name": "Share the KDA prefix-state mask across layers in one forward",
+  "enable": "SGLANG_AX_KDA_SHARED_PREFIX_MASK=1",
+  "default": "off",
+  "change": "Produce prefix_lens > 0 once in CUDA extend metadata preparation and reuse that read-only tensor across KDA layers. The mathematical operation and state handling are unchanged.",
+  "lifetime": "The shared mask belongs to the current forward metadata and the exact prefix tensor object. Prefix values must remain immutable until this forward's consumers finish, as required by the existing batch metadata contract.",
+  "fallback": "Original comparison during CUDA capture, source tensor replacement, missing shared metadata, CPU/non-CUDA preparation, target verify and draft-extend-v2. Decode does not prepare a shared mask.",
+  "mode_boundary": "The existing is_extend predicate includes mixed, split-prefill and dLLM modes. The shared comparison is layer-invariant in these modes; the current qualification exercised ordinary EXTEND only.",
+  "measured": {
+    "device": "A100 SM80",
+    "mask_preparation_and_34_layer_lookups_saved_us": "257-260",
+    "convolution_output_and_state": "bitwise equal in six B1/B2/B8 ragged and mixed-prefix cases",
+    "graph_checks": "Initialization inside/outside capture and replay after changing static prefix values passed"
+  },
+  "evidence": "evidence/execution-0930/kda-shared-prefix/receipt.json; metadata-independent-review.json",
+  "qualification_scope": "Exact production methods extracted via AST and 34 real Triton convolutions with native width4; the KDA scan was a stub. No complete KDA/model or TP8 performance claim.",
+  "review": "Independent source review passed for the production source SHA c42483fa7bf01bbeeb4df42e3e54074bf7af816a3c54bd6c866ae14c9422933f",
+  "pending": "TP8 real-model smoke and paired mixed-load chain/TPOT comparison"
+}

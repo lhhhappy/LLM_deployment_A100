@@ -66,7 +66,11 @@ def _install_on_module(mod):
     """Patch the real deep_gemm module in place with lazy dispatchers, so every importer that calls
     deep_gemm.<fn> at call time (e.g. dsa/kpool_plan.py) reaches the sm80 path too."""
     global _INSTALLED
-    if _INSTALLED or isinstance(mod, Exception):
+    if (_INSTALLED or isinstance(mod, Exception)
+            or os.environ.get("SGLANG_AX_SM80_INDEXER", "1") == "0"):
+        # An explicit opt-out must leave the real module untouched. Wrapping
+        # missing entry points would otherwise select ours via _orig is None
+        # even with the switch off, hiding a base-package incompatibility.
         return
     for name, ours in _OVERRIDES.items():
         orig = getattr(mod, name, None)

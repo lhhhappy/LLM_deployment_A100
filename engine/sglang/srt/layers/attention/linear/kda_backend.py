@@ -1,4 +1,5 @@
 import importlib.util
+import math
 from typing import Optional, Tuple, Union
 
 import torch
@@ -19,7 +20,7 @@ from sglang.srt.layers.attention.linear.utils import (
     build_verify_intermediate_state_indices,
 )
 from sglang.srt.layers.radix_linear_attention import RadixLinearAttention
-from sglang.srt.utils import is_cpu, is_cuda, is_npu
+from sglang.srt.utils import get_bool_env_var, is_cpu, is_cuda, is_npu
 from sglang.srt.utils.common import rank0_log
 
 # KDA always uses the triton causal_conv1d_fn (no CUDA override).
@@ -33,14 +34,135 @@ elif is_cpu():
 
     causal_conv1d_update = causal_conv1d_update_cpu
 
-from sglang.srt.model_executor.forward_batch_info import ForwardBatch
+from sglang.srt.model_executor.forward_batch_info import ForwardBatch, ForwardMode
 from sglang.srt.model_executor.model_runner import ModelRunner
 from sglang.srt.runtime_context import (
     get_disagg,
     get_exec,
     get_memory,
+    get_parallel,
     get_spec,
 )
+
+
+_AX_KDA_PREFILL_CPU_LENGTH = get_bool_env_var(
+    "SGLANG_AX_KDA_PREFILL_CPU_LENGTH", "false"
+)
+
+_AX_SM80_KDA_PACKED_DECODE = get_bool_env_var(
+    "SGLANG_AX_SM80_KDA_PACKED_DECODE", "false"
+)
+
+_AX_KDA_SHARED_PREFIX_MASK = get_bool_env_var(
+    "SGLANG_AX_KDA_SHARED_PREFIX_MASK", "false"
+)
+
+
+def _ax_kda_extend_prefix_mask(metadata, prefix_lens):
+    # Full graph captures retain the original comparison against their static
+    # prefix input. Eager attention breaks may share this round's read-only mask.
+    if (
+        _AX_KDA_SHARED_PREFIX_MASK
+        and getattr(metadata, "_ax_prefix_mask_source", None) is prefix_lens
+        and not torch.cuda.is_current_stream_capturing()
+    ):
+        return metadata._ax_prefix_mask
+    return prefix_lens > 0
+
+
+def _ax_kda_packed_token_rows(tensor, batch, width):
+    # GLM beta is a split view of a wider projection; row pitch can be gapped.
+    return tensor.ndim >= 2 and tensor.stride(-1) == 1 and tensor.shape in (
+        (batch, width), (1, batch, width), (batch, 1, width)
+    )
+
+
+def _ax_kda_safe_packed_decode_covered(layer, qkv, a, b, states, indices):
+    """Metadata-only check: never synchronize or copy a state-pool view."""
+    lower_bound = getattr(layer, "lower_bound", None)
+    if (
+        type(lower_bound) not in (float, int)
+        or not math.isfinite(lower_bound)
+        or lower_bound >= 0
+        or qkv.ndim != 2
+        or states.ndim != 4
+        or indices.ndim != 1
+    ):
+        return False
+    batch = qkv.shape[0]
+    hv, v, k = states.shape[-3:]
+    if v != 128 or k != 128:
+        return False
+    hq = layer.q_dim // k
+    return (
+        batch >= 1
+        and layer.head_q_dim == layer.head_k_dim == k
+        and layer.head_v_dim == v
+        and layer.q_dim == layer.k_dim == hq * k
+        and hq > 0
+        and hv % hq == 0
+        and layer.num_v_heads == hv
+        and layer.v_dim == hv * v
+        and qkv.shape == (batch, 2 * hq * k + hv * v)
+        and _ax_kda_packed_token_rows(a, batch, hv * k)
+        and _ax_kda_packed_token_rows(b, batch, hv)
+        and indices.shape == (batch,)
+        and layer.A_log.numel() == hv
+        and layer.dt_bias.numel() == hv * k
+        and all(t.dtype == torch.bfloat16 for t in (qkv, a, b))
+        and all(
+            t.dtype == torch.float32
+            for t in (states, layer.A_log, layer.dt_bias)
+        )
+        and indices.dtype == torch.int32
+        and qkv.is_cuda
+        and all(
+            t.device == qkv.device
+            for t in (a, b, states, indices, layer.A_log, layer.dt_bias)
+        )
+        and all(
+            t.is_contiguous()
+            for t in (qkv, indices, layer.A_log, layer.dt_bias)
+        )
+        and states.stride()[-3:] == (v * k, k, 1)
+        and states.stride(0) >= hv * v * k
+    )
+
+
+def _ax_kda_cpu_logical_tokens(forward_batch, query_start_loc, *, attn_cp_size=1):
+    """Prototype of the CPU-length part of upstream SGLang #39688.
+
+    The host list is the source of extend_seq_lens and its prefix sum. Unlike
+    extend_num_tokens, it retains logical lengths when inputs are padded.
+    Keep TBO's parent-relative offsets and unvalidated CP layouts on the old
+    path. CP metadata may be populated after backend metadata initialization,
+    so the already initialized parallel configuration is also required.
+    Decode/verify graphs use separate metadata and are unchanged.
+    """
+    if forward_batch.forward_mode not in (ForwardMode.EXTEND, ForwardMode.MIXED):
+        return None
+    if getattr(forward_batch, "tbo_parent_token_range", None) is not None:
+        return None
+    if attn_cp_size != 1 or getattr(forward_batch, "attn_cp_metadata", None) is not None:
+        return None
+    lengths = forward_batch.extend_seq_lens_cpu
+    if (
+        not isinstance(lengths, (list, tuple))
+        or len(lengths) != forward_batch.batch_size
+        or query_start_loc is None
+        or query_start_loc.shape != (len(lengths) + 1,)
+        or any(type(length) is not int or length < 0 for length in lengths)
+    ):
+        return None
+    return sum(lengths)
+
+
+def _ax_kda_resolve_logical_tokens(metadata, physical_num_tokens):
+    if _AX_KDA_PREFILL_CPU_LENGTH:
+        count = getattr(metadata, "_ax_cpu_logical_num_tokens", None)
+        if type(count) is int and 0 <= count <= physical_num_tokens:
+            return count
+    return int(metadata.query_start_loc[-1])
 
 
 class KDAKernelDispatcher:
@@ -429,6 +551,33 @@ class KDAAttnBackend(MambaAttnBackendBase):
         self.kernel_dispatcher = KDAKernelDispatcher(
             decode_backend, prefill_backend, verify_backend
         )
+        pool = self.req_to_token_pool.mamba_pool
+        self._ax_safe_packed_decode = (
+            _AX_SM80_KDA_PACKED_DECODE
+            and self.kernel_dispatcher.decode_kernel
+            is self.kernel_dispatcher.triton_kernel
+            and is_cuda()
+            and torch.cuda.get_device_capability(model_runner.device) == (8, 0)
+            and not get_spec().speculative_algorithm
+            and not pool.enable_linear_replayssm
+            and not pool.enable_linear_replayssm_spec
+        )
+        self._ax_safe_packed_notice = self._ax_safe_packed_decode
+        if self._ax_safe_packed_decode:
+            rank0_log("[ax] KDA safe-gate packed decode armed: sm80 bf16 Triton D=128")
+        # Warm only the selected prefill implementation, before graph capture.
+        # The same Triton object can also be an unused fallback for other backends.
+        if self.kernel_dispatcher.extend_kernel is self.kernel_dispatcher.triton_kernel:
+            armed = self.kernel_dispatcher.triton_kernel.arm_prefill_prepare(
+                model_runner.device
+            )
+            if armed:
+                rank0_log("[ax] KDA prefill prepare: sm80 bf16 T=8192/16384 H=8 D=128")
+            state_armed = self.kernel_dispatcher.triton_kernel.arm_prefill_state(
+                model_runner.device
+            )
+            if state_armed:
+                rank0_log("[ax] KDA prefill state: sm80 BV16 8k:N=1 16k:N<=3")
         # One-shot; emitted at the first fused-decode interception below.
         self._fused_override_notice = (
             "K3 fused KDA decode engaged: --linear-attn-decode-backend "
@@ -533,6 +682,33 @@ class KDAAttnBackend(MambaAttnBackendBase):
 
     def init_forward_metadata(self, forward_batch: ForwardBatch):
         super().init_forward_metadata(forward_batch)
+        if _AX_KDA_SHARED_PREFIX_MASK:
+            self.forward_metadata._ax_prefix_mask_source = None
+            mode = forward_batch.forward_mode
+            if (
+                mode.is_extend()
+                and not mode.is_target_verify()
+                and not mode.is_draft_extend_v2()
+                and forward_batch.extend_prefix_lens is not None
+                and forward_batch.extend_prefix_lens.is_cuda
+                and not torch.cuda.is_current_stream_capturing()
+            ):
+                self.forward_metadata._ax_prefix_mask_source = (
+                    forward_batch.extend_prefix_lens
+                )
+                self.forward_metadata._ax_prefix_mask = (
+                    forward_batch.extend_prefix_lens > 0
+                )
+        if _AX_KDA_PREFILL_CPU_LENGTH:
+            # Compute once per live batch, not once per KDA layer. Keep this
+            # experiment local to KDA rather than extending shared metadata.
+            self.forward_metadata._ax_cpu_logical_num_tokens = (
+                _ax_kda_cpu_logical_tokens(
+                    forward_batch,
+                    self.forward_metadata.query_start_loc,
+                    attn_cp_size=get_parallel().attn_cp_size,
+                )
+            )
         if self.forward_metadata.has_mamba_track_mask:
             self.forward_metadata.mamba_track_mask_indices = (
                 forward_batch.mamba_track_mask.nonzero(as_tuple=True)[0]
@@ -653,8 +829,29 @@ class KDAAttnBackend(MambaAttnBackendBase):
         # The packed kernel assumes one token per request.
         if (
             self.kernel_dispatcher.supports_packed_decode
-            and getattr(layer, "lower_bound", None) is None
+            and (
+                getattr(layer, "lower_bound", None) is None
+                or (
+                    self._ax_safe_packed_decode
+                    and all(
+                        t is None
+                        for t in (
+                            replayssm_d, replayssm_k, replayssm_g,
+                            replayssm_write_pos, replayssm_force_flush,
+                        )
+                    )
+                    and _ax_kda_safe_packed_decode_covered(
+                        layer, qkv, a, b, ssm_states, cache_indices
+                    )
+                )
+            )
         ):
+            if layer.lower_bound is not None and self._ax_safe_packed_notice:
+                rank0_log(
+                    "[ax] KDA safe-gate packed decode engaged: "
+                    f"B={qkv.shape[0]} H={layer.num_v_heads} D={layer.head_k_dim}"
+                )
+                self._ax_safe_packed_notice = False
             assert qkv.shape[0] == cache_indices.shape[0], (
                 "KDA packed decode requires one token per sequence (T=1): "
                 f"got {qkv.shape[0]} tokens for {cache_indices.shape[0]} requests."
@@ -676,6 +873,9 @@ class KDAAttnBackend(MambaAttnBackendBase):
                 replayssm_g=replayssm_g,
                 replayssm_write_pos=replayssm_write_pos,
                 replayssm_force_flush=replayssm_force_flush,
+                # Use scalar-load Triton for the optional A100 safe-gate route.
+                # Preserve CUDA dispatch for the existing no-safe-gate route.
+                use_cuda_kernel=layer.lower_bound is None,
             )
             self._track_mamba_state_decode(
                 forward_batch, conv_states, ssm_states, cache_indices, layer.layer_id
@@ -734,10 +934,14 @@ class KDAAttnBackend(MambaAttnBackendBase):
             raise RuntimeError(
                 "extend_prefix_lens cannot be None in non-TARGET_VERIFY mode."
             )
-        has_initial_state = forward_batch.extend_prefix_lens > 0
+        has_initial_state = _ax_kda_extend_prefix_mask(
+            self.forward_metadata, forward_batch.extend_prefix_lens
+        )
 
         physical_num_tokens = mixed_qkv.shape[0]
-        logical_num_tokens = int(query_start_loc[-1])
+        logical_num_tokens = _ax_kda_resolve_logical_tokens(
+            self.forward_metadata, physical_num_tokens
+        )
         if logical_num_tokens < physical_num_tokens:
             mixed_qkv = mixed_qkv[:logical_num_tokens]
             a = a[:, :logical_num_tokens]

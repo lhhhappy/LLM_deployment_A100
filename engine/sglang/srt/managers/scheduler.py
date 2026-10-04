@@ -111,6 +111,8 @@ from sglang.srt.layers.quantization.fp8_utils import initialize_fp8_gemm_config
 from sglang.srt.layers.quantization.unquant import initialize_bf16_gemm_config
 from sglang.srt.lora.lora_drainer import LoRADrainer
 from sglang.srt.lora.lora_overlap_loader import LoRAOverlapLoader
+from sglang.srt.managers import ax_deadline, ax_prefix_producer
+from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.managers.disagg_service import maybe_create_ascend_config_store
 from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
 from sglang.srt.managers.io_struct import (
@@ -213,7 +215,7 @@ from sglang.srt.managers.schedule_policy import (
     PrefillAdder,
     SchedulePolicy,
     _ax_sched_protect_config,
-    _role_boundary_token_ids,
+    _ax_srpt_aging,
     is_dsa_prefill_cp_in_seq_split,
     is_prefill_context_parallel_enabled,
 )
@@ -290,7 +292,6 @@ from sglang.srt.model_loader.utils import get_resolved_model_impl
 from sglang.srt.multiplex.multiplexing_mixin import SchedulerMultiplexMixin
 from sglang.srt.observability.metrics_collector import SchedulerMetricsCollector
 from sglang.srt.observability.req_time_stats import (
-    convert_time_to_realtime,
     flush_trace_batch,
     set_schedule_time_batch,
     set_time_batch,
@@ -1292,89 +1293,6 @@ class Scheduler(
     def _ax_sched_protect_enabled(self) -> bool:
         return self._ax_sched_protect_blocker() is None
 
-    def _ax_admission_trace(self):
-        """120: opt-in CPU-only diagnostics; no work/collectives on other ranks."""
-        trace = getattr(self, "_ax_admission_collector", False)
-        if trace is False:
-            trace = None
-            if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" and self.ps.tp_rank == 0:
-                from sglang.srt.managers.ax_admission_trace import AxAdmissionTrace
-
-                trace = AxAdmissionTrace(logger, to_epoch=convert_time_to_realtime)
-            self._ax_admission_collector = trace
-        return trace
-
-    def _ax_kv_scan_limit(self) -> int:
-        """120: bounded fallback after a rejected KV candidate; opt-in only."""
-        limit = getattr(self, "_ax_kv_scan_cfg", None)
-        if limit is None:
-            limit = int(os.environ.get("SGLANG_AX_SCHED_KV_SCAN", "0"))
-            if not 0 <= limit <= 16:
-                raise ValueError("SGLANG_AX_SCHED_KV_SCAN must be between 0 and 16")
-            if limit:
-                blocker = self._ax_sched_protect_blocker()
-                if blocker is not None or _role_boundary_token_ids():
-                    raise ValueError(
-                        "SGLANG_AX_SCHED_KV_SCAN requires active 120 and no role split: "
-                        + (blocker or "role_boundary")
-                    )
-            self._ax_kv_scan_cfg = limit
-        return limit
-
-    def _ax_release_rejected_match(self, req: Req):
-        # Cache matching may stage deferred COW/clear and allocate a Mamba slot.
-        # Session-owned slots have a separate lifecycle and must not be freed.
-        req.kv.mamba_cow_src_index = None
-        req.kv.mamba_needs_clear = False
-        if req.kv.holds_mamba and not getattr(req, "session", None):
-            self.tree_cache.req_to_token_pool.mamba_allocator.free(
-                req.kv.mamba_pool_idx.unsqueeze(-1)
-            )
-            req.kv.mamba_pool_idx = None
-
-    def _ax_scan_after_kv_rejection(self, adder, running_batch, start, trace):
-        """Return first unvisited queue index; leave the original full latch intact.
-
-        Only complete device short hits are eligible. All admission and future
-        decode reservations still go through the original PrefillAdder. This
-        runs inside the caller's Mamba allocation group, at most once per batch.
-        """
-        limit = self._ax_kv_scan_limit()
-        if not limit or adder.ax_protect is None:
-            return start
-        end = min(start + limit, len(self.waiting_queue))
-        while start < end:
-            if adder.chunk_budget_exhausted() or len(adder.can_run_list) >= self.get_num_allocatable_reqs(
-                len(running_batch.reqs), running_batch=running_batch
-            ):
-                break
-            req = self.waiting_queue[start]
-            start += 1
-            # Keep session and beam ownership outside this narrow fallback.
-            if req.beam_group is not None or getattr(req, "session", None):
-                if trace is not None:
-                    trace.record(req, "kv_scan_ownership_excluded")
-                continue
-            if trace is not None:
-                trace.begin_attempt(req)
-            req.init_next_round_input(self.tree_cache)
-            res = adder.add_one_req(
-                req,
-                has_chunked_req=(self.chunked_req is not None),
-                truncation_align_size=self.truncation_align_size,
-                ax_complete_only=True,
-            )
-            added = bool(adder.can_run_list) and req is adder.can_run_list[-1]
-            if not added:
-                if trace is not None:
-                    trace.rejected(req, "adder_" + res.name.lower())
-                self._ax_release_rejected_match(req)
-            # NO_TOKEN before admission is candidate-specific; after admission
-            # it describes the remaining batch budget, so stop just as before.
-            if res != AddReqResult.CONTINUE and added:
-                break
-        return start
-
     def _ax_mechanism_report(self) -> str:
         """[ax] Effective state of the scheduler-side mechanisms, one token per mechanism ("NNN=on" or
         "NNN=off:reason"), followed by the requested model-side switches. Jobs compare it with the
@@ -1400,25 +1318,65 @@ class Scheduler(
             m180 = "off:no_hierarchical_cache"
         else:
             m180 = "on" if not self.enable_hicache_storage else "off:l3_storage_refused"
-        kv_scan_limit = self._ax_kv_scan_limit()
+        deadline, backlog = self._ax_admission_cfgs()
+        # 118 is recorded by the DSA backend; a process that never imported it has none (and a non-DSA
+        # build may lack its dependencies), so look it up without importing.
+        dsa_backend = sys.modules.get("sglang.srt.layers.attention.dsa_backend")
+        m118 = dsa_backend.ax118_state() if dsa_backend is not None else "off:no_dsa_backend"
+        from sglang.srt.layers.dcp.local_extend import local_extend_mechanism_tokens
+
+        m115_local = local_extend_mechanism_tokens(
+            getattr(self.tp_worker, "model_runner", None)
+        )
+        risk_cfg = self._ax_chain_risk_cfg()
         items = {
             "101": m101,
+            "117": self._ax_humming_report(),
+            "118": m118,
+            "119": self._ax_scatter_report(),
             "120": "on" if blocker is None else f"off:{blocker}",
             "122": m122,
             "123": m123,
+            "124": "on" if deadline else "off:SGLANG_AX_DEADLINE_TIERS_unset",
+            "125": "on" if backlog else "off:SGLANG_AX_BACKLOG_RELIEF_unset",
+            "126": "on" if self._ax_demand_cap_max() is not None else "off:SGLANG_AX_SCHED_COLD_CAP_MAX_unset",
+            "128": "on" if getattr(self, "_ax_family_cfg", None) else "off:SGLANG_AX_DEADLINE_FAMILY_unset",
+            "128p": "on" if getattr(self, "_ax_prefix_tracker", None) else "off:SGLANG_AX_PREFIX_PRODUCER_unset",
+            "131": "on" if risk_cfg is not None else "off:SGLANG_AX_CHAIN_RISK_INTERVAL_unset",
+            "131_sync": "rank0" if risk_cfg is not None else "off",
+            "131_chunk": (str(risk_cfg.chunk) if risk_cfg.chunk else "auto") if risk_cfg is not None else "off",
+            "132": "on" if deadline and deadline.chain_first else "off:SGLANG_AX_DEADLINE_CHAIN_FIRST_unset",
             "140": "on" if dual else "off",
             "180": m180,
-            "120_trace": "on" if os.environ.get("SGLANG_AX_ADMISSION_TRACE", "0") == "1" else "off",
-            "120_scan": str(kv_scan_limit) if kv_scan_limit else "off",
         }
         requested = " ".join(
             f"{k}={os.environ.get(k, '-')}"
             for k in ("SGLANG_AX_SM80_INDEXER", "SGLANG_AX_SM80_FP8_MOE_MARLIN", "SGLANG_AX_INDEXER_ROW_SHARD",
-                      "SGLANG_AX_KDA_FUSE_PROJ", "SGLANG_AX_MOE_FUSE_SWIGLU")
+                      "SGLANG_AX_KDA_FUSE_PROJ", "SGLANG_AX_MOE_FUSE_SWIGLU",
+                      "SGLANG_AX_SM80_FP8_MOE_HUMMING")  # [ax] 117
         )
         spec = get_spec().speculative_algorithm or "-"
         return (" ".join(f"{k}={v}" for k, v in items.items())
-                + f" | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
+                + f" {m115_local} | spec={spec} dcp={get_parallel().dcp_size} | requested: {requested}")
+
+    def _ax_humming_report(self) -> str:
+        """[ax] 117: effective state, i.e. how many MoE layers this process serves through Humming."""
+        if os.environ.get("SGLANG_AX_SM80_FP8_MOE_HUMMING", "false").lower() not in ("1", "true"):
+            return "off:SGLANG_AX_SM80_FP8_MOE_HUMMING_unset"
+        from sglang.srt.layers.quantization.fp8_humming_moe import humming_moe_layer_count
+
+        n = humming_moe_layer_count()
+        return f"on:{n}_layers" if n else "off:no_sm80_block_fp8_moe_layer"
+    def _ax_scatter_report(self) -> str:
+        """[ax] 119: scatter only large extends; refuses without --enable-attn-tp-input-scattered."""
+        if int(os.environ.get("SGLANG_AX_SCATTER_MIN_TOKENS", "0") or 0) <= 0:
+            return "off:SGLANG_AX_SCATTER_MIN_TOKENS_unset"
+        from sglang.srt.layers.communicator import ax_scatter_min_tokens
+
+        n = ax_scatter_min_tokens()
+        if not get_parallel().enable_attn_tp_input_scattered:
+            raise ValueError("[ax] 119: SGLANG_AX_SCATTER_MIN_TOKENS needs --enable-attn-tp-input-scattered")
+        return f"on:{n}"
 
     def _ax_sched_protect_limits(self, chunk_size):
         if not self._ax_sched_protect_enabled():
@@ -1435,6 +1393,45 @@ class Scheduler(
         # A user cap below one grid unit is rounded UP to permit progress.
         cap = max(grid, cap // grid * grid)
         return min(cap, budget // grid * grid), short, grid
+
+    def _ax_demand_cap_max(self) -> Optional[int]:
+        """[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX > 0 turns 120's fixed cold cap into a floor and lets the cold
+        chunk take what the waiting short hits do not need, up to this maximum. Read once; refuses to start with
+        122 (which sizes the same cap from its own reservation) or a maximum below 120's cap."""
+        cap_max = getattr(self, "_ax_demand_cap_max_cfg", False)
+        if cap_max is False:
+            cap_max = int(os.environ.get("SGLANG_AX_SCHED_COLD_CAP_MAX", "0") or 0)
+            if cap_max < 0:
+                raise ValueError("[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX must be >= 0")
+            if cap_max and not self._ax_sched_protect_enabled():
+                raise ValueError(f"[ax] 126 needs 120's protection, which is off: {self._ax_sched_protect_blocker()}")
+            if cap_max and self._ax_pace() is not None:
+                raise ValueError("[ax] 126 and 122 both size the cold cap; unset SGLANG_AX_PACE_TPOT")
+            if cap_max and cap_max < _ax_sched_protect_config()[0]:
+                raise ValueError("[ax] 126: SGLANG_AX_SCHED_COLD_CAP_MAX is below SGLANG_AX_SCHED_COLD_CAP")
+            backlog = self._ax_admission_cfgs()[1]
+            cap_max = cap_max or None
+            self._ax_demand_cap_max_cfg = cap_max
+            if cap_max:
+                relief = backlog.cold_cap if backlog is not None and backlog.cold_cap else None
+                # With 125, its cold cap is the maximum while relieved (the reserve still applies, so waiting
+                # short hits keep their seat in the opening); the usual maximum applies otherwise.
+                logger.info(f"[ax] 126 on: cold cap between 120's cap and {cap_max} by waiting short-hit demand"
+                            + (f"; {relief} while 125 relieves" if relief else ""))
+        return cap_max
+
+    def _ax_demand_limits(self, chunk_size, ax_protect, cap_max=None):
+        """[ax] 126: this round's cold cap = the budget minus what the waiting complete short hits need (the
+        requests 120 lets share a batch with a partial), counting only hits that fit beside 120's cap, clamped to
+        [120's cap, COLD_CAP_MAX] on the checkpoint grid. Hits refused for another reason stop being reserved
+        (_ax_short_hit_reserve). The inputs are the queue after calc_priority's prefix match, identical on every TP
+        rank. `cap_max` overrides COLD_CAP_MAX for this round (125's cold cap while relieved).
+        """
+        floor, short, grid = ax_protect
+        budget = min(chunk_size, self.max_prefill_tokens) // grid * grid
+        reserve = self._ax_short_hit_reserve(budget, floor, short)
+        cap_max = (cap_max or self._ax_demand_cap_max()) // grid * grid
+        return max(floor, min(cap_max, (budget - reserve) // grid * grid)), short, grid
 
     def _ax_should_decode(self, running_batch: ScheduleBatch) -> bool:
         if not self._ax_sched_protect_enabled() or self.prefill_decode_interval:
@@ -1485,6 +1482,346 @@ class Scheduler(
             self._ax_pace_stats = [0, 0, 0, 0.0, 0]  # decisions, forced decode, capped prefill, sum budget, guard
             self._ax_pace_log_ts = 0.0
         return cfg
+
+    def _ax_rank0_decide(self, compute):
+        """[ax] Broadcast one request-plane decision; all group ranks must call."""
+        from sglang.srt.managers.ax_rank0_decision import rank0_decide
+
+        return rank0_decide(self.dp_tp_cpu_group, compute)
+
+    def _ax_admission_cfgs(self):
+        """[ax] 124/125 configs, read once; (None, None) when both are off.
+
+        Both rest on 120's protection: parking relies on it refusing a second partial, and 125 changes its
+        cold cap. 124 replaces 123's order, and 125 changes the cold cap and the fixed
+        --prefill-decode-interval that 122 replaces, so those pairs are exclusive. Unsupported combinations
+        refuse to start (the startup mechanism report calls this).
+        """
+        cfgs = getattr(self, "_ax_admission_cfg", None)
+        if cfgs is None:
+            deadline = ax_deadline.deadline_config()
+            if os.environ.get("SGLANG_AX_DEADLINE_CHAIN_FIRST", "0") == "1" and deadline is None:
+                raise ValueError("[ax] 132 needs 124 (SGLANG_AX_DEADLINE_TIERS=1)")
+            backlog = ax_deadline.backlog_config(self.prefill_decode_interval)
+            blocker = self._ax_sched_protect_blocker()
+            if (deadline or backlog) and blocker is not None:
+                raise ValueError(f"[ax] 124/125 need 120's protection, which is off: {blocker}")
+            if deadline and _ax_srpt_aging() is not None:
+                raise ValueError("[ax] 124 replaces 123's order; unset SGLANG_AX_SRPT_AGING")
+            if backlog and self._ax_pace() is not None:
+                raise ValueError("[ax] 125 changes the cold cap and fixed decode interval that 122 replaces; "
+                                 "unset SGLANG_AX_PACE_TPOT")
+            family = ax_deadline.family_config()
+            if family and not deadline:
+                raise ValueError("[ax] 128 ranks families inside 124's order; set SGLANG_AX_DEADLINE_TIERS=1")
+            producer = ax_prefix_producer.config()
+            if producer:
+                if not deadline or blocker is not None:
+                    raise ValueError("[ax-prefix] requires 124 and 120's supported scheduler/cache path")
+                if family:
+                    raise ValueError("[ax-prefix] mutually exclusive with SGLANG_AX_DEADLINE_FAMILY")
+                if self.schedule_policy != "lpm" or self.enable_priority_scheduling:
+                    raise ValueError("[ax-prefix] requires LPM without priority scheduling")
+                if self._ax_pace() is not None or self.min_free_slots_delayer is not None:
+                    raise ValueError("[ax-prefix] does not support pace or min-free-slot delay")
+                logger.info("[ax-prefix] on: %s; trace is bounded per flush; native allocation is authoritative", producer)
+            self._ax_prefix_tracker = ax_prefix_producer.Tracker(producer) if producer else None
+            self._ax_prefix_applied_sequence = 0
+            self._ax_family_cfg = family
+            self._ax_family_shared = {}
+            self._ax_family_last = (0.0, None)
+            self._ax_backlog = ax_deadline.BacklogState(backlog) if backlog else None
+            self._ax_backlog_relieved = False
+            self._ax_park_start = None
+            self._ax_admission_stats = dict(parks=0, relief_rounds=0, log_t=0.0)
+            cfgs = self._ax_admission_cfg = (deadline, backlog)
+            if deadline or backlog:
+                logger.info("[ax] 124 %s | 125 %s | 128 %s", deadline or "off", backlog or "off", family or "off")
+        return cfgs
+
+    def _ax_flush_admission_state(self):
+        """[ax] Per-level admission state, reset at /flush_cache (the platform flushes before every level):
+        125's TPOT guard, relief and open rate interval; 128's pairwise shared-prefix cache; the short-hit reserve
+        state shared by 122/126, which remembers RIDs reserved beside the last continuation (the same data is replayed
+        with the same RIDs at every level, so a stale entry would stop reserving for a hit that was never refused)."""
+        if getattr(self, "_ax_backlog", None) is not None:
+            self._ax_backlog.reset()
+            self._ax_backlog_relieved = False
+        if getattr(self, "_ax_family_shared", None):
+            self._ax_family_shared.clear()
+        if getattr(self, "_ax_family_last", None) is not None:
+            self._ax_family_last = (0.0, None)
+        if getattr(self, "_ax_reserve_state", None) is not None:
+            self._ax_reserve_state = (None, frozenset(), frozenset())
+        if getattr(self, "_ax_prefix_tracker", None) is not None:
+            self._ax_prefix_tracker.reset()
+            self._ax_prefix_applied_sequence = 0
+
+    def _ax_family_plan(self, cfg, deadline):
+        """[ax] 128 (request-plane rank 0): families among the waiting cold requests from block hashes of their
+        prompts, pairwise shared prefixes cached per pair while both wait. Broadcast with 124's order."""
+        cands = [r for r in self.waiting_queue if ax_deadline.is_cold(r, deadline.cold_hit_ratio)]
+        if len(cands) > cfg.max_candidates:
+            # Bounded CPU: the pairwise scan is O(n^2) per round (about 100 ms first time for 30 prompts of 250k
+            # tokens, then cached per pair); above the bound fall back to 124's per-request order this round.
+            self._ax_family_shared.clear()
+            return {}, set()
+        cache = self._ax_family_shared
+        live = {r.rid for r in cands}
+        for key in [k for k in cache if k[0] not in live or k[1] not in live]:
+            del cache[key]
+
+        def hashes(r):
+            h = getattr(r, "_ax_family_hash", None)
+            if h is None:
+                h = r._ax_family_hash = ax_deadline.block_hashes(r.origin_input_ids, cfg.block)
+            return h
+
+        def shared(a, b):
+            key = (a.rid, b.rid) if a.rid < b.rid else (b.rid, a.rid)
+            v = cache.get(key)
+            if v is None:
+                v = cache[key] = ax_deadline.shared_prefix_blocks(hashes(a), hashes(b)) * cfg.block
+            return v
+
+        work, held, families = ax_deadline.family_plan(cands, shared, cfg)
+        now = time.perf_counter()
+        last_t, last = self._ax_family_last
+        signature = tuple((leader, tuple(riders), tuple(others)) for leader, riders, others in families)
+        if signature != last and now - last_t >= 2.0:
+            self._ax_family_last = (now, signature)
+            logger.info("[ax-128] families=%d %s", len(families), " ".join(
+                f"leader={leader[-16:]}:riders={len(riders)}:others={len(others)}:work={work.get(leader, 0)}"
+                for leader, riders, others in families[:6]))
+        return work, held
+
+    def _ax_admission_plan(self, running_batch: ScheduleBatch, round_budget: int, kv_room: int,
+                           adder=None):
+        """[ax] 124/125 on request-plane rank 0: (waiting RIDs in order or None, park, relieve).
+
+        Reads rank-local clocks and arrival stamps, so the scheduler broadcasts the result; only rank-0
+        state (125 counters, park start, log clock) changes here.
+        """
+        deadline, backlog = self._ax_admission_cfgs()
+        now = time.perf_counter()
+
+        def waited(req) -> float:
+            ts = req.time_stats
+            start = getattr(ts, "scheduler_recv_time", 0.0) or getattr(ts, "wait_queue_entry_time", 0.0)
+            return max(0.0, now - start) if start else 0.0
+
+        order, park = None, False
+        cont = self.chunked_req
+        # prefix_indices covers every chunk scheduled so far (stashed at the top of get_next_batch_to_run);
+        # the continuation's num_matched_prefix_tokens is still its match from when it waited.
+        cont_left = cont.seqlen - len(cont.prefix_indices) if cont is not None else 0
+        if deadline is not None:
+            held = getattr(self.policy, "ax_held", set())
+            work, family_held = None, None
+            family = getattr(self, "_ax_family_cfg", None)
+            if family is not None:
+                work, family_held = self._ax_family_plan(family, deadline)
+            producer = getattr(self, "_ax_prefix_tracker", None)
+            if producer is not None:
+                _, short, grid = adder.ax_protect
+                slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+                ranked, held, family_held = producer.prepare(
+                    self.waiting_queue, cont, running_batch.reqs, held,
+                    getattr(self.policy, "ax_prefix_held_by", {}), now, waited,
+                    deadline, round_budget, grid, short,
+                    lambda r: r is cont or (slots > 0 and adder._request_total_tokens(
+                        r, r.seqlen - len(r.prefix_indices)) < adder.rem_total_tokens),
+                    held_depth=getattr(self.policy, "ax_prefix_held_depth", {}))
+            else:
+                ranked = ax_deadline.tier_order(self.waiting_queue, waited, held, round_budget, deadline, work, family_held)
+            order = [r.rid for r in ranked]
+            if cont is not None and self.get_num_allocatable_reqs(
+                len(running_batch.reqs), running_batch=running_batch
+            ) > 0:
+                rounds = getattr(cont, "_ax_parked_rounds", 0)
+                parked_s = now - self._ax_park_start if rounds and self._ax_park_start else 0.0
+                # Bounded scan: a high-ranked but non-runnable waiter must not
+                # consume the continuation's turn or hide a complete short hit.
+                for head in ranked[:64]:
+                    head_waited = waited(head)
+                    if head.rid in held or (family_held and head.rid in family_held
+                                           and not ax_deadline.is_starved(head, head_waited, deadline)):
+                        continue
+                    budget = adder.ax_complete_waiter_budget(head) if adder is not None else round_budget
+                    if budget <= 0:
+                        continue
+                    parking_decision = producer.should_park if producer is not None else ax_deadline.should_park
+                    park = parking_decision(
+                        cont, cont_left, waited(cont), head, head_waited,
+                        budget, kv_room, rounds, parked_s, deadline,
+                    )
+                    if park:
+                        # The normal adder stops at NO_TOKEN; put the selected
+                        # feasible waiter first on every rank before admission.
+                        order = [head.rid] + [rid for rid in order if rid != head.rid]
+                        break
+                if park and not rounds:
+                    self._ax_park_start = now
+        relieved = False
+        if backlog is not None:
+            state = self._ax_backlog
+            for req in running_batch.reqs:
+                produced = len(req.output_ids)
+                first = getattr(req.time_stats, "prefill_finished_time", 0.0)
+                if produced > 1 and first:
+                    state.note_tpot(req.rid, (now - first) / (produced - 1))
+            cold = cont_left + sum(
+                ax_deadline.remaining_tokens(r) for r in self.waiting_queue if ax_deadline.is_cold(r)
+            )
+            was = state.relieved
+            relieved = state.decide(cold)
+            if relieved != was:
+                logger.info("[ax-125] relief %s: cold backlog %d tokens at %.0f tok/s, slow %d/%d",
+                            "on" if relieved else "off", cold, state.rate, len(state.slow), len(state.seen))
+        stats = self._ax_admission_stats
+        if now - stats["log_t"] >= 30.0:
+            stats["log_t"] = now
+            logger.info("[ax-124/125] parks=%d relief_rounds=%d", stats["parks"], stats["relief_rounds"])
+        return order, park, relieved
+
+    def _ax_prefix_plan(self, running_batch, round_budget, kv_room, adder):
+        """Rank-0 two-phase plan: native matches -> dependencies/order -> seats.
+
+        With 126, ordinary short-hit demand is reserved after the final order;
+        READY uses its own authoritative transaction and never 126's blacklist.
+        """
+        order, park, relieved = self._ax_admission_plan(running_batch, round_budget, kv_room, adder)
+        tracker = self._ax_prefix_tracker
+        cont = self.chunked_req
+        grid = adder.ax_protect[2]
+        demand = self._ax_demand_cap_max() is not None
+        cold_floor = max(grid, _ax_sched_protect_config()[0] // grid * grid) if demand else grid
+        floor = 0
+        if cont is not None and not park:
+            floor = min(adder.ceil_paged_tokens(cont.seqlen - len(cont.prefix_indices)),
+                        max(cold_floor, math.ceil(tracker.cfg.min_progress / grid) * grid),
+                        adder.ax_protect[0])
+        reserve_kv = 0
+        if floor:
+            reserve_kv = floor + self.page_size + adder._mamba_gap_budget_for_req(cont)
+            if cont.seqlen - len(cont.prefix_indices) <= floor:
+                reserve_kv = adder._request_total_tokens(cont, floor)
+        slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+        if adder.prefill_max_requests is not None:
+            slots = min(slots, adder.prefill_max_requests)
+        slots -= int(cont is not None and not park)
+        by_id = {r.rid: r for r in self.waiting_queue}
+        ready, preview = [], []
+        tokens, kv, mamba_slots = 0, 0, 0
+        for rid in order:
+            req = by_id[rid]
+            if not tracker.ready(rid):
+                # Never jump a higher-ranked runnable short waiter or the
+                # selected parking rescue. Long waiters cannot join a partial.
+                if park or cont is None or (adder._ax_short_hit(req) and adder.ax_complete_waiter_budget(req)):
+                    break
+                continue
+            reason = adder.ax_prefix_preview(req, floor + tokens, reserve_kv + kv)
+            if slots <= len(ready) or running_batch.batch_is_full:
+                reason = "request_slots"
+            if (adder.rem_mamba_slots is not None and adder._mamba_gap_budget_for_req(req)
+                    and adder.rem_mamba_slots <= mamba_slots):
+                reason = "mamba_slots"
+            preview.append((rid, reason))
+            if reason != "ready":
+                continue
+            match = ax_prefix_readiness.view(req)
+            needed = adder.ceil_paged_tokens(req.seqlen - match.device)
+            ready.append((rid, match.device, needed))
+            tokens += needed
+            kv += adder._request_total_tokens(req, needed)
+            mamba_slots += int(bool(adder._mamba_gap_budget_for_req(req)))
+            if len(ready) >= tracker.cfg.max_ready:
+                break
+        ordinary_reserve = 0
+        if demand:
+            ordinary_reserve = self._ax_short_hit_reserve(
+                min(adder.rem_chunk_tokens, adder.rem_input_tokens) - tokens,
+                cold_floor, adder.ax_protect[1],
+                requests=[by_id[rid] for rid in order if not tracker.ready(rid)
+                          and rid not in tracker.wait_prefix])
+        return dict(version=tracker.VERSION, epoch=tracker.epoch, sequence=tracker.sequence,
+                    order=order, park=park, relieved=relieved, ready=ready, preview=preview,
+                    continuation=cont.rid if cont else None, floor=floor, reserve_kv=reserve_kv,
+                    wait_prefix=sorted(tracker.wait_prefix),
+                    demand=demand, cold_floor=cold_floor, ordinary_reserve=ordinary_reserve,
+                    reserved_tokens=tokens, cold_cap=adder.ax_protect[0], queue=len(order))
+
+    def _ax_prefix_consensus(self, value):
+        # All ranks enter once per planned READY attempt, even after local COW
+        # rejection. A differing live match rejects the seat on *every* rank.
+        from sglang.srt.managers.ax_rank0_decision import same_decision
+
+        return same_decision(self.dp_tp_cpu_group, value)
+
+    def _ax_prefix_cleanup(self, req, had_mamba):
+        req.kv.mamba_cow_src_index = None
+        req.kv.mamba_needs_clear = False
+        if not had_mamba and req.kv.holds_mamba:
+            self.tree_cache.req_to_token_pool.mamba_allocator.free(req.kv.mamba_pool_idx.unsqueeze(-1))
+            req.kv.mamba_pool_idx = None
+
+    def _ax_prefix_admit_ready(self, adder, plan, running_batch):
+        """Attempt complete tails before charging the continuation.
+
+        The unspent seat needs no rollback. Failed COW/rematch/admission frees
+        only a newly allocated request state; the continuation runs below in
+        this same scheduling pass with the original cap and live KV budget.
+        """
+        attempts = {rid for rid, reason in plan["preview"] if reason != "ready"}
+        results = [(rid, "preview_" + reason) for rid, reason in plan["preview"] if reason != "ready"]
+        by_id = {r.rid: r for r in self.waiting_queue}
+        for rid, expected_prefix, expected_tokens in plan["ready"]:
+            req = by_id[rid]
+            attempts.add(rid)
+            had_mamba = req.kv.holds_mamba
+            req._ax_prefix_reserving = True
+            reason = "ready"
+            added = False
+            try:
+                try:
+                    req.init_next_round_input(self.tree_cache)
+                except ax_prefix_readiness.ReservationUnavailable as exc:
+                    reason = str(exc)
+                # Pin before preview: locking removes evictable capacity and
+                # must be included in the gate that protects producer progress.
+                with adder._lock_node(req.last_node) if reason == "ready" else nullcontext():
+                    if reason == "ready":
+                        reason = adder.ax_prefix_preview(req, plan["floor"], plan["reserve_kv"])
+                        match = ax_prefix_readiness.view(req)
+                        if match is None or match.device < expected_prefix:
+                            reason = "match_regressed"
+                        slots = self.get_num_allocatable_reqs(len(running_batch.reqs), running_batch=running_batch)
+                        if adder.prefill_max_requests is not None:
+                            slots = min(slots, adder.prefill_max_requests)
+                        if len(adder.can_run_list) + int(bool(plan["floor"])) >= slots:
+                            reason = "request_slots"
+                    signature = (rid, reason, len(req.prefix_indices), req.host_hit_length,
+                                 getattr(req, "mamba_host_hit_length", 0))
+                    if not self._ax_prefix_consensus(signature):
+                        reason = "rank_match_disagreement"
+                    if reason == "ready":
+                        # has_chunked_req=True also forbids 101's tail role split
+                        # when no continuation exists: this is a COMPLETE seat.
+                        res = adder.add_one_req(req, has_chunked_req=True,
+                                                truncation_align_size=self.truncation_align_size)
+                        added = bool(adder.can_run_list and adder.can_run_list[-1] is req)
+                        reason = "admitted" if added else "adder_" + res.name.lower()
+                    if not self._ax_prefix_consensus((rid, added, req.extend_range.end if added else 0)):
+                        raise RuntimeError("[ax-prefix] authoritative admission differs across TP ranks")
+            finally:
+                req._ax_prefix_reserving = False
+                if not added:
+                    self._ax_prefix_cleanup(req, had_mamba)
+            if added and (adder.new_chunked_req is req or req.extend_range.end != req.seqlen):
+                raise RuntimeError("[ax-prefix] READY reservation created a partial request")
+            results.append((rid, reason))
+        return attempts, results
 
     def _ax_pace_now(self) -> float:
         # Every TP rank must take the same decision: agree on one clock (max over ranks). Only called
@@ -1586,32 +1923,41 @@ class Scheduler(
         budget = min(chunk_size, self.max_prefill_tokens)
         if self._ax_pace_tokens is not None:
             budget = min(budget, max(grid, self._ax_pace_tokens // grid * grid))
-        # A hit reserved in the previous round beside the same continuation that is still waiting was refused for a
-        # reason other than budget (request slots, KV, mamba slots, a partial-prefill rule). Stop reserving for it until
-        # this continuation ends, so one refused hit cannot shrink the continuation round after round; it can still be
-        # admitted whenever the batch has room. Same inputs on every TP rank, so the decision stays rank-consistent.
+        reserve = self._ax_short_hit_reserve(budget, grid, short)
+        cap = max(grid, (budget - reserve) // grid * grid)
+        return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
+
+    def _ax_short_hit_reserve(self, budget: int, min_cold: int, short: int, requests=None) -> int:
+        """[ax] 122/126: tokens to keep free for the waiting complete short hits (device prefix hit, no host
+        load-back, 0 < new tokens <= `short`), page-rounded, in queue order (prefix matched by calc_priority this
+        round). A hit is reserved only if it fits beside a cold chunk of `min_cold` tokens; otherwise it can never
+        join such a batch and would only shrink the cold chunk (e.g. an 8192-token hit in an 8192 budget forcing
+        endless one-grid continuation chunks).
+
+        A hit reserved in the previous round beside the same continuation that is still waiting was refused for a
+        reason other than budget (request slots, KV, mamba slots, a partial-prefill rule). Stop reserving for it
+        until this continuation ends, so one refused hit cannot shrink the continuation round after round; it can
+        still be admitted whenever the batch has room. Same inputs on every TP rank, so the decision stays
+        rank-consistent.
+        """
         cont = self.chunked_req.rid if self.chunked_req is not None else None
         last_cont, last_reserved, blocked = getattr(self, "_ax_reserve_state", (None, frozenset(), frozenset()))
-        waiting = {req.rid for req in self.waiting_queue}
+        requests = self.waiting_queue if requests is None else requests
+        waiting = {req.rid for req in requests}
         blocked = (blocked | last_reserved) & waiting if cont == last_cont else frozenset()
         reserve = 0
         reserved = []
-        for req in self.waiting_queue:
+        for req in requests:
             if req.rid in blocked:
                 continue
-            new = req.seqlen - len(req.prefix_indices)  # prefix matched by calc_priority this round
+            new = req.seqlen - len(req.prefix_indices)
             if len(req.prefix_indices) > 0 and not req.needs_host_load_back() and 0 < new <= short:
                 needed = -(-new // self.page_size) * self.page_size
-                # The continuation consumes at least one grid unit. Reserve
-                # only complete hits that fit beside it; otherwise an 8192-hit
-                # with an 8192 budget forces endless 64-token continuation
-                # chunks while the hit itself can never join those batches.
-                if needed <= budget - grid - reserve:
+                if needed <= budget - min_cold - reserve:
                     reserve += needed
                     reserved.append(req.rid)
         self._ax_reserve_state = (cont, frozenset(reserved), blocked)
-        cap = max(grid, (budget - reserve) // grid * grid)
-        return budget, (min(cap, max(grid, budget // grid * grid)), short, grid)
+        return reserve
 
     def _should_defer_prefill(self) -> bool:
         if self._prefill_decode_interval_remaining == 0:
@@ -1633,7 +1979,65 @@ class Scheduler(
             else batch.forward_mode.is_extend()
         )
         if is_extend:
-            self._prefill_decode_interval_remaining = self.prefill_decode_interval
+            interval = self.prefill_decode_interval
+            backlog = getattr(self, "_ax_admission_cfg", (None, None))[1]
+            if backlog is not None and self._ax_backlog_relieved:
+                interval = backlog.relaxed_interval  # [ax] 125
+            if self._ax_chain_risk_cfg() is not None:
+                # 131 reads rank-local clocks and the classification frozen by
+                # rank 0's admission plan. Only rank 0 may choose the cadence;
+                # every request-group rank enters, even when no request is at risk.
+                def decide_interval():
+                    risk = self._ax_chain_risk_interval(batch)
+                    return interval if risk is None else min(interval, risk)
+
+                interval = self._ax_rank0_decide(decide_interval)
+            self._prefill_decode_interval_remaining = interval
+
+    def _ax_chain_risk_cfg(self):
+        """[ax] 131: read once; refuses to start without 124, which supplies the budget and the cost model."""
+        cfg = getattr(self, "_ax_chain_risk_cfg_", False)
+        if cfg is False:
+            cfg = ax_deadline.chain_risk_config(self.prefill_decode_interval)
+            if cfg is not None and self._ax_admission_cfgs()[0] is None:
+                raise ValueError("[ax] 131 needs 124 (SGLANG_AX_DEADLINE_TIERS=1) for its budget and cost model")
+            self._ax_chain_risk_cfg_ = cfg
+            self._ax_chain_risk_stats = dict(rounds=0, log_t=0.0)
+            if cfg is not None:
+                logger.info("[ax] 131 chain-risk interval: %s (configured interval %d)", cfg, self.prefill_decode_interval)
+        return cfg
+
+    def _ax_chain_risk_interval(self, batch: ScheduleBatch) -> Optional[int]:
+        """[ax] 131: the reduced decode interval when a cold request in this extend batch is at risk, else None."""
+        cfg = self._ax_chain_risk_cfg()
+        if cfg is None:
+            return None
+        deadline = self._ax_admission_cfgs()[0]
+        now = time.perf_counter()
+        chunk = getattr(batch, "_ax_chain_risk_chunk", None)
+        # Arming happens BEFORE this batch's forward. Its tokens have already
+        # been removed from `left` below, but their execution time is still due.
+        # All requests wait for this batch, including its READY/ordinary riders.
+        current_tokens = batch.extend_num_tokens or 0
+        inflight_s = ax_deadline.service_s(current_tokens, max(current_tokens, 1), deadline)
+        best = None
+        for req in batch.reqs:
+            ts = req.time_stats
+            start = getattr(ts, "scheduler_recv_time", 0.0) or getattr(ts, "wait_queue_entry_time", 0.0)
+            waited = max(0.0, now - start) if start else 0.0
+            # prefix_indices covers the chunks scheduled before this one; extend_input_len is this chunk.
+            left = max(0, req.seqlen - len(req.prefix_indices) - (getattr(req, "extend_input_len", 0) or 0))
+            r = ax_deadline.chain_risk_interval(req, left, waited, deadline, cfg,
+                                               chunk=chunk, inflight_s=inflight_s)
+            if r is not None and (best is None or r < best):
+                best = r
+        if best is not None:
+            st = self._ax_chain_risk_stats
+            st["rounds"] += 1
+            if now - st["log_t"] > 30.0:
+                st["log_t"] = now
+                logger.info("[ax-131] risk rounds=%d interval=%d", st["rounds"], best)
+        return best
 
     def init_metrics_reporter(
         self, tp_rank: int, pp_rank: int, dp_rank: Optional[int]
@@ -1656,6 +2060,7 @@ class Scheduler(
             self.enable_hierarchical_cache,
             self.enable_priority_scheduling,
             self.schedule_low_priority_values_first,
+            rank0_decide=self._ax_rank0_decide,
         )
         self.prefill_delayer: Optional[PrefillDelayer] = None
         self.prefill_bs_tracker = RecentPrefillBatchSizeTracker(
@@ -3820,9 +4225,6 @@ class Scheduler(
             if self._ax_pace() is not None
             else self._should_defer_prefill() or self._ax_should_decode(running_batch)
         ):  # [ax] 122 replaces the fixed interval / 120's single decode turn when on
-            trace = self._ax_admission_trace()
-            if trace is not None:
-                trace.record_many(self.waiting_queue, "decode_cadence")
             new_batch = None
         else:
             prefill_plan = self.get_new_batch_prefill(running_batch)
@@ -3867,9 +4269,12 @@ class Scheduler(
             )
         ret = converted
         self._arm_prefill_decode_interval(ret)
-        trace = self._ax_admission_trace()
-        if trace is not None:
-            trace.snapshot(self.waiting_queue)
+        if getattr(self, "_ax_backlog", None) is not None and ret is not None and ret.forward_mode.is_extend():
+            # [ax] 125: rate sample and relief count on every prefill, whatever the decode interval (with
+            # --prefill-decode-interval 0 the arming above returns early); only rank 0's rate is read,
+            # inside the broadcast plan.
+            self._ax_backlog.note_batch(ret.extend_num_tokens or 0, time.monotonic())
+            self._ax_admission_stats["relief_rounds"] += self._ax_backlog_relieved
         if self._ax_pace() is not None and ret is not None and ret.forward_mode.is_extend():
             # predicted end of this prefill, from the agreed decision time; None if it was not paced (no
             # decoders then: requests it completes are anchored at the next decision, i.e. early)
@@ -3944,7 +4349,6 @@ class Scheduler(
         prefill_delayer_single_pass: Optional[PrefillDelayerSinglePassExecutor],
         running_batch: ScheduleBatch,
     ) -> Tuple[Optional[ScheduleBatch], ScheduleBatch]:
-        trace = self._ax_admission_trace()
         # Check if the grammar is ready in the grammar queue
         if self.grammar_manager.has_waiting_grammars():
             ready_grammar_requests = self.grammar_manager.get_ready_grammar_requests()
@@ -3963,8 +4367,6 @@ class Scheduler(
         if (
             running_batch.batch_is_full or len(self.waiting_queue) == 0
         ) and self.chunked_req is None:
-            if trace is not None and running_batch.batch_is_full:
-                trace.record_many(self.waiting_queue, "batch_full_latched")
             return None, running_batch
 
         running_bs = len(running_batch.reqs)
@@ -3979,8 +4381,6 @@ class Scheduler(
                 ),
             )
         ):
-            if trace is not None:
-                trace.record_many(self.waiting_queue, "min_free_slots_delayer")
             return None, running_batch
 
         # Ignore the check if self.chunked_req is not None.
@@ -3994,8 +4394,6 @@ class Scheduler(
             and not self.enable_priority_preemption
         ):
             running_batch.batch_is_full = True
-            if trace is not None:
-                trace.record_many(self.waiting_queue, "request_slots")
             return None, running_batch
 
         # Get priority queue
@@ -4024,8 +4422,31 @@ class Scheduler(
             prefill_tile_block_m = 64  # Fallback for non-Triton backends
 
         ax_protect = self._ax_sched_protect_limits(chunked_prefill_size)
+        backlog = self._ax_admission_cfgs()[1]
+        # [ax] 125 opening mode: the cold cap while relieved. The flag is last round's broadcast
+        # decision (this round's plan needs the cap as its round budget), so all ranks agree.
+        relieved_cap = (backlog.cold_cap if ax_protect is not None and backlog is not None
+                        and backlog.cold_cap and self._ax_backlog_relieved else 0)
         if ax_protect is not None and self._ax_pace() is not None:
             chunked_prefill_size, ax_protect = self._ax_pace_limits(chunked_prefill_size, ax_protect)
+        elif ax_protect is not None and self._ax_demand_cap_max() is not None:
+            # [ax] 126 with 125: while relieved, 125's cold cap is the maximum the demand-sized cap may reach, so
+            # the waiting short hits keep their seat beside the cold chunk in the opening as well (run 109: warm
+            # turn starts waited 18-23 s for the lane while relief ran 8192-token cold chunks with no room left).
+            if self._ax_prefix_tracker is None:
+                ax_protect = self._ax_demand_limits(chunked_prefill_size, ax_protect, cap_max=relieved_cap or None)
+            else:
+                # 128p finalizes 126's reservation after rank-0 ordering. Start
+                # with the allowed maximum, so a rejected READY seat can be
+                # returned to the continuation in this very pass.
+                floor, short, grid = ax_protect
+                budget = min(chunked_prefill_size, self.max_prefill_tokens) // grid * grid
+                maximum = (relieved_cap or self._ax_demand_cap_max()) // grid * grid
+                ax_protect = (max(floor, min(maximum, budget)), short, grid)
+        elif relieved_cap:
+            _, short, grid = ax_protect
+            budget = min(chunked_prefill_size, self.max_prefill_tokens) // grid * grid
+            ax_protect = (min(max(grid, relieved_cap // grid * grid), budget), short, grid)
 
         adder = PrefillAdder(
             self.page_size,
@@ -4045,12 +4466,49 @@ class Scheduler(
             waiting_queue_len=len(self.waiting_queue),
             prefill_tile_block_m=prefill_tile_block_m,
             ax_protect=ax_protect,
-            ax_admission_trace=trace,
         )
+
+        deadline, backlog = self._ax_admission_cfgs()
+        ax_park = False
+        ax_prefix_plan = None
+        if deadline is not None or backlog is not None:
+            # [ax] 124/125: decided on request-plane rank 0 (rank-local clocks and stamps) and applied on
+            # every rank. Reached under identical control flow: waiting requests or a continuation exist.
+            # Cost estimation uses the cold chunk size. Parking uses the
+            # adder's candidate-specific complete-fit budget, including KV.
+            round_budget = min(chunked_prefill_size, ax_protect[0]) if ax_protect else chunked_prefill_size
+            kv_room = int(adder.rem_total_tokens)
+            if self._ax_prefix_tracker is not None:
+                ax_prefix_plan = self._ax_rank0_decide(
+                    lambda: self._ax_prefix_plan(running_batch, round_budget, kv_room, adder))
+                if (ax_prefix_plan["version"] != self._ax_prefix_tracker.VERSION
+                        or ax_prefix_plan["epoch"] != self._ax_prefix_tracker.epoch
+                        or ax_prefix_plan["sequence"] != self._ax_prefix_applied_sequence + 1
+                        or ax_prefix_plan["continuation"] != (self.chunked_req.rid if self.chunked_req else None)):
+                    raise RuntimeError("[ax-prefix] stale plan or different continuation across TP ranks")
+                self._ax_prefix_applied_sequence = ax_prefix_plan["sequence"]
+                order, ax_park, self._ax_backlog_relieved = (
+                    ax_prefix_plan["order"], ax_prefix_plan["park"], ax_prefix_plan["relieved"])
+            else:
+                order, ax_park, self._ax_backlog_relieved = self._ax_rank0_decide(
+                    lambda: self._ax_admission_plan(running_batch, round_budget, kv_room, adder=adder)
+                )
+            if order is not None:
+                by_id = {r.rid: r for r in self.waiting_queue}
+                if (len(by_id) != len(self.waiting_queue) or len(order) != len(self.waiting_queue)
+                        or set(order) != set(by_id)):
+                    raise RuntimeError("[ax] 124 request queues differ across TP ranks")
+                self.waiting_queue[:] = [by_id[rid] for rid in order]
 
         if self.chunked_req is not None:
             self.chunked_req.init_next_round_input()
-            self.chunked_req = adder.add_chunked_req(self.chunked_req)
+            # When parking, leave the adder's continuation unset so a complete
+            # waiter can run. Count the park only after admission succeeds;
+            # otherwise resume this owner below in the same scheduling pass.
+            if not ax_park and ax_prefix_plan is None:
+                if deadline is not None:
+                    self.chunked_req._ax_parked_rounds = 0
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
 
         if self.enable_lora:
             running_loras = {
@@ -4065,14 +4523,32 @@ class Scheduler(
                     running_batch.reqs,
                 )
 
+        batch_was_full = running_batch.batch_is_full
         mamba_allocator = getattr(self.req_to_token_pool, "mamba_allocator", None)
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_begin(len(self.waiting_queue))
+        prefix_attempts, prefix_results = set(), []
+        if ax_prefix_plan is not None:
+            prefix_attempts, prefix_results = self._ax_prefix_admit_ready(adder, ax_prefix_plan, running_batch)
+            if ax_prefix_plan["demand"]:
+                cap, short, grid = adder.ax_protect
+                remaining = min(adder.rem_chunk_tokens, adder.rem_input_tokens)
+                cap = max(ax_prefix_plan["cold_floor"], min(cap,
+                    (remaining - ax_prefix_plan["ordinary_reserve"]) // grid * grid))
+                adder.ax_protect = (cap, short, grid)
+            if self.chunked_req is not None and not ax_park:
+                self.chunked_req._ax_parked_rounds = 0
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
         # Get requests from the waiting queue to a new prefill batch
-        for queue_index, req in enumerate(self.waiting_queue):
+        for req in self.waiting_queue:
+            if req.rid in prefix_attempts:
+                continue  # no second COW/allocation attempt in this pass
+            if ax_prefix_plan is not None and req.rid in ax_prefix_plan["wait_prefix"]:
+                prefix_results.append((req.rid, "wait_prefix"))
+                continue
             if adder.chunk_budget_exhausted():
-                if trace is not None:
-                    trace.record_many(self.waiting_queue[queue_index:], "batch_token_budget")
+                if ax_prefix_plan is not None:
+                    prefix_results.append((req.rid, "queue_stop_chunk_budget"))
                 break
 
             if self.enable_lora and not self._can_schedule_lora_req(req, running_loras):
@@ -4099,8 +4575,8 @@ class Scheduler(
                     not self.enable_priority_preemption
                     or not adder.preempt_to_schedule(req)
                 ):
-                    if trace is not None:
-                        trace.record_many(self.waiting_queue[queue_index:], "request_slots_or_batch_full")
+                    if ax_prefix_plan is not None:
+                        prefix_results.append((req.rid, "queue_stop_request_slots"))
                     break
 
             if self.enable_hicache_storage:
@@ -4113,8 +4589,6 @@ class Scheduler(
                 if loaded_tokens > 0:
                     req.storage_hit_length = loaded_tokens
 
-            if trace is not None:
-                trace.begin_attempt(req)
             req.init_next_round_input(self.tree_cache)
             if (
                 self.enable_hicache_storage
@@ -4140,6 +4614,9 @@ class Scheduler(
                 has_chunked_req=(self.chunked_req is not None),
                 truncation_align_size=self.truncation_align_size,
             )
+            if ax_prefix_plan is not None:
+                added = bool(adder.can_run_list and adder.can_run_list[-1] is req)
+                prefix_results.append((req.rid, "ordinary_admitted" if added else "ordinary_" + res.name.lower()))
 
             if self.enable_lora:
                 running_loras.add(req.lora_id)
@@ -4153,11 +4630,21 @@ class Scheduler(
                         )
                     else:
                         running_batch.batch_is_full = True
+                # revert matched mamba idx to avoid memory leak, if req is not added.
+                # Only free if the slot was freshly allocated in this batch (not
+                # pre-existing from a session). Session-held slots have their own
+                # lifecycle and freeing them here causes double-free.
                 added = len(adder.can_run_list) > 0 and req is adder.can_run_list[-1]
                 if not added:
-                    if trace is not None:
-                        trace.rejected(req, "adder_" + res.name.lower())
-                    self._ax_release_rejected_match(req)
+                    # init_next_round_input() may stage deferred Mamba COW/clear
+                    # metadata before add_one_req() rejects the request.
+                    req.kv.mamba_cow_src_index = None
+                    req.kv.mamba_needs_clear = False
+                    if req.kv.holds_mamba and not getattr(req, "session", None):
+                        self.tree_cache.req_to_token_pool.mamba_allocator.free(
+                            req.kv.mamba_pool_idx.unsqueeze(-1)
+                        )
+                        req.kv.mamba_pool_idx = None
                 if (
                     adder.ax_protect is not None
                     and not added
@@ -4170,22 +4657,28 @@ class Scheduler(
                     # A long/non-fitting waiter must not hide a short hit. Keep
                     # the native rejection cleanup above, and keep LPM order.
                     continue
-                next_index = queue_index + 1
-                if not added and res == AddReqResult.NO_TOKEN:
-                    next_index = self._ax_scan_after_kv_rejection(
-                        adder, running_batch, next_index, trace
-                    )
-                if trace is not None:
-                    trace.record_many(
-                        self.waiting_queue[next_index:],
-                        "unscanned_after_kv_scan" if next_index > queue_index + 1
-                        else "unscanned_after_" + res.name.lower(),
-                        {"blocker_rid": req.rid, "head_added": added},
-                    )
                 break
 
         if mamba_allocator is not None:
             mamba_allocator.alloc_group_end()
+
+        if ax_park:
+            if adder.can_run_list:
+                self.chunked_req._ax_parked_rounds = getattr(self.chunked_req, "_ax_parked_rounds", 0) + 1
+                self._ax_admission_stats["parks"] += 1
+            else:
+                # Prefix re-match, locks, COW or a delayer may invalidate the
+                # preview. Resume the owner in THIS pass with live KV limits.
+                # No waiter was admitted, so the adder's budgets are unspent.
+                self.chunked_req._ax_parked_rounds = 0
+                self._ax_park_start = 0.0
+                running_batch.batch_is_full = batch_was_full
+                self.chunked_req = adder.add_chunked_req(self.chunked_req)
+
+        if ax_prefix_plan is not None:
+            self._ax_rank0_decide(lambda: self._ax_prefix_tracker.log(
+                logger, time.perf_counter(), ax_prefix_plan, prefix_results,
+                [req.rid for req in adder.can_run_list]))
 
         # Update waiting queue
         can_run_list: List[Req] = adder.can_run_list
@@ -4193,12 +4686,6 @@ class Scheduler(
             return None, running_batch
 
         can_run_set = set(can_run_list)
-        if trace is not None:
-            # This is admission, not execution or H2D completion. A continuation
-            # was already admitted in an earlier pass and is not logged twice.
-            for req in self.waiting_queue:
-                if req in can_run_set:
-                    trace.admitted(req)
         self.waiting_queue = [x for x in self.waiting_queue if x not in can_run_set]
         if adder.preempt_list:
             for req in adder.preempt_list:
@@ -4209,8 +4696,13 @@ class Scheduler(
             assert self.chunked_req is None
             self.chunked_req = adder.new_chunked_req
 
-        if self.chunked_req is not None:
-            self.chunked_req.inflight_middle_chunks += 1
+        # A parked continuation is still owned by the scheduler, but has no
+        # forward/result in this batch. Count only a middle chunk that runs.
+        batch_chunked_req = (
+            self.chunked_req if self.chunked_req in can_run_set else None
+        )
+        if batch_chunked_req is not None:
+            batch_chunked_req.inflight_middle_chunks += 1
 
         set_time_batch(can_run_list, "set_forward_entry_time")
 
@@ -4223,11 +4715,19 @@ class Scheduler(
             self.model_config,
             self.enable_overlap,
             self.spec_algorithm,
-            chunked_req=self.chunked_req,
+            chunked_req=batch_chunked_req,
         )
 
+        if self._ax_chain_risk_cfg() is not None:
+            # Capture this batch's final planned cap (after 125/126/READY),
+            # not a fixed 8k or a short last fragment caused by role alignment.
+            new_batch._ax_chain_risk_chunk = min(
+                chunked_prefill_size, self.max_prefill_tokens,
+                adder.ax_protect[0] if adder.ax_protect else chunked_prefill_size,
+            )
+
         new_batch.contains_last_prefill_chunk = (
-            self.chunked_req is None or len(can_run_list) != 1
+            batch_chunked_req is None or len(can_run_list) != 1
         )
 
         if self.enable_hierarchical_cache:
@@ -4249,8 +4749,8 @@ class Scheduler(
             self.enable_priority_scheduling,
             num_pending_tokens=self.load_inquirer._get_num_pending_tokens(
                 chunk_deduct=(
-                    self.chunked_req.extend_range.length
-                    if self.chunked_req is not None
+                    batch_chunked_req.extend_range.length
+                    if batch_chunked_req is not None
                     else 0
                 ),
             ),
@@ -4833,6 +5333,11 @@ class Scheduler(
                 self.process_batch_result_disagg_prefill(batch, result)
             else:
                 self.batch_result_processor.process_batch_result_prefill(batch, result)
+                prefix_tracker = getattr(self, "_ax_prefix_tracker", None)
+                if prefix_tracker is not None:
+                    for req in batch.reqs:
+                        if req.output_ids and req is not batch.chunked_req:
+                            prefix_tracker.note_prefill_finished(req, logger)
         elif batch.forward_mode.is_prebuilt():
             self.batch_result_processor.process_batch_result_prebuilt(batch)
         elif batch.forward_mode.is_idle():
@@ -5191,6 +5696,7 @@ class Scheduler(
             self.req_to_token_pool.reset_aux_cache_allocator()
             self.grammar_manager.clear()
             self.metrics_reporter.reset_metrics()
+            self._ax_flush_admission_state()
 
             if self.draft_worker:
                 self.draft_worker.clear_cache_pool()

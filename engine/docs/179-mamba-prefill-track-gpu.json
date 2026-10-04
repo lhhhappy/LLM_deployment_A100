@@ -1,0 +1,20 @@
+{
+  "mechanism": 179,
+  "enable": "SGLANG_AX_MAMBA_PREFILL_TRACK_GPU=1",
+  "default": "off",
+  "change": "Freeze each request's track-buffer position before the prefill helper advances it; gather physical slot IDs from the existing authoritative GPU mapping. Upload the frozen CPU mask and sequence lengths using fresh per-batch pinned staging.",
+  "gate": "Batch size at least8; exact static HybridReqToTokenPool with CUDA int64 mapping and request indices; ordinary non-lazy extra_buffer; no speculative, mixed-chunk or dual-snapshot route. All other cases preserve scalar extraction and original uploads.",
+  "ownership": "Gather materializes a batch-owned tensor on the schedule stream. Fresh pinned tensors are immutable and retained by ScheduleBatch.copy and overlap snapshots; the pinned allocator fences storage reuse. Existing scheduler WAR and forward-stream waits preserve ordering.",
+  "validation": "48 synthetic request-batch steps using exact prepare/helper/static allocation/set/donate/free methods passed track/mask/length/request-state equivalence. Copy/filter/merge and two queued staging generations passed. Independent source review matched schedule SHA aa66801d5f33ea5aa2833d61eaa71109bf09e68231dbc1c235d2ac6ac66c4954.",
+  "measured_full_prepare_median_us": {
+    "B8": [603.491, 541.666],
+    "B12": [718.205, 599.353],
+    "B32": [1254.094, 845.714]
+  },
+  "limitations": "Request-slot admission, KV location allocation and sampler were mocked; token bodies and slots were synthetic. This is a boundary probe, not TP8/model/TPOT/chain performance. Earlier globally enabled variants regressed B1/B2 and are excluded by the final threshold.",
+  "remaining_sync": "The Hybrid allocator's two mapping writes with Python-list indices still synchronize. The change does not eliminate complete prefill preparation's wait for previous GPU work.",
+  "current_workload": "The first250 prefill batches of the current N46 diagnostic contained238 singletons; no global adoption claim follows from these boundary savings.",
+  "memory": "Fresh pinned mask/length payload9bytes per request; gathered positions use the existing helper. No persistent GPU workspace or KV/state pool resizing.",
+  "evidence": "evidence/execution-0930/tokenspeed-host-review/179-final-summary.json; metadata-review-mamba-track-gpu-final.json",
+  "pending": "TP8 real-model state/output and paired service comparison before enabling"
+}

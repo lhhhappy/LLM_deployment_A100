@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from sglang.srt.dllm.config import DllmConfig
+from sglang.srt.managers import ax_chunk_alignment
+from sglang.srt.mem_cache import ax_prefix_readiness
 from sglang.srt.model_executor.forward_batch_info import ForwardBatch
 from sglang.srt.runtime_context import (
     get_disagg,
@@ -1468,6 +1470,8 @@ class Req(ReqDllmMixin):
                 match_result = zero_match_result(
                     tree_cache, match_result, extra_key=self.extra_key
                 )
+            if ax_prefix_readiness.ENABLED:
+                ax_prefix_readiness.capture(self, match_result, self._compute_max_prefix_len(input_len))
             (
                 self.prefix_indices,
                 self.last_node,
@@ -1984,7 +1988,7 @@ class Req(ReqDllmMixin):
 
 class _MambaRadixCacheV2TrackEntry(NamedTuple):
     track_mask: bool
-    track_index: int
+    track_index: Optional[int]
     track_seqlen: int
 
 
@@ -2002,7 +2006,7 @@ def mamba_lazy_spec_in_window(
 
 
 def set_mamba_track_indices_from_reqs(
-    batch, track_positions: Optional[List[int]] = None
+    batch, track_positions: Optional[List[int]] = None, *, store_buffer_indices: bool = True
 ):
     """Build mamba_track_indices from req objects (authoritative source).
 
@@ -2025,7 +2029,8 @@ def set_mamba_track_indices_from_reqs(
             )
             for req in batch.reqs
         ]
-    batch.mamba_track_buffer_indices = list(track_positions)
+    if store_buffer_indices:
+        batch.mamba_track_buffer_indices = list(track_positions)
     idx = (
         torch.tensor(
             track_positions,
@@ -2038,6 +2043,60 @@ def set_mamba_track_indices_from_reqs(
     batch.mamba_track_indices = (
         torch.gather(all_buffers, 1, idx).squeeze(1).to(torch.int64)
     )
+
+
+def _mamba_prefill_track_gpu_positions(batch, req_pool_indices) -> Optional[List[int]]:
+    """Snapshot positions before the per-request helper swaps them.
+
+    Only the static pool's ordinary prefill contract is enabled. alloc_for_extend
+    has already allocated every request and populated the authoritative mapping;
+    donation/set_mamba_ping_pong_slot refresh that same mapping. Its gather is
+    stream ordered and produces a batch-owned tensor, not a live mapping view.
+    """
+    # The fixed gather/upload preparation cost does not amortize on small
+    # prefills. Keep them on the original path (one threshold, no batch table).
+    if not envs.SGLANG_AX_MAMBA_PREFILL_TRACK_GPU.get() or len(batch.reqs) < 8:
+        return None
+    pool = batch.req_to_token_pool
+    if (
+        type(pool) is not HybridReqToTokenPool
+        or not mamba_extra_buffer_enabled()
+        or mamba_extra_buffer_lazy_enabled()
+        or not batch.spec_algorithm.is_none()
+        or not batch.forward_mode.is_extend()
+        or get_schedule().enable_mixed_chunk
+        or getattr(batch.tree_cache, "ax_kda_dual_snapshot", False)
+        or batch.ax_kda_dual_snapshot_batch
+        or not batch.reqs
+    ):
+        return None
+    mapping = getattr(pool, "req_index_to_mamba_ping_pong_track_buffer_mapping", None)
+    if (
+        not isinstance(mapping, torch.Tensor)
+        or mapping.device.type != "cuda"
+        or mapping.dtype != torch.int64
+        or mapping.ndim != 2
+        or not isinstance(req_pool_indices, torch.Tensor)
+        or req_pool_indices.device != mapping.device
+        or req_pool_indices.dtype != torch.int64
+        or tuple(req_pool_indices.shape) != (len(batch.reqs),)
+    ):
+        return None
+    positions = []
+    for req in batch.reqs:
+        buf = req.kv.mamba_ping_pong_track_buffer
+        pos = req.kv.mamba_next_track_idx
+        if (
+            not isinstance(buf, torch.Tensor)
+            or buf.device != mapping.device
+            or buf.dtype != mapping.dtype
+            or tuple(buf.shape) != (mapping.shape[1],)
+            or type(pos) is not int
+            or not 0 <= pos < mapping.shape[1]
+        ):
+            return None
+        positions.append(pos)
+    return positions
 
 
 def release_req(
@@ -2238,6 +2297,8 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
     mamba_track_buffer_indices: Optional[List[int]] = None  # shape: [b], 0 or 1
     mamba_track_mask: torch.Tensor = None  # shape: [b], bool
     mamba_track_seqlens: torch.Tensor = None  # shape: [b], int64
+    # Per-batch immutable pinned sources for the optional async prefill upload.
+    ax_mamba_prefill_track_staging: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
     ax_kda_dual_snapshot_batch: bool = False
     ax_kda_snapshot_offsets: Optional[torch.Tensor] = None  # [b, 2], relative tokens
     ax_kda_snapshot_slots: Optional[torch.Tensor] = None  # [b, 2], physical slots
@@ -2579,6 +2640,10 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 self, mamba_checkpoint_grid(self.tree_cache.page_size)
             )
 
+        mamba_track_positions_gpu = _mamba_prefill_track_gpu_positions(
+            self, req_pool_indices_tensor
+        )
+
         for i, (req, seq_len, pre_len) in enumerate(zip(reqs, seq_lens, prefix_lens)):
             assert seq_len - pre_len == req.extend_range.length
 
@@ -2642,7 +2707,9 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
             req.is_retracted = False
 
             if mamba_extra_buffer_enabled():
-                track_entry = self._mamba_radix_cache_v2_req_prepare_for_extend(req)
+                track_entry = self._mamba_radix_cache_v2_req_prepare_for_extend(
+                    req, read_track_index=mamba_track_positions_gpu is None
+                )
                 mamba_track_mask_cpu.append(track_entry.track_mask)
                 mamba_track_indices_cpu.append(track_entry.track_index)
                 mamba_track_seqlens_cpu.append(track_entry.track_seqlen)
@@ -2747,21 +2814,46 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         self.extend_input_logprob_token_ids = extend_input_logprob_token_ids
 
         if mamba_extra_buffer_enabled():
-            self.mamba_track_indices = torch.tensor(
-                mamba_track_indices_cpu,
-                dtype=torch.int64,
-                device=self.device,
-            )
-            self.mamba_track_mask = torch.tensor(
-                mamba_track_mask_cpu,
-                dtype=torch.bool,
-                device=self.device,
-            )
-            self.mamba_track_seqlens = torch.tensor(
-                mamba_track_seqlens_cpu,
-                dtype=torch.int64,
-                device=self.device,
-            )
+            if mamba_track_positions_gpu is None:
+                self.mamba_track_indices = torch.tensor(
+                    mamba_track_indices_cpu,
+                    dtype=torch.int64,
+                    device=self.device,
+                )
+            else:
+                # Do not publish decode-only logical-position metadata during
+                # prefill. Only the device slot-ID tensor changes its source.
+                set_mamba_track_indices_from_reqs(
+                    self, mamba_track_positions_gpu, store_buffer_indices=False
+                )
+            if mamba_track_positions_gpu is None:
+                self.mamba_track_mask = torch.tensor(
+                    mamba_track_mask_cpu,
+                    dtype=torch.bool,
+                    device=self.device,
+                )
+                self.mamba_track_seqlens = torch.tensor(
+                    mamba_track_seqlens_cpu,
+                    dtype=torch.int64,
+                    device=self.device,
+                )
+                self.ax_mamba_prefill_track_staging = None
+            else:
+                # Pageable uploads would synchronize behind the previous forward
+                # and undo the device-only slot gather. Fresh sources per batch;
+                # retain them in the overlap snapshot and let the pinned allocator
+                # event-fence storage reuse after these asynchronous copies.
+                mask_staging = torch.tensor(
+                    mamba_track_mask_cpu, dtype=torch.bool, pin_memory=True
+                )
+                seqlens_staging = torch.tensor(
+                    mamba_track_seqlens_cpu, dtype=torch.int64, pin_memory=True
+                )
+                self.ax_mamba_prefill_track_staging = (mask_staging, seqlens_staging)
+                self.mamba_track_mask = mask_staging.to(self.device, non_blocking=True)
+                self.mamba_track_seqlens = seqlens_staging.to(
+                    self.device, non_blocking=True
+                )
 
         if self.ax_kda_dual_snapshot_batch:
             from sglang.srt.mem_cache.kda_dual_snapshot import prepare
@@ -2785,6 +2877,8 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
     def _mamba_radix_cache_v2_req_prepare_for_extend(
         self,
         req: Req,
+        *,
+        read_track_index: bool = True,
     ) -> _MambaRadixCacheV2TrackEntry:
         cache_chunk_size = mamba_cache_chunk_size()
         state_chunk_size = getattr(
@@ -2821,9 +2915,11 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
             checkpoint > prefix_len
             and (checkpoint - prefix_len) % cache_chunk_size == 0
         )
-        track_index = req.kv.mamba_ping_pong_track_buffer[
-            req.kv.mamba_next_track_idx
-        ].item()
+        track_index = (
+            req.kv.mamba_ping_pong_track_buffer[req.kv.mamba_next_track_idx].item()
+            if read_track_index
+            else None
+        )
         mamba_track_seqlen = -1
         if mask:
             # mamba_track_seqlen is used to calculate the indices to track in
@@ -2878,6 +2974,11 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                     mamba_track_seqlen = _force_track_h(req.mamba_branching_seqlen)
                     mamba_track_seqlen_aligned = req.mamba_branching_seqlen
             req.kv.mamba_last_track_seqlen = mamba_track_seqlen_aligned
+
+        if ax_chunk_alignment.ENABLED:
+            ax_chunk_alignment.checkpoint(
+                req, prefix_len, extend_end, cache_chunk_size, checkpoint_grid, mask
+            )
 
         return _MambaRadixCacheV2TrackEntry(
             track_mask=mask,
@@ -3598,6 +3699,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
             mamba_track_buffer_indices=self.mamba_track_buffer_indices,
             mamba_track_mask=self.mamba_track_mask,
             mamba_track_seqlens=self.mamba_track_seqlens,
+            ax_mamba_prefill_track_staging=self.ax_mamba_prefill_track_staging,
             mamba_track_mask_cpu=self.mamba_track_mask_cpu,
             mamba_track_mask_next_cpu=self.mamba_track_mask_next_cpu,
             mamba_decode_batch_idx_cpu=self.mamba_decode_batch_idx_cpu,

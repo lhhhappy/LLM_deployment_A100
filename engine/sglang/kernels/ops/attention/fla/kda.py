@@ -1097,6 +1097,7 @@ def chunk_kda_fwd(
     output_intermediate_states: bool = False,
     snapshot_offsets: Optional[torch.Tensor] = None,
     snapshot_slots: Optional[torch.Tensor] = None,
+    sm80_bv16: bool = False,
 ):
     chunk_size = 64
     # Pre-compute chunk indices once and thread through all downstream kernels.
@@ -1179,6 +1180,7 @@ def chunk_kda_fwd(
         use_exp2=True,
         snapshot_offsets=snapshot_offsets,
         snapshot_slots=snapshot_slots,
+        sm80_bv16=sm80_bv16,
     )
     del w, u, kg
 
@@ -1250,4 +1252,5 @@ def chunk_kda(
         output_intermediate_states=output_intermediate_states,
         snapshot_offsets=kwargs.get("snapshot_offsets"),
         snapshot_slots=kwargs.get("snapshot_slots"),
+        sm80_bv16=kwargs.get("sm80_bv16", False),
     )

@@ -1,0 +1,41 @@
+{
+  "mechanism": 177,
+  "title": "Startup capture of audited SM80 decode metadata",
+  "default_enabled": false,
+  "flag": "SGLANG_ENABLE_METADATA_GLUE_GRAPH",
+  "base_commit": "400adf7d99d5b26c5a889d1668c78ee8afc4b28f",
+  "changes": [
+    "Capture eligible replay metadata at engine startup; never capture during serving",
+    "Invalidate metadata graphs before model graph recapture",
+    "Restore forward_metadata, use_mha and dsa_prefill_impl after intervening prefill",
+    "Unknown keys and padded batches use eager metadata preparation; capture failure disables helper"
+  ],
+  "eligibility": [
+    "SM80 CUDA BF16 KV",
+    "Plain DECODE, no speculation, DCP1",
+    "Exact HybridLinearAttnBackend with DeepseekSparseAttnBackend and KDAAttnBackend",
+    "No overlap planning stream, TBO, PDMux, LoRA, ReplaySSM, unified memory or HiSparse"
+  ],
+  "developer_evidence": "evidence/execution-0930/metadata-glue-review/cuda-results-native.json",
+  "measurement_scope": "Actual DSA/KPool4 and KDA metadata methods with synthetic static pools; no full model, TP8, checkpoint or SLO result",
+  "batch32_complete_boundary_us": [
+    708.8715210556984,
+    158.40109437704086
+  ],
+  "measured_private_graph_pool_mib": {
+    "bs8": 22,
+    "bs32": 34,
+    "bs48": 50
+  },
+  "validated": [
+    "Four dynamic metadata mutations per key compare every walked field exactly",
+    "Real CUDA capture failure restores stream and eager fallback",
+    "Reset releases all106MiB graph private pools"
+  ],
+  "pending": [
+    "Real TP8 full output IDs and true checkpoint save transitions",
+    "Full-step and mixed-load service performance",
+    "Memory/KV capacity across all startup capture keys"
+  ],
+  "source_sha256": "ab5713ef63db84d5627cdbc064dba2a6de8a58f40f967b4bae889534121f911a"
+}

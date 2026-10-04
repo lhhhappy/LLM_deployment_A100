@@ -4,6 +4,7 @@ import logging
 from array import array
 
 from sglang.srt.environ import envs
+from sglang.srt.managers import ax_chunk_alignment
 from sglang.srt.managers.prefill_delayer import PrefillDelayerSinglePassExecutor
 from sglang.srt.runtime_context import (
     get_disagg,
@@ -69,6 +70,7 @@ from sglang.srt.mem_cache.multi_ended_allocator import (
     UnifiedMambaTokenToKVPoolAllocator,
 )
 from sglang.srt.mem_cache.radix_cache import RadixCache, RadixKey, TreeNode
+from sglang.srt.mem_cache import ax_prefix_readiness
 
 if TYPE_CHECKING:
     from sglang.srt.mem_cache.allocator import BaseTokenToKVPoolAllocator
@@ -159,6 +161,12 @@ def match_prefix_for_req(
     # this request's SWA ring. No-op for other layouts.
     reprefill_tail = tree_cache.swa_reprefill_tail_tokens()
     key_limit = max(0, len(token_ids) - reprefill_tail) if reprefill_tail else None
+    if ax_prefix_readiness.ENABLED and ax_prefix_readiness.eligible(req):
+        # Match exactly the consumer admission limit (including the final
+        # logits token). Merely clipping a longer match's length could claim a
+        # checkpoint at a split where no KDA state actually exists.
+        admission_limit = req._compute_max_prefix_len(len(token_ids))
+        key_limit = admission_limit if key_limit is None else min(key_limit, admission_limit)
 
     match_result = tree_cache.match_prefix(
         MatchPrefixParams(
@@ -201,6 +209,8 @@ def match_prefix_for_req(
         req.mamba_branching_seqlen = match_result.mamba_branching_seqlen
     if match_result.cache_protected_len is not None:
         req.kv.cache_protected_len = match_result.cache_protected_len
+    if ax_prefix_readiness.ENABLED:
+        ax_prefix_readiness.capture(req, match_result, max_len)
     return match_result
 
 
@@ -236,8 +246,10 @@ class SchedulePolicy:
         enable_hierarchical_cache: bool,
         enable_priority_scheduling: bool,
         schedule_low_priority_values_first: bool,
+        rank0_decide=None,
     ):
         self.policy = self._validate_and_adjust_policy(policy, tree_cache)
+        self.rank0_decide = rank0_decide
         self.tree_cache = tree_cache
         self.enable_hierarchical_cache = enable_hierarchical_cache
         self.enable_priority_scheduling = enable_priority_scheduling
@@ -251,6 +263,12 @@ class SchedulePolicy:
         self, waiting_queue: List[Req], running_batch: Optional[ScheduleBatch] = None
     ) -> None:
         policy = self._determine_active_policy(waiting_queue)
+        self.ax_held = set()  # [ax] 124 keeps LPM's in-batch prefix-sharing holdbacks last
+        if ax_prefix_readiness.ENABLED:
+            self.ax_prefix_held_by = {}
+            self.ax_prefix_held_depth = {}
+            for req in waiting_queue:
+                req._ax_prefix_match = None  # never reuse a previous round's match
 
         # Populate req.num_matched_prefix_tokens at schedule time. Cache-aware policies
         # set it in _compute_prefix_matches; do the same full match for
@@ -275,10 +293,25 @@ class SchedulePolicy:
             temporary_deprioritized = self._compute_prefix_matches(
                 waiting_queue, policy
             )
+            self.ax_held = temporary_deprioritized
             if policy == CacheAwarePolicy.LPM and _ax_srpt_aging() is not None:  # [ax] 123
-                SchedulePolicy._ax_sort_by_remaining_work(
-                    waiting_queue, temporary_deprioritized
-                )
+                # Entry timestamps are rank-local, so synchronizing only "now"
+                # cannot agree on aging. Compute the final order on group rank 0.
+                decide = getattr(self, "rank0_decide", None)
+                if decide is None:
+                    self._ax_sort_by_remaining_work(waiting_queue, temporary_deprioritized)
+                else:
+                    def order():
+                        queue = list(waiting_queue)
+                        self._ax_sort_by_remaining_work(queue, temporary_deprioritized)
+                        return [r.rid for r in queue]
+
+                    ids = decide(order)
+                    by_id = {r.rid: r for r in waiting_queue}
+                    if (len(by_id) != len(waiting_queue) or len(ids) != len(waiting_queue)
+                            or set(ids) != set(by_id)):
+                        raise RuntimeError("[ax] 123 request queues differ across TP ranks")
+                    waiting_queue[:] = [by_id[rid] for rid in ids]
             elif policy == CacheAwarePolicy.LPM:
                 SchedulePolicy._sort_by_longest_prefix(
                     waiting_queue, temporary_deprioritized
@@ -344,6 +377,7 @@ class SchedulePolicy:
         """
         temporary_deprioritized: Set[int] = set()
         self.waiting_queue_radix_tree.reset()
+        prefix_representatives = [] if ax_prefix_readiness.ENABLED else None
 
         for r in waiting_queue:
             prefix_ids = r.origin_input_ids + r.output_ids
@@ -380,6 +414,10 @@ class SchedulePolicy:
                     >= IN_BATCH_PREFIX_CACHING_DEPRIORITIZE_THRESHOLD
                 ):
                     temporary_deprioritized.add(r.rid)
+                    if prefix_representatives is not None:
+                        self.ax_prefix_held_by[r.rid] = ax_prefix_readiness.held_owner(
+                            r, prefix_representatives, len(in_batch_matching_prefixes))
+                        self.ax_prefix_held_depth[r.rid] = len(in_batch_matching_prefixes)
                 else:
                     # Insert with a dummy key
                     self.waiting_queue_radix_tree.insert(
@@ -392,6 +430,8 @@ class SchedulePolicy:
                             value=torch.empty(len(prefix_ids), dtype=torch.bool),
                         )
                     )
+                    if prefix_representatives is not None and len(prefix_representatives) < 64:
+                        prefix_representatives.append(r)
         return temporary_deprioritized
 
     @staticmethod
@@ -559,13 +599,11 @@ class PrefillAdder:
         waiting_queue_len: int = 0,
         prefill_tile_block_m: int = 64,
         ax_protect: Optional[tuple] = None,
-        ax_admission_trace=None,
     ):
         self.page_size = page_size
         # (aligned cold cap, short-hit threshold, checkpoint/alignment grid).
         # Only the normal TP scheduler opts in; other callers retain stock.
         self.ax_protect = ax_protect
-        self.ax_admission_trace = ax_admission_trace
         self.ax_continuation = None
         self.prefill_tile_block_m = prefill_tile_block_m
         self.tree_cache = tree_cache
@@ -1092,6 +1130,61 @@ class PrefillAdder:
             <= self.ax_protect[1]
         )
 
+    def _request_total_tokens(self, req: Req, extend_tokens: int) -> int:
+        """Admission's resident KV, output reserve, page and shared-state charge."""
+        max_new = min(
+            max(req.sampling_params.max_new_tokens - len(req.output_ids), 0),
+            CLIP_MAX_NEW_TOKENS,
+        )
+        return (extend_tokens + max_new + self.page_size
+                + self._mamba_gap_budget_for_req(req))
+
+    def ax_complete_waiter_budget(self, req: Req) -> int:
+        """Read-only parking eligibility after policy prefix matching.
+
+        A host hit saves compute but still needs device KV for the reload.
+        Complete device short hits may use the whole round, unlike cold work.
+        Matching with COW, locking and host loading remain in add_one_req;
+        its authoritative checks may still reject, so parking has a fallback.
+        """
+        extend = req.seqlen - len(req.prefix_indices)
+        compute = self.ceil_paged_tokens(extend - req.host_hit_length)
+        if compute <= 0 or self._request_total_tokens(req, extend) >= self.rem_total_tokens:
+            return 0
+        budget = min(self.rem_chunk_tokens, self.rem_input_tokens)
+        if self.ax_protect is not None:
+            cap, short, _ = self.ax_protect
+            device_short = (len(req.prefix_indices) > 0 and not req.needs_host_load_back()
+                            and 0 < extend <= short)
+            if not device_short:
+                budget = min(budget, cap)
+        return int(budget) if compute <= budget else 0
+
+    def ax_prefix_preview(self, req, reserve_tokens=0, reserve_kv=0):
+        """Read-only complete-device-tail check, including a continuation floor.
+
+        Used again while the consumer's native cache lock is held, after COW.
+        A successful preview neither allocates nor promises admission.
+        """
+        match = ax_prefix_readiness.view(req)
+        if match is None:
+            return "no_native_match"
+        reason = match.reason(req.seqlen, self.ax_protect[1])
+        if reason != "ready":
+            return reason
+        needed = self.ceil_paged_tokens(req.seqlen - match.device)
+        if needed > min(self.rem_chunk_tokens, self.rem_input_tokens) - reserve_tokens:
+            return "round_budget"
+        gap = self._mamba_gap_budget_for_req(req)
+        if self.rem_mamba_slots is not None and gap and self.rem_mamba_slots <= 0:
+            return "mamba_slots"
+        if (self._request_total_tokens(req, needed) + reserve_kv >= self.rem_total_tokens
+                or needed + self.page_size + gap + reserve_kv >= self.cur_rem_tokens):
+            return "kv_budget"
+        if self.prefill_max_requests is not None and len(self.can_run_list) >= self.prefill_max_requests:
+            return "prefill_slots"
+        return "ready"
+
     def add_chunked_req(self, req: Req):
         if self.dllm_config is not None:
             _rem_tokens = self._get_dllm_remain_tokens()
@@ -1114,6 +1207,9 @@ class PrefillAdder:
                     return req
                 _rem_tokens = self.rem_chunk_tokens
 
+        cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
+            req.prefix_indices
+        )
         if self.ax_protect is not None:
             self.ax_continuation = req
             cap, _, grid = self.ax_protect
@@ -1127,10 +1223,15 @@ class PrefillAdder:
             else:
                 _rem_tokens = min(_rem_tokens, self.rem_input_tokens)
             # Preserve checkpoint, KV-page and DSA/deterministic alignment.
-            # Below one grid unit retain the native resource-limited progress;
-            # the no-starvation bound assumes room for at least one unit.
+            # A truncated sub-grid chunk can misalign every later kernel
+            # snapshot with the cache tree. Keep the partial parked until a
+            # whole unit fits; a complete short tail can still finish now.
             if _rem_tokens >= grid:
                 _rem_tokens = _rem_tokens // grid * grid
+            elif cand_extend_input_len > _rem_tokens:
+                if ax_chunk_alignment.ENABLED:
+                    ax_chunk_alignment.defer(req, _rem_tokens, grid)
+                return req
 
         # A mid-chunk rank prefills this pass regardless of the delayer
         # verdict, so report prefillable=True and ignore the result.
@@ -1143,9 +1244,6 @@ class PrefillAdder:
                 waiting_queue_len=self.waiting_queue_len,
             )
 
-        cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
-            req.prefix_indices
-        )
         truncated = cand_extend_input_len > _rem_tokens
         new_len = min(cand_extend_input_len, _rem_tokens)
         if not truncated:
@@ -1157,6 +1255,8 @@ class PrefillAdder:
             if role_len is not None:
                 new_len, truncated = role_len, True
         req.set_extend_range(len(req.prefix_indices), len(req.prefix_indices) + new_len)
+        if ax_chunk_alignment.ENABLED:
+            ax_chunk_alignment.resume(req, new_len, truncated)
         self.can_run_list.append(req)
         self._update_prefill_budget(
             0,
@@ -1327,22 +1427,8 @@ class PrefillAdder:
         return self.budget_state()
 
     def add_one_req(
-        self, req: Req, has_chunked_req: bool, truncation_align_size: Optional[int],
-        *, ax_complete_only: bool = False,
+        self, req: Req, has_chunked_req: bool, truncation_align_size: Optional[int]
     ):
-        if ax_complete_only:
-            # 120's bounded KV fallback cannot start another partial or H2D.
-            assert self.ax_protect is not None and not _role_boundary_token_ids()
-            needed = self.ceil_paged_tokens(
-                len(req.full_untruncated_fill_ids) - len(req.prefix_indices)
-            )
-            if not self._ax_short_hit(req) or needed > min(
-                self.rem_chunk_tokens, self.rem_input_tokens
-            ):
-                if self.ax_admission_trace is not None:
-                    self.ax_admission_trace.record(req, "kv_scan_not_complete_device_short")
-                return AddReqResult.OTHER
-
         if self.ax_protect is not None and (
             self.ax_continuation is not None or self.new_chunked_req is not None
         ):
@@ -1355,17 +1441,6 @@ class PrefillAdder:
             if not self._ax_short_hit(req) or needed > min(
                 self.rem_chunk_tokens, self.rem_input_tokens
             ):
-                if self.ax_admission_trace is not None:
-                    if req.needs_host_load_back():
-                        reason = "partial_host_restore"
-                    elif len(req.prefix_indices) == 0:
-                        reason = "partial_no_device_prefix"
-                    elif not self._ax_short_hit(req):
-                        reason = "partial_long_tail"
-                    else:
-                        reason = "partial_token_budget"
-                    partial = self.ax_continuation or self.new_chunked_req
-                    self.ax_admission_trace.record(req, reason, {"partial_rid": partial.rid})
                 return AddReqResult.OTHER
 
         # TODO support cp with multiple requests
@@ -1383,36 +1458,10 @@ class PrefillAdder:
         # Reserve page_size for page-alignment overhead: the paged allocator may
         # consume one extra page per request (see alloc_extend), which
         # _update_prefill_budget also deducts.
-        max_new = min(
-            max(req.sampling_params.max_new_tokens - len(req.output_ids), 0),
-            CLIP_MAX_NEW_TOKENS,
-        )
         cand_extend_input_len = len(req.full_untruncated_fill_ids) - len(
             req.prefix_indices
         )
-        total_tokens = cand_extend_input_len + max_new + self.page_size
-        # Shared Mamba pool: fold the new mamba state's shared-gap cost into
-        # `total_tokens` so both `rem_total_tokens` gates reflect the joint budget.
-        total_tokens += self._mamba_gap_budget_for_req(req)
-        if ax_complete_only:
-            # Match the actual full-prefill charge in _update_prefill_budget,
-            # including page rounding and the full clipped output reservation.
-            # The legacy gate uses unrounded input and remaining output; using
-            # it alone can let a marginal candidate overdraw after admission.
-            total_tokens = (
-                self.ceil_paged_tokens(cand_extend_input_len)
-                + min(req.sampling_params.max_new_tokens, CLIP_MAX_NEW_TOKENS)
-                + self.page_size
-                + self._mamba_gap_budget_for_req(req)
-            )
-            if (
-                self._mamba_gap_budget_for_req(req)
-                and self.rem_mamba_slots is not None
-                and self.rem_mamba_slots <= 0
-            ):
-                if self.ax_admission_trace is not None:
-                    self.ax_admission_trace.record(req, "kv_scan_mamba_slots")
-                return AddReqResult.NO_TOKEN
+        total_tokens = self._request_total_tokens(req, cand_extend_input_len)
 
         # adjusting the input_tokens based on host_hit_length and page_size
         real_input_tokens = cand_extend_input_len - req.host_hit_length
@@ -1420,8 +1469,6 @@ class PrefillAdder:
         prefix_len = len(req.prefix_indices)
 
         if total_tokens >= self.rem_total_tokens:
-            if self.ax_admission_trace is not None:
-                self.ax_admission_trace.record(req, "kv_budget")
             return AddReqResult.NO_TOKEN
 
         chunk_tokens_limit = self.rem_chunk_tokens
@@ -1461,8 +1508,6 @@ class PrefillAdder:
         with self._lock_node(req.last_node):
             # self.rem_total_tokens may decrease after the lock acquisition
             if total_tokens >= self.rem_total_tokens:
-                if self.ax_admission_trace is not None:
-                    self.ax_admission_trace.record(req, "kv_budget_after_lock")
                 return AddReqResult.NO_TOKEN
 
             if self.is_hybrid_swa:

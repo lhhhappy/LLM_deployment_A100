@@ -2,6 +2,11 @@
 
 状态（2026-09-24）：**移植与本地适配完成，已进入 TP8 全量验证**。补丁可打在部署栈、S0 和裸底包上；CPU 测试 52 项全过，并且能区分有无本补丁。067–069已完成8卡全量N30；069扩host64后10/11门通过，仅chain失败。正式46173/46174均过能力门、最高通过N14/N18（两者host32）。这些是组合运行、性能和能力证据，不代替专门的GPU状态恢复数值验证。见[本地实验](../../notes/experiments.md)、[正式结果](../../notes/reports/official-46173-46174-0924.md)。关闭路径的等价条件与例外见§6及[引擎说明](../README.md)。
 
+2026-09-26 销毁路径复核：`DSAIndexerPoolHost.destroy()` 原先只清 backing tensor，`layer_first` 的
+`index_k_data_refs` 仍持有整块主机内存。现同时释放视图、指针表和 staging buffer，保留原先的
+注销顺序与幂等检查。设备池继续拥有其自身缓冲。验证与边界统一见
+[S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md)，不把销毁路径修正计为稳态 TTFT 加速。
+
 术语只解释一次：
 - **HiCache / 主机层**：GPU 放不下的前缀缓存挪到 CPU 内存，需要时再搬回 GPU。
 - **indexer 行**：DSA 稀疏注意力的“挑选器”给每个历史 token 存的打分键。GLM 用 kpool=4 压缩，4 个 token 合成 1 行。
@@ -75,7 +80,7 @@ HiCache及容量参数属于SGLang原有能力；180移植上游并适配GLM状�
 - `--hicache-write-policy write_through`（默认）：每个新节点插入时就异步写穿；**不要用 `write_through_selective`**（要命中 2 次才备份，第一次复用前可能已被挤掉）。
 - NUMA：`--numa-node 0 0 0 0 1 1 1 1`（按 pod 上 GPU0–3 在节点 0、GPU4–7 在节点 1；上 pod 前用 `nvidia-smi topo -m` 核对）。调度进程在建主机池之前绑到对应节点（`numa_bind_to_node` 设 CPU 亲和并 `numa_set_preferred`），主机池在启动时分配并 `cudaHostRegister` 锁页，热路径不再锁页。
 - 不支持、会**启动报错**的组合：L3 存储后端（`--hicache-storage-backend`，树页≠传输页）、外部 cache linker、140 双快照（140 自己的守卫拒绝 HiCache）、int8 Mamba 检查点（底包拒绝）、草稿行宽/格式不一致或草稿池比目标小。
-- 未验证、没有拦截的组合：170 的 breakable 预填充图（静态审查：DSA 注意力、kpool indexer、KDA 都在图外的 eager 段里读缓存，逐层等待可以生效；需实测）；115 DCP。
+- 未验证的组合：170 的 breakable 预填充图（静态审查：DSA 注意力、kpool indexer、KDA 都在图外的 eager 段里读缓存，逐层等待可以生效；需实测）。115 DCP 的受限支持与验证边界见§11。
 
 ## 5. 内存与时间账（标注：【按config推算】/【推算】）
 
@@ -87,7 +92,7 @@ HiCache及容量参数属于SGLang原有能力；180移植上游并适配GLM状�
 | 合计 | **12,716** | **13,872** |
 | KDA 状态（每个检查点，34 层，fp32 SSM + bf16 conv） | 18,452,480 B = 17.6 MiB | 同左 |
 
-MLA 在 TP8 下每卡一份完整副本，所以 8 卡各存一份相同内容，主机总用量是单卡的 8 倍。
+本表为DCP关闭时：MLA 在 TP8 下每卡一份完整副本，所以 8 卡各存一份相同内容，主机总用量是单卡的 8 倍。DCP开启时见§11。
 
 `--hicache-size` 的分配【推算】：先按设备上 KV 与 KDA 池的字节比例分，再把 indexer 从 KV 份额里扣出。例：设备 KV 104 万 token（13.2 GB）、KDA 200 槽（3.7 GB）、有 MTP：
 - 32 GB/卡 → KV 份额 25.0 GB → MLA 22.1 GB + indexer 2.9 GB ≈ **180 万主机 token**；KDA 7.0 GB ≈ **380 个状态**。8 卡共 256 GB。
@@ -183,9 +188,9 @@ CPU 上跑真实代码：真实设备池、主机池、组装策略、`HybridCac
 - **KDA 主机恢复本身**：上游 #39830 报告 GDN 模型在上游 main 上主机命中 20/20 答错，原因未明，不是 indexer 的问题。本地 CPU 测试证明 KDA 状态字节逐位还原、位置对齐，但没有排除那类问题。GPU 数值检查必须单独看 KDA（无 DSA 差异时输出仍须一致）。
 - 放宽后命中取整到 256，多重算最多 192 token（§5）；101 的角色切分也按 256。
 - indexer 镜像 3/4 是空位（每 token 多存、多搬约 1.2 KB）。可以只搬组头页来省掉，另做。
-- MLA 在每卡各存一份、各搬一份，这是底包 TP 设计，180 未改。
+- DCP关闭时，MLA 在每卡各存一份、各搬一份；DCP开启时latent按owner分片，indexer仍复制，见§11。
 - MTP 下 verify 的中间状态缓冲不进主机层（不需要）。KDA 份额是否被 spec 缓冲放大，未核实（§5）。
-- 170 breakable 预填充图、115 DCP 与 HiCache 的组合未验证（§4）。
+- 170 breakable 预填充图未验证；115 DCP 的主机搬移验证与完整服务恢复验证分开，见§11。
 
 ## 10. 复现
 
@@ -194,3 +199,15 @@ python3 scripts/engine/tree.py HEAD /tmp/t180      # fresh output directory; pri
 scripts/tests/hicache180/run_tests.sh /tmp/t180 python3  # Python environment must have torch and SGLang dependencies
 ```
 上游原始 diff：`refs/pr40913.diff`、`pr40914.diff`、`pr40915.diff`、`pr38212.diff`（本补丁使用）；`pr40134.diff`（未采用，§2）；`pr38474.diff`（KL 测试设计，参考）。
+
+## 11. DCP 与 packed NextN（2026-09-26）
+
+`MLATokenToKVPoolHost`已有物理行、逻辑行和owner-stride地址转换。本次把DSA indexer主机池改为覆盖`anchor.logical_size`，与设备上复制式indexer一致；host预算每个物理latent行计入W份indexer，防止扩池后突破`--hicache-size`。传输字节统计按latent逻辑token数/W计费，indexer和KDA保持原统计单位。
+
+允许组合限定为同checkpoint的GLM目标与单层NextN、EAGLE/NEXTN、topk=1；packed池的行宽、dtype、页和层映射仍由assembler校验。独立draft、树式draft、L3、LMCache等原有不支持组合继续明确拒绝。
+
+独立复核修正：HiCache 参数检查先于 speculative 默认值解析，因此这里也接纳尚未填写的 topk；该 GLM 架构随后解析为 `(steps=3, topk=1, draft_tokens=4)`。显式 topk>1 仍被拒绝，守卫不提前改写参数。回归入口：`python3 scripts/tests/test_dcp_mtp_review.py`，覆盖 NEXTN/EAGLE、W2/4/8 的默认值与原有拒绝边界。
+
+`test_dcp_round_trip_and_virtual_indexer_capacity`覆盖W=2/4/8、rank=0和末rank，包含packed草稿latent/indexer、KDA SSM/conv、高逻辑地址、源页毒化、异址恢复。这是主机搬运契约测试；W4/W8用单GPU分别构造各rank布局，不能当作分布式TP8或完整模型恢复证明。完整服务还需验证实际淘汰、恢复后续算、MTP三类图与flush。复现入口和验收范围见[工程计划](../../notes/plan-dcp-8card.md)。
+
+固定目标11层+草稿1层，每卡每逻辑token的host/KV字节是`12×(1024/W+132)`，KDA状态另计。容量倍数是预算推算；服务显存、传输并发和N@SLO须实测。

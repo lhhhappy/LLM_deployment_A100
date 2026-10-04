@@ -23,8 +23,14 @@ The base computes the DSA indexer logits with DeepGEMM FP8 kernels, which exist 
 - Kernels take runtime lengths and strides, so new prompt lengths do not trigger recompiles (50 random shapes, 0 JIT, F68).
 
 ## Switches
-`SGLANG_AX_SM80_INDEXER` (default 1; 0 restores the DeepGEMM path, which does not run on sm80),
-`SGLANG_AX_SM80_INDEXER_CHUNK_BYTES` (default 1 GiB; splits very large logits buffers).
+`SGLANG_AX_SM80_INDEXER` (default 1; 0 restores the DeepGEMM path, which does not run on sm80).
+2026-09-26 review repair: with an explicit 0, `_install_on_module` leaves the original module untouched,
+including absent attributes. Previously a missing base entry point could still call our kernel through the
+`_orig is None` fallback. Switches are startup configuration, not a runtime hot-swap API.
+
+`SGLANG_AX_SM80_INDEXER_CHUNK_BYTES` is a legacy parsed value, **not an effective logits memory limit** in the
+current 112/113 kernels: they allocate the complete fp32 output. Do not use it to budget peak memory.
+See the [S1/S2 review](../../notes/reports/review-s1s2-patches-0926.md) for the memory formula and optimization path.
 
 ## Evidence
 - A100 kernel tests (dev box): 88 numeric cases against the torch oracle, fp8 exhaustive decode, CUDA-graph replay bit-identical

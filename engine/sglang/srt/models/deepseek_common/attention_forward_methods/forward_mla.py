@@ -26,6 +26,7 @@ from sglang.srt.layers.dcp import (
     cp_lse_ag_out_rs_mla,
     dcp_a2a_lse_reduce,
 )
+from sglang.srt.layers.dcp.local_extend import uses_local_extend
 from sglang.srt.layers.logits_processor import get_in_autotune_dummy_run
 from sglang.srt.layers.radix_attention import unified_attention_with_output
 from sglang.srt.layers.utils.cp_utils import mla_use_prefill_cp
@@ -99,11 +100,18 @@ def is_dcp_mla_decode_phase(forward_batch: ForwardBatch) -> bool:
     return (
         forward_batch.forward_mode.is_decode()
         or forward_batch.forward_mode.is_target_verify()
+        # [ax] 115: the NextN draft writes the same owner-striped latent
+        # layout. Draft extend must gather Q and merge partial attention too.
+        or forward_batch.forward_mode.is_draft_extend_v2()
     )
 
 
 def is_mla_dcp_lse_base_on_e(attention_backend: Optional[str]) -> bool:
     return attention_backend in {"flashmla", "cutedsl_mla"}
+
+
+def is_dcp_mla_partial_phase(forward_batch: ForwardBatch) -> bool:
+    return is_dcp_mla_decode_phase(forward_batch) or uses_local_extend(forward_batch)
 
 
 if _is_cuda:
@@ -632,7 +640,7 @@ class DeepseekMLAForwardMixin:
 
         # all_gather q_pe, q_nope_out,take tp8 as an example， q_pe [B, H, ROPE_DIM], q_nope_out [B, H, NOPE_DIM] gathered to [B, H * dcp_world_size, ROPE_DIM] [B, H * dcp_world_size, NOPE_DIM] for decode batch, and all gather k_pe, k_nope for extend batch.
         if get_parallel().dcp_enabled:
-            if is_dcp_mla_decode_phase(forward_batch):
+            if is_dcp_mla_partial_phase(forward_batch):
                 if not q_replicate_active:
                     q_nope_out, q_pe = all_gather_q_for_mla_decode(
                         q_nope_out=q_nope_out,
@@ -716,7 +724,7 @@ class DeepseekMLAForwardMixin:
                     topk_indices=topk_indices,
                 )
                 attn_output = fusion_plan.attn_output_buf
-            elif is_dcp_mla_decode_phase(forward_batch):
+            elif is_dcp_mla_partial_phase(forward_batch):
                 # set return_lse=True to correct attn_output
                 attn_output, lse = self.attn_mqa_for_dcp_decode(
                     q_nope_out,
@@ -765,7 +773,7 @@ class DeepseekMLAForwardMixin:
             )
 
         # correct attn_output with respect to lse from other ranks
-        if is_dcp_mla_decode_phase(forward_batch):
+        if is_dcp_mla_partial_phase(forward_batch):
             attn_output = attn_output.view(
                 -1,
                 self.num_local_heads * get_parallel().attn_dcp_size,

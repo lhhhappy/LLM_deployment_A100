@@ -4,9 +4,14 @@ The 110 oracle rounds each head's GEMM result to bf16 BEFORE relu/weighting.
 Keep that rounding, and disable FMA in the epilogue. No tensor data reaches Python.
 v2: lengths and strides are runtime integers; only model/tile constants specialize.
 """
+import logging
+import os
 import torch
 import triton
 import triton.language as tl
+
+logger = logging.getLogger(__name__)
+_DECODE_LOOP_LOGGED = False
 
 
 @triton.jit
@@ -58,6 +63,46 @@ def _paged(Q, K, W, C, BT, O,
 
 
 @triton.jit
+def _paged_loop(Q, K, W, C, BT, O,
+                N, H: tl.constexpr, D: tl.constexpr, P, S, PAGE: tl.constexpr,
+                QB, QN, QH, QD, WB, WH, CB, CN, TB, TP, KB,
+                HH: tl.constexpr, DD: tl.constexpr, LOOP: tl.constexpr):
+    row = tl.program_id(0)
+    first = tl.program_id(1) * LOOP
+    b, n = row // N, row % N
+    ctx = tl.load(C + b * CB + n * CN).to(tl.int32)
+    tok = tl.arange(0, PAGE)
+    ds = tl.arange(0, DD)
+    hs = tl.arange(0, HH)
+    # Reuse the same decoded query and weights. Each page keeps the original
+    # dot-product shape and per-head BF16 rounding before the FP32 reduction.
+    if (first < P) & (first * PAGE < ctx):
+        q = _e4m3_to_bf16(tl.load(
+            Q + b * QB + n * QN + ds[:, None] * QD + hs[None, :] * QH,
+            mask=(ds[:, None] < D) & (hs[None, :] < H), other=0))
+        w = tl.load(W + row * WB + hs * WH, hs < H, other=0).to(tl.float32)
+        for j in range(LOOP):
+            page = first + j
+            pos = page * PAGE + tok
+            result = tl.full((PAGE,), 0, tl.float32)
+            if (page < P) & (page * PAGE < ctx):
+                physical = tl.maximum(tl.load(BT + b * TB + page * TP), 0).to(tl.int64)
+                kval = _e4m3_to_bf16(tl.load(
+                    K + physical * KB + tok[:, None] * D + ds[None, :],
+                    mask=ds[None, :] < D, other=0))
+                dots = tl.dot(kval, q).to(tl.bfloat16).to(tl.float32)
+                scale_ptr = (K + physical * KB + PAGE * D).to(tl.pointer_type(tl.float32))
+                scale = tl.load(scale_ptr + tok)
+                result = tl.sum(tl.maximum(dots, 0.0) * w[None, :], 1) * scale
+                result = tl.where(pos < ctx, result, 0.0)
+            tl.store(O + row.to(tl.int64) * S + pos, result, pos < S)
+    else:
+        # A shrinking replay must overwrite the old logits even on empty rows.
+        for j in range(LOOP):
+            pos = (first + j) * PAGE + tok
+            tl.store(O + row.to(tl.int64) * S + pos, 0.0, pos < S)
+
+@triton.jit
 def _ragged(Q, K, SC, W, KS, KE, O,
             NQ, NK, H: tl.constexpr, D: tl.constexpr,
             QQ, QH, QD,
@@ -103,6 +148,7 @@ def _ragged(Q, K, SC, W, KS, KE, O,
 def fp8_paged_mqa_logits(q, kv_cache, weights, context_lens, block_table, schedule_meta,
                          max_context_len, clean_logits=False, indices=None):
     """110 contract: [B*N,S] fp32; clean is ignored; negative pages clamp to zero."""
+    global _DECODE_LOOP_LOGGED
     assert indices is None
     if q.dim() == 3:
         q = q.unsqueeze(1)
@@ -119,14 +165,36 @@ def fp8_paged_mqa_logits(q, kv_cache, weights, context_lens, block_table, schedu
     if B * N == 0 or max_context_len == 0:
         return out
     with torch.cuda.device(q.device):
-        _paged[(B * N, triton.cdiv(max_context_len, page))](
+        # Reuse the decoded query/weights over four 64-key pages. Small grids
+        # retain the original kernel because the loop reduces CTA parallelism.
+        use_page_loop = (
+            H == 32
+            and os.environ.get("SGLANG_AX_SM80_INDEXER_DECODE_LOOP", "0") == "1"
+            and torch.cuda.get_device_capability(q.device) == (8, 0)
+            and (
+                (B * N >= 16 and max_context_len >= 8192)
+                or max_context_len >= 32768
+            )
+        )
+        kernel = _paged_loop if use_page_loop else _paged
+        pages_per_program = 4 if use_page_loop else 1
+        if use_page_loop and not _DECODE_LOOP_LOGGED:
+            logger.info(
+                "SM80 DSA decode page loop engaged: pages_per_program=4, "
+                "page_size=64, heads=32, rows=%d, logits_width=%d; "
+                "BF16 per-head rounding retained.",
+                B * N, max_context_len,
+            )
+            _DECODE_LOOP_LOGGED = True
+        kernel[(B * N, triton.cdiv(max_context_len, page * pages_per_program))](
             q.view(torch.uint8), cache, weights, ctx, block_table, out,
             N, H, D, block_table.shape[1], max_context_len, page,
             *q.stride(), *weights.stride(), ctx.stride(0),
             ctx.stride(1) if ctx.shape[1] == N else 0,
             *block_table.stride(), cache.stride(0),
             max(16, triton.next_power_of_2(H)), triton.next_power_of_2(D),
-            num_warps=4, enable_fp_fusion=False)
+            *([pages_per_program] if use_page_loop else []),
+            num_warps=4, num_stages=1 if use_page_loop else 3, enable_fp_fusion=False)
     return out
 
 

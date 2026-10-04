@@ -1,0 +1,10 @@
+{
+  "validity": "DIAGNOSTIC",
+  "requests": 21,
+  "tp": 2,
+  "dcp": 2,
+  "mtp": true,
+  "graph": true,
+  "hicache": true,
+  "limitations": "Scaled dummy model; no TP8 accuracy or SLO claim. Require mechanism log coverage."
+}

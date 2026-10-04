@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import (
     TYPE_CHECKING,
@@ -118,6 +119,30 @@ logger = logging.getLogger(__name__)
 _DSA_TRITON_PREFILL = get_bool_env_var("SGLANG_DSA_TRITON_PREFILL")
 _IS_GFX95 = is_gfx95_supported()
 
+# [ax] 118: every TileLang sparse-attention call (_forward_tilelang: prefill extend,
+# target verify, draft extend/decode, decode) runs the Triton kernel in
+# dsa/sparse_attention_triton.py instead. Default off.
+_AX_DSA_SPARSE_TRITON = get_bool_env_var("SGLANG_AX_DSA_SPARSE_TRITON")
+# [ax] 118: opt into only ordinary full-KV EXTEND calls. DCP's gathered
+# prefill has the same local-head contract; its partial/LSE calls do not.
+_AX_DSA_SPARSE_TRITON_PREFILL = get_bool_env_var(
+    "SGLANG_AX_DSA_SPARSE_TRITON_PREFILL"
+)
+# [ax] 181: reuse the caller's complete BF16 decode query. Default off.
+_AX_DSA_QUERY_VIEW = get_bool_env_var("SGLANG_AX_DSA_QUERY_VIEW")
+# Set once a backend in this process has validated and warmed up the 118 kernel.
+_ax118_engaged = False
+
+
+def ax118_state() -> str:
+    """[ax] 118 effective state for the scheduler's mechanism report."""
+    if not (_AX_DSA_SPARSE_TRITON or _AX_DSA_SPARSE_TRITON_PREFILL):
+        return "off:SGLANG_AX_DSA_SPARSE_TRITON_unset"
+    if _AX_DSA_SPARSE_TRITON_PREFILL:
+        return "on:prefill" if _ax118_engaged else "off:no_tilelang_dsa_prefill"
+    return "on" if _ax118_engaged else "off:no_tilelang_dsa_backend"
+
+
 if is_cuda():
     import deep_gemm
 
@@ -159,18 +184,34 @@ def _should_all_gather_dsa_trtllm_fp8_kv(
     return save_kv_cache and cos_sin_cache is not None and dsa_prefill_cp
 
 
-def _should_return_dsa_dcp_lse(*, forward_mode: ForwardMode, dcp_enabled: bool) -> bool:
-    return dcp_enabled and (forward_mode.is_decode() or forward_mode.is_target_verify())
+def _should_return_dsa_dcp_lse(
+    *, forward_mode: ForwardMode, dcp_enabled: bool, local_extend: bool = False
+) -> bool:
+    return dcp_enabled and (
+        forward_mode.is_decode()
+        or forward_mode.is_target_verify()
+        or forward_mode.is_draft_extend_v2()
+        or local_extend
+    )
 
 
 # [ax] 116: DCP address protocol for the DSA latent pool. req_to_token / page_table_1 / topk hold
 # VIRTUAL locs in [0, (size + page) * W); the latent write (set_mla_kv_buffer) keeps only
 # loc % W == rank at local row loc // W. The stock DSA backend read the local pool with virtual locs
 # (wrong rows, and out of bounds once a virtual loc >= local rows -> illegal memory access).
-def _ax116_dcp_local_indices(page_table_1: torch.Tensor) -> torch.Tensor:
+def _ax116_dcp_local_indices(
+    page_table_1: torch.Tensor, *, kpool_stride: int = 1
+) -> torch.Tensor:
     """[ax] 116 decode: keep this rank's locs as local rows, mask the rest (-1). Graph-safe."""
     parallel = get_parallel()
     w, r = parallel.attn_dcp_size, parallel.attn_dcp_rank
+    if kpool_stride > 1:
+        # [ax] 115: KPool expands every group in position order. Page-aligned
+        # virtual locs and column indices have the same residue modulo
+        # gcd(W, KPool); its tail starts at a whole-group boundary too.
+        # Drop columns that cannot belong to this rank before doing attention.
+        # This is not valid for an arbitrary ungrouped top-k list.
+        page_table_1 = page_table_1[:, r % kpool_stride :: kpool_stride]
     own = (page_table_1 >= 0) & (page_table_1 % w == r)
     return torch.where(own, page_table_1 // w, -1).to(torch.int32)
 
@@ -564,6 +605,28 @@ class DeepseekSparseAttnBackend(
         self.supports_mha_one_shot: bool = True
         self.dsa_prefill_impl: _DSA_IMPL_T = get_exec().kernel.dsa_prefill_backend
         self.dsa_decode_impl: _DSA_IMPL_T = get_exec().kernel.dsa_decode_backend
+        self.dcp_topk_column_stride = 1
+        if get_bool_env_var("SGLANG_AX_DCP_COMPACT_TOPK"):
+            if get_parallel().dcp_enabled:
+                if (
+                    self.dsa_index_kpool != 4
+                    or self.real_page_size % 4
+                    or self.dsa_prefill_impl != "tilelang"
+                    or self.dsa_decode_impl != "tilelang"
+                ):
+                    raise NotImplementedError(
+                        "DCP compact top-k requires KPool=4, aligned pages "
+                        "and TileLang prefill/decode"
+                    )
+                self.dcp_topk_column_stride = math.gcd(
+                    get_parallel().attn_dcp_size, self.dsa_index_kpool
+                )
+            logger.info(
+                "[ax] DCP top-k column stride=%d (W=%d, KPool=%d)",
+                self.dcp_topk_column_stride,
+                get_parallel().attn_dcp_size,
+                self.dsa_index_kpool,
+            )
         self.dsa_topk_backend: DSATopKBackend = DSATopKBackend.resolve(model_runner)
         if self.num_q_heads <= 64:
             self.flashmla_kv_num_q_heads = 64
@@ -673,6 +736,8 @@ class DeepseekSparseAttnBackend(
                 "--dsa-prefill-backend flashmla_sparse_q8 together with "
                 "--dsa-decode-backend flashmla_kv."
             )
+
+        self._ax118_init()
 
         # Q8KV8 per-call device-tensor caches, populated lazily on the first
         # Q8KV8 dispatch (no-ops for other backends).
@@ -2985,6 +3050,10 @@ class DeepseekSparseAttnBackend(
         metadata = self.forward_metadata
         assert causal, "DSA is causal only"
 
+        from sglang.srt.layers.dcp.local_extend import uses_local_extend
+
+        local_extend = uses_local_extend(forward_batch)
+
         dsa_impl = (
             self.dsa_decode_impl
             if (
@@ -3122,6 +3191,7 @@ class DeepseekSparseAttnBackend(
             and get_parallel().dcp_enabled
             and not forward_batch.forward_mode.is_target_verify()
             and not forward_batch.forward_mode.is_draft_extend_v2()
+            and not local_extend
         ):
             md = forward_batch.attn_dcp_metadata
             if md is None or md.dcp_kv_buffer is None:
@@ -3164,16 +3234,38 @@ class DeepseekSparseAttnBackend(
             if _should_return_dsa_dcp_lse(
                 forward_mode=forward_batch.forward_mode,
                 dcp_enabled=get_parallel().dcp_enabled,
+                local_extend=local_extend,
             ):
                 # [ax] 116: target-verify under DCP is a partial (LSE) pass like decode.
+                if local_extend:
+                    from sglang.kernels.ops.attention.dcp_local_indices import (
+                        local_dcp_indices,
+                    )
+
+                    ps = get_parallel()
+                    local_indices = local_dcp_indices(
+                        page_table_1,
+                        width=ps.attn_dcp_size,
+                        rank=ps.attn_dcp_rank,
+                        kpool_stride=math.gcd(ps.attn_dcp_size, self.dsa_index_kpool),
+                    )
+                else:
+                    local_indices = _ax116_dcp_local_indices(
+                        page_table_1, kpool_stride=self.dcp_topk_column_stride
+                    )
                 out, lse = self._forward_tilelang(
                     q_all=q_all,
                     kv_cache=kv_cache,
-                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    page_table_1=local_indices,
                     sm_scale=layer.scaling,
                     v_head_dim=layer.v_head_dim,
                     return_lse=True,
                 )
+                if local_extend:
+                    # Eager-only output owned by this call; no graph buffer or
+                    # caller aliases it. Avoid another T*H*W*D output allocation
+                    # while retaining zero contribution from an empty shard.
+                    return out.nan_to_num_(nan=0.0, posinf=0.0, neginf=0.0), lse
                 return torch.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0), lse
             return self._forward_tilelang(
                 q_all=q_all,
@@ -3182,6 +3274,7 @@ class DeepseekSparseAttnBackend(
                 sm_scale=layer.scaling,
                 v_head_dim=layer.v_head_dim,
                 return_lse=False,
+                is_prefill=forward_batch.forward_mode == ForwardMode.EXTEND,
             )
         elif dsa_impl in ("flashmla_sparse", "flashmla_sparse_q8"):
             if topk_transform_method == TopkTransformMethod.RAGGED:
@@ -3468,11 +3561,21 @@ class DeepseekSparseAttnBackend(
                 page_table_1=page_table_1,
             )
         elif dsa_impl == "tilelang":
-            # Cat-skip (HIP-only): when caller passes q_rope=None on HIP, q_all
-            # has already been set to a zero-copy view of q in the else branch
-            # above and we can reuse it directly. The `not _is_hip` clause keeps
-            # CUDA / MUSA paths byte-identical to pre-patch by always re-cat.
-            if q_all is None or not _is_hip:
+            # The BF16 CUDA kernel only reads Q. Its contiguous complete view
+            # needs no copy when there is no separate RoPE tail.
+            reuse_query_view = (
+                _AX_DSA_QUERY_VIEW
+                and not _AX_DSA_SPARSE_TRITON
+                and q_all is not None
+                and q_all.is_cuda
+                and not _is_hip
+                and q_all.is_contiguous()
+                and q_all.data_ptr() % 16 == 0
+                and q_all.dtype == torch.bfloat16
+                and kv_cache.dtype == torch.bfloat16
+                and q_all.shape[-1] == layer.v_head_dim
+            )
+            if q_all is None or (not _is_hip and not reuse_query_view):
                 q_all = concat_mla_absorb_q_general(q_nope, q_rope)
             ax116_lse = _should_return_dsa_dcp_lse(
                 forward_mode=forward_batch.forward_mode,
@@ -3485,7 +3588,9 @@ class DeepseekSparseAttnBackend(
                 out, lse = self._forward_tilelang(
                     q_all=q_all,
                     kv_cache=kv_cache,
-                    page_table_1=_ax116_dcp_local_indices(page_table_1),
+                    page_table_1=_ax116_dcp_local_indices(
+                        page_table_1, kpool_stride=self.dcp_topk_column_stride
+                    ),
                     sm_scale=layer.scaling,
                     v_head_dim=layer.v_head_dim,
                     return_lse=True,
@@ -4106,6 +4211,62 @@ class DeepseekSparseAttnBackend(
             causal=causal,
         )
 
+    def _ax118_init(self) -> None:
+        """[ax] 118: with the switch on and a TileLang DSA impl, check the supported
+        envelope and load every Triton kernel variant now, before CUDA-graph capture.
+        The prefill-only mode accepts DCP: its only call site is full-KV EXTEND,
+        after the existing DCP gather/remap. Partial attention, local extend,
+        verify and decode keep TileLang. All-phase mode still refuses DCP.
+        Deterministic inference is excluded because the split count (and so the
+        summation order) depends on the batch size."""
+        global _ax118_engaged
+        if _AX_DSA_SPARSE_TRITON and _AX_DSA_SPARSE_TRITON_PREFILL:
+            raise ValueError(
+                "118: SGLANG_AX_DSA_SPARSE_TRITON and "
+                "SGLANG_AX_DSA_SPARSE_TRITON_PREFILL are mutually exclusive"
+            )
+        if not (_AX_DSA_SPARSE_TRITON or _AX_DSA_SPARSE_TRITON_PREFILL):
+            return
+        if _AX_DSA_SPARSE_TRITON_PREFILL and self.dsa_prefill_impl != "tilelang":
+            return
+        if "tilelang" not in (
+            self.dsa_prefill_impl,
+            self.dsa_decode_impl,
+        ):
+            return
+        checks = [
+            (not is_cuda(), "not CUDA"),
+            (self.device_sm_major < 8, f"sm{self.device_sm_major}x"),
+            (self.kv_cache_dtype != torch.bfloat16, f"{self.kv_cache_dtype} KV cache"),
+            (self.qk_rope_head_dim != 0, f"qk_rope_head_dim={self.qk_rope_head_dim}"),
+            (get_parallel().dcp_enabled and _AX_DSA_SPARSE_TRITON, "DCP"),
+            (self.hisparse_coordinator is not None, "HiSparse"),
+            (
+                get_exec().deterministic.enable_deterministic_inference,
+                "deterministic inference",
+            ),
+        ]
+        reasons = [reason for unsupported, reason in checks if unsupported]
+        if reasons:
+            raise ValueError(
+                "Triton sparse attention (118) supports CUDA sm80+ with a bf16 KV "
+                "cache and qk_rope_head_dim=0, without HiSparse or deterministic "
+                "inference (DCP requires the PREFILL-only switch); "
+                f"got: {', '.join(reasons)}."
+            )
+        from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
+            warmup_sparse_attention_fwd,
+        )
+
+        warmup_sparse_attention_fwd(
+            num_heads=self.num_q_heads,
+            dim=self.kv_lora_rank,
+            # The indexer's output width: top-k plus index_kpool - 1 tail columns.
+            width=self.dsa_index_topk + self.dsa_index_kpool - 1,
+            device=torch.device(self.device),
+        )
+        _ax118_engaged = True
+
     def _forward_tilelang(
         self,
         q_all: torch.Tensor,
@@ -4114,7 +4275,37 @@ class DeepseekSparseAttnBackend(
         page_table_1: torch.Tensor,
         sm_scale: float,
         return_lse: bool = False,
+        is_prefill: bool = False,
     ) -> torch.Tensor:
+        use_prefill_triton = (
+            _AX_DSA_SPARSE_TRITON_PREFILL and is_prefill and not return_lse
+        )
+        if _AX_DSA_SPARSE_TRITON or use_prefill_triton:
+            # [ax] 118: takes the unpadded table, masks -1 itself. is_prefill is
+            # passed only by ordinary full-KV EXTEND, never a partial/LSE call.
+            from sglang.srt.layers.attention.dsa.sparse_attention_triton import (
+                sparse_attention_fwd,
+            )
+
+            if use_prefill_triton and not getattr(self, "_ax118_prefill_seen", False):
+                self._ax118_prefill_seen = True
+                logger.info(
+                    "[ax] 118 route=full_kv_prefill tokens=%d heads=%d width=%d dcp=%s",
+                    q_all.shape[0], q_all.shape[1], page_table_1.shape[-1],
+                    get_parallel().dcp_enabled,
+                )
+            result = sparse_attention_fwd(
+                q=q_all,
+                kv=kv_cache,
+                indices=page_table_1,
+                sm_scale=sm_scale,
+                d_v=v_head_dim,
+                return_lse=return_lse,
+            )
+            if return_lse:
+                return result[0], result[1].squeeze(0)
+            return result
+
         from sglang.kernels.ops.attention.dsa.tilelang_kernel import tilelang_sparse_fwd
 
         # KPool appends up to index_kpool - 1 live tail tokens to the fixed

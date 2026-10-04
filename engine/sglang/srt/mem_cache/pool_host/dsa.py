@@ -163,8 +163,11 @@ class DSAIndexerPoolHost(HostKVCache):
         self.layer_num = self.target_layer_num + len(self.mtp_draft_device_pools)
 
         self.indexer_dtype = storage_info.dtype
-        self.size = anchor_host.size
-        self.page_num = anchor_host.page_num
+        # [ax] 180: latent host rows are owner-striped under DCP, but index-K
+        # remains replicated. Indexer transfers use untranslated virtual locs,
+        # so this pool must cover the anchor's complete logical address space.
+        self.size = anchor_host.logical_size
+        self.page_num = self.size // self.page_size
 
         # uint8 storage, so element counts below are byte counts
         self.indexer_page_stride_size = storage_info.page_bytes(self.page_size)
@@ -216,6 +219,14 @@ class DSAIndexerPoolHost(HostKVCache):
         if buffer is not None and self.pin_memory and (_is_cuda or _is_hip):
             _cuda_host_unregister(buffer)
         self.index_k_with_scale_buffer = None
+        # layer_first views keep the entire host allocation alive even after
+        # its owning attribute is cleared. Release our views and staging
+        # allocations too; the device pool retains its own original buffers.
+        self.index_k_data_refs = []
+        self.index_k_data_ptrs = None
+        self.index_k_device_ptrs = None
+        self.packed_device_index_buffers = []
+        self.staging_buffer = None
         super().destroy()
 
     def get_size_per_token(self):

@@ -1,0 +1,98 @@
+{"kind": "start", "torch": "2.13.0+cu130", "gpu": "NVIDIA A100-SXM4-80GB", "argv": ["--base-fp8", "fp8_37e90023.py"], "commit": "37e90023+117-wip"}
+{"kind": "layer", "humming": true, "method": "Fp8HummingMoEMethod", "process_s": 10.012, "weight_bytes": 923324416, "load_transient_mb": 1192.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "first_humming_layer", "wall_s": 10.58}
+{"kind": "first_forward_after_load", "M": 4096, "s": 0.287}
+Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+{"kind": "layer", "humming": false, "method": "Fp8MoEMethod", "process_s": 8.287, "weight_bytes": 923320320, "load_transient_mb": 1159.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "check", "ok": true, "what": "switch selects the method"}
+{"kind": "layer", "humming": true, "method": "Fp8HummingMoEMethod", "process_s": 0.024, "weight_bytes": 923324416, "load_transient_mb": 1192.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "numerics", "M": 1, "inputs": "normal", "marlin": 0.005742, "humming": 0.005923, "humming_vs_marlin": 0.005607, "finite": true, "neg_no_shared_expert": 0.492, "neg_no_routed_scaling": 1.4991}
+{"kind": "check", "ok": true, "M": 1, "inputs": "normal", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 1, "inputs": "normal", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 1, "inputs": "normal", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 1, "inputs": "normal", "what": "negative controls rejected", "neg_no_shared_expert": 0.492, "neg_no_routed_scaling": 1.4991}
+{"kind": "numerics", "M": 32, "inputs": "normal", "marlin": 0.00606, "humming": 0.005971, "humming_vs_marlin": 0.004687, "finite": true, "neg_no_shared_expert": 0.7885, "neg_no_routed_scaling": 1.4996, "neg_expert_shifted_scales": 0.1741}
+{"kind": "check", "ok": true, "M": 32, "inputs": "normal", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 32, "inputs": "normal", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 32, "inputs": "normal", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 32, "inputs": "normal", "what": "negative controls rejected", "neg_no_shared_expert": 0.7885, "neg_no_routed_scaling": 1.4996, "neg_expert_shifted_scales": 0.1741}
+{"kind": "numerics", "M": 128, "inputs": "normal", "marlin": 0.006187, "humming": 0.006194, "humming_vs_marlin": 0.004666, "finite": true, "neg_no_shared_expert": 0.7434, "neg_no_routed_scaling": 1.4998}
+{"kind": "check", "ok": true, "M": 128, "inputs": "normal", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "normal", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "normal", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "normal", "what": "negative controls rejected", "neg_no_shared_expert": 0.7434, "neg_no_routed_scaling": 1.4998}
+{"kind": "numerics", "M": 128, "inputs": "clamp_heavy", "marlin": 0.006177, "humming": 0.00615, "humming_vs_marlin": 0.004317, "finite": true, "neg_no_shared_expert": 0.8042, "neg_no_routed_scaling": 1.5004, "neg_no_clamp": 0.7626}
+{"kind": "check", "ok": true, "M": 128, "inputs": "clamp_heavy", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "clamp_heavy", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "clamp_heavy", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 128, "inputs": "clamp_heavy", "what": "negative controls rejected", "neg_no_shared_expert": 0.8042, "neg_no_routed_scaling": 1.5004, "neg_no_clamp": 0.7626}
+{"kind": "numerics", "M": 2048, "inputs": "normal", "marlin": 0.006149, "humming": 0.005995, "humming_vs_marlin": 0.004519, "finite": true, "neg_no_shared_expert": 0.7653, "neg_no_routed_scaling": 1.4999, "neg_expert_shifted_scales": 0.1793}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "normal", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "normal", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "normal", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "normal", "what": "negative controls rejected", "neg_no_shared_expert": 0.7653, "neg_no_routed_scaling": 1.4999, "neg_expert_shifted_scales": 0.1793}
+{"kind": "numerics", "M": 2048, "inputs": "clamp_heavy", "marlin": 0.00617, "humming": 0.005943, "humming_vs_marlin": 0.004084, "finite": true, "neg_no_shared_expert": 0.8097, "neg_no_routed_scaling": 1.5003, "neg_no_clamp": 0.7652, "neg_expert_shifted_scales": 0.2008}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "clamp_heavy", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "clamp_heavy", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "clamp_heavy", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 2048, "inputs": "clamp_heavy", "what": "negative controls rejected", "neg_no_shared_expert": 0.8097, "neg_no_routed_scaling": 1.5003, "neg_no_clamp": 0.7652, "neg_expert_shifted_scales": 0.2008}
+{"kind": "numerics", "M": 8192, "inputs": "normal", "marlin": 0.006141, "humming": 0.005884, "humming_vs_marlin": 0.004111, "finite": true, "neg_no_shared_expert": 0.771, "neg_no_routed_scaling": 1.4999}
+{"kind": "check", "ok": true, "M": 8192, "inputs": "normal", "what": "finite outputs"}
+{"kind": "check", "ok": true, "M": 8192, "inputs": "normal", "what": "error vs fp32 reference"}
+{"kind": "check", "ok": true, "M": 8192, "inputs": "normal", "what": "humming error within 1.25x marlin"}
+{"kind": "check", "ok": true, "M": 8192, "inputs": "normal", "what": "negative controls rejected", "neg_no_shared_expert": 0.771, "neg_no_routed_scaling": 1.4999}
+{"kind": "check", "ok": true, "M": 1, "trial": 0, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006142, "eager": 0.006142, "replay_vs_eager": 0.0, "stale_output": 1.6337}
+{"kind": "check", "ok": true, "M": 1, "trial": 0, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.007091, "eager": 0.007091, "replay_vs_eager": 0.0, "stale_output": 1.6328}
+{"kind": "graph", "M": 1, "trial": 0, "marlin": {"replay": 0.006142, "eager": 0.006142, "replay_vs_eager": 0.0, "stale_output": 1.6337}, "humming": {"replay": 0.007091, "eager": 0.007091, "replay_vs_eager": 0.0, "stale_output": 1.6328}}
+{"kind": "check", "ok": true, "M": 1, "trial": 1, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006233, "eager": 0.006233, "replay_vs_eager": 0.0, "stale_output": 1.5315}
+{"kind": "check", "ok": true, "M": 1, "trial": 1, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006128, "eager": 0.006132, "replay_vs_eager": 0.000516, "stale_output": 1.5305}
+{"kind": "graph", "M": 1, "trial": 1, "marlin": {"replay": 0.006233, "eager": 0.006233, "replay_vs_eager": 0.0, "stale_output": 1.5315}, "humming": {"replay": 0.006128, "eager": 0.006132, "replay_vs_eager": 0.000516, "stale_output": 1.5305}}
+{"kind": "graph_time", "M": 1, "marlin": 0.0545, "humming": 0.0438}
+{"kind": "check", "ok": true, "M": 8, "trial": 0, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006007, "eager": 0.006007, "replay_vs_eager": 0.0, "stale_output": 1.3548}
+{"kind": "check", "ok": true, "M": 8, "trial": 0, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006159, "eager": 0.006068, "replay_vs_eager": 0.002789, "stale_output": 1.3551}
+{"kind": "graph", "M": 8, "trial": 0, "marlin": {"replay": 0.006007, "eager": 0.006007, "replay_vs_eager": 0.0, "stale_output": 1.3548}, "humming": {"replay": 0.006159, "eager": 0.006068, "replay_vs_eager": 0.002789, "stale_output": 1.3551}}
+{"kind": "check", "ok": true, "M": 8, "trial": 1, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006395, "eager": 0.006395, "replay_vs_eager": 0.0, "stale_output": 1.3803}
+{"kind": "check", "ok": true, "M": 8, "trial": 1, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006289, "eager": 0.006289, "replay_vs_eager": 0.0, "stale_output": 1.3805}
+{"kind": "graph", "M": 8, "trial": 1, "marlin": {"replay": 0.006395, "eager": 0.006395, "replay_vs_eager": 0.0, "stale_output": 1.3803}, "humming": {"replay": 0.006289, "eager": 0.006289, "replay_vs_eager": 0.0, "stale_output": 1.3805}}
+{"kind": "graph_time", "M": 8, "marlin": 0.1602, "humming": 0.1452}
+{"kind": "check", "ok": true, "M": 32, "trial": 0, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.005994, "eager": 0.005994, "replay_vs_eager": 0.0, "stale_output": 1.4046}
+{"kind": "check", "ok": true, "M": 32, "trial": 0, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006135, "eager": 0.00618, "replay_vs_eager": 0.003959, "stale_output": 1.4042}
+{"kind": "graph", "M": 32, "trial": 0, "marlin": {"replay": 0.005994, "eager": 0.005994, "replay_vs_eager": 0.0, "stale_output": 1.4046}, "humming": {"replay": 0.006135, "eager": 0.00618, "replay_vs_eager": 0.003959, "stale_output": 1.4042}}
+{"kind": "check", "ok": true, "M": 32, "trial": 1, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006217, "eager": 0.006217, "replay_vs_eager": 6e-06, "stale_output": 1.446}
+{"kind": "check", "ok": true, "M": 32, "trial": 1, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006116, "eager": 0.006172, "replay_vs_eager": 0.003357, "stale_output": 1.4455}
+{"kind": "graph", "M": 32, "trial": 1, "marlin": {"replay": 0.006217, "eager": 0.006217, "replay_vs_eager": 6e-06, "stale_output": 1.446}, "humming": {"replay": 0.006116, "eager": 0.006172, "replay_vs_eager": 0.003357, "stale_output": 1.4455}}
+{"kind": "graph_time", "M": 32, "marlin": 0.4034, "humming": 0.3751}
+{"kind": "check", "ok": true, "M": 64, "trial": 0, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006194, "eager": 0.006194, "replay_vs_eager": 0.0, "stale_output": 1.4102}
+{"kind": "check", "ok": true, "M": 64, "trial": 0, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006016, "eager": 0.006016, "replay_vs_eager": 0.0, "stale_output": 1.4098}
+{"kind": "graph", "M": 64, "trial": 0, "marlin": {"replay": 0.006194, "eager": 0.006194, "replay_vs_eager": 0.0, "stale_output": 1.4102}, "humming": {"replay": 0.006016, "eager": 0.006016, "replay_vs_eager": 0.0, "stale_output": 1.4098}}
+{"kind": "check", "ok": true, "M": 64, "trial": 1, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006094, "eager": 0.006094, "replay_vs_eager": 3.8e-05, "stale_output": 1.4067}
+{"kind": "check", "ok": true, "M": 64, "trial": 1, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.005883, "eager": 0.005883, "replay_vs_eager": 0.0, "stale_output": 1.4063}
+{"kind": "graph", "M": 64, "trial": 1, "marlin": {"replay": 0.006094, "eager": 0.006094, "replay_vs_eager": 3.8e-05, "stale_output": 1.4067}, "humming": {"replay": 0.005883, "eager": 0.005883, "replay_vs_eager": 0.0, "stale_output": 1.4063}}
+{"kind": "graph_time", "M": 64, "marlin": 0.5421, "humming": 0.493}
+{"kind": "check", "ok": true, "M": 128, "trial": 0, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006184, "eager": 0.006184, "replay_vs_eager": 7.7e-05, "stale_output": 1.41}
+{"kind": "check", "ok": true, "M": 128, "trial": 0, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.00615, "eager": 0.006144, "replay_vs_eager": 0.003832, "stale_output": 1.4096}
+{"kind": "graph", "M": 128, "trial": 0, "marlin": {"replay": 0.006184, "eager": 0.006184, "replay_vs_eager": 7.7e-05, "stale_output": 1.41}, "humming": {"replay": 0.00615, "eager": 0.006144, "replay_vs_eager": 0.003832, "stale_output": 1.4096}}
+{"kind": "check", "ok": true, "M": 128, "trial": 1, "path": "marlin", "what": "graph replay recomputes fresh inputs", "replay": 0.006125, "eager": 0.006126, "replay_vs_eager": 0.000112, "stale_output": 1.4087}
+{"kind": "check", "ok": true, "M": 128, "trial": 1, "path": "humming", "what": "graph replay recomputes fresh inputs", "replay": 0.006082, "eager": 0.006149, "replay_vs_eager": 0.003863, "stale_output": 1.4084}
+{"kind": "graph", "M": 128, "trial": 1, "marlin": {"replay": 0.006125, "eager": 0.006126, "replay_vs_eager": 0.000112, "stale_output": 1.4087}, "humming": {"replay": 0.006082, "eager": 0.006149, "replay_vs_eager": 0.003863, "stale_output": 1.4084}}
+{"kind": "graph_time", "M": 128, "marlin": 0.6488, "humming": 0.5898}
+{"kind": "timing", "M": 128, "marlin": {"host_ms": 0.4776, "wall_ms": 0.6924, "gpu_ms": 0.691, "transient_mb": 16.3}, "humming": {"host_ms": 0.5602, "wall_ms": 0.6174, "gpu_ms": 0.6161, "transient_mb": 10.0}, "gpu_speedup": 1.122}
+{"kind": "timing", "M": 2048, "marlin": {"host_ms": 0.4787, "wall_ms": 1.5208, "gpu_ms": 1.5192, "transient_mb": 189.1}, "humming": {"host_ms": 0.5618, "wall_ms": 1.3192, "gpu_ms": 1.3178, "transient_mb": 160.2}, "gpu_speedup": 1.153}
+{"kind": "timing", "M": 8192, "marlin": {"host_ms": 0.4939, "wall_ms": 5.8081, "gpu_ms": 5.8059, "transient_mb": 756.4}, "humming": {"host_ms": 0.5871, "wall_ms": 3.5133, "gpu_ms": 3.5114, "transient_mb": 640.4}, "gpu_speedup": 1.653}
+{"kind": "timing", "M": 16384, "marlin": {"host_ms": 0.5152, "wall_ms": 11.4257, "gpu_ms": 11.4224, "transient_mb": 1512.6}, "humming": {"host_ms": 0.5884, "wall_ms": 6.9019, "gpu_ms": 6.8995, "transient_mb": 1280.7}, "gpu_speedup": 1.656}
+{"kind": "host_overhead", "M": 128, "persistent_core": {"host_ms": 0.5183720029890537, "wall_ms": 0.6144266575574875, "gpu_ms": 0.6131631851196289}, "base_per_call_core": {"host_ms": 0.6744244135916233, "wall_ms": 0.690709799528122, "gpu_ms": 0.6891871929168701}}
+{"kind": "layer", "humming": false, "method": "Fp8MoEMethod", "process_s": 0.194, "weight_bytes": 923320320, "load_transient_mb": 1159.0, "params": {"w13_weight": [[289, 256, 2048], "torch.int32"], "w2_weight": [[289, 16, 16384], "torch.int32"], "w13_weight_scale": [[289, 32, 512], "torch.bfloat16"], "w2_weight_scale": [[289, 2, 4096], "torch.bfloat16"]}}
+{"kind": "check", "ok": true, "what": "switch off selects the reference method and Marlin runner", "fp8_sha256": "35df7f613d75e4e7"}
+{"kind": "check", "ok": true, "what": "bitwise-equal weights after loading", "params": ["w13_weight", "w13_weight_scale", "w2_weight", "w2_weight_scale"]}
+{"kind": "identity", "M": 1, "bitwise_equal_fixed_alignment": true, "repeat_rows_differing_free_alignment": 0}
+{"kind": "check", "ok": true, "M": 1, "what": "bitwise-equal outputs vs reference fp8.py"}
+{"kind": "identity", "M": 32, "bitwise_equal_fixed_alignment": true, "repeat_rows_differing_free_alignment": 0}
+{"kind": "check", "ok": true, "M": 32, "what": "bitwise-equal outputs vs reference fp8.py"}
+{"kind": "identity", "M": 128, "bitwise_equal_fixed_alignment": true, "repeat_rows_differing_free_alignment": 3}
+{"kind": "check", "ok": true, "M": 128, "what": "bitwise-equal outputs vs reference fp8.py"}
+{"kind": "identity", "M": 2048, "bitwise_equal_fixed_alignment": true, "repeat_rows_differing_free_alignment": 90}
+{"kind": "check", "ok": true, "M": 2048, "what": "bitwise-equal outputs vs reference fp8.py"}
+{"kind": "identity", "M": 8192, "bitwise_equal_fixed_alignment": true, "repeat_rows_differing_free_alignment": 198}
+{"kind": "check", "ok": true, "M": 8192, "what": "bitwise-equal outputs vs reference fp8.py"}
+{"kind": "done", "ok": true}
+[rank0]:[W925 18:43:24.051221451 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

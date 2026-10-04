@@ -1025,6 +1025,10 @@ class DecodeCudaGraphRunner(BaseCudaGraphRunner):
         return forward_batch, attn_backend, pp_proxy_tensors
 
     def capture(self) -> None:
+        # Adapters may inherit capture() without initializing metadata glue.
+        metadata_glue = getattr(self, "_metadata_glue", None)
+        if metadata_glue is not None:
+            metadata_glue.reset()
         # Warm up + autotune kernels once before capture (run-once across the
         # decode + prefill runners; see BaseRunner.warmup).
         self.warmup()
@@ -1087,9 +1091,75 @@ class DecodeCudaGraphRunner(BaseCudaGraphRunner):
         if self.enable_profile_cuda_graph:
             self._post_process_after_profile(prof)
         self._profiler = None
+        self._prepare_metadata_glue()
 
         # No pool-side pin to clear: the captured full-physical write loc rides the
         # backend's `ForwardMetadata.out_cache_loc_full_physical` (-> KVWriteLoc.full_loc).
+
+    def _prepare_metadata_glue(self) -> None:
+        glue = getattr(self, "_metadata_glue", None)
+        if glue is None or glue.disabled:
+            return
+        # Only audited plain decode paths. Other modes retain eager prep.
+        from sglang.srt.layers.attention.dsa_backend import DeepseekSparseAttnBackend
+        from sglang.srt.layers.attention.hybrid_linear_attn_backend import HybridLinearAttnBackend
+        from sglang.srt.layers.attention.linear.kda_backend import KDAAttnBackend
+
+        backend = self.attn_backend
+        args = self.model_runner.server_args
+        if not (
+            str(self.device).startswith("cuda")
+            and self.capture_forward_mode == ForwardMode.DECODE
+            and self.model_runner.spec_algorithm.is_none()
+            and torch.cuda.get_device_capability(self.device) == (8, 0)
+            and self.model_runner.kv_cache_dtype == torch.bfloat16
+            and get_parallel().attn_dcp_size == 1
+            and not envs.SGLANG_ENABLE_OVERLAP_PLAN_STREAM.get()
+            and not self.enable_two_batch_overlap
+            and not self.enable_pdmux
+            and self.model_runner.lora_manager is None
+            and not args.enable_linear_replayssm
+            and not args.enable_linear_replayssm_spec
+            and not args.enable_unified_memory
+            and self.model_runner.hisparse_coordinator is None
+            and type(backend) is HybridLinearAttnBackend
+            and type(backend.full_attn_backend) is DeepseekSparseAttnBackend
+            and type(backend.linear_attn_backend) is KDAAttnBackend
+        ):
+            logger.info("Metadata glue startup capture unsupported; using eager prep")
+            glue.disabled = True
+            return
+        with forward_context(ForwardContext(attn_backend=backend)):
+            for bs in reversed(self.capture_bs):
+                forward_batch, _, _ = self.capture_prepare(bs)
+                view = build_replay_fb_view(
+                    forward_batch=forward_batch,
+                    buffers=self.buffers,
+                    bs=bs,
+                    raw_bs=bs,
+                    num_tokens=bs * self.captured_req_width,
+                    seq_len_fill_value=self.seq_len_fill_value,
+                    capture_forward_mode=self.capture_forward_mode,
+                    is_encoder_decoder=self.is_encoder_decoder,
+                )
+                glue.prepare(backend, view, self._metadata_glue_key(backend, view))
+                if glue.disabled:
+                    break
+        logger.info(
+            "Metadata glue startup prepared %d keys; CUDA allocated=%.1f MiB "
+            "reserved=%.1f MiB",
+            len(glue._states),
+            torch.cuda.memory_allocated(self.device) / (1024 * 1024),
+            torch.cuda.memory_reserved(self.device) / (1024 * 1024),
+        )
+
+    def _metadata_glue_key(self, attn_backend, fb_view):
+        return (
+            id(attn_backend),
+            fb_view.batch_size,
+            str(self.capture_forward_mode),
+            str(fb_view.actual_forward_mode),
+        )
 
     def _capture_one_stream(self, stream_idx: Optional[int] = None) -> None:
         avail_mem = get_available_gpu_memory(
@@ -1416,11 +1486,7 @@ class DecodeCudaGraphRunner(BaseCudaGraphRunner):
             self._metadata_glue.run(
                 attn_backend,
                 fb_view,
-                (
-                    bs,
-                    str(self.capture_forward_mode),
-                    str(fb_view.actual_forward_mode),
-                ),
+                self._metadata_glue_key(attn_backend, fb_view),
             )
         else:
             attn_backend.init_forward_metadata_out_graph(fb_view)

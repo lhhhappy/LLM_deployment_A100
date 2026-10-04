@@ -79,6 +79,9 @@ def covered(
         and initial_state.stride(-1) == 1
         and initial_state.stride(-2) == K
         and initial_state.stride(-3) == V * K
+        # The CUDA state loads/stores use float4. Pool slots can be strided.
+        and initial_state.stride(0) % 4 == 0
+        and initial_state.storage_offset() % 4 == 0
         and out.is_contiguous()
         and ssm_state_indices.is_contiguous()
     )
