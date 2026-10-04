@@ -38,7 +38,8 @@ def cpu_namespace():
     import enum as enums
 
     scope = {"IntEnum": enums.IntEnum, "auto": enums.auto,
-             "_AX_KDA_PREFILL_CPU_LENGTH": False}
+             "_AX_KDA_PREFILL_CPU_LENGTH": False,
+             "_AX_KDA_SHARED_PREFIX_MASK": False}
     definitions = [n for n in source_nodes() if isinstance(n, ast.FunctionDef)
                    and n.name in ("_ax_kda_cpu_logical_tokens", "_ax_kda_resolve_logical_tokens")]
     tree = ast.Module(body=[enum, *definitions], type_ignores=[])
